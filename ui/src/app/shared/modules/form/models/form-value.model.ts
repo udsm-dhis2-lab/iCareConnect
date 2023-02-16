@@ -30,7 +30,12 @@ export class FormValue {
       if (field) {
         newValues[key] = {
           id: field.id,
-          value: field?.value ? field?.value : formValues[key],
+          value:
+            formValues[key]
+              ? formValues[key]
+              : field?.value
+              ? field?.value
+              : "",
           options: field.options,
           isFile: this.fileValues ? true : false,
           label: field?.label,

@@ -244,7 +244,7 @@ export class LabSamplesEffects {
                   }) || [])[0]?.timestamp,
                   orders: _.map(sample?.orders, (order) => {
                     const allocationStatuses = _.flatten(
-                      order.testAllocations.map((allocation) => {
+                      order?.testAllocations?.map((allocation) => {
                         return allocation?.statuses;
                       })
                     );
@@ -571,9 +571,10 @@ export class LabSamplesEffects {
       switchMap(([action, lisConfigs]: [any, any]) => {
         return this.sampleService
           .getLabSamplesByCollectionDates(
-            action?.datesParameters,
-            action?.startIndex,
-            action?.limit
+            action.datesParameters,
+            action?.category,
+            action?.hasStatus,
+            action.excludeAllocations
           )
           .pipe(
             map((response) => {
@@ -745,7 +746,7 @@ export class LabSamplesEffects {
                   }) || [])[0]?.timestamp,
                   orders: _.map(sample?.orders, (order) => {
                     const allocationStatuses = _.flatten(
-                      order.testAllocations.map((allocation) => {
+                      order?.testAllocations?.map((allocation) => {
                         return allocation?.statuses;
                       })
                     );

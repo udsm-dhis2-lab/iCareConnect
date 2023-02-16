@@ -468,4 +468,21 @@ export class ConceptsService {
       })
     );
   }
+
+  getConceptByMappingSource(source: string, fields?: string){
+   return from(
+      this.api.concept.getAllConcepts({
+        source: source,
+        v: !fields
+          ? "custom:(uuid,display,names,descriptions,setMembers:(uuid,display,datatype,attributes:(uuid,display,value,attributeType:(uuid,display)),answers:(uuid,display),setMembers:(uuid,display,attributes:(uuid,display,value,attributeType:(uuid,display)),datatype,answers:(uuid,display))))"
+          : fields,
+      })).pipe(
+      map((data) => {
+        return data;
+      }),
+      catchError((error) => {
+        return of(error);
+      })
+    );
+  }
 }

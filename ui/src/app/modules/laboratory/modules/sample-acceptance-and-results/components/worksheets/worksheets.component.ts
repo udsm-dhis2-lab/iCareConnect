@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
 import { catchError, map, tap } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
+import { WorkSheetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 
 @Component({
   selector: "app-worksheets",
@@ -16,7 +16,7 @@ export class WorksheetsComponent implements OnInit {
   errors: any[] = [];
   worksheetDefinitionLabelFormatReference$: Observable<string>;
   constructor(
-    private worksheetsService: WorkSeetsService,
+    private worksheetsService: WorkSheetsService,
     private systemSettingsService: SystemSettingsService
   ) {}
 

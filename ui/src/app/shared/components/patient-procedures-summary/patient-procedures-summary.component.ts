@@ -13,6 +13,7 @@ import { AppState } from "src/app/store/reducers";
 import { getGroupedObservationByConcept } from "src/app/store/selectors/observation.selectors";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-patient-procedures-summary",
@@ -50,6 +51,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    
     this.procedures$ = this.visitService.getActiveVisitProcedures(
       this.patientVisit.uuid,
       this.fields

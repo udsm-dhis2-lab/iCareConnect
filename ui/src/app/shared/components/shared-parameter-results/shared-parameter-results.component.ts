@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { groupBy, orderBy } from "lodash";
 
 @Component({
@@ -12,8 +12,11 @@ export class SharedParameterResultsComponent implements OnInit {
   @Input() count: number;
   @Input() units: string;
   @Input() hideParameterLabel: boolean;
+  @Input() allocation: any;
 
   parameterResultsDetails: any;
+  resultRemarks: any = {};
+  @Output() remarksData: EventEmitter<any> = new EventEmitter<any>();
   constructor() {}
 
   ngOnInit(): void {
@@ -41,9 +44,6 @@ export class SharedParameterResultsComponent implements OnInit {
         "parameterUuid"
       ),
     };
-    // console.log(this.order);
-    // console.log(this.parameter);
-    // console.log(this.count);
     this.parameterResultsDetails = this.order?.allocationsGroupedByParameter[
       this.parameter?.uuid
     ]?.map((result) => {
@@ -75,11 +75,29 @@ export class SharedParameterResultsComponent implements OnInit {
           (resultValue, index) => {
             return {
               ...resultValue,
+              creator: {
+                ...resultValue?.creator,
+                name: resultValue?.creator?.display?.split("(")[0],
+              },
+              resultsFedBy: {
+                ...resultValue?.creator,
+                name: resultValue?.creator?.display?.split("(")[0],
+              },
               toShow: index === 0,
             };
           }
         ),
       };
+    });
+    this.parameterResultsDetails?.forEach((parameterResultsDetail) => {
+      if (parameterResultsDetail?.results?.length > 0) {
+        const result = parameterResultsDetail?.results[0];
+        this.resultRemarks[this.order?.order?.uuid] =
+          (parameterResultsDetail?.statuses?.filter(
+            (status) => status?.result?.uuid === result?.uuid
+          ) || [])[0];
+        this.remarksData.emit(this.resultRemarks);
+      }
     });
   }
 }

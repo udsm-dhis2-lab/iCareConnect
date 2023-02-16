@@ -37,6 +37,7 @@ export class OrderResultsRendererComponent implements OnInit {
   @Input() orderTypes: any[];
   @Input() provider: any;
   @Input() iCareGeneralConfigurations: any;
+  // TODO: Softcode department for common lab tests
   @Input() commonLabTestsConceptReference: string =
     "26172ff2-c058-44a9-8b09-980b24f6e973";
   showCommonLabTests: boolean = false;
@@ -127,6 +128,7 @@ export class OrderResultsRendererComponent implements OnInit {
                 (orderType) => orderType?.conceptClassName === "Test"
               ) || [])[0]?.uuid,
               action: "NEW",
+              visit: this.visit?.uuid,
               patient: this.visit?.patientUuid,
               careSetting: !this.visit?.isAdmitted ? "OUTPATIENT" : "INPATIENT",
               orderer: this.provider?.uuid,
@@ -153,19 +155,16 @@ export class OrderResultsRendererComponent implements OnInit {
             (orderType) => orderType?.conceptClassName === "Test"
           ) || [])[0]?.uuid,
           action: "NEW",
+          visit: this.visit?.uuid,
           patient: this.visit?.patientUuid,
           careSetting: !this.visit?.isAdmitted ? "OUTPATIENT" : "INPATIENT",
           orderer: this.provider?.uuid,
           urgency: "ROUTINE",
           instructions: this.formValuesData["remarks"]?.value,
-          encounter: JSON.parse(localStorage.getItem("patientConsultation"))[
-            "encounterUuid"
-          ],
           type: "testorder",
         },
       ];
     }
-
     this.store.dispatch(
       createLabOrders({
         orders: labOrders,

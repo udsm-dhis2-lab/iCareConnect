@@ -1,5 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { flatten, omit, keyBy } from "lodash";
+import { Observable } from "rxjs";
+import { tap } from "rxjs/operators";
+import { GenerateMetadataLabelsService } from "src/app/core/services";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { DropdownOption } from "src/app/shared/modules/form/models/dropdown-option.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
@@ -61,9 +65,12 @@ export class BatchRegistrationComponent implements OnInit {
   batchsetDescription: any;
   errors: any[] = [];
   selectedBatch: any;
-  isFormInstantiated: boolean = false;
+  isFormInstantiated: boolean = false
 
-  constructor(private sampleService: SamplesService) {}
+  constructor(
+    private sampleService: SamplesService,
+    private systemSettingsService: SystemSettingsService
+  ) {}
 
   ngOnInit(): void {
     this.warning = {
@@ -132,6 +139,32 @@ export class BatchRegistrationComponent implements OnInit {
     setTimeout(() => {
       this.instantiateBatchRegistrationFields();
     }, 200);
+
+    if (!this.fromMaintenance) {
+      this.batchSampleCodeFormatReference$ = this.systemSettingsService
+        .getSystemSettingsDetailsByKey(
+          `iCare.laboratory.settings.batch.sample.registration.code.format`
+        )
+        .pipe(
+          tap((response) => {
+            if (response && !response?.error && response?.uuid) {
+              return response;
+            } else if (!response?.uuid && !response?.error) {
+              this.errors = [
+                ...this.errors,
+                {
+                  error: {
+                    message:
+                      "iCare.laboratory.settings.batch.sample.registration.code.format is not set",
+                  },
+                },
+              ];
+            } else {
+              this.errors = [...this.errors, response];
+            }
+          })
+        );
+    }
   }
 
   instantiateBatchRegistrationFields() {
@@ -422,7 +455,7 @@ export class BatchRegistrationComponent implements OnInit {
             field = {
               ...field,
               max: `${year}-${month}-${day}`,
-              disabled: true,
+              disabled: true
             };
             return field;
           }
@@ -433,7 +466,7 @@ export class BatchRegistrationComponent implements OnInit {
           if (field.allowCustomDateTime) {
             field = {
               ...field,
-              max: `${year}-${month}-${day}`,
+              // max: `${year}-${month}-${day}`,
             };
             return field;
           }
@@ -443,7 +476,7 @@ export class BatchRegistrationComponent implements OnInit {
           if (field.allowCustomDateTime) {
             field = {
               ...field,
-              max: `${year}-${month}-${day}`,
+              // max: `${year}-${month}-${day}`,
             };
             return field;
           }

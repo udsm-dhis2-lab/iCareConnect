@@ -1,9 +1,10 @@
 package org.openmrs.module.icare.store.services;
 
-import org.openmrs.DrugOrder;
 import org.openmrs.Location;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.store.models.*;
 import org.openmrs.module.icare.store.util.StockOutException;
 
@@ -37,9 +38,11 @@ public interface StoreService extends OpenmrsService {
 	
 	public List<RequisitionStatus> getRequisitionStatuses();
 	
-	public List<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid);
+	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager,
+	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection);
 	
-	public List<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid);
+	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager,
+	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection);
 	
 	public Requisition getRequestByUuid(String requisitionUuid);
 	
@@ -100,4 +103,32 @@ public interface StoreService extends OpenmrsService {
 	List<OrderStatus> getOrderStatus(String visitUuid);
 	
 	OrderStatus dispenseDrug(String drugOrderUuid, String location, String location1);
+	
+	StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception;
+	
+	public Supplier getSupplierByUuid(String supplierUuid);
+	
+	ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status);
+	
+	Supplier saveSupplier(Supplier supplier);
+	
+	List<Supplier> getSuppliers(Integer startIndex, Integer limit);
+	
+	StockInvoiceStatus saveStockInvoiceStatus(StockInvoiceStatus stockInvoiceStatus) throws Exception;
+	
+	List<StockInvoiceStatus> getStockInvoicesStatus(Integer startIndex, Integer limit, String q);
+	
+	StockInvoice updateStockInvoice(StockInvoice stockInvoice) throws Exception;
+	
+	StockInvoice getStockInvoice(String stockInvoiceUuid);
+	
+	StockInvoiceItem updateStockInvoiceItem(StockInvoiceItem stockInvoiceItem) throws Exception;
+	
+	StockInvoiceItem getStockInvoiceItemByUuid(String stockInvoiceItemUuid);
+	
+	StockInvoiceItem saveStockInvoiceItem(StockInvoiceItem stockInvoiceItem) throws Exception;
+	
+	StockInvoiceItemStatus saveStockInvoiceItemStatus(StockInvoiceItemStatus stockInvoiceItemStatus);
+	
+	Supplier updateSupplier(Supplier supplier) throws Exception;
 }

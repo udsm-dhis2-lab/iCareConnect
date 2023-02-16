@@ -51,7 +51,6 @@ export class InvestigationProcedureService {
       })
       .pipe(
         map((response) => {
-          console.log(response);
           return response;
         }),
         catchError((error) => of(error))
@@ -65,5 +64,9 @@ export class InvestigationProcedureService {
           "encounterUuid"
         ];
     return this.httpClientService.post(`encounter/${encounterId}`, data);
+  }
+
+  createEncounterWithOrders(data): Observable<any> {
+    return this.httpClientService.post(`encounter`, data);
   }
 }

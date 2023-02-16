@@ -261,6 +261,10 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 			result.setInstrument(instrument);
 		}
 		
+		if (map.get("resultStatus") != null) {
+			result.setResultStatus(map.get("resultStatus").toString());
+		}
+		
 		Concept concept = new Concept();
 		concept.setUuid(((Map) map.get("concept")).get("uuid").toString());
 		result.setConcept(concept);
@@ -393,6 +397,9 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	@Transient
 	private String remarks;
 	
+	@Transient
+	private String resultStatus;
+	
 	public String getStatus() {
 		return this.status;
 	}
@@ -415,6 +422,14 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	
 	public void setStatusRemarks(String remarks) {
 		this.remarks = remarks;
+	}
+	
+	public String getResultStatus() {
+		return resultStatus;
+	}
+	
+	public void setResultStatus(String resultStatus) {
+		this.resultStatus = resultStatus;
 	}
 	
 	/*

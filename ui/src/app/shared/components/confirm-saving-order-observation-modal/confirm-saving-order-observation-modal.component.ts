@@ -43,7 +43,9 @@ export class ConfirmSavingOrderObservationModalComponent implements OnInit {
       uuid: this.matchedEncounter?.uuid,
       obs: [
         {
+          person: data?.patient?.patient?.person?.uuid,
           concept: data?.concept?.uuid,
+          obsDatetime: new Date(),
           value: data?.value,
           comment: data?.comments,
           order: data?.uuid,
@@ -54,9 +56,9 @@ export class ConfirmSavingOrderObservationModalComponent implements OnInit {
     this.httpClient
       .post(`encounter/${encounterData?.uuid}`, encounterData)
       .subscribe((response) => {
+        this.savingData = false;
         if (response) {
           setTimeout(() => {
-            this.savingData = false;
             setTimeout(() => {
               this.dialogRef.close(true);
             }, 500);

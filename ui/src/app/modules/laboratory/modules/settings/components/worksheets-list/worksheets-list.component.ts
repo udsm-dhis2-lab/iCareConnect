@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
-import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
+import { WorkSheetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 
 @Component({
   selector: "app-worksheets-list",
@@ -9,7 +9,7 @@ import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/
 })
 export class WorksheetsListComponent implements OnInit {
   worksheets$: Observable<any>;
-  constructor(private worksheetsService: WorkSeetsService) {}
+  constructor(private worksheetsService: WorkSheetsService) {}
 
   ngOnInit(): void {
     this.getWorksheets();

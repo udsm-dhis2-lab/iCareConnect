@@ -5,6 +5,7 @@ package org.openmrs.module.icare.laboratory.models;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.hibernate.annotations.DiscriminatorFormula;
 import org.openmrs.*;
 import org.openmrs.module.icare.core.JSONConverter;
 import org.openmrs.module.icare.core.utils.ChildIdOnlyDeserializer;
@@ -22,6 +23,8 @@ import static javax.persistence.GenerationType.IDENTITY;
  */
 @Entity
 @Table(name = "lb_sample")
+@DiscriminatorFormula("0")
+@DiscriminatorValue("0")
 public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSONConverter {
 	
 	@Id
@@ -158,7 +161,7 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 		for (SampleOrder sampleOrder : this.getSampleOrders()) {
 			
 			if (!sampleOrder.getOrder().getVoided()) {
-				orders.add(sampleOrder.toMap());
+				orders.add(sampleOrder.toMap(false));
 			}
 		}
 		

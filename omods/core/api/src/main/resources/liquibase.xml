@@ -3890,6 +3890,674 @@
                 referencedTableName="lb_batch_sample"/>
     </changeSet>
 
+    <changeSet id="create_st_supplier" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_supplier"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_supplier table</comment>
+        <createTable tableName="st_supplier">
+            <column name="supplier_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="supplier_id_pk"/>
+            </column>
+            <column name="name" type="TEXT"/>
+            <column name="description" type="TEXT"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
 
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_supplier"
+                constraintName="st_supplier_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_supplier"
+                constraintName="st_supplier_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+    </changeSet>
+
+    <changeSet id="create_st_supplier_attribute_type" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_supplier_attribute_type"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_supplier_attribute_type table</comment>
+        <createTable tableName="st_supplier_attribute_type">
+            <column name="supplier_attribute_type_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="supplier_attribute_type_id_pk"/>
+            </column>
+            <column name="name" type="TEXT"/>
+            <column name="description" type="TEXT"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="retired" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_retired" type="DATE"/>
+            <column name="retired_by" type="INTEGER"/>
+            <column name="retired_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_supplier_attribute_type"
+                constraintName="st_supplier_attr_type_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_supplier_attribute_type"
+                constraintName="st_supplier_attr_type_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+    </changeSet>
+
+    <changeSet id="create_st_supplier_attribute" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_supplier_attribute"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_supplier_attribute table</comment>
+        <createTable tableName="st_supplier_attribute">
+            <column name="supplier_attribute_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="supplier_attribute_id_pk"/>
+            </column>
+            <column name="supplier_id" type="INTEGER"/>
+            <column name="supplier_attribute_type_id" type="INTEGER"/>
+            <column name="value" type="char(38)"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_supplier_attribute"
+                constraintName="st_supplier_attr_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_supplier_attribute"
+                constraintName="st_supplier_attr_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="supplier_id"
+                baseTableName="st_supplier_attribute"
+                constraintName="st_supplier_attr_supplier_id_st_supplier_fk"
+                referencedColumnNames="supplier_id"
+                referencedTableName="st_supplier"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="supplier_attribute_type_id"
+                baseTableName="st_supplier_attribute"
+                constraintName="st_supplier_attr_supplier_attr_id_st_supplier_attr_fk"
+                referencedColumnNames="supplier_attribute_type_id"
+                referencedTableName="st_supplier_attribute_type"/>
+
+    </changeSet>
+
+    <changeSet id="create_st_purchase_order" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_purchase_order"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_purchase_order table</comment>
+        <createTable tableName="st_purchase_order">
+            <column name="purchase_order_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="purchase_order_id_pk"/>
+            </column>
+            <column name="code" type="CHAR(38)"/>
+            <column name="description" type="CHAR(38)"/>
+            <column name="order_date" type="DATE"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_purchase_order"
+                constraintName="st_purchase_order_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_purchase_order"
+                constraintName="st_purchase_order_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+    </changeSet>
+
+    <changeSet id="create_st_purchase_order_item" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_purchase_order_item"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_purchase_order_item table</comment>
+        <createTable tableName="st_purchase_order_item">
+            <column name="purchase_order_item_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="purchase_order_item_id_pk"/>
+            </column>
+            <column name="item_id" type="INTEGER"/>
+            <column name="quantity" type="INTEGER"/>
+            <column name="purchase_order_id" type="INTEGER"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_purchase_order_item"
+                constraintName="st_purchase_order_item_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_purchase_order_item"
+                constraintName="st_purchase_order_item_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="purchase_order_id"
+                baseTableName="st_purchase_order_item"
+                constraintName="st_purchase_order_item_purchase_order_id_purchase_order_fk"
+                referencedColumnNames="purchase_order_id"
+                referencedTableName="st_purchase_order"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="item_id"
+                baseTableName="st_purchase_order_item"
+                constraintName="st_purchase_order_item_item_id_item_fk"
+                referencedColumnNames="item_id"
+                referencedTableName="item"/>
+
+    </changeSet>
+
+    <changeSet id="create_st_purchase_order_status" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_purchase_order_status"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_purchase_order_item table</comment>
+        <createTable tableName="st_purchase_order_status">
+            <column name="purchase_order_status_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="purchase_order_status_id_pk"/>
+            </column>
+            <column name="purchase_order_id" type="INTEGER"/>
+            <column name="status" type="TEXT"/>
+            <column name="remarks" type="TEXT"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_purchase_order_status"
+                constraintName="st_purchase_order_status_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_purchase_order_status"
+                constraintName="st_purchase_order_status_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="purchase_order_id"
+                baseTableName="st_purchase_order_status"
+                constraintName="st_purchase_order_status_purchase_order_id_purchase_order_fk"
+                referencedColumnNames="purchase_order_id"
+                referencedTableName="st_purchase_order"/>
+
+    </changeSet>
+
+
+    <changeSet id="create_st_stock_invoice" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_stock_invoice"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_stock_invoice table</comment>
+        <createTable tableName="st_stock_invoice">
+            <column name="stock_invoice_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="stock_invoice_id_pk"/>
+            </column>
+            <column name="invoice_number" type="CHAR(38)"/>
+            <column name="supplier_id" type="INTEGER"/>
+            <column name="purchase_order_id" type="INTEGER">
+                <constraints nullable="true"></constraints>
+            </column>
+            <column name="receiving_date" type="DATE"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_stock_invoice"
+                constraintName="st_stock_invoice_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_stock_invoice"
+                constraintName="st_stock_invoice_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="supplier_id"
+                baseTableName="st_stock_invoice"
+                constraintName="st_stock_invoice_supplier_id_supplier_fk"
+                referencedColumnNames="supplier_id"
+                referencedTableName="st_supplier"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="purchase_order_id"
+                baseTableName="st_stock_invoice"
+                constraintName="st_stock_invoice_purchase_order_id_st_purchase_order_fk"
+                referencedColumnNames="purchase_order_id"
+                referencedTableName="st_purchase_order"/>
+
+    </changeSet>
+
+    <changeSet id="create_st_stock_invoice_attribute_type" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_stock_invoice_attribute_type"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_stock_invoice_attribute_type table</comment>
+        <createTable tableName="st_stock_invoice_attribute_type">
+            <column name="stock_invoice_attribute_type_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="stock_invoice_attribute_type_id_pk"/>
+            </column>
+            <column name="name" type="TEXT"/>
+            <column name="description" type="TEXT"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="retired" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_retired" type="DATE"/>
+            <column name="retired_by" type="INTEGER"/>
+            <column name="retired_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_stock_invoice_attribute_type"
+                constraintName="st_stock_invoice_attr_type_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_stock_invoice_attribute_type"
+                constraintName="st_stock_invoice_attr_type_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+    </changeSet>
+
+    <changeSet id="create_st_stock_invoice_attribute" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_stock_invoice_attribute"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_supplier_attribute table</comment>
+        <createTable tableName="st_stock_invoice_attribute">
+            <column name="stock_invoice_attribute_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="stock_invoice_attribute_id_pk"/>
+            </column>
+            <column name="stock_invoice_id" type="INTEGER"/>
+            <column name="stock_invoice_attribute_type_id" type="INTEGER"/>
+            <column name="value" type="char(38)"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_stock_invoice_attribute"
+                constraintName="st_stock_invoice_attr_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_supplier_attribute"
+                constraintName="st_stock_invoice_attr_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="stock_invoice_id"
+                baseTableName="st_stock_invoice_attribute"
+                constraintName="st_stock_invoice_attr_stock_invoice_id_st_stock_invoice_fk"
+                referencedColumnNames="stock_invoice_id"
+                referencedTableName="st_stock_invoice"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="stock_invoice_attribute_type_id"
+                baseTableName="st_stock_invoice_attribute"
+                constraintName="st_stock_invoice_attr_invoice_attr_type_id_st_stock_inv_attr_fk"
+                referencedColumnNames="stock_invoice_attribute_type_id"
+                referencedTableName="st_stock_invoice_attribute_type"/>
+
+    </changeSet>
+
+    <changeSet id="create_st_stock_invoice_item" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_stock_invoice_item"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_stock_invoice_item table</comment>
+        <createTable tableName="st_stock_invoice_item">
+            <column name="stock_invoice_item_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="stock_invoice_item_id_pk"/>
+            </column>
+            <column name="stock_invoice_id" type="INTEGER"/>
+            <column name="item_id" type="INTEGER"/>
+            <column name="batch_no" type="char(38)"/>
+            <column name="order_quantity" type="INTEGER"/>
+            <column name="batch_quantity" type="INTEGER"/>
+            <column name="expiry_date" type="DATE"/>
+            <column name="uom" type="INTEGER"/>
+            <column name="unit_price" type="DOUBLE"/>
+            <column name="amount" type="DOUBLE"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_stock_invoice_item"
+                constraintName="st_stock_invoice_item_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_stock_invoice_item"
+                constraintName="st_stock_invoice_item_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="stock_invoice_id"
+                baseTableName="st_stock_invoice_item"
+                constraintName="st_stock_invoice_item_st_inv_id_stock_invoice_fk"
+                referencedColumnNames="stock_invoice_id"
+                referencedTableName="st_stock_invoice"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="uom"
+                baseTableName="st_stock_invoice_item"
+                constraintName="st_stock_invoice_item_uom_concept_fk"
+                referencedColumnNames="concept_id"
+                referencedTableName="concept"/>
+
+    </changeSet>
+
+    <changeSet id="create_st_stock_invoice_status" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_stock_invoice_status"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_stock_invoice_status table</comment>
+        <createTable tableName="st_stock_invoice_status">
+            <column name="stock_invoice_status_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="stock_invoice_status_id_pk"/>
+            </column>
+            <column name="stock_invoice_id" type="INTEGER"/>
+            <column name="status" type="TEXT"/>
+            <column name="remarks" type="TEXT"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_stock_invoice_status"
+                constraintName="st_stock_invoice_status_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_stock_invoice_status"
+                constraintName="st_stock_invoice_status_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="stock_invoice_id"
+                baseTableName="st_stock_invoice_status"
+                constraintName="st_stock_invoice_status_st_invoice_id_st_stock_invoice_fk"
+                referencedColumnNames="stock_invoice_id"
+                referencedTableName="st_stock_invoice"/>
+
+    </changeSet>
+
+    <changeSet id="create_st_stock_invoice_item_status" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_stock_invoice_item_status"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_stock_invoice_status table</comment>
+        <createTable tableName="st_stock_invoice_item_status">
+            <column name="stock_invoice_item_status_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="stock_invoice_item_status_id_pk"/>
+            </column>
+            <column name="stock_invoice_item_id" type="INTEGER"/>
+            <column name="status" type="TEXT"/>
+            <column name="remarks" type="TEXT"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_stock_invoice_item_status"
+                constraintName="st_stock_invoice_item_status_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_stock_invoice_item_status"
+                constraintName="st_stock_invoice_item_status_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="stock_invoice_item_id"
+                baseTableName="st_stock_invoice_item_status"
+                constraintName="st_stock_invoice_item_status_st_invoice_id_st_stock_invoice_fk"
+                referencedColumnNames="stock_invoice_item_id"
+                referencedTableName="st_stock_invoice_item"/>
+
+    </changeSet>
+
+    <changeSet id="update_st_stock_invoice_item_add_column_location" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice_item
+            ADD COLUMN location_id INT,
+            ADD FOREIGN KEY(location_id) REFERENCES location(location_id);
+        </sql>
+    </changeSet>
 
 </databaseChangeLog>

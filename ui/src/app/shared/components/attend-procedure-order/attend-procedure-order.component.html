@@ -1,5 +1,4 @@
 <div
-  class="p-3"
   *ngIf="{
     currentBills: currentBills$ | async,
     patient: patient$ | async,
@@ -11,6 +10,7 @@
   <!-- {{ dialogData | json }} -->
   <mat-toolbar color="primary"> Attend procedures </mat-toolbar>
   <div
+    class="m-3"
     *ngIf="
       params?.currentBills &&
       params?.patient &&

@@ -18,16 +18,14 @@
                 <td>
                   <!-- {{ allocation?.formattedAllocation?.finalResult | json }} -->
                   <app-test-parameter-entry
-                    [parameterUuid]="allocation?.allocation?.parameter?.uuid"
-                    [allocation]="allocation?.allocation"
+                    [parameterUuid]="allocation?.parameter?.uuid"
+                    [allocation]="allocation"
                     [isLIS]="isLIS"
                     [relatedResult]="result"
                     [disabled]="disabled"
                     [finalResult]="allocation?.formattedAllocation?.finalResult"
                     [conceptNameType]="conceptNameType"
-                    (data)="
-                      getFedResult($event, result, allocation?.allocation)
-                    "
+                    (data)="getFedResult($event, result, allocation)"
                   ></app-test-parameter-entry>
                 </td>
               </tr>

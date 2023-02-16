@@ -74,13 +74,13 @@ export class RequisitionFormComponent implements OnInit {
                     (tag) => tag?.uuid === this.data?.mainStoreLocationTagUuid
                   ) || []
                 )?.length > 0) ||
-                (canRequestFromPharmacy &&
+                (!canRequestFromPharmacy &&
                   (
                     store?.tags?.filter(
                       (tag) => tag?.uuid === this.data?.pharmacyLocationTagUuid
                     ) || []
                   )?.length > 0) ||
-                (!canRequestFromMainStore &&
+                (canRequestFromMainStore &&
                   (
                     store?.tags?.filter(
                       (tag) => tag?.uuid === this.data?.mainStoreLocationTagUuid
@@ -98,6 +98,11 @@ export class RequisitionFormComponent implements OnInit {
                 label: store.name,
               };
             }
+            // return {
+            //   key: store.id,
+            //   value: store.id,
+            //   label: store.name,
+            // };
           })
           ?.filter((storeLocation) => storeLocation),
       }),

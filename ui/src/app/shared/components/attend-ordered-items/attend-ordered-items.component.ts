@@ -107,6 +107,7 @@ export class AttendOrderedItemsComponent implements OnInit {
           orderTypeName: this.orderTypeName,
           value: this.status[orderedItem?.concept?.uuid],
           comments: this.comments[orderedItem?.concept?.uuid],
+          patient: this.patient,
           encounters: this.encounters,
         },
       })

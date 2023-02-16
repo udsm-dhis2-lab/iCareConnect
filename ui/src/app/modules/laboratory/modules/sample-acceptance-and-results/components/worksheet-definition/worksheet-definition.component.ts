@@ -1,6 +1,6 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
 import { Observable, of } from "rxjs";
-import { WorkSeetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
+import { WorkSheetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
@@ -9,6 +9,12 @@ import { DatasetDataService } from "src/app/core/services/dataset-data.service";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { GenerateMetadataLabelsService } from "src/app/core/services";
+import { MatCheckboxChange } from "@angular/material/checkbox";
+// import jsPDF from "jspdf";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import htmlToPdfmake from "html-to-pdfmake";
 
 @Component({
   selector: "app-worksheet-definition",
@@ -34,21 +40,24 @@ export class WorksheetDefinitionComponent implements OnInit {
   isWorksheetRenderingReady: boolean = false;
   isComplete: boolean = false;
   maxLabelCharCount: number = 7;
-  currentLabelCharCount: number = 7;
+  currentLabelCharCount: number = 15;
   minLabelCharCount: number = 3;
 
   message: string;
   worksheetSelectionField: any;
   currentWorksheet: any;
   isFormValid: boolean = false;
+  expirationDateChecked: boolean = true;
+  searchingText: string;
+  @ViewChild("wsdefntable") pdfTable: ElementRef;
   constructor(
-    private worksheetsService: WorkSeetsService,
+    private worksheetsService: WorkSheetsService,
     private datasetDataService: DatasetDataService,
     private generateMetadataLabelsService: GenerateMetadataLabelsService
   ) {}
 
   ngOnInit(): void {
-    this.getWorksheetDefinitions();
+    this.getWorksheetDefinitions(this.datesParameters);
     this.createWorksheetDefinitionFields();
     this.getTestControls();
     this.createWorksheetSelectionField();
@@ -82,13 +91,6 @@ export class WorksheetDefinitionComponent implements OnInit {
         disabled: true,
         value: data?.code?.value,
       }),
-      new TextArea({
-        id: "description",
-        key: "description",
-        label: "Description",
-        value: data?.description?.value,
-        required: false,
-      }),
       new Textbox({
         id: "abbreviation",
         key: "abbreviation",
@@ -117,7 +119,32 @@ export class WorksheetDefinitionComponent implements OnInit {
         value: data?.lotNumber?.value,
         required: false,
       }),
+      new TextArea({
+        id: "description",
+        key: "description",
+        label: "Description",
+        value: data?.description?.value,
+        required: false,
+      }),
     ];
+  }
+
+  getWSDefns(event: any): void {
+    const searchingText = event ? event?.target?.value : "";
+    this.getWorksheetDefinitions(
+      this.expirationDateChecked
+        ? { ...this.datesParameters, q: searchingText }
+        : { q: searchingText }
+    );
+  }
+
+  setExpirationDate(event: MatCheckboxChange): void {
+    this.expirationDateChecked = event?.checked;
+    this.getWorksheetDefinitions(
+      this.expirationDateChecked
+        ? { ...this.datesParameters, q: this.searchingText }
+        : { q: this.searchingText }
+    );
   }
 
   onGetSelectedWorksheet(formValue: FormValue): void {
@@ -191,11 +218,11 @@ export class WorksheetDefinitionComponent implements OnInit {
                   if (response && !response?.error) {
                     this.saving = false;
                     this.currentWorksheetDefinition = null;
-                    this.getWorksheetDefinitions();
+                    this.getWorksheetDefinitions(this.datesParameters);
                     this.createWorksheetSelectionField();
                   } else {
                     this.saving = false;
-                    this.getWorksheetDefinitions();
+                    this.getWorksheetDefinitions(this.datesParameters);
                     this.createWorksheetSelectionField();
                   }
                 });
@@ -205,9 +232,9 @@ export class WorksheetDefinitionComponent implements OnInit {
     });
   }
 
-  getWorksheetDefinitions(): void {
+  getWorksheetDefinitions(parameters?: any): void {
     this.worksheetDefinitions$ =
-      this.worksheetsService.getWorksheetDefinitions();
+      this.worksheetsService.getWorksheetDefinitions(parameters);
   }
 
   getTestControls(): void {
@@ -241,42 +268,15 @@ export class WorksheetDefinitionComponent implements OnInit {
     };
   }
 
-  onSaveWorkSheetDefinition(event: Event): void {
-    this.saving = true;
-    this.generateMetadataLabelsService
-      .getLabMetadatalabels({
-        globalProperty: this.worksheetDefinitionLabelFormatReferenceUuid,
-        metadataType: "worksheetdefinition",
-      })
-      .subscribe((response) => {
-        if (response) {
-          this.worksheetDefnPayload = {
-            ...this.worksheetDefnPayload,
-            code: response[0],
-          };
-          console.log("worksheetDefnPayload", this.worksheetDefnPayload);
-          // this.worksheetsService
-          //   .createWorksheetDefinitions([this.worksheetDefnPayload])
-          //   .subscribe((response: any) => {
-          //     if (response && !response?.error) {
-          //       this.getWorksheetDefinitions();
-          //       this.createWorksheetDefinitionFields();
-          //       this.saving = false;
-          //     }
-          //   });
-        }
-      });
-  }
-
   setCurrentWorksheetDefn(event: Event, worksheetDefn: any): void {
     // event.stopPropagation();
     this.currentWorksheetDefinition = null;
+    this.message = null;
     this.isWorksheetRenderingReady = false;
     this.createWorksheetSelectionField(worksheetDefn?.worksheet);
     const wsDefnFields = worksheetDefn?.additionalFields
       ? JSON.parse(worksheetDefn?.additionalFields)
       : null;
-    console.log("wsDefnFields", wsDefnFields);
     this.createWorksheetDefinitionFields(
       wsDefnFields
         ? keyBy(
@@ -291,23 +291,54 @@ export class WorksheetDefinitionComponent implements OnInit {
     const matchedWorksheet = (this.worksheets?.filter(
       (worksheet) => worksheet?.uuid === worksheetDefn?.worksheet?.uuid
     ) || [])[0];
-    // console.log(worksheetDefn);
-    this.currentWorksheetDefinition = {
-      ...worksheetDefn,
-      worksheet: {
-        ...worksheetDefn?.worksheet,
-        ...{
-          ...matchedWorksheet,
-          columns: this.generateArrayOfItemsFromCount(
-            matchedWorksheet?.columns
-          ),
-          rows: this.generateArrayOfItemsFromCount(matchedWorksheet?.rows),
-        },
-      },
-    };
-    this.isWorksheetRenderingReady = true;
+    this.worksheetsService
+      .getWorksheetDefinitionsByUuid(worksheetDefn?.uuid)
+      .subscribe((response) => {
+        if (response && !response?.error) {
+          const worksheetDefnItems = {};
+          response?.worksheetSamples?.forEach((ws) => {
+            worksheetDefnItems[
+              ws?.row +
+                "-" +
+                ws?.column +
+                "-" +
+                (ws?.type === "SAMPLE" ? "sample" : "control")
+            ] = {
+              set: true,
+              value: { ...ws?.sample, label: ws?.sample?.display },
+            };
+          });
+          const additionalFields = JSON.parse(response?.additionFields);
+          const currentLabelCharCountField = (additionalFields?.filter(
+            (field) => field?.id === "currentLabelCharCount"
+          ) || [])[0];
+          this.currentLabelCharCount = currentLabelCharCountField
+            ? currentLabelCharCountField?.value
+            : this.currentLabelCharCount;
+          // console.log("worksheetDefnItems", worksheetDefnItems);
+          this.selectedRowsColumns = worksheetDefnItems;
+          this.isComplete = true;
+          this.currentWorksheetDefinition = {
+            ...worksheetDefn,
+            ...response,
+            worksheet: {
+              ...worksheetDefn?.worksheet,
+              ...{
+                ...matchedWorksheet,
+                columns: this.generateArrayOfItemsFromCount(
+                  matchedWorksheet?.columns
+                ),
+                rows: this.generateArrayOfItemsFromCount(
+                  matchedWorksheet?.rows
+                ),
+              },
+            },
+          };
+          this.isWorksheetRenderingReady = true;
 
-    this.generateDefaultWorksheetRowsColumns();
+          // this.generateDefaultWorksheetRowsColumns();
+        }
+      });
   }
 
   generateDefaultWorksheetRowsColumns(): void {
@@ -427,5 +458,103 @@ export class WorksheetDefinitionComponent implements OnInit {
   onCloseMessage(event: Event): void {
     event.stopPropagation();
     this.message = null;
+  }
+
+  printPDF(event: Event) {
+    event.stopPropagation();
+
+    const pdfTable = this.pdfTable.nativeElement;
+
+    const html = htmlToPdfmake(pdfTable.innerHTML);
+
+    const documentDefinition = {
+      pageMargins: [30, 60, 30, 80],
+      header: "WORKSHEET: " + this.currentWorksheetDefinition?.code,
+      footer: (currentPage, pageCount) => {
+        return {
+          table: {
+            body: [
+              [
+                {
+                  text: "Page " + currentPage + " of " + pageCount,
+                  alignment: "right",
+                  style: "normalText",
+                  margin: [0, 20, 50, 0],
+                },
+              ],
+            ],
+          },
+          layout: "noBorders",
+        };
+      },
+      content: html,
+      defaultStyle: {
+        fontSize: 12,
+      },
+      pageSize: "A4",
+      styles: {
+        header: {
+          fontSize: 6,
+          margin: [15, 20, 15, 10],
+        },
+      },
+    };
+    const fonts = null;
+    const vfs = null;
+    const tableLayouts = { layout: "fixed" };
+    pdfMake.fonts = fonts;
+
+    pdfMake.createPdf(documentDefinition, tableLayouts, fonts, vfs).print();
+    // pdfMake.createPdf(documentDefinition).download("filename.pdf");
+    // setTimeout(function () {
+    //   window.print();
+    // }, 500);
+
+    // var file = new Blob([data], { type: 'application/pdf' });
+    // var fileURL = URL.createObjectURL(file);
+
+    // // if you want to open PDF in new tab
+    // window.open(fileURL);
+    // var a = document.createElement('a');
+    // a.href = fileURL;
+    // a.target = '_blank';
+    // a.download = 'bill.pdf';
+    // document.body.appendChild(a);
+    // a.click();
+  }
+
+  public download(event: Event, id, filename): void {
+    event.stopPropagation();
+    var preHtml =
+      "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+    var postHtml = "</body></html>";
+    var html = preHtml + document.getElementById(id).innerHTML + postHtml;
+
+    var blob = new Blob(["\ufeff", html], {
+      type: "application/msword",
+    });
+
+    // Specify link url
+    var url =
+      "data:application/vnd.ms-word;charset=utf-8," + encodeURIComponent(html);
+
+    // Specify file name
+    filename = filename ? filename + ".doc" : "document.doc";
+
+    // Create download link element
+    var downloadLink = document.createElement("a");
+
+    document.body.appendChild(downloadLink);
+
+    // Create a link to the file
+    downloadLink.href = url;
+
+    // Setting the file name
+    downloadLink.download = filename;
+
+    //triggering the function
+    downloadLink.click();
+
+    document.body.removeChild(downloadLink);
   }
 }

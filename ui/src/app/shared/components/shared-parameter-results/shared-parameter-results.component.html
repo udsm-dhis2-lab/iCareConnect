@@ -16,9 +16,15 @@
                     <tr *ngIf="result?.toShow">
                       <td>
                         {{
-                          !result?.valueCoded?.display
+                          result?.valueCoded?.display
+                            ? result?.valueCoded?.display
+                            : result?.value
                             ? result?.value
-                            : result?.valueCoded?.display
+                            : result?.valueText
+                            ? result?.valueText
+                            : result?.valueNumeric
+                            ? result?.valueNumeric
+                            : ""
                         }}
 
                         <span
@@ -28,7 +34,9 @@
                           <em
                             >(By
                             {{
-                              result?.value ? result?.resultsFedBy?.name : "-"
+                              result?.resultsFedBy
+                                ? result?.resultsFedBy?.name
+                                : "-"
                             }}
                             On {{ result?.dateCreated | date: "medium" }})</em
                           >
