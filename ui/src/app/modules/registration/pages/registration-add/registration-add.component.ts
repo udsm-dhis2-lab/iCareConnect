@@ -385,13 +385,7 @@ export class RegistrationAddComponent implements OnInit {
     this.wardField = new Dropdown({
       id: "ward",
       key: "ward",
-      options: [
-        {
-          key: data?.ward,
-          value: data?.ward,
-          label: data?.ward,
-        },
-      ],
+      options: [{ key: data?.ward, value: data?.ward, label: data?.ward }],
       label: "Ward",
       value: data?.ward,
       searchControlType: "residenceLocation",
@@ -606,6 +600,25 @@ export class RegistrationAddComponent implements OnInit {
                   return attribute.attributeType.display === "kinPhone";
                 }
               )[0]?.value;
+            this.residenceField.value = this.residenceField.searchTerm = this
+              ?.patientInformation?.patient?.person?.preferredAddress
+              ?.cityVillage
+              ? this?.patientInformation?.patient?.person?.preferredAddress
+                  ?.cityVillage
+              : this?.patientInformation?.patient?.person?.preferredAddress
+                  ?.address2
+              ? this?.patientInformation?.patient?.person?.preferredAddress
+                  ?.address2
+              : null;
+            this.residenceField.searchTerm = this?.patientInformation?.patient
+              ?.person?.preferredAddress?.cityVillage
+              ? this?.patientInformation?.patient?.person?.preferredAddress
+                  ?.cityVillage
+              : this?.patientInformation?.patient?.person?.preferredAddress
+                  ?.address2
+              ? this?.patientInformation?.patient?.person?.preferredAddress
+                  ?.address2
+              : null;
             this.patient = {
               ...this.patient,
               fname: this.patientInformation?.fname
