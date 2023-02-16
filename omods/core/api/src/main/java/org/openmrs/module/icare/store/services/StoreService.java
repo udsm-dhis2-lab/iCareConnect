@@ -49,7 +49,7 @@ public interface StoreService extends OpenmrsService {
 	public Issue saveIssue(Issue issue) throws StockOutException;
 	
 	public IssueStatus saveIssueStatus(IssueStatus issueStatus);
-
+	
 	public IssueItemStatus saveIssueItemStatus(IssueItemStatus issueItemStatus);
 	
 	public List<Issue> getIssuesByIssueingLocation(String issueingLocationUuid);
@@ -141,4 +141,6 @@ public interface StoreService extends OpenmrsService {
 	RequisitionItemStatus saveRequisitionItemStatus(RequisitionItemStatus requisitionItemStatus);
 	
 	RequisitionItem updateRequisitionItem(RequisitionItem requisitionItem) throws Exception;
+	
+	public IssueItem getIssueItemByUuid(String IssueItemUuid);
 }

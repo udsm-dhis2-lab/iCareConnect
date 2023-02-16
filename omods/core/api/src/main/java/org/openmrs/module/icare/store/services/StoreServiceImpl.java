@@ -59,8 +59,10 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	StockInvoiceItemStatusDAO stockInvoiceItemStatusDAO;
 	
 	RequisitionItemStatusDAO requisitionItemStatusDAO;
-
+	
 	IssueItemStatusDAO issueItemStatusDAO;
+	
+	IssueItemDAO issueItemDAO;
 	
 	public void setLedgerDAO(LedgerDAO ledgerDAO) {
 		this.ledgerDAO = ledgerDAO;
@@ -133,11 +135,15 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	public void setRequisitionItemStatusDAO(RequisitionItemStatusDAO requisitionItemStatusDAO) {
 		this.requisitionItemStatusDAO = requisitionItemStatusDAO;
 	}
-
+	
 	public void setIssueItemStatusDAO(IssueItemStatusDAO issueItemStatusDAO) {
 		this.issueItemStatusDAO = issueItemStatusDAO;
 	}
-
+	
+	public void setIssueItemDAO(IssueItemDAO issueItemDAO) {
+		this.issueItemDAO = issueItemDAO;
+	}
+	
 	@Override
 	public ReorderLevel addReorderLevel(ReorderLevel reorderLevel) {
 		
@@ -294,19 +300,19 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		issueStatus.setRemarks("Items have been issued");
 		issueStatus.setStatus(IssueStatus.IssueStatusCode.ISSUED);
 		this.saveIssueStatus(issueStatus);
-
-		for(IssueItem issueItem : newIssue.getIssueItems()){
-			for(IssueItemStatus issueItemStatus : issueItem.getIssueItemStatuses()){
+		
+		for (IssueItem issueItem : newIssue.getIssueItems()) {
+			for (IssueItemStatus issueItemStatus : issueItem.getIssueItemStatuses()) {
 				issueItemStatus.setStatus(IssueItemStatus.IssueItemStatusCode.ISSUED.toString());
 				issueItemStatus.setRemarks("Item has been issued");
 				issueItemStatus.setIssueItem(issueItem);
 				this.saveIssueItemStatus(issueItemStatus);
 			}
-
+			
 		}
 		if (newIssue.getRequisition() != null) {
 			RequisitionStatus requisitionStatus = new RequisitionStatus();
-			requisitionStatus.setRemarks("Items have been received");
+			requisitionStatus.setRemarks("Items have been issued");
 			requisitionStatus.setRequisition(newIssue.getRequisition());
 			requisitionStatus.setStatus(RequisitionStatus.RequisitionStatusCode.ISSUED);
 			this.saveRequestStatus(requisitionStatus);
@@ -321,12 +327,12 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		return this.issueStatusDAO.save(issueStatus);
 		
 	}
-
+	
 	@Override
 	public IssueItemStatus saveIssueItemStatus(IssueItemStatus issueItemStatus) {
 		return this.issueItemStatusDAO.save(issueItemStatus);
 	}
-
+	
 	@Override
 	public List<Issue> getIssuesByIssueingLocation(String issueingLocationUuid) {
 		
@@ -378,6 +384,15 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			issueStatus.setRemarks("Items have been received");
 			issueStatus.setStatus(IssueStatus.IssueStatusCode.RECEIVED);
 			this.saveIssueStatus(issueStatus);
+			
+			for (IssueItem issueItem : receipt.getIssue().getIssueItems()) {
+				IssueItemStatus issueItemStatus = new IssueItemStatus();
+				issueItemStatus.setStatus(IssueItemStatus.IssueItemStatusCode.RECEIVED.toString());
+				issueItemStatus.setRemarks("Item has been received");
+				issueItemStatus.setIssueItem(issueItem);
+				this.saveIssueItemStatus(issueItemStatus);
+			}
+			
 			if (receipt.getIssue().getRequisition() != null) {
 				RequisitionStatus requisitionStatus = new RequisitionStatus();
 				requisitionStatus.setRemarks("Items have been received");
@@ -808,7 +823,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			        + " does not exist");
 		}
 		requisitionItem.setRequisition(requisition);
-
+		
 		RequisitionItem saveRequisitionItem = requisitionItemDAO.save(requisitionItem);
 		
 		if (requisitionItem.getRequisitionItemStatuses().size() > 0) {
@@ -822,7 +837,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			}
 		}
 		
-		return saveRequisitionItem ;
+		return saveRequisitionItem;
 	}
 	
 	@Override
@@ -865,6 +880,11 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		}
 		
 		return requisitionItemDAO.updateRequisitionItem(requisitionItem);
+	}
+	
+	@Override
+	public IssueItem getIssueItemByUuid(String issueItemUuid) {
+		return issueItemDAO.findByUuid(issueItemUuid);
 	}
 	
 	@Override

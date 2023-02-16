@@ -266,8 +266,8 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("The receiving location is store A", ((Map) issues.get(0).get("issuedLocation")).get("display")
 		        .toString(), is("store B"));
 		
-		assertThat("The issuing location is store B", ((Map) issues.get(0).get("issueingLocation")).get("display").toString(), is("store A"));
-
+		assertThat("The issuing location is store B", ((Map) issues.get(0).get("issueingLocation")).get("display")
+		        .toString(), is("store A"));
 		
 	}
 	
@@ -850,7 +850,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> createdRequisition = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("There is one created requisition item",
 		    ((Map) createdRequisition.get("item")).get("uuid").equals("8o00d43570-8y37-11f3-1234-08002007777"));
-
+		
 		//Update requisition Item
 		String dto2 = this.readFile("dto/store/requisition-item-update.json");
 		Map<String, Object> requisitionMap2 = (new ObjectMapper()).readValue(dto2, Map.class);
@@ -859,7 +859,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle2 = handle(newPostRequest2);
 		Map<String, Object> updateRequisition = (new ObjectMapper()).readValue(handle2.getContentAsString(), Map.class);
 		System.out.println(updateRequisition);
-
+		
 	}
 	
 	@Test

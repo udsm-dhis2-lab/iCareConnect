@@ -71,7 +71,7 @@ public class RequisitionItemDAO extends BaseDAO<RequisitionItem> {
 		}
 		
 		query.setParameter("uuid", requisitionItem.getUuid());
-
+		
 		System.out.println(queryStr);
 		
 		Integer success = query.executeUpdate();

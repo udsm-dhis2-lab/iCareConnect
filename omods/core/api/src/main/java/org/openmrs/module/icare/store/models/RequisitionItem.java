@@ -5,6 +5,7 @@ package org.openmrs.module.icare.store.models;
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.laboratory.models.TestAllocation;
+import org.openmrs.module.icare.store.util.Stockable;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -194,4 +195,5 @@ public class RequisitionItem extends BaseOpenmrsData implements java.io.Serializ
 	public void setId(Integer integer) {
 		
 	}
+	
 }
