@@ -385,13 +385,7 @@ export class RegistrationAddComponent implements OnInit {
     this.wardField = new Dropdown({
       id: "ward",
       key: "ward",
-      options: [
-        {
-          key: data?.ward,
-          value: data?.ward,
-          label: data?.ward,
-        },
-      ],
+      options: [{ key: data?.ward, value: data?.ward, label: data?.ward }],
       label: "Ward",
       value: data?.ward,
       searchControlType: "residenceLocation",
@@ -562,11 +556,16 @@ export class RegistrationAddComponent implements OnInit {
                 }
               )[0];
             this.patient["patientType"] =
-              otherIdentifierObject?.identifierType?.uuid ===
-              ("6e7203dd-0d6b-4c92-998d-fdc82a71a1b0" ||
-                "9f6496ec-cf8e-4186-b8fc-aaf9e93b3406")
-                ? otherIdentifierObject?.identifierType?.display?.split(" ")[0]
-                : "Other";
+              this.patientInformation?.patient?.person?.attributes.filter(
+                (attribute) => {
+                  return attribute.attributeType.display === "patientType";
+                }
+              )[0]?.value;
+            // otherIdentifierObject?.identifierType?.uuid ===
+            // ("6e7203dd-0d6b-4c92-998d-fdc82a71a1b0" ||
+            //   "9f6496ec-cf8e-4186-b8fc-aaf9e93b3406")
+            //   ? otherIdentifierObject?.identifierType?.display?.split(" ")[0]
+            //   : "Other";
 
             this.selectedIdentifierType.id =
               otherIdentifierObject?.identifierType?.uuid;
@@ -595,6 +594,31 @@ export class RegistrationAddComponent implements OnInit {
                   );
                 }
               )[0]?.value;
+            this.primaryPhoneNumberNextOfKinFormField.value =
+              this.patientInformation?.patient?.person?.attributes.filter(
+                (attribute) => {
+                  return attribute.attributeType.display === "kinPhone";
+                }
+              )[0]?.value;
+            this.residenceField.value = this.residenceField.searchTerm = this
+              ?.patientInformation?.patient?.person?.preferredAddress
+              ?.cityVillage
+              ? this?.patientInformation?.patient?.person?.preferredAddress
+                  ?.cityVillage
+              : this?.patientInformation?.patient?.person?.preferredAddress
+                  ?.address2
+              ? this?.patientInformation?.patient?.person?.preferredAddress
+                  ?.address2
+              : null;
+            this.residenceField.searchTerm = this?.patientInformation?.patient
+              ?.person?.preferredAddress?.cityVillage
+              ? this?.patientInformation?.patient?.person?.preferredAddress
+                  ?.cityVillage
+              : this?.patientInformation?.patient?.person?.preferredAddress
+                  ?.address2
+              ? this?.patientInformation?.patient?.person?.preferredAddress
+                  ?.address2
+              : null;
             this.patient = {
               ...this.patient,
               fname: this.patientInformation?.fname
@@ -734,7 +758,10 @@ export class RegistrationAddComponent implements OnInit {
       .subscribe((personAttributeTypes) => {
         this.personAttributeTypes = personAttributeTypes;
         personAttributeTypes.forEach((personAttributeType) => {
-          this.patient[personAttributeType.name] = null;
+          if (!this.editMode) {
+            this.patient[personAttributeType.name] = null;
+          }
+          // this.patient[personAttributeType.name] = null;
         });
       });
   }
@@ -768,9 +795,9 @@ export class RegistrationAddComponent implements OnInit {
           person: {
             names: [
               {
-                givenName: this.patient.fname.toUpperCase(),
-                middleName: this.patient.mname.toUpperCase(),
-                familyName: this.patient.lname.toUpperCase(),
+                givenName: this.patient?.fname?.toUpperCase(),
+                middleName: this.patient?.mname?.toUpperCase(),
+                familyName: this.patient?.lname?.toUpperCase(),
               },
             ],
             gender: this.patient.gender,
@@ -1154,21 +1181,21 @@ export class RegistrationAddComponent implements OnInit {
 
   get residenceRegion(): any[] {
     return uniq(
-      this.patientLocation.map((obj) => {
+      this.patientLocation?.map((obj) => {
         return obj.REGION;
       })
     );
   }
   get residenceDistrict(): any[] {
     return uniq(
-      this.patientLocation.map((obj) => {
+      this.patientLocation?.map((obj) => {
         return obj.DISTRICT;
       })
     );
   }
   // addResidenceArea(area: string) {
   //   if (area?.length > 0) {
-  //     let areaUpper = area.toUpperCase();
+  //     let areaUpper = area?.toUpperCase();
   //     const found = DarRegion.some((el) => el.STREET === areaUpper);
   //     if (!found) {
   //       let obj = {

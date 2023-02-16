@@ -173,46 +173,63 @@ export class SampleAllocation {
         : null;
     const hasResultsGroup =
       formattedResults[0] && formattedResults[0]?.resultGroupUuid !== "NONE";
+
+    const formattedFinalResultPart = !hasResultsGroup
+      ? {
+          ...finalResult,
+          statuses:
+            this.allocation?.statuses?.filter(
+              (status) => status?.result?.uuid === finalResult?.uuid
+            ) || [],
+          authorizationStatuses:
+            this.allocation?.statuses?.filter(
+              (status) =>
+                status?.category === "RESULT_AUTHORIZATION" &&
+                status?.result?.uuid === finalResult?.uuid
+            ) || [],
+        }
+      : {
+          groups: Object.keys(finalResult)?.map((key) => {
+            return {
+              key,
+              results: finalResult[key],
+              authorizationStatuses:
+                this.allocation?.statuses?.filter(
+                  (status) =>
+                    status?.category === "RESULT_AUTHORIZATION" &&
+                    status?.result?.uuid ===
+                      orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
+                        ?.uuid
+                ) || [],
+              authorizationIsReady:
+                Number(this.allocation?.resultApprovalConfiguration) <=
+                (
+                  this.allocation?.statuses?.filter(
+                    (status) =>
+                      status?.category === "RESULT_AUTHORIZATION" &&
+                      status?.status == "AUTHORIZED" &&
+                      status?.result?.uuid ===
+                        orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
+                          ?.uuid
+                  ) || []
+                )?.length,
+            };
+          }),
+          statuses:
+            this.allocation?.statuses?.filter(
+              (status) => status?.result?.uuid === finalResult?.uuid
+            ) || [],
+          authorizationStatuses:
+            this.allocation?.statuses?.filter(
+              (status) =>
+                status?.category === "RESULT_AUTHORIZATION" &&
+                status?.result?.uuid === finalResult?.uuid
+            ) || [],
+        };
     return finalResult
       ? {
           ...{
-            ...(!hasResultsGroup
-              ? finalResult
-              : {
-                  groups: Object.keys(finalResult)?.map((key) => {
-                    return {
-                      key,
-                      results: finalResult[key],
-                      authorizationStatuses:
-                        this.allocation?.statuses?.filter(
-                          (status) =>
-                            status?.category === "RESULT_AUTHORIZATION" &&
-                            status?.result?.uuid ===
-                              orderBy(
-                                finalResult[key],
-                                ["dateCreated"],
-                                ["desc"]
-                              )[0]?.uuid
-                        ) || [],
-                      authorizationIsReady:
-                        Number(this.allocation?.resultApprovalConfiguration) <=
-                        (
-                          this.allocation?.statuses?.filter(
-                            (status) =>
-                              status?.category === "RESULT_AUTHORIZATION" &&
-                              (status?.status == "APPROVED" ||
-                                status?.status == "AUTHORIZED") &&
-                              status?.result?.uuid ===
-                                orderBy(
-                                  finalResult[key],
-                                  ["dateCreated"],
-                                  ["desc"]
-                                )[0]?.uuid
-                          ) || []
-                        )?.length,
-                    };
-                  }),
-                }),
+            ...formattedFinalResultPart,
           },
           statuses:
             this.allocation?.statuses?.filter(
@@ -225,16 +242,7 @@ export class SampleAllocation {
                 status?.result?.uuid === finalResult?.uuid
             ) || [],
           authorizationIsReady:
-            Number(this.allocation?.resultApprovalConfiguration) <=
-            (
-              this.allocation?.statuses?.filter(
-                (status) =>
-                  status?.category === "RESULT_AUTHORIZATION" &&
-                  (status?.status == "APPROVED" ||
-                    status?.status == "AUTHORIZED") &&
-                  status?.result?.uuid === finalResult?.uuid
-              ) || []
-            )?.length,
+            formattedFinalResultPart?.authorizationStatuses?.length > 0,
         }
       : null;
   }

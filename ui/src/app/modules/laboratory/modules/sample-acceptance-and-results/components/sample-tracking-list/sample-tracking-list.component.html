@@ -1,0 +1,28 @@
+<div
+  class="w-100"
+  *ngIf="{
+    acceptedSamples: acceptedSamples$ | async,
+    providerDetails: providerDetails$ | async
+  } as params"
+>
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="!params?.acceptedSamples"
+  ></mat-progress-bar>
+  <div class="loading-overlay" *ngIf="saving">
+    <div class="text-center">
+      <div>Saving ....</div>
+      <div class="mt-3 d-flex justify-content-center w-100">
+        <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="params?.acceptedSamples">
+    <app-shared-samples-list
+      [tabType]="'sample-tracking'"
+      [samples]="params?.acceptedSamples"
+      [LISConfigurations]="LISConfigurations"
+      [labSamplesDepartments]="labSamplesDepartments"
+    ></app-shared-samples-list>
+  </div>
+</div>

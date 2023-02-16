@@ -43,7 +43,7 @@
         [id]="field?.key"
         [name]="field?.key"
         [formControlName]="field?.key"
-        (change)="fileChangeEvent($event, field)"
+        (keyup)="fileChangeEvent($event, field)"
         multiple="multiple"
         accept=".pdf,.png,.jpeg,.jpg,.doc,.xls,.docx"
       />

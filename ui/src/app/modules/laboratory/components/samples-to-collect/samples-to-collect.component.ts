@@ -209,7 +209,7 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
         fulfillerStatus: "RECEIVED",
         encounter: order?.encounterUuid,
       };
-    })
+    });
     this.ordersService.updateOrdersViaEncounter(orders).subscribe({
       next: (order) => {
         return order;

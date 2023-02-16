@@ -1,13 +1,32 @@
 <div *ngIf="!forSetMember">
   <b>
     {{
-      labTest?.result && !keyedResults[labTest?.result?.concept?.uuid]
-        ? labTest?.result?.value
-        : keyedResults[labTest?.result?.concept?.uuid]
-        ? keyedResults[labTest?.result?.concept?.uuid]?.display
+      observationsKeyedByConcept[labTest?.concept?.uuid + "-" + labTest?.uuid]
+        ?.latest
+        ? !observationsKeyedByConcept[
+            labTest?.concept?.uuid + "-" + labTest?.uuid
+          ]?.latest?.valueObject
+          ? observationsKeyedByConcept[
+              labTest?.concept?.uuid + "-" + labTest?.uuid
+            ]?.latest?.value
+          : observationsKeyedByConcept[
+              labTest?.concept?.uuid + "-" + labTest?.uuid
+            ]?.latest?.valueObject?.display
         : "No result"
     }}
   </b>
+
+  <span>
+    {{
+      observationsKeyedByConcept &&
+      observationsKeyedByConcept[labTest?.concept?.uuid + "-" + labTest?.uuid]
+        ?.latest
+        ? observationsKeyedByConcept[
+            labTest?.concept?.uuid + "-" + labTest?.uuid
+          ]?.latest?.concept?.units
+        : ""
+    }}
+  </span>
   <span style="font-size: x-small">
     <em *ngIf="labTest?.result"
       >(Fed at:
@@ -20,17 +39,61 @@
   >
 </div>
 <div *ngIf="forSetMember">
-  <b *ngIf="!observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri">
+  <b
+    *ngIf="
+      !observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest
+        ?.value?.links?.uri
+    "
+  >
     {{
       observationsKeyedByConcept &&
-      observationsKeyedByConcept[concept?.uuid]?.latest
-        ? observationsKeyedByConcept[concept?.uuid]?.latest?.value
+      observationsKeyedByConcept[concept?.uuid + "-" + labTest?.uuid]?.latest
+        ? observationsKeyedByConcept[concept?.uuid + "-" + labTest?.uuid]
+            ?.latest?.value
         : "No result"
     }}
   </b>
-  <span *ngIf="observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri">
-    <a *ngIf="observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri.split('openmrs').length > 2" href="{{ '/openmrs' + observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri.split('openmrs')[2] }}"> Download Results </a>
-    <a *ngIf="observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri.split('openmrs').length == 2 " href="{{ '/openmrs' + observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri.split('openmrs')[1] }}"> Download Results
+  <span>
+    {{
+      observationsKeyedByConcept &&
+      observationsKeyedByConcept[concept?.uuid + "-" + labTest?.uuid]?.latest
+        ? observationsKeyedByConcept[concept?.uuid + "-" + labTest?.uuid]
+            ?.latest?.concept?.units
+        : ""
+    }}
+  </span>
+  <span
+    *ngIf="observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri"
+  >
+    <a
+      *ngIf="
+        observationsKeyedByConcept[
+          concept?.uuid
+        ]?.latest?.value?.links?.uri.split('openmrs').length > 2
+      "
+      href="{{
+        '/openmrs' +
+          observationsKeyedByConcept[
+            concept?.uuid
+          ]?.latest?.value?.links?.uri.split('openmrs')[2]
+      }}"
+    >
+      Download Results
+    </a>
+    <a
+      *ngIf="
+        observationsKeyedByConcept[
+          concept?.uuid
+        ]?.latest?.value?.links?.uri.split('openmrs').length == 2
+      "
+      href="{{
+        '/openmrs' +
+          observationsKeyedByConcept[
+            concept?.uuid
+          ]?.latest?.value?.links?.uri.split('openmrs')[1]
+      }}"
+    >
+      Download Results
     </a>
   </span>
 </div>

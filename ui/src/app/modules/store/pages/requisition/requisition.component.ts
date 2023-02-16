@@ -1,9 +1,8 @@
-import { ThrowStmt } from "@angular/compiler";
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
-import { Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
+import { Observable, of } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { RequisitionInput } from "src/app/shared/resources/store/models/requisition-input.model";
 import { RequisitionObject } from "src/app/shared/resources/store/models/requisition.model";
@@ -18,15 +17,9 @@ import {
 import { AppState } from "src/app/store/reducers";
 import {
   getCurrentLocation,
-  getLocations,
   getStoreLocations,
 } from "src/app/store/selectors";
 import { getAllStockableItems } from "src/app/store/selectors/pricing-item.selectors";
-import {
-  getActiveRequisitions,
-  getAllRequisitions,
-  getRequisitionLoadingState,
-} from "src/app/store/selectors/requisition.selectors";
 import { RequestCancelComponent } from "../../modals/request-cancel/request-cancel.component";
 import { RequisitionFormComponent } from "../../modals/requisition-form/requisition-form.component";
 
@@ -36,6 +29,7 @@ import { RequisitionFormComponent } from "../../modals/requisition-form/requisit
   styleUrls: ["./requisition.component.scss"],
 })
 export class RequisitionComponent implements OnInit {
+  @Input() currentLocation: any;
   requisitions$: Observable<RequisitionObject[]>;
   loadingRequisitions$: Observable<boolean>;
   stores$: Observable<any>;
@@ -49,14 +43,19 @@ export class RequisitionComponent implements OnInit {
   searchTerm: any;
   requisitions: RequisitionObject[];
   storedRequisitions: RequisitionObject[];
+  page: number = 1;
+  pageSize: number = 50;
+  pageSizeOptions: number[] = [5, 10, 25, 50, 100];
+  pager: any;
+  statuses: string[] = ['', "PENDING", "ISSUED", "CANCELLED", "REJECTED", "RECEIVED"];
+  selectedStatus: string;
+  showRequisitionForm: boolean;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
     private systemSettingsService: SystemSettingsService,
     private requisitionService: RequisitionService
-  ) {
-    this.store.dispatch(loadRequisitions());
-  }
+  ) {}
 
   ngOnInit() {
     this.referenceTagsThatCanRequestFromMainStoreConfigs$ =
@@ -77,11 +76,8 @@ export class RequisitionComponent implements OnInit {
         `iCare.store.settings.pharmacy.locationTagUuid`
       );
     this.getAllRequisition();
-    this.loadingRequisitions$ = this.store.pipe(
-      select(getRequisitionLoadingState)
-    );
+    this.currentStore$ = of(this.currentLocation);
     this.stores$ = this.store.pipe(select(getStoreLocations));
-    this.currentStore$ = this.store.pipe(select(getCurrentLocation));
     this.stockableItems$ = this.store.pipe(select(getAllStockableItems));
   }
 
@@ -89,39 +85,50 @@ export class RequisitionComponent implements OnInit {
     this.loadedRequisitions = false;
     this.searchTerm = event ? event?.target?.value : "";
     this.requisitions$ = this.requisitionService
-      .getAllRequisitions(
-        JSON.parse(localStorage.getItem("currentLocation"))?.uuid
+      .getRequisitions(
+        this.currentLocation?.id,
+        this.page,
+        this.pageSize,
+        this.selectedStatus,
+        'DESC'
       )
       .pipe(
         map((requisitions) => {
-          this.requisitions = requisitions;
-          this.storedRequisitions = requisitions;
+          this.pager = requisitions?.pager;
+          this.requisitions = requisitions?.requisitions;
+          this.storedRequisitions = requisitions?.requisitions;
           this.loadedRequisitions = true;
           return requisitions;
         })
       );
   }
 
-  onSearchRequisition(event?: any){
-    this.requisitions = undefined
+  onSearchRequisition(event?: any) {
+    this.requisitions = undefined;
     this.loadedRequisitions = false;
     this.searchTerm = event ? event?.target?.value : "";
     setTimeout(() => {
-      if (this.searchTerm?.length > 0){
+      if (this.searchTerm?.length > 0) {
         this.requisitions = this.storedRequisitions.filter((requisition) => {
-          if(requisition?.name?.toLowerCase().includes(this.searchTerm.toLowerCase())){
-            return requisition
+          if (
+            requisition?.name
+              ?.toLowerCase()
+              .includes(this.searchTerm.toLowerCase())
+          ) {
+            return requisition;
           }
         });
       } else {
-        this.requisitions = this.storedRequisitions
+        this.requisitions = this.storedRequisitions;
       }
       this.loadedRequisitions = true;
-    }, 200)
+    }, 200);
   }
 
   onNewRequest(e: Event, params: any): void {
     e.stopPropagation();
+
+    // this.showRequisitionForm = !this.showRequisitionForm
 
     if (params) {
       const {
@@ -134,7 +141,7 @@ export class RequisitionComponent implements OnInit {
         referenceTagsThatCanRequestFromPharmacyConfigs,
       } = params;
       const dialog = this.dialog.open(RequisitionFormComponent, {
-        width: "30%",
+        width: "25%",
         panelClass: "custom-dialog-container",
         data: {
           currentStore,
@@ -217,5 +224,17 @@ export class RequisitionComponent implements OnInit {
       );
       this.getAllRequisition();
     }
+  }
+
+  onPageChange(event) {
+    this.page =
+      event.pageIndex - this.page >= 0 ? this.page + 1 : this.page - 1;
+    this.pageSize = Number(event?.pageSize);
+    this.getAllRequisition();
+  }
+
+  onSelectStatus(e) {
+    this.selectedStatus = e?.value;
+    this.getAllRequisition();
   }
 }

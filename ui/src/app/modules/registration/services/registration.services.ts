@@ -81,7 +81,7 @@ export class RegistrationService {
   }
 
   getPersonAttributeTypes() {
-    return this.httpClient.get("personattributetype?v=full").pipe(
+    return this.httpClient.get("personattributetype?limit=60&v=full").pipe(
       map((res) => {
         return (res.results || [])
           .map((personAttributeType: any) => {

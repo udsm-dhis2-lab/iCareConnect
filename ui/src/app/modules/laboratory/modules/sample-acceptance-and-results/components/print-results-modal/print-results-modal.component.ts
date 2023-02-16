@@ -33,10 +33,10 @@ export class PrintResultsModalComponent implements OnInit {
   providerDetails$: Observable<any>;
   visit$: Observable<any>;
   referringDoctorAttributes$: any;
-  authorized: any;
   refferedFromFacility$: Observable<any>;
   obs$: Observable<any>;
   phoneNumber$: Observable<any>;
+  keyedRemarks: any;
   constructor(
     private patientService: PatientService,
     private visitService: VisitsService,
@@ -57,7 +57,6 @@ export class PrintResultsModalComponent implements OnInit {
           this.errorLoadingPhone = false;
           this.loadingPatientPhone = false;
           this.phoneNumber = response;
-          this.authorized = data.authorized;
         })
       );
     this.labConfigs = data?.labConfigs;
@@ -280,5 +279,9 @@ export class PrintResultsModalComponent implements OnInit {
     return allocation?.length > 0
       ? allocation[0]?.results[allocation[0]?.results?.length - 1]["value"]
       : "";
+  }
+
+  onGetRemarks(remarks: any): void {
+    this.keyedRemarks = remarks;
   }
 }
