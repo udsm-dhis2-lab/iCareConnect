@@ -65,7 +65,8 @@ export class BatchRegistrationComponent implements OnInit {
   batchsetDescription: any;
   errors: any[] = [];
   selectedBatch: any;
-  isFormInstantiated: boolean = false
+  isFormInstantiated: boolean = false;
+  batchSampleCodeFormatReference$: Observable<any>;
 
   constructor(
     private sampleService: SamplesService,
@@ -454,8 +455,8 @@ export class BatchRegistrationComponent implements OnInit {
           if (field.allowCustomDateTime) {
             field = {
               ...field,
-              max: `${year}-${month}-${day}`,
-              disabled: true
+              // max: `${year}-${month}-${day}`,
+              disabled: true,
             };
             return field;
           }
