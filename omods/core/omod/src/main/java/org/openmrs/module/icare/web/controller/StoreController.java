@@ -329,6 +329,17 @@ public class StoreController {
 		return storeService.saveIssueStatus(issueStatus).toMap();
 	}
 	
+	@RequestMapping(value = "issueitemstatus", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> addIssueItemStatus(@RequestBody Map<String, Object> issueItemStatusMap) {
+		
+		IssueItemStatus issueItemStatus = new IssueItemStatus().fromMap(issueItemStatusMap);
+		
+		issueItemStatus.setIssueItem(storeService.getIssueItemByUuid(issueItemStatus.getIssueItem().getUuid()));
+		
+		return storeService.saveIssueItemStatus(issueItemStatus).toMap();
+	}
+	
 	@RequestMapping(value = "issues", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getIssuesByLocation(@RequestParam(required = false) String issueingLocationUuid,

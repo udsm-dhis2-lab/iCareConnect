@@ -4853,14 +4853,6 @@
         </sql>
     </changeSet>
 
-    <changeSet id="update_st_issue_date_columns" author="dennis-kibahila" dbms="mysql">
-        <sql>
-            ALTER TABLE st_issue
-            MODIFY date_created DATETIME,
-            MODIFY date_changed DATETIME,
-            MODIFY date_voided DATETIME;
-        </sql>
-    </changeSet>
 
     <changeSet id="update_st_issue_status_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
@@ -4933,6 +4925,37 @@
                 referencedColumnNames="issue_id"/>
     </changeSet>
 
+
+    <changeSet id="add_columns_to_st_issue_item" author="dennis-kibahila" dbms="mysql">
+        <addColumn tableName="st_issue_item" >
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created"  type="DATETIME"/>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" defaultValueBoolean="false" type="BOOLEAN"/>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid"  type="char(38)" >
+                <constraints nullable="true"  unique="true"></constraints>
+            </column>
+
+        </addColumn>
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_issue_item"
+                constraintName="st_issue_item_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_requisition_item"
+                constraintName="st_issue_item_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+    </changeSet>
 
 
 </databaseChangeLog>
