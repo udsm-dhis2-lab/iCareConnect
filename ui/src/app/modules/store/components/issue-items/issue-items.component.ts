@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { MatCheckboxChange } from "@angular/material/checkbox";
 import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
-import { tap } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { getFilteredIssueItems } from "src/app/shared/helpers/issuings.helper";
 import { RequisitionService } from "src/app/shared/resources/store/services/requisition.service";
 import { RequisitionFormDialogComponent } from "../../modals/requisition-form-dialog/requisition-form-dialog.component";
 @Component({
@@ -12,11 +14,18 @@ import { RequisitionFormDialogComponent } from "../../modals/requisition-form-di
 })
 export class IssueItemsComponent implements OnInit {
   @Input() issue: any;
+  @Input() currentLocation: any;
   @Output() reloadList: EventEmitter<any> = new EventEmitter();
+
+  @Output() rejectRequest: EventEmitter<any> = new EventEmitter();
+  @Output() issueRequest: EventEmitter<any> = new EventEmitter();
+  @Output() selectionChange: EventEmitter<any> = new EventEmitter();
 
   errors: any[];
   specificRequisition$: Observable<any>;
   loadingRequisition: boolean = false;
+  selectedItems: any = {};
+
   constructor(
     private requisitionService: RequisitionService,
     private dialog: MatDialog
@@ -27,59 +36,35 @@ export class IssueItemsComponent implements OnInit {
     this.specificRequisition$ = this.requisitionService
       .getRequisitionByUuid(this.issue?.uuid)
       .pipe(
-        tap(() => {
+        map((response) => {
+          const items = getFilteredIssueItems(response?.requisitionItems, response?.issues);
           this.loadingRequisition = false;
+          return {
+            ...response,
+            items: items
+          }
         })
       );
   }
 
-  onUpdateRequsitionItem(requisitionItem, key?: string) {
-    if (!key) {
-      this.dialog
-        .open(RequisitionFormDialogComponent, {
-          width: "80%",
-          data: {
-            requisitionItem: requisitionItem,
-          },
-        })
-        .afterClosed()
-        .subscribe(() => {
-          this.reloadList.emit(this.issue);
-        });
-    }
+  onReject(e: Event, item: any) {
+    e.stopPropagation();
+    this.rejectRequest.emit(item);
+  }
 
-    if (key === "delete") {
-      this.dialog
-        .open(SharedConfirmationComponent, {
-          width: "25%",
-          data: {
-            modalTitle: "Are you sure to delete this Item",
-            modalMessage:
-              "This action is irreversible. Please, click confirm to delete and click cancel to cancel deletion.",
-          },
-        })
-        .afterClosed()
-        .subscribe((data) => {
-          if (data?.confirmed) {
-            const requisitionItemObject = {
-              ...requisitionItem,
-              voided: true,
-            };
+  onIssue(e, item: any) {
+    e.stopPropagation();
+    this.issueRequest.emit({
+      item: item,
+      currentStore: this.currentLocation,
+    });
+  }
 
-            this.requisitionService
-              .updateRequisitionItem(
-                requisitionItem?.uuid,
-                requisitionItemObject
-              )
-              .pipe(
-                tap((response) => {
-                  this.reloadList.emit(this.issue);
-                })
-              )
-              .subscribe();
-          }
-          this.reloadList.emit(this.issue);
-        });
-    }
+  getSelection(event: MatCheckboxChange, item: any): void {
+    this.selectionChange.emit({ event: event, item: item });
+  }
+
+  get selectedIssuesCount(): number {
+    return this.selectedItems ? Object.keys(this.selectedItems)?.length : 0;
   }
 }
