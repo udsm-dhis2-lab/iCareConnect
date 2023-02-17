@@ -44,9 +44,7 @@ export class IssuingService {
         map((issueResponse: any) => {
           return {
             ...omit(issueResponse, "results"),
-            issuings: (issueResponse?.results || [])?.map((issueItem) =>
-              new Issuing(issueItem).toJson()
-            ),
+            issuings: issueResponse?.results
           };
         })
       );

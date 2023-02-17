@@ -1,3 +1,4 @@
+import { IssueItemsComponent } from "./issue-items/issue-items.component";
 import { IssuingStockByStoreComponent } from "./issuing-stock-by-store/issuing-stock-by-store.component";
 import { LedgersListComponent } from "./ledgers-list/ledgers-list.component";
 import { NewRequisitionFormComponent } from "./new-requisition-form/new-requisition-form.component";
@@ -36,4 +37,5 @@ export const stockComponents: any[] = [
   StockInvoiceItemsComponent,
   NewRequisitionFormComponent,
   RequisitionItemsComponent,
+  IssueItemsComponent,
 ];
