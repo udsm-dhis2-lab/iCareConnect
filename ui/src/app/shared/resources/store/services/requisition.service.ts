@@ -41,7 +41,7 @@ export class RequisitionService {
   
   getRequisitionByUuid(uuid: string) : Observable<any> {
     return this.httpClient
-      .get(`store/requisition/${uuid}`)
+      .get(`store/request/${uuid}`)
       .pipe(
         map((requestResponse) => {
           return requestResponse

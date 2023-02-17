@@ -142,7 +142,69 @@
       (page)="onPageChange($event)"
     >
     </mat-paginator>
-    <div *ngIf="params?.issuingList?.length && currentLocation">
+
+    <mat-accordion>
+            <mat-expansion-panel
+              class="border mat-elevation-z0 mt-2"
+              *ngFor="let issue of params?.issuingList; let issueIndex = index"
+              [expanded]="viewIssueItems && viewIssueItems === issue?.uuid ? true : issueIndex === 0 ? true : false"
+            >
+              <mat-expansion-panel-header class="d-flex justify-content-between">
+                <mat-panel-title>
+                  <span>Issue Number: {{ issue?.code }} </span>
+                  <span class="ml-4">Requesting Store: {{ issue?.requestingLocation?.display }}</span>
+                  <span class="ml-4 text-small"><i>
+                    Requested on: {{ issue?.created | date:"dd/MM/yyyy" }}
+                  </i></span>
+                  <span class="ml-4">
+                    Status: {{ issue?.requisitionStatuses[issue?.requisitionStatuses?.length - 1]?.status ? issue?.requisitionStatuses[issue?.requisitionStatuses?.length - 1]?.status : 'DRAFT' }}
+                  </span>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <div class="row mt-2">
+                  <div class="col-4"></div>
+                  <div class="col-4"></div>
+                  <div class="col-4">
+                    <div class="float-right">
+                      <a 
+                        class="anchor-button ml-4" 
+                        color="primary"
+                        (click)="onViewIssueItems(issue?.uuid)"  
+                        matTooltip="{{viewIssueItems && viewIssueItems !== issue?.uuid ? 'View Issue Items' : 'Hide Issue Items' }}"
+                      >
+                        <mat-icon *ngIf="viewIssueItems && viewIssueItems === issue?.uuid">visibility_off</mat-icon>
+                          <mat-icon *ngIf="!viewIssueItems || viewIssueItems !== issue?.uuid">visibility</mat-icon>
+                      </a>
+                      <a 
+                        class="anchor-button ml-4" 
+                        color="primary"
+                        matTooltip="Issue all items"
+                      >
+                        <mat-icon>done_all</mat-icon>
+                      </a>
+                      <a
+                          class="anchor-button ml-4" 
+                          color="primary" 
+                          matTooltip="Reject all items"
+                        >
+                            <mat-icon>clear</mat-icon>
+                        </a>
+                      
+                    </div>
+                  </div>
+                </div>
+                <div class="inv-items-table container-fluid" *ngIf="viewIssueItems && viewIssueItems === issue?.uuid">
+                    <app-issue-items 
+                        [issue]="issue"
+                    ></app-issue-items>
+                </div>
+            </mat-expansion-panel>
+          </mat-accordion>
+
+
+
+
+    <!-- <div *ngIf="params?.issuingList?.length && currentLocation">
       <app-issuing-stock-by-store
         [issuingStock]="params?.issuingList"
         [currentStore]="currentLocation"
@@ -151,7 +213,7 @@
         (selectionChange)="getSelection($event)"
       >
       </app-issuing-stock-by-store>
-    </div>
+    </div> -->
     <div *ngIf="!params?.issuingList?.length && currentLocation">
       <table class="table table-striped">
         <tbody>

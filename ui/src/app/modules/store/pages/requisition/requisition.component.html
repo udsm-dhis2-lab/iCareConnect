@@ -210,7 +210,7 @@
                     Requested on: {{ requisition?.created | date:"dd/MM/yyyy" }}
                   </i></span>
                   <span class="ml-4">
-                    Status: {{ requisition?.requisitionStatuses[requisitionStatuses?.length - 1]?.status ? requisition?.requisitionStatuses[requisitionStatuses?.length - 1]?.status : 'DRAFT' }}
+                    Status: {{ requisition?.requisitionStatuses[requisition?.requisitionStatuses?.length - 1]?.status ? requisition?.requisitionStatuses[requisition?.requisitionStatuses?.length - 1]?.status : 'DRAFT' }}
                   </span>
                 </mat-panel-title>
               </mat-expansion-panel-header>
@@ -229,7 +229,7 @@
                           <mat-icon *ngIf="!viewRequisitionItems || viewRequisitionItems !== requisition?.uuid">visibility</mat-icon>
                       </a>
                       <!-- ATTENDED REQUISITION -->
-                      <ng-container *ngIf="requisition?.requisitionStatuses[requisitionStatuses?.length - 1]?.status === 'ATTENDED'">
+                      <ng-container *ngIf="requisition?.requisitionStatuses[requisition?.requisitionStatuses?.length - 1]?.status === 'ATTENDED'">
                         <a
                           class="anchor-button ml-4" 
                           color="primary" 
@@ -248,7 +248,7 @@
                         </a>
                       </ng-container>
                       <!-- DRAFT REQUISITION -->
-                      <ng-container *ngIf="requisition?.requisitionStatuses[requisitionStatuses?.length - 1]?.status === 'DRAFT' || !requisition?.requisitionStatuses[requisitionStatuses?.length - 1]">
+                      <ng-container *ngIf="requisition?.requisitionStatuses[requisition?.requisitionStatuses?.length - 1]?.status === 'DRAFT'">
                         <a
                           class="anchor-button ml-4" 
                           color="primary" 
@@ -268,7 +268,7 @@
                       </ng-container>
                       <!-- PENDING REQUISITION -->
                       <a 
-                      *ngIf="requisition?.requisitionStatuses[requisitionStatuses?.length - 1]?.status === 'PENDING'"
+                      *ngIf="requisition?.requisitionStatuses[requisition?.requisitionStatuses?.length - 1]?.status === 'PENDING'"
                         class="anchor-button ml-4" 
                         color="primary"
                         (click)="onCancelRequisition($event, requisition)"  

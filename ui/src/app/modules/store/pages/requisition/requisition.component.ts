@@ -143,7 +143,9 @@ export class RequisitionComponent implements OnInit {
 
   onNewRequest(e: Event, params: any): void {
     e.stopPropagation();
-
+    if(this.showRequisitionForm){
+      //TODO: Ask user is done with requesition
+    }
     this.showRequisitionForm = !this.showRequisitionForm;
 
     // if (params) {

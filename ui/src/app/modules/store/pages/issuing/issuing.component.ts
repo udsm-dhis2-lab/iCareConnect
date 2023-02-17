@@ -46,6 +46,7 @@ export class IssuingComponent implements OnInit {
   pager: any;
   statuses: string[] = ["", "PENDING", "CANCELLED", "REJECTED", "ISSUED"];
   selectedStatus: string;
+  viewIssueItems: string;
 
   constructor(
     private store: Store<AppState>,
@@ -287,5 +288,13 @@ export class IssuingComponent implements OnInit {
 
   get selectedIssuesCount(): number {
     return this.selectedIssues ? Object.keys(this.selectedIssues)?.length : 0;
+  }
+
+  onViewIssueItems(issueUuid: string){
+    if (this.viewIssueItems === issueUuid) {
+      this.viewIssueItems = undefined;
+    } else {
+      this.viewIssueItems = issueUuid;
+    }
   }
 }
