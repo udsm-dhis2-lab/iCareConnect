@@ -32,6 +32,15 @@
     (formUpdate)="onFormUpdate($event)"
   ></app-form>
   <angular-editor [(ngModel)]="htmlContent" [config]="config"></angular-editor>
+  <section class="mt-4">
+    <mat-checkbox
+      class="text-muted"
+      color="primary"
+      [checked]="useDefaultPeFilter"
+      (change)="onGetHasDefaultPeriodFilter($event)"
+      >Use default period filter?</mat-checkbox
+    >
+  </section>
   <section class="mt-2">
     <mat-checkbox
       class="text-muted"
