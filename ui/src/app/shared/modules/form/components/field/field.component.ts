@@ -69,6 +69,8 @@ export class FieldComponent implements AfterViewInit {
           v:
             this.field?.searchControlType === "concept"
               ? "custom:(uuid,display,datatype,conceptClass,mappings)"
+              : this.field?.searchControlType === "residenceLocation"
+              ? "custom:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display)))))"
               : "custom:(uuid,display)",
         },
         this.field?.searchControlType,

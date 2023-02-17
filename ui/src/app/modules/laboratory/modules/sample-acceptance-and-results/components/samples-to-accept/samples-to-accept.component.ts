@@ -57,7 +57,7 @@ export class SamplesToAcceptComponent implements OnInit {
   getSamples(): void {
     this.samplesToAccept$ = this.sampleService.getLabSamplesByCollectionDates(
       this.datesParameters,
-      null,
+      this.LISConfigurations?.isLIS ? "NOT ACCEPTED" : null,
       !this.LISConfigurations?.isLIS ? "NO" : "YES",
       this.excludeAllocations,
       null,
@@ -76,9 +76,9 @@ export class SamplesToAcceptComponent implements OnInit {
 
   onGetSelectedSampleDetails(sample: any, providerDetails: any): void {
     if (sample?.actionType === "accept") {
-      this.accept(sample?.sample, providerDetails);
+      this.accept(sample, providerDetails);
     } else {
-      this.reject(sample?.sample, providerDetails);
+      this.reject(sample, providerDetails);
     }
   }
 
@@ -107,17 +107,19 @@ export class SamplesToAcceptComponent implements OnInit {
           confirmationObject?.remarks &&
           confirmationObject?.remarks.length > 0
         ) {
-          const confirmationRemarks = {
-            sample: {
-              uuid: sample?.uuid,
+          const confirmationRemarks = [
+            {
+              sample: {
+                uuid: sample?.uuid,
+              },
+              user: {
+                uuid: this.userUuid,
+              },
+              remarks: confirmationObject?.remarks,
+              status: "ACCEPTANCE_REMARKS",
+              category: "ACCEPTANCE_REMARKS",
             },
-            user: {
-              uuid: this.userUuid,
-            },
-            remarks: confirmationObject?.remarks,
-            status: "ACCEPTANCE_REMARKS",
-            category: "ACCEPTANCE_REMARKS",
-          };
+          ];
           this.sampleService
             .saveSampleStatuses(confirmationRemarks)
             .subscribe((response) => {
