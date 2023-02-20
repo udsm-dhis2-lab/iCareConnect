@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
 import { Store } from "@ngrx/store";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
-import { map } from "rxjs/operators";
+import { map, take } from "rxjs/operators";
 import { AppState } from "src/app/store/reducers";
 import {
   getAllUSerRoles,
@@ -79,7 +79,7 @@ export class LaboratoryComponent implements OnInit {
     // this.store.dispatch(loadLISConfigurations());
 
     this.LISConfigurations$ = this.store.select(getLISConfigurations);
-    router.events.subscribe((currentRoute) => {
+    router.events.pipe(take(1)).subscribe((currentRoute) => {
       // console.log('this :: ', currentRoute instanceof NavigationEnd);
       if (currentRoute instanceof NavigationEnd) {
         // console.log(currentRoute);

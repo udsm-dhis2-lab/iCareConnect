@@ -32,10 +32,13 @@ export class SamplesService {
       specimenSources: any[];
       codedRejectionReasons: any[];
     },
-    acceptedBy?: string
+    acceptedBy?: string,
+    q?: string
   ): Observable<any> {
     let parameters = [];
     if (pagerInfo) {
+      parameters = [...parameters, "page=" + pagerInfo?.page];
+      parameters = [...parameters, "pageSize=" + pagerInfo?.pageSize];
     } else {
       parameters = [...parameters, "paging=false"];
     }
@@ -57,6 +60,10 @@ export class SamplesService {
       parameters = [...parameters, "acceptedBy=" + acceptedBy];
     }
 
+    if (q) {
+      parameters = [...parameters, "q=" + q];
+    }
+
     if (excludeAllocations) {
       parameters = [...parameters, "excludeAllocations=true"];
     } else {
@@ -69,17 +76,17 @@ export class SamplesService {
       )
       .pipe(
         map((response: any) => {
-          if (!pagerInfo) {
-            return response?.results?.map((result) =>
+          return {
+            pager: response?.pager,
+            results: response?.results?.map((result) =>
               new LabSample(
                 result,
                 otherParams?.departments,
                 otherParams?.specimenSources,
                 otherParams?.codedRejectionReasons
               ).toJSon()
-            );
-          } else {
-          }
+            ),
+          };
         })
       );
   }

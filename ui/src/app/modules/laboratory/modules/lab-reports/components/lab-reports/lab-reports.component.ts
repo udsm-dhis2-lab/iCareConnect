@@ -27,6 +27,8 @@ import { ExportService } from "src/app/shared/services/export.service";
 import { map } from "rxjs/operators";
 import { ExportDataService } from "src/app/core/services/export-data.service";
 import { MatSelectChange } from "@angular/material/select";
+import { Router } from "@angular/router";
+import { go } from "src/app/store/actions";
 
 @Component({
   selector: "app-lab-reports",
@@ -70,7 +72,8 @@ export class LabReportsComponent implements OnInit {
     private sampleService: SamplesService,
     private store: Store<AppState>,
     private dialog: MatDialog,
-    private exportDataService: ExportDataService
+    private exportDataService: ExportDataService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -104,6 +107,10 @@ export class LabReportsComponent implements OnInit {
     );
   }
 
+  onGetSelectedReport(report: any): void {
+    this.store.dispatch(go({ path: ["/laboratory/reports/" + report?.uuid] }));
+  }
+
   onGetCurrentReport(selectionEvent: MatSelectChange) {
     this.currentReport = null;
     this.selectionDates = null;
@@ -133,7 +140,6 @@ export class LabReportsComponent implements OnInit {
 
     if (buttonToggleChange) {
       this.startDate = null;
-
       this.endDate = null;
     }
     this.dateChanged = false;

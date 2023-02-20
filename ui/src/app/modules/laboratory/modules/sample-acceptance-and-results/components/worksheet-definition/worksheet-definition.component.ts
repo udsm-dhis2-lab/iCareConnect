@@ -197,17 +197,20 @@ export class WorksheetDefinitionComponent implements OnInit {
               const worksheetSamples = Object.keys(this.selectedRowsColumns)
                 ?.map((key) => {
                   if (this.selectedRowsColumns[key]?.set) {
-                    return {
+                    const type =
+                      key?.indexOf("control") === -1 ? "SAMPLE" : "CONTROL";
+                    let returnObj = {
                       row: Number(key?.split("-")[0]),
                       column: Number(key?.split("-")[1]),
-                      sample: {
-                        uuid: this.selectedRowsColumns[key]?.value?.uuid,
-                      },
                       worksheetDefinition: {
                         uuid: responseWorkSheetDefn[0]?.uuid,
                       },
-                      type: "SAMPLE",
+                      type: type,
                     };
+                    returnObj[type === "SAMPLE" ? "sample" : "control"] = {
+                      uuid: this.selectedRowsColumns[key]?.value?.uuid,
+                    };
+                    return returnObj;
                   }
                 })
                 ?.filter((worksheetSample) => worksheetSample);

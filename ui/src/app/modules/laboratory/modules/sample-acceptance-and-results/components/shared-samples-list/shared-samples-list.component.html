@@ -1,9 +1,9 @@
-<div>
+<div *ngIf="{ samples: samples$ | async } as params">
   <div class="filter-and-legend">
     <mat-form-field class="w-50">
       <mat-label>Search</mat-label>
       <mat-icon matPrefix>search</mat-icon
-      ><input matInput [(ngModel)]="searchingText" />
+      ><input matInput (keyup)="onSearchSamples($event)" />
     </mat-form-field>
 
     <table style="border: none; margin-left: 15px" class="w-20 float-right">
@@ -80,6 +80,11 @@
       </mat-select>
     </mat-form-field>
   </div>
+
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="!params?.samples"
+  ></mat-progress-bar>
   <table class="table table-bordered">
     <thead class="table-header">
       <tr>
@@ -109,10 +114,10 @@
       </tr>
     </thead>
     <tbody>
-      <ng-container *ngIf="samples?.length > 0">
+      <ng-container *ngIf="params?.samples?.results?.length > 0">
         <ng-container
           *ngFor="
-            let sample of samples
+            let sample of params?.samples?.results
               | filterSamples: searchingText:selectedDepartment;
             let count = index
           "
@@ -135,7 +140,7 @@
             [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
           >
             <td *ngIf="orderCount == 0" [attr.rowspan]="sample?.orders?.length">
-              {{ count + 1 + (page - 1) * pageCount }}
+              {{ count + 1 + (page - 1) * pageSize }}
             </td>
             <td *ngIf="orderCount == 0" [attr.rowspan]="sample?.orders?.length">
               {{
@@ -342,7 +347,7 @@
           </tr>
         </ng-container>
       </ng-container>
-      <ng-container *ngIf="samples?.length === 0">
+      <ng-container *ngIf="params?.samples?.results?.length === 0">
         <tr>
           <td colspan="100%">
             <div class="alert alert-warning" role="alert">No samples</div>
@@ -351,4 +356,13 @@
       </ng-container>
     </tbody>
   </table>
+
+  <mat-paginator
+    [hidden]="!pageCounts"
+    [length]="params?.samples?.pager?.total"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="pageCounts"
+    (page)="onPageChange($event)"
+  >
+  </mat-paginator>
 </div>
