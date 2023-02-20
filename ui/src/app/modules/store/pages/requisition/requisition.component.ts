@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { map } from "rxjs/operators";
-import { Observable, of } from "rxjs";
+import { Observable, of, zip } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { RequisitionObject } from "src/app/shared/resources/store/models/requisition.model";
 import { RequisitionService } from "src/app/shared/resources/store/services/requisition.service";
@@ -214,6 +214,42 @@ export class RequisitionComponent implements OnInit {
       });
   }
 
+  receiveAllSelected(e: Event, requisition) {
+    e?.stopPropagation();
+    let receiveIssuedItemsObject = {
+      issue: this.selectedItems[0]?.issue,
+      receivingLocation: {
+        uuid: requisition?.requestingLocation?.uuid,
+      },
+      issueingLocation: {
+        uuid: requisition?.requestedLocation?.uuid,
+      },
+    };
+
+    const items = Object.keys(this.selectedItems)?.map((key) => {
+      return {
+        item: {
+          uuid: this.selectedItems[key]?.item?.uuid,
+        },
+        quantity: this.selectedItems[key]?.quantity,
+        batch: this.selectedItems[key]?.batch,
+      };
+    });
+
+    const receiveObject = {
+      ...receiveIssuedItemsObject,
+      receiptItems: items,
+    };
+
+    this.requisitionService
+      .receiveIssueItem(receiveObject)
+      .subscribe((response) => {
+        if (response) {
+          this.getAllRequisition();
+        }
+      });
+  }
+
   onReceiveRequisition(e: any, requisition: any) {
     e?.stopPropagation();
     const requisitionObject = {
@@ -232,34 +268,74 @@ export class RequisitionComponent implements OnInit {
   }
 
   onRejectItem(e: any) {
-    this.dialog.open(SharedConfirmationComponent, {
-      width: '40%',
-      data: {
-        modalTitle: 'Confirm Issue Rejection',
-        modalMessage : 'Are you sure you want to reject this item?',
-        showRemarksInput: true,
-        confirmationButtonText: "Reject"
-      }
-    }).afterClosed().subscribe((rejection) => {
-      if(rejection?.confirmed){
-        const issueItemRejectedObject = {
-          issueItem: {
-            uuid: e?.item?.uuid,
-          },
-          status: "REJECTED",
-          remarks: rejection?.remarks || "",
-        };
-    
-        this.requisitionService
-          .createIssueItemStatus(issueItemRejectedObject)
-          .subscribe((response) => {
-            // Add support to catch error
-            if (response) {
-              this.getAllRequisition();
-            }
-          });
-      }
-    })
+    this.dialog
+      .open(SharedConfirmationComponent, {
+        width: "40%",
+        data: {
+          modalTitle: "Confirm Issue Rejection",
+          modalMessage: "Are you sure you want to reject this item?",
+          showRemarksInput: true,
+          confirmationButtonText: "Reject",
+        },
+      })
+      .afterClosed()
+      .subscribe((rejection) => {
+        if (rejection?.confirmed) {
+          const issueItemRejectedObject = {
+            issueItem: {
+              uuid: e?.item?.uuid,
+            },
+            status: "REJECTED",
+            remarks: rejection?.remarks || "",
+          };
+
+          this.requisitionService
+            .createIssueItemStatus(issueItemRejectedObject)
+            .subscribe((response) => {
+              // Add support to catch error
+              if (response) {
+                this.getAllRequisition();
+              }
+            });
+        }
+      });
+  }
+
+  rejectAllSelected(e: Event) {
+    this.dialog
+      .open(SharedConfirmationComponent, {
+        width: "40%",
+        data: {
+          modalTitle: "Confirm Issues Rejection",
+          modalMessage: "Are you sure you want to reject this all selected items?",
+          showRemarksInput: true,
+          confirmationButtonText: "Reject",
+        },
+      })
+      .afterClosed()
+      .subscribe((rejection) => {
+        if (rejection?.confirmed) {
+          const rejectionObjects = Object.keys(this.selectedItems)?.map((key) => {
+            return {
+              issueItem: {
+                uuid: this.selectedItems[key]?.uuid,
+              },
+              status: "REJECTED",
+              remarks: rejection?.remarks || "",
+            };
+          })
+          zip(
+            ...rejectionObjects?.map((rejectionObject) => {
+              return this.requisitionService.createIssueItemStatus(rejectionObject);
+            })
+          ).subscribe((response) => {
+              // Add support to catch error
+              if (response) {
+                this.getAllRequisition();
+              }
+            });
+        }
+      });
   }
 
   onReceiveItem(e: any, requisition?: any) {
@@ -283,7 +359,7 @@ export class RequisitionComponent implements OnInit {
     };
 
     this.requisitionService
-      .createIssueItemStatus(issueReceiveObject)
+      .receiveIssueItem(issueReceiveObject)
       .subscribe((response) => {
         // Add support to catch error
         if (response) {
@@ -406,7 +482,7 @@ export class RequisitionComponent implements OnInit {
       this.selectedItems[item?.uuid] = item;
     } else {
       let newSelectedItems: any;
-      Object.keys(this.selectedItems).forEach((uuid) => {
+      Object.keys(this.selectedItems)?.forEach((uuid) => {
         if (uuid === item?.uuid) {
           newSelectedItems = omit(this.selectedItems, uuid);
         }
