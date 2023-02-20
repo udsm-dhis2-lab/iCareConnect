@@ -37,6 +37,8 @@ export class SamplesService {
   ): Observable<any> {
     let parameters = [];
     if (pagerInfo) {
+      parameters = [...parameters, "page=" + pagerInfo?.page];
+      parameters = [...parameters, "pageSize=" + pagerInfo?.pageSize];
     } else {
       parameters = [...parameters, "paging=false"];
     }
@@ -74,17 +76,17 @@ export class SamplesService {
       )
       .pipe(
         map((response: any) => {
-          if (!pagerInfo) {
-            return response?.results?.map((result) =>
+          return {
+            pager: response?.pager,
+            results: response?.results?.map((result) =>
               new LabSample(
                 result,
                 otherParams?.departments,
                 otherParams?.specimenSources,
                 otherParams?.codedRejectionReasons
               ).toJSon()
-            );
-          } else {
-          }
+            ),
+          };
         })
       );
   }
