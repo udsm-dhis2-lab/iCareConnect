@@ -8,7 +8,7 @@ export class SearchingItemPipe implements PipeTransform {
     return items && searchingText
       ? items.filter(
           (item) =>
-            item?.searchingText
+            (item?.searchingText || item?.name)
               ?.toLowerCase()
               .indexOf(searchingText?.toLowerCase()) > -1
         ) || []

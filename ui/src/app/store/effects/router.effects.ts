@@ -1,6 +1,6 @@
 import { Location } from "@angular/common";
 import { Injectable } from "@angular/core";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { tap } from "rxjs/operators";
 
@@ -11,7 +11,8 @@ export class RouterEffects {
   constructor(
     private actions$: Actions,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private route: ActivatedRoute
   ) {}
 
   navigate$ = createEffect(
@@ -34,29 +35,29 @@ export class RouterEffects {
     }
   );
 
-  navigateBack$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(back),
-        tap(() => {
-          this.location.back();
-        })
-      ),
-    {
-      dispatch: false,
-    }
-  );
+  // navigateBack$ = createEffect(
+  //   () =>
+  //     this.actions$.pipe(
+  //       ofType(back),
+  //       tap(() => {
+  //         this.location.back();
+  //       })
+  //     ),
+  //   {
+  //     dispatch: false,
+  //   }
+  // );
 
-  navigateForward$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(forward),
-        tap(() => {
-          this.location.forward();
-        })
-      ),
-    {
-      dispatch: false,
-    }
-  );
+  // navigateForward$ = createEffect(
+  //   () =>
+  //     this.actions$.pipe(
+  //       ofType(forward),
+  //       tap(() => {
+  //         this.location.forward();
+  //       })
+  //     ),
+  //   {
+  //     dispatch: false,
+  //   }
+  // );
 }
