@@ -152,6 +152,7 @@ public class IssueItem extends BaseOpenmrsData implements java.io.Serializable, 
 		issueItemObject.put("quantity", this.getQuantity());
 		issueItemObject.put("batch", this.getBatchNo());
 		issueItemObject.put("expiryDate", this.getExpiryDate());
+		issueItemObject.put("uuid",this.getUuid());
 		
 		Map<String, Object> itemObject = new HashMap<String, Object>();
 		itemObject.put("uuid", this.getIssueItemId().getItem().getUuid());
@@ -177,6 +178,8 @@ public class IssueItem extends BaseOpenmrsData implements java.io.Serializable, 
 			issueItemStatusesMapList.add(issueItemStatusMap);
 			issueItemObject.put("issueItemStatuses",issueItemStatusesMapList);
 		}
+
+
 		
 		return issueItemObject;
 	}
