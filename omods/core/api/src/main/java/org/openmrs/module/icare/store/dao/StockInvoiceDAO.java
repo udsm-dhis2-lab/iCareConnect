@@ -123,4 +123,17 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 			return null;
 		}
 	}
+
+	public Double getTotalStockItemsAmountByStockInvoice(StockInvoice stockInvoice) {
+
+		DbSession session = this.getSession();
+		String queryStr = "SELECT SUM(sti.amount) FROM StockInvoiceItem sti WHERE sti.stockInvoice = :stockInvoice";
+
+		Query query = session.createQuery(queryStr);
+
+		query.setParameter("stockInvoice",stockInvoice);
+
+		return (double) query.list().get(0);
+
+	}
 }
