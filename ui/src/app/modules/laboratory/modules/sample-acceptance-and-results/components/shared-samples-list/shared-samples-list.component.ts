@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatCheckboxChange } from "@angular/material/checkbox";
 import { omit } from "lodash";
+import { Observable } from "rxjs";
+import { SamplesService } from "src/app/shared/services/samples.service";
 
 @Component({
   selector: "app-shared-samples-list",
@@ -8,24 +10,48 @@ import { omit } from "lodash";
   styleUrls: ["./shared-samples-list.component.scss"],
 })
 export class SharedSamplesListComponent implements OnInit {
-  @Input() samples: any[];
   @Input() LISConfigurations: any;
   @Input() labSamplesDepartments: any;
   @Input() tabType: string;
-  @Input() searchingText: string;
+  @Input() datesParameters: any;
+  @Input() excludeAllocations: boolean;
+  @Input() sampleTypes: any[];
+  @Input() codedSampleRejectionReasons: any[];
+  @Input() category: string;
+  @Input() hasStatus: string;
   samplesToViewMoreDetails: any = {};
   selectedDepartment: string;
-
+  searchingText: string;
   page: number = 1;
   pageCount: number = 100;
   @Output() resultEntrySample: EventEmitter<any> = new EventEmitter<any>();
   @Output() selectedSampleDetails: EventEmitter<any> = new EventEmitter<any>();
   selectedSamples: any[] = [];
   @Output() samplesForAction: EventEmitter<any[]> = new EventEmitter<any[]>();
-  @Output() searchText: EventEmitter<string> = new EventEmitter<string>();
-  constructor() {}
 
-  ngOnInit(): void {}
+  samples$: Observable<any>;
+  constructor(private sampleService: SamplesService) {}
+
+  ngOnInit(): void {
+    this.getSamples({ category: this.category });
+  }
+
+  getSamples(params?: any): void {
+    this.samples$ = this.sampleService.getLabSamplesByCollectionDates(
+      this.datesParameters,
+      params?.category,
+      params?.hasStatus,
+      this.excludeAllocations,
+      null,
+      {
+        departments: this.labSamplesDepartments,
+        specimenSources: this.sampleTypes,
+        codedRejectionReasons: this.codedSampleRejectionReasons,
+      },
+      null,
+      params?.q
+    );
+  }
 
   onToggleViewSampleDetails(event: Event, sample: any): void {
     event.stopPropagation();
@@ -74,6 +100,6 @@ export class SharedSamplesListComponent implements OnInit {
 
   onSearchSamples(event): void {
     this.searchingText = (event.target as HTMLInputElement)?.value;
-    this.searchText.emit(this.searchingText);
+    this.getSamples({ q: this.searchingText });
   }
 }
