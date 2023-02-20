@@ -1,13 +1,12 @@
 <div
   class="w-100"
   *ngIf="{
-    sampplesForResultsEntry: sampplesForResultsEntry$ | async,
     providerDetails: providerDetails$ | async
   } as params"
 >
   <mat-progress-bar
     mode="indeterminate"
-    *ngIf="!params?.sampplesForResultsEntry"
+    *ngIf="!params?.providerDetails"
   ></mat-progress-bar>
   <div class="loading-overlay" *ngIf="saving">
     <div class="text-center">
@@ -17,7 +16,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="params?.sampplesForResultsEntry">
+  <div *ngIf="params?.providerDetails">
     <app-shared-samples-list
       [tabType]="'result-entry'"
       [samples]="params?.sampplesForResultsEntry"
@@ -26,6 +25,12 @@
       (resultEntrySample)="
         onResultsEntryAndReview($event, params?.providerDetails, 'entry')
       "
+      [category]="'ACCEPTED'"
+      [hasStatus]="'YES'"
+      [datesParameters]="datesParameters"
+      [excludeAllocations]="true"
+      [sampleTypes]="sampleTypes"
+      [codedSampleRejectionReasons]="codedSampleRejectionReasons"
     ></app-shared-samples-list>
   </div>
 </div>

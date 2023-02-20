@@ -51,7 +51,6 @@ export class SamplesToAcceptComponent implements OnInit {
 
   ngOnInit(): void {
     this.providerDetails$ = this.store.select(getProviderDetails);
-    this.getSamples();
   }
 
   getSamples(): void {

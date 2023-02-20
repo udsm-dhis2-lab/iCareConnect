@@ -50,7 +50,6 @@ export class CompletedSamplesComponent implements OnInit {
 
   ngOnInit(): void {
     this.providerDetails$ = this.store.select(getProviderDetails);
-    this.getSamples();
   }
 
   getSamples(): void {
