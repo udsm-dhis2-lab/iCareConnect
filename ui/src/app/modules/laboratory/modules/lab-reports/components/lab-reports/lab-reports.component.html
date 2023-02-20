@@ -10,6 +10,12 @@
       facilityDetails: facilityDetails$ | async
     } as params"
   >
+    <div class="col-12" style="display: none">
+      <app-lab-reports-list
+        [reports]="reports"
+        (selectedReport)="onGetSelectedReport($event)"
+      ></app-lab-reports-list>
+    </div>
     <div class="col-md-12 col-sx-12 col-sm-12 report">
       <div class="w-100 d-flex justify-content-left no-print">
         <div class="w-25">
