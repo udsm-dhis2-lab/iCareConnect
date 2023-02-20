@@ -21,11 +21,13 @@
     <app-shared-samples-list
       [tabType]="'accepted-samples'"
       [samples]="params?.acceptedSamples"
+      [searchingText]=""
       [LISConfigurations]="LISConfigurations"
       [labSamplesDepartments]="labSamplesDepartments"
       (selectedSampleDetails)="
         onGetSelectedSampleDetails($event, params?.providerDetails)
       "
+      (searchText)="onGetSearchText($event)"
     ></app-shared-samples-list>
   </div>
 </div>

@@ -12,7 +12,7 @@ export class SharedSamplesListComponent implements OnInit {
   @Input() LISConfigurations: any;
   @Input() labSamplesDepartments: any;
   @Input() tabType: string;
-  searchingText: string;
+  @Input() searchingText: string;
   samplesToViewMoreDetails: any = {};
   selectedDepartment: string;
 
@@ -22,6 +22,7 @@ export class SharedSamplesListComponent implements OnInit {
   @Output() selectedSampleDetails: EventEmitter<any> = new EventEmitter<any>();
   selectedSamples: any[] = [];
   @Output() samplesForAction: EventEmitter<any[]> = new EventEmitter<any[]>();
+  @Output() searchText: EventEmitter<string> = new EventEmitter<string>();
   constructor() {}
 
   ngOnInit(): void {}
@@ -69,5 +70,10 @@ export class SharedSamplesListComponent implements OnInit {
           (selectedSample) => selectedSample?.label !== sample?.label
         ) || [];
     this.samplesForAction.emit(this.selectedSamples);
+  }
+
+  onSearchSamples(event): void {
+    this.searchingText = (event.target as HTMLInputElement)?.value;
+    this.searchText.emit(this.searchingText);
   }
 }

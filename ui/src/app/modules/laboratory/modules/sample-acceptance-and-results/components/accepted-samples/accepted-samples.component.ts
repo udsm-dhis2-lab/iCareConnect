@@ -64,4 +64,8 @@ export class AcceptedSamplesComponent implements OnInit {
     event.stopPropagation();
     console.log(sample);
   }
+
+  onGetSearchText(onGetSearchText: string): void {
+    console.log("onGetSearchText", onGetSearchText);
+  }
 }

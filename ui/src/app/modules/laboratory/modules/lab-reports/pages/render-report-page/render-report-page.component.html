@@ -64,15 +64,16 @@
         (click)="
           onDownloadXLS(
             $event,
-            currentReport?.renderAs && currentReport?.renderAs === 'iframe'
+            params?.report?.renderAs && params?.report?.renderAs === 'iframe'
               ? 'iframe_id'
               : 'report-to-download',
-            currentReport?.name,
-            currentReport?.renderAs
+            params?.report?.name,
+            params?.report?.renderAs
           )
         "
         [disabled]="
-          (!selectionDates || !dateChanged) && currentReport?.useDefaultPeFilter
+          (!selectionDates || !dateChanged) &&
+          params?.report?.useDefaultPeFilter
         "
         mat-flat-button
         color="primary"
@@ -85,7 +86,8 @@
 
       <button
         [disabled]="
-          (!selectionDates || !dateChanged) && currentReport?.useDefaultPeFilter
+          (!selectionDates || !dateChanged) &&
+          params?.report?.useDefaultPeFilter
         "
         (click)="onPrint($event)"
         class="ml-2"
@@ -96,7 +98,7 @@
         Print
       </button>
     </div>
-    <div *ngIf="!currentReport?.hardCoded" id="report-to-download">
+    <div *ngIf="!params?.report?.hardCoded" id="report-to-download">
       <div class="row">
         <div class="col-2" style="display: inline-block; width: 16.67%">
           <img [src]="params?.facilityDetails?.logo" height="90" />
