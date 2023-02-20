@@ -108,8 +108,7 @@ export class LabReportsComponent implements OnInit {
   }
 
   onGetSelectedReport(report: any): void {
-    // this.router.navigate(["/laboratory/reports/" + report?.id]);
-    this.store.dispatch(go({ path: ["/laboratory/reports/" + report?.id] }));
+    this.store.dispatch(go({ path: ["/laboratory/reports/" + report?.uuid] }));
   }
 
   onGetCurrentReport(selectionEvent: MatSelectChange) {
@@ -141,7 +140,6 @@ export class LabReportsComponent implements OnInit {
 
     if (buttonToggleChange) {
       this.startDate = null;
-
       this.endDate = null;
     }
     this.dateChanged = false;

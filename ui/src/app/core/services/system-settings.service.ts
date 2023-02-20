@@ -37,6 +37,19 @@ export class SystemSettingsService {
       catchError((error) => of(error))
     );
   }
+  getSystemSettingsByUuid(uuid: string): Observable<any> {
+    return from(this.api.systemsetting.getSystemSetting(uuid)).pipe(
+      map((response) => {
+        return response && response
+          ? response?.value.indexOf("{") > -1 ||
+            response?.value.indexOf("[") > -1
+            ? JSON.parse(response?.value)
+            : response?.value
+          : "none";
+      }),
+      catchError((error) => of(error))
+    );
+  }
 
   deleteSystemSettingByUuid(uuid: string): Observable<any> {
     return from(this.api.systemsetting.deleteSystemSetting(uuid)).pipe(
