@@ -17,9 +17,32 @@
     </div>
   </div>
   <div *ngIf="params?.providerDetails">
+    <mat-radio-group class="mb-3 mt-2">
+      <mat-radio-button
+        [value]="'Normal'"
+        [checked]="selectedResultEntryCategory === 'Normal'"
+        color="primary"
+        (change)="getSelectedResultEntryCategory($event)"
+        >Normal</mat-radio-button
+      >
+      <mat-radio-button
+        [value]="'Worksheet'"
+        [checked]="selectedResultEntryCategory === 'Worksheet'"
+        color="primary"
+        class="ml-3"
+        (change)="getSelectedResultEntryCategory($event)"
+        >By Worksheet</mat-radio-button
+      >
+    </mat-radio-group>
+    <div class="p-3" *ngIf="selectedResultEntryCategory === 'Worksheet'">
+      <app-result-entry-by-worksheet-home
+        [isLIS]="LISConfigurations?.isLIS"
+        [datesParameters]="datesParameters"
+      ></app-result-entry-by-worksheet-home>
+    </div>
     <app-shared-samples-list
+      *ngIf="selectedResultEntryCategory === 'Normal'"
       [tabType]="'result-entry'"
-      [samples]="params?.sampplesForResultsEntry"
       [LISConfigurations]="LISConfigurations"
       [labSamplesDepartments]="labSamplesDepartments"
       (resultEntrySample)="
