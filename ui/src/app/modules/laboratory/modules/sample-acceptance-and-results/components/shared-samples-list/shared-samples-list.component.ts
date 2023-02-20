@@ -19,6 +19,7 @@ export class SharedSamplesListComponent implements OnInit {
   @Input() codedSampleRejectionReasons: any[];
   @Input() category: string;
   @Input() hasStatus: string;
+  @Input() acceptedBy: string;
   samplesToViewMoreDetails: any = {};
   selectedDepartment: string;
   searchingText: string;
@@ -33,7 +34,7 @@ export class SharedSamplesListComponent implements OnInit {
   constructor(private sampleService: SamplesService) {}
 
   ngOnInit(): void {
-    this.getSamples({ category: this.category });
+    this.getSamples({ category: this.category, hasStatus: this.hasStatus });
   }
 
   getSamples(params?: any): void {
@@ -48,7 +49,7 @@ export class SharedSamplesListComponent implements OnInit {
         specimenSources: this.sampleTypes,
         codedRejectionReasons: this.codedSampleRejectionReasons,
       },
-      null,
+      this.acceptedBy,
       params?.q
     );
   }
