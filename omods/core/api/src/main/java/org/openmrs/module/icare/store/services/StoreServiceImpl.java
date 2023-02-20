@@ -300,15 +300,14 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		issueStatus.setRemarks("Items have been issued");
 		issueStatus.setStatus(IssueStatus.IssueStatusCode.ISSUED);
 		this.saveIssueStatus(issueStatus);
-		
-		for (IssueItem issueItem : newIssue.getIssueItems()) {
-			for (IssueItemStatus issueItemStatus : issueItem.getIssueItemStatuses()) {
-				issueItemStatus.setStatus(IssueItemStatus.IssueItemStatusCode.ISSUED.toString());
-				issueItemStatus.setRemarks("Item has been issued");
-				issueItemStatus.setIssueItem(issueItem);
-				this.saveIssueItemStatus(issueItemStatus);
+		if(newIssue != null){
+			for (IssueItem issueItem : newIssue.getIssueItems()) {
+					IssueItemStatus issueItemStatus = new IssueItemStatus();
+					issueItemStatus.setStatus(IssueItemStatus.IssueItemStatusCode.ISSUED.toString());
+					issueItemStatus.setRemarks("Item has been issued");
+					issueItemStatus.setIssueItem(issueItem);
+					this.saveIssueItemStatus(issueItemStatus);
 			}
-			
 		}
 		if (newIssue.getRequisition() != null) {
 			RequisitionStatus requisitionStatus = new RequisitionStatus();
