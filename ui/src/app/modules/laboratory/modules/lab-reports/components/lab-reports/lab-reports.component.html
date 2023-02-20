@@ -10,7 +10,13 @@
       facilityDetails: facilityDetails$ | async
     } as params"
   >
-    <div class="col-md-12 col-sx-12 col-sm-12 report">
+    <div class="col-12">
+      <app-lab-reports-list
+        [reports]="reports"
+        (selectedReport)="onGetSelectedReport($event)"
+      ></app-lab-reports-list>
+    </div>
+    <div class="col-md-12 col-sx-12 col-sm-12 report" *ngIf="false">
       <div class="w-100 d-flex justify-content-left no-print">
         <div class="w-25">
           <mat-form-field class="w-100">
@@ -130,7 +136,6 @@
           <div class="row">
             <div class="col-2" style="display: inline-block; width: 16.67%">
               <img [src]="params?.facilityDetails?.logo" height="90" />
-              <!-- <img src="assets/images/tanzania-logo.png" height="90" /> -->
             </div>
             <div class="col-8" style="display: inline-block; width: 66.67%">
               <h4 style="text-align: center">

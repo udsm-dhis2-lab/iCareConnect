@@ -24,7 +24,6 @@ export class AcceptedSamplesComponent implements OnInit {
 
   acceptedSamples$: Observable<any[]>;
   selectedDepartment: string;
-  searchingText: string;
   excludeAllocations: boolean = true;
 
   page: number = 1;
@@ -45,7 +44,7 @@ export class AcceptedSamplesComponent implements OnInit {
     this.getSamples();
   }
 
-  getSamples(): void {
+  getSamples(params?: any): void {
     this.acceptedSamples$ = this.sampleService.getLabSamplesByCollectionDates(
       this.datesParameters,
       "ACCEPTED",
