@@ -539,6 +539,12 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	@Override
 	public ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status) {
+
+		ListResult<StockInvoice> stockInvoices = stockInvoiceDAO.getStockInvoices(pager, status);
+		for (StockInvoice stockInvoice : stockInvoices.getResults()){
+			Double totalAmount = stockInvoiceDAO.getTotalStockItemsAmountByStockInvoice(stockInvoice);
+			stockInvoice.setTotalAmount(totalAmount);
+		}
 		return stockInvoiceDAO.getStockInvoices(pager, status);
 	}
 	
