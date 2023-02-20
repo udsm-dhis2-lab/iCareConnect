@@ -24,17 +24,24 @@ export class SharedSamplesListComponent implements OnInit {
   selectedDepartment: string;
   searchingText: string;
   page: number = 1;
-  pageCount: number = 100;
+  pageSize: number = 10;
   @Output() resultEntrySample: EventEmitter<any> = new EventEmitter<any>();
   @Output() selectedSampleDetails: EventEmitter<any> = new EventEmitter<any>();
   selectedSamples: any[] = [];
   @Output() samplesForAction: EventEmitter<any[]> = new EventEmitter<any[]>();
 
-  samples$: Observable<any>;
+  samples$: Observable<{ pager: any; results: any[] }>;
+
+  pageCounts: any[] = [1, 5, 10, 20, 25, 50, 100, 200];
   constructor(private sampleService: SamplesService) {}
 
   ngOnInit(): void {
-    this.getSamples({ category: this.category, hasStatus: this.hasStatus });
+    this.getSamples({
+      category: this.category,
+      hasStatus: this.hasStatus,
+      pageSize: this.pageSize,
+      page: this.page,
+    });
   }
 
   getSamples(params?: any): void {
@@ -43,7 +50,10 @@ export class SharedSamplesListComponent implements OnInit {
       params?.category,
       params?.hasStatus,
       this.excludeAllocations,
-      null,
+      {
+        pageSize: params?.pageSize,
+        page: params?.page,
+      },
       {
         departments: this.labSamplesDepartments,
         specimenSources: this.sampleTypes,
@@ -52,6 +62,17 @@ export class SharedSamplesListComponent implements OnInit {
       this.acceptedBy,
       params?.q
     );
+  }
+
+  onPageChange(event: any): void {
+    this.page = this.page + (event?.pageIndex - event?.previousPageIndex);
+    this.pageSize = event?.pageSize;
+    this.getSamples({
+      category: this.category,
+      hasStatus: this.hasStatus,
+      pageSize: this.pageSize,
+      page: this.page,
+    });
   }
 
   onToggleViewSampleDetails(event: Event, sample: any): void {
@@ -101,6 +122,12 @@ export class SharedSamplesListComponent implements OnInit {
 
   onSearchSamples(event): void {
     this.searchingText = (event.target as HTMLInputElement)?.value;
-    this.getSamples({ q: this.searchingText });
+    this.getSamples({
+      category: this.category,
+      hasStatus: this.hasStatus,
+      pageSize: this.pageSize,
+      page: 1,
+      q: this.searchingText,
+    });
   }
 }
