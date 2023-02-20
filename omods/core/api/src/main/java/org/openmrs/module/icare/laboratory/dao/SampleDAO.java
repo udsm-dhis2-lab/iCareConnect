@@ -402,6 +402,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (startDate != null && endDate != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
 			}
 			queryStr += " ((cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) \n"
 			        + "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate))";

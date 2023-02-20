@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="{ samples: samples$ | async } as params">
   <div class="filter-and-legend">
     <mat-form-field class="w-50">
       <mat-label>Search</mat-label>
@@ -80,6 +80,11 @@
       </mat-select>
     </mat-form-field>
   </div>
+
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="!params?.samples"
+  ></mat-progress-bar>
   <table class="table table-bordered">
     <thead class="table-header">
       <tr>
@@ -109,10 +114,10 @@
       </tr>
     </thead>
     <tbody>
-      <ng-container *ngIf="samples?.length > 0">
+      <ng-container *ngIf="params?.samples?.length > 0">
         <ng-container
           *ngFor="
-            let sample of samples
+            let sample of params?.samples
               | filterSamples: searchingText:selectedDepartment;
             let count = index
           "
@@ -342,7 +347,7 @@
           </tr>
         </ng-container>
       </ng-container>
-      <ng-container *ngIf="samples?.length === 0">
+      <ng-container *ngIf="params?.samples?.length === 0">
         <tr>
           <td colspan="100%">
             <div class="alert alert-warning" role="alert">No samples</div>
