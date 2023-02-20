@@ -1,4 +1,3 @@
-getFilteredIssueItems;
 export function getFilteredIssueItems(requisitionItems: any[], issues: any[]){
     let issueItems = [] 
     issues?.forEach((issue) => {
@@ -27,9 +26,13 @@ export function getFilteredIssueItems(requisitionItems: any[], issues: any[]){
         let issuedItems = issueItems?.filter((issueItem) => issueItem?.item?.uuid === requisitionItem?.item?.uuid)
         if(!issuedItems?.length || issuedItems.length === 0){
             return {
-                ...requisitionItem,
-                status: "PENDING"
-            }
+              ...requisitionItem,
+              status: requisitionItem?.requisitionItemStatuses?.length
+                ? requisitionItem?.requisitionItemStatuses[
+                    requisitionItem?.requisitionItemStatuses?.length -1
+                  ]?.status
+                : "PENDING",
+            };
         }
         return null
     }).filter(item => item)

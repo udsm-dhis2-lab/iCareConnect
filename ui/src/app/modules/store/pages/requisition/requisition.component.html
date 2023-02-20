@@ -33,7 +33,7 @@
         </div>
       </div>
       <button
-        class="{{ showRequisitionForm ? 'float-right' : '' }}"
+        class="{{ showRequisitionForm ? 'float-right button-round' : 'button-round' }}"
         [disabled]="
           !params?.pharmacyLocationTagUuid ||
           params?.pharmacyLocationTagUuid == 'none' ||
@@ -282,8 +282,30 @@
               <div class="inv-items-table container-fluid" *ngIf="viewRequisitionItems && viewRequisitionItems === requisition?.uuid">
                 <app-requisition-items 
                   [requisition]="requisition"
+                  (rejectItem)="onRejectItem($event)"
+                  (receiveItem)="onReceiveItem($event, requisition)"
+                  (selectionChange)="getSelection($event)"
                   ></app-requisition-items>
               </div>
+              <div class="w-100" *ngIf="selectedItemsCount > 0">
+                  <div class="float-right">
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      (click)="receiveAllSelected($event, requisition)"
+                      >
+                      Receive
+                    </button>
+                    <button
+                    class="ml-3"
+                    mat-flat-button
+                    color="warn"
+                    (click)="rejectAllSelected($event, requisition)"
+                      >
+                      Reject
+                    </button>
+                  </div>
+                </div>
             </mat-expansion-panel>
           </mat-accordion>
         <!-- <app-requisition-by-store

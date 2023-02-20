@@ -4,7 +4,7 @@ import { MatSelectChange } from "@angular/material/select";
 import { select, Store } from "@ngrx/store";
 import { IssuingObject } from "src/app/shared/resources/store/models/issuing.model";
 import { IssuingService } from "src/app/shared/resources/store/services/issuing.service";
-import { groupBy, orderBy, flatten, omit } from "lodash";
+import { orderBy, flatten, omit } from "lodash";
 import { Observable, zip } from "rxjs";
 import { map, tap } from "rxjs/operators";
 import { LocationGet } from "src/app/shared/resources/openmrs";
@@ -38,6 +38,7 @@ export class IssuingComponent implements OnInit {
   statuses: string[] = ["", "PENDING", "CANCELLED", "REJECTED", "ISSUED"];
   selectedStatus: string;
   viewIssueItems: string;
+  loadingIssues: boolean;
 
   constructor(
     private store: Store<AppState>,
@@ -93,6 +94,7 @@ export class IssuingComponent implements OnInit {
 
   getSelection(event: any): void {
     const item = event?.item;
+
     event = event?.event;
     if (event?.checked) {
       this.selectedItems[item?.uuid] = item;
@@ -113,6 +115,7 @@ export class IssuingComponent implements OnInit {
   }
 
   getAllIssuing(): void {
+    this.loadingIssues = true
     this.issuingList$ = this.issuingService
       .getIssuings(
         this.currentLocation?.id,
@@ -125,6 +128,7 @@ export class IssuingComponent implements OnInit {
       ?.pipe(
         map((response) => {
           this.pager = response?.pager;
+          this.loadingIssues = false;
           return response?.issuings;
         })
       );
@@ -154,10 +158,10 @@ export class IssuingComponent implements OnInit {
           };
 
           this.requisitionService
-            .updateRequisitionItem(item?.uuid, item)
+            .updateRequisitionItem(item?.uuid, ItemObject)
             .pipe(
               tap((response) => {
-                this.getAllIssuing()
+                this.getAllIssuing();
               })
             )
             .subscribe();
@@ -176,22 +180,23 @@ export class IssuingComponent implements OnInit {
     );
   }
 
-  issueAllSelected(event: Event, selectedItemsToIssue: any): void {
+  issueAllSelected(event: Event, issue: any): void {
     event.stopPropagation();
     let itemsToIssue = [];
-    Object.keys(selectedItemsToIssue).forEach((key) => {
-      itemsToIssue = [...itemsToIssue, selectedItemsToIssue[key]];
+    Object.keys(this.selectedItems).forEach((key) => {
+      itemsToIssue = [...itemsToIssue, this.selectedItems[key]];
     });
-    const groupedRequisitions = groupBy(itemsToIssue, "requisitionUuid");
-
     this.dialog
       .open(ConfirmRequisitionsModalComponent, {
         width: "20%",
-        data: groupedRequisitions,
+        data: {
+          items: itemsToIssue,
+          issue: issue
+        }
       })
       .afterClosed()
       .subscribe((requisitionData) => {
-        const groupedRequisitions = requisitionData?.requisitions;
+        const items = requisitionData?.requisitions?.items;
         const nonExpiredBatches = this.getBatchsNotExpired(
           flatten(
             requisitionData?.stockStatus.map(
@@ -200,73 +205,62 @@ export class IssuingComponent implements OnInit {
           )
         );
 
-        if (groupedRequisitions) {
+        if (items) {
           zip(
-            ...Object.keys(groupedRequisitions).map((key) => {
-              const currentItemsToIssue = groupedRequisitions[key];
-              // Create items to issue by batches
-              const toIssueItemsByBatches = flatten(
-                currentItemsToIssue.map((item) => {
-                  // Determine all batches eligible to match the requested quantity
-                  const batchesForThisItem =
-                    nonExpiredBatches.filter(
-                      (batch) => batch?.item?.uuid === item?.itemUuid
-                    ) || [];
-                  let eligibleBatches = [];
-                  const quantityToIssue = Number(item?.quantityRequested);
-                  let eligibleToIssue = 0;
-                  let count = 0;
-                  while (
-                    batchesForThisItem?.length > 0 &&
-                    quantityToIssue > eligibleToIssue
-                  ) {
-                    const toIssue =
-                      quantityToIssue - eligibleToIssue >
-                      Number(batchesForThisItem[count]?.quantity)
-                        ? Number(batchesForThisItem[count]?.quantity)
-                        : quantityToIssue - eligibleToIssue;
-                    eligibleBatches = [
-                      ...eligibleBatches,
-                      {
-                        ...batchesForThisItem[count],
-                        ...item,
-                        toIssue: toIssue,
-                      },
-                    ];
-                    eligibleToIssue =
-                      eligibleToIssue +
-                      Number(batchesForThisItem[count]?.quantity);
-                    count++;
-                  }
-                  return eligibleBatches;
-                })
-              );
+            ...items.map((item) => {
+                // Determine all batches eligible to match the requested quantity
+                const batchesForThisItem = nonExpiredBatches.filter((batch) => batch?.item?.uuid === item?.item?.uuid) || [];
+                let eligibleBatches = [];
+                const quantityToIssue = Number(item?.quantity);
+                let eligibleToIssue = 0;
+                let count = 0;
+                while (
+                  batchesForThisItem?.length > 0 &&
+                  quantityToIssue > eligibleToIssue
+                ) {
+                  const toIssue =
+                    quantityToIssue - eligibleToIssue >
+                    Number(batchesForThisItem[count]?.quantity)
+                      ? Number(batchesForThisItem[count]?.quantity)
+                      : quantityToIssue - eligibleToIssue;
+                  eligibleBatches = [
+                    ...eligibleBatches,
+                    {
+                      ...batchesForThisItem[count],
+                      ...item,
+                      toIssue: toIssue,
+                    },
+                  ];
+                  eligibleToIssue =
+                    eligibleToIssue +
+                    Number(batchesForThisItem[count]?.quantity);
+                  count++;
+                }
               const issueInput = {
-                requisitionUuid: key,
-                issuedLocationUuid:
-                  groupedRequisitions[key][0]?.requestingLocation.uuid,
-                issuingLocationUuid:
-                  groupedRequisitions[key][0].requestedLocation.uuid,
-                issueItems: toIssueItemsByBatches.map((matchedItemToIssue) => {
-                  // console.log("matchedItemToIssue", matchedItemToIssue);
+                requisitionUuid: issue?.uuid,
+                issuedLocationUuid: issue?.requestingLocation.uuid,
+                issuingLocationUuid: issue?.requestedLocation.uuid,
+                issueItems: eligibleBatches.map((batch) => {
                   return {
-                    itemUuid: matchedItemToIssue?.itemUuid,
-                    quantity: matchedItemToIssue?.toIssue,
-                    batch: matchedItemToIssue?.batch,
-                    expiryDate: new Date(matchedItemToIssue?.expiryDate),
+                    itemUuid: batch?.item?.uuid,
+                    quantity: batch?.toIssue,
+                    batch: batch?.batch,
+                    expiryDate: new Date(batch?.expiryDate),
                   };
                 }),
               };
-              return this.issuingService.issueRequest(issueInput).pipe(
+              return this.issuingService.issueItems(issueInput).pipe(
                 map((response) => {
                   return response;
                 })
               );
             })
-          ).subscribe((response) => {
+          ).subscribe((response: any) => {
             if (response) {
-              this.selectedItems = {};
-              this.getAllIssuing();
+              if(!response?.error){
+                this.selectedItems = {};
+                this.getAllIssuing();
+              }
             }
           });
         }

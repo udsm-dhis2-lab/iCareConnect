@@ -19,49 +19,61 @@
                 <td>{{ item?.item?.display }}</td>
                 <td>{{ item?.quantity }}</td>
                 <td>{{ item?.requisitionItemStatuses[item?.requisitionItemStatuses?.length - 1]?.status ? item?.requisitionItemStatuses[item?.requisitionItemStatuses?.length - 1]?.status : 'DRAFT' }}</td>
-                <ng-container>
-                  <td>
+                <td
+                  *ngIf="requisition?.requisitionStatuses[requisition?.requisitionStatuses?.length - 1]?.status === 'DRAFT'"
+                >
+                  <button
+                    mat-icon-button
+                    [matMenuTriggerFor]="menu"
+                  >
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu">
+                      <button
+                        mat-menu-item
+                        (click)="onUpdateRequsitionItem(item)"
+                      >
+                        <mat-icon>edit</mat-icon>
+                        <span>Update</span>
+                      </button>
+                      <button
+                        mat-menu-item
+                        (click)="onUpdateRequsitionItem(item, 'delete')"
+                      >
+                        <mat-icon>delete</mat-icon>
+                        <span>Delete</span>
+                      </button>
+                  </mat-menu>
+                </td>
+                <td>
+                  <ng-container *ngIf="item?.requisitionItemStatuses[item?.requisitionItemStatuses?.length - 1]?.status === 'ISSUED'">
                     <button
-                      mat-icon-button
-                      [matMenuTriggerFor]="menu"
-                      *ngIf="requisition?.requisitionStatuses[requisition?.requisitionStatuses?.length - 1]?.status !== 'REJECTED' && requisition?.requisitionStatuses[requisition?.requisitionStatuses?.length -1]?.status !== 'RECEIVED' && requisition?.requisitionStatuses[requisition?.requisitionStatuses?.length -1]?.status !== 'PENDING'"
+                      mat-flat-button
+                      color="primary"
+                      (click)="onReceiveItem($event, item)"
                     >
-                      <mat-icon>more_vert</mat-icon>
+                      Receive
                     </button>
-                    <mat-menu #menu="matMenu">
-                      <ng-container *ngIf="requisition?.requisitionStatuses[requisition?.requisitionStatuses?.length - 1]?.status === 'DRAFT'">
-                        <button
-                          mat-menu-item
-                          (click)="onUpdateRequsitionItem(item)"
-                        >
-                          <mat-icon>edit</mat-icon>
-                          <span>Update</span>
-                        </button>
-                        <button
-                          mat-menu-item
-                          (click)="onUpdateRequsitionItem(item, 'delete')"
-                        >
-                          <mat-icon>delete</mat-icon>
-                          <span>Delete</span>
-                        </button>
-                      </ng-container>
-                      <ng-container *ngIf="requisition?.requisitionStatuses[requisition?.requisitionStatuses?.length -1]?.status === 'ISSUED'">
-                        <button
-                          mat-menu-item
-                        >
-                          <mat-icon>check</mat-icon>
-                          <span>Receive</span>
-                        </button>
-                        <button
-                          mat-menu-item
-                        >
-                          <mat-icon>thumb_down</mat-icon>
-                          <span>Reject</span>
-                        </button>
-                      </ng-container>
-                    </mat-menu>
-                  </td>
-                </ng-container>
+                    <button
+                      mat-flat-button
+                      class="ml-2"
+                      color="warn"
+                      (click)="onRejectItem($event, item)"
+                    >
+                      Reject
+                    </button>
+                  </ng-container>
+                </td>
+                <td>
+                  <section>
+                    <mat-checkbox
+                      color="primary"
+                      (change)="getSelection($event, item)"
+                      [checked]="selectedItems[item]"
+                      *ngIf="item?.requisitionItemStatuses[item?.requisitionItemStatuses?.length - 1]?.status === 'ISSUED'"
+                    ></mat-checkbox>
+                  </section>
+                </td>
               </tr>
             </tbody>
       </table>

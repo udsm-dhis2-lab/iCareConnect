@@ -131,7 +131,7 @@
         </tr>
       </table>
     </div> -->
-    <div *ngIf="!params?.issuingList?.length && !currentLocation">
+    <div *ngIf="!params?.issuingList?.length && loadingIssues">
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
     <mat-paginator 
@@ -201,13 +201,14 @@
                     [currentLocation]="currentLocation"
                     (rejectRequest)="onReject($event, issue)"
                     (issueRequest)="onIssue($event, issue)"
-                    (selectionChange)="getSelection($event, issue)"
+                    (selectionChange)="getSelection($event)"
                 ></app-issue-items>
                 <div class="w-100" *ngIf="selectedIssuesCount > 0">
                   <div class="float-right">
                     <button
                       mat-flat-button
                       color="primary"
+                      (click)="issueAllSelected($event, issue)"
                       >
                       Issue
                     </button>
@@ -238,7 +239,7 @@
       >
       </app-issuing-stock-by-store>
     </div> -->
-    <div *ngIf="!params?.issuingList?.length && currentLocation">
+    <div *ngIf="!params?.issuingList?.length && currentLocation && !loadingIssues">
       <table class="table table-striped">
         <tbody>
           <tr>
@@ -247,7 +248,7 @@
         </tbody>
       </table>
     </div>
-
+<!-- 
     <div class="d-flex justify-content-end mt-2 mr-2">
       <button
         color="primary"
@@ -257,6 +258,6 @@
       >
         Issue selected items
       </button>
-    </div>
+    </div> -->
   </mat-card>
 </div>

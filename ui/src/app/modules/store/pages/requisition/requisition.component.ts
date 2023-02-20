@@ -4,24 +4,15 @@ import { select, Store } from "@ngrx/store";
 import { map } from "rxjs/operators";
 import { Observable, of } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { RequisitionInput } from "src/app/shared/resources/store/models/requisition-input.model";
 import { RequisitionObject } from "src/app/shared/resources/store/models/requisition.model";
 import { RequisitionService } from "src/app/shared/resources/store/services/requisition.service";
-import {
-  cancelRequisition,
-  createRequest,
-  loadRequisitions,
-  receiveRequisition,
-  rejectRequisition,
-} from "src/app/store/actions/requisition.actions";
+import { omit } from "lodash";
 import { AppState } from "src/app/store/reducers";
 import {
-  getCurrentLocation,
   getStoreLocations,
 } from "src/app/store/selectors";
 import { getAllStockableItems } from "src/app/store/selectors/pricing-item.selectors";
-import { RequestCancelComponent } from "../../modals/request-cancel/request-cancel.component";
-import { RequisitionFormComponent } from "../../modals/requisition-form/requisition-form.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
 
 @Component({
   selector: "app-requisition",
@@ -61,6 +52,7 @@ export class RequisitionComponent implements OnInit {
   showRequisitionForm: boolean;
   requisitionCodeFormat$: Observable<any>;
   viewRequisitionItems: string;
+  selectedItems: any = {};
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -143,8 +135,9 @@ export class RequisitionComponent implements OnInit {
 
   onNewRequest(e: Event, params: any): void {
     e.stopPropagation();
-    if(this.showRequisitionForm){
+    if (this.showRequisitionForm) {
       //TODO: Ask user is done with requesition
+      // this.dialog.open()
     }
     this.showRequisitionForm = !this.showRequisitionForm;
 
@@ -238,6 +231,67 @@ export class RequisitionComponent implements OnInit {
       });
   }
 
+  onRejectItem(e: any) {
+    this.dialog.open(SharedConfirmationComponent, {
+      width: '40%',
+      data: {
+        modalTitle: 'Confirm Issue Rejection',
+        modalMessage : 'Are you sure you want to reject this item?',
+        showRemarksInput: true,
+        confirmationButtonText: "Reject"
+      }
+    }).afterClosed().subscribe((rejection) => {
+      if(rejection?.confirmed){
+        const issueItemRejectedObject = {
+          issueItem: {
+            uuid: e?.item?.uuid,
+          },
+          status: "REJECTED",
+          remarks: rejection?.remarks || "",
+        };
+    
+        this.requisitionService
+          .createIssueItemStatus(issueItemRejectedObject)
+          .subscribe((response) => {
+            // Add support to catch error
+            if (response) {
+              this.getAllRequisition();
+            }
+          });
+      }
+    })
+  }
+
+  onReceiveItem(e: any, requisition?: any) {
+    const issueReceiveObject = {
+      issue: e?.item?.issue,
+      receivingLocation: {
+        uuid: requisition?.requestingLocation?.uuid,
+      },
+      issueingLocation: {
+        uuid: requisition?.requestedLocation?.uuid,
+      },
+      receiptItems: [
+        {
+          item: {
+            uuid: e?.item?.item?.uuid,
+          },
+          quantity: e?.item?.quantity,
+          batch: e?.item?.batch,
+        },
+      ],
+    };
+
+    this.requisitionService
+      .createIssueItemStatus(issueReceiveObject)
+      .subscribe((response) => {
+        // Add support to catch error
+        if (response) {
+          this.getAllRequisition();
+        }
+      });
+  }
+
   onRejectRequisition(e: any, requisition: any) {
     e?.stopPropagation();
     const requisitionObject = {
@@ -254,7 +308,7 @@ export class RequisitionComponent implements OnInit {
         this.getAllRequisition();
       });
   }
-  
+
   onCancelRequisition(e: any, requisition: any) {
     e?.stopPropagation();
     const requisitionObject = {
@@ -343,5 +397,25 @@ export class RequisitionComponent implements OnInit {
   onSelectStatus(e) {
     this.selectedStatus = e?.value;
     this.getAllRequisition();
+  }
+
+  getSelection(e: any): void {
+    const item = e?.item;
+    const event = e?.event;
+    if (event?.checked) {
+      this.selectedItems[item?.uuid] = item;
+    } else {
+      let newSelectedItems: any;
+      Object.keys(this.selectedItems).forEach((uuid) => {
+        if (uuid === item?.uuid) {
+          newSelectedItems = omit(this.selectedItems, uuid);
+        }
+      });
+      this.selectedItems = newSelectedItems;
+    }
+  }
+
+  get selectedItemsCount(): number {
+    return this.selectedItems ? Object.keys(this.selectedItems)?.length : 0;
   }
 }

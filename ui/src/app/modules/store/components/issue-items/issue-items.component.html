@@ -3,7 +3,7 @@
 } as params">
    <div class="row">
     <div class="col-12">
-      <mat-progress-bar mode="indeterminate" *ngIf="params?.specificRequisition && loadingRequisition"></mat-progress-bar>
+      <mat-progress-bar mode="indeterminate" *ngIf="!params?.specificRequisition?.items?.length && loadingRequisition"></mat-progress-bar>
       <table class="table table-hover table-striped" *ngIf="params?.specificRequisition?.items?.length && !loadingRequisition">
             <thead>
               <tr>
