@@ -106,7 +106,7 @@ export class WorkSheetsService {
                 sample: {
                   ...worksheetSample?.sample,
                   allocations: worksheetSample?.sample?.allocations?.map(
-                    (allocation) => new SampleAllocation(allocation)
+                    (allocation) => new SampleAllocation(allocation).toJson()
                   ),
                 },
               };

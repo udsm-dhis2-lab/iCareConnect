@@ -47,21 +47,17 @@
                     allocation?.order?.concept?.setMembers?.length == 0 ||
                     (allocation?.order?.concept?.setMembers?.length > 0 &&
                       allocation?.order?.concept?.uuid !==
-                        allocation?.allocation?.parameter?.uuid)
+                        allocation?.parameter?.uuid)
                   "
-                  [parameterUuid]="allocation?.allocation?.parameter?.uuid"
-                  [allocation]="allocation?.allocation"
+                  [parameterUuid]="allocation?.parameter?.uuid"
+                  [allocation]="allocation"
                   [multipleResultsAttributeType]="multipleResultsAttributeType"
                   [isLIS]="isLIS"
                   [disabled]="false"
                   [finalResult]="allocation?.finalResult"
                   [conceptNameType]="conceptNameType"
                   (data)="
-                    getFedResult(
-                      $event,
-                      worksheetSample?.sample,
-                      allocation?.allocation
-                    )
+                    getFedResult($event, worksheetSample?.sample, allocation)
                   "
                 ></app-test-parameter-entry>
               </ng-container>
