@@ -66,7 +66,14 @@ export class ResultEntryByWorksheetComponent implements OnInit {
       this.worksheetsService.getWorksheetDefinitionsByUuid(uuid);
   }
 
-  getFedResult(response: any, sample: any, allocation: any): void {
+  getFedResult(
+    response: any,
+    sample: any,
+    allocation: any,
+    currentWorksheetDefinition: any
+  ): void {
+    this.selectedInstrument =
+      currentWorksheetDefinition?.worksheet?.instrument?.uuid;
     const resKey = response?.parameter?.uuid + ":" + allocation?.uuid;
     if (allocation?.finalResult?.value !== response?.value) {
       this.results[resKey] = {
@@ -88,6 +95,10 @@ export class ResultEntryByWorksheetComponent implements OnInit {
           ) || []
         )?.length > 0;
     }
+  }
+
+  onGetRemarks(remark: string, allocation) {
+    this.remarksData[allocation?.order?.concept?.uuid] = remark;
   }
 
   onSave(event: Event): void {
