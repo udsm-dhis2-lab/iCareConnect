@@ -179,7 +179,7 @@ public class StoreController {
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
 	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
 	        @RequestParam(value = "status", required = false) RequisitionStatus.RequisitionStatusCode status,
-			@RequestParam(value ="orderByDirection", required = false) Requisition.OrderByDirection orderByDirection) {
+	        @RequestParam(value = "orderByDirection", required = false) Requisition.OrderByDirection orderByDirection) {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
@@ -188,7 +188,7 @@ public class StoreController {
 		
 		if (requestedLocationUuid != null && requestingLocationUuid == null) {
 			ListResult<Requisition> requisitions = this.storeService.getRequestsForRequestedLocation(requestedLocationUuid,
-			    pager, status,orderByDirection);
+			    pager, status, orderByDirection);
 			
 			//			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
 			//
@@ -544,22 +544,7 @@ public class StoreController {
 
 			List<StockInvoiceItem> stockInvoiceItems = new ArrayList<>();
 			for (Map<String, Object> invoiceItemMap : (List<Map<String, Object>>) stockInvoiceMap.get("invoiceItems")){
-				StockInvoiceItem stockInvoiceItem = new StockInvoiceItem();
-				stockInvoiceItem.setItem(iCareService.getItemByUuid(((Map)invoiceItemMap.get("item")).get("uuid").toString()));
-				stockInvoiceItem.setBatchNo((String) invoiceItemMap.get("batchNo"));
-				stockInvoiceItem.setOrderQuantity((Integer) invoiceItemMap.get("orderQuantity"));
-				stockInvoiceItem.setBatchQuantity((Integer) invoiceItemMap.get("batchQuantity"));
-				stockInvoiceItem.setAmount((Double) invoiceItemMap.get("amount"));
-				stockInvoiceItem.setUnitPrice((Double) invoiceItemMap.get("unitPrice"));
-				stockInvoiceItem.setUom(Context.getConceptService().getConceptByUuid(((Map)invoiceItemMap.get("uom")).get("uuid").toString()));
-
-				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-				if (invoiceItemMap.get("expiryDate").toString().length() == 10) {
-					stockInvoiceItem.setExpiryDate(dateFormat.parse(invoiceItemMap.get("expiryDate").toString()));
-				} else {
-					stockInvoiceItem.setExpiryDate(dateFormat.parse(invoiceItemMap.get("expiryDate").toString()
-							.substring(0, invoiceItemMap.get("expiryDate").toString().indexOf("T"))));
-				}
+				StockInvoiceItem stockInvoiceItem = StockInvoiceItem.fromMap(invoiceItemMap);
 				stockInvoiceItem.setStockInvoice(stockInvoice);
 				stockInvoiceItems.add(stockInvoiceItem);
 			}
@@ -570,9 +555,29 @@ public class StoreController {
 			newStockInvoicesObject.add(savedStockInvoice.toMap());
 
 		}
-
 		return newStockInvoicesObject;
 
+	}
+	
+	@RequestMapping(value = "stockinvoice/{stockInvoiceUuid}",method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> updateStockInvoice(@PathVariable String stockInvoiceUuid, @RequestBody Map<String,Object> stockInvoiceMap) throws Exception {
+
+		StockInvoice stockInvoice = StockInvoice.fromMap(stockInvoiceMap);
+		stockInvoice.setUuid(stockInvoiceUuid);
+		if(stockInvoiceMap.get("invoiceItems") != null) {
+			List<StockInvoiceItem> stockInvoiceItems = new ArrayList<>();
+			for (Map<String, Object> invoiceItemMap : (List<Map<String, Object>>) stockInvoiceMap.get("invoiceItems")) {
+				StockInvoiceItem stockInvoiceItem = StockInvoiceItem.fromMap(invoiceItemMap);
+				stockInvoiceItem.setStockInvoice(stockInvoice);
+				stockInvoiceItems.add(stockInvoiceItem);
+			}
+
+			stockInvoice.setStockInvoiceItems(stockInvoiceItems);
+		}
+		StockInvoice updatedStockInvoice = storeService.updateStockInvoice(stockInvoice);
+
+		return updatedStockInvoice.toMap();
 	}
 	
 	@RequestMapping(value = "stockinvoices", method = RequestMethod.GET)
@@ -580,15 +585,25 @@ public class StoreController {
 	public Map<String, Object> getStockInvoices(
 	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) {
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(required = false, value = "status") StockInvoiceStatus.Type status) {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 		
-		ListResult<StockInvoice> stockInvoices = this.storeService.getStockInvoices(pager);
+		ListResult<StockInvoice> stockInvoices = this.storeService.getStockInvoices(pager, status);
 		return stockInvoices.toMap();
+	}
+	
+	@RequestMapping(value = "stockinvoice/{stockInvoiceUuid}", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getStockInvoiceByUuid(@PathVariable String stockInvoiceUuid) {
+		
+		StockInvoice stockInvoice = storeService.getStockInvoice(stockInvoiceUuid);
+		return stockInvoice.toMap();
+		
 	}
 	
 	@RequestMapping(value = "suppliers",method = RequestMethod.POST)
@@ -606,6 +621,17 @@ public class StoreController {
 		}
 
 		return newSuppliersMapList;
+	}
+	
+	@RequestMapping(value = "supplier/{supplierUuid}", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> updateSupplier(@PathVariable String supplierUuid, @RequestBody Map<String, Object> supplierMap)
+	        throws Exception {
+		Supplier supplier = Supplier.fromMap(supplierMap);
+		supplier.setUuid(supplierUuid);
+		Supplier updatedSupplier = storeService.updateSupplier(supplier);
+		
+		return updatedSupplier.toMap();
 	}
 	
 	@RequestMapping(value="suppliers",method = RequestMethod.GET)
@@ -647,5 +673,24 @@ public class StoreController {
 		}
 
 		return stockInvoiceStatusMapList;
+	}
+	
+	@RequestMapping(value = "stockinvoiceitem/{stockInvoiceItemUuid}", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> updateStockInvoiceItems(@PathVariable String stockInvoiceItemUuid,
+	        @RequestBody Map<String, Object> stockInvoiceItemsMap) throws Exception {
+		
+		StockInvoiceItem stockInvoiceItem = StockInvoiceItem.fromMap(stockInvoiceItemsMap);
+		stockInvoiceItem.setUuid(stockInvoiceItemUuid);
+		StockInvoiceItem updatedStockInvoiceItem = storeService.updateStockInvoiceItem(stockInvoiceItem);
+		return updatedStockInvoiceItem.toMap();
+		
+	}
+	
+	@RequestMapping(value = "stockinvoiceitem/{stockInvoiceItemUuid}", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getStockInvoiceItemByUuid(@PathVariable String stockInvoiceItemUuid) {
+		StockInvoiceItem stockInvoiceItem = storeService.getStockInvoiceItemByUuid(stockInvoiceItemUuid);
+		return stockInvoiceItem.toMap();
 	}
 }

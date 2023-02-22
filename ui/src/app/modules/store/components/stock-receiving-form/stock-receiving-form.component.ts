@@ -27,14 +27,16 @@ export class StockReceivingFormComponent implements OnInit {
   unitsOfMeasurements$: Observable<any>;
   stockInvoice: any;
   loadingInvoice: boolean = false;
+  updateStockInvoice: boolean = false;
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
+    this.updateStockInvoice = this.existingStockInvoice ? true : false;
     this.stockInvoice = this.existingStockInvoice;
     this.unitsOfMeasurements$ = this.conceptService
       ?.getConceptByMappingSource(
         this.unitsOfMeasurementSettings?.mappingSource,
-        "custom:(uuid,display,mappings:(uuid,display,conceptReferenceTerm:(uuid,display,code)))"
+        "custom:(uuid,display,mappings:(uuid,display,conceptReferenceTerm:(uuid,display,code,conceptSource)))"
       )
       .pipe(
         map((response) => {

@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { MatCheckboxChange } from "@angular/material/checkbox";
 
 @Component({
   selector: "app-shared-samples-list",
@@ -18,6 +19,8 @@ export class SharedSamplesListComponent implements OnInit {
   pageCount: number = 100;
   @Output() resultEntrySample: EventEmitter<any> = new EventEmitter<any>();
   @Output() selectedSampleDetails: EventEmitter<any> = new EventEmitter<any>();
+  selectedSamples: any[] = [];
+  @Output() samplesForAction: EventEmitter<any[]> = new EventEmitter<any[]>();
   constructor() {}
 
   ngOnInit(): void {}
@@ -49,5 +52,14 @@ export class SharedSamplesListComponent implements OnInit {
   onReject(event: Event, sample: any, actionType?: string): void {
     event.stopPropagation();
     this.selectedSampleDetails.emit({ ...sample, actionType });
+  }
+
+  onSelectItem(event: MatCheckboxChange, sample: any): void {
+    this.selectedSamples = event?.checked
+      ? [...this.selectedSamples, sample]
+      : this.selectedSamples?.filter(
+          (selectedSample) => selectedSample?.label !== sample?.label
+        ) || [];
+    this.samplesForAction.emit(this.selectedSamples);
   }
 }

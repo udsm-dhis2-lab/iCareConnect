@@ -6,7 +6,7 @@ import { AppState } from "src/app/store/reducers";
 import { Observable, of, zip } from "rxjs";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
 import { map, take } from "rxjs/operators";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
@@ -40,6 +40,8 @@ export class SamplesToAcceptComponent implements OnInit {
 
   samplesToViewMoreDetails: any = {};
   saving: boolean = false;
+
+  selectedSamplesForAction: any[];
   constructor(
     private dialog: MatDialog,
     private store: Store<AppState>,
@@ -80,7 +82,7 @@ export class SamplesToAcceptComponent implements OnInit {
     }
   }
 
-  accept(sample: any, providerDetails: any): void {
+  accept(sample: any, providerDetails?: any): void {
     this.saving = true;
     let confirmDialog;
     if (this.LISConfigurations?.isLIS) {
@@ -214,7 +216,7 @@ export class SamplesToAcceptComponent implements OnInit {
     });
   }
 
-  reject(sample, providerDetails) {
+  reject(sample: any, providerDetails?: any) {
     this.dialog
       .open(RejectionReasonComponent, {
         width: "40%",
@@ -254,5 +256,23 @@ export class SamplesToAcceptComponent implements OnInit {
           });
         }
       });
+  }
+
+  onGetSelectedSamplesForAction(samples: any[]): void {
+    this.selectedSamplesForAction = samples;
+  }
+
+  onAcceptAll(event: Event): void {
+    event.stopPropagation();
+    for (const sampleDetails of this.selectedSamplesForAction) {
+      this.accept(sampleDetails?.sample, null);
+    }
+  }
+
+  onRejectAll(event: Event): void {
+    event.stopPropagation();
+    for (const sampleDetails of this.selectedSamplesForAction) {
+      this.reject(sampleDetails?.sample, null);
+    }
   }
 }
