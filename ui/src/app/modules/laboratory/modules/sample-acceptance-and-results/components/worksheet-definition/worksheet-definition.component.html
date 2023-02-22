@@ -54,6 +54,7 @@
         </button>
       </div>
       <div class="w-100 mt-2" style="max-height: 700px; overflow: auto">
+        <!-- {{ selectedRowsColumns | json }} -->
         <table
           class="table table-bordered"
           id="wsdefntable"
@@ -112,14 +113,13 @@
                   </mat-radio-group>
                 </section>
                 {{
-                  (selectedRowsColumns[row + "-" + column + "-control"]?.value
+                  selectedRowsColumns[row + "-" + column + "-control"]?.value
                     ? selectedRowsColumns[row + "-" + column + "-control"]
                         ?.value?.code
                     : selectedRowsColumns[row + "-" + column + "-sample"]?.value
                     ? selectedRowsColumns[row + "-" + column + "-sample"]?.value
                         ?.label
                     : ""
-                  ) | formatLabelCharCountDisplay: currentLabelCharCount
                 }}
                 <div
                   *ngIf="

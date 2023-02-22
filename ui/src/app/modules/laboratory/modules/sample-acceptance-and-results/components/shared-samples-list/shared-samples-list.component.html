@@ -1,12 +1,29 @@
 <div *ngIf="{ samples: samples$ | async } as params">
-  <div class="filter-and-legend">
-    <mat-form-field class="w-50">
+  <div class="filter-and-legend w-100 d-flex justify-content-between">
+    <mat-form-field class="w-25">
       <mat-label>Search</mat-label>
       <mat-icon matPrefix>search</mat-icon
       ><input matInput (keyup)="onSearchSamples($event)" />
     </mat-form-field>
 
-    <table style="border: none; margin-left: 15px" class="w-20 float-right">
+    <mat-form-field appearance="fill" class="w-25 ml-2">
+      <mat-label
+        >Select
+        {{ !LISConfigurations?.isLIS ? "Department" : "Section" }}</mat-label
+      >
+      <mat-select (selectionChange)="onSelectDepartment($event)">
+        <mat-option (click)="setDepartment($event, '')">All</mat-option>
+        <mat-option
+          *ngFor="let dept of labSamplesDepartments"
+          [value]="dept"
+          (click)="setDepartment($event, dept)"
+        >
+          {{ dept?.display }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <table style="border: none; margin-left: 15px" class="w-50">
       <tr style="height: 30px">
         <td style="width: 40px; border: solid 1px #eee"></td>
         <td>
@@ -62,23 +79,6 @@
         </td>
       </tr>
     </table>
-
-    <mat-form-field appearance="fill" class="w-30 ml-2 float-right">
-      <mat-label
-        >Select
-        {{ !LISConfigurations?.isLIS ? "Department" : "Section" }}</mat-label
-      >
-      <mat-select (selectionChange)="onSelectDepartment($event)">
-        <mat-option (click)="setDepartment($event, '')">All</mat-option>
-        <mat-option
-          *ngFor="let dept of labSamplesDepartments"
-          [value]="dept"
-          (click)="setDepartment($event, dept)"
-        >
-          {{ dept?.display }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
   </div>
 
   <mat-progress-bar
