@@ -6,6 +6,7 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { groupBy, flatten, omit } from "lodash";
 import { SampleAllocationService } from "src/app/shared/resources/sample-allocations/services/sample-allocation.service";
 import { SamplesService } from "src/app/shared/services/samples.service";
+import { MatRadioChange } from "@angular/material/radio";
 
 @Component({
   selector: "app-result-entry-by-worksheet",
@@ -27,6 +28,8 @@ export class ResultEntryByWorksheetComponent implements OnInit {
   files: any[];
   isFormValid: boolean = false;
   testAllocationDetails: any = {};
+  showRemarks: boolean = false;
+  remarksShowStatus: string = "hide";
   constructor(
     private worksheetsService: WorkSheetsService,
     private sampleService: SamplesService,
@@ -59,6 +62,11 @@ export class ResultEntryByWorksheetComponent implements OnInit {
     if (this.currentWorksheetDefinitionUuid) {
       this.getWorksheetDefinitionByUuid(this.currentWorksheetDefinitionUuid);
     }
+  }
+
+  getRemarksShowStatus(event: MatRadioChange): void {
+    this.remarksShowStatus = event?.value;
+    this.showRemarks = this.remarksShowStatus === "hide" ? false : true;
   }
 
   getWorksheetDefinitionByUuid(uuid: string): void {
