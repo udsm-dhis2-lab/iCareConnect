@@ -227,7 +227,7 @@ public class LaboratoryController {
 	        @RequestParam(value = "excludeAllocations", required = false) boolean excludeAllocations,
 	        @RequestParam(value = "acceptedBy", required = false) String acceptedByUuid,
 	        @RequestParam(value = "test", required = false) String testConceptUuid,
-			@RequestParam(value = "department", required = false) String departmentUuid) throws ParseException {
+	        @RequestParam(value = "department", required = false) String departmentUuid) throws ParseException {
 		
 		Date start = null;
 		Date end = null;

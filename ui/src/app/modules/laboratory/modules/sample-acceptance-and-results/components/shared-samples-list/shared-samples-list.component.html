@@ -68,12 +68,12 @@
         >Select
         {{ !LISConfigurations?.isLIS ? "Department" : "Section" }}</mat-label
       >
-      <mat-select [(value)]="selectedDepartment">
+      <mat-select (selectionChange)="onSelectDepartment($event)">
         <mat-option (click)="setDepartment($event, '')">All</mat-option>
         <mat-option
           *ngFor="let dept of labSamplesDepartments"
-          [value]="dept?.display"
-          (click)="setDepartment($event, dept?.display)"
+          [value]="dept"
+          (click)="setDepartment($event, dept)"
         >
           {{ dept?.display }}
         </mat-option>
@@ -116,11 +116,7 @@
     <tbody>
       <ng-container *ngIf="params?.samples?.results?.length > 0">
         <ng-container
-          *ngFor="
-            let sample of params?.samples?.results
-              | filterSamples: searchingText:selectedDepartment;
-            let count = index
-          "
+          *ngFor="let sample of params?.samples?.results; let count = index"
         >
           <tr
             [ngStyle]="{
