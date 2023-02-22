@@ -4,7 +4,7 @@
     currentWorksheetDefinition: currentWorksheetDefinition$ | async
   } as params"
 >
-  <div style="margin-left: -18px">
+  <div>
     <app-form
       [fields]="[worksheetDefinitionField]"
       (formUpdate)="onFormUpdate($event)"
@@ -26,6 +26,25 @@
     </div>
   </div>
   <div class="row" *ngIf="params?.currentWorksheetDefinition">
+    <div class="col-12 d-flex justify-content-end">
+      <mat-radio-group>
+        <mat-radio-button
+          [value]="'hide'"
+          [checked]="remarksShowStatus === 'hide'"
+          color="primary"
+          (change)="getRemarksShowStatus($event)"
+          >Hide remarks</mat-radio-button
+        >
+        <mat-radio-button
+          [value]="'show'"
+          [checked]="remarksShowStatus === 'show'"
+          color="primary"
+          class="ml-3"
+          (change)="getRemarksShowStatus($event)"
+          >Show remarks</mat-radio-button
+        >
+      </mat-radio-group>
+    </div>
     <div class="col-md-4">
       <table class="table table-bordered">
         <ng-container
@@ -74,7 +93,7 @@
               </div>
             </td>
           </tr>
-          <tr>
+          <tr *ngIf="showRemarks">
             <td colspan="2">
               <app-shared-remarks-entry
                 (remarks)="onGetRemarks($event, allocation)"
@@ -132,7 +151,7 @@
               </div>
             </td>
           </tr>
-          <tr>
+          <tr *ngIf="showRemarks">
             <td colspan="2">
               <app-shared-remarks-entry
                 (remarks)="onGetRemarks($event, allocation)"
@@ -190,7 +209,7 @@
               </div>
             </td>
           </tr>
-          <tr>
+          <tr *ngIf="showRemarks">
             <td colspan="2">
               <app-shared-remarks-entry
                 (remarks)="onGetRemarks($event, allocation)"
