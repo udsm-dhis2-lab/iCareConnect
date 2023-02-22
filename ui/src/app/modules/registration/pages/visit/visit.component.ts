@@ -350,9 +350,6 @@ export class VisitComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.visitService
-      .getLastPatientVisit(this.patientDetails?.uuid)
-      .subscribe((data) => console.log("visit", data));
     this.patientVisist$ = this.visitService
       .getLastPatientVisit(this.patientDetails?.uuid)
       .pipe(

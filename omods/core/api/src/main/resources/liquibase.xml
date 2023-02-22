@@ -4552,4 +4552,12 @@
 
     </changeSet>
 
+    <changeSet id="update_st_stock_invoice_item_add_column_location" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice_item
+            ADD COLUMN location_id INT,
+            ADD FOREIGN KEY(location_id) REFERENCES location(location_id);
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

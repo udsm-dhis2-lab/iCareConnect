@@ -19,8 +19,32 @@ export class StockInvoicesService {
     );
   }
 
-  getStockInvoices(): Observable<any> {
-    return this.httpClient.get(`store/stockinvoices`).pipe(
+  getStockInvoices(page?: number, pageSize?: number, status?: string, orderByDirection?: string): Observable<any> {
+    const pageNumber = page ? `page=${page}` : ``;
+    const pageSizeNumber =
+      pageSize && page
+        ? `&pageSize=${pageSize}`
+        : pageSize
+        ? `pageSize=${pageSize}`
+        : ``;
+    const filterStatus =
+      status && (page || pageSize)
+        ? `&status=${status}`
+        : status
+        ? `status=${status}`
+        : ``;
+    const orderByDirectionArg =
+      orderByDirection && (page || pageSize || status)
+        ? `&orderByDirection=${orderByDirection}`
+        : orderByDirection
+        ? `orderByDirection=${orderByDirection}`
+        : ``;
+    const pagingArgs =
+      pageNumber ||
+      pageSizeNumber ||
+      filterStatus ||
+      orderByDirectionArg ? `?${pageNumber}${pageSizeNumber}${filterStatus}${orderByDirectionArg}` : '';
+    return this.httpClient.get(`store/stockinvoices${pagingArgs}`).pipe(
       map((stockInvoiceResponse: any) => {
         return stockInvoiceResponse;
       }),

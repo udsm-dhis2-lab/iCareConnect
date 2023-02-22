@@ -39,10 +39,10 @@ public interface StoreService extends OpenmrsService {
 	public List<RequisitionStatus> getRequisitionStatuses();
 	
 	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager,
-																   RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection);
+	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection);
 	
 	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager,
-																   RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection);
+	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection);
 	
 	public Requisition getRequestByUuid(String requisitionUuid);
 	
@@ -108,7 +108,7 @@ public interface StoreService extends OpenmrsService {
 	
 	public Supplier getSupplierByUuid(String supplierUuid);
 	
-	ListResult<StockInvoice> getStockInvoices(Pager pager);
+	ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status);
 	
 	Supplier saveSupplier(Supplier supplier);
 	
@@ -117,4 +117,18 @@ public interface StoreService extends OpenmrsService {
 	StockInvoiceStatus saveStockInvoiceStatus(StockInvoiceStatus stockInvoiceStatus) throws Exception;
 	
 	List<StockInvoiceStatus> getStockInvoicesStatus(Integer startIndex, Integer limit, String q);
+	
+	StockInvoice updateStockInvoice(StockInvoice stockInvoice) throws Exception;
+	
+	StockInvoice getStockInvoice(String stockInvoiceUuid);
+	
+	StockInvoiceItem updateStockInvoiceItem(StockInvoiceItem stockInvoiceItem) throws Exception;
+	
+	StockInvoiceItem getStockInvoiceItemByUuid(String stockInvoiceItemUuid);
+	
+	StockInvoiceItem saveStockInvoiceItem(StockInvoiceItem stockInvoiceItem) throws Exception;
+	
+	StockInvoiceItemStatus saveStockInvoiceItemStatus(StockInvoiceItemStatus stockInvoiceItemStatus);
+	
+	Supplier updateSupplier(Supplier supplier) throws Exception;
 }

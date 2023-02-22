@@ -32,6 +32,8 @@ import {
 import { loadActiveVisit } from "../actions/visit.actions";
 import { VisitsService } from "src/app/shared/services/visits.service";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
+import { LabOrdersService } from "src/app/modules/laboratory/resources/services/lab-orders.service";
 
 @Injectable()
 export class LabOrdersEffects {
@@ -40,7 +42,8 @@ export class LabOrdersEffects {
     private notificationService: NotificationService,
     private investigationProcedureService: InvestigationProcedureService,
     private visitService: VisitsService,
-    private ordersService: OrdersService
+    private ordersService: OrdersService,
+    private labOrdersService: LabOrdersService
   ) {}
 
   labOrderCreateUsingEncounter$ = createEffect(() =>
@@ -53,15 +56,26 @@ export class LabOrdersEffects {
             type: "LOADING",
           })
         );
-        const data = {
-          uuid: action.orders[0]?.encounter,
-          orders: action.orders.map((order) => {
-            const formattedOrder = _.omit(order, "encounter");
-            return formattedOrder;
-          }),
+        const formattedOrders = action.orders.map((order) => {
+          const formattedOrder = _.omit(order, ["encounter", "visit"]);
+          return formattedOrder;
+        });
+        // TODO: Softcode encoutnter type
+        const encounterData = {
+          visit: action.orders[0]?.visit,
+          patient: action.orders[0]?.patient,
+          encounterType: "d7151f82-c1f3-4152-a605-2f9ea7414a79",
+          location: action.orders[0]?.locations,
+          orders: formattedOrders,
+          encounterProviders: [
+            {
+              provider: action?.orders[0]?.orderer,
+              encounterRole: ICARE_CONFIG.encounterRole,
+            },
+          ],
         };
-        return this.investigationProcedureService
-          .saveOrdersUsingEncounter(data, action.orders[0]?.encounter)
+        return this.labOrdersService
+          .createLabOrdersViaEncounter(encounterData)
           .pipe(
             switchMap((labOrdersResponse: any) => {
               this.notificationService.show(

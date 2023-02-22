@@ -16,6 +16,7 @@ export class Observation {
 
   get concept(): any {
     return {
+      ...this.obs?.concept,
       uuid: this.obs?.concept?.uuid,
       display: this.obs?.concept?.display,
     };
@@ -85,6 +86,10 @@ export class Observation {
     return this.obs?.encounterProvider;
   }
 
+  get order(): any {
+    return this.obs?.order;
+  }
+
   toJson(): ObservationObject {
     return {
       id: this.uuid,
@@ -104,6 +109,7 @@ export class Observation {
       status: this.status,
       conceptUuid: this.conceptUuid,
       provider: this.provider,
+      order: this.order,
     };
   }
 }

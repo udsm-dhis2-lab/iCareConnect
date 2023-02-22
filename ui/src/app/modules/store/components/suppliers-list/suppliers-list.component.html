@@ -31,6 +31,30 @@
             <td>{{ index + 1 }}</td>
             <td>{{ supplier?.name }}</td>
             <td>{{ supplier?.description }}</td>
+            <td>
+              <button
+                    mat-icon-button
+                    [matMenuTriggerFor]="menu"
+                  >
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu">
+                    <button
+                      mat-menu-item
+                      (click)="onUpdateSupplier($event, supplier)"
+                    >
+                      <mat-icon>edit</mat-icon>
+                      <span>Update</span>
+                    </button>
+                    <button
+                      mat-menu-item
+                      (click)="onDeleteSupplier($event, supplier)"
+                    >
+                      <mat-icon>delete</mat-icon>
+                      <span>Delete</span>
+                    </button>
+                  </mat-menu>
+            </td>
           </tr>
         </tbody>
       </table>

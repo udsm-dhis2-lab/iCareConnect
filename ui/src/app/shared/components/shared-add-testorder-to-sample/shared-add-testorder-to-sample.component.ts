@@ -21,7 +21,7 @@ import { ICARE_CONFIG } from "../../resources/config";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { VisitsService } from "../../resources/visits/services";
 import { SamplesService } from "../../services/samples.service";
-import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
 
 @Component({
   selector: "app-shared-add-testorder-to-sample",
