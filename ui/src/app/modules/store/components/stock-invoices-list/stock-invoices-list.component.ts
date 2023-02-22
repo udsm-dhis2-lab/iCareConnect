@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { map, tap } from "rxjs/operators";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { StockInvoicesService } from "src/app/shared/resources/store/services/stockInvoice.service";
 import { StockInvoiceFormDialogComponent } from "../../modals/stock-invoice-form-dialog/stock-invoice-form-dialog.component";
 @Component({
