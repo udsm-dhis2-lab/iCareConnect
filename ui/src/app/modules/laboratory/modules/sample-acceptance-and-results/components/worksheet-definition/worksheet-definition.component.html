@@ -113,13 +113,14 @@
                   </mat-radio-group>
                 </section>
                 {{
-                  selectedRowsColumns[row + "-" + column + "-control"]?.value
+                  (selectedRowsColumns[row + "-" + column + "-control"]?.value
                     ? selectedRowsColumns[row + "-" + column + "-control"]
                         ?.value?.code
                     : selectedRowsColumns[row + "-" + column + "-sample"]?.value
                     ? selectedRowsColumns[row + "-" + column + "-sample"]?.value
                         ?.label
                     : ""
+                  ) | formatLabelCharCountDisplay: currentLabelCharCount
                 }}
                 <div
                   *ngIf="

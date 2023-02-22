@@ -3795,6 +3795,13 @@
             ADD FOREIGN KEY lb_worksheet_sample_sample_id_lb_sample_sample_id_fk(sample_id) REFERENCES lb_sample(sample_id);
         </sql>
     </changeSet>
+    <!-- For worksheet control -->
+    <changeSet id="update_lb_worksheet_sample_change_control_id_foreign_key" author="josephat-mwakyusa" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_sample DROP FOREIGN KEY lb_worksheet_control_control_id_lb_sample_sample_id_fk,
+            ADD FOREIGN KEY control_id_lb_worksheet_control_control_id_fk(control_id) REFERENCES lb_worksheet_control(worksheet_control_id);
+        </sql>
+    </changeSet>
 
     <!-- foreign key was wrongly referenced in lb_worksheet_definition -->
     <changeSet id="update_lb_worksheet_definition_change_worksheet_id_foreign_key" author="dennis-kibahila" dbms="mysql">
