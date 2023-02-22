@@ -18,7 +18,7 @@ import { InvestigationProcedureService } from "../../resources/investigation-pro
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
-import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
 
 @Component({
   selector: "app-order-results-renderer",

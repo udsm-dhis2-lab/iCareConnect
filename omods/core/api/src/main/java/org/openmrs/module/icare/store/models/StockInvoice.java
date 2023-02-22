@@ -35,13 +35,6 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "stockInvoice")
     private List<StockInvoiceItem> stockInvoiceItems = new ArrayList<>(0);
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "stockInvoice")
-    private List<StockInvoiceStatus> stockInvoiceStatuses = new ArrayList<>(0);
-
-    @Transient
-    private Double totalAmount;
-
-
     @Override
     public Integer getId() {
         return id;
@@ -90,22 +83,6 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
 
     public void setStockInvoiceItems(List<StockInvoiceItem> stockInvoiceItems) {
         this.stockInvoiceItems = stockInvoiceItems;
-    }
-
-    public List<StockInvoiceStatus> getStockInvoiceStatuses() {
-        return stockInvoiceStatuses;
-    }
-
-    public void setStockInvoiceStatuses(List<StockInvoiceStatus> stockInvoiceStatuses) {
-        this.stockInvoiceStatuses = stockInvoiceStatuses;
-    }
-
-    public Double getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(Double totalAmount) {
-        this.totalAmount = totalAmount;
     }
 
     public static StockInvoice fromMap(Map<String,Object> stockInvoiceMap) throws ParseException {
@@ -177,15 +154,12 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
             purchaseOrderObject.put("display",this.getPurchaseOrder().getCode());
             stockInvoiceObject.put("purchaseOrder",purchaseOrderObject);
         }
-        if(this.getStockInvoiceItems() != null) {
-                List<Map<String, Object>> stockInvoiceItems = new ArrayList<>();
-                for (StockInvoiceItem stockInvoiceItem : this.getStockInvoiceItems()) {
-                    stockInvoiceItems.add(stockInvoiceItem.toMap());
-                }
-                stockInvoiceObject.put("InvoiceItems", stockInvoiceItems);
 
+        List<Map<String,Object>> stockInvoiceItems = new ArrayList<>();
+        for(StockInvoiceItem stockInvoiceItem : this.getStockInvoiceItems()){
+            stockInvoiceItems.add(stockInvoiceItem.toMap());
         }
-
+        stockInvoiceObject.put("stockInvoiceItems",stockInvoiceItems);
 
         if (this.getCreator() != null) {
             Map<String, Object> creatorObject = new HashMap<String, Object>();
@@ -193,26 +167,6 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
             creatorObject.put("display", this.getCreator().getDisplayString());
             stockInvoiceObject.put("creator", creatorObject);
         }
-
-        if(this.getStockInvoiceStatuses() != null){
-            List<Map<String,Object>> stockInvoiceStatusesMapList = new ArrayList<>();
-            Map<String,Object> stockInvoiceStatusesMap = new HashMap<>();
-            for (StockInvoiceStatus stockInvoiceStatus : this.getStockInvoiceStatuses()){
-                stockInvoiceStatusesMap.put("status",stockInvoiceStatus.getStatus());
-            }
-            stockInvoiceStatusesMapList.add(stockInvoiceStatusesMap);
-            stockInvoiceObject.put("stockInvoiceStatus",stockInvoiceStatusesMapList);
-
-        }
-
-        if(this.getVoided() != null){
-            stockInvoiceObject.put("voided",this.getVoided());
-        }
-
-        if(this.getTotalAmount() != null){
-            stockInvoiceObject.put("totalAmount",this.getTotalAmount());
-        }
-
         return stockInvoiceObject;
     }
 

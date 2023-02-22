@@ -6,7 +6,7 @@ import { AppState } from "src/app/store/reducers";
 import { Observable, of, zip } from "rxjs";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
 import { map, take } from "rxjs/operators";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
