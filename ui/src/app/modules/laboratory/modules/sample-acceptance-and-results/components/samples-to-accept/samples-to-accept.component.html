@@ -16,10 +16,11 @@
       </div>
     </div>
   </div>
-  <div *ngIf="params?.providerDetails">
+  <div *ngIf="params?.samplesToAccept">
     <div class="w-100" style="max-height: 60vh; overflow: auto">
       <app-shared-samples-list
         [tabType]="'samples-to-accept'"
+        [samples]="params?.samplesToAccept"
         [LISConfigurations]="LISConfigurations"
         [labSamplesDepartments]="labSamplesDepartments"
         (selectedSampleDetails)="
