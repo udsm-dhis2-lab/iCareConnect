@@ -12,7 +12,7 @@ import {
   getStoreLocations,
 } from "src/app/store/selectors";
 import { getAllStockableItems } from "src/app/store/selectors/pricing-item.selectors";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 
 @Component({
   selector: "app-requisition",

@@ -3,7 +3,7 @@ import { MatCheckboxChange } from "@angular/material/checkbox";
 import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { map, tap } from "rxjs/operators";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { getFilteredIssueItems } from "src/app/shared/helpers/issuings.helper";
 import { RequisitionService } from "src/app/shared/resources/store/services/requisition.service";
 import { RequisitionFormDialogComponent } from "../../modals/requisition-form-dialog/requisition-form-dialog.component";
