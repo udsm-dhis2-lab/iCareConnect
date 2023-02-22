@@ -3,6 +3,8 @@ import { MatCheckboxChange } from "@angular/material/checkbox";
 import { MatSelectChange } from "@angular/material/select";
 import { omit } from "lodash";
 import { Observable } from "rxjs";
+import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
+import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { SamplesService } from "src/app/shared/services/samples.service";
 
 @Component({
@@ -35,6 +37,8 @@ export class SharedSamplesListComponent implements OnInit {
   samples$: Observable<{ pager: any; results: any[] }>;
 
   pageCounts: any[] = [1, 5, 10, 20, 25, 50, 100, 200];
+
+  searchingTestField: any;
   constructor(private sampleService: SamplesService) {}
 
   ngOnInit(): void {
@@ -43,6 +47,15 @@ export class SharedSamplesListComponent implements OnInit {
       hasStatus: this.hasStatus,
       pageSize: this.pageSize,
       page: this.page,
+    });
+    this.searchingTestField = new Dropdown({
+      id: "test",
+      key: "test",
+      label: "Search by Test",
+      searchControlType: "concept",
+      searchTerm: "TEST_ORDERS",
+      conceptClass: "Test",
+      shouldHaveLiveSearchForDropDownFields: true,
     });
   }
 
@@ -63,7 +76,8 @@ export class SharedSamplesListComponent implements OnInit {
       },
       this.acceptedBy,
       params?.q,
-      params?.dapartment
+      params?.dapartment,
+      params?.testUuid
     );
   }
 
@@ -137,6 +151,17 @@ export class SharedSamplesListComponent implements OnInit {
       pageSize: this.pageSize,
       page: 1,
       q: this.searchingText,
+    });
+  }
+
+  onSearchByTest(formValue: FormValue): void {
+    this.getSamples({
+      category: this.category,
+      hasStatus: this.hasStatus,
+      pageSize: this.pageSize,
+      page: 1,
+      q: this.searchingText,
+      testUuid: formValue.getValues()?.test?.value,
     });
   }
 }

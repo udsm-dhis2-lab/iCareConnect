@@ -14,15 +14,15 @@
         >
         <mat-select (selectionChange)="onSelectDepartment($event)">
           <mat-option (click)="setDepartment($event, '')">All</mat-option>
-          <mat-option
-            *ngFor="let dept of labSamplesDepartments"
-            [value]="dept"
-            (click)="setDepartment($event, dept)"
-          >
+          <mat-option *ngFor="let dept of labSamplesDepartments" [value]="dept">
             {{ dept?.display }}
           </mat-option>
         </mat-select>
       </mat-form-field>
+      <app-form
+        [fields]="[searchingTestField]"
+        (formUpdate)="onSearchByTest($event)"
+      ></app-form>
     </div>
 
     <div class="w-50 d-flex" style="height: 20px" *ngIf="showLegend">
