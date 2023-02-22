@@ -46,7 +46,6 @@ export class SharedSamplesListComponent implements OnInit {
   }
 
   getSamples(params?: any): void {
-    console.log(params);
     this.samples$ = this.sampleService.getLabSamplesByCollectionDates(
       this.datesParameters,
       params?.category,

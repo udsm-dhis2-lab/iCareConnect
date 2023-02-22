@@ -256,10 +256,12 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.selectedWorkSheetConfiguration = values?.worksheet?.value;
     this.worksheetDefnPayload = {
       code: null,
-      expirationDateTime: new Date(values?.expirationDateTime?.value)
-        ?.toISOString()
-        ?.replace("T", " ")
-        .replace(".000Z", ""),
+      expirationDateTime: values?.expirationDateTime?.value
+        ? new Date(values?.expirationDateTime?.value)
+            ?.toISOString()
+            ?.replace("T", " ")
+            .replace(".000Z", "")
+        : null,
       additionalFields: JSON.stringify(
         Object.keys(values).map((key) => {
           return values[key];
@@ -308,7 +310,10 @@ export class WorksheetDefinitionComponent implements OnInit {
                 (ws?.type === "SAMPLE" ? "sample" : "control")
             ] = {
               set: true,
-              value: { ...ws?.sample, label: ws?.sample?.display },
+              value:
+                ws?.type === "SAMPLE"
+                  ? { ...ws?.sample, label: ws?.sample?.display }
+                  : { ...ws.control, label: ws?.control?.display },
             };
           });
           const additionalFields = JSON.parse(response?.additionFields);
