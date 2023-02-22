@@ -207,14 +207,16 @@ export class WorksheetDefinitionComponent implements OnInit {
                       },
                       type: type,
                     };
-                    returnObj[type === "SAMPLE" ? "sample" : "control"] = {
+                    returnObj[
+                      type === "SAMPLE" ? "sample" : "worksheetControl"
+                    ] = {
                       uuid: this.selectedRowsColumns[key]?.value?.uuid,
                     };
                     return returnObj;
                   }
                 })
                 ?.filter((worksheetSample) => worksheetSample);
-
+              // console.log(JSON.stringify(worksheetSamples));
               this.worksheetsService
                 .createWorksheetSamples(worksheetSamples)
                 .subscribe((response) => {
@@ -313,7 +315,10 @@ export class WorksheetDefinitionComponent implements OnInit {
               value:
                 ws?.type === "SAMPLE"
                   ? { ...ws?.sample, label: ws?.sample?.display }
-                  : { ...ws.control, label: ws?.control?.display },
+                  : {
+                      ...ws.worksheetControl,
+                      label: ws?.worksheetControl?.display,
+                    },
             };
           });
           const additionalFields = JSON.parse(response?.additionFields);
