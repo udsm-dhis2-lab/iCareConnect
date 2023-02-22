@@ -62,6 +62,15 @@
         : ""
     }}
   </span>
+  <span>
+    {{
+      observationsKeyedByConcept &&
+      observationsKeyedByConcept[concept?.uuid + "-" + labTest?.uuid]?.latest
+        ? observationsKeyedByConcept[concept?.uuid + "-" + labTest?.uuid]
+            ?.latest?.concept?.units
+        : ""
+    }}
+  </span>
   <span
     *ngIf="observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri"
   >

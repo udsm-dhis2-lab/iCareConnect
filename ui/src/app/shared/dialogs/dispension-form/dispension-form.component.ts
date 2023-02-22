@@ -24,7 +24,6 @@ import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { DrugsService } from "../../resources/drugs/services/drugs.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
-import { flatten, keyBy } from "lodash";
 import { VisitsService } from "../../resources/visits/services";
 import { LocationService } from "src/app/core/services";
 import { map, tap } from "rxjs/operators";

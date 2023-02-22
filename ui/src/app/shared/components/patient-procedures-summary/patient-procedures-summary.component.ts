@@ -12,7 +12,7 @@ import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getGroupedObservationByConcept } from "src/app/store/selectors/observation.selectors";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
-import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
 import { map } from "rxjs/operators";
 
 @Component({
