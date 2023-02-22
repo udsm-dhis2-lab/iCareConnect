@@ -6,7 +6,7 @@ import { EncountersService } from "../../services/encounters.service";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { map, tap } from "rxjs/operators";
 import { Observable } from "rxjs";
-import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
 import { MatDialog } from "@angular/material/dialog";
 import { getGenericDrugPrescriptionsFromVisit } from "../../helpers/visits.helper";
 
