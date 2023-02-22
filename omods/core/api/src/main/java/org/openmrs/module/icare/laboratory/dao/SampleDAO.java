@@ -115,7 +115,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			queryStr += " ((cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) \n"
 			        + "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate))";
 		}
-
+		
 		if (departmentUuid != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -214,7 +214,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
 		}
-
+		
 		if (locationUuid != null) {
 			query.setParameter("locationUuid", locationUuid);
 		}
@@ -226,7 +226,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
 		}
-
+		
 		if (departmentUuid != null) {
 			query.setParameter("departmentUuid", departmentUuid);
 		}
@@ -422,7 +422,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			queryStr += " ((cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) \n"
 			        + "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate))";
 		}
-
+		
 		if (departmentUuid != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -535,7 +535,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
 		}
-
+		
 		if (departmentUuid != null) {
 			query.setParameter("departmentUuid", departmentUuid);
 		}

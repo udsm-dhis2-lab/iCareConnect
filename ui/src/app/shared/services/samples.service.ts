@@ -33,7 +33,8 @@ export class SamplesService {
       codedRejectionReasons: any[];
     },
     acceptedBy?: string,
-    q?: string
+    q?: string,
+    department?: string
   ): Observable<any> {
     let parameters = [];
     if (pagerInfo) {
@@ -62,6 +63,10 @@ export class SamplesService {
 
     if (q) {
       parameters = [...parameters, "q=" + q];
+    }
+
+    if (department) {
+      parameters = [...parameters, "department=" + department];
     }
 
     if (excludeAllocations) {

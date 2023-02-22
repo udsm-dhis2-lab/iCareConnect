@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatCheckboxChange } from "@angular/material/checkbox";
+import { MatSelectChange } from "@angular/material/select";
 import { omit } from "lodash";
 import { Observable } from "rxjs";
 import { SamplesService } from "src/app/shared/services/samples.service";
@@ -45,6 +46,7 @@ export class SharedSamplesListComponent implements OnInit {
   }
 
   getSamples(params?: any): void {
+    console.log(params);
     this.samples$ = this.sampleService.getLabSamplesByCollectionDates(
       this.datesParameters,
       params?.category,
@@ -60,7 +62,8 @@ export class SharedSamplesListComponent implements OnInit {
         codedRejectionReasons: this.codedSampleRejectionReasons,
       },
       this.acceptedBy,
-      params?.q
+      params?.q,
+      params?.dapartment
     );
   }
 
@@ -87,9 +90,15 @@ export class SharedSamplesListComponent implements OnInit {
     }
   }
 
-  setDepartment(event: Event, departmentName): void {
-    event.stopPropagation();
-    this.selectedDepartment = departmentName;
+  onSelectDepartment(event: MatSelectChange): void {
+    this.getSamples({
+      category: this.category,
+      hasStatus: this.hasStatus,
+      pageSize: this.pageSize,
+      page: 1,
+      q: this.searchingText,
+      dapartment: event?.value?.uuid,
+    });
   }
 
   onResultsEntryAndReview(e: Event, sample: any): void {
