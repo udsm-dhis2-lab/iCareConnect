@@ -268,7 +268,9 @@ export class ResultEntryByWorksheetComponent implements OnInit {
                             };
                             this.sampleService
                               .saveSampleStatuses([status])
-                              .subscribe((response) => {});
+                              .subscribe((response) => {
+                                console.log("response", response);
+                              });
                           }
                           setTimeout(() => {
                             // this.getAllocations();

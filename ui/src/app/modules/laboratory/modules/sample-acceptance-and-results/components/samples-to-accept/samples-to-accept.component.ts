@@ -205,11 +205,9 @@ export class SamplesToAcceptComponent implements OnInit {
               .subscribe((response) => {
                 if (response && !response?.error) {
                   this.saving = false;
-                  this.getSamples();
                 } else {
                   // TODO: Handle errors
                   this.saving = false;
-                  this.getSamples();
                 }
               });
           });
