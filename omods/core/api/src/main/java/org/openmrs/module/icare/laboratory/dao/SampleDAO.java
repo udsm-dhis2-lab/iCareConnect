@@ -74,7 +74,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
 	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
-	        String testConceptUuid) {
+	        String testConceptUuid, String departmentUuid) {
 		
 		DbSession session = this.getSession();
 		
@@ -114,6 +114,15 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 			queryStr += " ((cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) \n"
 			        + "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate))";
+		}
+
+		if (departmentUuid != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp.concept.uuid =:departmentUuid";
 		}
 		
 		if (locationUuid != null) {
@@ -205,6 +214,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
 		}
+
 		if (locationUuid != null) {
 			query.setParameter("locationUuid", locationUuid);
 		}
@@ -215,6 +225,10 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
+		}
+
+		if (departmentUuid != null) {
+			query.setParameter("departmentUuid", departmentUuid);
 		}
 		
 		if (testCategory != null && testCategory != "Completed") {
@@ -367,7 +381,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 	
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager,
 	        String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
-	        String acceptedByUuid, String testConceptUuid) {
+	        String acceptedByUuid, String testConceptUuid, String departmentUuid) {
 		
 		DbSession session = this.getSession();
 		
@@ -407,6 +421,15 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 			queryStr += " ((cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) \n"
 			        + "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate))";
+		}
+
+		if (departmentUuid != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp.concept.uuid =:departmentUuid";
 		}
 		
 		if (locationUuid != null) {
@@ -511,6 +534,10 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
+		}
+
+		if (departmentUuid != null) {
+			query.setParameter("departmentUuid", departmentUuid);
 		}
 		
 		if (testCategory != null && testCategory != "Completed") {
