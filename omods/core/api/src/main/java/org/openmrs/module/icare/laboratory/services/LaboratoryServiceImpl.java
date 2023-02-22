@@ -448,13 +448,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		resultStatus.setUser(response.getCreator());
 		resultStatus.setTestAllocation(response.getTestAllocation());
 		this.testAllocationStatusDAO.save(resultStatus);
-		
-		if (result.getResultStatus() == "AMEND") {
-			
-		}
-		
 		return result;
-		
 	}
 	
 	public List<Map<String, Object>> saveMultipleResults(List<Result> results) throws Exception {
