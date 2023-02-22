@@ -28,42 +28,176 @@
   <div class="row" *ngIf="params?.currentWorksheetDefinition">
     <div class="col-md-4">
       <table class="table table-bordered">
-        <tr
+        <ng-container
           *ngFor="
             let worksheetSample of params?.currentWorksheetDefinition
-              ?.worksheetSamples
+              ?.groupedWorksheetSamples?.group1
           "
         >
-          <td style="width: 50px">
-            {{ worksheetSample?.sample?.display }}
-          </td>
-          <td style="width: 50px">
-            <div class="w-100">
-              <ng-container
-                *ngFor="let allocation of worksheetSample?.sample?.allocations"
-              >
-                <app-test-parameter-entry
-                  *ngIf="
-                    allocation?.order?.concept?.setMembers?.length == 0 ||
-                    (allocation?.order?.concept?.setMembers?.length > 0 &&
-                      allocation?.order?.concept?.uuid !==
-                        allocation?.parameter?.uuid)
+          <tr>
+            <td style="width: 50px">
+              {{ worksheetSample?.sample?.display }}
+            </td>
+            <td style="width: 50px">
+              <div class="w-100">
+                <ng-container
+                  *ngFor="
+                    let allocation of worksheetSample?.sample?.allocations
                   "
-                  [parameterUuid]="allocation?.parameter?.uuid"
-                  [allocation]="allocation"
-                  [multipleResultsAttributeType]="multipleResultsAttributeType"
-                  [isLIS]="isLIS"
-                  [disabled]="false"
-                  [finalResult]="allocation?.finalResult"
-                  [conceptNameType]="conceptNameType"
-                  (data)="
-                    getFedResult($event, worksheetSample?.sample, allocation)
+                >
+                  <app-test-parameter-entry
+                    *ngIf="
+                      allocation?.order?.concept?.setMembers?.length == 0 ||
+                      (allocation?.order?.concept?.setMembers?.length > 0 &&
+                        allocation?.order?.concept?.uuid !==
+                          allocation?.parameter?.uuid)
+                    "
+                    [parameterUuid]="allocation?.parameter?.uuid"
+                    [allocation]="allocation"
+                    [multipleResultsAttributeType]="
+                      multipleResultsAttributeType
+                    "
+                    [isLIS]="isLIS"
+                    [disabled]="false"
+                    [finalResult]="allocation?.finalResult"
+                    [conceptNameType]="conceptNameType"
+                    (data)="
+                      getFedResult(
+                        $event,
+                        worksheetSample?.sample,
+                        allocation,
+                        params?.currentWorksheetDefinition
+                      )
+                    "
+                  ></app-test-parameter-entry>
+                </ng-container>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <app-shared-remarks-entry
+                (remarks)="onGetRemarks($event, allocation)"
+              ></app-shared-remarks-entry>
+            </td>
+          </tr>
+        </ng-container>
+      </table>
+    </div>
+    <div class="col-md-4">
+      <table class="table table-bordered">
+        <ng-container
+          *ngFor="
+            let worksheetSample of params?.currentWorksheetDefinition
+              ?.groupedWorksheetSamples?.group2
+          "
+        >
+          <tr>
+            <td style="width: 50px">
+              {{ worksheetSample?.sample?.display }}
+            </td>
+            <td style="width: 50px">
+              <div class="w-100">
+                <ng-container
+                  *ngFor="
+                    let allocation of worksheetSample?.sample?.allocations
                   "
-                ></app-test-parameter-entry>
-              </ng-container>
-            </div>
-          </td>
-        </tr>
+                >
+                  <app-test-parameter-entry
+                    *ngIf="
+                      allocation?.order?.concept?.setMembers?.length == 0 ||
+                      (allocation?.order?.concept?.setMembers?.length > 0 &&
+                        allocation?.order?.concept?.uuid !==
+                          allocation?.parameter?.uuid)
+                    "
+                    [parameterUuid]="allocation?.parameter?.uuid"
+                    [allocation]="allocation"
+                    [multipleResultsAttributeType]="
+                      multipleResultsAttributeType
+                    "
+                    [isLIS]="isLIS"
+                    [disabled]="false"
+                    [finalResult]="allocation?.finalResult"
+                    [conceptNameType]="conceptNameType"
+                    (data)="
+                      getFedResult(
+                        $event,
+                        worksheetSample?.sample,
+                        allocation,
+                        params?.currentWorksheetDefinition
+                      )
+                    "
+                  ></app-test-parameter-entry>
+                </ng-container>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <app-shared-remarks-entry
+                (remarks)="onGetRemarks($event, allocation)"
+              ></app-shared-remarks-entry>
+            </td>
+          </tr>
+        </ng-container>
+      </table>
+    </div>
+    <div class="col-md-4">
+      <table class="table table-bordered">
+        <ng-container
+          *ngFor="
+            let worksheetSample of params?.currentWorksheetDefinition
+              ?.groupedWorksheetSamples?.group3
+          "
+        >
+          <tr>
+            <td style="width: 50px">
+              {{ worksheetSample?.sample?.display }}
+            </td>
+            <td style="width: 50px">
+              <div class="w-100">
+                <ng-container
+                  *ngFor="
+                    let allocation of worksheetSample?.sample?.allocations
+                  "
+                >
+                  <app-test-parameter-entry
+                    *ngIf="
+                      allocation?.order?.concept?.setMembers?.length == 0 ||
+                      (allocation?.order?.concept?.setMembers?.length > 0 &&
+                        allocation?.order?.concept?.uuid !==
+                          allocation?.parameter?.uuid)
+                    "
+                    [parameterUuid]="allocation?.parameter?.uuid"
+                    [allocation]="allocation"
+                    [multipleResultsAttributeType]="
+                      multipleResultsAttributeType
+                    "
+                    [isLIS]="isLIS"
+                    [disabled]="false"
+                    [finalResult]="allocation?.finalResult"
+                    [conceptNameType]="conceptNameType"
+                    (data)="
+                      getFedResult(
+                        $event,
+                        worksheetSample?.sample,
+                        allocation,
+                        params?.currentWorksheetDefinition
+                      )
+                    "
+                  ></app-test-parameter-entry>
+                </ng-container>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <app-shared-remarks-entry
+                (remarks)="onGetRemarks($event, allocation)"
+              ></app-shared-remarks-entry>
+            </td>
+          </tr>
+        </ng-container>
       </table>
     </div>
   </div>

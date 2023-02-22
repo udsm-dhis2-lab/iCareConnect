@@ -97,21 +97,42 @@ export class WorkSheetsService {
   getWorksheetDefinitionsByUuid(uuid: string): Observable<any> {
     return this.httpClient.get(`lab/worksheetdefinition?uuid=${uuid}`).pipe(
       map((response) => {
+        const formattedWorksheetSamples = response?.worksheetSamples?.map(
+          (worksheetSample) => {
+            return {
+              ...worksheetSample,
+              sample: {
+                ...worksheetSample?.sample,
+                allocations: worksheetSample?.sample?.allocations?.map(
+                  (allocation) => new SampleAllocation(allocation).toJson()
+                ),
+              },
+            };
+          }
+        );
+        const countOfWSSamples = formattedWorksheetSamples?.length;
         return {
           ...response,
-          worksheetSamples: response?.worksheetSamples?.map(
-            (worksheetSample) => {
-              return {
-                ...worksheetSample,
-                sample: {
-                  ...worksheetSample?.sample,
-                  allocations: worksheetSample?.sample?.allocations?.map(
-                    (allocation) => new SampleAllocation(allocation).toJson()
+          worksheetSamples: formattedWorksheetSamples,
+          groupedWorksheetSamples:
+            countOfWSSamples > 1
+              ? {
+                  group1: formattedWorksheetSamples.slice(
+                    0,
+                    countOfWSSamples / 3
                   ),
+                  group2: formattedWorksheetSamples.slice(
+                    Number((countOfWSSamples / 3).toFixed(0)),
+                    Number((2 * (countOfWSSamples / 3)).toFixed(0))
+                  ),
+                  group3: formattedWorksheetSamples.slice(
+                    Number((2 * (countOfWSSamples / 3)).toFixed(0)),
+                    countOfWSSamples
+                  ),
+                }
+              : {
+                  group1: formattedWorksheetSamples,
                 },
-              };
-            }
-          ),
         };
       }),
       catchError((error) => of(error))
