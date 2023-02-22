@@ -166,7 +166,15 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 					}
 				}
 			}
+
+			List<Map<String, Object>> sampleStatuses = new ArrayList<>();
+			if (this.getSample().getSampleStatuses().size() > 0) {
+				for (SampleStatus sampleStatus: this.getSample().getSampleStatuses()) {
+					sampleStatuses.add(sampleStatus.toMap());
+				}
+			}
 			sampleObject.put("allocations", allocations);
+			sampleObject.put("statuses",sampleStatuses);
 			worksheetSampleObject.put("sample", sampleObject);
 		}
 

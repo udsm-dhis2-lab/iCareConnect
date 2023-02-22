@@ -26,6 +26,7 @@ export class ResultEntryByWorksheetComponent implements OnInit {
   savingData: boolean = false;
   files: any[];
   isFormValid: boolean = false;
+  testAllocationDetails: any = {};
   constructor(
     private worksheetsService: WorkSheetsService,
     private sampleService: SamplesService,
@@ -66,16 +67,27 @@ export class ResultEntryByWorksheetComponent implements OnInit {
   }
 
   getFedResult(response: any, sample: any, allocation: any): void {
-    this.results[response?.parameter?.uuid + ":" + allocation?.uuid] = {
-      result: { ...response, allocation },
-      sample,
-    };
-    this.isFormValid =
-      (
-        Object?.keys(this.results)?.filter(
-          (key) => this.results[key]?.result?.value
-        ) || []
-      )?.length > 0;
+    const resKey = response?.parameter?.uuid + ":" + allocation?.uuid;
+    if (allocation?.finalResult?.value !== response?.value) {
+      this.results[resKey] = {
+        result: { ...response, allocation },
+        sample,
+      };
+      this.isFormValid =
+        (
+          Object?.keys(this.results)?.filter(
+            (key) => this.results[key]?.result?.value
+          ) || []
+        )?.length > 0;
+    } else {
+      this.results = omit(this.results, resKey);
+      this.isFormValid =
+        (
+          Object?.keys(this.results)?.filter(
+            (key) => this.results[key]?.result?.value
+          ) || []
+        )?.length > 0;
+    }
   }
 
   onSave(event: Event): void {
@@ -86,6 +98,10 @@ export class ResultEntryByWorksheetComponent implements OnInit {
       const dataValue = this.results[key]?.result;
       const order = dataValue?.allocation?.order;
       const sample = this.results[key]?.sample;
+      this.testAllocationDetails[dataValue?.allocation?.uuid] = {
+        ...dataValue?.allocation,
+        sample,
+      };
       if (dataValue?.multipleResults && dataValue?.value) {
         /**
          * 1. Create allocation
@@ -293,14 +309,18 @@ export class ResultEntryByWorksheetComponent implements OnInit {
             responseInfo?.map((response: any) => {
               if (
                 (
-                  response?.sample?.statuses?.filter(
+                  this.testAllocationDetails[
+                    response?.testAllocation?.uuid
+                  ]?.sample?.statuses?.filter(
                     (status) => status?.category === "HAS_RESULTS"
                   ) || []
                 )?.length === 0
               ) {
                 const status = {
                   sample: {
-                    uuid: response?.sample?.uuid,
+                    uuid: this.testAllocationDetails[
+                      response?.testAllocation?.uuid
+                    ].sample?.uuid,
                   },
                   user: {
                     uuid: localStorage.getItem("userUuid"),

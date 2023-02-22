@@ -153,6 +153,17 @@ export class SampleAllocation {
             this.allocation?.results?.map((result) => {
               return {
                 ...result,
+                value: result?.valueBoolean
+                  ? result?.valueBoolean
+                  : result?.valueCoded
+                  ? result?.valueCoded?.uuid
+                  : result?.valueComplex
+                  ? result?.valueComplex
+                  : result?.valueNumeric
+                  ? result?.valueNumeric
+                  : result?.valueText
+                  ? result?.valueText
+                  : result?.valueModifier,
                 resultGroupUuid: !result?.resultGroup?.uuid
                   ? "NONE"
                   : result?.resultGroup?.uuid,
