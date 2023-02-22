@@ -21,6 +21,7 @@ export class SharedSamplesListComponent implements OnInit {
   @Input() category: string;
   @Input() hasStatus: string;
   @Input() acceptedBy: string;
+  @Input() showLegend: boolean;
   samplesToViewMoreDetails: any = {};
   selectedDepartment: string;
   searchingText: string;
