@@ -383,7 +383,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		handleGet = handle(newGetRequest);
 		
 		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
-
+		
 	}
 	
 	@Test
