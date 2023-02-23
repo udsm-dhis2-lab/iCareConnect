@@ -1,14 +1,15 @@
 <div
   *ngIf="{
-    allSamples: allSamples$ | async,
-    samplesWithResults: samplesWithResults$ | async,
     testResultsMapping: testResultsMapping$ | async,
     externalSystemsReferenceConceptUuid:
       externalSystemsReferenceConceptUuid$ | async
   } as sampleParams"
 >
   <mat-progress-bar
-    *ngIf="!sampleParams?.allSamples"
+    *ngIf="
+      !sampleParams?.testResultsMapping ||
+      !sampleParams?.externalSystemsReferenceConceptUuid
+    "
     mode="indeterminate"
   ></mat-progress-bar>
 
@@ -21,29 +22,27 @@
     </div>
   </div>
 
-  <div *ngIf="sampleParams?.allSamples">
-    <!-- <div class="sample-dashboard-summary">
-      <app-samples-summary-dashboard></app-samples-summary-dashboard>
-    </div> -->
-    <div class="filtering-div d-flex justify-content-end">
-      <mat-form-field class="w-50">
-        <mat-label>Search</mat-label>
-        <mat-icon matPrefix>search</mat-icon
-        ><input
-          matInput
-          (keyup)="onSearch($event)"
-          [(ngModel)]="searchingText"
-        />
-      </mat-form-field>
-      <div class="w-50">
-        <app-shared-departments-selection
-          [searchTerm]="'LAB_DEPARTMENT'"
-          (selectedDepartments)="getSelectedDepartments($event)"
-        ></app-shared-departments-selection>
-      </div>
+  <div
+    *ngIf="
+      sampleParams?.testResultsMapping &&
+      sampleParams?.externalSystemsReferenceConceptUuid
+    "
+  >
+    <div class="p-2">
+      <app-shared-samples-list
+        [tabType]="'view-results'"
+        [LISConfigurations]="LISConfigurations"
+        [labSamplesDepartments]="labSamplesDepartments"
+        [category]="'HAS_RESULTS'"
+        [hasStatus]="'YES'"
+        [datesParameters]="datesParameters"
+        [excludeAllocations]="true"
+        [sampleTypes]="sampleTypes"
+        [codedSampleRejectionReasons]="codedSampleRejectionReasons"
+      ></app-shared-samples-list>
     </div>
-    <div class="p-1">
-      <!-- {{ sampleParams?.samplesWithResults | json }} -->
+
+    <!-- <div class="p-1">
       <table class="table table-bordered">
         <thead class="table-header">
           <tr>
@@ -202,32 +201,6 @@
                   *ngIf="orderCount == 0"
                   [attr.rowspan]="sample?.orders?.length"
                 >
-                  <!-- *ngIf="
-                      !sample.externalUseStatus.length ||
-                      sample?.releasedStatuses[0]?.status !== 'RELEASED'
-                    " -->
-
-                  <!-- 
-                    *ngIf="
-                      sample.externalUseStatus.length > 0 &&
-                      sample?.externalUseStatus[0]?.status === 'RELEASED'
-                    " -->
-                  <!-- <button
-                    *ngIf="sample?.releasedStatuses?.length === 0"
-                    mat-stroked-button
-                    class="colored-button"
-                    (click)="onUpdateStatus($event, sample, 'release')"
-                  >
-                    Release
-                  </button>
-                  <button
-                    *ngIf="sample?.releasedStatuses?.length > 0"
-                    mat-stroked-button
-                    class="btn-danger"
-                    (click)="onUpdateStatus($event, sample, 'restrict')"
-                  >
-                    Restrict
-                  </button> -->
                   <div class="d-flex justify-content-center">
                     <button
                       mat-flat-button
@@ -358,6 +331,6 @@
           </ng-container>
         </tbody>
       </table>
-    </div>
+    </div> -->
   </div>
 </div>
