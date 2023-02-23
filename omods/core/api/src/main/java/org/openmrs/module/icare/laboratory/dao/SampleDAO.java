@@ -134,15 +134,21 @@ public class SampleDAO extends BaseDAO<Sample> {
 			queryStr += " sp.visit.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
 		}
 		if (sampleCategory != null) {
-			
 			if (sampleCategory.toLowerCase().equals("not accepted")) {
 				if (!queryStr.contains("WHERE")) {
 					queryStr += " WHERE ";
 				} else {
 					queryStr += " AND ";
 				}
-				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE sst.category='ACCEPTED')  ";
+				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'  OR  lower(sst.category) LIKE 'reject%'))  ";
 				
+			} else if (sampleCategory.toLowerCase().equals("no results")) {
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS'  OR  lower(sst.category) LIKE 'reject%'))  ";
 			} else {
 				
 				if (!queryStr.contains("WHERE")) {
@@ -219,7 +225,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("locationUuid", locationUuid);
 		}
 		
-		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")) {
+		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted") && !sampleCategory.toLowerCase().equals("no results")) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
 		
@@ -448,9 +454,16 @@ public class SampleDAO extends BaseDAO<Sample> {
 				} else {
 					queryStr += " AND ";
 				}
-				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE sst.category='ACCEPTED')  OR  lower(sst.category) LIKE 'rejected'";
+				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'  OR  lower(sst.category) LIKE 'reject%'))";
 				
-			} else {
+			} else if (sampleCategory.toLowerCase().equals("no results")) {
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS'  OR  lower(sst.category) LIKE 'reject%'))  ";
+			}  else {
 				
 				if (!queryStr.contains("WHERE")) {
 					queryStr += " WHERE ";
@@ -528,7 +541,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("locationUuid", locationUuid);
 		}
 		
-		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")) {
+		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted") && !sampleCategory.toLowerCase().equals("no results")) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
 		
