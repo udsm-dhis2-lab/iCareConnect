@@ -131,6 +131,8 @@
             [datesParameters]="datesParameters"
             [LISConfigurations]="LISConfigurations"
             [patients]="patients"
+            [category]="LISConfigurations?.isLIS ? 'NO RESULTS' : null"
+            [hasStatus]="'YES'"
             [sampleTypes]="sampleTypes"
             [labSamplesDepartments]="labSamplesDepartments"
             [labSamplesContainers]="labSamplesContainers"

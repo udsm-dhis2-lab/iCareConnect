@@ -225,7 +225,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("locationUuid", locationUuid);
 		}
 		
-		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted") && !sampleCategory.toLowerCase().equals("no results")) {
+		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")
+		        && !sampleCategory.toLowerCase().equals("no results")) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
 		
@@ -454,7 +455,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 				} else {
 					queryStr += " AND ";
 				}
-				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'  OR  lower(sst.category) LIKE 'reject%'))";
+				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'  OR  lower(sst.category) LIKE 'reject%')) ";
 				
 			} else if (sampleCategory.toLowerCase().equals("no results")) {
 				if (!queryStr.contains("WHERE")) {
@@ -462,8 +463,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 				} else {
 					queryStr += " AND ";
 				}
-				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS'  OR  lower(sst.category) LIKE 'reject%'))  ";
-			}  else {
+				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS'  OR  lower(sst.category) LIKE 'reject%')) ";
+			} else {
 				
 				if (!queryStr.contains("WHERE")) {
 					queryStr += " WHERE ";
@@ -541,7 +542,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("locationUuid", locationUuid);
 		}
 		
-		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted") && !sampleCategory.toLowerCase().equals("no results")) {
+		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")
+		        && !sampleCategory.toLowerCase().equals("no results")) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
 		
