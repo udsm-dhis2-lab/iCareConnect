@@ -9,7 +9,10 @@ import {
 import { formulateSamplesByDepartments } from "src/app/core/helpers/create-samples-as-per-departments.helper";
 import { Location } from "src/app/core/models";
 import { SystemSettingsWithKeyDetails } from "src/app/core/models/system-settings.model";
-import { GenerateMetadataLabelsService, LocationService } from "src/app/core/services";
+import {
+  GenerateMetadataLabelsService,
+  LocationService,
+} from "src/app/core/services";
 import { IdentifiersService } from "src/app/core/services/identifiers.service";
 import { LabOrdersService } from "src/app/modules/laboratory/resources/services/lab-orders.service";
 import { LabTestsService } from "src/app/modules/laboratory/resources/services/lab-tests.service";
@@ -27,7 +30,7 @@ import { uniqBy, keyBy, omit } from "lodash";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { SampleRegistrationFinalizationComponent } from "../sample-registration-finalization/sample-registration-finalization.component";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
-import { map, tap } from "rxjs/operators";
+import { tap } from "rxjs/operators";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { Store } from "@ngrx/store";
@@ -35,7 +38,6 @@ import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";
 import { isMoment } from "moment";
 import { PersonService } from "src/app/core/services/person.service";
-import { Field } from "src/app/shared/modules/form/models/field.model";
 
 @Component({
   selector: "app-sample-in-batch-registration",
@@ -166,7 +168,10 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if(localStorage.getItem("batch") === this.batch?.uuid && localStorage.getItem("batchSample")){
+    if (
+      localStorage.getItem("batch") === this.batch?.uuid &&
+      localStorage.getItem("batchSample")
+    ) {
       this.dialog
         .open(SharedConfirmationComponent, {
           data: {
@@ -190,7 +195,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
           }
         });
     }
-    
+
     localStorage.setItem("batch", this.batch?.uuid);
     this.assignFields();
     const userLocationsIds = JSON.parse(
@@ -291,16 +296,18 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     this.fixedFields = this.fieldsObject?.fixedFieldsWithValues;
     this.staticFields = this.fieldsObject?.staticFieldsWithValues;
     this.dynamicFields = this.fieldsObject?.dynamicFields;
-    this.batchSampleCode$ = this.generateMetadataLabelsService.getLabMetadatalabels({
-      globalProperty:this.batchSampleCodeFormatReference?.uuid,
-      metadataType:'batch'
-    }).pipe(
-      tap((response) => {
-        if(!response[0]?.error){
-          this.batchSampleCode = response[0];
-        }
+    this.batchSampleCode$ = this.generateMetadataLabelsService
+      .getLabMetadatalabels({
+        globalProperty: this.batchSampleCodeFormatReference?.uuid,
+        metadataType: "batch",
       })
-    )
+      .pipe(
+        tap((response) => {
+          if (!response[0]?.error) {
+            this.batchSampleCode = response[0];
+          }
+        })
+      );
   }
 
   getDateStringFromDate(date) {
@@ -1154,15 +1161,22 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                             ordersResponse,
                                                             "uuid"
                                                           );
-                                                        const batchSampleObject = [
+                                                        const batchSampleObject =
+                                                          [
                                                             {
-                                                              code: this.batchSampleCode,
+                                                              code: this
+                                                                .batchSampleCode,
                                                               batch: {
-                                                                uuid: this.batch.uuid
-                                                              }
-                                                            }
-                                                        ]
-                                                        if(localStorage.getItem("batchSample")?.length){
+                                                                uuid: this.batch
+                                                                  .uuid,
+                                                              },
+                                                            },
+                                                          ];
+                                                        if (
+                                                          localStorage.getItem(
+                                                            "batchSample"
+                                                          )?.length
+                                                        ) {
                                                           this.samplesService
                                                             .getIncreamentalSampleLabel()
                                                             .subscribe(
@@ -1202,7 +1216,9 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                         ),
                                                                       batchSample:
                                                                         {
-                                                                          uuid: localStorage.getItem('batchSample'),
+                                                                          uuid: localStorage.getItem(
+                                                                            "batchSample"
+                                                                          ),
                                                                         },
                                                                     };
                                                                   // Create sample
@@ -1214,7 +1230,10 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                       (
                                                                         sampleResponse
                                                                       ) => {
-                                                                        localStorage.setItem('batchSample', sampleResponse?.uuid)
+                                                                        localStorage.setItem(
+                                                                          "batchSample",
+                                                                          sampleResponse?.uuid
+                                                                        );
                                                                         this.savingDataResponse =
                                                                           sampleResponse;
                                                                         this.sampleLabelsUsedDetails =
@@ -1947,9 +1966,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                 }
                                                               }
                                                             );
-                                                        } 
-                                                        
-                                                        else {
+                                                        } else {
                                                           this.samplesService
                                                             .createBatchSample(
                                                               batchSampleObject
@@ -2014,7 +2031,8 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                 ),
                                                                               batchSample:
                                                                                 {
-                                                                                  uuid: batchSampleResponse[0]?.uuid,
+                                                                                  uuid: batchSampleResponse[0]
+                                                                                    ?.uuid,
                                                                                 },
                                                                             };
                                                                           // Create sample
@@ -2764,8 +2782,8 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                         }
                                                       }
                                                     }
-                                                  )
-                                                        
+                                                  );
+
                                                 // Set diagnosis if any
 
                                                 if (

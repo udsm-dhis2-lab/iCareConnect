@@ -3,7 +3,6 @@ import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { orderBy } from "lodash";
 import { Observable, zip } from "rxjs";
-import { catchError, map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
@@ -14,19 +13,12 @@ import { SamplesService } from "src/app/shared/services/samples.service";
 import {
   addLabDepartments,
   loadLabSamplesByCollectionDates,
-  setSampleStatus,
 } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
-  getCodedSampleRejectionReassons,
   getFormattedLabSamplesForTracking,
-  getFormattedLabSamplesLoadedState,
-  getLabConfigurations,
-  getLabDepartments,
   getLabSamplesWithResults,
-  getSamplesWithResults,
 } from "src/app/store/selectors";
-import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 
 @Component({
   selector: "app-sample-results-dashboard",
