@@ -53,21 +53,6 @@ export class SamplesToAcceptComponent implements OnInit {
     this.providerDetails$ = this.store.select(getProviderDetails);
   }
 
-  getSamples(): void {
-    this.samplesToAccept$ = this.sampleService.getLabSamplesByCollectionDates(
-      this.datesParameters,
-      this.LISConfigurations?.isLIS ? "NOT ACCEPTED" : null,
-      !this.LISConfigurations?.isLIS ? "NO" : "YES",
-      this.excludeAllocations,
-      null,
-      {
-        departments: this.labSamplesDepartments,
-        specimenSources: this.sampleTypes,
-        codedRejectionReasons: this.codedSampleRejectionReasons,
-      }
-    );
-  }
-
   onToggleViewSampleDetails(event: Event, sample: any): void {
     event.stopPropagation();
     console.log(sample);
@@ -250,7 +235,7 @@ export class SamplesToAcceptComponent implements OnInit {
           });
           this.sampleService.saveSampleStatuses(data).subscribe((response) => {
             if (response && !response?.error) {
-              this.getSamples();
+              this.saving = false;
             }
           });
         }
