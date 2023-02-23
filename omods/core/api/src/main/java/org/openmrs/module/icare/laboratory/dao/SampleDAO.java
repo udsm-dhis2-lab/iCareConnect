@@ -448,7 +448,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 				} else {
 					queryStr += " AND ";
 				}
-				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE sst.category='ACCEPTED')  ";
+				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE sst.category='ACCEPTED')  OR  lower(sst.category) LIKE 'rejected'";
 				
 			} else {
 				
