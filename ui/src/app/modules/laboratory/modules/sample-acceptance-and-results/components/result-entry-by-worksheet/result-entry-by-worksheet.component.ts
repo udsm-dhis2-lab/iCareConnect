@@ -36,6 +36,7 @@ export class ResultEntryByWorksheetComponent implements OnInit {
   allocationStatuses: any[] = [];
   userUuid: string;
   selectedSamples: any[] = [];
+  allSelectedItems: any = {};
   constructor(
     private worksheetsService: WorkSheetsService,
     private sampleService: SamplesService,
@@ -639,6 +640,27 @@ export class ResultEntryByWorksheetComponent implements OnInit {
       : this.selectedSamples?.filter(
           (selectedWSSample) => selectedWSSample?.uuid !== worksheetSample?.uuid
         ) || [];
-    console.log(this.selectedSamples);
+  }
+
+  onSelectAllItems(event: MatCheckboxChange, worksheetSamples: any[]): void {
+    if (event.checked) {
+      this.selectedSamples =
+        worksheetSamples?.filter(
+          (worksheetSample) =>
+            (
+              worksheetSample?.sample?.statuses?.filter(
+                (status) => status.category === "RESULT_AUTHORIZATION"
+              ) || []
+            )?.length === 0 && worksheetSample?.type === "SAMPLE"
+        ) || [];
+      this.selectedSamples?.forEach((worksheetSample) => {
+        this.allSelectedItems[worksheetSample?.uuid] = worksheetSample;
+      });
+    } else {
+      this.selectedSamples = [];
+      worksheetSamples?.forEach((worksheetSample) => {
+        this.allSelectedItems[worksheetSample?.uuid] = null;
+      });
+    }
   }
 }
