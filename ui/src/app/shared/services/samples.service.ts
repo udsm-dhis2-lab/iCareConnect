@@ -127,6 +127,13 @@ export class SamplesService {
     );
   }
 
+  saveSampleStatus(data: any): Observable<any> {
+    return this.opeMRSHttpClientService.post("lab/samplestatus", data).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
+
   getSampleLabel(): Observable<string> {
     return this.httpClient.get(`${BASE_URL}lab/samplelable`).pipe(
       map((response: { label: number }) => {

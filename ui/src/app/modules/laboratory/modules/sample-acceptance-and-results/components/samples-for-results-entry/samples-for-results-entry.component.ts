@@ -26,6 +26,7 @@ export class SamplesForResultsEntryComponent implements OnInit {
   @Input() userUuid: string;
   @Input() category: string;
   @Input() hasStatus: string;
+  @Input() viewType: string;
 
   sampplesForResultsEntry$: Observable<any[]>;
   selectedDepartment: string;
