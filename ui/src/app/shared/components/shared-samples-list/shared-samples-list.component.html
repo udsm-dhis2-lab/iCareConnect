@@ -296,20 +296,22 @@
                   Send
                 </button>
               </div>
-              <button
-                *ngIf="LISConfigurations?.isLIS"
-                mat-flat-button
-                class="ml-2 mt-2"
-                color="primary"
-                (click)="onToggleViewSampleDetails($event, sample)"
-              >
-                <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.uuid]"
-                  >remove_red_eye</mat-icon
+              <div class="w-100">
+                <button
+                  *ngIf="LISConfigurations?.isLIS"
+                  mat-flat-button
+                  class="mt-2"
+                  color="primary"
+                  (click)="onToggleViewSampleDetails($event, sample)"
                 >
-                {{
-                  !samplesToViewMoreDetails[sample?.uuid] ? "Details" : "Hide"
-                }}
-              </button>
+                  <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.uuid]"
+                    >remove_red_eye</mat-icon
+                  >
+                  {{
+                    !samplesToViewMoreDetails[sample?.uuid] ? "Details" : "Hide"
+                  }}
+                </button>
+              </div>
             </td>
           </tr>
           <tr
