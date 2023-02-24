@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
 import { WorkSheetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
@@ -30,6 +30,7 @@ export class ResultEntryByWorksheetComponent implements OnInit {
   testAllocationDetails: any = {};
   showRemarks: boolean = false;
   remarksShowStatus: string = "hide";
+  searchingText: string = "";
   constructor(
     private worksheetsService: WorkSheetsService,
     private sampleService: SamplesService,

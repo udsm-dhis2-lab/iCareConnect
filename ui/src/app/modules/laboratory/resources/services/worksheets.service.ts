@@ -101,6 +101,16 @@ export class WorkSheetsService {
           (worksheetSample) => {
             return {
               ...worksheetSample,
+              searchText:
+                worksheetSample?.sample?.display +
+                " " +
+                worksheetSample?.sample?.allocations
+                  ?.map(
+                    (allocation) =>
+                      allocation?.concept?.display + " " + allocation?.label
+                  )
+                  ?.join(" "),
+              allocationsCount: worksheetSample?.sample?.allocations.length,
               sample: {
                 ...worksheetSample?.sample,
                 allocations: worksheetSample?.sample?.allocations?.map(
@@ -119,15 +129,11 @@ export class WorkSheetsService {
               ? {
                   group1: formattedWorksheetSamples.slice(
                     0,
-                    countOfWSSamples / 3
+                    countOfWSSamples / 2
                   ),
                   group2: formattedWorksheetSamples.slice(
-                    Number((countOfWSSamples / 3).toFixed(0)),
-                    Number((2 * (countOfWSSamples / 3)).toFixed(0))
-                  ),
-                  group3: formattedWorksheetSamples.slice(
-                    Number((2 * (countOfWSSamples / 3)).toFixed(0)),
-                    countOfWSSamples
+                    Number((countOfWSSamples / 2).toFixed(0)),
+                    Number((2 * (countOfWSSamples / 2)).toFixed(0))
                   ),
                 }
               : {
