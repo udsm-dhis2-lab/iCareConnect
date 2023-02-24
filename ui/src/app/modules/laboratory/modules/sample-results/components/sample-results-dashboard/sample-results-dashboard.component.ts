@@ -9,6 +9,7 @@ import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resou
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { SharedSamplesVerificationIntegratedComponent } from "src/app/shared/dialogs/shared-samples-verification-integrated/shared-samples-verification-integrated.component";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
+import { VisitsService } from "src/app/shared/resources/visits/services";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import {
   addLabDepartments,
@@ -58,18 +59,19 @@ export class SampleResultsDashboardComponent implements OnInit {
   message: any = {};
   testResultsMapping$: Observable<any>;
   externalSystemsReferenceConceptUuid$: Observable<string>;
+  selectedSample: any;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
     private samplesService: SamplesService,
     private otherSystemsService: OtherClientLevelSystemsService,
     private conceptService: ConceptsService,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private visitService: VisitsService
   ) {}
 
   ngOnInit(): void {
     this.userUuid = this.currentUser?.uuid;
-    this.getCompletedSamples();
     this.testResultsMapping$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.laboratory.settings.externalSystems.pimaCOVID.testResults.mappingSourceUuid"
@@ -79,6 +81,50 @@ export class SampleResultsDashboardComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "icare.lis.externalSystems.dhis2Based.conceptUuid"
       );
+  }
+
+  onGetSelectedSampleDetails(
+    sampleDetails: any,
+    testResultsMapping: any,
+    externalSystemsReferenceConceptUuid: string
+  ): void {
+    this.selectedSample = sampleDetails?.data;
+    this.visitService
+      .getVisitDetailsByVisitUuid(this.selectedSample?.visit?.uuid, {
+        v: "custom:(uuid,visitType,startDatetime,attributes:(uuid,display,value,attributeType:(uuid,display))",
+      })
+      ?.subscribe((response) => {
+        if (response) {
+          this.externalSystemPayload = this.onGetVisitDetails(response);
+          (this.externalSystemPayload
+            ? this.dialog
+                .open(SharedConfirmationComponent, {
+                  width: "30%",
+                  data: {
+                    modalTitle: `Send results for ${this.selectedSample?.label}`,
+                    modalMessage: `Are you sure to send data to Pima COVID?`,
+                    showRemarksInput: false,
+                  },
+                })
+                .afterClosed()
+            : this.dialog
+                .open(SharedSamplesVerificationIntegratedComponent, {
+                  width: "30%",
+                  data: {
+                    ...this.selectedSample,
+                    externalSystemsReferenceConceptUuid,
+                  },
+                })
+                .afterClosed()
+          ).subscribe((confirmationDetails: any) => {
+            if (confirmationDetails?.confirmed) {
+              this.onSend(this.selectedSample, true, testResultsMapping);
+            } else if (confirmationDetails?.sendResults) {
+              this.onSend(this.selectedSample, true, testResultsMapping);
+            }
+          });
+        }
+      });
   }
 
   getCompletedSamples() {
@@ -209,33 +255,19 @@ export class SampleResultsDashboardComponent implements OnInit {
     });
   }
 
-  onToggleViewSampleDetails(event: Event, sample: any): void {
-    event.stopPropagation();
-    this.samplesToViewMoreDetails[sample?.id] = !this.samplesToViewMoreDetails[
-      sample?.id
-    ]
-      ? sample
-      : null;
-  }
-
-  onGetVisitDetails(visitDetails): void {
+  onGetVisitDetails(visitDetails): any {
     const matchedAttribute = (visitDetails?.attributes?.filter(
       (attribute) =>
         attribute?.attributeType?.uuid ===
         "0acd3180-710d-4417-8768-97bc45a02395"
     ) || [])[0];
-    this.externalSystemPayload = matchedAttribute
+    const externalSystemPayload = matchedAttribute
       ? JSON.parse(matchedAttribute?.value)
       : null;
+    return externalSystemPayload;
   }
 
-  onSend(
-    event: Event,
-    sample: any,
-    confirmed?: boolean,
-    testResultsMapping?: string
-  ): void {
-    event.stopPropagation();
+  onSend(sample: any, confirmed?: boolean, testResultsMapping?: string): void {
     if (confirmed) {
       const result = orderBy(
         (sample?.ordersWithResults[0]?.testAllocations?.filter(
