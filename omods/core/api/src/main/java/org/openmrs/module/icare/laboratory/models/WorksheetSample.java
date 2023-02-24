@@ -178,7 +178,7 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 			patient.put("gender", this.getSample().getVisit().getPatient().getGender().toString());
 			sampleObject.put("allocations", allocations);
 			sampleObject.put("statuses",sampleStatuses);
-			sampleObject.put("patient",sampleStatuses);
+			sampleObject.put("patient",patient);
 			worksheetSampleObject.put("sample", sampleObject);
 		}
 
