@@ -3,10 +3,11 @@ import { Observable } from "rxjs";
 import { WorkSheetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
-import { groupBy, flatten, omit } from "lodash";
+import { groupBy, flatten, omit, orderBy } from "lodash";
 import { SampleAllocationService } from "src/app/shared/resources/sample-allocations/services/sample-allocation.service";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { MatRadioChange } from "@angular/material/radio";
+import { MatCheckboxChange } from "@angular/material/checkbox";
 
 @Component({
   selector: "app-result-entry-by-worksheet",
@@ -18,6 +19,7 @@ export class ResultEntryByWorksheetComponent implements OnInit {
   @Input() isLIS: boolean;
   @Input() conceptNameType: string;
   @Input() multipleResultsAttributeType: string;
+  @Input() viewType: string;
   worksheetDefinitionField: any;
   currentWorksheetDefinition$: Observable<any>;
   currentWorksheetDefinitionUuid: string;
@@ -31,11 +33,16 @@ export class ResultEntryByWorksheetComponent implements OnInit {
   showRemarks: boolean = false;
   remarksShowStatus: string = "hide";
   searchingText: string = "";
+  allocationStatuses: any[] = [];
+  userUuid: string;
+  selectedSamples: any[] = [];
   constructor(
     private worksheetsService: WorkSheetsService,
     private sampleService: SamplesService,
     private sampleAllocationService: SampleAllocationService
-  ) {}
+  ) {
+    this.userUuid = localStorage.getItem("userUuid");
+  }
 
   ngOnInit(): void {
     this.createWorksheetDefnitionField();
@@ -71,6 +78,7 @@ export class ResultEntryByWorksheetComponent implements OnInit {
   }
 
   getWorksheetDefinitionByUuid(uuid: string): void {
+    this.selectedSamples = [];
     this.currentWorksheetDefinition$ =
       this.worksheetsService.getWorksheetDefinitionsByUuid(uuid);
   }
@@ -358,5 +366,279 @@ export class ResultEntryByWorksheetComponent implements OnInit {
           }
         });
     }
+  }
+
+  onAuthorize(event: Event, workSheetSample: any, related?: any): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    const allocationsData = workSheetSample?.sample?.allocations;
+    this.allocationStatuses = flatten(
+      allocationsData
+        ?.map((allocationData) => {
+          if (
+            allocationData?.finalResult &&
+            allocationData?.parameter?.datatype?.display != "Complex"
+          ) {
+            // TODO: Find a better way to handle second complex (file) data types
+            const results = !allocationData?.finalResult?.groups
+              ? [allocationData?.finalResult]
+              : !related
+              ? allocationData?.finalResult?.groups[
+                  allocationData?.finalResult?.groups?.length - 1
+                ]?.results
+              : allocationData?.finalResult?.groups?.map((group) => {
+                  return orderBy(group?.results, ["dateCreated"], ["desc"])[0];
+                });
+            let approvalStatuses = [];
+            if (allocationData?.finalResult?.groups) {
+              approvalStatuses = results?.map((result) => {
+                return {
+                  status:
+                    workSheetSample?.sample?.authorizationStatuses?.length ===
+                      0 && !this.isLIS
+                      ? "APPROVED"
+                      : "AUTHORIZED",
+                  remarks: "APPROVED",
+                  category: "RESULT_AUTHORIZATION",
+                  user: {
+                    uuid: this.userUuid,
+                  },
+                  testAllocation: {
+                    uuid: allocationData?.uuid,
+                  },
+                  testResult: {
+                    uuid: result?.uuid,
+                  },
+                };
+              });
+            } else {
+              approvalStatuses = [
+                {
+                  status:
+                    workSheetSample?.sample?.authorizationStatuses?.length ===
+                      0 && !this.isLIS
+                      ? "APPROVED"
+                      : "AUTHORIZED",
+                  remarks: "APPROVED",
+                  category: "RESULT_AUTHORIZATION",
+                  user: {
+                    uuid: this.userUuid,
+                  },
+                  testAllocation: {
+                    uuid: allocationData?.uuid,
+                  },
+                  testResult: {
+                    uuid: orderBy(results, ["dateCreated"], ["desc"])[0]?.uuid,
+                  },
+                },
+              ];
+            }
+            return approvalStatuses;
+          }
+        })
+        ?.filter((allStatus) => allStatus)
+    );
+    this.savingData = true;
+    this.sampleAllocationService
+      .saveAllocationStatuses(this.allocationStatuses)
+      .subscribe((response) => {
+        if (response && !response?.error) {
+          this.savingData = false;
+          if (
+            (
+              this.allocationStatuses?.filter(
+                (status) => status?.status === "AUTHORIZED"
+              ) || []
+            )?.length > 0
+          ) {
+            // Save sample full authorized
+            const status = {
+              sample: {
+                uuid: workSheetSample?.sample?.uuid,
+              },
+              user: {
+                uuid: this.userUuid,
+              },
+              remarks: "AUTHORIZED",
+              status: "AUTHORIZED",
+              category: "RESULT_AUTHORIZATION",
+            };
+            this.sampleService
+              .saveSampleStatus(status)
+              .subscribe((response) => {});
+          } else if (
+            (
+              response?.sample?.statuses?.filter(
+                (status) => status?.status === "APPROVED"
+              ) || []
+            )?.length === 0
+          ) {
+            const status = {
+              sample: {
+                uuid: workSheetSample?.sample?.uuid,
+              },
+              user: {
+                uuid: localStorage.getItem("userUuid"),
+              },
+              remarks: "APPROVED",
+              status: "APPROVED",
+              category: "RESULT_AUTHORIZATION",
+            };
+            this.sampleService
+              .saveSampleStatus(status)
+              .subscribe((response) => {});
+          }
+          setTimeout(() => {
+            this.getWorksheetDefinitionByUuid(
+              this.currentWorksheetDefinitionUuid
+            );
+            this.savingData = false;
+          }, 100);
+        } else {
+          this.savingData = false;
+          this.getWorksheetDefinitionByUuid(
+            this.currentWorksheetDefinitionUuid
+          );
+        }
+      });
+  }
+
+  onAuthorizeAll(event: Event, related?: boolean): void {
+    event.stopPropagation();
+    this.allocationStatuses = [];
+    let sampleAuthorizationStatuses = [];
+    this.selectedSamples.forEach((worksheetSample: any) => {
+      if (
+        (
+          worksheetSample?.sample?.statuses?.filter(
+            (status) => status?.category === "RESULT_AUTHORIZATION"
+          ) || []
+        )?.length === 0
+      ) {
+        sampleAuthorizationStatuses = [
+          ...sampleAuthorizationStatuses,
+          {
+            sample: {
+              uuid: worksheetSample?.sample?.uuid,
+            },
+            user: {
+              uuid: this.userUuid,
+            },
+            remarks: "AUTHORIZED",
+            status: "AUTHORIZED",
+            category: "RESULT_AUTHORIZATION",
+          },
+        ];
+      }
+      const allocationsData = worksheetSample?.sample?.allocations;
+      this.allocationStatuses = [
+        ...this.allocationStatuses,
+        ...flatten(
+          allocationsData
+            ?.map((allocationData) => {
+              if (
+                allocationData?.finalResult &&
+                allocationData?.parameter?.datatype?.display != "Complex"
+              ) {
+                // TODO: Find a better way to handle second complex (file) data types
+                const results = !allocationData?.finalResult?.groups
+                  ? [allocationData?.finalResult]
+                  : !related
+                  ? allocationData?.finalResult?.groups[
+                      allocationData?.finalResult?.groups?.length - 1
+                    ]?.results
+                  : allocationData?.finalResult?.groups?.map((group) => {
+                      return orderBy(
+                        group?.results,
+                        ["dateCreated"],
+                        ["desc"]
+                      )[0];
+                    });
+                let approvalStatuses = [];
+                if (allocationData?.finalResult?.groups) {
+                  approvalStatuses = results?.map((result) => {
+                    return {
+                      status:
+                        worksheetSample?.sample?.authorizationStatuses
+                          ?.length === 0 && !this.isLIS
+                          ? "APPROVED"
+                          : "AUTHORIZED",
+                      remarks: "APPROVED",
+                      category: "RESULT_AUTHORIZATION",
+                      user: {
+                        uuid: this.userUuid,
+                      },
+                      testAllocation: {
+                        uuid: allocationData?.uuid,
+                      },
+                      testResult: {
+                        uuid: result?.uuid,
+                      },
+                    };
+                  });
+                } else {
+                  approvalStatuses = [
+                    {
+                      status:
+                        worksheetSample?.sample?.authorizationStatuses
+                          ?.length === 0 && !this.isLIS
+                          ? "APPROVED"
+                          : "AUTHORIZED",
+                      remarks: "APPROVED",
+                      category: "RESULT_AUTHORIZATION",
+                      user: {
+                        uuid: this.userUuid,
+                      },
+                      testAllocation: {
+                        uuid: allocationData?.uuid,
+                      },
+                      testResult: {
+                        uuid: orderBy(results, ["dateCreated"], ["desc"])[0]
+                          ?.uuid,
+                      },
+                    },
+                  ];
+                }
+                return approvalStatuses;
+              }
+            })
+            ?.filter((allStatus) => allStatus)
+        ),
+      ];
+    });
+    this.savingData = true;
+    this.sampleAllocationService
+      .saveAllocationStatuses(this.allocationStatuses)
+      .subscribe((response) => {
+        if (response && !response?.error) {
+          this.savingData = false;
+          if (sampleAuthorizationStatuses?.length > 0) {
+            this.sampleService
+              .saveSampleStatuses(sampleAuthorizationStatuses)
+              .subscribe((response) => {});
+          }
+          setTimeout(() => {
+            this.getWorksheetDefinitionByUuid(
+              this.currentWorksheetDefinitionUuid
+            );
+            this.savingData = false;
+          }, 100);
+        } else {
+          this.savingData = false;
+          this.getWorksheetDefinitionByUuid(
+            this.currentWorksheetDefinitionUuid
+          );
+        }
+      });
+  }
+
+  onSelectItem(event: MatCheckboxChange, worksheetSample: any): void {
+    this.selectedSamples = event?.checked
+      ? [...this.selectedSamples, worksheetSample]
+      : this.selectedSamples?.filter(
+          (selectedWSSample) => selectedWSSample?.uuid !== worksheetSample?.uuid
+        ) || [];
+    console.log(this.selectedSamples);
   }
 }

@@ -116,6 +116,16 @@ export class WorkSheetsService {
                 allocations: worksheetSample?.sample?.allocations?.map(
                   (allocation) => new SampleAllocation(allocation).toJson()
                 ),
+                hasResults:
+                  (
+                    worksheetSample?.sample?.statuses?.filter(
+                      (status) => status?.category === "HAS_RESULTS"
+                    ) || []
+                  )?.length > 0,
+                authorizationStatuses:
+                  worksheetSample?.sample?.statuses?.filter(
+                    (status) => status?.category === "RESULT_AUTHORIZATION"
+                  ) || [],
               },
             };
           }
