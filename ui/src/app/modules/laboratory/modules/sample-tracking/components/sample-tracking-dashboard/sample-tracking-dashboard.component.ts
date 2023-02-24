@@ -45,17 +45,6 @@ export class SampleTrackingDashboardComponent implements OnInit {
     this.store.dispatch(
       addLabDepartments({ labDepartments: this.labSamplesDepartments })
     );
-    this.store.dispatch(
-      loadLabSamplesByCollectionDates({
-        datesParameters: this.datesParameters,
-        patients: this.patients,
-        sampleTypes: this.sampleTypes,
-        departments: this.labSamplesDepartments,
-        containers: this.labSamplesContainers,
-        configs: this.configs,
-        codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-      })
-    );
 
     this.codedSampleRejectionReasons$ = this.store.select(
       getCodedSampleRejectionReassons
@@ -68,10 +57,6 @@ export class SampleTrackingDashboardComponent implements OnInit {
     this.samplesLoadedState$ = this.store.select(
       getFormattedLabSamplesLoadedState
     );
-    this.allSamples$ = this.store.select(getFormattedLabSamplesForTracking, {
-      department: this.selectedDepartment,
-      searchingText: this.searchingText,
-    });
   }
 
   setDepartment(department) {
