@@ -204,6 +204,10 @@ button:hover {
 .toolbar-spacer {
   flex: 1 1 auto;
 }
+.table td,
+th {
+  padding: 0.375rem !important;
+}
 
 mat-dialog-container {
   padding: 0 !important;
