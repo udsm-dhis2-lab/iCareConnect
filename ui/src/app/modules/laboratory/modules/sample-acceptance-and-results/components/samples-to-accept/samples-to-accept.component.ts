@@ -67,7 +67,6 @@ export class SamplesToAcceptComponent implements OnInit {
   }
 
   accept(sample: any, providerDetails?: any): void {
-    this.saving = true;
     let confirmDialog;
     if (this.LISConfigurations?.isLIS) {
       confirmDialog = this.dialog.open(SharedConfirmationComponent, {
@@ -87,6 +86,7 @@ export class SamplesToAcceptComponent implements OnInit {
       : of({ confirmed: true })
     ).subscribe((confirmationObject) => {
       if (confirmationObject?.confirmed) {
+        this.saving = true;
         if (
           confirmationObject?.remarks &&
           confirmationObject?.remarks.length > 0
