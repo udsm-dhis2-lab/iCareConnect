@@ -38,6 +38,7 @@ import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";
 import { isMoment } from "moment";
 import { PersonService } from "src/app/core/services/person.service";
+import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 
 @Component({
   selector: "app-sample-in-batch-registration",
@@ -1881,10 +1882,6 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                             0
                                                                           ) {
                                                                             zip(
-                                                                              this.samplesService.saveTestContainerAllocation(
-                                                                                ordersWithConceptsDetails,
-                                                                                configs
-                                                                              ),
                                                                               this.samplesService.setMultipleSampleStatuses(
                                                                                 statuses
                                                                               )
@@ -2691,10 +2688,6 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                     0
                                                                                   ) {
                                                                                     zip(
-                                                                                      this.samplesService.saveTestContainerAllocation(
-                                                                                        ordersWithConceptsDetails,
-                                                                                        configs
-                                                                                      ),
                                                                                       this.samplesService.setMultipleSampleStatuses(
                                                                                         statuses
                                                                                       )
@@ -2971,6 +2964,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   //   }
 
   createLabRequestPayload(data): any {
+    // TODO: Remove hardcoded UIDS
     this.labRequestPayload = {
       program: data?.program,
       programStage: "emVt37lHjub",
@@ -2978,15 +2972,38 @@ export class SampleInBatchRegistrationComponent implements OnInit {
       trackedEntityInstance: data?.trackedEntityInstance,
       enrollment: data?.enrollment,
       dataValues: [
-        { dataElement: "Q98LhagGLFj", value: new Date().toISOString() },
+        {
+          dataElement: "Q98LhagGLFj",
+          value: this.formatDateAndTime(new Date()),
+        },
         { dataElement: "D0RBm3alWd9", value: "RT - PCR" },
-        { dataElement: "RfWBPHo9MnC", value: new Date() },
+        {
+          dataElement: "RfWBPHo9MnC",
+          value: this.formatDateAndTime(new Date()),
+        },
         { dataElement: "HTBFvtjeztu", value: true },
         { dataElement: "xzuzLYN1f0J", value: true },
       ],
-      eventDate: new Date().toISOString(),
+      eventDate: this.formatDateAndTime(new Date()),
     };
     return this.labRequestPayload;
+  }
+
+  formatDateAndTime(date: Date): string {
+    return (
+      formatDateToYYMMDD(date) +
+      "T" +
+      this.formatDimeChars(date.getHours().toString()) +
+      ":" +
+      this.formatDimeChars(date.getMinutes().toString()) +
+      ":" +
+      this.formatDimeChars(date.getSeconds().toString()) +
+      ".000Z"
+    );
+  }
+
+  formatDimeChars(char: string): string {
+    return char.length == 1 ? "0" + char : char;
   }
 
   onPageChange(e: any) {
