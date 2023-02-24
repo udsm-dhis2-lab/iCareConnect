@@ -29,6 +29,14 @@
     "
   >
     <div class="p-2">
+      <div class="mb-2">
+        <app-shared-samples-summary-dashboard
+          [datesParams]="datesParameters"
+          [dashboardSingleValueDataSetsReferenceKey]="
+            'iCare.laboratory.sampleResults.dashboard.settings.samples.singleValue'
+          "
+        ></app-shared-samples-summary-dashboard>
+      </div>
       <app-shared-samples-list
         [tabType]="'view-results'"
         [LISConfigurations]="LISConfigurations"

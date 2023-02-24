@@ -7,6 +7,7 @@ import { sampleAcceptanceContainers } from "./containers";
 import { HomeComponent } from "./pages/home/home.component";
 import { FilterSamplesPipe } from "../lab-reports/pipes/filter-samples.pipe";
 import { SearchTestsPipe } from "../lab-reports/pipes/filter-tests.pipe";
+import { SharedLabModule } from "../../shared/modules/shared-lab.module";
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { SearchTestsPipe } from "../lab-reports/pipes/filter-tests.pipe";
     CommonModule,
     SampleAcceptanceAndResultsRoutingModule,
     SharedModule,
+    SharedLabModule,
   ],
   entryComponents: [...sampleAcceptanceAndResultsModals],
 })
