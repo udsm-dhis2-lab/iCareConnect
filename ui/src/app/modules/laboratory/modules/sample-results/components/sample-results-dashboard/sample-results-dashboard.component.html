@@ -48,6 +48,13 @@
         [excludeAllocations]="true"
         [sampleTypes]="sampleTypes"
         [codedSampleRejectionReasons]="codedSampleRejectionReasons"
+        (selectedSampleDetails)="
+          onGetSelectedSampleDetails(
+            $event,
+            sampleParams?.testResultsMapping,
+            sampleParams?.externalSystemsReferenceConceptUuid
+          )
+        "
       ></app-shared-samples-list>
     </div>
 

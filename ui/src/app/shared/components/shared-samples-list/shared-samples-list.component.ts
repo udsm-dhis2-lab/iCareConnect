@@ -134,6 +134,11 @@ export class SharedSamplesListComponent implements OnInit {
     this.selectedSampleDetails.emit({ ...sample, actionType });
   }
 
+  onGetSelectedSampleDetails(event: Event, sample: any, action: string): void {
+    event.stopPropagation();
+    this.selectedSampleDetails.emit({ data: sample, action: action });
+  }
+
   onSelectItem(event: MatCheckboxChange, sample: any): void {
     this.selectedSamples = event?.checked
       ? [...this.selectedSamples, sample]

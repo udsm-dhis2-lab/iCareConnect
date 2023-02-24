@@ -527,6 +527,10 @@ export class LabSample {
       : false;
   }
 
+  get visit(): any {
+    return this.sample?.visit;
+  }
+
   toJSon(): any {
     return {
       uuid: this.uuid,
@@ -566,6 +570,7 @@ export class LabSample {
       priorityHigh: this.priorityHigh,
       priorityOrderNumber: this.priorityOrderNumber,
       searchingText: this.searchingText,
+      visit: this.visit,
     };
   }
 }
