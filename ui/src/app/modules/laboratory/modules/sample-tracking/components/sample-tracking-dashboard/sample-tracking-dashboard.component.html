@@ -11,8 +11,14 @@
     mode="indeterminate"
   ></mat-progress-bar>
 
-  <div *ngIf="sampleParams?.labConfigs">
-    <div class="p-2">
+  <div>
+    <app-shared-samples-summary-dashboard
+      [datesParams]="datesParameters"
+      [dashboardSingleValueDataSetsReferenceKey]="
+        'iCare.laboratory.sampleTracking.dashboard.settings.samples.singleValue'
+      "
+    ></app-shared-samples-summary-dashboard>
+    <div class="p-2" *ngIf="sampleParams?.labConfigs">
       <app-shared-samples-list
         [tabType]="'view-results'"
         [LISConfigurations]="LISConfigurations"
