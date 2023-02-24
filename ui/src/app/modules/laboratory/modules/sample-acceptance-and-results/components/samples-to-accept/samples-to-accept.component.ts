@@ -59,6 +59,7 @@ export class SamplesToAcceptComponent implements OnInit {
   }
 
   onGetSelectedSampleDetails(sample: any, providerDetails: any): void {
+    console.log(sample);
     if (sample?.actionType === "accept") {
       this.accept(sample, providerDetails);
     } else {
@@ -249,14 +250,14 @@ export class SamplesToAcceptComponent implements OnInit {
   onAcceptAll(event: Event): void {
     event.stopPropagation();
     for (const sampleDetails of this.selectedSamplesForAction) {
-      this.accept(sampleDetails?.sample, null);
+      this.accept(sampleDetails, null);
     }
   }
 
   onRejectAll(event: Event): void {
     event.stopPropagation();
     for (const sampleDetails of this.selectedSamplesForAction) {
-      this.reject(sampleDetails?.sample, null);
+      this.reject(sampleDetails, null);
     }
   }
 }
