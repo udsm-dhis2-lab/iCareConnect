@@ -74,7 +74,21 @@
               Parameters
             </th>
             <th *ngIf="showRemarks" style="width: 20%">Remarks</th>
-            <th style="width: 30px" *ngIf="viewType === 'authorization'"></th>
+            <th style="width: 30px" *ngIf="viewType === 'authorization'">
+              <div class="d-flex justify-content-end">
+                <section class="mr-2" title="Tick all to authorize">
+                  <mat-checkbox
+                    color="primary"
+                    (change)="
+                      onSelectAllItems(
+                        $event,
+                        params?.currentWorksheetDefinition?.worksheetSamples
+                      )
+                    "
+                  ></mat-checkbox>
+                </section>
+              </div>
+            </th>
           </tr>
         </thead>
         <ng-container
@@ -84,7 +98,7 @@
             let count = index
           "
         >
-          <tr>
+          <tr *ngIf="worksheetSample?.type === 'SAMPLE'">
             <td class="text-center">
               {{ count + 1 }}
             </td>
@@ -147,6 +161,16 @@
                 <section class="ml-4 mr-2" title="Tick to authorize">
                   <mat-checkbox
                     color="primary"
+                    [checked]="
+                      allSelectedItems[worksheetSample?.uuid] &&
+                      worksheetSample?.sample?.authorizationStatuses?.length ===
+                        0
+                        ? true
+                        : false
+                    "
+                    [disabled]="
+                      worksheetSample?.sample?.authorizationStatuses?.length > 0
+                    "
                     (change)="onSelectItem($event, worksheetSample)"
                   ></mat-checkbox>
                 </section>
