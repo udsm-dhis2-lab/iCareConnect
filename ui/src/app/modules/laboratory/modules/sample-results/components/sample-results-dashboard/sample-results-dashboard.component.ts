@@ -8,6 +8,7 @@ import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/mod
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { SharedSamplesVerificationIntegratedComponent } from "src/app/shared/dialogs/shared-samples-verification-integrated/shared-samples-verification-integrated.component";
+import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { SamplesService } from "src/app/shared/services/samples.service";
@@ -349,6 +350,7 @@ export class SampleResultsDashboardComponent implements OnInit {
   }
 
   createResultsPayload(referencePayload: any, mappedResult: string): any {
+    // TODO:Remove all hardcoded UIDs
     const labResultPayload = {
       program: referencePayload?.program,
       programStage: "QreyZUwCOlg",
@@ -356,13 +358,34 @@ export class SampleResultsDashboardComponent implements OnInit {
       trackedEntityInstance: referencePayload?.trackedEntityInstance,
       enrollment: referencePayload?.enrollment,
       dataValues: [
-        { dataElement: "Cl2I1H6Y3oj", value: new Date().toISOString() },
+        {
+          dataElement: "Cl2I1H6Y3oj",
+          value: this.formatDateAndTime(new Date()),
+        },
         { dataElement: "ovY6E8BSdto", value: mappedResult },
         { dataElement: "eDrW5iJLYbP", value: "PCR" },
       ],
-      eventDate: new Date().toISOString(),
+      eventDate: this.formatDateAndTime(new Date()),
     };
+
     return labResultPayload;
+  }
+
+  formatDateAndTime(date: Date): string {
+    return (
+      formatDateToYYMMDD(date) +
+      "T" +
+      this.formatDimeChars(date.getHours().toString()) +
+      ":" +
+      this.formatDimeChars(date.getMinutes().toString()) +
+      ":" +
+      this.formatDimeChars(date.getSeconds().toString()) +
+      ".000Z"
+    );
+  }
+
+  formatDimeChars(char: string): string {
+    return char.length == 1 ? "0" + char : char;
   }
 
   onVerifyIfIsFromExternalSystem(
@@ -388,7 +411,5 @@ export class SampleResultsDashboardComponent implements OnInit {
       });
   }
 
-  getSelectedDepartments(selectedDepartments: any[]): void {
-    console.log(selectedDepartments);
-  }
+  getSelectedDepartments(selectedDepartments: any[]): void {}
 }
