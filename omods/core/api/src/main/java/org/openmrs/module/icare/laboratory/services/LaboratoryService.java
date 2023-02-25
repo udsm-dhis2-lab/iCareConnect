@@ -111,6 +111,7 @@ public interface LaboratoryService extends OpenmrsService {
 	List<Batch> getBatches(Date start, Date end, String uuid, String q, Integer startIndex, Integer limit);
 	
 	Batch getBatchByUuid(String batchUuid);
+	
 	List<Sample> getSamplesByBatchSampleUuid(String batchUuid);
 	
 	Batch addBatch(Batch batch);
