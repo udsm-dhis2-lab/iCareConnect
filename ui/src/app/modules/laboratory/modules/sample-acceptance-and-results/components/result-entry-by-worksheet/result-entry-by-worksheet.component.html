@@ -98,7 +98,18 @@
             let count = index
           "
         >
-          <tr *ngIf="worksheetSample?.type === 'SAMPLE'">
+          <tr
+            [ngStyle]="{
+              'background-color': worksheetSample?.sample
+                ? worksheetSample?.sample?.authorizationStatuses?.length > 0
+                  ? '#6fd67bcf'
+                  : worksheetSample?.sample?.hasResults
+                  ? '#ec864acf'
+                  : ''
+                : 'transparent'
+            }"
+            *ngIf="worksheetSample?.type === 'SAMPLE'"
+          >
             <td class="text-center">
               {{ count + 1 }}
             </td>

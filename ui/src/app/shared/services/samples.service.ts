@@ -554,6 +554,7 @@ export class SamplesService {
       })
     );
   }
+
   createBatch(batch: any): Observable<any> {
     return this.httpClient.post(BASE_URL + "lab/batches", batch).pipe(
       map((response) => {
@@ -564,6 +565,16 @@ export class SamplesService {
       })
     );
   }
+
+  getBatchDetailsByUuid(uuid: string): Observable<any> {
+    return this.opeMRSHttpClientService.get(`lab/batches?uuid=${uuid}`).pipe(
+      map((response: any) => {
+        console.log(response);
+        return response;
+      })
+    );
+  }
+
   getBatches(
     startDate?: string,
     endDate?: string,
