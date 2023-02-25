@@ -1229,11 +1229,17 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                     )
                                                                     .subscribe(
                                                                       (
-                                                                        sampleResponse
+                                                                        sampleResponse: any
                                                                       ) => {
                                                                         localStorage.setItem(
                                                                           "batchSample",
-                                                                          sampleResponse?.uuid
+                                                                          sampleResponse?.batchSample
+                                                                            ? sampleResponse
+                                                                                ?.batchSample
+                                                                                ?.uuid
+                                                                            : sampleResponse
+                                                                                ?.batch
+                                                                                ?.uuid
                                                                         );
                                                                         this.savingDataResponse =
                                                                           sampleResponse;

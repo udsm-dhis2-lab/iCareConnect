@@ -40,7 +40,20 @@
   <div *ngIf="dynamicFields.length">
     <div class="row">
       <div class="col-12">
-        <app-batch-samples-list></app-batch-samples-list>
+        <mat-accordion *ngIf="getBatch?.length && !gettingBatches">
+          <mat-expansion-panel
+            class="border mat-elevation-z0 mt-2"
+            [expanded]="true"
+          >
+            <mat-expansion-panel-header class="d-flex justify-content-between">
+              <mat-panel-title>
+                <span>Samples in {{ this.batch?.name }}</span>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <app-batch-samples-list></app-batch-samples-list>
+          </mat-expansion-panel>
+        </mat-accordion>
       </div>
       <div class="col-11">
         <table class="table table-responsive">
@@ -152,11 +165,11 @@
     >
 
     </mat-paginator>  -->
-    <mat-progress-bar
+    <!-- <mat-progress-bar
       *ngIf="!getBatch?.length && gettingBatches"
       mode="indeterminate"
-    ></mat-progress-bar>
-    <mat-accordion *ngIf="getBatch?.length && !gettingBatches">
+    ></mat-progress-bar> -->
+    <!-- <mat-accordion *ngIf="getBatch?.length && !gettingBatches">
       <mat-expansion-panel
         class="border mat-elevation-z0 mt-2"
         [expanded]="false"
@@ -183,15 +196,11 @@
                 <td>{{ sample?.label }}</td>
                 <td>{{ sample?.creator?.display }}</td>
                 <td>{{ sample?.dateTimeCreated | date: "medium" }}</td>
-                <!-- <td class="d-flex">
-                        <button mat-flat-button class="ml-3" style="border:1px solid #cecece"><mat-icon>edit</mat-icon></button>
-                        <button mat-flat-button class="ml-3" style="border:1px solid #cecece" color="warn"><mat-icon>delete_outline</mat-icon></button>
-                    </td>   -->
               </tr>
             </ng-container>
           </tbody>
         </table>
       </mat-expansion-panel>
-    </mat-accordion>
+    </mat-accordion> -->
   </div>
 </div>

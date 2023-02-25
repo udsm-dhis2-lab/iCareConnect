@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { SamplesService } from "src/app/shared/services/samples.service";
 
 @Component({
@@ -8,14 +8,18 @@ import { SamplesService } from "src/app/shared/services/samples.service";
   styleUrls: ["./batch-samples-list.component.scss"],
 })
 export class BatchSamplesListComponent implements OnInit {
-  batchDetails$: Observable<any>;
-  batchUuid: string;
+  batchSampleDetails$: Observable<any>;
+  batchSampleUuid: string;
   constructor(private sampleService: SamplesService) {}
 
   ngOnInit(): void {
-    this.batchUuid = localStorage.getItem("batch");
-    this.batchDetails$ = this.sampleService.getBatchDetailsByUuid(
-      this.batchUuid
-    );
+    this.batchSampleUuid = localStorage.getItem("batchSample");
+    if (this.batchSampleUuid) {
+      this.batchSampleDetails$ = this.sampleService.getBatchSamplesByUuid(
+        this.batchSampleUuid
+      );
+    } else {
+      this.batchSampleDetails$ = of([]);
+    }
   }
 }
