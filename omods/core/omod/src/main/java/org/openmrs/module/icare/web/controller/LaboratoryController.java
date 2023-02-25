@@ -150,10 +150,10 @@ public class LaboratoryController {
 			sampleStatusesList.add(statusesObject);
 		}
 		if(createdSample.getBatchSample() != null){
-			HashMap<String,Object> batchObject = new HashMap<>();
-			batchObject.put("uuid",createdSample.getBatchSample().getUuid());
-			batchObject.put("display",createdSample.getBatchSample().getCode());
-			response.put("batch",batchObject);
+			HashMap<String,Object> batchSampleObject = new HashMap<>();
+			batchSampleObject.put("uuid",createdSample.getBatchSample().getUuid());
+			batchSampleObject.put("display",createdSample.getBatchSample().getCode());
+			response.put("batchSample",batchSampleObject);
 		}
 		
 		response.put("status", sampleStatusesList);
