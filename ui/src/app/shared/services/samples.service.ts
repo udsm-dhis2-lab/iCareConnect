@@ -569,10 +569,42 @@ export class SamplesService {
   getBatchDetailsByUuid(uuid: string): Observable<any> {
     return this.opeMRSHttpClientService.get(`lab/batches?uuid=${uuid}`).pipe(
       map((response: any) => {
-        console.log(response);
         return response;
       })
     );
+  }
+
+  getBatchSamplesByUuid(uuid: string): Observable<any> {
+    return this.opeMRSHttpClientService
+      .get(`lab/batchSample?uuid=${uuid}`)
+      .pipe(
+        map((response: any) => {
+          return {
+            ...response,
+            samples: response?.samples?.map((sample: any) => {
+              return {
+                ...sample,
+                orders: sample?.orders?.map((order) => {
+                  const orderDetails = {
+                    ...order,
+                    order: {
+                      ...order?.order,
+                      concept: {
+                        ...order?.order?.concept,
+                        display:
+                          order?.order?.concept?.display?.indexOf(":") > -1
+                            ? order?.order?.concept?.display?.split(":")[1]
+                            : order?.order?.concept?.display,
+                      },
+                    },
+                  };
+                  return orderDetails;
+                }),
+              };
+            }),
+          };
+        })
+      );
   }
 
   getBatches(
