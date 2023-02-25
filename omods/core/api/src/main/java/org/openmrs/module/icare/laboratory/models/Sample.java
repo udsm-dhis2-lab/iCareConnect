@@ -223,7 +223,7 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 			Map<String,Object> batchObject = new HashMap<>();
 			batchObject.put("uuid",this.getBatchSample().getUuid());
 			batchObject.put("display",this.getBatchSample().getCode());
-			sampleObject.put("batch",batchObject);
+			sampleObject.put("batchSample",batchObject);
 		}
 		
 		return sampleObject;

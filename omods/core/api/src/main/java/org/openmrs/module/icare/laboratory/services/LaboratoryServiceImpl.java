@@ -806,8 +806,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 
 	@Override
-	public List<Sample> getSamplesByBatchUuid(String batchUuid) {
-		return  batchDAO.getSamplesByBatchUuid(batchUuid);
+	public List<Sample> getSamplesByBatchSampleUuid(String batchUuid) {
+		return  sampleDAO.getSamplesByBatchSampleUuid(batchUuid);
 	}
 	@Override
 	public Batch addBatch(Batch batch) {

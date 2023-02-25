@@ -578,4 +578,13 @@ public class SampleDAO extends BaseDAO<Sample> {
 		listResults.setResults(query.list());
 		return listResults;
 	}
+
+
+	public List<Sample> getSamplesByBatchSampleUuid(String batchSampleUuid) {
+		DbSession session = this.getSession();
+		String queryStr = "SELECT s FROM Sample s WHERE s.batchSample IN (select bs FROM BatchSample bs WHERE bs.uuid =:batchUuid)";
+		Query query = session.createQuery(queryStr);
+		query.setParameter("batchSampleUuid", batchSampleUuid);
+		return query.list();
+	}
 }
