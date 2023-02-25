@@ -34,10 +34,11 @@
         >By Worksheet</mat-radio-button
       >
     </mat-radio-group>
-    <div class="p-3" *ngIf="selectedResultEntryCategory === 'Worksheet'">
+    <div class="p-2" *ngIf="selectedResultEntryCategory === 'Worksheet'">
       <app-result-entry-by-worksheet-home
         [isLIS]="LISConfigurations?.isLIS"
         [datesParameters]="datesParameters"
+        [viewType]="viewType"
       ></app-result-entry-by-worksheet-home>
     </div>
     <app-shared-samples-list
@@ -48,8 +49,9 @@
       (resultEntrySample)="
         onResultsEntryAndReview($event, params?.providerDetails, 'entry')
       "
-      [category]="'ACCEPTED'"
-      [hasStatus]="'YES'"
+      [category]="category"
+      [hasStatus]="hasStatus"
+      [showLegend]="true"
       [datesParameters]="datesParameters"
       [excludeAllocations]="true"
       [sampleTypes]="sampleTypes"

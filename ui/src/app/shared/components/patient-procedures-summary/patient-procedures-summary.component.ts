@@ -1,7 +1,6 @@
 import { Component, Input, OnInit, Output, EventEmitter } from "@angular/core";
 import { FormValue } from "../../modules/form/models/form-value.model";
 import { Visit } from "../../resources/visits/models/visit.model";
-import { keyBy, flatten, orderBy, uniqBy } from "lodash";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { Observable } from "rxjs";
 import { VisitsService } from "../../resources/visits/services";
@@ -11,9 +10,7 @@ import { AttendProcedureOrderComponent } from "../attend-procedure-order/attend-
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getGroupedObservationByConcept } from "src/app/store/selectors/observation.selectors";
-import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
-import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
-import { map } from "rxjs/operators";
+import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
 
 @Component({
   selector: "app-patient-procedures-summary",
@@ -51,7 +48,6 @@ export class PatientProceduresSummaryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    
     this.procedures$ = this.visitService.getActiveVisitProcedures(
       this.patientVisit.uuid,
       this.fields
@@ -158,7 +154,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
     });
   }
 
-  onDeleteProcedure(e: Event, procedure: any){
+  onDeleteProcedure(e: Event, procedure: any) {
     e.stopPropagation();
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
       width: "25%",

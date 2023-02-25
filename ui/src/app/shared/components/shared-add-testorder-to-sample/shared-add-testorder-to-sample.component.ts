@@ -21,7 +21,7 @@ import { ICARE_CONFIG } from "../../resources/config";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { VisitsService } from "../../resources/visits/services";
 import { SamplesService } from "../../services/samples.service";
-import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
 
 @Component({
   selector: "app-shared-add-testorder-to-sample",
@@ -262,31 +262,28 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
             uuid: order?.order?.uuid,
             voidReason: response?.remarks || "No reason provided",
           };
-          this.orderService.voidOrderWithReason(voidObject).subscribe(
-            (response: any) => {
-              if(!response?.error && !response?.stackTrace){
+          this.orderService
+            .voidOrderWithReason(voidObject)
+            .subscribe((response: any) => {
+              if (!response?.error && !response?.stackTrace) {
                 this.store.dispatch(
                   loadSampleByUuid({ uuid: this.sample?.uuid })
                 );
               } else {
-                if(response?.error){
-                  this.errors = [
-                    ...this.errors,
-                    response?.error
-                  ]
+                if (response?.error) {
+                  this.errors = [...this.errors, response?.error];
                 } else {
-                  this.errors = [ 
+                  this.errors = [
                     ...this.errors,
                     {
                       error: {
-                        message: response?.message
-                      }
-                    }
-                  ]
+                        message: response?.message,
+                      },
+                    },
+                  ];
                 }
               }
-            }
-          );
+            });
         }
       });
   }

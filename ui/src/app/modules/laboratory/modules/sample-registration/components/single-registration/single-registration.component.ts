@@ -29,7 +29,7 @@ import { SampleRegistrationFinalizationComponent } from "../sample-registration-
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { map } from "rxjs/operators";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";
@@ -156,10 +156,11 @@ export class SingleRegistrationComponent implements OnInit {
 
     this.specimenDetailsFields = Object.keys(
       this.allRegistrationFields?.specimenDetailFields
-    ).slice(0, 3)
+    )
+      .slice(0, 3)
       .map((key) => {
         const field = this.allRegistrationFields?.specimenDetailFields[key];
-        return field
+        return field;
       });
 
     // this.specimenDetailsFields = [
@@ -218,16 +219,23 @@ export class SingleRegistrationComponent implements OnInit {
     //   // }),
     // ];
 
-    this.receivedOnField = this.allRegistrationFields?.specimenDetailFields?.receivedOn;
-    this.receivedByField = this.allRegistrationFields?.specimenDetailFields?.receivedBy;
-    this.transportCondition = this.allRegistrationFields?.specimenDetailFields?.transportCondition;
-    this.transportationTemperature = this.allRegistrationFields?.specimenDetailFields?.transportationTemperature;
+    this.receivedOnField =
+      this.allRegistrationFields?.specimenDetailFields?.receivedOn;
+    this.receivedByField =
+      this.allRegistrationFields?.specimenDetailFields?.receivedBy;
+    this.transportCondition =
+      this.allRegistrationFields?.specimenDetailFields?.transportCondition;
+    this.transportationTemperature =
+      this.allRegistrationFields?.specimenDetailFields?.transportationTemperature;
 
-    this.sampleColectionDateField = this.allRegistrationFields?.specimenDetailFields?.collectedOn;
-    this.sampleCollectedByField = this.allRegistrationFields?.specimenDetailFields?.collectedBy;
-    this.broughtOnField = this.allRegistrationFields?.specimenDetailFields?.broughtOn;
-    this.broughtByField = this.allRegistrationFields?.specimenDetailFields?.broughtBy;
-
+    this.sampleColectionDateField =
+      this.allRegistrationFields?.specimenDetailFields?.collectedOn;
+    this.sampleCollectedByField =
+      this.allRegistrationFields?.specimenDetailFields?.collectedBy;
+    this.broughtOnField =
+      this.allRegistrationFields?.specimenDetailFields?.broughtOn;
+    this.broughtByField =
+      this.allRegistrationFields?.specimenDetailFields?.broughtBy;
 
     this.receivedOnField.max = this.maximumDate;
     this.broughtOnField.max = this.maximumDate;
@@ -412,8 +420,8 @@ export class SingleRegistrationComponent implements OnInit {
     };
   }
 
-  onGetDateTime(e: any){
-    console.log("==> Date time: ", e )
+  onGetDateTime(e: any) {
+    console.log("==> Date time: ", e);
   }
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
@@ -1875,12 +1883,16 @@ export class SingleRegistrationComponent implements OnInit {
     return (
       formatDateToYYMMDD(date) +
       "T" +
-      date.getHours() +
+      this.formatDimeChars(date.getHours().toString()) +
       ":" +
-      date.getMinutes() +
+      this.formatDimeChars(date.getMinutes().toString()) +
       ":" +
-      date.getSeconds() +
+      this.formatDimeChars(date.getSeconds().toString()) +
       ".000Z"
     );
+  }
+
+  formatDimeChars(char: string): string {
+    return char.length == 1 ? "0" + char : char;
   }
 }

@@ -26,13 +26,14 @@ export function getAuthorizationDetailsByOrder(order: any, isLIS?: boolean) {
         (
           allocation?.statuses?.filter(
             (status) =>
-              ((status?.status === "APPROVED" ||
+              (((status?.status === "APPROVED" ||
                 status?.status === "AUTHORIZED") &&
                 isLIS) ||
-              (!isLIS &&
-                (status?.remarks?.toLowerCase()?.indexOf("second_approval") >
-                  -1 ||
-                  status?.status === "AUTHORIZED"))
+                (!isLIS &&
+                  (status?.remarks?.toLowerCase()?.indexOf("second_approval") >
+                    -1 ||
+                    status?.status === "AUTHORIZED"))) &&
+              status?.timestamp
           ) || []
         )?.length > 0
     ) || [];
@@ -50,7 +51,10 @@ export function getAuthorizationDetailsByOrder(order: any, isLIS?: boolean) {
                 allocation: allocation,
               };
             })
-            ?.filter((status) => status?.status === "APPROVED") || [],
+            ?.filter(
+              (status) =>
+                status?.status === "APPROVED" || status?.status === "AUTHORIZED"
+            ) || [],
       };
     }),
     "name"
@@ -67,8 +71,9 @@ export function getAuthorizationDetails(sample) {
             (
               allocation?.statuses?.filter(
                 (status) =>
-                  status?.status === "APPROVED" ||
-                  status?.category === "APPROVED"
+                  status?.timestamp &&
+                  (status?.status === "AUTHORIZED" ||
+                    status?.category === "RESULT_AUTHORIZATION")
               ) || []
             )?.length > 0
         ) || []
@@ -78,7 +83,9 @@ export function getAuthorizationDetails(sample) {
   const allocationStatuses = uniqBy(
     flatten(
       approvedAllocations?.map((allocation) => {
-        return allocation?.statuses?.map((status) => {
+        return (
+          allocation?.statuses?.filter((status) => status?.timestamp) || []
+        )?.map((status) => {
           return {
             ...status,
             allocation: allocation,
