@@ -798,25 +798,12 @@ public class LaboratoryController {
 	}
 
 
-	@RequestMapping(value = "batch", method = RequestMethod.GET)
+	@RequestMapping(value = "batchSample", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getBatchByUuid(@RequestParam(value = "uuid", required = true) String uuid) throws ParseException {
+	public Map<String, Object> getBatchSampleByUuid(@RequestParam(value = "uuid", required = true) String uuid) throws ParseException {
 
-		List<Sample> samples= laboratoryService.getSamplesByBatchUuid(uuid);
-		Batch batch = laboratoryService.getBatchByUuid(uuid);
-		Map<String, Object> batchInformation = new HashMap<>();
-		batchInformation.put("code", batch.getLabel());
-		batchInformation.put("label", batch.getLabel());
-		batchInformation.put("uuid", batch.getUuid());
-		batchInformation.put("name", batch.getBatchName());
-		List batchSamples = new ArrayList();
-		if (samples.size() > 0) {
-			for (Sample sample : samples) {
-				batchSamples.add(sample.toMap());
-			}
-		}
-		batchInformation.put("samples", batchSamples);
-		return batchInformation;
+		BatchSample batchSample= laboratoryService.getBatchSampleByUuid(uuid);
+		return batchSample.toMap();
 	}
 	
 	@RequestMapping(value = "batchsamples",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)

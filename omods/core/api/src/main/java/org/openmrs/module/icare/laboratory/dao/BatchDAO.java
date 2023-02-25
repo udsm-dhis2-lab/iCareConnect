@@ -67,13 +67,4 @@ public class BatchDAO extends BaseDAO<Batch> {
 		}
 	}
 
-	public List<Sample> getSamplesByBatchUuid(String batchUuid) {
-		DbSession session = this.getSession();
-		String queryStr = "SELECT s FROM Sample s WHERE s.batch IN (select b FROM Batch b WHERE b.uuid =:batchUuid)";
-		queryStr += " WHERE bt.uuid =:uuid";
-		Query query = session.createQuery(queryStr);
-		query.setParameter("batchUuid", batchUuid);
-		return query.list();
-	}
-
 }
