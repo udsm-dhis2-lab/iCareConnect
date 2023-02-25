@@ -6,6 +6,7 @@ import { SampleResultsRoutingModule } from "./sample-results-routing.module";
 import { SampleResultsComponent } from "./sample-results/sample-results.component";
 import { resultsComponents } from "./components";
 import { modals } from "./modals";
+import { SharedLabModule } from "../../shared/modules/shared-lab.module";
 
 @NgModule({
   declarations: [
@@ -14,7 +15,12 @@ import { modals } from "./modals";
     ...resultsComponents,
     ...modals,
   ],
-  imports: [CommonModule, SampleResultsRoutingModule, SharedModule],
+  imports: [
+    CommonModule,
+    SampleResultsRoutingModule,
+    SharedModule,
+    SharedLabModule,
+  ],
   entryComponents: [...modals],
 })
 export class SampleResultsModule {}
