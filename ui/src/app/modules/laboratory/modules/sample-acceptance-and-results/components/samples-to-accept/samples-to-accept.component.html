@@ -16,10 +16,11 @@
       </div>
     </div>
   </div>
-  <div *ngIf="params?.providerDetails">
-    <div class="w-100" style="max-height: 60vh; overflow: auto">
+  <div *ngIf="params?.providerDetails && !saving">
+    <div class="w-100">
       <app-shared-samples-list
         [tabType]="'samples-to-accept'"
+        [samples]="params?.samplesToAccept"
         [LISConfigurations]="LISConfigurations"
         [labSamplesDepartments]="labSamplesDepartments"
         (selectedSampleDetails)="
@@ -27,7 +28,7 @@
         "
         (samplesForAction)="onGetSelectedSamplesForAction($event)"
         [category]="LISConfigurations?.isLIS ? 'NOT ACCEPTED' : null"
-        [hasStatus]="LISConfigurations?.isLIS ? 'NO' : 'YES'"
+        [hasStatus]="LISConfigurations?.isLIS ? 'YES' : 'NO'"
         [datesParameters]="datesParameters"
         [excludeAllocations]="excludeAllocations"
         [sampleTypes]="sampleTypes"

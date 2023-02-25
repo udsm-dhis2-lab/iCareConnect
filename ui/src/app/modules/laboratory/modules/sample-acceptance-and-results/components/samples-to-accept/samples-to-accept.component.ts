@@ -6,7 +6,7 @@ import { AppState } from "src/app/store/reducers";
 import { Observable, of, zip } from "rxjs";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
 import { map, take } from "rxjs/operators";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
@@ -53,27 +53,13 @@ export class SamplesToAcceptComponent implements OnInit {
     this.providerDetails$ = this.store.select(getProviderDetails);
   }
 
-  getSamples(): void {
-    this.samplesToAccept$ = this.sampleService.getLabSamplesByCollectionDates(
-      this.datesParameters,
-      this.LISConfigurations?.isLIS ? "NOT ACCEPTED" : null,
-      !this.LISConfigurations?.isLIS ? "NO" : "YES",
-      this.excludeAllocations,
-      null,
-      {
-        departments: this.labSamplesDepartments,
-        specimenSources: this.sampleTypes,
-        codedRejectionReasons: this.codedSampleRejectionReasons,
-      }
-    );
-  }
-
   onToggleViewSampleDetails(event: Event, sample: any): void {
     event.stopPropagation();
     console.log(sample);
   }
 
   onGetSelectedSampleDetails(sample: any, providerDetails: any): void {
+    console.log(sample);
     if (sample?.actionType === "accept") {
       this.accept(sample, providerDetails);
     } else {
@@ -82,7 +68,6 @@ export class SamplesToAcceptComponent implements OnInit {
   }
 
   accept(sample: any, providerDetails?: any): void {
-    this.saving = true;
     let confirmDialog;
     if (this.LISConfigurations?.isLIS) {
       confirmDialog = this.dialog.open(SharedConfirmationComponent, {
@@ -102,6 +87,7 @@ export class SamplesToAcceptComponent implements OnInit {
       : of({ confirmed: true })
     ).subscribe((confirmationObject) => {
       if (confirmationObject?.confirmed) {
+        this.saving = true;
         if (
           confirmationObject?.remarks &&
           confirmationObject?.remarks.length > 0
@@ -205,11 +191,9 @@ export class SamplesToAcceptComponent implements OnInit {
               .subscribe((response) => {
                 if (response && !response?.error) {
                   this.saving = false;
-                  this.getSamples();
                 } else {
                   // TODO: Handle errors
                   this.saving = false;
-                  this.getSamples();
                 }
               });
           });
@@ -252,7 +236,7 @@ export class SamplesToAcceptComponent implements OnInit {
           });
           this.sampleService.saveSampleStatuses(data).subscribe((response) => {
             if (response && !response?.error) {
-              this.getSamples();
+              this.saving = false;
             }
           });
         }
@@ -266,14 +250,14 @@ export class SamplesToAcceptComponent implements OnInit {
   onAcceptAll(event: Event): void {
     event.stopPropagation();
     for (const sampleDetails of this.selectedSamplesForAction) {
-      this.accept(sampleDetails?.sample, null);
+      this.accept(sampleDetails, null);
     }
   }
 
   onRejectAll(event: Event): void {
     event.stopPropagation();
     for (const sampleDetails of this.selectedSamplesForAction) {
-      this.reject(sampleDetails?.sample, null);
+      this.reject(sampleDetails, null);
     }
   }
 }

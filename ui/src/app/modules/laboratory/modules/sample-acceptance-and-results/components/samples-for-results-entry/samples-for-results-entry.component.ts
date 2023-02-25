@@ -24,6 +24,9 @@ export class SamplesForResultsEntryComponent implements OnInit {
   @Input() currentUser: any;
   @Input() LISConfigurations: any;
   @Input() userUuid: string;
+  @Input() category: string;
+  @Input() hasStatus: string;
+  @Input() viewType: string;
 
   sampplesForResultsEntry$: Observable<any[]>;
   selectedDepartment: string;

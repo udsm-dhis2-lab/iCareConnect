@@ -207,14 +207,16 @@ export class WorksheetDefinitionComponent implements OnInit {
                       },
                       type: type,
                     };
-                    returnObj[type === "SAMPLE" ? "sample" : "control"] = {
+                    returnObj[
+                      type === "SAMPLE" ? "sample" : "worksheetControl"
+                    ] = {
                       uuid: this.selectedRowsColumns[key]?.value?.uuid,
                     };
                     return returnObj;
                   }
                 })
                 ?.filter((worksheetSample) => worksheetSample);
-
+              // console.log(JSON.stringify(worksheetSamples));
               this.worksheetsService
                 .createWorksheetSamples(worksheetSamples)
                 .subscribe((response) => {
@@ -256,10 +258,12 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.selectedWorkSheetConfiguration = values?.worksheet?.value;
     this.worksheetDefnPayload = {
       code: null,
-      expirationDateTime: new Date(values?.expirationDateTime?.value)
-        ?.toISOString()
-        ?.replace("T", " ")
-        .replace(".000Z", ""),
+      expirationDateTime: values?.expirationDateTime?.value
+        ? new Date(values?.expirationDateTime?.value)
+            ?.toISOString()
+            ?.replace("T", " ")
+            .replace(".000Z", "")
+        : null,
       additionalFields: JSON.stringify(
         Object.keys(values).map((key) => {
           return values[key];
@@ -308,7 +312,13 @@ export class WorksheetDefinitionComponent implements OnInit {
                 (ws?.type === "SAMPLE" ? "sample" : "control")
             ] = {
               set: true,
-              value: { ...ws?.sample, label: ws?.sample?.display },
+              value:
+                ws?.type === "SAMPLE"
+                  ? { ...ws?.sample, label: ws?.sample?.display }
+                  : {
+                      ...ws.worksheetControl,
+                      label: ws?.worksheetControl?.display,
+                    },
             };
           });
           const additionalFields = JSON.parse(response?.additionFields);

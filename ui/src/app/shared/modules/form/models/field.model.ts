@@ -46,6 +46,7 @@ export class Field<T> {
       max?: number | string;
       hidden?: boolean;
       units?: string;
+      rows?: number;
       conceptClass?: any;
       searchControlType?: string;
       shouldHaveLiveSearchForDropDownFields?: boolean;
@@ -74,6 +75,7 @@ export class Field<T> {
     this.max = options.max;
     this.hidden = options.hidden || false;
     this.units = options.units || "";
+    this.rows = options?.rows || 2;
     this.shouldHaveLiveSearchForDropDownFields =
       options.shouldHaveLiveSearchForDropDownFields;
     this.searchControlType = options.searchControlType;

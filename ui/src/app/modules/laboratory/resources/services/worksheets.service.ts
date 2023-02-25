@@ -97,21 +97,58 @@ export class WorkSheetsService {
   getWorksheetDefinitionsByUuid(uuid: string): Observable<any> {
     return this.httpClient.get(`lab/worksheetdefinition?uuid=${uuid}`).pipe(
       map((response) => {
+        const formattedWorksheetSamples = response?.worksheetSamples?.map(
+          (worksheetSample) => {
+            return {
+              ...worksheetSample,
+              searchText:
+                worksheetSample?.sample?.display +
+                " " +
+                worksheetSample?.sample?.allocations
+                  ?.map(
+                    (allocation) =>
+                      allocation?.concept?.display + " " + allocation?.label
+                  )
+                  ?.join(" "),
+              allocationsCount: worksheetSample?.sample?.allocations.length,
+              sample: {
+                ...worksheetSample?.sample,
+                allocations: worksheetSample?.sample?.allocations?.map(
+                  (allocation) => new SampleAllocation(allocation).toJson()
+                ),
+                hasResults:
+                  (
+                    worksheetSample?.sample?.statuses?.filter(
+                      (status) => status?.category === "HAS_RESULTS"
+                    ) || []
+                  )?.length > 0,
+                authorizationStatuses:
+                  worksheetSample?.sample?.statuses?.filter(
+                    (status) => status?.category === "RESULT_AUTHORIZATION"
+                  ) || [],
+              },
+            };
+          }
+        );
+        const countOfWSSamples = formattedWorksheetSamples?.length;
         return {
           ...response,
-          worksheetSamples: response?.worksheetSamples?.map(
-            (worksheetSample) => {
-              return {
-                ...worksheetSample,
-                sample: {
-                  ...worksheetSample?.sample,
-                  allocations: worksheetSample?.sample?.allocations?.map(
-                    (allocation) => new SampleAllocation(allocation)
+          worksheetSamples: formattedWorksheetSamples,
+          groupedWorksheetSamples:
+            countOfWSSamples > 1
+              ? {
+                  group1: formattedWorksheetSamples.slice(
+                    0,
+                    countOfWSSamples / 2
                   ),
+                  group2: formattedWorksheetSamples.slice(
+                    Number((countOfWSSamples / 2).toFixed(0)),
+                    Number((2 * (countOfWSSamples / 2)).toFixed(0))
+                  ),
+                }
+              : {
+                  group1: formattedWorksheetSamples,
                 },
-              };
-            }
-          ),
         };
       }),
       catchError((error) => of(error))

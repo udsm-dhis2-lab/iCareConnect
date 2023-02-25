@@ -3,7 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { from, interval, Observable, of } from "rxjs";
 import { debounceTime, map, tap } from "rxjs/operators";
 import { LocationService } from "src/app/core/services";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
@@ -87,15 +87,15 @@ export class SuppliersListComponent implements OnInit {
         if (data?.confirmed) {
           const supplierObject = {
             ...supplier,
-            voided: true
-          }
+            voided: true,
+          };
 
           this.supplierService
             .updateSupplier(supplier?.uuid, supplierObject)
             .pipe(
               tap((response) => {
                 if (!response?.error) {
-                  this.ngOnInit()
+                  this.ngOnInit();
                 }
               })
             )

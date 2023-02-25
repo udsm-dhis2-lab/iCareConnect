@@ -21,6 +21,7 @@ export class SharedRemarksEntryComponent implements OnInit {
       key: "remarks",
       label: "Remarks",
       required: false,
+      rows: 1,
       disabled: this.disabled,
     });
   }
