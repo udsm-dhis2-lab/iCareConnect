@@ -174,8 +174,16 @@ public class WorksheetSample extends BaseOpenmrsData implements java.io.Serializ
 				}
 			}
 			Map<String, Object> patient = new HashMap<>();
-			patient.put("age", this.getSample().getVisit().getPatient().getAge().toString());
-			patient.put("gender", this.getSample().getVisit().getPatient().getGender().toString());
+			if (this.getSample().getVisit() != null && this.getSample().getVisit().getPatient() != null) {
+				if (this.getSample().getVisit().getPatient().getAge() != null) {
+					patient.put("age", this.getSample().getVisit().getPatient().getAge().toString());
+				}
+
+				if (this.getSample().getVisit().getPatient().getGender() != null) {
+					patient.put("gender", this.getSample().getVisit().getPatient().getGender().toString());
+				}
+			}
+
 			sampleObject.put("allocations", allocations);
 			sampleObject.put("statuses",sampleStatuses);
 			sampleObject.put("patient",patient);
