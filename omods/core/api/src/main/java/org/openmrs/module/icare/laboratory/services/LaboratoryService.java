@@ -108,9 +108,10 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	WorkloadSummary getWorkLoadSummary(Date startDate, Date endDate);
 	
-	List<Batch> getBatches(Date start, Date end, String q, Integer startIndex, Integer limit);
+	List<Batch> getBatches(Date start, Date end, String uuid, String q, Integer startIndex, Integer limit);
 	
 	Batch getBatchByUuid(String batchUuid);
+	List<Sample> getSamplesByBatchUuid(String batchUuid);
 	
 	Batch addBatch(Batch batch);
 	

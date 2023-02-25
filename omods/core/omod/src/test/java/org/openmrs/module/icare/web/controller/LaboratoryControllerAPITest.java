@@ -683,7 +683,6 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String, Object>> batches = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
 		
 		assertThat("Has 1 batch", batches.size(), is(1));
-		
 	}
 	
 	@Test
