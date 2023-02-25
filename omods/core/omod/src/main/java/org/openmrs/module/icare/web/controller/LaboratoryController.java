@@ -774,6 +774,7 @@ public class LaboratoryController {
 	@ResponseBody
 	public List<Map<String, Object>> getbatches(@RequestParam(value = "startDate", required = false) String startDate,
 	        @RequestParam(value = "endDate", required = false) String endDate,
+			@RequestParam(value = "uuid", required = false) String uuid,
 	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
 	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
 		
@@ -786,16 +787,36 @@ public class LaboratoryController {
 			end = formatter.parse(endDate);
 		}
 		
-		List<Batch> batches = laboratoryService.getBatches(start, end, q, startIndex, limit);
+		List<Batch> batches = laboratoryService.getBatches(start, end, uuid, q, startIndex, limit);
 		
 		List<Map<String, Object>> responseBatchesObject = new ArrayList<Map<String, Object>>();
 		for (Batch batch : batches) {
 			Map<String, Object> batchObject = batch.toMap();
 			responseBatchesObject.add(batchObject);
 		}
-		
 		return responseBatchesObject;
-		
+	}
+
+
+	@RequestMapping(value = "batch", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getBatchByUuid(@RequestParam(value = "uuid", required = true) String uuid) throws ParseException {
+
+		List<Sample> samples= laboratoryService.getSamplesByBatchUuid(uuid);
+		Batch batch = laboratoryService.getBatchByUuid(uuid);
+		Map<String, Object> batchInformation = new HashMap<>();
+		batchInformation.put("code", batch.getLabel());
+		batchInformation.put("label", batch.getLabel());
+		batchInformation.put("uuid", batch.getUuid());
+		batchInformation.put("name", batch.getBatchName());
+		List batchSamples = new ArrayList();
+		if (samples.size() > 0) {
+			for (Sample sample : samples) {
+				batchSamples.add(sample.toMap());
+			}
+		}
+		batchInformation.put("samples", batchSamples);
+		return batchInformation;
 	}
 	
 	@RequestMapping(value = "batchsamples",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
