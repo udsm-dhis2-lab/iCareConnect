@@ -774,7 +774,7 @@ public class LaboratoryController {
 	@ResponseBody
 	public List<Map<String, Object>> getbatches(@RequestParam(value = "startDate", required = false) String startDate,
 	        @RequestParam(value = "endDate", required = false) String endDate,
-			@RequestParam(value = "uuid", required = false) String uuid,
+	        @RequestParam(value = "uuid", required = false) String uuid,
 	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
 	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
 		
@@ -796,13 +796,13 @@ public class LaboratoryController {
 		}
 		return responseBatchesObject;
 	}
-
-
+	
 	@RequestMapping(value = "batchSample", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getBatchSampleByUuid(@RequestParam(value = "uuid", required = true) String uuid) throws ParseException {
-
-		BatchSample batchSample= laboratoryService.getBatchSampleByUuid(uuid);
+	public Map<String, Object> getBatchSampleByUuid(@RequestParam(value = "uuid", required = true) String uuid)
+	        throws ParseException {
+		
+		BatchSample batchSample = laboratoryService.getBatchSampleByUuid(uuid);
 		return batchSample.toMap();
 	}
 	

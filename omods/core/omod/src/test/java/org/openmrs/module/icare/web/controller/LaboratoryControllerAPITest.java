@@ -683,7 +683,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String, Object>> batches = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
 		
 		assertThat("Has 1 batch", batches.size(), is(1));
-
+		
 	}
 	
 	@Test
@@ -710,13 +710,14 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String, Object>> batchsamples = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
 		System.out.println(batchsamples);
 		assertThat("Has 1 batch sample", batchsamples.size(), is(1));
-
+		
 		//3. Getting a single batchSample
-		MockHttpServletRequest newGetRequest2 = newGetRequest("lab/batchSample",new Parameter("uuid","iCARE890-TEST-GGGH-9beb-d30dcfc0cd35"));
+		MockHttpServletRequest newGetRequest2 = newGetRequest("lab/batchSample", new Parameter("uuid",
+		        "iCARE890-TEST-GGGH-9beb-d30dcfc0cd35"));
 		MockHttpServletResponse handle3 = handle(newGetRequest2);
 		System.out.println(handle3.getContentAsString());
-		Map<String,Object> batchSample = new ObjectMapper().readValue(handle3.getContentAsString(),Map.class);
-		assertThat("Has 1 sample",((Map)((List)batchSample.get("samples")).get(0)).get("label").equals("Sample Label y"));
+		Map<String, Object> batchSample = new ObjectMapper().readValue(handle3.getContentAsString(), Map.class);
+		assertThat("Has 1 sample", ((Map) ((List) batchSample.get("samples")).get(0)).get("label").equals("Sample Label y"));
 	}
 	
 	@Test
