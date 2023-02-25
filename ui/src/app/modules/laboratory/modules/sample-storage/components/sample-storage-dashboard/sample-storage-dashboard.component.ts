@@ -200,4 +200,8 @@ export class SampleStorageDashboardComponent implements OnInit {
       ? JSON.parse(matchedAttribute?.value)
       : null;
   }
+
+  onGetSelectedSampleDetails(sample: any): void {
+    console.log(sample);
+  }
 }
