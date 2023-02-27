@@ -125,13 +125,13 @@ export class SharedSamplesListComponent implements OnInit {
     this.selectedSampleDetails.emit(sample);
   }
 
-  onAccept(event: Event, sample: any, actionType?: string): void {
+  onAccept(event: Event, samples: any[], actionType?: string): void {
     event.stopPropagation();
-    this.selectedSampleDetails.emit({ ...sample, actionType });
+    this.selectedSampleDetails.emit({ data: samples, actionType });
   }
-  onReject(event: Event, sample: any, actionType?: string): void {
+  onReject(event: Event, samples: any[], actionType?: string): void {
     event.stopPropagation();
-    this.selectedSampleDetails.emit({ ...sample, actionType });
+    this.selectedSampleDetails.emit({ data: samples, actionType });
   }
 
   onGetSelectedSampleDetails(event: Event, sample: any, action: string): void {
