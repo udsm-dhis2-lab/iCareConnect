@@ -74,7 +74,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
 	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
-	        String testConceptUuid, String departmentUuid) {
+	        String testConceptUuid, String departmentUuid, String specimenSourceUuid) {
 		
 		DbSession session = this.getSession();
 		
@@ -123,6 +123,15 @@ public class SampleDAO extends BaseDAO<Sample> {
 				queryStr += " AND ";
 			}
 			queryStr += "sp.concept.uuid =:departmentUuid";
+		}
+
+		if (specimenSourceUuid != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp.specimenSource.uuid =:specimenSourceUuid";
 		}
 		
 		if (locationUuid != null) {
@@ -236,6 +245,10 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		if (departmentUuid != null) {
 			query.setParameter("departmentUuid", departmentUuid);
+		}
+
+		if (specimenSourceUuid != null) {
+			query.setParameter("specimenSourceUuid",specimenSourceUuid);
 		}
 		
 		if (testCategory != null && testCategory != "Completed") {
@@ -388,7 +401,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 	
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager,
 	        String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
-	        String acceptedByUuid, String testConceptUuid, String departmentUuid) {
+	        String acceptedByUuid, String testConceptUuid, String departmentUuid, String specimenSourceUuid) {
 		
 		DbSession session = this.getSession();
 		
@@ -437,6 +450,15 @@ public class SampleDAO extends BaseDAO<Sample> {
 				queryStr += " AND ";
 			}
 			queryStr += "sp.concept.uuid =:departmentUuid";
+		}
+
+		if (specimenSourceUuid != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp.specimenSource.uuid =:specimenSourceUuid";
 		}
 		
 		if (locationUuid != null) {
@@ -553,6 +575,10 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		if (departmentUuid != null) {
 			query.setParameter("departmentUuid", departmentUuid);
+		}
+
+		if (specimenSourceUuid != null) {
+			query.setParameter("specimenSourceUuid",specimenSourceUuid);
 		}
 		
 		if (testCategory != null && testCategory != "Completed") {
