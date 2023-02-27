@@ -68,9 +68,9 @@ from (select  	SUM(IF(DAY(CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT')) = 1, 1, 
         INNER JOIN person p ON p.person_id=v.patient_id
         INNER JOIN encounter test_order_encounter ON test_order_encounter.visit_id=v.visit_id
         INNER JOIN orders test_order_order ON test_order_order.encounter_id=test_order_encounter.encounter_id
-        INNER JOIN concept test_order_concept ON test_order_concept.concept_id=test_order_order.concept_id AND (test_order_concept.concept_id=215764)
+        INNER JOIN concept test_order_concept ON test_order_concept.concept_id=test_order_order.concept_id AND (test_order_concept.concept_id=(select concept_id from concept where uuid =:uuid))
         INNER JOIN lb_sample_order so ON so.order_id = test_order_order.order_id
-        INNER JOIN lb_sample sp ON sp.sample_id = so.sample_id
-        INNER JOIN lb_sample_status spstatus ON spstatus.sample_id = sp.sample_id AND (spstatus.category = 'REJECTED_LABORATORY' OR spstatus.category='REJECTED_REGISTRATION')
+        INNER JOIN lb_sample sp ON sp.sample_id = so.sample_id AND so.sample_id IN(SELECT sample_id FROM lb_sample_status WHERE (category = 'REJECTED_LABORATORY' OR category ='REJECTED_REGISTRATION'))
+        -- INNER JOIN lb_sample_status spstatus ON spstatus.sample_id = sp.sample_id AND (spstatus.category = 'REJECTED_LABORATORY' OR spstatus.category='REJECTED_REGISTRATION')
         WHERE CAST(CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT') AS DATE) BETWEEN '2022-11-01' and '2022-11-31'
      ) as a
