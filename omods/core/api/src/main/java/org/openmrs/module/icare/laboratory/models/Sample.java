@@ -50,6 +50,12 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	@JsonDeserialize(using = ChildIdOnlyDeserializer.class)
 	private Concept concept;
 	
+	@ManyToOne
+	@JoinColumn(name = "specimen_source_id")
+	@JsonSerialize(using = ChildIdOnlySerializer.class)
+	@JsonDeserialize(using = ChildIdOnlyDeserializer.class)
+	private Concept specimenSource;
+	
 	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "id.sample", cascade = { CascadeType.PERSIST })
 	private List<SampleOrder> sampleOrders = new ArrayList<SampleOrder>(0);
@@ -153,8 +159,17 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 		
 		HashMap<String, Object> conceptObject = new HashMap<String, Object>();
 		conceptObject.put("uuid", this.getConcept().getUuid());
+		conceptObject.put("display", this.getConcept().getDisplayString());
 		
 		sampleObject.put("concept", conceptObject);
+		sampleObject.put("department", conceptObject);
+
+		HashMap<String, Object> specimenSource = new HashMap<String, Object>();
+		if (this.getSpecimenSource() != null) {
+			specimenSource.put("uuid", this.getSpecimenSource().getUuid());
+			specimenSource.put("display", this.getSpecimenSource().getDisplayString());
+		}
+		sampleObject.put("specimenSource", specimenSource);
 		
 		List<Map<String, Object>> orders = new ArrayList<Map<String, Object>>();
 		
@@ -164,11 +179,11 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 				orders.add(sampleOrder.toMap(false));
 			}
 		}
-		
+
 		sampleObject.put("orders", orders);
 		
 		List<Map<String, Object>> sampleStatusesList = new ArrayList<Map<String, Object>>();
-		
+
 		for (SampleStatus sampleStatus : this.getSampleStatuses()) {
 			
 			sampleStatusesList.add(sampleStatus.toMap());
@@ -259,6 +274,14 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	
 	public void setConcept(Concept concept) {
 		this.concept = concept;
+	}
+	
+	public Concept getSpecimenSource() {
+		return this.specimenSource;
+	}
+	
+	public void setSpecimenSource(Concept specimenSource) {
+		this.specimenSource = specimenSource;
 	}
 	
 	public Integer getId() {
