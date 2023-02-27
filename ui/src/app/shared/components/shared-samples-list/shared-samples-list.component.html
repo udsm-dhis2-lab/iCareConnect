@@ -263,14 +263,14 @@
                   <button
                     mat-flat-button
                     color="primary"
-                    (click)="onAccept($event, sample, 'accept')"
+                    (click)="onAccept($event, [sample], 'accept')"
                   >
                     Accept
                   </button>
 
                   <button
                     mat-stroked-button
-                    (click)="onReject($event, sample, 'reject')"
+                    (click)="onReject($event, [sample], 'reject')"
                     class="ml-2 reject-button"
                   >
                     Reject
