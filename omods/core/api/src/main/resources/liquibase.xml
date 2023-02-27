@@ -4567,4 +4567,191 @@
         </sql>
     </changeSet>
 
+    <changeSet id="create_lb_associated_field" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_associated_field"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs lb_associated_field table</comment>
+        <createTable tableName="lb_associated_field">
+            <column name="associated_field_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="associated_field_id_pk"/>
+            </column>
+            <column name="name" type="TEXT"/>
+            <column name="description" type="TEXT"/>
+            <column name="field_type" type="TEXT"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+
+        </createTable>
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="lb_associated_field"
+                constraintName="lb_associated_field_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="lb_associated_field"
+                constraintName="lb_associated_field_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="voided_by"
+                baseTableName="lb_associated_field"
+                constraintName="lb_associated_field_voided_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+    </changeSet>
+
+    <changeSet id="create_lb_test_allocation_associated_field" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_test_allocation_associated_field"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs lb_test_allocation_associated_field table</comment>
+        <createTable tableName="lb_test_allocation_associated_field">
+            <column name="test_allocation_associated_field_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="test_allocation_associated_field_id_pk"/>
+            </column>
+            <column name="name" type="TEXT"/>
+            <column name="test_allocation_id" type="INTEGER"/>
+            <column name="associated_field_id" type="INTEGER"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+
+        </createTable>
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="lb_test_allocation_associated_field"
+                constraintName="lb_alloc_field_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="lb_test_allocation_associated_field"
+                constraintName="lb_alloc_field_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="voided_by"
+                baseTableName="lb_test_allocation_associated_field"
+                constraintName="lb_alloc_field_voided_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="test_allocation_id"
+                baseTableName="lb_test_allocation_associated_field"
+                constraintName="lb_alloc_field_alloc_id_test_allocation_alloc_id_fk"
+                referencedColumnNames="test_allocation_id"
+                referencedTableName="lb_test_allocation"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="associated_field_id"
+                baseTableName="lb_test_allocation_associated_field"
+                constraintName="lb_alloc_field_assoc_field_associated_field_id_fk"
+                referencedColumnNames="associated_field_id"
+                referencedTableName="lb_associated_field"/>
+    </changeSet>
+
+    <changeSet id="create_lb_associated_field_result" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_associated_field_result"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs lb_associated_fields_result table</comment>
+        <createTable tableName="lb_associated_field_result">
+            <column name="associated_field_result_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="associated_field_result_id_pk"/>
+            </column>
+            <column name="test_result_id" type="INTEGER"/>
+            <column name="associated_field_id" type="INTEGER"/>
+            <column name="value" type="TEXT"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+
+        </createTable>
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="lb_associated_field_result"
+                constraintName="lb_assoc_field_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="lb_associated_field_result"
+                constraintName="lb_assoc_field_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="voided_by"
+                baseTableName="lb_associated_field_result"
+                constraintName="lb_assoc_field_voided_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="associated_field_id"
+                baseTableName="lb_associated_field_result"
+                constraintName="lb_assoc_field_assoc_field_associated_field_id_fk"
+                referencedColumnNames="associated_field_id"
+                referencedTableName="lb_associated_field"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="test_result_id"
+                baseTableName="lb_associated_field_result"
+                constraintName="lb_assoc_field_test_result_id_lb_test_result_id_fk"
+                referencedColumnNames="test_result_id"
+                referencedTableName="lb_test_result"/>
+    </changeSet>
+
 </databaseChangeLog>
