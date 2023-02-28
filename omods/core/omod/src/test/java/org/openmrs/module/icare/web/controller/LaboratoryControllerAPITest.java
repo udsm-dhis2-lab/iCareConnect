@@ -975,7 +975,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Created two allocation associated fields",createdAllocationAssociatedFields.size(),is(2));
 
 		//Get allocation associated field
-		MockHttpServletRequest newGetRequest = newGetRequest("lab/testallocationassociatedfields");
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/testallocationassociatedfields",new Parameter("allocationUuid","111xxx60-7777-11e3-1111-0sndiu87hsju"), new Parameter("associatedFieldUuid","iCARE110-TEST-OSDH-9beb-d30dcfc0c636"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		List<Map<String,Object>> allocationAssociatedFields = (new ObjectMapper()).readValue(handle2.getContentAsString(),List.class);
 		assertThat("Get two allocation associated fields",allocationAssociatedFields.size(),is(2));
@@ -990,11 +990,10 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newPostRequest = newPostRequest("lab/associatedfieldresults",associatedFieldResultMap);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String,Object>> associatedFieldResults = (new ObjectMapper()).readValue(handle.getContentAsString(),List.class);
-		System.out.println(handle.getContentAsString());
 		assertThat("Created two associated field results",associatedFieldResults.size(),is(2));
 
 		//Get  associated field results
-		MockHttpServletRequest newGetRequest = newGetRequest("lab/associatedfieldresults");
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/associatedfieldresults", new Parameter("resultUuid","222yyy70-7777-11e3-1221-0sndiu87hsj3"),new Parameter("associatedFieldUuid","iCARE110-TEST-OSDH-9beb-d30dcfc0c636"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		List<Map<String,Object>> AssociatedFieldResults = (new ObjectMapper()).readValue(handle2.getContentAsString(),List.class);
 		assertThat("Get two allocation associated fields",AssociatedFieldResults.size(),is(2));

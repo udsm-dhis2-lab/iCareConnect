@@ -1175,6 +1175,15 @@ public class LaboratoryController {
 		return  responseAssociatedFields;
 	}
 
+	@RequestMapping(value = "associatedfield/{associatedFieldUuid}")
+	@ResponseBody
+	public Map<String,Object> getAssociatedFieldByUuid(@PathVariable String associatedFieldUuid){
+
+		AssociatedField associatedField = laboratoryService.getAssociatedFieldByUuid(associatedFieldUuid);
+		return  associatedField.toMap();
+	}
+
+
 	@RequestMapping(value = "testallocationassociatedfields", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String,Object>> addTestAllocationAssociatedFields( @RequestBody List<Map<String,Object>> allocationAssociatedFieldListMap) throws Exception {
@@ -1195,11 +1204,11 @@ public class LaboratoryController {
 
 	@RequestMapping(value = "testallocationassociatedfields", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String,Object>> getTestAllocation(@RequestParam(value = "q" , required = false) String q, @RequestParam(value = "startIndex", defaultValue = "0") Integer startIndex, @RequestParam( value ="limit", defaultValue = "100") Integer limit){
+	public List<Map<String,Object>> getTestAllocationAssociatedField(@RequestParam(value = "q" , required = false) String q, @RequestParam(value = "startIndex", defaultValue = "0") Integer startIndex, @RequestParam( value ="limit", defaultValue = "100") Integer limit, @RequestParam(value = "allocationUuid", required = false) String allocationUuid, @RequestParam(value = "associatedFieldUuid", required = false) String associatedFieldUuid){
 
 		List<Map<String,Object>> testAllocationAssociatedFieldsListMap = new ArrayList<>();
 
-		List<TestAllocationAssociatedField> testAllocationAssociatedFields = laboratoryService.getTestAllocationAssociatedFields(q,startIndex,limit);
+		List<TestAllocationAssociatedField> testAllocationAssociatedFields = laboratoryService.getTestAllocationAssociatedFields(q,startIndex,limit,allocationUuid,associatedFieldUuid);
 
 		for(TestAllocationAssociatedField testAllocationAssociatedField : testAllocationAssociatedFields){
 			testAllocationAssociatedFieldsListMap.add(testAllocationAssociatedField.toMap());
@@ -1225,11 +1234,11 @@ public class LaboratoryController {
 
 	@RequestMapping(value = "associatedfieldresults", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String,Object>> getAssociatedFieldResults(@RequestParam(value = "startIndex", defaultValue = "0") Integer startIndex, @RequestParam(value = "limit",defaultValue = "0") Integer limit){
+	public List<Map<String,Object>> getAssociatedFieldResults(@RequestParam(value = "startIndex", defaultValue = "0") Integer startIndex, @RequestParam(value = "limit",defaultValue = "0") Integer limit, @RequestParam(value = "resultUuid", required = false) String resultUuid, @RequestParam(value = "associatedFieldUuid", required = false) String associatedFieldUuid){
 
 		List<Map<String,Object>> associatedFieldResultListMap = new ArrayList<>();
 
-		List<AssociatedFieldResult> associatedFieldResults = laboratoryService.getAssociatedFieldResults(startIndex,limit);
+		List<AssociatedFieldResult> associatedFieldResults = laboratoryService.getAssociatedFieldResults(startIndex,limit,resultUuid,associatedFieldUuid);
 
 		for( AssociatedFieldResult associatedFieldResult : associatedFieldResults){
 			associatedFieldResultListMap.add(associatedFieldResult.toMap());
