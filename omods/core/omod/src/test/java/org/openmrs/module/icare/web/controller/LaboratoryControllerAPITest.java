@@ -365,7 +365,6 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		Map<String, Object> sampleResults3 = (new ObjectMapper()).readValue(handleGet3.getContentAsString(), Map.class);
-		System.out.println(sampleResults3);
 		
 		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
 		    new Parameter("hasStatus", "NO"), new Parameter("excludeAllocations", "true"), new Parameter("test",
@@ -376,8 +375,21 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
-		System.out.println("aaa: " + sampleResults);
 		
+		// SEARCH BY DEPARTMENT
+		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
+		    new Parameter("excludeAllocations", "true"), new Parameter("department", "123111zz-0011-477v-8y8y-acc38ebc6222"));
+		
+		handleGet = handle(newGetRequest);
+		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+
+		// SEARCH BY SPECIMEN SOURCE
+		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
+				new Parameter("excludeAllocations", "true"), new Parameter("specimen", "323111zz-0011-477v-8y8y-acc38ebc6215"));
+
+		handleGet = handle(newGetRequest);
+		Map<String, Object> sampleResultsFilteredBySpecimen = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		assertThat("There is 1 sample", ((List<Map>) samples.get("results")).size(), is(1));
 	}
 	
 	@Test
@@ -704,6 +716,14 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String, Object>> batchsamples = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
 		System.out.println(batchsamples);
 		assertThat("Has 1 batch sample", batchsamples.size(), is(1));
+		
+		//3. Getting a single batchSample
+		MockHttpServletRequest newGetRequest2 = newGetRequest("lab/batchSample", new Parameter("uuid",
+		        "iCARE890-TEST-GGGH-9beb-d30dcfc0cd35"));
+		MockHttpServletResponse handle3 = handle(newGetRequest2);
+		System.out.println(handle3.getContentAsString());
+		Map<String, Object> batchSample = new ObjectMapper().readValue(handle3.getContentAsString(), Map.class);
+		assertThat("Has 1 sample", ((Map) ((List) batchSample.get("samples")).get(0)).get("label").equals("Sample Label y"));
 	}
 	
 	@Test

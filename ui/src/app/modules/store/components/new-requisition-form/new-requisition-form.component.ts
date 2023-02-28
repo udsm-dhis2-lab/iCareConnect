@@ -248,6 +248,7 @@ export class NewRequisitionFormComponent implements OnInit {
           }
         });
     }
+    
   }
 
   onUpdateItem(e: any) {

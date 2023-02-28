@@ -261,7 +261,6 @@ export class SingleRegistrationComponent implements OnInit {
     this.broughtByField =
       this.allRegistrationFields?.specimenDetailFields?.broughtBy;
 
-
     this.receivedOnField.max = this.maximumDate;
     this.broughtOnField.max = this.maximumDate;
     this.sampleColectionDateField.max = this.maximumDate;
@@ -1912,12 +1911,16 @@ export class SingleRegistrationComponent implements OnInit {
     return (
       formatDateToYYMMDD(date) +
       "T" +
-      date.getHours() +
+      this.formatDimeChars(date.getHours().toString()) +
       ":" +
-      date.getMinutes() +
+      this.formatDimeChars(date.getMinutes().toString()) +
       ":" +
-      date.getSeconds() +
+      this.formatDimeChars(date.getSeconds().toString()) +
       ".000Z"
     );
+  }
+
+  formatDimeChars(char: string): string {
+    return char.length == 1 ? "0" + char : char;
   }
 }

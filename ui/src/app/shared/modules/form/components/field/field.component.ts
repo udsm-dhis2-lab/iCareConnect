@@ -50,6 +50,14 @@ export class FieldComponent implements AfterViewInit {
   @Output() fileFieldUpdate: EventEmitter<any> = new EventEmitter<any>();
 
   ngAfterViewInit() {
+    if (typeof this.field?.value === "object") {
+      this.value = (this.field?.value as any[])?.map((val) => {
+        return {
+          ...val,
+          value: val?.value ? val?.value : val?.uuid,
+        };
+      });
+    }
     if (
       this.field?.searchTerm ||
       this.field?.source ||

@@ -719,6 +719,8 @@
                                   <span>
                                     {{
                                       keyedRemarks &&
+                                      order?.order &&
+                                      order?.order?.uuid &&
                                       keyedRemarks[order?.order?.uuid]
                                         ? keyedRemarks[order?.order?.uuid]
                                             ?.remarks

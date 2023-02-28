@@ -1,6 +1,5 @@
 <div
   *ngIf="{
-    allSamples: allSamples$ | async,
     samplesLoadedState: samplesLoadedState$ | async,
     privileges: privileges$ | async,
     labConfigs: labConfigs$ | async,
@@ -8,25 +7,33 @@
   } as sampleParams"
 >
   <mat-progress-bar
-    *ngIf="
-      !sampleParams?.samplesLoadedState ||
-      !sampleParams?.labConfigs ||
-      !sampleParams?.allSamples
-    "
+    *ngIf="!sampleParams?.labConfigs"
     mode="indeterminate"
   ></mat-progress-bar>
 
-  <div
-    *ngIf="
-      sampleParams?.samplesLoadedState &&
-      sampleParams?.allSamples &&
-      sampleParams?.labConfigs
-    "
-  >
-    <div class="sample-dashboard-summary">
-      <app-samples-summary-dashboard></app-samples-summary-dashboard>
+  <div>
+    <div class="p-2" *ngIf="sampleParams?.labConfigs">
+      <div class="mb-2">
+        <app-shared-samples-summary-dashboard
+          [datesParams]="datesParameters"
+          [dashboardSingleValueDataSetsReferenceKey]="
+            'iCare.laboratory.sampleTracking.dashboard.settings.samples.singleValue'
+          "
+        ></app-shared-samples-summary-dashboard>
+      </div>
+      <app-shared-samples-list
+        [tabType]="'view-results'"
+        [LISConfigurations]="LISConfigurations"
+        [labSamplesDepartments]="labSamplesDepartments"
+        [hasStatus]="'YES'"
+        [showLegend]="true"
+        [datesParameters]="datesParameters"
+        [excludeAllocations]="true"
+        [sampleTypes]="sampleTypes"
+        [codedSampleRejectionReasons]="codedSampleRejectionReasons"
+      ></app-shared-samples-list>
     </div>
-    <div class="filtering-div">
+    <!-- <div class="filtering-div">
       <mat-form-field class="w-50">
         <mat-label>Search</mat-label>
         <mat-icon matPrefix>search</mat-icon
@@ -309,6 +316,6 @@
           </ng-container>
         </tbody>
       </table>
-    </div>
+    </div> -->
   </div>
 </div>

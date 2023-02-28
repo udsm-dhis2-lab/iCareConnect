@@ -32,10 +32,15 @@ export class SamplesService {
       specimenSources: any[];
       codedRejectionReasons: any[];
     },
-    acceptedBy?: string
+    acceptedBy?: string,
+    q?: string,
+    department?: string,
+    testUuid?: string
   ): Observable<any> {
     let parameters = [];
     if (pagerInfo) {
+      parameters = [...parameters, "page=" + pagerInfo?.page];
+      parameters = [...parameters, "pageSize=" + pagerInfo?.pageSize];
     } else {
       parameters = [...parameters, "paging=false"];
     }
@@ -57,6 +62,18 @@ export class SamplesService {
       parameters = [...parameters, "acceptedBy=" + acceptedBy];
     }
 
+    if (q) {
+      parameters = [...parameters, "q=" + q];
+    }
+
+    if (department) {
+      parameters = [...parameters, "department=" + department];
+    }
+
+    if (testUuid) {
+      parameters = [...parameters, "test=" + testUuid];
+    }
+
     if (excludeAllocations) {
       parameters = [...parameters, "excludeAllocations=true"];
     } else {
@@ -69,17 +86,17 @@ export class SamplesService {
       )
       .pipe(
         map((response: any) => {
-          if (!pagerInfo) {
-            return response?.results?.map((result) =>
+          return {
+            pager: response?.pager,
+            results: response?.results?.map((result) =>
               new LabSample(
                 result,
                 otherParams?.departments,
                 otherParams?.specimenSources,
                 otherParams?.codedRejectionReasons
               ).toJSon()
-            );
-          } else {
-          }
+            ),
+          };
         })
       );
   }
@@ -106,6 +123,13 @@ export class SamplesService {
           codedRejectedReasons
         ).toJSon()
       ),
+      catchError((error) => of(error))
+    );
+  }
+
+  saveSampleStatus(data: any): Observable<any> {
+    return this.opeMRSHttpClientService.post("lab/samplestatus", data).pipe(
+      map((response) => response),
       catchError((error) => of(error))
     );
   }
@@ -530,6 +554,7 @@ export class SamplesService {
       })
     );
   }
+
   createBatch(batch: any): Observable<any> {
     return this.httpClient.post(BASE_URL + "lab/batches", batch).pipe(
       map((response) => {
@@ -540,6 +565,48 @@ export class SamplesService {
       })
     );
   }
+
+  getBatchDetailsByUuid(uuid: string): Observable<any> {
+    return this.opeMRSHttpClientService.get(`lab/batches?uuid=${uuid}`).pipe(
+      map((response: any) => {
+        return response;
+      })
+    );
+  }
+
+  getBatchSamplesByUuid(uuid: string): Observable<any> {
+    return this.opeMRSHttpClientService
+      .get(`lab/batchSample?uuid=${uuid}`)
+      .pipe(
+        map((response: any) => {
+          return {
+            ...response,
+            samples: response?.samples?.map((sample: any) => {
+              return {
+                ...sample,
+                orders: sample?.orders?.map((order) => {
+                  const orderDetails = {
+                    ...order,
+                    order: {
+                      ...order?.order,
+                      concept: {
+                        ...order?.order?.concept,
+                        display:
+                          order?.order?.concept?.display?.indexOf(":") > -1
+                            ? order?.order?.concept?.display?.split(":")[1]
+                            : order?.order?.concept?.display,
+                      },
+                    },
+                  };
+                  return orderDetails;
+                }),
+              };
+            }),
+          };
+        })
+      );
+  }
+
   getBatches(
     startDate?: string,
     endDate?: string,

@@ -3,30 +3,24 @@ import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { orderBy } from "lodash";
 import { Observable, zip } from "rxjs";
-import { catchError, map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { SharedSamplesVerificationIntegratedComponent } from "src/app/shared/dialogs/shared-samples-verification-integrated/shared-samples-verification-integrated.component";
+import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
+import { VisitsService } from "src/app/shared/resources/visits/services";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import {
   addLabDepartments,
   loadLabSamplesByCollectionDates,
-  setSampleStatus,
 } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
-  getCodedSampleRejectionReassons,
   getFormattedLabSamplesForTracking,
-  getFormattedLabSamplesLoadedState,
-  getLabConfigurations,
-  getLabDepartments,
   getLabSamplesWithResults,
-  getSamplesWithResults,
 } from "src/app/store/selectors";
-import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 
 @Component({
   selector: "app-sample-results-dashboard",
@@ -66,18 +60,19 @@ export class SampleResultsDashboardComponent implements OnInit {
   message: any = {};
   testResultsMapping$: Observable<any>;
   externalSystemsReferenceConceptUuid$: Observable<string>;
+  selectedSample: any;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
     private samplesService: SamplesService,
     private otherSystemsService: OtherClientLevelSystemsService,
     private conceptService: ConceptsService,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private visitService: VisitsService
   ) {}
 
   ngOnInit(): void {
     this.userUuid = this.currentUser?.uuid;
-    this.getCompletedSamples();
     this.testResultsMapping$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.laboratory.settings.externalSystems.pimaCOVID.testResults.mappingSourceUuid"
@@ -87,6 +82,50 @@ export class SampleResultsDashboardComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "icare.lis.externalSystems.dhis2Based.conceptUuid"
       );
+  }
+
+  onGetSelectedSampleDetails(
+    sampleDetails: any,
+    testResultsMapping: any,
+    externalSystemsReferenceConceptUuid: string
+  ): void {
+    this.selectedSample = sampleDetails?.data;
+    this.visitService
+      .getVisitDetailsByVisitUuid(this.selectedSample?.visit?.uuid, {
+        v: "custom:(uuid,visitType,startDatetime,attributes:(uuid,display,value,attributeType:(uuid,display))",
+      })
+      ?.subscribe((response) => {
+        if (response) {
+          this.externalSystemPayload = this.onGetVisitDetails(response);
+          (this.externalSystemPayload
+            ? this.dialog
+                .open(SharedConfirmationComponent, {
+                  width: "30%",
+                  data: {
+                    modalTitle: `Send results for ${this.selectedSample?.label}`,
+                    modalMessage: `Are you sure to send data to Pima COVID?`,
+                    showRemarksInput: false,
+                  },
+                })
+                .afterClosed()
+            : this.dialog
+                .open(SharedSamplesVerificationIntegratedComponent, {
+                  width: "30%",
+                  data: {
+                    ...this.selectedSample,
+                    externalSystemsReferenceConceptUuid,
+                  },
+                })
+                .afterClosed()
+          ).subscribe((confirmationDetails: any) => {
+            if (confirmationDetails?.confirmed) {
+              this.onSend(this.selectedSample, true, testResultsMapping);
+            } else if (confirmationDetails?.sendResults) {
+              this.onSend(this.selectedSample, true, testResultsMapping);
+            }
+          });
+        }
+      });
   }
 
   getCompletedSamples() {
@@ -217,33 +256,19 @@ export class SampleResultsDashboardComponent implements OnInit {
     });
   }
 
-  onToggleViewSampleDetails(event: Event, sample: any): void {
-    event.stopPropagation();
-    this.samplesToViewMoreDetails[sample?.id] = !this.samplesToViewMoreDetails[
-      sample?.id
-    ]
-      ? sample
-      : null;
-  }
-
-  onGetVisitDetails(visitDetails): void {
+  onGetVisitDetails(visitDetails): any {
     const matchedAttribute = (visitDetails?.attributes?.filter(
       (attribute) =>
         attribute?.attributeType?.uuid ===
         "0acd3180-710d-4417-8768-97bc45a02395"
     ) || [])[0];
-    this.externalSystemPayload = matchedAttribute
+    const externalSystemPayload = matchedAttribute
       ? JSON.parse(matchedAttribute?.value)
       : null;
+    return externalSystemPayload;
   }
 
-  onSend(
-    event: Event,
-    sample: any,
-    confirmed?: boolean,
-    testResultsMapping?: string
-  ): void {
-    event.stopPropagation();
+  onSend(sample: any, confirmed?: boolean, testResultsMapping?: string): void {
     if (confirmed) {
       const result = orderBy(
         (sample?.ordersWithResults[0]?.testAllocations?.filter(
@@ -325,6 +350,7 @@ export class SampleResultsDashboardComponent implements OnInit {
   }
 
   createResultsPayload(referencePayload: any, mappedResult: string): any {
+    // TODO:Remove all hardcoded UIDs
     const labResultPayload = {
       program: referencePayload?.program,
       programStage: "QreyZUwCOlg",
@@ -332,13 +358,34 @@ export class SampleResultsDashboardComponent implements OnInit {
       trackedEntityInstance: referencePayload?.trackedEntityInstance,
       enrollment: referencePayload?.enrollment,
       dataValues: [
-        { dataElement: "Cl2I1H6Y3oj", value: new Date().toISOString() },
+        {
+          dataElement: "Cl2I1H6Y3oj",
+          value: this.formatDateAndTime(new Date()),
+        },
         { dataElement: "ovY6E8BSdto", value: mappedResult },
         { dataElement: "eDrW5iJLYbP", value: "PCR" },
       ],
-      eventDate: new Date().toISOString(),
+      eventDate: this.formatDateAndTime(new Date()),
     };
+
     return labResultPayload;
+  }
+
+  formatDateAndTime(date: Date): string {
+    return (
+      formatDateToYYMMDD(date) +
+      "T" +
+      this.formatDimeChars(date.getHours().toString()) +
+      ":" +
+      this.formatDimeChars(date.getMinutes().toString()) +
+      ":" +
+      this.formatDimeChars(date.getSeconds().toString()) +
+      ".000Z"
+    );
+  }
+
+  formatDimeChars(char: string): string {
+    return char.length == 1 ? "0" + char : char;
   }
 
   onVerifyIfIsFromExternalSystem(
@@ -364,7 +411,5 @@ export class SampleResultsDashboardComponent implements OnInit {
       });
   }
 
-  getSelectedDepartments(selectedDepartments: any[]): void {
-    console.log(selectedDepartments);
-  }
+  getSelectedDepartments(selectedDepartments: any[]): void {}
 }

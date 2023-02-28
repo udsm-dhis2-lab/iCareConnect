@@ -87,15 +87,15 @@ export class SuppliersListComponent implements OnInit {
         if (data?.confirmed) {
           const supplierObject = {
             ...supplier,
-            voided: true
-          }
+            voided: true,
+          };
 
           this.supplierService
             .updateSupplier(supplier?.uuid, supplierObject)
             .pipe(
               tap((response) => {
                 if (!response?.error) {
-                  this.ngOnInit()
+                  this.ngOnInit();
                 }
               })
             )

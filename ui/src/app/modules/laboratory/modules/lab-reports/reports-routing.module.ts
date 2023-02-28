@@ -1,7 +1,8 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
+import { RenderReportPageComponent } from "./pages/render-report-page/render-report-page.component";
 import { ReportsDashboardComponent } from "./pages/reports-dashboard/reports-dashboard.component";
-import { ReportsHomeComponent } from "./reports-home/reports-home.component";
+import { ReportsHomeComponent } from "./pages/reports-home/reports-home.component";
 
 const routes: Routes = [
   {
@@ -11,6 +12,10 @@ const routes: Routes = [
       {
         path: "",
         component: ReportsDashboardComponent,
+      },
+      {
+        path: ":id",
+        component: RenderReportPageComponent,
       },
     ],
   },
