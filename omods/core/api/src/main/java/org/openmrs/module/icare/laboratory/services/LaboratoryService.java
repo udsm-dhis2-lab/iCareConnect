@@ -174,4 +174,8 @@ public interface LaboratoryService extends OpenmrsService {
 	TestAllocationAssociatedField addTestAllocationAssociatedField(TestAllocationAssociatedField testAllocationAssociatedField) throws Exception;
 
 	List<TestAllocationAssociatedField> getTestAllocationAssociatedFields(String q, Integer startIndex, Integer limit);
+
+	AssociatedFieldResult addAssociatedFieldResult(AssociatedFieldResult associatedFieldResult) throws Exception;
+
+	List<AssociatedFieldResult> getAssociatedFieldResults(Integer startIndex, Integer limit);
 }

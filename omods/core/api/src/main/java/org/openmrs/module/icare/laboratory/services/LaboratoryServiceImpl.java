@@ -65,6 +65,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	AssociatedFieldDAO associatedFieldDAO;
 
 	TestAllocationAssociatedFieldDAO testAllocationAssociatedFieldDAO;
+
+	AssociatedFieldResultDAO associatedFieldResultDAO;
 	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
@@ -156,6 +158,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 
 	public void setTestAllocationAssociatedFieldDAO(TestAllocationAssociatedFieldDAO testAllocationAssociatedFieldDAO) {
 		this.testAllocationAssociatedFieldDAO = testAllocationAssociatedFieldDAO;
+	}
+
+	public void setAssociatedFieldResultDAO(AssociatedFieldResultDAO associatedFieldResultDAO) {
+		this.associatedFieldResultDAO = associatedFieldResultDAO;
 	}
 
 	@Override
@@ -893,6 +899,34 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public List<TestAllocationAssociatedField> getTestAllocationAssociatedFields(String q, Integer startIndex, Integer limit) {
 		return testAllocationAssociatedFieldDAO.getTestAllocationAssociatedField(q,startIndex,limit);
+	}
+
+	@Override
+	public AssociatedFieldResult addAssociatedFieldResult(AssociatedFieldResult associatedFieldResult) throws Exception {
+
+		if(associatedFieldResult.getAssociatedField() != null){
+
+			AssociatedField associatedField = this.associatedFieldDAO.findByUuid(associatedFieldResult.getAssociatedField().getUuid());
+			if(associatedField == null){
+				throw new Exception(" The associated field with uuid "+associatedFieldResult.getAssociatedField().getUuid()+" does not exist");
+			}
+			associatedFieldResult.setAssociatedField(associatedField);
+		}
+
+		if(associatedFieldResult.getResult() != null){
+			Result result = this.resultDAO.findByUuid(associatedFieldResult.getResult().getUuid());
+			if(result == null){
+				throw new Exception(" The result with uuid"+associatedFieldResult.getResult().getUuid()+" does not exist");
+			}
+			associatedFieldResult.setResult(result);
+		}
+
+		return associatedFieldResultDAO.save(associatedFieldResult) ;
+	}
+
+	@Override
+	public List<AssociatedFieldResult> getAssociatedFieldResults(Integer startIndex, Integer limit) {
+		return associatedFieldResultDAO.getAssociatedFieldResult(startIndex,limit);
 	}
 
 	public BatchSet addBatchSet(BatchSet batchSet) {
