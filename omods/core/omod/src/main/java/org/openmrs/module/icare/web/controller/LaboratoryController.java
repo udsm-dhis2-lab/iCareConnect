@@ -1141,4 +1141,37 @@ public class LaboratoryController {
 		
 		return newWorksheetSampleStatus.toMap();
 	}
+
+	@RequestMapping(value = "associatedfields", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addAssociatedFields(@RequestBody List<Map<String,Object>> associatedFieldListMap){
+
+		List<Map<String,Object>> createdAssociatedFieldsListMap = new ArrayList<>();
+		for( Map<String,Object> associatedFieldMap : associatedFieldListMap){
+
+			AssociatedField associatedField = AssociatedField.fromMap(associatedFieldMap);
+
+			AssociatedField createdAssociatedField = laboratoryService.addAssociatedField(associatedField);
+
+			createdAssociatedFieldsListMap.add(createdAssociatedField.toMap());
+		}
+
+		return createdAssociatedFieldsListMap;
+
+	}
+
+	@RequestMapping(value = "associatedfields", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getAssociatedFields( @RequestParam(required = false, value = "q") String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit){
+
+		List<Map<String,Object>> responseAssociatedFields = new ArrayList<>();
+
+		List<AssociatedField> associatedFields = laboratoryService.getAssociatedFields(q, startIndex, limit);
+
+		for( AssociatedField associatedField : associatedFields){
+			responseAssociatedFields.add(associatedField.toMap());
+		}
+
+		return  responseAssociatedFields;
+	}
 }
