@@ -262,31 +262,28 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
             uuid: order?.order?.uuid,
             voidReason: response?.remarks || "No reason provided",
           };
-          this.orderService.voidOrderWithReason(voidObject).subscribe(
-            (response: any) => {
-              if(!response?.error && !response?.stackTrace){
+          this.orderService
+            .voidOrderWithReason(voidObject)
+            .subscribe((response: any) => {
+              if (!response?.error && !response?.stackTrace) {
                 this.store.dispatch(
                   loadSampleByUuid({ uuid: this.sample?.uuid })
                 );
               } else {
-                if(response?.error){
-                  this.errors = [
-                    ...this.errors,
-                    response?.error
-                  ]
+                if (response?.error) {
+                  this.errors = [...this.errors, response?.error];
                 } else {
-                  this.errors = [ 
+                  this.errors = [
                     ...this.errors,
                     {
                       error: {
-                        message: response?.message
-                      }
-                    }
-                  ]
+                        message: response?.message,
+                      },
+                    },
+                  ];
                 }
               }
-            }
-          );
+            });
         }
       });
   }

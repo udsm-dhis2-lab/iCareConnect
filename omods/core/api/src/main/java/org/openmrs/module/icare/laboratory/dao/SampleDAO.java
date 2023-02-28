@@ -74,7 +74,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
 	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
-	        String testConceptUuid) {
+	        String testConceptUuid, String departmentUuid, String specimenSourceUuid) {
 		
 		DbSession session = this.getSession();
 		
@@ -116,6 +116,24 @@ public class SampleDAO extends BaseDAO<Sample> {
 			        + "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate))";
 		}
 		
+		if (departmentUuid != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp.concept.uuid =:departmentUuid";
+		}
+
+		if (specimenSourceUuid != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp.specimenSource.uuid =:specimenSourceUuid";
+		}
+		
 		if (locationUuid != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -125,15 +143,21 @@ public class SampleDAO extends BaseDAO<Sample> {
 			queryStr += " sp.visit.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
 		}
 		if (sampleCategory != null) {
-			
 			if (sampleCategory.toLowerCase().equals("not accepted")) {
 				if (!queryStr.contains("WHERE")) {
 					queryStr += " WHERE ";
 				} else {
 					queryStr += " AND ";
 				}
-				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE sst.category='ACCEPTED')  ";
+				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'  OR  lower(sst.category) LIKE 'reject%'))  ";
 				
+			} else if (sampleCategory.toLowerCase().equals("no results")) {
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS'  OR  lower(sst.category) LIKE 'reject%'))   AND sp IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'))";
 			} else {
 				
 				if (!queryStr.contains("WHERE")) {
@@ -205,16 +229,26 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
 		}
+		
 		if (locationUuid != null) {
 			query.setParameter("locationUuid", locationUuid);
 		}
 		
-		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")) {
+		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")
+		        && !sampleCategory.toLowerCase().equals("no results")) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
 		
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
+		}
+		
+		if (departmentUuid != null) {
+			query.setParameter("departmentUuid", departmentUuid);
+		}
+
+		if (specimenSourceUuid != null) {
+			query.setParameter("specimenSourceUuid",specimenSourceUuid);
 		}
 		
 		if (testCategory != null && testCategory != "Completed") {
@@ -367,7 +401,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 	
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager,
 	        String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
-	        String acceptedByUuid, String testConceptUuid) {
+	        String acceptedByUuid, String testConceptUuid, String departmentUuid, String specimenSourceUuid) {
 		
 		DbSession session = this.getSession();
 		
@@ -402,9 +436,29 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (startDate != null && endDate != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
 			}
 			queryStr += " ((cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) \n"
 			        + "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate))";
+		}
+		
+		if (departmentUuid != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp.concept.uuid =:departmentUuid";
+		}
+
+		if (specimenSourceUuid != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp.specimenSource.uuid =:specimenSourceUuid";
 		}
 		
 		if (locationUuid != null) {
@@ -423,8 +477,15 @@ public class SampleDAO extends BaseDAO<Sample> {
 				} else {
 					queryStr += " AND ";
 				}
-				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE sst.category='ACCEPTED')  ";
+				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'  OR  lower(sst.category) LIKE 'reject%')) ";
 				
+			} else if (sampleCategory.toLowerCase().equals("no results")) {
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS'  OR  lower(sst.category) LIKE 'reject%')) AND sp IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'))";
 			} else {
 				
 				if (!queryStr.contains("WHERE")) {
@@ -503,12 +564,21 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("locationUuid", locationUuid);
 		}
 		
-		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")) {
+		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")
+		        && !sampleCategory.toLowerCase().equals("no results")) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
 		
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
+		}
+		
+		if (departmentUuid != null) {
+			query.setParameter("departmentUuid", departmentUuid);
+		}
+
+		if (specimenSourceUuid != null) {
+			query.setParameter("specimenSourceUuid",specimenSourceUuid);
 		}
 		
 		if (testCategory != null && testCategory != "Completed") {
@@ -533,5 +603,13 @@ public class SampleDAO extends BaseDAO<Sample> {
 		listResults.setPager(pager);
 		listResults.setResults(query.list());
 		return listResults;
+	}
+	
+	public List<Sample> getSamplesByBatchSampleUuid(String batchSampleUuid) {
+		DbSession session = this.getSession();
+		String queryStr = "SELECT s FROM Sample s WHERE s.batchSample IN (select bs FROM BatchSample bs WHERE bs.uuid =:batchUuid)";
+		Query query = session.createQuery(queryStr);
+		query.setParameter("batchSampleUuid", batchSampleUuid);
+		return query.list();
 	}
 }

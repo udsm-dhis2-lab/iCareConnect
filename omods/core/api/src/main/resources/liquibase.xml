@@ -853,14 +853,36 @@
                 referencedTableName="concept"/>
     </changeSet>
 
-    <changeSet id="add_foreign_key_for_lb_test_result" author="dennis-kibahila" dbms="mysql">
+    <changeSet id="add_columns_to_lb_sample" author="josephat-mwakyusa" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="specimen_source_id" tableName="lb_sample"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_sample" >
+            <column name="specimen_source_id" type="INTEGER">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+        <addForeignKeyConstraint
+                baseColumnNames="specimen_source_id"
+                baseTableName="lb_sample"
+                constraintName="lb_sample_specimen_source_id_concept_concept_id_fk"
+                referencedColumnNames="concept_id"
+                referencedTableName="concept"/>
+    </changeSet>
 
+    <changeSet id="add_foreign_key_for_lb_test_result" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists schemaName="public" foreignKeyName="lb_test_result_value_group_id_lb_test_result_test_result_id_fk"></foreignKeyConstraintExists>
+            </not>
+        </preConditions>
         <sql>
             ALTER TABLE lb_test_result
             ADD CONSTRAINT lb_test_result_value_group_id_lb_test_result_test_result_id_fk
             FOREIGN KEY (value_group_id) REFERENCES lb_test_result(test_result_id);
         </sql>
-
     </changeSet>
 
 
@@ -3793,6 +3815,13 @@
         <sql>
             ALTER TABLE lb_worksheet_sample DROP FOREIGN KEY lb_worksheet_sample_sample_id_lb_sample_sample_id_fk,
             ADD FOREIGN KEY lb_worksheet_sample_sample_id_lb_sample_sample_id_fk(sample_id) REFERENCES lb_sample(sample_id);
+        </sql>
+    </changeSet>
+    <!-- For worksheet control -->
+    <changeSet id="update_lb_worksheet_sample_change_control_id_foreign_key" author="josephat-mwakyusa" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_sample DROP FOREIGN KEY lb_worksheet_control_control_id_lb_sample_sample_id_fk,
+            ADD FOREIGN KEY control_id_lb_worksheet_control_control_id_fk(control_id) REFERENCES lb_worksheet_control(worksheet_control_id);
         </sql>
     </changeSet>
 

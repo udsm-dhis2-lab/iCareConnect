@@ -1,10 +1,8 @@
-import { HttpClient } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { Observable, of } from "rxjs";
-import { catchError, map } from "rxjs/operators";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { BASE_URL } from "src/app/shared/constants/constants.constants";
 import { AppState } from "src/app/store/reducers";
 import { getLabConfigurations } from "src/app/store/selectors";
 
@@ -17,7 +15,6 @@ export class ReportsDashboardComponent implements OnInit {
   configuredReports$: Observable<any>;
   configs$: Observable<any>;
   constructor(
-    private httpClient: HttpClient,
     private store: Store<AppState>,
     private systemSettingsService: SystemSettingsService
   ) {}

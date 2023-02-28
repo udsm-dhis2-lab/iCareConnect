@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { MatRadioChange } from "@angular/material/radio";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { SamplesService } from "src/app/shared/services/samples.service";
@@ -23,6 +24,9 @@ export class SamplesForResultsEntryComponent implements OnInit {
   @Input() currentUser: any;
   @Input() LISConfigurations: any;
   @Input() userUuid: string;
+  @Input() category: string;
+  @Input() hasStatus: string;
+  @Input() viewType: string;
 
   sampplesForResultsEntry$: Observable<any[]>;
   selectedDepartment: string;
@@ -37,6 +41,7 @@ export class SamplesForResultsEntryComponent implements OnInit {
 
   samplesToViewMoreDetails: any = {};
   saving: boolean = false;
+  selectedResultEntryCategory: string = "Normal";
   constructor(
     private store: Store<AppState>,
     private sampleService: SamplesService,
@@ -45,7 +50,10 @@ export class SamplesForResultsEntryComponent implements OnInit {
 
   ngOnInit(): void {
     this.providerDetails$ = this.store.select(getProviderDetails);
-    this.getSamples();
+  }
+
+  getSelectedResultEntryCategory(event: MatRadioChange): void {
+    this.selectedResultEntryCategory = event?.value;
   }
 
   getSamples(): void {

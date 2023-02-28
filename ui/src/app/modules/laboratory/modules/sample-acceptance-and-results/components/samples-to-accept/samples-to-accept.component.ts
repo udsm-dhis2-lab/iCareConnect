@@ -51,22 +51,6 @@ export class SamplesToAcceptComponent implements OnInit {
 
   ngOnInit(): void {
     this.providerDetails$ = this.store.select(getProviderDetails);
-    this.getSamples();
-  }
-
-  getSamples(): void {
-    this.samplesToAccept$ = this.sampleService.getLabSamplesByCollectionDates(
-      this.datesParameters,
-      this.LISConfigurations?.isLIS ? "NOT ACCEPTED" : null,
-      !this.LISConfigurations?.isLIS ? "NO" : "YES",
-      this.excludeAllocations,
-      null,
-      {
-        departments: this.labSamplesDepartments,
-        specimenSources: this.sampleTypes,
-        codedRejectionReasons: this.codedSampleRejectionReasons,
-      }
-    );
   }
 
   onToggleViewSampleDetails(event: Event, sample: any): void {
@@ -74,23 +58,22 @@ export class SamplesToAcceptComponent implements OnInit {
     console.log(sample);
   }
 
-  onGetSelectedSampleDetails(sample: any, providerDetails: any): void {
-    if (sample?.actionType === "accept") {
-      this.accept(sample, providerDetails);
+  onGetSelectedSampleDetails(sampleDetails: any, providerDetails: any): void {
+    if (sampleDetails?.actionType === "accept") {
+      this.accept(sampleDetails?.data, providerDetails);
     } else {
-      this.reject(sample, providerDetails);
+      this.reject(sampleDetails?.data, providerDetails);
     }
   }
 
-  accept(sample: any, providerDetails?: any): void {
-    this.saving = true;
+  accept(samples: any[], providerDetails?: any): void {
     let confirmDialog;
     if (this.LISConfigurations?.isLIS) {
       confirmDialog = this.dialog.open(SharedConfirmationComponent, {
         width: "25%",
         data: {
           modalTitle: `Accept Sample`,
-          modalMessage: `Please, provide results compromization remarks if any upon accepting this sample. Click confirm to accept the sample!`,
+          modalMessage: `Please, provide results compromization remarks if any upon accepting sample. Click confirm to accept the sample!`,
           showRemarksInput: true,
         },
         disableClose: false,
@@ -103,12 +86,13 @@ export class SamplesToAcceptComponent implements OnInit {
       : of({ confirmed: true })
     ).subscribe((confirmationObject) => {
       if (confirmationObject?.confirmed) {
+        this.saving = true;
         if (
           confirmationObject?.remarks &&
           confirmationObject?.remarks.length > 0
         ) {
-          const confirmationRemarks = [
-            {
+          const confirmationRemarks = samples?.map((sample) => {
+            return {
               sample: {
                 uuid: sample?.uuid,
               },
@@ -118,8 +102,8 @@ export class SamplesToAcceptComponent implements OnInit {
               remarks: confirmationObject?.remarks,
               status: "ACCEPTANCE_REMARKS",
               category: "ACCEPTANCE_REMARKS",
-            },
-          ];
+            };
+          });
           this.sampleService
             .saveSampleStatuses(confirmationRemarks)
             .subscribe((response) => {
@@ -129,102 +113,102 @@ export class SamplesToAcceptComponent implements OnInit {
             });
         }
 
-        this.savingMessage[sample?.id + "-accept"] = true;
-        const data = {
-          sample: {
-            uuid: sample?.uuid,
-          },
-          user: {
-            uuid: this.userUuid,
-          },
-          remarks: "accepted",
-          status: "ACCEPTED",
-          category: "ACCEPTED",
-        };
-        zip(
-          ...sample?.orders.map((sampleOrder) => {
-            return this.conceptService
-              .getConceptDetailsByUuid(
-                sampleOrder?.order?.concept?.uuid,
-                "custom:(uuid,display,setMembers:(uuid,display))"
-              )
-              .pipe(
-                map((response) => {
-                  return response?.setMembers?.length == 0
-                    ? [
-                        {
-                          order: {
-                            uuid: sampleOrder?.order?.uuid,
+        this.savingMessage[samples[0]?.id + "-accept"] = true;
+        for (const sample of samples) {
+          zip(
+            ...sample?.orders.map((sampleOrder) => {
+              return this.conceptService
+                .getConceptDetailsByUuid(
+                  sampleOrder?.order?.concept?.uuid,
+                  "custom:(uuid,display,setMembers:(uuid,display))"
+                )
+                .pipe(
+                  map((response) => {
+                    return response?.setMembers?.length == 0
+                      ? [
+                          {
+                            order: {
+                              uuid: sampleOrder?.order?.uuid,
+                            },
+                            container: {
+                              uuid: this.labConfigs["otherContainer"]?.uuid,
+                            },
+                            sample: {
+                              uuid: sample?.uuid,
+                            },
+                            concept: {
+                              uuid: sampleOrder?.order?.concept?.uuid,
+                            },
+                            label: sampleOrder?.order?.orderNumber,
                           },
-                          container: {
-                            uuid: this.labConfigs["otherContainer"]?.uuid,
-                          },
-                          sample: {
-                            uuid: sample?.uuid,
-                          },
-                          concept: {
-                            uuid: sampleOrder?.order?.concept?.uuid,
-                          },
-                          label: sampleOrder?.order?.orderNumber,
-                        },
-                      ]
-                    : response?.setMembers?.map((setMember) => {
-                        return {
-                          order: {
-                            uuid: sampleOrder?.order?.uuid,
-                          },
-                          container: {
-                            uuid: this.labConfigs["otherContainer"]?.uuid,
-                          },
-                          sample: {
-                            uuid: sample?.uuid,
-                          },
-                          concept: {
-                            uuid: setMember?.uuid,
-                          },
-                          label: sampleOrder?.order?.orderNumber,
-                        };
-                      });
-                })
-              );
-          })
-        )
-          .pipe(
-            map((allocationsData) => {
-              let sampleAcceptStatusWithAllocations = {
-                status: data,
-                allocations: _.flatten(allocationsData),
-              };
-              return sampleAcceptStatusWithAllocations;
+                        ]
+                      : response?.setMembers?.map((setMember) => {
+                          return {
+                            order: {
+                              uuid: sampleOrder?.order?.uuid,
+                            },
+                            container: {
+                              uuid: this.labConfigs["otherContainer"]?.uuid,
+                            },
+                            sample: {
+                              uuid: sample?.uuid,
+                            },
+                            concept: {
+                              uuid: setMember?.uuid,
+                            },
+                            label: sampleOrder?.order?.orderNumber,
+                          };
+                        });
+                  })
+                );
             })
           )
-          .subscribe((sampleAcceptStatusWithAllocations) => {
-            this.sampleService
-              .acceptSampleAndCreateAllocations(
-                sampleAcceptStatusWithAllocations
-              )
-              .subscribe((response) => {
-                if (response && !response?.error) {
-                  this.saving = false;
-                  this.getSamples();
-                } else {
-                  // TODO: Handle errors
-                  this.saving = false;
-                  this.getSamples();
-                }
-              });
-          });
+            .pipe(
+              map((allocationsData) => {
+                let sampleAcceptStatusWithAllocations = {
+                  status: {
+                    sample: {
+                      uuid: sample?.uuid,
+                    },
+                    user: {
+                      uuid: this.userUuid,
+                    },
+                    remarks: "accepted",
+                    status: "ACCEPTED",
+                    category: "ACCEPTED",
+                  },
+                  allocations: _.flatten(allocationsData),
+                };
+                return sampleAcceptStatusWithAllocations;
+              })
+            )
+            .subscribe((sampleAcceptStatusWithAllocations) => {
+              this.sampleService
+                .acceptSampleAndCreateAllocations(
+                  sampleAcceptStatusWithAllocations
+                )
+                .subscribe((response) => {
+                  if (response && !response?.error) {
+                    this.saving = false;
+                  } else {
+                    // TODO: Handle errors
+                    this.saving = false;
+                  }
+                });
+            });
+        }
       }
     });
   }
 
-  reject(sample: any, providerDetails?: any) {
+  reject(samples: any[], providerDetails?: any) {
     this.dialog
       .open(RejectionReasonComponent, {
         width: "40%",
         disableClose: false,
         data: {
-          sample: sample,
+          sample: samples[0],
+          samples: samples,
           codedSampleRejectionReasons: this.codedSampleRejectionReasons,
         },
         panelClass: "custom-dialog-container",
@@ -234,28 +218,34 @@ export class SamplesToAcceptComponent implements OnInit {
       .subscribe((response) => {
         if (response && response?.reasons) {
           this.saving = true;
-          this.savingMessage[sample?.id + "-reject"] = true;
+          this.savingMessage[samples[0]?.id + "-reject"] = true;
 
-          const data = response?.reasons?.map((reason) => {
-            return {
-              sample: {
-                uuid: sample?.uuid,
-              },
-              user: {
-                uuid: this.userUuid,
-              },
-              remarks: response?.rejectionRemarks
-                ? response?.rejectionRemarks
-                : "None",
-              category: "REJECTED_LABORATORY",
-              status: reason?.uuid,
-            };
-          });
-          this.sampleService.saveSampleStatuses(data).subscribe((response) => {
-            if (response && !response?.error) {
-              this.getSamples();
-            }
-          });
+          const statuses = _.flatten(
+            response?.reasons?.map((reason) => {
+              return samples?.map((sample) => {
+                return {
+                  sample: {
+                    uuid: sample?.uuid,
+                  },
+                  user: {
+                    uuid: this.userUuid,
+                  },
+                  remarks: response?.rejectionRemarks
+                    ? response?.rejectionRemarks
+                    : "None",
+                  category: "REJECTED_LABORATORY",
+                  status: reason?.uuid,
+                };
+              });
+            })
+          );
+          this.sampleService
+            .saveSampleStatuses(statuses)
+            .subscribe((response) => {
+              if (response && !response?.error) {
+                this.saving = false;
+              }
+            });
         }
       });
   }
@@ -266,15 +256,11 @@ export class SamplesToAcceptComponent implements OnInit {
 
   onAcceptAll(event: Event): void {
     event.stopPropagation();
-    for (const sampleDetails of this.selectedSamplesForAction) {
-      this.accept(sampleDetails?.sample, null);
-    }
+    this.accept(this.selectedSamplesForAction, null);
   }
 
   onRejectAll(event: Event): void {
     event.stopPropagation();
-    for (const sampleDetails of this.selectedSamplesForAction) {
-      this.reject(sampleDetails?.sample, null);
-    }
+    this.reject(this.selectedSamplesForAction, null);
   }
 }

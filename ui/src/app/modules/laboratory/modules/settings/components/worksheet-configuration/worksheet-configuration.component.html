@@ -7,10 +7,10 @@
   </div>
 </div>
 <div class="row mt-4" *ngIf="!saving">
-  <div class="col-md-7">
+  <div class="col-md-8">
     <app-worksheets-list></app-worksheets-list>
   </div>
-  <div class="col-md-5">
+  <div class="col-md-4">
     <div class="h6">Worksheet configuration</div>
     <app-create-worksheet
       (formValues)="onGetFormValues($event)"

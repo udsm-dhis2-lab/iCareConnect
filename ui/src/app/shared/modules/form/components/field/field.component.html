@@ -278,14 +278,18 @@
     <mat-select
       [formControlName]="field?.key"
       [required]="field?.required"
-      [disabled]="field?.disabled"
       (selectionChange)="onFieldUpdate()"
+      [value]="value"
       multiple
     >
-      <!-- <mat-select-trigger>
-        {{toppings.value?.[0] || ''}}
-        <span *ngIf="(toppings.value?.length || 0) > 1" class="example-additional-selection">
-          (+{{(toppings.value?.length || 0) - 1}} {{toppings.value?.length === 2 ? 'other' : 'others'}})
+      <!-- <mat-select-trigger *ngIf="field?.value">
+        {{ field?.value[0] || "" }}
+        <span
+          *ngIf="(field?.value?.length || 0) > 1"
+          class="example-additional-selection"
+        >
+          (+{{ (field.value?.length || 0) - 1 }}
+          {{ field.value?.length === 2 ? "other" : "others" }})
         </span>
       </mat-select-trigger> -->
       <mat-option *ngFor="let option of members$ | async" [value]="option">{{

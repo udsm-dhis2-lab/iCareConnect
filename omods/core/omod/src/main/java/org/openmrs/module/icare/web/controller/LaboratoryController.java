@@ -150,10 +150,10 @@ public class LaboratoryController {
 			sampleStatusesList.add(statusesObject);
 		}
 		if(createdSample.getBatchSample() != null){
-			HashMap<String,Object> batchObject = new HashMap<>();
-			batchObject.put("uuid",createdSample.getBatchSample().getUuid());
-			batchObject.put("display",createdSample.getBatchSample().getCode());
-			response.put("batch",batchObject);
+			HashMap<String,Object> batchSampleObject = new HashMap<>();
+			batchSampleObject.put("uuid",createdSample.getBatchSample().getUuid());
+			batchSampleObject.put("display",createdSample.getBatchSample().getCode());
+			response.put("batchSample",batchSampleObject);
 		}
 		
 		response.put("status", sampleStatusesList);
@@ -226,7 +226,9 @@ public class LaboratoryController {
 	        @RequestParam(value = "q", required = false) String q,
 	        @RequestParam(value = "excludeAllocations", required = false) boolean excludeAllocations,
 	        @RequestParam(value = "acceptedBy", required = false) String acceptedByUuid,
-	        @RequestParam(value = "test", required = false) String testConceptUuid) throws ParseException {
+	        @RequestParam(value = "test", required = false) String testConceptUuid,
+	        @RequestParam(value = "department", required = false) String departmentUuid,
+			@RequestParam(value = "specimen", required = false) String specimenSourceUuid) throws ParseException {
 		
 		Date start = null;
 		Date end = null;
@@ -244,12 +246,12 @@ public class LaboratoryController {
 		pager.setPage(page);
 		if (!excludeAllocations) {
 			ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
-			    testCategory, q, hasStatus, acceptedByUuid, testConceptUuid);
+			    testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid);
 			return sampleResults.toMap();
 		}
 		if (excludeAllocations) {
 			ListResult<SampleExt> sampleResults = laboratoryService.getSamplesWithoutAllocations(start, end, pager,
-			    locationUuid, sampleCategory, testCategory, q, hasStatus, acceptedByUuid, testConceptUuid);
+			    locationUuid, sampleCategory, testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid,specimenSourceUuid);
 			return sampleResults.toMap();
 		}
 		
@@ -773,6 +775,7 @@ public class LaboratoryController {
 	@ResponseBody
 	public List<Map<String, Object>> getbatches(@RequestParam(value = "startDate", required = false) String startDate,
 	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "uuid", required = false) String uuid,
 	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
 	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
 		
@@ -785,16 +788,23 @@ public class LaboratoryController {
 			end = formatter.parse(endDate);
 		}
 		
-		List<Batch> batches = laboratoryService.getBatches(start, end, q, startIndex, limit);
+		List<Batch> batches = laboratoryService.getBatches(start, end, uuid, q, startIndex, limit);
 		
 		List<Map<String, Object>> responseBatchesObject = new ArrayList<Map<String, Object>>();
 		for (Batch batch : batches) {
 			Map<String, Object> batchObject = batch.toMap();
 			responseBatchesObject.add(batchObject);
 		}
-		
 		return responseBatchesObject;
+	}
+	
+	@RequestMapping(value = "batchSample", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getBatchSampleByUuid(@RequestParam(value = "uuid", required = true) String uuid)
+	        throws ParseException {
 		
+		BatchSample batchSample = laboratoryService.getBatchSampleByUuid(uuid);
+		return batchSample.toMap();
 	}
 	
 	@RequestMapping(value = "batchsamples",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
