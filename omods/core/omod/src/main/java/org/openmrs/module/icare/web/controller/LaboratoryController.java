@@ -1207,4 +1207,34 @@ public class LaboratoryController {
 
 		return testAllocationAssociatedFieldsListMap;
 	}
+
+	@RequestMapping(value = "associatedfieldresults", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addAssociatedFieldResult(@RequestBody List<Map<String,Object>> associatedFieldResultListMap) throws Exception {
+
+		List<Map<String,Object>> createdAssociatedFieldResultListMap = new ArrayList<>();
+
+		for (Map<String,Object> associatedFieldResultMap : associatedFieldResultListMap){
+			AssociatedFieldResult associatedFieldResult = AssociatedFieldResult.fromMap(associatedFieldResultMap);
+
+			AssociatedFieldResult savedAssociatedFieldResult = laboratoryService.addAssociatedFieldResult(associatedFieldResult);
+			createdAssociatedFieldResultListMap.add(savedAssociatedFieldResult.toMap());
+		}
+		return createdAssociatedFieldResultListMap;
+	}
+
+	@RequestMapping(value = "associatedfieldresults", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getAssociatedFieldResults(@RequestParam(value = "startIndex", defaultValue = "0") Integer startIndex, @RequestParam(value = "limit",defaultValue = "0") Integer limit){
+
+		List<Map<String,Object>> associatedFieldResultListMap = new ArrayList<>();
+
+		List<AssociatedFieldResult> associatedFieldResults = laboratoryService.getAssociatedFieldResults(startIndex,limit);
+
+		for( AssociatedFieldResult associatedFieldResult : associatedFieldResults){
+			associatedFieldResultListMap.add(associatedFieldResult.toMap());
+		}
+
+		return associatedFieldResultListMap;
+	}
 }

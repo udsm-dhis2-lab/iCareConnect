@@ -980,6 +980,26 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String,Object>> allocationAssociatedFields = (new ObjectMapper()).readValue(handle2.getContentAsString(),List.class);
 		assertThat("Get two allocation associated fields",allocationAssociatedFields.size(),is(2));
 	}
+
+	@Test
+	public void createAndGetAssociatedFieldResult() throws Exception{
+
+		String dto = this.readFile("dto/associated-field-result-create-dto.json");
+		List<Map<String,Object>> associatedFieldResultMap = (new ObjectMapper()).readValue(dto,List.class);
+
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/associatedfieldresults",associatedFieldResultMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String,Object>> associatedFieldResults = (new ObjectMapper()).readValue(handle.getContentAsString(),List.class);
+		System.out.println(handle.getContentAsString());
+		assertThat("Created two associated field results",associatedFieldResults.size(),is(2));
+
+		//Get  associated field results
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/associatedfieldresults");
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		List<Map<String,Object>> AssociatedFieldResults = (new ObjectMapper()).readValue(handle2.getContentAsString(),List.class);
+		assertThat("Get two allocation associated fields",AssociatedFieldResults.size(),is(2));
+
+	}
 	
 	@Override
 	public String getURI() {
