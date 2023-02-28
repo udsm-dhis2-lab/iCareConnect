@@ -958,8 +958,27 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/associatedfields", new Parameter("q","first"));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		List<Map<String,Object>> associatedfields = (new ObjectMapper()).readValue(handle2.getContentAsString(),List.class);
-		assertThat("There is one serached associated field",associatedfields.size(),is(1));
+		assertThat("There is one searched associated field",associatedfields.size(),is(1));
 
+	}
+
+	@Test
+	public void createAndGetTestAllocationAssociatedField() throws Exception{
+
+		//Create test allocation associated fields
+		String dto = this.readFile("dto/allocation-associated-fields-dto.json");
+		List<Map<String,Object>> allocationFieldListMap = (new ObjectMapper()).readValue(dto, List.class);
+
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/testallocationassociatedfields",allocationFieldListMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String,Object>> createdAllocationAssociatedFields = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
+		assertThat("Created two allocation associated fields",createdAllocationAssociatedFields.size(),is(2));
+
+		//Get allocation associated field
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/testallocationassociatedfields");
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		List<Map<String,Object>> allocationAssociatedFields = (new ObjectMapper()).readValue(handle2.getContentAsString(),List.class);
+		assertThat("Get two allocation associated fields",allocationAssociatedFields.size(),is(2));
 	}
 	
 	@Override

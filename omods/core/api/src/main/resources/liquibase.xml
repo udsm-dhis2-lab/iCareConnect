@@ -4631,7 +4631,6 @@
             <column name="test_allocation_associated_field_id" type="INTEGER" autoIncrement="true">
                 <constraints primaryKey="true" primaryKeyName="test_allocation_associated_field_id_pk"/>
             </column>
-            <column name="name" type="TEXT"/>
             <column name="test_allocation_id" type="INTEGER"/>
             <column name="associated_field_id" type="INTEGER"/>
             <column name="creator" type="INTEGER"/>

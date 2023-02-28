@@ -87,6 +87,7 @@ public class TestAllocationAssociatedField extends BaseOpenmrsData implements JS
             Map<String,Object> testAllocationMap = new HashMap<>();
             testAllocationMap.put("uuid", this.getTestAllocation().getUuid());
             testAllocationMap.put("display",this.getTestAllocation().getLabel());
+            testAllocationAssociatedFieldMap.put("testAllocation",testAllocationMap);
         }
 
         if(this.getUuid() != null){

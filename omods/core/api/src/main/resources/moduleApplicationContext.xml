@@ -217,6 +217,12 @@
                     </bean>
                 </property>
 
+                <property name="testAllocationAssociatedFieldDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.TestAllocationAssociatedFieldDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
 
             </bean>
         </property>
