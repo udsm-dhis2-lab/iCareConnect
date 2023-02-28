@@ -1,6 +1,5 @@
 package org.openmrs.module.icare.laboratory.models;
 
-import org.graalvm.compiler.lir.LIRInstruction;
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.module.icare.core.JSONConverter;
 

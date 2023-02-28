@@ -61,6 +61,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	WorksheetSampleStatusDAO worksheetSampleStatusDAO;
 	
 	BatchSampleDAO batchSampleDAO;
+
+	AssociatedFieldDAO associatedFieldDAO;
 	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
@@ -145,7 +147,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public void setWorksheetSampleStatusDAO(WorksheetSampleStatusDAO worksheetSampleStatusDAO) {
 		this.worksheetSampleStatusDAO = worksheetSampleStatusDAO;
 	}
-	
+
+	public void setAssociatedFieldDAO(AssociatedFieldDAO associatedFieldDAO) {
+		this.associatedFieldDAO = associatedFieldDAO;
+	}
+
 	@Override
 	public Sample createSample(Sample sample) {
 		this.sampleDAO.save(sample);
@@ -844,7 +850,17 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		return sampleDAO.getSamplesWithoutAllocations(startDate, endDate, pager, location, sampleCategory, testCategory, q,
 		    hasStatus, acceptedByUuid, testConceptUuid, departmentUuid);
 	}
-	
+
+	@Override
+	public AssociatedField addAssociatedField(AssociatedField associatedField) {
+		return associatedFieldDAO.save(associatedField);
+	}
+
+	@Override
+	public List<AssociatedField> getAssociatedFields(String q, Integer startIndex, Integer limit) {
+		return associatedFieldDAO.getAssociatedFields(q, startIndex, limit);
+	}
+
 	public BatchSet addBatchSet(BatchSet batchSet) {
 		return batchSetDAO.save(batchSet);
 	}

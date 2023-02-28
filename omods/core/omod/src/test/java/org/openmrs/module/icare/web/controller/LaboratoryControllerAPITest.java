@@ -23,6 +23,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.io.IOException;
+import java.security.spec.ECField;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -939,6 +940,26 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		    Map.class);
 		
 		assertThat("created worksheet sample status", createdWorksheetSampleStatus.get("status") != null);
+	}
+
+	@Test
+	public void createAndGetAssociatedFields() throws Exception {
+
+		// Create associated fields
+		String dto = this.readFile("dto/associated-fields-dto.json");
+		List<Map<String,Object>> associatedFieldListMap = (new ObjectMapper()).readValue(dto, List.class);
+
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/associatedfields",associatedFieldListMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String,Object>> createdAssociatedFields = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
+		assertThat("Created two associated fields",createdAssociatedFields.size(),is(2));
+
+		// Get associated fields
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/associatedfields", new Parameter("q","first"));
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		List<Map<String,Object>> associatedfields = (new ObjectMapper()).readValue(handle2.getContentAsString(),List.class);
+		assertThat("There is one serached associated field",associatedfields.size(),is(1));
+
 	}
 	
 	@Override

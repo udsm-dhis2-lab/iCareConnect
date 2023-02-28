@@ -166,4 +166,8 @@ public interface LaboratoryService extends OpenmrsService {
 	ListResult<SampleExt> getSamplesWithoutAllocations(Date start, Date end, Pager pager, String locationUuid,
 	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
 	        String testConceptUuid, String departmentUuid);
+
+    AssociatedField addAssociatedField(AssociatedField associatedField);
+
+	List<AssociatedField> getAssociatedFields(String q, Integer startIndex, Integer limit);
 }

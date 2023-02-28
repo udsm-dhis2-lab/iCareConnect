@@ -211,6 +211,12 @@
                     </bean>
                 </property>
 
+                <property name="associatedFieldDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.AssociatedFieldDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
 
             </bean>
         </property>
