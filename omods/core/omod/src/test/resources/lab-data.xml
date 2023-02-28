@@ -192,4 +192,7 @@
 
     <global_property property="icare.laboratory.settings.sample.id.format" property_value="NPHL/WS/D{YYYY}/COUNT:5" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c631" description="For sample label format" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2022-12-10 15:51:57.0" changed_by="1" />
 
+    <!-- AssociatedField  -->
+    <lb_associated_field associated_field_id="1" name="assoc-field" description="assoc description" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c636" creator="1" voided="0" date_created="2022-12-10 15:51:57" />
+
 </dataset>

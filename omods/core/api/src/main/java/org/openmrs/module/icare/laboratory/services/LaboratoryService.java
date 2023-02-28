@@ -170,4 +170,8 @@ public interface LaboratoryService extends OpenmrsService {
     AssociatedField addAssociatedField(AssociatedField associatedField);
 
 	List<AssociatedField> getAssociatedFields(String q, Integer startIndex, Integer limit);
+
+	TestAllocationAssociatedField addTestAllocationAssociatedField(TestAllocationAssociatedField testAllocationAssociatedField) throws Exception;
+
+	List<TestAllocationAssociatedField> getTestAllocationAssociatedFields(String q, Integer startIndex, Integer limit);
 }

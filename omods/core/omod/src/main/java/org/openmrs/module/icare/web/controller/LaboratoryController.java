@@ -1174,4 +1174,37 @@ public class LaboratoryController {
 
 		return  responseAssociatedFields;
 	}
+
+	@RequestMapping(value = "testallocationassociatedfields", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addTestAllocationAssociatedFields( @RequestBody List<Map<String,Object>> allocationAssociatedFieldListMap) throws Exception {
+
+		List<Map<String,Object>> createdAllocationAssociatedField = new ArrayList<>();
+
+		for(Map<String,Object> allocationAssociatedFieldMap : allocationAssociatedFieldListMap){
+
+			TestAllocationAssociatedField testAllocationAssociatedField = TestAllocationAssociatedField.fromMap(allocationAssociatedFieldMap);
+
+			TestAllocationAssociatedField savedTestAllocationAssociatedField = laboratoryService.addTestAllocationAssociatedField(testAllocationAssociatedField);
+
+			createdAllocationAssociatedField.add(savedTestAllocationAssociatedField.toMap());
+		}
+
+		return createdAllocationAssociatedField;
+	}
+
+	@RequestMapping(value = "testallocationassociatedfields", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getTestAllocation(@RequestParam(value = "q" , required = false) String q, @RequestParam(value = "startIndex", defaultValue = "0") Integer startIndex, @RequestParam( value ="limit", defaultValue = "100") Integer limit){
+
+		List<Map<String,Object>> testAllocationAssociatedFieldsListMap = new ArrayList<>();
+
+		List<TestAllocationAssociatedField> testAllocationAssociatedFields = laboratoryService.getTestAllocationAssociatedFields(q,startIndex,limit);
+
+		for(TestAllocationAssociatedField testAllocationAssociatedField : testAllocationAssociatedFields){
+			testAllocationAssociatedFieldsListMap.add(testAllocationAssociatedField.toMap());
+		}
+
+		return testAllocationAssociatedFieldsListMap;
+	}
 }

@@ -63,6 +63,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	BatchSampleDAO batchSampleDAO;
 
 	AssociatedFieldDAO associatedFieldDAO;
+
+	TestAllocationAssociatedFieldDAO testAllocationAssociatedFieldDAO;
 	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
@@ -150,6 +152,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 
 	public void setAssociatedFieldDAO(AssociatedFieldDAO associatedFieldDAO) {
 		this.associatedFieldDAO = associatedFieldDAO;
+	}
+
+	public void setTestAllocationAssociatedFieldDAO(TestAllocationAssociatedFieldDAO testAllocationAssociatedFieldDAO) {
+		this.testAllocationAssociatedFieldDAO = testAllocationAssociatedFieldDAO;
 	}
 
 	@Override
@@ -859,6 +865,34 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public List<AssociatedField> getAssociatedFields(String q, Integer startIndex, Integer limit) {
 		return associatedFieldDAO.getAssociatedFields(q, startIndex, limit);
+	}
+
+	@Override
+	public TestAllocationAssociatedField addTestAllocationAssociatedField(TestAllocationAssociatedField testAllocationAssociatedField) throws Exception {
+
+		if(testAllocationAssociatedField.getTestAllocation() != null){
+			TestAllocation testAllocation = this.testAllocationDAO.findByUuid(testAllocationAssociatedField.getTestAllocation().getUuid());
+
+			if(testAllocation == null){
+				throw new Exception("The test allocation with uuid "+testAllocationAssociatedField.getTestAllocation().getUuid() +" does not exist");
+			}
+			testAllocationAssociatedField.setTestAllocation(testAllocation);
+		}
+
+		if(testAllocationAssociatedField.getAssociatedField() != null){
+			AssociatedField associatedField = this.associatedFieldDAO.findByUuid(testAllocationAssociatedField.getAssociatedField().getUuid());
+
+			if(associatedField == null){
+				throw new Exception(" The associated field with uuid "+testAllocationAssociatedField.getAssociatedField().getUuid()+" does not exist");
+			}
+			testAllocationAssociatedField.setAssociatedField(associatedField);
+		}
+		return testAllocationAssociatedFieldDAO.save(testAllocationAssociatedField);
+	}
+
+	@Override
+	public List<TestAllocationAssociatedField> getTestAllocationAssociatedFields(String q, Integer startIndex, Integer limit) {
+		return testAllocationAssociatedFieldDAO.getTestAllocationAssociatedField(q,startIndex,limit);
 	}
 
 	public BatchSet addBatchSet(BatchSet batchSet) {
