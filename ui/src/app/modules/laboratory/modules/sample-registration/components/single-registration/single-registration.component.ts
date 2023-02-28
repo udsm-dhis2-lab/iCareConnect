@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { AfterViewInit, Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatRadioChange } from "@angular/material/radio";
 import { Observable, of, zip } from "rxjs";
@@ -34,6 +34,8 @@ import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import * as JSPM from "jsprintmanager"
+import { BarCodePrintModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-print-modal/bar-code-print-modal.component";
 
 @Component({
   selector: "app-single-registration",
@@ -144,29 +146,7 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.openBarCodeDialog({
-      sampleLabelsUsedDetails: [
-        {
-          visit: {
-            uuid: "612f8729-5137-41ef-ad3c-a61be01f38d3",
-          },
-          label: "NPHL/23/0000009",
-          concept: {
-            uuid: "e61969c1-eb08-4c26-b9ce-fd7b02a4064e",
-          },
-          location: {
-            uuid: "7fdfa2cb-bc95-405a-88c6-32b7673c0453",
-          },
-          orders: [
-            {
-              uuid: "5054b30f-16eb-4a61-a02e-7951975a3af8",
-            },
-          ],
-          uuid: "0400bfa3-0d7f-47d8-99a4-eda66143b8da",
-        },
-      ],
-      isLis: true
-    });
+    this.jsPrint();
     const userLocationsIds = JSON.parse(
       this.currentUser?.userProperties?.locations
     );
@@ -1078,8 +1058,7 @@ export class SingleRegistrationComponent implements OnInit {
                                                                             .sampleLabelsUsedDetails,
                                                                           {
                                                                             ...sample,
-                                                                            uuid:
-                                                                              sampleResponse?.uuid,
+                                                                            uuid: sampleResponse?.uuid,
                                                                           },
                                                                         ];
                                                                       // TODO: Find a better way to control three labels to be printed
@@ -1842,15 +1821,21 @@ export class SingleRegistrationComponent implements OnInit {
 
   openBarCodeDialog(data): void {
     this.dialog
-      .open(BarCodeModalComponent, {
+      .open(BarCodePrintModalComponent, {
         height: "200px",
         width: "15%",
         data,
-        disableClose: false,
+        disableClose: true,
         panelClass: "custom-dialog-container",
       })
       .afterClosed()
-      .subscribe();
+      .subscribe((results) => {
+        console.log("==> Result: ", results)
+          if(results?.confirmed) {
+            this.doPrintZPL(results)
+          }
+        }
+      );
   }
 
   onGetIsDataFromExternalSystem(fromExternalSystem: boolean): void {
@@ -1923,4 +1908,86 @@ export class SingleRegistrationComponent implements OnInit {
   formatDimeChars(char: string): string {
     return char.length == 1 ? "0" + char : char;
   }
+
+  //Check JSPM WebSocket status
+  
+  
+  jsPrint(data?: any) {
+    const printData = data ? data :  {
+          visit: {
+              uuid: "330a23f2-83f6-4795-861c-71c22bcf230a"
+          },
+          label: "NPHL/23/0000115",
+          concept: {
+              uuid: "e61969c1-eb08-4c26-b9ce-fd7b02a4064e"
+          },
+          location: {
+              uuid: "7fdfa2cb-bc95-405a-88c6-32b7673c0453"
+          },
+          orders: [
+              {
+                  uuid: "36799ca6-bd8f-4dfb-8e47-3994c6775dde"
+              },
+              {
+                  uuid: "ad49832a-05e6-46af-bae4-3781b0e55749"
+              }
+          ],
+          uuid: "051b1294-b272-41bf-ba60-dbd95d308bf6"
+        }
+    // WebSocket settings
+    JSPM.JSPrintManager.auto_reconnect = true;
+    JSPM.JSPrintManager.start();
+    JSPM.JSPrintManager.WS.onStatusChanged = () => {
+        if (this.jspmWSStatus()) {
+            // get client installed printers
+            JSPM.JSPrintManager.getPrinters().then((printers) => {
+              this.openBarCodeDialog({
+                sampleLabelsUsedDetails: [printData],
+                printers: printers,
+                isLis: true,
+              });
+            })
+        }
+    };
+  }
+
+  jspmWSStatus() {
+    if (JSPM.JSPrintManager.websocket_status === JSPM.WSStatus.Open) {
+        return true;
+    } else if (JSPM.JSPrintManager.websocket_status === JSPM.WSStatus.Closed) {
+        this.errorMessage = 'JSPrintManager (JSPM) is not installed or not running! Download JSPM Client App from https://neodynamic.com/downloads/jspm';
+        return false;
+      } else if (JSPM.JSPrintManager.websocket_status === JSPM.WSStatus.Blocked) {
+      this.errorMessage = 'JSPM has blocked this website!';
+        return false;
+    }
+  }
+
+  // Do Zebra ZPL printing...
+  doPrintZPL(data?: any) {
+        // Create a ClientPrintJob
+    const cpj = new JSPM.ClientPrintJob();
+    if(data?.selectedPrinter){
+      cpj.clientPrinter = new JSPM.InstalledPrinter(data?.selectedPrinter)
+    } else {
+      cpj.clientPrinter = new JSPM.DefaultPrinter();
+    }
+        // Set content to print...
+        //Create Zebra ZPL commands for sample label
+		var cmds =  `
+      ^XA
+      ^FO200,40^GB400, 1000,10,B^FS
+      ^FO220,60^A0N,20^FDLIS Bongo^FS
+      ^FO220,100^FDTest Zebra^FS
+      ^FO250,200^GC200,50^FS
+      ^FO250,300^GE200,150,10^FS
+      ^FO200,500^BCB,100^FD${data?.sampleDetails?.label}^FS
+      ^XZ
+    `;
+		cpj.printerCommands = cmds;
+
+    // Send print job to printer!
+    cpj.sendToClient();
+    }
+
 }
