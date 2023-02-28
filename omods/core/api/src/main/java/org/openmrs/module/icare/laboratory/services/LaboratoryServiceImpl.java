@@ -897,8 +897,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 
 	@Override
-	public List<TestAllocationAssociatedField> getTestAllocationAssociatedFields(String q, Integer startIndex, Integer limit) {
-		return testAllocationAssociatedFieldDAO.getTestAllocationAssociatedField(q,startIndex,limit);
+	public List<TestAllocationAssociatedField> getTestAllocationAssociatedFields(String q, Integer startIndex, Integer limit, String allocationUuid, String associatedFieldUuid) {
+		return testAllocationAssociatedFieldDAO.getTestAllocationAssociatedField(q,startIndex,limit,allocationUuid,associatedFieldUuid);
 	}
 
 	@Override
@@ -925,8 +925,13 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 
 	@Override
-	public List<AssociatedFieldResult> getAssociatedFieldResults(Integer startIndex, Integer limit) {
-		return associatedFieldResultDAO.getAssociatedFieldResult(startIndex,limit);
+	public List<AssociatedFieldResult> getAssociatedFieldResults(Integer startIndex, Integer limit, String resultUuid, String associatedFieldUuid) {
+		return associatedFieldResultDAO.getAssociatedFieldResult(startIndex,limit,resultUuid,associatedFieldUuid);
+	}
+
+	@Override
+	public AssociatedField getAssociatedFieldByUuid(String associatedFieldUuid) {
+		return associatedFieldDAO.findByUuid(associatedFieldUuid);
 	}
 
 	public BatchSet addBatchSet(BatchSet batchSet) {
