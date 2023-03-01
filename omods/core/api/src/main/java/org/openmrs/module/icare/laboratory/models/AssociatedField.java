@@ -76,6 +76,10 @@ public class AssociatedField extends BaseOpenmrsData implements java.io.Serializ
             associatedField.setFieldType(associatedFieldMap.get("fieldType").toString());
         }
 
+        if(associatedFieldMap.get("voided") != null){
+            associatedField.setVoided((Boolean) associatedFieldMap.get("voided"));
+        }
+
         return associatedField;
     }
 
@@ -108,6 +112,10 @@ public class AssociatedField extends BaseOpenmrsData implements java.io.Serializ
 
         if(this.getUuid() != null){
             associatedFieldMap.put("uuid",this.getUuid());
+        }
+
+        if(this.getVoided() != null){
+            associatedFieldMap.put("voided", this.getVoided());
         }
 
         return  associatedFieldMap;

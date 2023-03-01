@@ -1183,6 +1183,15 @@ public class LaboratoryController {
 		return  associatedField.toMap();
 	}
 
+	@RequestMapping(value = "associatedfield/{associatedFieldUuid}")
+	@ResponseBody
+	public Map<String,Object> updateAssociatedField(@PathVariable String associatedFieldUuid, @RequestBody Map<String,Object> associatedFieldMap){
+
+		AssociatedField associatedField = AssociatedField.fromMap(associatedFieldMap);
+		AssociatedField updatedAssociatedField = laboratoryService.updateAssociatedField(associatedFieldUuid,associatedField);
+
+	}
+
 
 	@RequestMapping(value = "testallocationassociatedfields", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody

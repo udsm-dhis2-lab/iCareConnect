@@ -180,4 +180,6 @@ public interface LaboratoryService extends OpenmrsService {
 	List<AssociatedFieldResult> getAssociatedFieldResults(Integer startIndex, Integer limit, String resultUuid, String associatedFieldUuid);
 
     AssociatedField getAssociatedFieldByUuid(String associatedFieldUuid);
+
+	AssociatedField updateAssociatedField(String associatedFieldUuid, AssociatedField associatedField);
 }

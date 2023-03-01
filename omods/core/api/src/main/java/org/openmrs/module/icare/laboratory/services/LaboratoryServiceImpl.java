@@ -934,6 +934,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		return associatedFieldDAO.findByUuid(associatedFieldUuid);
 	}
 
+	@Override
+	public AssociatedField updateAssociatedField(String associatedFieldUuid, AssociatedField associatedField) {
+		return associatedFieldDAO.updateAssociatedField(associatedFieldUuid,associatedField);
+	}
+
 	public BatchSet addBatchSet(BatchSet batchSet) {
 		return batchSetDAO.save(batchSet);
 	}
