@@ -36,7 +36,6 @@ import { getLocationsByIds } from "src/app/store/selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import * as JSPM from "jsprintmanager"
 import { BarCodePrintModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-print-modal/bar-code-print-modal.component";
-import { webSocket } from 'rxjs/webSocket';
 
 @Component({
   selector: "app-single-registration",
@@ -147,7 +146,6 @@ export class SingleRegistrationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.jsPrint();
     const userLocationsIds = JSON.parse(
       this.currentUser?.userProperties?.locations
     );
@@ -1564,7 +1562,7 @@ export class SingleRegistrationComponent implements OnInit {
                                                                                 sampleStatusResponse
                                                                               ) {
                                                                                 const data =
-                                                                                  {
+                                                                                {
                                                                                     identifier:
                                                                                       this
                                                                                         .currentSampleLabel,
@@ -1575,7 +1573,7 @@ export class SingleRegistrationComponent implements OnInit {
                                                                                       this
                                                                                         .LISConfigurations
                                                                                         ?.isLis,
-                                                                                  };
+                                                                                      };
                                                                                 this.dialog
                                                                                   .open(
                                                                                     SampleRegistrationFinalizationComponent,
@@ -1604,7 +1602,7 @@ export class SingleRegistrationComponent implements OnInit {
                                                                                   .afterClosed()
                                                                                   .subscribe(
                                                                                     () => {
-                                                                                      this.openBarCodeDialog(
+                                                                                      this.jsPrint(
                                                                                         data
                                                                                       );
                                                                                       this.isRegistrationReady =
@@ -1831,7 +1829,6 @@ export class SingleRegistrationComponent implements OnInit {
       })
       .afterClosed()
       .subscribe((results) => {
-        console.log("==> Result: ", results)
           if(results?.confirmed) {
             this.doPrintZPL(results)
           }
@@ -1913,8 +1910,7 @@ export class SingleRegistrationComponent implements OnInit {
   //Check JSPM WebSocket status
   
   
-  jsPrint(data?: any) {
-    const printData = data ? data :  {
+  jsPrint(data: any = [{
           visit: {
               uuid: "330a23f2-83f6-4795-861c-71c22bcf230a"
           },
@@ -1934,20 +1930,7 @@ export class SingleRegistrationComponent implements OnInit {
               }
           ],
           uuid: "051b1294-b272-41bf-ba60-dbd95d308bf6"
-        }
-
-      const conn = webSocket('wss://localhost:25443');
-
-      conn.subscribe({
-        next: msg => console.log('message received: ', msg), // Called whenever there is a message from the server.
-        error: err => console.log(err), // Called if at any point WebSocket API signals some kind of error.
-        complete: () => console.log('complete') // Called when connection is closed (for whatever reason).
-      });
-
-      conn.next({testMessage: 'Test message!'})
-
-
-
+        }]) {
     // WebSocket settings
     JSPM.JSPrintManager.auto_reconnect = true;
     JSPM.JSPrintManager.start();
@@ -1956,7 +1939,7 @@ export class SingleRegistrationComponent implements OnInit {
             // get client installed printers
             JSPM.JSPrintManager.getPrinters().then((printers) => {
               this.openBarCodeDialog({
-                sampleLabelsUsedDetails: [printData],
+                sampleLabelsUsedDetails: data?.sampleLabelsUsedDetails ? data?.sampleLabelsUsedDetails : data,
                 printers: printers,
                 isLis: true,
               });
@@ -1990,9 +1973,9 @@ export class SingleRegistrationComponent implements OnInit {
         //Create Zebra ZPL commands for sample label
 		var cmds =  `
       ^XA
-      ^FO10,30^BCB,100,Y,N,N,N^FDMwambimbi1^FS
-      ^FO220,30^BCB,100,Y,N,N,N^FDMwambimbi2^FS
-      ^FO400,30^BCB,100,Y,N,N,N^FDMwambimbi3^FS
+      ^FO10,30^BCB,100,Y,N,N,N^FD${data?.sampleDetails?.label}^FS
+      ^FO220,30^BCB,100,Y,N,N,N^FD${data?.sampleDetails?.label}^FS
+      ^FO400,30^BCB,100,Y,N,N,N^FD${data?.sampleDetails?.label}^FS
       ^XZ
     `;
 		cpj.printerCommands = cmds;
