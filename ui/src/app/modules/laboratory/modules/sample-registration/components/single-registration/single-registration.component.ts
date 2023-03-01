@@ -36,6 +36,7 @@ import { getLocationsByIds } from "src/app/store/selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import * as JSPM from "jsprintmanager"
 import { BarCodePrintModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-print-modal/bar-code-print-modal.component";
+import { webSocket } from 'rxjs/webSocket';
 
 @Component({
   selector: "app-single-registration",
@@ -1934,6 +1935,19 @@ export class SingleRegistrationComponent implements OnInit {
           ],
           uuid: "051b1294-b272-41bf-ba60-dbd95d308bf6"
         }
+
+      const conn = webSocket('wss://localhost:25443');
+
+      conn.subscribe({
+        next: msg => console.log('message received: ', msg), // Called whenever there is a message from the server.
+        error: err => console.log(err), // Called if at any point WebSocket API signals some kind of error.
+        complete: () => console.log('complete') // Called when connection is closed (for whatever reason).
+      });
+
+      conn.next({testMessage: 'Test message!'})
+
+
+
     // WebSocket settings
     JSPM.JSPrintManager.auto_reconnect = true;
     JSPM.JSPrintManager.start();
@@ -1976,12 +1990,9 @@ export class SingleRegistrationComponent implements OnInit {
         //Create Zebra ZPL commands for sample label
 		var cmds =  `
       ^XA
-      ^FO200,40^GB400, 1000,10,B^FS
-      ^FO220,60^A0N,20^FDLIS Bongo^FS
-      ^FO220,100^FDTest Zebra^FS
-      ^FO250,200^GC200,50^FS
-      ^FO250,300^GE200,150,10^FS
-      ^FO200,500^BCB,100^FD${data?.sampleDetails?.label}^FS
+      ^FO10,30^BCB,100,Y,N,N,N^FDMwambimbi1^FS
+      ^FO220,30^BCB,100,Y,N,N,N^FDMwambimbi2^FS
+      ^FO400,30^BCB,100,Y,N,N,N^FDMwambimbi3^FS
       ^XZ
     `;
 		cpj.printerCommands = cmds;
