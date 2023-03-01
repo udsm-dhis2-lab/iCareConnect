@@ -21,7 +21,7 @@ public class AssociatedFieldResult extends BaseOpenmrsData implements java.io.Se
 	private AssociatedField associatedField;
 	
 	@ManyToOne
-	@JoinColumn(name = "result_id", nullable = false)
+	@JoinColumn(name = "test_result_id", nullable = false)
 	private Result result;
 	
 	@Column(name = "value", length = 100)
