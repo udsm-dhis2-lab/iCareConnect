@@ -1175,7 +1175,7 @@ public class LaboratoryController {
 		return  responseAssociatedFields;
 	}
 
-	@RequestMapping(value = "associatedfield/{associatedFieldUuid}")
+	@RequestMapping(value = "associatedfield/{associatedFieldUuid}", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String,Object> getAssociatedFieldByUuid(@PathVariable String associatedFieldUuid){
 
@@ -1183,13 +1183,14 @@ public class LaboratoryController {
 		return  associatedField.toMap();
 	}
 
-	@RequestMapping(value = "associatedfield/{associatedFieldUuid}")
+	@RequestMapping(value = "associatedfield/{associatedFieldUuid}",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String,Object> updateAssociatedField(@PathVariable String associatedFieldUuid, @RequestBody Map<String,Object> associatedFieldMap){
 
 		AssociatedField associatedField = AssociatedField.fromMap(associatedFieldMap);
 		AssociatedField updatedAssociatedField = laboratoryService.updateAssociatedField(associatedFieldUuid,associatedField);
 
+		return updatedAssociatedField.toMap();
 	}
 
 

@@ -70,7 +70,7 @@ public class AssociatedFieldDAO extends BaseDAO<AssociatedField> {
             query.setParameter("description",associatedField.getDescription());
         }
 
-        query.setParameter("uuid",associatedField.getUuid());
+        query.setParameter("uuid",associatedFieldUuid);
 
         Integer success = query.executeUpdate();
 
