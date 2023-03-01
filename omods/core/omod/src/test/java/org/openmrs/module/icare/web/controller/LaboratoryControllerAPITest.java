@@ -960,6 +960,16 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String,Object>> associatedfields = (new ObjectMapper()).readValue(handle2.getContentAsString(),List.class);
 		assertThat("There is one searched associated field",associatedfields.size(),is(1));
 
+		//update associated field
+		String dto2 = this.readFile("dto/associated-field-update.json");
+		Map<String,Object> associatedFieldMap = (new ObjectMapper()).readValue(dto2,Map.class);
+
+		MockHttpServletRequest newPostRequest2 = newPostRequest("lab/associatedfield/iCARE110-TEST-OSDH-9beb-d30dcfc0c636",associatedFieldMap);
+		MockHttpServletResponse handle3 = handle(newPostRequest2);
+		Map<String,Object> updatedAssociatedField = (new ObjectMapper()).readValue(handle3.getContentAsString(), Map.class);
+		System.out.println(handle3.getContentAsString());
+		//assertThat("The associated field has been updated",);
+
 	}
 
 	@Test
