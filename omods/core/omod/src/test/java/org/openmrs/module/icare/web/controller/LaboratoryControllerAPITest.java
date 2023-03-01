@@ -382,9 +382,15 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		    new Parameter("excludeAllocations", "true"), new Parameter("department", "123111zz-0011-477v-8y8y-acc38ebc6222"));
 		
 		handleGet = handle(newGetRequest);
-		
 		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
-		
+
+		// SEARCH BY SPECIMEN SOURCE
+		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
+				new Parameter("excludeAllocations", "true"), new Parameter("specimen", "323111zz-0011-477v-8y8y-acc38ebc6215"));
+
+		handleGet = handle(newGetRequest);
+		Map<String, Object> sampleResultsFilteredBySpecimen = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		assertThat("There is 1 sample", ((List<Map>) samples.get("results")).size(), is(1));
 	}
 	
 	@Test
