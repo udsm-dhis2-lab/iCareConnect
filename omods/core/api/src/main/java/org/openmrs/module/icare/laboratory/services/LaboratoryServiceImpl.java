@@ -61,11 +61,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	WorksheetSampleStatusDAO worksheetSampleStatusDAO;
 	
 	BatchSampleDAO batchSampleDAO;
-
+	
 	AssociatedFieldDAO associatedFieldDAO;
-
+	
 	TestAllocationAssociatedFieldDAO testAllocationAssociatedFieldDAO;
-
+	
 	AssociatedFieldResultDAO associatedFieldResultDAO;
 	
 	public void setSampleDAO(SampleDAO sampleDAO) {
@@ -151,19 +151,19 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	public void setWorksheetSampleStatusDAO(WorksheetSampleStatusDAO worksheetSampleStatusDAO) {
 		this.worksheetSampleStatusDAO = worksheetSampleStatusDAO;
 	}
-
+	
 	public void setAssociatedFieldDAO(AssociatedFieldDAO associatedFieldDAO) {
 		this.associatedFieldDAO = associatedFieldDAO;
 	}
-
+	
 	public void setTestAllocationAssociatedFieldDAO(TestAllocationAssociatedFieldDAO testAllocationAssociatedFieldDAO) {
 		this.testAllocationAssociatedFieldDAO = testAllocationAssociatedFieldDAO;
 	}
-
+	
 	public void setAssociatedFieldResultDAO(AssociatedFieldResultDAO associatedFieldResultDAO) {
 		this.associatedFieldResultDAO = associatedFieldResultDAO;
 	}
-
+	
 	@Override
 	public Sample createSample(Sample sample) {
 		this.sampleDAO.save(sample);
@@ -862,83 +862,94 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		return sampleDAO.getSamplesWithoutAllocations(startDate, endDate, pager, location, sampleCategory, testCategory, q,
 		    hasStatus, acceptedByUuid, testConceptUuid, departmentUuid);
 	}
-
+	
 	@Override
 	public AssociatedField addAssociatedField(AssociatedField associatedField) {
 		return associatedFieldDAO.save(associatedField);
 	}
-
+	
 	@Override
 	public List<AssociatedField> getAssociatedFields(String q, Integer startIndex, Integer limit) {
 		return associatedFieldDAO.getAssociatedFields(q, startIndex, limit);
 	}
-
+	
 	@Override
-	public TestAllocationAssociatedField addTestAllocationAssociatedField(TestAllocationAssociatedField testAllocationAssociatedField) throws Exception {
-
-		if(testAllocationAssociatedField.getTestAllocation() != null){
-			TestAllocation testAllocation = this.testAllocationDAO.findByUuid(testAllocationAssociatedField.getTestAllocation().getUuid());
-
-			if(testAllocation == null){
-				throw new Exception("The test allocation with uuid "+testAllocationAssociatedField.getTestAllocation().getUuid() +" does not exist");
+	public TestAllocationAssociatedField addTestAllocationAssociatedField(
+	        TestAllocationAssociatedField testAllocationAssociatedField) throws Exception {
+		
+		if (testAllocationAssociatedField.getTestAllocation() != null) {
+			TestAllocation testAllocation = this.testAllocationDAO.findByUuid(testAllocationAssociatedField
+			        .getTestAllocation().getUuid());
+			
+			if (testAllocation == null) {
+				throw new Exception("The test allocation with uuid "
+				        + testAllocationAssociatedField.getTestAllocation().getUuid() + " does not exist");
 			}
 			testAllocationAssociatedField.setTestAllocation(testAllocation);
 		}
-
-		if(testAllocationAssociatedField.getAssociatedField() != null){
-			AssociatedField associatedField = this.associatedFieldDAO.findByUuid(testAllocationAssociatedField.getAssociatedField().getUuid());
-
-			if(associatedField == null){
-				throw new Exception(" The associated field with uuid "+testAllocationAssociatedField.getAssociatedField().getUuid()+" does not exist");
+		
+		if (testAllocationAssociatedField.getAssociatedField() != null) {
+			AssociatedField associatedField = this.associatedFieldDAO.findByUuid(testAllocationAssociatedField
+			        .getAssociatedField().getUuid());
+			
+			if (associatedField == null) {
+				throw new Exception(" The associated field with uuid "
+				        + testAllocationAssociatedField.getAssociatedField().getUuid() + " does not exist");
 			}
 			testAllocationAssociatedField.setAssociatedField(associatedField);
 		}
 		return testAllocationAssociatedFieldDAO.save(testAllocationAssociatedField);
 	}
-
+	
 	@Override
-	public List<TestAllocationAssociatedField> getTestAllocationAssociatedFields(String q, Integer startIndex, Integer limit, String allocationUuid, String associatedFieldUuid) {
-		return testAllocationAssociatedFieldDAO.getTestAllocationAssociatedField(q,startIndex,limit,allocationUuid,associatedFieldUuid);
+	public List<TestAllocationAssociatedField> getTestAllocationAssociatedFields(String q, Integer startIndex,
+	        Integer limit, String allocationUuid, String associatedFieldUuid) {
+		return testAllocationAssociatedFieldDAO.getTestAllocationAssociatedField(q, startIndex, limit, allocationUuid,
+		    associatedFieldUuid);
 	}
-
+	
 	@Override
 	public AssociatedFieldResult addAssociatedFieldResult(AssociatedFieldResult associatedFieldResult) throws Exception {
-
-		if(associatedFieldResult.getAssociatedField() != null){
-
-			AssociatedField associatedField = this.associatedFieldDAO.findByUuid(associatedFieldResult.getAssociatedField().getUuid());
-			if(associatedField == null){
-				throw new Exception(" The associated field with uuid "+associatedFieldResult.getAssociatedField().getUuid()+" does not exist");
+		
+		if (associatedFieldResult.getAssociatedField() != null) {
+			
+			AssociatedField associatedField = this.associatedFieldDAO.findByUuid(associatedFieldResult.getAssociatedField()
+			        .getUuid());
+			if (associatedField == null) {
+				throw new Exception(" The associated field with uuid "
+				        + associatedFieldResult.getAssociatedField().getUuid() + " does not exist");
 			}
 			associatedFieldResult.setAssociatedField(associatedField);
 		}
-
-		if(associatedFieldResult.getResult() != null){
+		
+		if (associatedFieldResult.getResult() != null) {
 			Result result = this.resultDAO.findByUuid(associatedFieldResult.getResult().getUuid());
-			if(result == null){
-				throw new Exception(" The result with uuid"+associatedFieldResult.getResult().getUuid()+" does not exist");
+			if (result == null) {
+				throw new Exception(" The result with uuid" + associatedFieldResult.getResult().getUuid()
+				        + " does not exist");
 			}
 			associatedFieldResult.setResult(result);
 		}
-
-		return associatedFieldResultDAO.save(associatedFieldResult) ;
+		
+		return associatedFieldResultDAO.save(associatedFieldResult);
 	}
-
+	
 	@Override
-	public List<AssociatedFieldResult> getAssociatedFieldResults(Integer startIndex, Integer limit, String resultUuid, String associatedFieldUuid) {
-		return associatedFieldResultDAO.getAssociatedFieldResult(startIndex,limit,resultUuid,associatedFieldUuid);
+	public List<AssociatedFieldResult> getAssociatedFieldResults(Integer startIndex, Integer limit, String resultUuid,
+	        String associatedFieldUuid) {
+		return associatedFieldResultDAO.getAssociatedFieldResult(startIndex, limit, resultUuid, associatedFieldUuid);
 	}
-
+	
 	@Override
 	public AssociatedField getAssociatedFieldByUuid(String associatedFieldUuid) {
 		return associatedFieldDAO.findByUuid(associatedFieldUuid);
 	}
-
+	
 	@Override
 	public AssociatedField updateAssociatedField(String associatedFieldUuid, AssociatedField associatedField) {
-		return associatedFieldDAO.updateAssociatedField(associatedFieldUuid,associatedField);
+		return associatedFieldDAO.updateAssociatedField(associatedFieldUuid, associatedField);
 	}
-
+	
 	public BatchSet addBatchSet(BatchSet batchSet) {
 		return batchSetDAO.save(batchSet);
 	}

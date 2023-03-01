@@ -1141,7 +1141,7 @@ public class LaboratoryController {
 		
 		return newWorksheetSampleStatus.toMap();
 	}
-
+	
 	@RequestMapping(value = "associatedfields", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String,Object>> addAssociatedFields(@RequestBody List<Map<String,Object>> associatedFieldListMap){
@@ -1159,7 +1159,7 @@ public class LaboratoryController {
 		return createdAssociatedFieldsListMap;
 
 	}
-
+	
 	@RequestMapping(value = "associatedfields", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String,Object>> getAssociatedFields( @RequestParam(required = false, value = "q") String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit){
@@ -1174,26 +1174,27 @@ public class LaboratoryController {
 
 		return  responseAssociatedFields;
 	}
-
+	
 	@RequestMapping(value = "associatedfield/{associatedFieldUuid}", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String,Object> getAssociatedFieldByUuid(@PathVariable String associatedFieldUuid){
-
+	public Map<String, Object> getAssociatedFieldByUuid(@PathVariable String associatedFieldUuid) {
+		
 		AssociatedField associatedField = laboratoryService.getAssociatedFieldByUuid(associatedFieldUuid);
-		return  associatedField.toMap();
+		return associatedField.toMap();
 	}
-
-	@RequestMapping(value = "associatedfield/{associatedFieldUuid}",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	
+	@RequestMapping(value = "associatedfield/{associatedFieldUuid}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public Map<String,Object> updateAssociatedField(@PathVariable String associatedFieldUuid, @RequestBody Map<String,Object> associatedFieldMap){
-
+	public Map<String, Object> updateAssociatedField(@PathVariable String associatedFieldUuid,
+	        @RequestBody Map<String, Object> associatedFieldMap) {
+		
 		AssociatedField associatedField = AssociatedField.fromMap(associatedFieldMap);
-		AssociatedField updatedAssociatedField = laboratoryService.updateAssociatedField(associatedFieldUuid,associatedField);
-
+		AssociatedField updatedAssociatedField = laboratoryService.updateAssociatedField(associatedFieldUuid,
+		    associatedField);
+		
 		return updatedAssociatedField.toMap();
 	}
-
-
+	
 	@RequestMapping(value = "testallocationassociatedfields", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String,Object>> addTestAllocationAssociatedFields( @RequestBody List<Map<String,Object>> allocationAssociatedFieldListMap) throws Exception {
@@ -1211,7 +1212,7 @@ public class LaboratoryController {
 
 		return createdAllocationAssociatedField;
 	}
-
+	
 	@RequestMapping(value = "testallocationassociatedfields", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String,Object>> getTestAllocationAssociatedField(@RequestParam(value = "q" , required = false) String q, @RequestParam(value = "startIndex", defaultValue = "0") Integer startIndex, @RequestParam( value ="limit", defaultValue = "100") Integer limit, @RequestParam(value = "allocationUuid", required = false) String allocationUuid, @RequestParam(value = "associatedFieldUuid", required = false) String associatedFieldUuid){
@@ -1226,7 +1227,7 @@ public class LaboratoryController {
 
 		return testAllocationAssociatedFieldsListMap;
 	}
-
+	
 	@RequestMapping(value = "associatedfieldresults", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String,Object>> addAssociatedFieldResult(@RequestBody List<Map<String,Object>> associatedFieldResultListMap) throws Exception {
@@ -1241,7 +1242,7 @@ public class LaboratoryController {
 		}
 		return createdAssociatedFieldResultListMap;
 	}
-
+	
 	@RequestMapping(value = "associatedfieldresults", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String,Object>> getAssociatedFieldResults(@RequestParam(value = "startIndex", defaultValue = "0") Integer startIndex, @RequestParam(value = "limit",defaultValue = "0") Integer limit, @RequestParam(value = "resultUuid", required = false) String resultUuid, @RequestParam(value = "associatedFieldUuid", required = false) String associatedFieldUuid){

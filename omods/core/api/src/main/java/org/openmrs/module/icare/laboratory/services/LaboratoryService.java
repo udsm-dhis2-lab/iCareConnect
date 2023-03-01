@@ -166,20 +166,23 @@ public interface LaboratoryService extends OpenmrsService {
 	ListResult<SampleExt> getSamplesWithoutAllocations(Date start, Date end, Pager pager, String locationUuid,
 	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
 	        String testConceptUuid, String departmentUuid);
-
-    AssociatedField addAssociatedField(AssociatedField associatedField);
-
+	
+	AssociatedField addAssociatedField(AssociatedField associatedField);
+	
 	List<AssociatedField> getAssociatedFields(String q, Integer startIndex, Integer limit);
-
-	TestAllocationAssociatedField addTestAllocationAssociatedField(TestAllocationAssociatedField testAllocationAssociatedField) throws Exception;
-
-	List<TestAllocationAssociatedField> getTestAllocationAssociatedFields(String q, Integer startIndex, Integer limit, String allocationUuid, String associatedFieldUuid);
-
+	
+	TestAllocationAssociatedField addTestAllocationAssociatedField(
+	        TestAllocationAssociatedField testAllocationAssociatedField) throws Exception;
+	
+	List<TestAllocationAssociatedField> getTestAllocationAssociatedFields(String q, Integer startIndex, Integer limit,
+	        String allocationUuid, String associatedFieldUuid);
+	
 	AssociatedFieldResult addAssociatedFieldResult(AssociatedFieldResult associatedFieldResult) throws Exception;
-
-	List<AssociatedFieldResult> getAssociatedFieldResults(Integer startIndex, Integer limit, String resultUuid, String associatedFieldUuid);
-
-    AssociatedField getAssociatedFieldByUuid(String associatedFieldUuid);
-
+	
+	List<AssociatedFieldResult> getAssociatedFieldResults(Integer startIndex, Integer limit, String resultUuid,
+	        String associatedFieldUuid);
+	
+	AssociatedField getAssociatedFieldByUuid(String associatedFieldUuid);
+	
 	AssociatedField updateAssociatedField(String associatedFieldUuid, AssociatedField associatedField);
 }
