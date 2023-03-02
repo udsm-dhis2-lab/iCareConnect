@@ -57,6 +57,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log("DATA", this.data);
     this.preferredName = this.data?.LISConfigurations?.isLIS
       ? "SHORT"
       : "FULLY_SPECIFIED";
