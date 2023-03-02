@@ -52,7 +52,6 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("ALLCNS", this.allocations);
     this.labSampleLoadingState$ = this.store.select(getLabSampleLoadingState);
     this.getSampleOrdersDetails();
     this.getOrderField();
