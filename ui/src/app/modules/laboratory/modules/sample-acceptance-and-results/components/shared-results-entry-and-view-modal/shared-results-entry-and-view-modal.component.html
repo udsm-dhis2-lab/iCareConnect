@@ -225,6 +225,7 @@
                         >
                           <app-shared-instrument-selection
                             [conceptReferenceTerm]="'LIS_INSTRUMENT'"
+                            [order]="order"
                             (selectedInstrument)="
                               onGetSelectedInstrument($event, order)
                             "
@@ -355,6 +356,7 @@
                         >
                           <app-shared-instrument-selection
                             [conceptReferenceTerm]="'LIS_INSTRUMENT'"
+                            [order]="order"
                             (selectedInstrument)="
                               onGetSelectedInstrument($event, order)
                             "
