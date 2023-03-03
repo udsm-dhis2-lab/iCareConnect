@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatRadioChange } from "@angular/material/radio";
 import { Store } from "@ngrx/store";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
@@ -91,8 +91,13 @@ export class SamplesForResultsEntryComponent implements OnInit {
         panelClass: "custom-dialog-container",
       })
       .afterClosed()
-      .subscribe(() => {
-        this.getSamples();
+      .subscribe((changed: boolean) => {
+        if (changed) {
+          this.providerDetails$ = of(null);
+          setTimeout(() => {
+            this.providerDetails$ = this.store.select(getProviderDetails);
+          }, 50);
+        }
       });
   }
 }

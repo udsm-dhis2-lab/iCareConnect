@@ -4,11 +4,25 @@
     currentWorksheetDefinition: currentWorksheetDefinition$ | async
   } as params"
 >
-  <div>
-    <app-form
-      [fields]="[worksheetDefinitionField]"
-      (formUpdate)="onFormUpdate($event)"
-    ></app-form>
+  <div class="row">
+    <div class="col-10">
+      <app-form
+        [fields]="[worksheetDefinitionField]"
+        (formUpdate)="onFormUpdate($event)"
+      ></app-form>
+    </div>
+    <div class="col-2" *ngIf="currentWorksheetDefinitionUuid">
+      <div class="d-flex justify-content-end">
+        <button
+          [disabled]="!params?.currentWorksheetDefinition"
+          mat-flat-button
+          color="primary"
+          (click)="onAddNewFields($event, params?.currentWorksheetDefinition)"
+        >
+          Additional Fields
+        </button>
+      </div>
+    </div>
   </div>
 
   <mat-progress-bar
@@ -65,6 +79,22 @@
             <th style="width: 10%">Age</th>
             <th style="width: 10%">Gender</th>
             <th style="width: 10%">Lab No</th>
+            <ng-container
+              *ngIf="
+                params?.currentWorksheetDefinition?.associatedFieldsReference
+                  ?.length > 0
+              "
+            >
+              <th
+                style="width: 2%"
+                *ngFor="
+                  let field of params?.currentWorksheetDefinition
+                    ?.associatedFieldsReference
+                "
+              >
+                {{ field?.associatedField?.display }}
+              </th>
+            </ng-container>
             <th
               [attr.colspan]="
                 params?.currentWorksheetDefinition?.worksheetSamples[0]
@@ -118,6 +148,30 @@
             <td style="width: 50px">
               {{ worksheetSample?.sample?.display }}
             </td>
+            <ng-container
+              *ngIf="
+                worksheetSample?.testAllocationAssociatedFields &&
+                worksheetSample?.testAllocationAssociatedFields?.length > 0
+              "
+            >
+              <td
+                *ngFor="
+                  let testAllocationAssociatedField of worksheetSample?.testAllocationAssociatedFields
+                "
+              >
+                <app-shared-associated-field-results-entry
+                  [testAllocationAssociatedField]="
+                    testAllocationAssociatedField
+                  "
+                  (enteredResults)="
+                    getAssociatedFieldsResults(
+                      $event,
+                      testAllocationAssociatedField
+                    )
+                  "
+                ></app-shared-associated-field-results-entry>
+              </td>
+            </ng-container>
             <td
               style="width: 30px"
               *ngFor="let allocation of worksheetSample?.sample?.allocations"
@@ -197,7 +251,7 @@
       mat-flat-button
       color="primary"
       (click)="onSave($event)"
-      [disabled]="!isFormValid"
+      [disabled]="!isFormValid && !associatedFieldsHasResults"
     >
       Save
     </button>
