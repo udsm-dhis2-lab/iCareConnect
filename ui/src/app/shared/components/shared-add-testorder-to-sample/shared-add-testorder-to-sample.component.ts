@@ -33,6 +33,7 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
   @Input() visit: any;
   @Input() sample: any;
   @Input() currentUser: any;
+  @Input() allocations: any[];
   existingOrdersDetails: any;
   formField: Field<string>;
   isFormValid: boolean = false;
@@ -51,16 +52,37 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.existingOrdersDetails = flatten(
-      this.visit?.encounters?.map((encounter) => encounter?.orders)
-    );
-
     this.labSampleLoadingState$ = this.store.select(getLabSampleLoadingState);
-
-    this.existingOrdersDetails$ = this.store.select(
-      getTestOrdersFromSampleBySampleLabel(this.sample?.id)
-    );
+    this.getSampleOrdersDetails();
     this.getOrderField();
+  }
+
+  getSampleOrdersDetails(): void {
+    this.existingOrdersDetails$ = this.sampleService
+      .getSampleByUuid(this.sample?.uuid)
+      .pipe(
+        map((response) => {
+          if (response) {
+            return response?.orders?.map((order) => {
+              return {
+                ...order,
+                ...response,
+                order: {
+                  ...order?.order,
+                  concept: {
+                    ...order?.order?.concept,
+                    display:
+                      order?.order?.concept?.display &&
+                      order?.order?.concept?.display?.indexOf(":") > -1
+                        ? order?.order?.concept?.display?.split(":")[1]
+                        : order?.order?.concept?.display,
+                  },
+                },
+              };
+            });
+          }
+        })
+      );
   }
 
   getOrderField() {
@@ -91,7 +113,7 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
     const encounter = {
       visit: this.sample?.visit?.uuid,
       encounterDatetime: new Date().toISOString(),
-      patient: this.existingOrdersDetails[0]?.patient?.uuid,
+      patient: this.sample?.patient?.uuid,
       encounterType: this.visit?.encounters[0]?.encounterType?.uuid,
       location: JSON.parse(localStorage.getItem("currentLocation"))?.uuid,
       encounterProviders: [
@@ -102,11 +124,13 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
       ],
       orders: this.valuesToSave?.map((value) => {
         return {
-          orderType: this.existingOrdersDetails[0]?.orderType?.uuid,
+          orderType: flatten(
+            this.visit?.encounters?.map((encounter) => encounter?.orders)
+          )[0]?.orderType?.uuid,
           action: "NEW",
           urgency: "ROUTINE",
           careSetting: "OUTPATIENT",
-          patient: this.existingOrdersDetails[0]?.patient?.uuid,
+          patient: this.sample?.patient?.uuid,
           concept: value?.uuid,
           orderer: this.provider?.uuid,
           type: "testorder",
@@ -134,10 +158,6 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
               return this.sampleService.createSampleOrder(sampleOrder);
             })
           ).subscribe((saveOrderResponse: any) => {
-            const orderWithAllocation = this.sample.orders.filter(
-              (order) => order?.testAllocations?.length > 0
-            )[0];
-
             if (!saveOrderResponse?.error) {
               zip(
                 ...saveOrderResponse?.map((responseOrder) => {
@@ -157,7 +177,7 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
                                 uuid: responseOrder?.order?.uuid,
                               },
                               container: {
-                                uuid: orderWithAllocation?.testAllocations[0]
+                                uuid: this.allocations[0]?.allocations[0]
                                   ?.container?.uuid,
                               },
                               sample: {
@@ -178,7 +198,7 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
                                   uuid: responseOrder?.order?.uuid,
                                 },
                                 container: {
-                                  uuid: orderWithAllocation?.testAllocations[0]
+                                  uuid: this.allocations[0]?.allocations[0]
                                     ?.container?.uuid,
                                 },
                                 sample: {
@@ -195,10 +215,10 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
 
                         const status = {
                           sample: {
-                            uuid: orderWithAllocation?.sample?.uuid,
+                            uuid: this.sample?.uuid,
                           },
                           user: {
-                            uuid: this.currentUser?.uuid,
+                            uuid: localStorage.getItem("userUuid"),
                           },
                           remarks: "added test",
                           status: "ADDED_TEST",
@@ -226,9 +246,7 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
                     )
                   ).subscribe((response) => {
                     this.getOrderField();
-                    this.store.dispatch(
-                      loadSampleByUuid({ uuid: this.sample?.uuid })
-                    );
+                    this.getSampleOrdersDetails();
                   });
                 }
               });
@@ -266,9 +284,7 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
             .voidOrderWithReason(voidObject)
             .subscribe((response: any) => {
               if (!response?.error && !response?.stackTrace) {
-                this.store.dispatch(
-                  loadSampleByUuid({ uuid: this.sample?.uuid })
-                );
+                this.getSampleOrdersDetails();
               } else {
                 if (response?.error) {
                   this.errors = [...this.errors, response?.error];
