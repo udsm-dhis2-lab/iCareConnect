@@ -14,11 +14,27 @@
     </div>
   </div>
   <div class="col-md-9" style="z-index: 102">
-    <app-form
-      [fields]="[worksheetSelectionField]"
-      (formUpdate)="onGetSelectedWorksheet($event)"
-    >
-    </app-form>
+    <div class="row">
+      <div class="col-md-10">
+        <app-form
+          [fields]="[worksheetSelectionField]"
+          (formUpdate)="onGetSelectedWorksheet($event)"
+        >
+        </app-form>
+      </div>
+      <div class="col-md-2">
+        <div class="d-flex justify-content-end">
+          <button
+            [disabled]="!currentWorksheetDefinition"
+            mat-flat-button
+            color="primary"
+            (click)="onAddNewFields($event, currentWorksheetDefinition)"
+          >
+            Additional Fields
+          </button>
+        </div>
+      </div>
+    </div>
 
     <div class="w-100" *ngIf="currentWorksheetDefinition">
       <div class="w-100 d-flex">
@@ -68,82 +84,110 @@
                 let rowCount = index
               "
             >
-              <td
-                [ngStyle]="{
-                  width:
-                    100 /
-                      currentWorksheetDefinition?.worksheet?.columns?.length +
-                    '%'
-                }"
-                style="border: solid 1px"
+              <ng-container
                 *ngFor="
                   let column of currentWorksheetDefinition?.worksheet?.columns;
                   let columnCount = index
                 "
               >
-                <section class="example-section" *ngIf="!isComplete">
-                  <mat-radio-group>
-                    <mat-radio-button
-                      color="primary"
-                      (change)="
-                        toggleControl($event, row + '-' + column + '-control')
+                <td
+                  [ngStyle]="{
+                    width:
+                      100 /
+                        currentWorksheetDefinition?.worksheet?.columns?.length +
+                      '%'
+                  }"
+                  style="border: solid 1px"
+                >
+                  <section class="example-section" *ngIf="!isComplete">
+                    <mat-radio-group>
+                      <mat-radio-button
+                        color="primary"
+                        (change)="
+                          toggleControl($event, row + '-' + column + '-control')
+                        "
+                        [checked]="
+                          selectedRowsColumns &&
+                          selectedRowsColumns[row + '-' + column + '-control']
+                        "
+                        [value]="row + '-' + column + '-control'"
+                      >
+                        CTRL
+                      </mat-radio-button>
+                      <mat-radio-button
+                        (change)="
+                          toggleControl($event, row + '-' + column + '-sample')
+                        "
+                        [checked]="
+                          selectedRowsColumns &&
+                          selectedRowsColumns[row + '-' + column + '-sample']
+                        "
+                        class="ml-2"
+                        color="primary"
+                        [value]="row + '-' + column + '-sample'"
+                      >
+                        S
+                      </mat-radio-button>
+                    </mat-radio-group>
+                  </section>
+                  {{
+                    (selectedRowsColumns[row + "-" + column + "-control"]?.value
+                      ? selectedRowsColumns[row + "-" + column + "-control"]
+                          ?.value?.code
+                      : selectedRowsColumns[row + "-" + column + "-sample"]
+                          ?.value
+                      ? selectedRowsColumns[row + "-" + column + "-sample"]
+                          ?.value?.label
+                      : ""
+                    ) | formatLabelCharCountDisplay: currentLabelCharCount
+                  }}
+                  <div
+                    *ngIf="
+                      selectedRowsColumns[row + '-' + column + '-control'] &&
+                      !isComplete
+                    "
+                  >
+                    <app-test-control-selection-form
+                      *ngIf="params?.testControls"
+                      [id]="row + '-' + column + '-control'"
+                      [testControls]="params?.testControls"
+                      [testOrder]="
+                        currentWorksheetDefinition?.worksheet?.testOrder
                       "
-                      [checked]="
-                        selectedRowsColumns &&
-                        selectedRowsColumns[row + '-' + column + '-control']
+                      (selectedControl)="
+                        getSelectedTestControl(
+                          $event,
+                          row + '-' + column + '-control'
+                        )
                       "
-                      [value]="row + '-' + column + '-control'"
-                    >
-                      CTRL
-                    </mat-radio-button>
-                    <mat-radio-button
-                      (change)="
-                        toggleControl($event, row + '-' + column + '-sample')
-                      "
-                      [checked]="
-                        selectedRowsColumns &&
-                        selectedRowsColumns[row + '-' + column + '-sample']
-                      "
-                      class="ml-2"
-                      color="primary"
-                      [value]="row + '-' + column + '-sample'"
-                    >
-                      S
-                    </mat-radio-button>
-                  </mat-radio-group>
-                </section>
-                {{
-                  (selectedRowsColumns[row + "-" + column + "-control"]?.value
-                    ? selectedRowsColumns[row + "-" + column + "-control"]
-                        ?.value?.code
-                    : selectedRowsColumns[row + "-" + column + "-sample"]?.value
-                    ? selectedRowsColumns[row + "-" + column + "-sample"]?.value
-                        ?.label
-                    : ""
-                  ) | formatLabelCharCountDisplay: currentLabelCharCount
-                }}
-                <div
+                    ></app-test-control-selection-form>
+                  </div>
+                </td>
+                <ng-container
                   *ngIf="
-                    selectedRowsColumns[row + '-' + column + '-control'] &&
-                    !isComplete
+                    currentWorksheetDefinition?.worksheetSamples &&
+                    currentWorksheetDefinition?.worksheetSamples?.length > 0 &&
+                    row &&
+                    column &&
+                    (
+                      currentWorksheetDefinition?.worksheetSamples
+                      | getAssociatedFields: row:column
+                    )?.length > 0
                   "
                 >
-                  <app-test-control-selection-form
-                    *ngIf="params?.testControls"
-                    [id]="row + '-' + column + '-control'"
-                    [testControls]="params?.testControls"
-                    [testOrder]="
-                      currentWorksheetDefinition?.worksheet?.testOrder
+                  <td
+                    *ngFor="
+                      let testAllocationAssociatedField of currentWorksheetDefinition?.worksheetSamples
+                        | getAssociatedFields: row:column
                     "
-                    (selectedControl)="
-                      getSelectedTestControl(
-                        $event,
-                        row + '-' + column + '-control'
-                      )
-                    "
-                  ></app-test-control-selection-form>
-                </div>
-              </td>
+                    style="border: solid 1px"
+                  >
+                    {{
+                      testAllocationAssociatedField?.associatedField?.display
+                    }}
+                  </td>
+                </ng-container>
+              </ng-container>
             </tr>
           </tbody>
         </table>

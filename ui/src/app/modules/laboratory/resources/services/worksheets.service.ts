@@ -97,8 +97,30 @@ export class WorkSheetsService {
   getWorksheetDefinitionsByUuid(uuid: string): Observable<any> {
     return this.httpClient.get(`lab/worksheetdefinition?uuid=${uuid}`).pipe(
       map((response) => {
+        let testAllocationAssociatedFieldsCount = 1;
+        let associatedFieldsReference = [];
         const formattedWorksheetSamples = response?.worksheetSamples?.map(
           (worksheetSample) => {
+            const testAllocationAssociatedFields =
+              worksheetSample?.sample?.allocations[0]?.testAllocationAssociatedFields?.map(
+                (assocField) => {
+                  return {
+                    ...assocField,
+                    sample: worksheetSample?.sample,
+                  };
+                }
+              );
+
+            associatedFieldsReference = testAllocationAssociatedFields
+              ? testAllocationAssociatedFields
+              : associatedFieldsReference;
+            if (
+              testAllocationAssociatedFieldsCount <
+              testAllocationAssociatedFields?.length
+            ) {
+              testAllocationAssociatedFieldsCount =
+                testAllocationAssociatedFields?.length;
+            }
             return {
               ...worksheetSample,
               searchText:
@@ -111,6 +133,8 @@ export class WorkSheetsService {
                   )
                   ?.join(" "),
               allocationsCount: worksheetSample?.sample?.allocations.length,
+              testAllocationAssociatedFieldsCount: 0,
+              testAllocationAssociatedFields: testAllocationAssociatedFields,
               sample: {
                 ...worksheetSample?.sample,
                 allocations: worksheetSample?.sample?.allocations?.map(
@@ -134,6 +158,8 @@ export class WorkSheetsService {
         return {
           ...response,
           worksheetSamples: formattedWorksheetSamples,
+          testAllocationAssociatedFieldsCount,
+          associatedFieldsReference,
           groupedWorksheetSamples:
             countOfWSSamples > 1
               ? {
