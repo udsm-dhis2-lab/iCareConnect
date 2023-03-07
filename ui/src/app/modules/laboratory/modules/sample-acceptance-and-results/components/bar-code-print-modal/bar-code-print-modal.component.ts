@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 
 import { take } from "lodash";
 import { map } from "rxjs/operators";
+import { webSocket } from "rxjs/webSocket";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { SamplesService } from "src/app/shared/services/samples.service";
@@ -29,6 +30,7 @@ export class BarCodePrintModalComponent implements OnInit {
   sampleData$: any;
   printersField: Dropdown
   selectedPrinter: string;
+  connection: any;
 
   constructor(
     private sampleService: SamplesService,
@@ -42,8 +44,7 @@ export class BarCodePrintModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.dialogData.printers)
-    if(this.dialogData?.printers){
+   if(this.dialogData?.printers){
       this.printersField = new Dropdown({
         id: "printer",
         label: "Select Printer",
@@ -83,11 +84,13 @@ export class BarCodePrintModalComponent implements OnInit {
       confirmed: true, 
       selectedPrinter: this.selectedPrinter
     }
-    this.dialogRef.close(results)
+    
+    // this.dialogRef.close(results)
   }
-
+  
   onCancel(e) {
     e.stopPropagation();
-    this.dialogRef.close();
+    // this.connection?.complete();
+    // this.dialogRef.close();
   }
 }
