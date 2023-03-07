@@ -466,6 +466,16 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		resultStatus.setUser(response.getCreator());
 		resultStatus.setTestAllocation(response.getTestAllocation());
 		this.testAllocationStatusDAO.save(resultStatus);
+
+		//Save associated field via result
+		if(result.getAssociatedFieldResults() != null) {
+			AssociatedFieldResult associatedFieldResult = new AssociatedFieldResult();
+			AssociatedField associatedField = this.associatedFieldDAO.findByUuid(result.getAssociatedFieldResults().get(0).getAssociatedField().getUuid());
+			associatedFieldResult.setValue(result.getAssociatedFieldResults().get(0).getValue());
+			associatedFieldResult.setAssociatedField(associatedField);
+			associatedFieldResult.setResult(response);
+			this.associatedFieldResultDAO.save(associatedFieldResult);
+		}
 		return result;
 	}
 	
