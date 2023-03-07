@@ -1614,10 +1614,12 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
                                                                                   .afterClosed()
                                                                                   .subscribe(
                                                                                     () => {
-                                                                                      this.connection.next(
-                                                                                        {
-                                                                                          message: this.barcodeSettings?.barcode?.split("{{sampleID}}").join(data?.sampleLabelsUsedDetails[0]?.label), 
-                                                                                          type: "print"})
+                                                                                      if( this.barcodeSettings?.barcode){
+                                                                                        this.connection.next(
+                                                                                          {
+                                                                                            message: this.barcodeSettings?.barcode?.split("{{sampleID}}").join(data?.sampleLabelsUsedDetails[0]?.label), 
+                                                                                            type: "print"})
+                                                                                      }
                                                                                       // this.jsPrint(
                                                                                       //   data
                                                                                       // );
