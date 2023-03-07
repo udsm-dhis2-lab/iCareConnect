@@ -275,6 +275,20 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		if (map.get("resultStatus") != null) {
 			result.setResultStatus(map.get("resultStatus").toString());
 		}
+
+		if(map.get("associatedFieldResult") != null){
+			List<AssociatedFieldResult> associatedFieldResultsList = new ArrayList<>();
+
+			AssociatedField associatedField = new AssociatedField();
+			associatedField.setUuid(((Map)((Map) map.get("associatedFieldResult")).get("associatedField")).get("uuid").toString());
+
+			AssociatedFieldResult associatedFieldResult = new AssociatedFieldResult();
+			associatedFieldResult.setValue(((Map) map.get("associatedFieldResult")).get("value").toString());
+			associatedFieldResult.setAssociatedField(associatedField);
+
+			associatedFieldResultsList.add(associatedFieldResult);
+			result.setAssociatedFieldResults(associatedFieldResultsList);
+		}
 		
 		Concept concept = new Concept();
 		concept.setUuid(((Map) map.get("concept")).get("uuid").toString());
