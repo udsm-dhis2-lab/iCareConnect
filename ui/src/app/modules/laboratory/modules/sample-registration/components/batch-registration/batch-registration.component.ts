@@ -32,6 +32,7 @@ export class BatchRegistrationComponent implements OnInit {
   @Input() existingBatchsets: any[] = [];
   @Input() existingBatches: any[] = [];
   @Input() fromMaintenance: boolean;
+  @Input() LISConfigurations: boolean;
   @Output() reloadRegisterSample: EventEmitter<any> = new EventEmitter();
   formData: any;
   useExistingBatchset: boolean = false;
