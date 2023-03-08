@@ -124,7 +124,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 			queryStr += "sp.concept.uuid =:departmentUuid";
 		}
-
+		
 		if (specimenSourceUuid != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -246,9 +246,9 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (departmentUuid != null) {
 			query.setParameter("departmentUuid", departmentUuid);
 		}
-
+		
 		if (specimenSourceUuid != null) {
-			query.setParameter("specimenSourceUuid",specimenSourceUuid);
+			query.setParameter("specimenSourceUuid", specimenSourceUuid);
 		}
 		
 		if (testCategory != null && testCategory != "Completed") {
@@ -451,7 +451,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 			queryStr += "sp.concept.uuid =:departmentUuid";
 		}
-
+		
 		if (specimenSourceUuid != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -576,9 +576,9 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (departmentUuid != null) {
 			query.setParameter("departmentUuid", departmentUuid);
 		}
-
+		
 		if (specimenSourceUuid != null) {
-			query.setParameter("specimenSourceUuid",specimenSourceUuid);
+			query.setParameter("specimenSourceUuid", specimenSourceUuid);
 		}
 		
 		if (testCategory != null && testCategory != "Completed") {

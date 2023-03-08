@@ -76,21 +76,20 @@
                         {{ order?.concept?.display }}
                       </td>
                       <td>
-                        {{ allocationData | json }}
-                        <div class="row">
+                        <div class="row p-2">
                           <div
                             [ngClass]="{
                               'col-12':
                                 !allocationData?.isSetMember ||
-                                order?.allocations?.length == 1,
-                              'parameter-test-default':
+                                order?.allocations?.length < 2,
+                              'col-6':
                                 (allocationData?.parameter?.datatype?.name ==
                                   'Numeric' ||
                                   allocationData?.parameter?.datatype.name ==
                                     'Coded') &&
                                 allocationData?.isSetMember &&
-                                order?.allocations?.length > 1,
-                              'parameter-test-text':
+                                order?.allocations?.length == 2,
+                              'col-2':
                                 allocationData?.parameter?.datatype.name !=
                                   'Numeric' &&
                                 allocationData?.parameter?.datatype.name !=
@@ -220,11 +219,12 @@
                     <tr>
                       <td colspan="100%">
                         <div
-                          class="w-75"
+                          class="w-75 ml-1"
                           *ngIf="data?.LISConfigurations?.isLIS"
                         >
                           <app-shared-instrument-selection
                             [conceptReferenceTerm]="'LIS_INSTRUMENT'"
+                            [order]="order"
                             (selectedInstrument)="
                               onGetSelectedInstrument($event, order)
                             "
@@ -355,6 +355,7 @@
                         >
                           <app-shared-instrument-selection
                             [conceptReferenceTerm]="'LIS_INSTRUMENT'"
+                            [order]="order"
                             (selectedInstrument)="
                               onGetSelectedInstrument($event, order)
                             "
@@ -386,7 +387,7 @@
         </div>
       </mat-tab>
       <mat-tab
-        label="Update Sample Tests"
+        label="Add Test Orders"
         *ngIf="data?.actionType === 'entry' && data?.LISConfigurations?.isLIS"
       >
         <div class="p-3">
@@ -404,6 +405,7 @@
             [provider]="params?.providerDetails"
             [visit]="params?.visitDetails"
             [sample]="data?.sample"
+            [allocations]="params?.sampleAllocations"
             [currentUser]="data?.currentUser"
           ></app-shared-add-testorder-to-sample>
         </div>

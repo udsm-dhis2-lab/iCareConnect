@@ -1199,6 +1199,11 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                         ][0]
                                                                           ?.departmentUuid,
                                                                       },
+                                                                      specimenSource:
+                                                                        {
+                                                                          uuid: this
+                                                                            .selectedSpecimenUuid,
+                                                                        },
                                                                       location:
                                                                         {
                                                                           uuid: this

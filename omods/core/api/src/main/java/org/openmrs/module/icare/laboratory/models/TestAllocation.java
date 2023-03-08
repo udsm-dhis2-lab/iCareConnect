@@ -53,6 +53,9 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "testAllocation")
 	private List<Result> testAllocationResults = new ArrayList<Result>(0);
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "testAllocation")
+	private List<TestAllocationAssociatedField> testAllocationAssociatedFields = new ArrayList<>(0);
 	
 	public Concept getTestConcept() {
 		return this.testConcept;
@@ -113,7 +116,15 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 	public void setContainer(Concept container) {
 		this.container = container;
 	}
-	
+
+	public List<TestAllocationAssociatedField> getTestAllocationAssociatedFields() {
+		return testAllocationAssociatedFields;
+	}
+
+	public void setTestAllocationAssociatedFields(List<TestAllocationAssociatedField> testAllocationAssociatedFields) {
+		this.testAllocationAssociatedFields = testAllocationAssociatedFields;
+	}
+
 	public static TestAllocation fromMap(Map<String, Object> map) {
 		Concept containerConcept = new Concept();
 		containerConcept.setUuid(((Map<String, Object>) map.get("container")).get("uuid").toString());
@@ -237,6 +248,15 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 		sample.put("label", this.sampleOrder.getSample().getLabel());
 		testAllocationMap.put("sample", sample);
 		testAllocationMap.put("isSetMember", this.getSampleOrder().getOrder().getConcept().getSetMembers().size() > 0 && this.getTestConcept().getUuid().toString() != this.getSampleOrder().getOrder().getConcept().getUuid().toString());
+
+		if(this.getTestAllocationAssociatedFields() != null){
+			List<Map<String,Object>> allocationAssociatedfieldsListMap = new ArrayList<>();
+			for(TestAllocationAssociatedField testAllocationAssociatedField : this.getTestAllocationAssociatedFields()){
+				allocationAssociatedfieldsListMap.add(testAllocationAssociatedField.toMap());
+			}
+			testAllocationMap.put("testAllocationAssociatedFields",allocationAssociatedfieldsListMap);
+		}
+
 		return testAllocationMap;
 	}
 	
