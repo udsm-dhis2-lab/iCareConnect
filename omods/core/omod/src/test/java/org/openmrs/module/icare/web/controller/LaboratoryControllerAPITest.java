@@ -23,6 +23,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.io.IOException;
+import java.security.spec.ECField;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -382,13 +383,14 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		handleGet = handle(newGetRequest);
 		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
-
+		
 		// SEARCH BY SPECIMEN SOURCE
 		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
-				new Parameter("excludeAllocations", "true"), new Parameter("specimen", "323111zz-0011-477v-8y8y-acc38ebc6215"));
-
+		    new Parameter("excludeAllocations", "true"), new Parameter("specimen", "323111zz-0011-477v-8y8y-acc38ebc6215"));
+		
 		handleGet = handle(newGetRequest);
-		Map<String, Object> sampleResultsFilteredBySpecimen = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		Map<String, Object> sampleResultsFilteredBySpecimen = (new ObjectMapper()).readValue(handleGet.getContentAsString(),
+		    Map.class);
 		assertThat("There is 1 sample", ((List<Map>) samples.get("results")).size(), is(1));
 	}
 	
@@ -945,6 +947,85 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		    Map.class);
 		
 		assertThat("created worksheet sample status", createdWorksheetSampleStatus.get("status") != null);
+	}
+	
+	@Test
+	public void createAndGetAssociatedFields() throws Exception {
+		
+		// Create associated fields
+		String dto = this.readFile("dto/associated-fields-dto.json");
+		List<Map<String, Object>> associatedFieldListMap = (new ObjectMapper()).readValue(dto, List.class);
+		
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/associatedfields", associatedFieldListMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String, Object>> createdAssociatedFields = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    List.class);
+		assertThat("Created two associated fields", createdAssociatedFields.size(), is(2));
+		
+		// Get associated fields
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/associatedfields", new Parameter("q", "first"));
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		List<Map<String, Object>> associatedfields = (new ObjectMapper())
+		        .readValue(handle2.getContentAsString(), List.class);
+		assertThat("There is one searched associated field", associatedfields.size(), is(1));
+		
+		//update associated field
+		String dto2 = this.readFile("dto/associated-field-update.json");
+		Map<String, Object> associatedFieldMap = (new ObjectMapper()).readValue(dto2, Map.class);
+		
+		MockHttpServletRequest newPostRequest2 = newPostRequest("lab/associatedfield/iCARE110-TEST-OSDH-9beb-d30dcfc0c636",
+		    associatedFieldMap);
+		MockHttpServletResponse handle3 = handle(newPostRequest2);
+		Map<String, Object> updatedAssociatedField = (new ObjectMapper()).readValue(handle3.getContentAsString(), Map.class);
+		System.out.println(handle3.getContentAsString());
+		//assertThat("The associated field has been updated",);
+		
+	}
+	
+	@Test
+	public void createAndGetTestAllocationAssociatedField() throws Exception {
+		
+		//Create test allocation associated fields
+		String dto = this.readFile("dto/allocation-associated-fields-dto.json");
+		List<Map<String, Object>> allocationFieldListMap = (new ObjectMapper()).readValue(dto, List.class);
+		
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/testallocationassociatedfields", allocationFieldListMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String, Object>> createdAllocationAssociatedFields = (new ObjectMapper()).readValue(
+		    handle.getContentAsString(), List.class);
+		assertThat("Created two allocation associated fields", createdAllocationAssociatedFields.size(), is(2));
+		
+		//Get allocation associated field
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/testallocationassociatedfields", new Parameter(
+		        "allocationUuid", "111xxx60-7777-11e3-1111-0sndiu87hsju"), new Parameter("associatedFieldUuid",
+		        "iCARE110-TEST-OSDH-9beb-d30dcfc0c636"));
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		List<Map<String, Object>> allocationAssociatedFields = (new ObjectMapper()).readValue(handle2.getContentAsString(),
+		    List.class);
+		assertThat("Get two allocation associated fields", allocationAssociatedFields.size(), is(2));
+	}
+	
+	@Test
+	public void createAndGetAssociatedFieldResult() throws Exception {
+		
+		String dto = this.readFile("dto/associated-field-result-create-dto.json");
+		List<Map<String, Object>> associatedFieldResultMap = (new ObjectMapper()).readValue(dto, List.class);
+		
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/associatedfieldresults", associatedFieldResultMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String, Object>> associatedFieldResults = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    List.class);
+		assertThat("Created two associated field results", associatedFieldResults.size(), is(2));
+		
+		//Get  associated field results
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/associatedfieldresults", new Parameter("resultUuid",
+		        "222yyy70-7777-11e3-1221-0sndiu87hsj3"), new Parameter("associatedFieldUuid",
+		        "iCARE110-TEST-OSDH-9beb-d30dcfc0c636"));
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		List<Map<String, Object>> AssociatedFieldResults = (new ObjectMapper()).readValue(handle2.getContentAsString(),
+		    List.class);
+		assertThat("Get two allocation associated fields", AssociatedFieldResults.size(), is(2));
+		
 	}
 	
 	@Override
