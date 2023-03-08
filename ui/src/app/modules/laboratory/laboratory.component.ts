@@ -57,6 +57,7 @@ export class LaboratoryComponent implements OnInit {
   specimenSources$: Observable<any>;
   userRoles$: Observable<any>;
   currentRoutePath: string = "";
+  showMenuItems: boolean = true;
   /**
    *
    * @param store
@@ -234,6 +235,11 @@ export class LaboratoryComponent implements OnInit {
       navigationDetails && navigationDetails?.path[0]
         ? navigationDetails?.path[0]?.replace("/laboratory/", "")
         : "";
+  }
+
+  toggleMenuItems(event: Event): void {
+    event.stopPropagation();
+    this.showMenuItems = !this.showMenuItems;
   }
 
   disableDate() {

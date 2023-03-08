@@ -10,7 +10,7 @@
   right: 0;
   // position: fixed;
   z-index: 200;
-  background-color: #FFF;
+  background-color: #fff;
   padding: 10px 5px;
 }
 
@@ -22,7 +22,6 @@
   text-decoration: none;
 }
 
-
 ::ng-deep .full-width-chip .mat-chip-list-wrapper .mat-standard-chip {
   width: 95% !important;
   height: auto !important;
@@ -31,10 +30,10 @@
   background-color: rgba(238, 238, 238, 0.218);
 }
 
-::ng-deep .full-width-chip .mat-chip-list-wrapper .mat-standard-chip:hover {
-  border-radius: 0 16px 16px 0 !important;
-}
-.active-route { 
+// ::ng-deep .full-width-chip .mat-chip-list-wrapper .mat-standard-chip:hover {
+//   border-radius: 0 16px 16px 0 !important;
+// }
+.active-route {
   background-color: #2a8fd1 !important; // TODO use variable
   color: #fff !important;
   border-radius: 0 16px 16px 0 !important;
