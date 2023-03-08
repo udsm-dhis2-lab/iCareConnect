@@ -166,24 +166,44 @@
         </div>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Completed Samples">
+    <mat-tab label="Results" *ngIf="LISConfigurations?.isLIS">
       <ng-template matTabContent>
         <div class="p-2">
-          <app-completed-samples
-            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
-            [labConfigs]="labConfigs"
-            [datesParameters]="datesParameters"
-            [LISConfigurations]="LISConfigurations"
-            [patients]="patients"
-            [sampleTypes]="sampleTypes"
-            [labSamplesDepartments]="labSamplesDepartments"
-            [labSamplesContainers]="labSamplesContainers"
-            [userUuid]="userUuid"
-          ></app-completed-samples>
+          <mat-tab-group (selectedTabChange)="onOpenNewTab($event)">
+            <mat-tab label="By samples">
+              <ng-template matTabContent>
+                <div class="p-2">
+                  <app-sample-to-print-results
+                    [tabType]="'completed-samples'"
+                    [codedSampleRejectionReasons]="
+                      params?.codedSampleRejectionReasons
+                    "
+                    [labConfigs]="labConfigs"
+                    [datesParameters]="datesParameters"
+                    [LISConfigurations]="LISConfigurations"
+                    [category]="'HAS_RESULTS'"
+                    [hasStatus]="'YES'"
+                    [patients]="patients"
+                    [sampleTypes]="sampleTypes"
+                    [labSamplesDepartments]="labSamplesDepartments"
+                    [labSamplesContainers]="labSamplesContainers"
+                    [userUuid]="userUuid"
+                    [viewType]="'authorization'"
+                  ></app-sample-to-print-results>
+                </div>
+              </ng-template>
+            </mat-tab>
+            <mat-tab label="By Clients">
+              <ng-template matTabContent>
+                <div class="p-2"></div>
+              </ng-template>
+            </mat-tab>
+          </mat-tab-group>
         </div>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Results" *ngIf="LISConfigurations?.isLIS">
+
+    <mat-tab label="Completed Samples">
       <ng-template matTabContent>
         <div class="p-2">
           <app-completed-samples

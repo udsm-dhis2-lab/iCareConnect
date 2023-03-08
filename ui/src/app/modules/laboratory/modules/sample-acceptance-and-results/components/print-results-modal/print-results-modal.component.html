@@ -1,5 +1,5 @@
 <div
-  class="container my-3"
+  class="container-fluid my-3"
   *ngIf="{
     facility: facilityDetails$ | async,
     visit: visit$ | async,
@@ -38,25 +38,16 @@
           <div class="row">
             <div class="col-2" style="display: inline-block; width: 16.67%">
               <img [src]="params?.facility?.logo" height="90" />
-              <!-- <img src="assets/images/tanzania-logo.png" height="90" /> -->
             </div>
             <div class="col-8" style="display: inline-block; width: 66.67%">
               <h4 style="text-align: center">
                 <b>
                   {{ params?.facility?.display }}
                   <br />
-                  <!-- <span *ngIf="labConfigs?.facilityDetails">
-                    {{ labConfigs?.facilityDetails?.name }}<br />
-                  </span> -->
                   <span *ngIf="params?.facility?.display">
                     {{ params?.facility?.description }}<br />
                   </span>
                   <small>
-                    <!-- <span
-                      *ngIf="
-                        labConfigs?.facilityDetails &&
-                        labConfigs?.facilityDetails?.addressBox
-                      ">P.O BOX: {{ labConfigs?.facilityDetails?.addressBox }}</span> -->
                     <span
                       *ngIf="params?.facility && params?.facility?.postalCode"
                     >
@@ -71,14 +62,6 @@
                     >
                       {{ params?.facility?.stateProvince }}
                     </span>
-                    <!-- <span
-                      *ngIf="
-                        labConfigs?.facilityDetails &&
-                        labConfigs?.facilityDetails?.addressLocaton
-                      "
-                    >
-                      {{ labConfigs?.facilityDetails?.addressLocaton }}
-                    </span> -->
                   </small>
                 </b>
               </h4>
@@ -95,13 +78,15 @@
               >
                 {{ samplesGroupedByDepartment?.departmentName }}
                 {{
-                  samplesGroupedByDepartment["samples"][0]
+                  samplesGroupedByDepartment["samples"][0] &&
+                  samplesGroupedByDepartment["samples"][0]?.authorizationInfo
+                    ?.length > 0
                     ? "Final Report"
                     : "Provisional Report"
                 }}
               </div>
               <div>
-                <!-- {{ samplesGroupedByDepartment["samples"][0]?.orders[0] | json }} -->
+                <!-- {{ samplesGroupedByDepartment["samples"][0] | json }} -->
 
                 <table style="width: 100%">
                   <tr>
@@ -131,8 +116,8 @@
                       <td>
                         {{
                           !LISConfigurations?.isLIS
-                            ? (samplesGroupedByDepartment?.samples[0]?.created
-                              | date: "medium")
+                            ? (samplesGroupedByDepartment?.samples[0]
+                                ?.dateCreated | date: "medium")
                             : (samplesGroupedByDepartment?.samples[0]
                                 ?.collectedOnStatus?.remarks | date: "medium")
                         }}
@@ -243,7 +228,7 @@
                       </td>
                       <td>
                         {{
-                          samplesGroupedByDepartment?.samples[0]?.acceptedBy
+                          samplesGroupedByDepartment?.samples[0]?.acceptedStatus
                             ?.timestamp | date: "medium"
                         }}
                       </td>
@@ -424,8 +409,8 @@
                 <table class="table" style="width: 100%">
                   <thead>
                     <tr>
-                      <td colspan="1">Sample</td>
-                      <td colspan="4">Tests</td>
+                      <th colspan="1">Specimen</th>
+                      <th colspan="4">Tests Details</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -449,44 +434,62 @@
                             "
                           >
                             <tr>
-                              <td *ngIf="!LISConfigurations?.isLIS">Test #</td>
-                              <td>Test</td>
-                              <td>Results</td>
+                              <th style="width: 15px">SN</th>
+                              <th *ngIf="!LISConfigurations?.isLIS">Test #</th>
+                              <th>Test Order</th>
+                              <th>Parameter</th>
+                              <th>Results</th>
                               <!-- <td>SI Units</td> -->
-                              <td *ngIf="!LISConfigurations?.isLIS">LL</td>
-                              <td *ngIf="!LISConfigurations?.isLIS">UL</td>
-                              <td>Remarks</td>
-                              <td *ngIf="!LISConfigurations?.isLIS">
+                              <th *ngIf="!LISConfigurations?.isLIS">LL</th>
+                              <th *ngIf="!LISConfigurations?.isLIS">UL</th>
+                              <th>Remarks</th>
+                              <th *ngIf="!LISConfigurations?.isLIS">
                                 Order date & Time
-                              </td>
+                              </th>
                             </tr>
 
-                            <ng-container *ngFor="let order of sample?.orders">
-                              <tr>
+                            <ng-container
+                              *ngFor="
+                                let order of sample?.orders;
+                                let count = index
+                              "
+                            >
+                              <tr
+                                [ngClass]="{
+                                  'row-alternated': count % 2 !== 0
+                                }"
+                              >
+                                <td rowspan="2">
+                                  {{ count + 1 }}
+                                </td>
                                 <td *ngIf="!LISConfigurations?.isLIS">
                                   {{ order?.order?.orderNumber }}
                                 </td>
                                 <td>
                                   {{ order?.order?.concept?.display }} <br />
-                                  <!-- <span
-                                    *ngIf="
-                                      order?.authorizationInfo[0]?.statuses
-                                        ?.length > 0
-                                    "
+                                </td>
+                                <td>
+                                  <div
+                                    class="w-100"
+                                    *ngIf="order?.testAllocations?.length > 0"
                                   >
-                                    <i
-                                      >Authorised by
-                                      {{
-                                        order?.authorizationInfo[0]?.statuses[0]
-                                          ?.name
-                                      }}
-                                      On
-                                      {{
-                                        order?.authorizationInfo[0]?.statuses[0]
-                                          ?.timestamp | date: "medium"
-                                      }}
-                                    </i>
-                                  </span> -->
+                                    <div
+                                      *ngFor="
+                                        let allocation of order?.testAllocations;
+                                        let count = index
+                                      "
+                                    >
+                                      <app-shared-parameter-results
+                                        [order]="order"
+                                        [allocation]="allocation"
+                                        [count]="count"
+                                        [whatToShow]="'parameter'"
+                                        [parameter]="allocation?.parameter"
+                                        [units]="allocation?.parameter?.units"
+                                        (remarksData)="onGetRemarks($event)"
+                                      ></app-shared-parameter-results>
+                                    </div>
+                                  </div>
                                 </td>
                                 <td>
                                   <div
@@ -578,6 +581,7 @@
                                       <app-shared-parameter-results
                                         [order]="order"
                                         [allocation]="allocation"
+                                        [whatToShow]="'result'"
                                         [count]="count"
                                         [parameter]="allocation?.parameter"
                                         [units]="allocation?.parameter?.units"
@@ -732,7 +736,12 @@
                                   {{ order?.order?.orderDate | date: "medium" }}
                                 </td>
                               </tr>
-                              <tr class="mb-2">
+                              <tr
+                                class="mb-2"
+                                [ngClass]="{
+                                  'row-alternated': count % 2 !== 0
+                                }"
+                              >
                                 <td colspan="100%">
                                   <div
                                     *ngIf="
