@@ -1,5 +1,7 @@
-<div style="padding: 2%">
-  <div id="bar-code" style="text-align: center">
+<div style="padding: 2%" *ngIf="{
+  sampleData: sampleData$ | async
+} as params">
+  <div id="bar-code">
     <div *ngIf="!dialogData?.sampleLabelsUsedDetails">
       <!-- <p
         style="
@@ -33,13 +35,17 @@
         </span>
       </p>
     </div>
-    <div *ngIf="dialogData?.sampleLabelsUsedDetails">
-      <div *ngFor="let sampleDetails of dialogData?.sampleLabelsUsedDetails">
-        <p class="sample-tests-list">
-          <!-- {{ sampleDetails?.label }} -->
-        </p>
+    <div *ngIf="dialogData?.sampleLabelsUsedDetails && params?.sampleData && dialogData?.isLis">
+      <!-- To be printed -->
+      <div *ngIf="dialogData?.sampleLabelsUsedDetails[0] as sampleDetails" id="barcode">
         <ngx-barcode
-          [bc-value]="sampleDetails?.label"
+          [bc-value]="
+            sampleDetails?.label + '|' 
+            + params?.sampleData?.patient?.givenName + ' ' 
+            + (params?.sampleData?.patient?.middleName ? params?.sampleData?.patient?.middleName : '')
+            + ' ' + params?.sampleData?.patient?.familyName + '|' 
+            + params?.sampleData?.stringTests
+          "
           [bc-display-value]="true"
           [bc-element-type]="elementType"
           [bc-format]="format"
@@ -47,16 +53,150 @@
           [bc-width]="width"
           [bc-height]="height"
           [bc-font-size]="fontSize"
-          [bc-text-align]="bcTextAlign"
+          [bc-background]="'transparent'"
           [bc-text-position]="bcTextPosition"
+          [bc-text-align]="bcTextAlign"
+        ></ngx-barcode>
+      </div>
+    </div>
+    <div *ngIf="dialogData?.sampleLabelsUsedDetails && params?.sampleData && dialogData?.isLis">
+      <div *ngIf="dialogData?.sampleLabelsUsedDetails[0] as sampleDetails">
+        <ngx-barcode
+          class="barcode"
+          [bc-value]="sampleDetails?.label"
+          [bc-display-value]="false"
+          [bc-element-type]="elementType"
+          [bc-format]="format"
+          [bc-line-color]="lineColor"
+          [bc-width]="width"
+          [bc-height]="height"
+          [bc-font-size]="fontSize"
           [bc-background]="'transparent'"
         ></ngx-barcode>
-        <p class="sample-tests-list">
-          <span *ngFor="let order of sampleDetails?.orders; let count = index">
-            {{ order?.display }}
-            <span *ngIf="count < sampleDetails?.orders?.length - 1">,</span>
-          </span>
-        </p>
+        <div class="bar-code-texts">
+          <p class="sample-info mt-1">
+            <span class="text-left">
+              {{ params?.sampleData?.patient?.givenName }}
+            {{ params?.sampleData?.patient?.middleName ? params?.sampleData?.patient?.middleName : '' }}
+            {{ params?.sampleData?.patient?.familyName }}
+            </span>
+            <span class="text-right">
+              {{ params?.sampleData?.dateTimeCreated | date:"dd/MM/yyyy" }}
+            </span>
+          </p>
+          <br>
+          <p class="sample-info mt-3">
+            <span class="text-left">
+              {{ sampleDetails?.label }}
+            </span>
+            <span class="text-right">
+              <span>
+                {{ sampleDetails?.label }}
+              </span>
+              <br>
+              <span>
+                {{ params?.sampleData?.patient?.givenName }}
+                {{ params?.sampleData?.patient?.middleName ? params?.sampleData?.patient?.middleName : '' }}
+                {{ params?.sampleData?.patient?.familyName }}
+              </span>
+            </span>
+          </p>
+          <br>
+          <p class="sample-tests-list mt-3">
+            {{ params?.sampleData?.stringTests }}
+          </p>
+          <hr class="dotted">
+          <p>{{ sampleDetails?.label }}</p>
+        </div>
+      </div>
+      <hr>
+      <div *ngIf="dialogData?.sampleLabelsUsedDetails[0] as sampleDetails">
+        <div class="bar-code-texts">
+          <p class="sample-info mt-1">
+            <span class="text-left">
+              {{ params?.sampleData?.patient?.givenName }}
+            {{ params?.sampleData?.patient?.middleName ? params?.sampleData?.patient?.middleName : '' }}
+            {{ params?.sampleData?.patient?.familyName }}
+            </span>
+            <span class="text-right">
+              {{ params?.sampleData?.dateTimeCreated | date:"dd/MM/yyyy" }}
+            </span>
+          </p>
+          <br>
+          <p class="sample-info mt-3">
+            <span class="text-left">
+              {{ sampleDetails?.label }}
+            </span>
+            <span class="text-right">
+              <span>
+                {{ sampleDetails?.label }}
+              </span>
+              <br>
+              <span>
+                {{ params?.sampleData?.patient?.givenName }}
+                {{ params?.sampleData?.patient?.middleName ? params?.sampleData?.patient?.middleName : '' }}
+                {{ params?.sampleData?.patient?.familyName }}
+              </span>
+            </span>
+          </p>
+          <br>
+          <p class="sample-tests-list mt-3">
+            {{ params?.sampleData?.stringTests }}
+          </p>
+          <hr class="dotted">
+          <p>{{ sampleDetails?.label }}</p>
+        </div>
+      </div>
+      <hr>
+      <div *ngIf="dialogData?.sampleLabelsUsedDetails[0] as sampleDetails">
+        <ngx-barcode
+          class="barcode"
+          [bc-value]="sampleDetails?.label"
+          [bc-display-value]="false"
+          [bc-element-type]="elementType"
+          [bc-format]="format"
+          [bc-line-color]="lineColor"
+          [bc-width]="width"
+          [bc-height]="height"
+          [bc-font-size]="fontSize"
+          [bc-background]="'transparent'"
+        ></ngx-barcode>
+        <div class="bar-code-texts">
+          
+          <p class="sample-info mt-1">
+            <span class="text-left">
+              {{ params?.sampleData?.patient?.givenName }}
+            {{ params?.sampleData?.patient?.middleName ? params?.sampleData?.patient?.middleName : '' }}
+            {{ params?.sampleData?.patient?.familyName }}
+            </span>
+            <span class="text-right">
+              {{ params?.sampleData?.dateTimeCreated | date:"dd/MM/yyyy" }}
+            </span>
+          </p>
+          <br>
+          <p class="sample-info mt-3">
+            <span class="text-left">
+              {{ sampleDetails?.label }}
+            </span>
+            <span class="text-right">
+              <span>
+                {{ sampleDetails?.label }}
+              </span>
+              <br>
+              <span>
+                {{ params?.sampleData?.patient?.givenName }}
+                {{ params?.sampleData?.patient?.middleName ? params?.sampleData?.patient?.middleName : '' }}
+                {{ params?.sampleData?.patient?.familyName }}
+              </span>
+            </span>
+          </p>
+          <br>
+          <p class="sample-tests-list mt-3">
+            {{ params?.sampleData?.stringTests }}
+          </p>
+          <hr class="dotted">
+          <p>{{ sampleDetails?.label }}</p>
+        </div>
       </div>
     </div>
   </div>
@@ -66,7 +206,7 @@
       color="primary"
       mat-flat-button
       class="ml-2"
-      (click)="onPrint($event)"
+      (click)="onPrint($event, params?.sampleData, dialogData?.sampleLabelsUsedDetails[0])"
     >
       Print
     </button>
