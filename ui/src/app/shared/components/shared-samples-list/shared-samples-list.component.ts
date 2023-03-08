@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatCheckboxChange } from "@angular/material/checkbox";
 import { MatSelectChange } from "@angular/material/select";
-import { omit } from "lodash";
+import { omit, keyBy } from "lodash";
 import { Observable } from "rxjs";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -39,6 +39,7 @@ export class SharedSamplesListComponent implements OnInit {
   pageCounts: any[] = [1, 5, 10, 20, 25, 50, 100, 200];
 
   searchingTestField: any;
+  keyedSelectedSamples: any = {};
   constructor(private sampleService: SamplesService) {}
 
   ngOnInit(): void {
@@ -145,6 +146,17 @@ export class SharedSamplesListComponent implements OnInit {
       : this.selectedSamples?.filter(
           (selectedSample) => selectedSample?.label !== sample?.label
         ) || [];
+    this.keyedSelectedSamples[sample?.id] = sample;
+    this.samplesForAction.emit(this.selectedSamples);
+  }
+
+  onSelectAll(event: MatCheckboxChange, samples: any[]): void {
+    this.selectedSamples = [];
+    this.selectedSamples = event?.checked
+      ? [...this.selectedSamples, ...samples]
+      : [];
+    this.keyedSelectedSamples =
+      this.selectedSamples?.length > 0 ? keyBy(this.selectedSamples, "id") : {};
     this.samplesForAction.emit(this.selectedSamples);
   }
 
