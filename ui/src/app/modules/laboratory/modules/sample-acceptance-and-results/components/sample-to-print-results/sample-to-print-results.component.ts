@@ -11,11 +11,11 @@ import { PrintResultsModalComponent } from "../print-results-modal/print-results
 import { LabSample } from "src/app/modules/laboratory/resources/models";
 
 @Component({
-  selector: "app-completed-samples",
-  templateUrl: "./completed-samples.component.html",
-  styleUrls: ["./completed-samples.component.scss"],
+  selector: "app-sample-to-print-results",
+  templateUrl: "./sample-to-print-results.component.html",
+  styleUrls: ["./sample-to-print-results.component.scss"],
 })
-export class CompletedSamplesComponent implements OnInit {
+export class SampleToPrintResultsComponent implements OnInit {
   @Input() codedSampleRejectionReasons: any;
   @Input() labConfigs: any;
   @Input() datesParameters: any;
@@ -26,6 +26,8 @@ export class CompletedSamplesComponent implements OnInit {
   @Input() currentUser: any;
   @Input() LISConfigurations: any;
   @Input() userUuid: string;
+  @Input() category: string;
+  @Input() hasStatus: string;
 
   completedSamples$: Observable<any[]>;
   selectedDepartment: string;
@@ -48,21 +50,6 @@ export class CompletedSamplesComponent implements OnInit {
 
   ngOnInit(): void {
     this.providerDetails$ = this.store.select(getProviderDetails);
-  }
-
-  getSamples(): void {
-    this.completedSamples$ = this.sampleService.getLabSamplesByCollectionDates(
-      this.datesParameters,
-      "RESULT_AUTHORIZATION",
-      "YES",
-      this.excludeAllocations,
-      null,
-      {
-        departments: this.labSamplesDepartments,
-        specimenSources: this.sampleTypes,
-        codedRejectionReasons: this.codedSampleRejectionReasons,
-      }
-    );
   }
 
   onToggleViewSampleDetails(event: Event, sample: any): void {

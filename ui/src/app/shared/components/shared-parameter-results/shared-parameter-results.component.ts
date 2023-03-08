@@ -13,6 +13,7 @@ export class SharedParameterResultsComponent implements OnInit {
   @Input() units: string;
   @Input() hideParameterLabel: boolean;
   @Input() allocation: any;
+  @Input() whatToShow: string;
 
   parameterResultsDetails: any;
   resultRemarks: any = {};

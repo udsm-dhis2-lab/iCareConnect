@@ -223,6 +223,9 @@ export class PrintResultsModalComponent implements OnInit {
               .content table,.providers-details {
                 font-size: 0.8rem !important;
               }
+              .row-alternated {
+                background-color: #f2f2f2;
+              }
               
             </style>`
       );

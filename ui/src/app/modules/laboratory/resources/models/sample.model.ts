@@ -470,10 +470,23 @@ export class LabSample {
     ) || [])[0];
   }
 
+  get collectedOnStatus(): any {
+    return (this.sample?.statuses?.filter(
+      (status) =>
+        status?.category === "COLLECTED_ON" ||
+        status?.status === "COLLECTED_ON" ||
+        status?.category === "BROUGHT_ON" ||
+        status?.status === "BROUGHT_ON"
+    ) || [])[0];
+  }
+
   get receivedByStatus(): any {
     return (this.sample?.statuses?.filter(
       (status) =>
-        status?.category === "RECEIVED_BY" || status?.status === "RECEIVED_BY"
+        status?.category === "RECEIVED_BY" ||
+        status?.status === "RECEIVED_BY" ||
+        status?.category === "BROUGHT_ON" ||
+        status?.status === "BROUGHT_ON"
     ) || [])[0];
   }
 
@@ -515,6 +528,12 @@ export class LabSample {
     )?.length > 0
       ? true
       : false;
+  }
+
+  get acceptedStatus(): any {
+    return (this.sample?.statuses?.filter(
+      (status) => status?.status === "ACCEPTED"
+    ) || [])[0];
   }
 
   get authorized(): boolean {
@@ -561,6 +580,7 @@ export class LabSample {
       rejectedBy: this.rejectedBy,
       departmentName: this.department?.name,
       collectedBy: this.collectedBy,
+      collectedOnStatus: this.collectedOnStatus,
       authorizationInfo: this.authorizationInfo,
       priorityStatus: this.priorityStatus,
       disposedStatus: this.disposedStatus,
@@ -571,6 +591,7 @@ export class LabSample {
       priorityOrderNumber: this.priorityOrderNumber,
       searchingText: this.searchingText,
       visit: this.visit,
+      acceptedStatus: this.acceptedStatus,
     };
   }
 }
