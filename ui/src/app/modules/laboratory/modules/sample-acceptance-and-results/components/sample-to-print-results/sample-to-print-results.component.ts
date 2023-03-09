@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
@@ -42,6 +42,8 @@ export class SampleToPrintResultsComponent implements OnInit {
 
   samplesToViewMoreDetails: any = {};
   saving: boolean = false;
+  dataForPrinting: any;
+  @Output() dataToPrint: EventEmitter<any> = new EventEmitter<any>();
   constructor(
     private store: Store<AppState>,
     private sampleService: SamplesService,
@@ -105,18 +107,26 @@ export class SampleToPrintResultsComponent implements OnInit {
         })
       )
       .subscribe((response) => {
-        this.dialog.open(PrintResultsModalComponent, {
-          data: {
-            patientDetailsAndSamples: response[0],
-            labConfigs: this.labConfigs,
-            LISConfigurations: this.LISConfigurations,
-            user: providerDetails,
-            authorized: true,
-          },
-          width: "60%",
-          maxHeight: "85%",
-          disableClose: false,
-        });
+        this.dataForPrinting = {
+          patientDetailsAndSamples: response[0],
+          labConfigs: this.labConfigs,
+          LISConfigurations: this.LISConfigurations,
+          user: providerDetails,
+          authorized: true,
+        };
+        this.dataToPrint.emit(this.dataForPrinting);
+        // this.dialog.open(PrintResultsModalComponent, {
+        //   data: {
+        //     patientDetailsAndSamples: response[0],
+        //     labConfigs: this.labConfigs,
+        //     LISConfigurations: this.LISConfigurations,
+        //     user: providerDetails,
+        //     authorized: true,
+        //   },
+        //   width: "60%",
+        //   maxHeight: "85%",
+        //   disableClose: false,
+        // });
       });
   }
 }
