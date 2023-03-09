@@ -67,12 +67,14 @@
             (click)="changeRoute($event, 'dashboard-lab', true)"
             routerLinkActive="active-route"
             [ngClass]="{
-              'active-route': currentRoutePath === 'dashboard-lab'
+              'active-route': currentRoutePath === 'dashboard-lab',
+              'for-lis-chip': params?.LISConfigurations?.isLIS
             }"
             [ngStyle]="{
               'border-radius': params?.LISConfigurations?.isLIS
                 ? '0 !important'
-                : ''
+                : '',
+              padding: params?.LISConfigurations?.isLIS ? '12px !important' : ''
             }"
           >
             Dashboard
