@@ -4775,4 +4775,12 @@
                 referencedTableName="lb_test_result"/>
     </changeSet>
 
+    <changeSet id="update_st_transaction_add_column_source_location" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_transaction
+            ADD COLUMN source_location_id INT AFTER transaction_type_id,
+            ADD FOREIGN KEY(source_location_id) REFERENCES location(location_id);;
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
