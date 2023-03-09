@@ -32,6 +32,9 @@ export class BatchRegistrationComponent implements OnInit {
   @Input() existingBatchsets: any[] = [];
   @Input() existingBatches: any[] = [];
   @Input() fromMaintenance: boolean;
+  @Input() LISConfigurations: boolean;
+  @Input() barcodeSettings: any;
+  
   @Output() reloadRegisterSample: EventEmitter<any> = new EventEmitter();
   formData: any;
   useExistingBatchset: boolean = false;
@@ -584,7 +587,7 @@ export class BatchRegistrationComponent implements OnInit {
       this.validBatchsetName &&
       this.validBatchName &&
       !this.useExistingBatch &&
-      this.fieldsObjectValues?.fixedFieldsWithValues?.length ===
+      this.fieldsObjectValues?.fixedFieldsWithValues?.length >=
         this.selectedFixedFields.length
     ) {
       this.validForm = true;

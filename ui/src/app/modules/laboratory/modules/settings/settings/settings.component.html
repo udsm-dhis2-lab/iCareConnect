@@ -11,7 +11,6 @@
     *ngIf="!params?.LISConfigurations"
   ></mat-progress-bar>
   <mat-tab-group
-    class="m-2"
     *ngIf="params?.LISConfigurations"
     [selectedIndex]="selectedTab.value"
     (selectedTabChange)="onChangeRoute($event)"
