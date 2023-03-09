@@ -8,6 +8,8 @@ import { SampleAllocationService } from "src/app/shared/resources/sample-allocat
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { MatRadioChange } from "@angular/material/radio";
 import { MatCheckboxChange } from "@angular/material/checkbox";
+import { MatDialog } from "@angular/material/dialog";
+import { AdditionalFieldsModalComponent } from "src/app/modules/laboratory/modals/additional-fields-modal/additional-fields-modal.component";
 
 @Component({
   selector: "app-result-entry-by-worksheet",
@@ -37,10 +39,14 @@ export class ResultEntryByWorksheetComponent implements OnInit {
   userUuid: string;
   selectedSamples: any[] = [];
   allSelectedItems: any = {};
+  associatedFieldsResults: any = {};
+  associatedFieldsHasResults: boolean = false;
+  fedResultsKeyedByAllocation: any = {};
   constructor(
     private worksheetsService: WorkSheetsService,
     private sampleService: SamplesService,
-    private sampleAllocationService: SampleAllocationService
+    private sampleAllocationService: SampleAllocationService,
+    private dialog: MatDialog
   ) {
     this.userUuid = localStorage.getItem("userUuid");
   }
@@ -662,5 +668,33 @@ export class ResultEntryByWorksheetComponent implements OnInit {
         this.allSelectedItems[worksheetSample?.uuid] = null;
       });
     }
+  }
+
+  onAddNewFields(event: Event, currentWorksheetDefinition: any): void {
+    event.stopPropagation();
+    this.dialog.open(AdditionalFieldsModalComponent, {
+      width: "50%",
+      data: currentWorksheetDefinition,
+    });
+  }
+
+  getAssociatedFieldsResults(
+    data: any,
+    testAllocationAssociatedField: any
+  ): void {
+    if (data) {
+      this.associatedFieldsResults[testAllocationAssociatedField?.uuid] = {
+        ...testAllocationAssociatedField,
+        value: data,
+      };
+    } else {
+      this.associatedFieldsResults[testAllocationAssociatedField?.uuid] = null;
+    }
+    this.associatedFieldsHasResults =
+      (
+        Object.keys(this.associatedFieldsResults).filter(
+          (key) => this.associatedFieldsResults[key]
+        ) || []
+      )?.length > 0;
   }
 }

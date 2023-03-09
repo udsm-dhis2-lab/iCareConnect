@@ -18,6 +18,7 @@ import { CreateLabFieldsPipe } from "./create-lab-fields.pipe";
 import { FilterResultsByResultGroupPipe } from "./filter-results-by-result-group.pipe";
 import { FormatLabelCharCountDisplayPipe } from "./format-label-char-count-display.pipe";
 import { FilterOrdersByOrderPipe } from "./filter-orders-by-order.pipe";
+import { GetAssociatedFieldsPipe } from "./get-associated-fields.pipe";
 
 export const sharedPipes: any[] = [
   FilterByPipe,
@@ -40,4 +41,5 @@ export const sharedPipes: any[] = [
   FilterResultsByResultGroupPipe,
   FormatLabelCharCountDisplayPipe,
   FilterOrdersByOrderPipe,
+  GetAssociatedFieldsPipe,
 ];

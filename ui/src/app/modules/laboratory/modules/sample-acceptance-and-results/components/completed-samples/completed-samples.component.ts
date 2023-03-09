@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
@@ -40,6 +40,8 @@ export class CompletedSamplesComponent implements OnInit {
 
   samplesToViewMoreDetails: any = {};
   saving: boolean = false;
+  @Output() dataToPrint: EventEmitter<any> = new EventEmitter<any>();
+
   constructor(
     private store: Store<AppState>,
     private sampleService: SamplesService,
@@ -118,18 +120,14 @@ export class CompletedSamplesComponent implements OnInit {
         })
       )
       .subscribe((response) => {
-        this.dialog.open(PrintResultsModalComponent, {
-          data: {
-            patientDetailsAndSamples: response[0],
-            labConfigs: this.labConfigs,
-            LISConfigurations: this.LISConfigurations,
-            user: providerDetails,
-            authorized: true,
-          },
-          width: "60%",
-          height: "100%",
-          disableClose: false,
-        });
+        const data = {
+          patientDetailsAndSamples: response[0],
+          labConfigs: this.labConfigs,
+          LISConfigurations: this.LISConfigurations,
+          user: providerDetails,
+          authorized: true,
+        };
+        this.dataToPrint.emit(data);
       });
   }
 }

@@ -2,7 +2,13 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { MatSelectChange } from "@angular/material/select";
 import { from, fromEvent, Observable, of, Subject, Subscription } from "rxjs";
-import { debounceTime, distinctUntilChanged, map, take, tap } from "rxjs/operators";
+import {
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  take,
+  tap,
+} from "rxjs/operators";
 import { SamplesService } from "src/app/shared/services/samples.service";
 
 @Component({
@@ -19,13 +25,15 @@ export class SamplesListComponent implements OnInit {
   page: number;
   pageSize: number;
   errors: any[] = [];
-  pageCounts: any[] = [5, 10, 20, 25, 50, 100, 200];
+  pageCounts: any[] = [10, 20, 25, 50, 100, 200];
   searchText: string;
   subject = new Subject<string>();
   constructor(private samplesService: SamplesService) {
-    this.subject.pipe(debounceTime(2000), distinctUntilChanged()).subscribe(() => {
-      this.getList();
-    });
+    this.subject
+      .pipe(debounceTime(2000), distinctUntilChanged())
+      .subscribe(() => {
+        this.getList();
+      });
   }
 
   ngOnInit(): void {

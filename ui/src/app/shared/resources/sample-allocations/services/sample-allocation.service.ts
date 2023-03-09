@@ -132,7 +132,7 @@ export class SampleAllocationService {
                     relatedAllocation: new SampleAllocation(
                       allocationsKeyedByParametersUuid[
                         allocation?.parameter?.relatedTo?.code
-                      ]?.allocation
+                      ]
                     ).toJson(),
                     formattedAllocation: new SampleAllocation(
                       allocation

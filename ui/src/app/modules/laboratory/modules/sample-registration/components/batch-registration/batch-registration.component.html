@@ -8,10 +8,10 @@
     *ngIf="!isFormInstantiated"
   ></mat-progress-bar>
   <div *ngIf="isFormInstantiated">
-    <app-shared-error
+    <!-- <app-shared-error
       [errors]="[warning]"
       [dismissible]="false"
-    ></app-shared-error>
+    ></app-shared-error> -->
     <app-shared-error
       *ngIf="errors?.length"
       [errors]="errors"
@@ -123,10 +123,6 @@
         <!-- Fixed fields -->
         <div class="{{ fromMaintenance ? 'col-3' : 'col-4' }}">
           <div class="row">
-            <!-- <div class="col-12">
-                            <app-date-time-field [dateTimeField]="allRegistrationFields?.specimenDetailFields?.receivedOn"></app-date-time-field>
-                        </div> -->
-            <!-- If available fixed fields -->
             <ng-container *ngIf="selectedFixedFields?.length > 0">
               <ng-container
                 *ngFor="let selectedFixedField of selectedFixedFields"
@@ -155,9 +151,6 @@
                     "
                   ></app-date-time-field>
                 </div>
-                <!-- <div class="col-1" *ngIf="!useExistingBatchset && !useExistingBatch">
-                                    <button class="remove-field" mat-button matTooltip="Remove '{{ selectedFixedField?.label }}' from Fixed fields "><mat-icon>delete_outline</mat-icon></button>
-                                </div> -->
               </ng-container>
             </ng-container>
             <div class="col-12">
@@ -172,16 +165,6 @@
                 (formUpdate)="onFormUpdate($event, 'Fixed')"
               ></app-form>
             </div>
-            <!-- <div class="col-2">
-                            <button 
-                                [disabled]="!selectedFixedFields?.length" 
-                                class="save-field" 
-                                mat-flat-button 
-                                color="primary" 
-                                matTooltip="Save all fixed fields"
-                                (click)="onSave($event, 'Fixed')"
-                            > Save </button>
-                        </div> -->
           </div>
         </div>
 
@@ -360,9 +343,11 @@
               [testsFromExternalSystemsConfigs]="
                 testsFromExternalSystemsConfigs
               "
+              [barcodeSettings]="barcodeSettings"
               [batchSampleCodeFormatReference]="
                 params?.batchSampleCodeFormatReference
               "
+              [LISConfigurations]="LISConfigurations"
               [batch]="selectedBatch"
             ></app-sample-in-batch-registration>
           </div>

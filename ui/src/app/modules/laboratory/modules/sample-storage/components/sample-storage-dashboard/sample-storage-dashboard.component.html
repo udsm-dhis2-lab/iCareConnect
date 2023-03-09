@@ -2,6 +2,7 @@
   <mat-tab-group>
     <mat-tab label="Sample Disposal">
       <div
+        class="mt-2"
         *ngIf="{
           testResultsMapping: testResultsMapping$ | async,
           externalSystemsReferenceConceptUuid:
@@ -47,6 +48,7 @@
     </mat-tab>
     <mat-tab label="Sample Storage">
       <div
+        class="mt-2"
         *ngIf="{
           externalSystemsReferenceConceptUuid:
             externalSystemsReferenceConceptUuid$ | async
@@ -65,24 +67,21 @@
             </div>
           </div>
         </div>
-
-        <div>
-          <app-shared-samples-list
-            [tabType]="'sample-disposal'"
-            [LISConfigurations]="LISConfigurations"
-            [labSamplesDepartments]="labSamplesDepartments"
-            [externalSystemsReferenceConceptUuid]="
-              sampleParams?.externalSystemsReferenceConceptUuid
-            "
-            [hasStatus]="'YES'"
-            [showLegend]="true"
-            [datesParameters]="datesParameters"
-            [excludeAllocations]="true"
-            [sampleTypes]="sampleTypes"
-            [codedSampleRejectionReasons]="codedSampleRejectionReasons"
-            (selectedSampleDetails)="onGetSelectedSampleDetails($event)"
-          ></app-shared-samples-list>
-        </div>
+        <app-shared-samples-list
+          [tabType]="'sample-disposal'"
+          [LISConfigurations]="LISConfigurations"
+          [labSamplesDepartments]="labSamplesDepartments"
+          [externalSystemsReferenceConceptUuid]="
+            sampleParams?.externalSystemsReferenceConceptUuid
+          "
+          [hasStatus]="'YES'"
+          [showLegend]="true"
+          [datesParameters]="datesParameters"
+          [excludeAllocations]="true"
+          [sampleTypes]="sampleTypes"
+          [codedSampleRejectionReasons]="codedSampleRejectionReasons"
+          (selectedSampleDetails)="onGetSelectedSampleDetails($event)"
+        ></app-shared-samples-list>
       </div>
     </mat-tab>
   </mat-tab-group>

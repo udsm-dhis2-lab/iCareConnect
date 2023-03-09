@@ -28,4 +28,10 @@ export class ConceptSourcesService {
       catchError((error) => of(error))
     );
   }
+  getConceptSourceDetailsByUuid(uuid): Observable<any> {
+    return from(this.api.conceptsource.getConceptSource(uuid)).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
 }

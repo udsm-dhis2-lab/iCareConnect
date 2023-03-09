@@ -110,7 +110,19 @@
           {{ !LISConfigurations?.isLIS ? "Collected On" : "Registered On" }}
         </th>
         <th rowspan="2">Priority</th>
-        <th rowspan="2">Action</th>
+        <th rowspan="2">
+          <div
+            class="d-flex justify-content-end"
+            *ngIf="tabType === 'samples-to-accept'"
+          >
+            <section class="ml-4" title="Tick to select all">
+              <mat-checkbox
+                color="primary"
+                (change)="onSelectAll($event, params?.samples?.results)"
+              ></mat-checkbox>
+            </section>
+          </div>
+        </th>
       </tr>
       <tr>
         <th>Test Order</th>
@@ -278,6 +290,7 @@
                   <section class="ml-4" title="Tick to accept or reject">
                     <mat-checkbox
                       color="primary"
+                      [checked]="keyedSelectedSamples[sample?.id]"
                       (change)="onSelectItem($event, sample)"
                     ></mat-checkbox>
                   </section>

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { AfterViewInit, Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatRadioChange } from "@angular/material/radio";
 import { Observable, of, zip } from "rxjs";
@@ -39,13 +39,14 @@ import { getLocationsByIds } from "src/app/store/selectors";
 import { isMoment } from "moment";
 import { PersonService } from "src/app/core/services/person.service";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { webSocket } from "rxjs/webSocket";
 
 @Component({
   selector: "app-sample-in-batch-registration",
   templateUrl: "./sample-in-batch-registration.component.html",
   styleUrls: ["./sample-in-batch-registration.component.scss"],
 })
-export class SampleInBatchRegistrationComponent implements OnInit {
+export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit {
   labSampleLabel$: Observable<string>;
   @Input() mrnGeneratorSourceUuid: string;
   @Input() preferredPersonIdentifier: string;
@@ -61,6 +62,9 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   @Input() fieldsObject: any;
   @Input() batch: any;
   @Input() batchSampleCodeFormatReference: any;
+  @Input() barcodeSettings: any;
+  @Input() LISConfigurations: any;
+  
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -147,6 +151,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   batchSampleCode$: Observable<any[]>;
   batchSampleCode: any;
   useExistingBatchSample: boolean = false;
+  connection: any;
 
   constructor(
     private samplesService: SamplesService,
@@ -166,6 +171,16 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     private generateMetadataLabelsService: GenerateMetadataLabelsService
   ) {
     this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
+  }
+
+  ngAfterViewInit(): void {
+    this.connection = webSocket(this.barcodeSettings?.socketUrl);
+
+    this.connection.subscribe({
+      next: msg => console.log('message received: ', msg), // Called whenever there is a message from the server.
+      error: err => console.log(err), // Called if at any point WebSocket API signals some kind of error.
+      complete: () => console.log('complete') // Called when connection is closed (for whatever reason).
+    });
   }
 
   ngOnInit(): void {
@@ -912,6 +927,12 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                             ? this.personDetailsData[
                                                 personIdentifierType.id
                                               ]
+                                            : this.formData[
+                                                "26742868-a38c-4e6a-ac1d-ae283c414c2e"
+                                              ]?.value
+                                            ? this.formData[
+                                                "26742868-a38c-4e6a-ac1d-ae283c414c2e"
+                                              ]?.value
                                             : identifierResponse[0],
                                           identifierType:
                                             personIdentifierType.id,
@@ -2721,6 +2742,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                               sampleLabelsUsedDetails:
                                                                                                 this
                                                                                                   .sampleLabelsUsedDetails,
+                                                                                                isLis: this.LISConfigurations?.isLIS
                                                                                             };
                                                                                           this.dialog
                                                                                             .open(
@@ -2754,9 +2776,16 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                                   },
                                                                                                   100
                                                                                                 );
-                                                                                                this.openBarCodeDialog(
-                                                                                                  data
-                                                                                                );
+                                                                                                if( this.barcodeSettings?.barcode){
+                                                                                                  this.connection.next(
+                                                                                                    {
+                                                                                                      Message: this.barcodeSettings?.barcode?.split("{{sampleID}}").join(data?.sampleLabelsUsedDetails[0]?.label), 
+                                                                                                      Type: "print"})
+                                                                                                } else {
+                                                                                                  this.openBarCodeDialog(
+                                                                                                    data
+                                                                                                  );
+                                                                                                }
                                                                                                 this.isRegistrationReady =
                                                                                                   false;
                                                                                                 setTimeout(
@@ -2956,7 +2985,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     this.dialog
       .open(BarCodeModalComponent, {
         height: "200px",
-        width: "15%",
+        width: "25%",
         data,
         disableClose: false,
         panelClass: "custom-dialog-container",

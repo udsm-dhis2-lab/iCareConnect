@@ -22,7 +22,7 @@ import {
   clearVisitsDatesParameters,
 } from "src/app/store/actions";
 import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
-import { getAllSampleTypes } from "src/app/store/selectors";
+import { getAllSampleTypes, getCurrentLocation } from "src/app/store/selectors";
 import { LISConfigurationsModel } from "./resources/models/lis-configurations.model";
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 import { Title } from "@angular/platform-browser";
@@ -57,6 +57,7 @@ export class LaboratoryComponent implements OnInit {
   specimenSources$: Observable<any>;
   userRoles$: Observable<any>;
   currentRoutePath: string = "";
+  showMenuItems: boolean = true;
   /**
    *
    * @param store
@@ -68,6 +69,8 @@ export class LaboratoryComponent implements OnInit {
    */
 
   LISConfigurations$: Observable<LISConfigurationsModel>;
+  currentLocation$: Observable<any>;
+
   constructor(
     private store: Store<AppState>,
     private router: Router,
@@ -234,6 +237,12 @@ export class LaboratoryComponent implements OnInit {
       navigationDetails && navigationDetails?.path[0]
         ? navigationDetails?.path[0]?.replace("/laboratory/", "")
         : "";
+    this.currentLocation$ = this.store.select(getCurrentLocation);
+  }
+
+  toggleMenuItems(event: Event): void {
+    event.stopPropagation();
+    this.showMenuItems = !this.showMenuItems;
   }
 
   disableDate() {

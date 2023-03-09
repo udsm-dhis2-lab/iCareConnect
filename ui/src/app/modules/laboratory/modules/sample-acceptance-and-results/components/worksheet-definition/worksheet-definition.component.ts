@@ -15,6 +15,8 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import htmlToPdfmake from "html-to-pdfmake";
+import { AdditionalFieldsModalComponent } from "src/app/modules/laboratory/modals/additional-fields-modal/additional-fields-modal.component";
+import { MatDialog } from "@angular/material/dialog";
 
 @Component({
   selector: "app-worksheet-definition",
@@ -53,7 +55,8 @@ export class WorksheetDefinitionComponent implements OnInit {
   constructor(
     private worksheetsService: WorkSheetsService,
     private datasetDataService: DatasetDataService,
-    private generateMetadataLabelsService: GenerateMetadataLabelsService
+    private generateMetadataLabelsService: GenerateMetadataLabelsService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -348,7 +351,10 @@ export class WorksheetDefinitionComponent implements OnInit {
             },
           };
           this.isWorksheetRenderingReady = true;
-
+          console.log(
+            "currentWorksheetDefinition",
+            this.currentWorksheetDefinition
+          );
           // this.generateDefaultWorksheetRowsColumns();
         }
       });
@@ -471,6 +477,14 @@ export class WorksheetDefinitionComponent implements OnInit {
   onCloseMessage(event: Event): void {
     event.stopPropagation();
     this.message = null;
+  }
+
+  onAddNewFields(event: Event, currentWorksheetDefinition: any): void {
+    event.stopPropagation();
+    this.dialog.open(AdditionalFieldsModalComponent, {
+      width: "50%",
+      data: currentWorksheetDefinition,
+    });
   }
 
   printPDF(event: Event) {
