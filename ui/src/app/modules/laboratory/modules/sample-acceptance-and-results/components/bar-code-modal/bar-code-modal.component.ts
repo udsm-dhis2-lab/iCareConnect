@@ -39,7 +39,7 @@ export class BarCodeModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.sampleData$ = this.sampleService.getSampleByUuid(
-      this.dialogData?.sampleLabelsUsedDetails[0]?.uuid
+      this.dialogData?.sample?.uuid
     )?.pipe(map((sample) => {
       return {
         ...sample,

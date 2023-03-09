@@ -1588,6 +1588,7 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
                                                                                     sampleLabelsUsedDetails:
                                                                                       this
                                                                                         .sampleLabelsUsedDetails,
+                                                                                    isLis: this.LISConfigurations?.isLIS
                                                                                   };
                                                                                 this.dialog
                                                                                   .open(
@@ -1847,7 +1848,7 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
     this.dialog
       .open(BarCodeModalComponent, {
         height: "200px",
-        width: "15%",
+        width: "25%",
         data,
         disableClose: false,
         panelClass: "custom-dialog-container",
