@@ -6,6 +6,7 @@ import { Observable } from "rxjs";
 import { catchError, map, sample, tap } from "rxjs/operators";
 import { LocationService } from "src/app/core/services/location.service";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { SampleAllocation } from "src/app/shared/resources/sample-allocations/models/allocation.model";
 import { VisitsService } from "src/app/shared/resources/visits/services/visits.service";
 import { PatientService } from "src/app/shared/services/patient.service";
 import { setSampleStatuses } from "src/app/store/actions";
@@ -46,7 +47,101 @@ export class PrintResultsModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) data,
     private store: Store<AppState>
   ) {
-    this.patientDetailsAndSamples = data?.patientDetailsAndSamples;
+    this.patientDetailsAndSamples = {
+      ...data?.patientDetailsAndSamples,
+      departments: data?.patientDetailsAndSamples?.departments?.map(
+        (department: any) => {
+          return {
+            ...department,
+            samples: department?.samples?.map((sample: any) => {
+              const allocations =
+                (
+                  _.flatten(
+                    sample?.orders?.map((order: any) =>
+                      order?.testAllocations?.map((all) =>
+                        new SampleAllocation(all).toJson()
+                      )
+                    )
+                  ) || []
+                )?.filter((allocation) => allocation?.finalResult) || [];
+              let allocationsKeyedByParametersUuid = {};
+              allocations?.forEach((allocation) => {
+                allocationsKeyedByParametersUuid[allocation?.parameter?.uuid] =
+                  allocation;
+              });
+              const allocationsWithNoDataRelationship =
+                allocations?.filter(
+                  (allocation) =>
+                    !allocation?.finalResult?.groups ||
+                    (allocation?.finalResult?.groups &&
+                      allocation?.finalResult?.groups?.length === 0)
+                ) || [];
+              const allocationsWithDataRelationship = (
+                allocations?.filter(
+                  (allocation) =>
+                    allocation?.finalResult?.groups &&
+                    allocation?.finalResult?.groups?.length > 0 &&
+                    (
+                      allocation?.parameter?.mappings?.filter(
+                        (mapping: any) =>
+                          mapping?.conceptReference?.conceptSource?.uuid ===
+                          "5b5af7e2-cd3d-4dba-8b11-ce6ca8b3d6a5"
+                      ) || []
+                    )?.length > 0
+                ) || []
+              )?.map((alloc) => {
+                const relationshipMapping = (alloc?.parameter?.mappings?.filter(
+                  (mapping: any) =>
+                    mapping?.conceptReference?.conceptSource?.uuid ===
+                    "5b5af7e2-cd3d-4dba-8b11-ce6ca8b3d6a5"
+                ) || [])[0];
+                const relatedParameteruuid = relationshipMapping
+                  ? relationshipMapping?.conceptReference?.code
+                  : null;
+                return {
+                  ...alloc,
+                  relatedParameteruuid: relatedParameteruuid,
+                  relatedAllocation: relatedParameteruuid
+                    ? allocationsKeyedByParametersUuid[relatedParameteruuid]
+                    : null,
+                };
+              });
+              const relatedResultsAllocation =
+                allocationsWithDataRelationship[0]?.relatedAllocation;
+              return {
+                ...sample,
+                samplesAllocations:
+                  allocations?.filter(
+                    (allocation) =>
+                      allocation?.finalResult?.groups &&
+                      allocation?.finalResult?.groups?.length > 0
+                  ) || [],
+                relatedResults:
+                  relatedResultsAllocation &&
+                  relatedResultsAllocation?.finalResult
+                    ? relatedResultsAllocation?.finalResult?.groups[
+                        relatedResultsAllocation?.finalResult?.groups?.length -
+                          1
+                      ]?.results
+                    : null,
+                orders: sample?.orders?.map((order) => {
+                  return {
+                    ...order,
+                    allocationsWithDataRelationship:
+                      allocationsWithDataRelationship?.filter(
+                        (all) =>
+                          all?.order?.concept?.uuid ===
+                          order?.order?.concept?.uuid
+                      ) || [],
+                  };
+                }),
+              };
+            }),
+          };
+        }
+      ),
+    };
+    console.log("test", this.patientDetailsAndSamples);
     this.LISConfigurations = data?.LISConfigurations;
     this.loadingPatientPhone = true;
     this.errorLoadingPhone = false;

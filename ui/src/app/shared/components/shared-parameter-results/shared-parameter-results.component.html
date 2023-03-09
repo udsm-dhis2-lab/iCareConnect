@@ -1,5 +1,11 @@
-<ng-container *ngIf="parameterResultsDetails">
-  <div>
+<ng-container>
+  <div
+    *ngIf="
+      parameterResultsDetails &&
+      parameterResultsDetails?.length > 0 &&
+      !resultGroup
+    "
+  >
     <table class="table">
       <tbody>
         <tr>
