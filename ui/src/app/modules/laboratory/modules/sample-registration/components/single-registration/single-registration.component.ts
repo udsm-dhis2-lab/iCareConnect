@@ -1622,10 +1622,14 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
                                                                                           {
                                                                                             Message: this.barcodeSettings?.barcode?.split("{{sampleID}}").join(data?.sampleLabelsUsedDetails[0]?.label), 
                                                                                             Type: "print"})
+                                                                                      } else {
+                                                                                        // this.jsPrint(
+                                                                                        //   data
+                                                                                        // );
+                                                                                        this.openBarCodeDialog(
+                                                                                          data
+                                                                                        );
                                                                                       }
-                                                                                      // this.jsPrint(
-                                                                                      //   data
-                                                                                      // );
                                                                                       this.isRegistrationReady =
                                                                                         false;
                                                                                       setTimeout(
