@@ -169,36 +169,57 @@
     <mat-tab label="Results" *ngIf="LISConfigurations?.isLIS">
       <ng-template matTabContent>
         <div class="p-2">
-          <mat-tab-group (selectedTabChange)="onOpenNewTab($event)">
-            <mat-tab label="By samples">
-              <ng-template matTabContent>
-                <div class="p-2">
-                  <app-sample-to-print-results
-                    [tabType]="'completed-samples'"
-                    [codedSampleRejectionReasons]="
-                      params?.codedSampleRejectionReasons
-                    "
-                    [labConfigs]="labConfigs"
-                    [datesParameters]="datesParameters"
-                    [LISConfigurations]="LISConfigurations"
-                    [category]="'HAS_RESULTS'"
-                    [hasStatus]="'YES'"
-                    [patients]="patients"
-                    [sampleTypes]="sampleTypes"
-                    [labSamplesDepartments]="labSamplesDepartments"
-                    [labSamplesContainers]="labSamplesContainers"
-                    [userUuid]="userUuid"
-                    [viewType]="'authorization'"
-                  ></app-sample-to-print-results>
-                </div>
-              </ng-template>
-            </mat-tab>
-            <mat-tab label="By Clients">
-              <ng-template matTabContent>
-                <div class="p-2"></div>
-              </ng-template>
-            </mat-tab>
-          </mat-tab-group>
+          <div *ngIf="!showPrintingPage">
+            <mat-tab-group (selectedTabChange)="onOpenNewTab($event)">
+              <mat-tab label="By samples">
+                <ng-template matTabContent>
+                  <div class="p-2">
+                    <app-sample-to-print-results
+                      [tabType]="'completed-samples'"
+                      [codedSampleRejectionReasons]="
+                        params?.codedSampleRejectionReasons
+                      "
+                      [labConfigs]="labConfigs"
+                      [datesParameters]="datesParameters"
+                      [LISConfigurations]="LISConfigurations"
+                      [category]="'HAS_RESULTS'"
+                      [hasStatus]="'YES'"
+                      [patients]="patients"
+                      [sampleTypes]="sampleTypes"
+                      [labSamplesDepartments]="labSamplesDepartments"
+                      [labSamplesContainers]="labSamplesContainers"
+                      [userUuid]="userUuid"
+                      [viewType]="'authorization'"
+                      (dataToPrint)="onGetDataToPrint($event)"
+                    ></app-sample-to-print-results>
+                  </div>
+                </ng-template>
+              </mat-tab>
+              <mat-tab label="By Clients">
+                <ng-template matTabContent>
+                  <div class="p-2"></div>
+                </ng-template>
+              </mat-tab>
+            </mat-tab-group>
+          </div>
+
+          <div class="w-100" *ngIf="showPrintingPage">
+            <div class="d-flex justify-content-left mb-2">
+              <button
+                class="ml-3"
+                mat-flat-button
+                color="primary"
+                (click)="togglePrintAndList($event)"
+                matTooltip="Back to lis"
+              >
+                <mat-icon>arrow_back</mat-icon>
+                Back to List
+              </button>
+            </div>
+            <app-print-results-page
+              [data]="dataToPrint"
+            ></app-print-results-page>
+          </div>
         </div>
       </ng-template>
     </mat-tab>
@@ -206,17 +227,39 @@
     <mat-tab label="Completed Samples">
       <ng-template matTabContent>
         <div class="p-2">
-          <app-completed-samples
-            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
-            [labConfigs]="labConfigs"
-            [datesParameters]="datesParameters"
-            [LISConfigurations]="LISConfigurations"
-            [patients]="patients"
-            [sampleTypes]="sampleTypes"
-            [labSamplesDepartments]="labSamplesDepartments"
-            [labSamplesContainers]="labSamplesContainers"
-            [userUuid]="userUuid"
-          ></app-completed-samples>
+          <div *ngIf="!showPrintingPage">
+            <app-completed-samples
+              [codedSampleRejectionReasons]="
+                params?.codedSampleRejectionReasons
+              "
+              [labConfigs]="labConfigs"
+              [datesParameters]="datesParameters"
+              [LISConfigurations]="LISConfigurations"
+              [patients]="patients"
+              [sampleTypes]="sampleTypes"
+              [labSamplesDepartments]="labSamplesDepartments"
+              [labSamplesContainers]="labSamplesContainers"
+              [userUuid]="userUuid"
+              (dataToPrint)="onGetDataToPrint($event)"
+            ></app-completed-samples>
+          </div>
+          <div class="w-100" *ngIf="showPrintingPage">
+            <div class="d-flex justify-content-left mb-2">
+              <button
+                class="ml-3"
+                mat-flat-button
+                color="primary"
+                (click)="togglePrintAndList($event)"
+                matTooltip="Back to lis"
+              >
+                <mat-icon>arrow_back</mat-icon>
+                Back to List
+              </button>
+            </div>
+            <app-print-results-page
+              [data]="dataToPrint"
+            ></app-print-results-page>
+          </div>
         </div>
       </ng-template>
     </mat-tab>

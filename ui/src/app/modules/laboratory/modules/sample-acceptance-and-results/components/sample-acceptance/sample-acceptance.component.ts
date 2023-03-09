@@ -80,6 +80,8 @@ export class SampleAcceptanceComponent implements OnInit {
 
   entryCategory: string = "INDIVIDUAL";
   currentTabWithDataLoaded: number = 0;
+  showPrintingPage: boolean = false;
+  dataToPrint: any;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -97,20 +99,16 @@ export class SampleAcceptanceComponent implements OnInit {
     this.settingLabSampleStatus$ = this.store.select(
       getSettingLabSampleStatusState
     );
+  }
 
-    // this.store.dispatch(
-    //   loadLabSamplesByCollectionDates({
-    //     datesParameters: this.datesParameters,
-    //     patients: this.patients,
-    //     sampleTypes: this.sampleTypes,
-    //     departments: this.labSamplesDepartments,
-    //     containers: this.labSamplesContainers,
-    //     hasStatus: "NO",
-    //     configs: this.labConfigs,
-    //     codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-    //   })
-    // );
-    // this.getSamples();
+  onGetDataToPrint(data: any): void {
+    this.dataToPrint = data;
+    this.showPrintingPage = true;
+  }
+
+  togglePrintAndList(event: Event): void {
+    event.stopPropagation();
+    this.showPrintingPage = !this.showPrintingPage;
   }
 
   onToggleViewSampleDetails(event: Event, sample: any): void {

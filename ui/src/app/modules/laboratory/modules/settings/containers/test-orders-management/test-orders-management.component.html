@@ -1,6 +1,10 @@
 <div
   class="tes-orders-management"
-  *ngIf="{ conceptDataTypes: conceptDataTypes$ | async } as params"
+  *ngIf="{
+    conceptDataTypes: conceptDataTypes$ | async,
+    testRelationshipMappingSourceUuid:
+      testRelationshipMappingSourceUuid$ | async
+  } as params"
 >
   <div>
     <mat-tab-group>
@@ -42,6 +46,22 @@
               *ngIf="!params?.conceptDataTypes"
               mode="indeterminate"
             ></mat-progress-bar>
+          </div>
+        </ng-template>
+      </mat-tab>
+      <mat-tab label="Test Orders Parameters Relationship">
+        <ng-template matTabContent>
+          <div class="p-3">
+            <mat-progress-bar
+              *ngIf="!params?.testRelationshipMappingSourceUuid"
+              mode="indeterminate"
+            ></mat-progress-bar>
+            <app-test-order-parameters-relationship
+              *ngIf="params?.testRelationshipMappingSourceUuid"
+              [testRelationshipMappingSourceUuid]="
+                params?.testRelationshipMappingSourceUuid
+              "
+            ></app-test-order-parameters-relationship>
           </div>
         </ng-template>
       </mat-tab>

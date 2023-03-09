@@ -5,7 +5,9 @@
       specimenSources: specimenSources$ | async,
       privileges: privileges$ | async,
       userRoles: userRoles$ | async,
-      LISConfigurations: LISConfigurations$ | async
+      LISConfigurations: LISConfigurations$ | async,
+      currentUser: currentUser$ | async,
+      currentLocation: currentLocation$ | async
     } as params"
   >
     <div
@@ -61,6 +63,20 @@
               params?.LISConfigurations?.isLIS
           }"
         >
+          <div
+            style="border-bottom: solid 1px #f2f2f2; background-color: #f2f2f2"
+            class="w-100 pl-3 pt-1 pb-2"
+            *ngIf="params?.LISConfigurations?.isLIS"
+          >
+            <button mat-button>
+              <mat-icon color="primary">location_on</mat-icon
+              >{{ params?.currentLocation?.display }}
+            </button>
+            <p class="ml-4">
+              {{ params?.currentUser?.person?.display }}
+              <em>({{ params?.currentUser?.username }})</em>
+            </p>
+          </div>
           <mat-chip
             class="w-20"
             *ngIf="params?.privileges && params?.LISConfigurations?.isLIS"
@@ -215,6 +231,7 @@
                 [title]="showMenuItems ? 'Hide side menu' : 'Show side menu'"
                 (click)="toggleMenuItems($event)"
                 mat-icon-button
+                color="primary"
                 style="margin-top: -10px; margin-left: -10px"
               >
                 <mat-icon>menu</mat-icon>
