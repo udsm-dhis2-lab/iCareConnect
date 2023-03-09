@@ -100,7 +100,8 @@
               params?.referringDoctorAttributes &&
               params?.referFromFacilityVisitAttribute && 
               params?.identifierTypes && 
-              params?.batchsets && params?.batches
+              params?.batchsets && params?.batches &&
+              params?.barcodeSettings
           ">
           <app-batch-registration
             [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
@@ -122,6 +123,7 @@
             [existingBatches]="params?.batches"
             [fromMaintenance]="fromMaintenance"
             [LISConfigurations]="LISConfigurations"
+            [barcodeSettings]="params?.barcodeSettings"
             (reloadRegisterSample)="onReloadRegisterSample($event)"
           ></app-batch-registration>
         </div>
