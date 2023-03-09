@@ -460,7 +460,6 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
     //Validate Date fields
     this.formData = { ...this.formData, ...formValues.getValues() };
-    console.log(this.formData);
     if (
       formValues.getValues()?.collectedOn?.value.toString()?.length > 0 ||
       this.fixedFields.filter((field) => {
@@ -913,6 +912,12 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                             ? this.personDetailsData[
                                                 personIdentifierType.id
                                               ]
+                                            : this.formData[
+                                                "26742868-a38c-4e6a-ac1d-ae283c414c2e"
+                                              ]?.value
+                                            ? this.formData[
+                                                "26742868-a38c-4e6a-ac1d-ae283c414c2e"
+                                              ]?.value
                                             : identifierResponse[0],
                                           identifierType:
                                             personIdentifierType.id,
