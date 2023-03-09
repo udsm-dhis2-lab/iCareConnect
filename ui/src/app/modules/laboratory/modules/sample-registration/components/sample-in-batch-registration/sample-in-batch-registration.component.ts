@@ -2778,10 +2778,11 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
                                                                                                     {
                                                                                                       Message: this.barcodeSettings?.barcode?.split("{{sampleID}}").join(data?.sampleLabelsUsedDetails[0]?.label), 
                                                                                                       Type: "print"})
+                                                                                                } else {
+                                                                                                  this.openBarCodeDialog(
+                                                                                                    data
+                                                                                                  );
                                                                                                 }
-                                                                                                // this.openBarCodeDialog(
-                                                                                                //   data
-                                                                                                // );
                                                                                                 this.isRegistrationReady =
                                                                                                   false;
                                                                                                 setTimeout(
