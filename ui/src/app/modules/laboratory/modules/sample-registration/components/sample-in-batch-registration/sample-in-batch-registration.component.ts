@@ -2776,8 +2776,8 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
                                                                                                 if( this.barcodeSettings?.barcode){
                                                                                                   this.connection.next(
                                                                                                     {
-                                                                                                      message: this.barcodeSettings?.barcode?.split("{{sampleID}}").join(data?.sampleLabelsUsedDetails[0]?.label), 
-                                                                                                      type: "print"})
+                                                                                                      Message: this.barcodeSettings?.barcode?.split("{{sampleID}}").join(data?.sampleLabelsUsedDetails[0]?.label), 
+                                                                                                      Type: "print"})
                                                                                                 }
                                                                                                 // this.openBarCodeDialog(
                                                                                                 //   data
