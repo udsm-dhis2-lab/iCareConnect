@@ -585,7 +585,7 @@ export class BatchRegistrationComponent implements OnInit {
       this.validBatchsetName &&
       this.validBatchName &&
       !this.useExistingBatch &&
-      this.fieldsObjectValues?.fixedFieldsWithValues?.length ===
+      this.fieldsObjectValues?.fixedFieldsWithValues?.length >=
         this.selectedFixedFields.length
     ) {
       this.validForm = true;
