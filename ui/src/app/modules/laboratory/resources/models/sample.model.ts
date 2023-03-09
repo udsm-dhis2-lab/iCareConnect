@@ -14,6 +14,7 @@ import {
   getResultsCommentsStatuses,
   mergeTestAllocations,
 } from "src/app/core/helpers/lab-samples.helpers";
+import { SampleAllocation } from "src/app/shared/resources/sample-allocations/models/allocation.model";
 export interface SampleObject {
   id?: string;
   uuid?: string;
@@ -75,6 +76,11 @@ export class LabSample {
         ...orderObj,
         order: {
           ...orderObj?.order,
+          testAllocations: orderObj?.order?.testAllocations?.map(
+            (allocation: any) => {
+              return new SampleAllocation(allocation).toJson();
+            }
+          ),
           concept: {
             ...orderObj?.order?.concept,
             display: orderObj?.order?.concept?.display?.replace(
