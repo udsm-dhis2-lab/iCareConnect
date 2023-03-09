@@ -8,10 +8,10 @@
     *ngIf="!isFormInstantiated"
   ></mat-progress-bar>
   <div *ngIf="isFormInstantiated">
-    <app-shared-error
+    <!-- <app-shared-error
       [errors]="[warning]"
       [dismissible]="false"
-    ></app-shared-error>
+    ></app-shared-error> -->
     <app-shared-error
       *ngIf="errors?.length"
       [errors]="errors"
@@ -343,6 +343,7 @@
               [testsFromExternalSystemsConfigs]="
                 testsFromExternalSystemsConfigs
               "
+              [barcodeSettings]="params?.barcodeSettings"
               [batchSampleCodeFormatReference]="
                 params?.batchSampleCodeFormatReference
               "
