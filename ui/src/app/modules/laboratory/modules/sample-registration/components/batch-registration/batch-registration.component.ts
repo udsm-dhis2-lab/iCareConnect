@@ -33,7 +33,7 @@ export class BatchRegistrationComponent implements OnInit {
   @Input() existingBatches: any[] = [];
   @Input() fromMaintenance: boolean;
   @Input() LISConfigurations: boolean;
-  @Input() barcodeSettings;
+  @Input() barcodeSettings: any;
   
   @Output() reloadRegisterSample: EventEmitter<any> = new EventEmitter();
   formData: any;
