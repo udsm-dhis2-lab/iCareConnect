@@ -63,6 +63,8 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
   @Input() batch: any;
   @Input() batchSampleCodeFormatReference: any;
   @Input() barcodeSettings: any;
+  @Input() LISConfigurations: any;
+  
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -2740,6 +2742,7 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
                                                                                               sampleLabelsUsedDetails:
                                                                                                 this
                                                                                                   .sampleLabelsUsedDetails,
+                                                                                                isLis: this.LISConfigurations?.isLIS
                                                                                             };
                                                                                           this.dialog
                                                                                             .open(
@@ -2982,7 +2985,7 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
     this.dialog
       .open(BarCodeModalComponent, {
         height: "200px",
-        width: "15%",
+        width: "25%",
         data,
         disableClose: false,
         panelClass: "custom-dialog-container",
