@@ -466,16 +466,18 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		resultStatus.setUser(response.getCreator());
 		resultStatus.setTestAllocation(response.getTestAllocation());
 		this.testAllocationStatusDAO.save(resultStatus);
-
+		
 		//Save associated field via result
-		if(result.getAssociatedFieldResults().size() > 0) {
+		if (result.getAssociatedFieldResults().size() > 0) {
 			AssociatedFieldResult associatedFieldResult = new AssociatedFieldResult();
-			AssociatedField associatedField = this.associatedFieldDAO.findByUuid(result.getAssociatedFieldResults().get(0).getAssociatedField().getUuid());
-
-			if(associatedField == null){
-				throw new Exception("The associated field with uuid "+result.getAssociatedFieldResults().get(0).getAssociatedField().getUuid()+" does not exist");
+			AssociatedField associatedField = this.associatedFieldDAO.findByUuid(result.getAssociatedFieldResults().get(0)
+			        .getAssociatedField().getUuid());
+			
+			if (associatedField == null) {
+				throw new Exception("The associated field with uuid "
+				        + result.getAssociatedFieldResults().get(0).getAssociatedField().getUuid() + " does not exist");
 			}
-
+			
 			associatedFieldResult.setValue(result.getAssociatedFieldResults().get(0).getValue());
 			associatedFieldResult.setAssociatedField(associatedField);
 			associatedFieldResult.setResult(response);
