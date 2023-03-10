@@ -69,10 +69,7 @@
                     "
                   >
                     <tr>
-                      <td
-                        rowspan="4"
-                        *ngIf="order?.concept?.setMembers?.length > 0"
-                      >
+                      <td style="max-width: 10%" rowspan="4">
                         {{ order?.concept?.display }}
                       </td>
                       <td>
@@ -250,7 +247,7 @@
                     *ngIf="order?.parametersWithDefinedRelationship?.length > 0"
                   >
                     <tr>
-                      <td rowspan="3">
+                      <td rowspan="3" style="max-width: 10%">
                         {{ order?.concept?.display }}
 
                         <!-- {{ order?.parametersWithDefinedRelationship | json }} -->
