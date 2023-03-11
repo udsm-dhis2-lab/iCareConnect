@@ -81,9 +81,8 @@ public class ICareController {
 	@ResponseBody
 	public List<String> onGenerateCode(@RequestParam(value = "globalProperty", required = true) String globalProperty,
 	        @RequestParam(value = "metadataType", required = true) String metadataType,
-	        @RequestParam(value = "count", defaultValue = "1", required = false) Integer count,
-	        @RequestParam(value = "digitCount", defaultValue = "5", required = false) Integer digitCount) {
-		List<String> generatedCode = iCareService.generateCode(globalProperty, metadataType, count, digitCount);
+	        @RequestParam(value = "count", defaultValue = "1", required = false) Integer count) {
+		List<String> generatedCode = iCareService.generateCode(globalProperty, metadataType, count);
 		
 		return generatedCode;
 	}
