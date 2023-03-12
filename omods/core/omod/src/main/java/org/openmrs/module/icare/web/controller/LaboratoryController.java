@@ -76,11 +76,11 @@ public class LaboratoryController {
 		
 		Visit existingVisit = visitService.getVisitByUuid(((Map) sample.get("visit")).get("uuid").toString());
 		Concept concept = conceptService.getConceptByUuid(((Map) sample.get("concept")).get("uuid").toString());
+		Concept specimenSource = conceptService.getConceptByUuid(((Map) sample.get("specimenSource")).get("uuid").toString());
 		
 		if (sample.get("location") != null) {
 			Location location = locationService.getLocationByUuid(((Map) sample.get("location")).get("uuid").toString());
 			newSample.setLocation(location);
-			System.out.println(location.getName());
 		}
 		if (sample.get("batchSample") != null) {
 			BatchSample batchSample = laboratoryService.getBatchSampleByUuid(((Map) sample.get("batchSample")).get("uuid").toString());
@@ -89,9 +89,10 @@ public class LaboratoryController {
 		
 		newSample.setVisit(existingVisit);
 		newSample.setConcept(concept);
+		newSample.setSpecimenSource(specimenSource);
 		
 		newSample.setLabel((String) sample.get("label"));
-		
+
 		List<SampleOrder> sampleOrders = new ArrayList<SampleOrder>();
 		
 		for (Map order : (List<Map>) sample.get("orders")) {
@@ -119,7 +120,14 @@ public class LaboratoryController {
 		
 		HashMap<String, Object> conceptObject = new HashMap<String, Object>();
 		conceptObject.put("uuid", createdSample.getConcept().getUuid());
+		conceptObject.put("display", createdSample.getConcept().getDisplayString());
 		response.put("concept", conceptObject);
+		response.put("department", conceptObject);
+
+		HashMap<String, Object> specimenSourceObject = new HashMap<String, Object>();
+		specimenSourceObject.put("uuid", createdSample.getSpecimenSource().getUuid());
+		specimenSourceObject.put("display", createdSample.getSpecimenSource().getDisplayString());
+		response.put("specimenSource", specimenSourceObject);
 		
 		List<Map<String, Object>> orders = new ArrayList<Map<String, Object>>();
 		for (SampleOrder sampleOrder : createdSample.getSampleOrders()) {
@@ -127,18 +135,7 @@ public class LaboratoryController {
 			Map<String, Object> order = new HashMap<String, Object>();
 			order.put("uuid", sampleOrder.getOrder().getUuid());
 			order.put("orderNumber", sampleOrder.getOrder().getOrderNumber());
-			//
-			//			List<TestTimeConfig> testTimeConfigs = laboratoryService.getTestTimeConfigByConcept(sampleOrder.getOrder()
-			//			        .getConcept().getUuid());
-			//			List<Map<String, Object>> mapListTestTimeConfigs = new ArrayList<Map<String, Object>>();
-			//			for (TestTimeConfig testTimeConfig : testTimeConfigs) {
-			//				mapListTestTimeConfigs.add(testTimeConfig.toMap());
-			//			}
-			//
-			//			order.put("tatconfigs", mapListTestTimeConfigs);
-			
 			orders.add(order);
-			
 		}
 		response.put("orders", orders);
 		
@@ -158,7 +155,6 @@ public class LaboratoryController {
 		
 		response.put("status", sampleStatusesList);
 		response.put("uuid", createdSample.getUuid());
-		
 		return response;
 	}
 	
