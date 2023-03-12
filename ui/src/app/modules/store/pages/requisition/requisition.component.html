@@ -205,7 +205,7 @@
               <mat-expansion-panel-header class="d-flex justify-content-between">
                 <mat-panel-title>
                   <span>Requisition: {{ requisition?.code }} </span>
-                  <span class="ml-4">Target Store: {{ requisition?.targetStore?.name }}</span>
+                  <span class="ml-4">Target Store: {{ requisition?.requestedLocation?.display }}</span>
                   <span class="ml-4 text-small"><i>
                     Requested on: {{ requisition?.created | date:"dd/MM/yyyy" }}
                   </i></span>
@@ -256,6 +256,14 @@
                           (click)="onSendRequisition($event, requisition)"
                         >
                             <mat-icon>send</mat-icon>
+                        </a>
+                        <a
+                          class="anchor-button ml-4" 
+                          color="primary" 
+                          matTooltip="Update this requisition"
+                          (click)="onUpdateRequisition($event, requisition)"
+                        >
+                            <mat-icon>edit</mat-icon>
                         </a>
                         <a
                           class="anchor-button ml-4" 
@@ -337,6 +345,7 @@
         [mainStoreLocationTagUuid]="params?.mainStoreLocationTagUuid"
         [pharmacyLocationTagUuid]="params?.pharmacyLocationTagUuid"
         [codeFormatSetting]="params?.requisitionCodeFormat[0]"
+        [existingRequisition]="existingRequisition"
       ></app-new-requisition-form>
     </div>
   </mat-card>

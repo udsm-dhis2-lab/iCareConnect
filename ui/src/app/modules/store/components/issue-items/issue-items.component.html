@@ -12,6 +12,13 @@
                 <th>Quantity</th>
                 <th>Batch</th>
                 <th>Status</th>
+                <th></th>
+                <th>
+                  <section
+                    *ngIf="issue?.requisitionStatuses[issue?.requisitionStatuses?.length - 1]?.status === 'PENDING'">
+                    <mat-checkbox color="primary" (change)="selectAll($event, params?.specificRequisition?.items)" [checked]="selectAllItems"></mat-checkbox>
+                  </section>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -22,7 +29,7 @@
                 <td>{{ item?.batch ? item?.batch : " - " }}</td>
                 <td>{{ item?.status }}</td>
                 <td>
-                  <ng-container *ngIf="item?.status === 'PENDING'">
+                  <ng-container *ngIf="item?.status === 'PENDING' && issue?.requisitionStatuses[issue?.requisitionStatuses?.length - 1]?.status !== 'CANCELLED'">
                     <button
                       mat-flat-button
                       color="primary"
@@ -39,32 +46,9 @@
                       Reject
                     </button>
                   </ng-container>
-                  <!-- <button
-                    mat-icon-button
-                    [matMenuTriggerFor]="menu"
-                    *ngIf="item?.requisitionItemStatuses[item?.requisitionItemStatuses?.length - 1]?.status === 'PENDING'"
-                  >
-                    <mat-icon>more_vert</mat-icon>
-                  </button>
-                  <mat-menu #menu="matMenu">
-                    <ng-container>
-                      <button
-                        mat-menu-item
-                      >
-                        <mat-icon>check</mat-icon>
-                        <span>Issue</span>
-                      </button>
-                      <button
-                        mat-menu-item
-                      >
-                        <mat-icon>clear</mat-icon>
-                        <span>Reject</span>
-                      </button>
-                    </ng-container>
-                  </mat-menu> -->
                 </td>
                 <td>
-                  <section>
+                  <section *ngIf="item?.status === 'PENDING' && issue?.requisitionStatuses[issue?.requisitionStatuses?.length - 1]?.status !== 'CANCELLED'">
                     <mat-checkbox
                       color="primary"
                       (change)="getSelection($event, item)"

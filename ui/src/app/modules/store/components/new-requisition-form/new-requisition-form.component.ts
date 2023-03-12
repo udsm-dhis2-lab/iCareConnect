@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Inject, Input, OnInit, Output } from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { Field } from "src/app/shared/modules/form/models/field.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -11,6 +11,7 @@ import { StockService } from "src/app/shared/resources/store/services/stock.serv
 import { RequisitionService } from "src/app/shared/resources/store/services/requisition.service";
 import { ConfigsService } from "src/app/shared/services/configs.service";
 import { inpatientComponents } from "src/app/modules/inpatient/components";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 
 @Component({
   selector: "app-new-requisition-form",
@@ -26,6 +27,7 @@ export class NewRequisitionFormComponent implements OnInit {
   @Input() stores: any;
   @Input() codeFormatSetting: any;
   @Input() existingRequisitionItem: any;
+  @Input() existingRequisition: any;
 
   @Output() closePopup: EventEmitter<any> = new EventEmitter();;
 
@@ -45,10 +47,36 @@ export class NewRequisitionFormComponent implements OnInit {
   constructor(
     private stockService: StockService,
     private requisitionService: RequisitionService,
-    private configService: ConfigsService
+    private configService: ConfigsService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
+    this.requisition = this.existingRequisition;
+    if (localStorage.getItem('availableRequisition') && !this.requisition) {
+      const availableRequisition = JSON.parse(localStorage.getItem('availableRequisition'));
+      this.dialog.open(SharedConfirmationComponent, {
+        width: "25%",
+        data: {
+          modalTitle: `Continue with last request (${availableRequisition?.code})`,
+          modalMessage: `Do you want to continue with the last request with number ${availableRequisition?.code}`,
+          showRemarksInput: false,
+          confirmationButtonText: "Continue",
+        },
+      }).afterClosed().subscribe((closingObject) => {
+        if (closingObject?.confirmed) {
+          this.requisition = availableRequisition;
+        } else {
+          localStorage.removeItem("availableRequisition");
+        }
+        this.initializeRequisitionForm();
+      });
+    } else {
+      this.initializeRequisitionForm();
+    }
+  }
+
+  initializeRequisitionForm(){
     const keyedMainStoreRequestEligibleTags = keyBy(
       this.referenceTagsThatCanRequestFromMainStoreConfigs,
       "value"
@@ -75,6 +103,7 @@ export class NewRequisitionFormComponent implements OnInit {
         key: "targetStore",
         label: "Target Store",
         required: true,
+        value: this.requisition?.requestedLocation?.uuid,
         options: (this.stores || [])
           .map((store) => {
             if (
@@ -138,7 +167,6 @@ export class NewRequisitionFormComponent implements OnInit {
       }),
     ];
   }
-
   onRequest(e: Event) {
     e.stopPropagation();
     this.requisitionObject = {
@@ -188,7 +216,7 @@ export class NewRequisitionFormComponent implements OnInit {
             this.quantityField = [];
             this.requisitionFields = [];
             setTimeout(() => {
-              this.requisition = storedRequisition;
+              this.requisition = storedRequisition; 
               this.requisitionFields = reserveRequisitionFields;
               this.quantityField = reserveQuantityFields;
             }, 100);
@@ -239,6 +267,7 @@ export class NewRequisitionFormComponent implements OnInit {
                   const reserveQuantityFields = this.quantityField;
                   this.quantityField = [];
                   this.requisitionFields = [];
+                  localStorage.setItem('availableRequisition', JSON.stringify(this.requisition));
                   setTimeout(() => {
                     this.requisitionFields = reserveRequisitionFields;
                     this.quantityField = reserveQuantityFields;
