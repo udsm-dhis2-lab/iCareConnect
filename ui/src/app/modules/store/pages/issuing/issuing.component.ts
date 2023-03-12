@@ -15,6 +15,7 @@ import { ConfirmRequisitionsModalComponent } from "../../modals/confirm-requisit
 import { IssuingFormComponent } from "../../modals/issuing-form/issuing-form.component";
 import { RequestCancelComponent } from "../../modals/request-cancel/request-cancel.component";
 import { RequisitionService } from "src/app/shared/resources/store/services/requisition.service";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 
 @Component({
   selector: "app-issuing",
@@ -264,6 +265,54 @@ export class IssuingComponent implements OnInit {
             }
           });
         }
+      });
+  }
+  
+  rejectAllSelected(event: Event, issue: any): void {
+    event.stopPropagation();
+    let itemsToReject = [];
+    Object.keys(this.selectedItems).forEach((key) => {
+      itemsToReject = [...itemsToReject, this.selectedItems[key]];
+    });
+    this.dialog
+      .open(SharedConfirmationComponent, {
+        width: "20%",
+        data: {
+          modalTitle: `Multiple Items Rejection`,
+          modalMessage: `Are you sure you want to reject all selected items?`,
+          showRemarksInput: true,
+          confirmationButtonText: "Reject All",
+        },
+      })
+      .afterClosed()
+      .subscribe((results) => {
+        if (results?.confirmed) {
+          if (itemsToReject?.length) {
+            zip(
+              ...itemsToReject.map((item) => {
+                const ItemObject = {
+                  ...item,
+                  requisitionItemStatuses: [
+                    {
+                      status: "REJECTED",
+                      remarks: results?.reason
+                    }
+                  ]
+                }
+                return this.requisitionService
+                  .updateRequisitionItem(item?.uuid, ItemObject)
+              })
+            ).subscribe((response: any) => {
+              if (response) {
+                if(!response?.error){
+                  this.selectedItems = {};
+                  this.getAllIssuing();
+                }
+              }
+            });
+          }
+        } 
+
       });
   }
 

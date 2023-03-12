@@ -177,21 +177,24 @@
                     <mat-icon *ngIf="viewIssueItems && viewIssueItems === issue?.uuid">visibility_off</mat-icon>
                       <mat-icon *ngIf="!viewIssueItems || viewIssueItems !== issue?.uuid">visibility</mat-icon>
                   </a>
-                  <a 
-                    class="anchor-button ml-4" 
-                    color="primary"
-                    matTooltip="Issue all items"
-                  >
-                    <mat-icon>done_all</mat-icon>
-                  </a>
-                  <a
+                  <!--
+                  <ng-container *ngIf="issue?.requisitionStatuses[issue?.requisitionStatuses?.length - 1]?.status === 'PENDING'">
+                       <a 
                       class="anchor-button ml-4" 
-                      color="primary" 
-                      matTooltip="Reject all items"
+                      color="primary"
+                      matTooltip="Issue all items"
                     >
-                        <mat-icon>clear</mat-icon>
+                      <mat-icon>done_all</mat-icon>
                     </a>
-                  
+                    <a
+                        class="anchor-button ml-4" 
+                        color="primary" 
+                        matTooltip="Reject all items"
+                      >
+                          <mat-icon>clear</mat-icon>
+                      </a>
+                    
+                  </ng-container> -->
                 </div>
               </div>
             </div>
@@ -216,6 +219,7 @@
                       class="ml-3"
                       mat-flat-button
                       color="warn"
+                      (click)="rejectAllSelected($event, issue)"
                       >
                       Reject
                     </button>

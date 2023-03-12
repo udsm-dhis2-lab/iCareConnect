@@ -53,6 +53,7 @@ export class RequisitionComponent implements OnInit {
   requisitionCodeFormat$: Observable<any>;
   viewRequisitionItems: string;
   selectedItems: any = {};
+  existingRequisition: any;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -81,15 +82,15 @@ export class RequisitionComponent implements OnInit {
 
     this.requisitionCodeFormat$ =
       this.systemSettingsService.getSystemSettingsMatchingAKey(
-        `iCare.store.requisition.code.format`
+        `iCare.store.requisition.id.format`
       );
-    this.getAllRequisition();
+    this.getAllRequisitions();
     this.currentStore$ = of(this.currentLocation);
     this.stores$ = this.store.pipe(select(getStoreLocations));
     this.stockableItems$ = this.store.pipe(select(getAllStockableItems));
   }
 
-  getAllRequisition(event?: any): void {
+  getAllRequisitions(event?: any): void {
     this.loadedRequisitions = false;
     this.searchTerm = event ? event?.target?.value : "";
     this.requisitions$ = this.requisitionService
@@ -99,13 +100,13 @@ export class RequisitionComponent implements OnInit {
         this.pageSize,
         this.selectedStatus,
         "DESC"
-      )
-      .pipe(
-        map((requisitions) => {
-          this.pager = requisitions?.pager;
-          this.requisitions = requisitions?.requisitions;
-          this.storedRequisitions = requisitions?.requisitions;
-          this.loadedRequisitions = true;
+        )
+        .pipe(
+          map((requisitions) => {
+            this.pager = requisitions?.pager;
+            this.requisitions = requisitions?.requisitions;
+            this.storedRequisitions = requisitions?.requisitions;
+            this.loadedRequisitions = true;
           return requisitions;
         })
       );
@@ -135,11 +136,10 @@ export class RequisitionComponent implements OnInit {
 
   onNewRequest(e: Event, params: any): void {
     e.stopPropagation();
-    if (this.showRequisitionForm) {
-      //TODO: Ask user is done with requesition
-      // this.dialog.open()
-    }
     this.showRequisitionForm = !this.showRequisitionForm;
+    if(!this.showRequisitionForm) {
+      this.getAllRequisitions();
+    }
 
     // if (params) {
     //   const {
@@ -184,6 +184,11 @@ export class RequisitionComponent implements OnInit {
     // }
   }
 
+  onUpdateRequisition(e: any, requisition: any){
+    this.showRequisitionForm = true;
+    this.existingRequisition = requisition;
+  }
+
   onSendRequisition(e: any, requisition: any) {
     e?.stopPropagation();
     const requisitionObject = {
@@ -197,7 +202,8 @@ export class RequisitionComponent implements OnInit {
     this.requisitionService
       .updateRequisition(requisition?.uuid, requisitionObject)
       .subscribe((response) => {
-        this.getAllRequisition();
+        this.getAllRequisitions();
+        localStorage.removeItem("availableRequisition");
       });
   }
 
@@ -210,7 +216,8 @@ export class RequisitionComponent implements OnInit {
     this.requisitionService
       .updateRequisition(requisition?.uuid, requisitionObject)
       .subscribe((response) => {
-        this.getAllRequisition();
+        localStorage.removeItem("availableRequisition");
+        this.getAllRequisitions();
       });
   }
 
@@ -245,7 +252,7 @@ export class RequisitionComponent implements OnInit {
       .receiveIssueItem(receiveObject)
       .subscribe((response) => {
         if (response) {
-          this.getAllRequisition();
+          this.getAllRequisitions();
         }
       });
   }
@@ -263,7 +270,7 @@ export class RequisitionComponent implements OnInit {
     this.requisitionService
       .updateRequisition(requisition?.uuid, requisitionObject)
       .subscribe((response) => {
-        this.getAllRequisition();
+        this.getAllRequisitions();
       });
   }
 
@@ -294,7 +301,7 @@ export class RequisitionComponent implements OnInit {
             .subscribe((response) => {
               // Add support to catch error
               if (response) {
-                this.getAllRequisition();
+                this.getAllRequisitions();
               }
             });
         }
@@ -331,7 +338,7 @@ export class RequisitionComponent implements OnInit {
           ).subscribe((response) => {
               // Add support to catch error
               if (response) {
-                this.getAllRequisition();
+                this.getAllRequisitions();
               }
             });
         }
@@ -363,7 +370,7 @@ export class RequisitionComponent implements OnInit {
       .subscribe((response) => {
         // Add support to catch error
         if (response) {
-          this.getAllRequisition();
+          this.getAllRequisitions();
         }
       });
   }
@@ -381,7 +388,7 @@ export class RequisitionComponent implements OnInit {
     this.requisitionService
       .updateRequisition(requisition?.uuid, requisitionObject)
       .subscribe((response) => {
-        this.getAllRequisition();
+        this.getAllRequisitions();
       });
   }
 
@@ -398,7 +405,7 @@ export class RequisitionComponent implements OnInit {
     this.requisitionService
       .updateRequisition(requisition?.uuid, requisitionObject)
       .subscribe((response) => {
-        this.getAllRequisition();
+        this.getAllRequisitions();
       });
   }
 
@@ -467,12 +474,12 @@ export class RequisitionComponent implements OnInit {
     this.page =
       event.pageIndex - this.page >= 0 ? this.page + 1 : this.page - 1;
     this.pageSize = Number(event?.pageSize);
-    this.getAllRequisition();
+    this.getAllRequisitions();
   }
 
   onSelectStatus(e) {
     this.selectedStatus = e?.value;
-    this.getAllRequisition();
+    this.getAllRequisitions();
   }
 
   getSelection(e: any): void {

@@ -25,6 +25,7 @@ export class IssueItemsComponent implements OnInit {
   specificRequisition$: Observable<any>;
   loadingRequisition: boolean = false;
   selectedItems: any = {};
+  selectAllItems: boolean = false;
 
   constructor(
     private requisitionService: RequisitionService,
@@ -61,7 +62,29 @@ export class IssueItemsComponent implements OnInit {
   }
 
   getSelection(event: MatCheckboxChange, item: any): void {
+    if(!event.checked) {
+      this.selectAllItems = false
+    }
     this.selectionChange.emit({ event: event, item: item });
+  }
+  
+  selectAll(e: MatCheckboxChange, items: any[]){
+    if(e?.checked){
+      items.forEach((item) => {
+        this.selectedItems = {
+          ...this.selectedItems,
+          [item]: item
+        }
+        this.selectionChange.emit({ event: e, item: item });
+      })
+      this.selectAllItems = true;
+    } else {
+      this.selectAllItems = false;
+      this.selectedItems = {}
+      items.forEach((item) => {
+        this.selectionChange.emit({ event: e, item: item });
+      })
+    }
   }
 
   get selectedIssuesCount(): number {
