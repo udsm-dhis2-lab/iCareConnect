@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CaptureLabResultsComponent } from './capture-lab-results.component';
+import { BarCodePrintModalComponent } from './bar-code-print-modal.component';
 
-describe('CaptureLabResultsComponent', () => {
-  let component: CaptureLabResultsComponent;
-  let fixture: ComponentFixture<CaptureLabResultsComponent>;
+describe('BarCodePrintModalComponent', () => {
+  let component: BarCodePrintModalComponent;
+  let fixture: ComponentFixture<BarCodePrintModalComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CaptureLabResultsComponent ]
+      declarations: [ BarCodePrintModalComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CaptureLabResultsComponent);
+    fixture = TestBed.createComponent(BarCodePrintModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

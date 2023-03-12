@@ -19,11 +19,9 @@ export class IframeBasedStandardReportComponent
     iframe.style.border = "none";
     iframe.style.width = "100%";
     iframe.style.maxHeight = "90vh";
+    iframe.height = "800";
     iframe.setAttribute("id", "iframe_id");
-    iframe.setAttribute(
-      "onload",
-      "this.height=this.contentWindow.document.body.scrollHeight;"
-    );
+    iframe.setAttribute("onload", "resizeIframe(this)");
     setTimeout(() => {
       const where = document.getElementById("html_id");
       if (where) {

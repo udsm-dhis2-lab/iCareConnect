@@ -85,7 +85,7 @@ public class SampleLableDAO extends BaseDAO<SampleLable> {
 			} else if (metadataType.equals("batchset")){
 				queryStr = "SELECT COUNT(bs) FROM BatchSet bs WHERE YEAR(bs.dateCreated) = :year";
 			} else if (metadataType.equals("batch")){
-				queryStr = "SELECT COUNT(b) FROM Batch b WHERE YEAR(b.dateCreated) = :year";
+				queryStr = "SELECT COUNT(b) FROM BatchSample b WHERE YEAR(b.dateCreated) = :year";
 			}
 			if (queryStr != null) {
 				Calendar calendar = Calendar.getInstance();

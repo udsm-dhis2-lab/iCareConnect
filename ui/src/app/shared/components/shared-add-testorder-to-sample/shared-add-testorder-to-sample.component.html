@@ -22,6 +22,17 @@
         [fields]="[formField]"
         (formUpdate)="onUpdateForm($event)"
       ></app-form>
+
+      <div class="d-flex justify-content-end mt-2">
+        <button
+          mat-flat-button
+          [disabled]="!isFormValid"
+          color="primary"
+          (click)="onSave($event)"
+        >
+          Add
+        </button>
+      </div>
     </div>
     <div class="col-md-6">
       <div class="ml-2 mr-2">
@@ -75,15 +86,5 @@
         </table>
       </div>
     </div>
-  </div>
-  <div class="d-flex justify-content-end">
-    <button
-      mat-flat-button
-      [disabled]="!isFormValid"
-      color="primary"
-      (click)="onSave($event)"
-    >
-      Save
-    </button>
   </div>
 </div>

@@ -117,10 +117,9 @@ import { SharedInstrumentSelectionComponent } from "./shared-instrument-selectio
 import { DateTimeFieldComponent } from "./date-time-field/date-time-field.component";
 import { PatientHistoryComponent } from "./patient-history/patient-history.component";
 import { PatientHistoryDataComponent } from "./patient-history-data/patient-history-data.component";
-
+import { SharedSamplesListComponent } from "./shared-samples-list/shared-samples-list.component";
 export const components: any[] = [
   PatientAddressComponent,
-
   PatientSearchComponent,
   PatientProfileComponent,
   DrugOrderComponent,
@@ -208,7 +207,6 @@ export const components: any[] = [
   SharedBmiComponent,
   PatientObservationsChartComponent,
   ObservationChartTableComponent,
-  SharedConfirmationComponent,
   IpdFormsComponent,
   SharedErrorComponent,
   SharedConceptCreateComponent,
@@ -239,6 +237,8 @@ export const components: any[] = [
   DateTimeFieldComponent,
   PatientHistoryComponent,
   PatientHistoryDataComponent,
+  SharedConfirmationComponent,
+  SharedSamplesListComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
@@ -261,8 +261,8 @@ export const sharedEntryComponents: any[] = [
   ManageRolesComponent,
   SharedConfirmationDialogComponent,
   AttendProcedureOrderComponent,
-  SharedConfirmationComponent,
   ManageItemPriceComponent,
+  SharedConfirmationComponent,
 ];
 
 export * from "./patient-vitals-summary/patient-vitals-summary.component";

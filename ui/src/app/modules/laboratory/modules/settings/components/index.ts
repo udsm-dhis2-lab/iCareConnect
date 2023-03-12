@@ -3,6 +3,7 @@ import { CodedAnswersSelectionComponent } from "./coded-answers-selection/coded-
 import { CodedAnswersComponent } from "./coded-answers/coded-answers.component";
 import { CodesSelectionComponent } from "./codes-selection/codes-selection.component";
 import { ConceptMapTypesComponent } from "./concept-map-types/concept-map-types.component";
+import { ConceptReferenceTermsSelectionComponent } from "./concept-reference-terms-selection/concept-reference-terms-selection.component";
 import { ConceptReferenceTermsComponent } from "./concept-reference-terms/concept-reference-terms.component";
 import { ConceptSetMembersSelectionComponent } from "./concept-set-members-selection/concept-set-members-selection.component";
 import { ConceptSetMembersComponent } from "./concept-set-members/concept-set-members.component";
@@ -23,6 +24,7 @@ import { SampleTypesListComponent } from "./sample-types-list/sample-types-list.
 import { SharedPriceListComponent } from "./shared-price-list/shared-price-list.component";
 import { StandardConceptCreationComponent } from "./standard-concept-creation/standard-concept-creation.component";
 import { TestMethodsComponent } from "./test-methods/test-methods.component";
+import { TestOrderParametersRelationshipComponent } from "./test-order-parameters-relationship/test-order-parameters-relationship.component";
 import { TestsControlComponent } from "./tests-control/tests-control.component";
 import { UserManagementDashboardComponent } from "./user-management-dashboard/user-management-dashboard.component";
 import { UsersListComponent } from "./users-list/users-list.component";
@@ -62,6 +64,8 @@ export const components: any[] = [
   WorksheetsListComponent,
   WorksheetConfigurationComponent,
   WorksheetControlsComponent,
+  TestOrderParametersRelationshipComponent,
+  ConceptReferenceTermsSelectionComponent,
 ];
 
 export const entrySettingComponents: any[] = [

@@ -43,7 +43,9 @@ import { WorklistComponent } from "./worklist/worklist.component";
 import { CompletedSamplesComponent } from "./completed-samples/completed-samples.component";
 import { SamplesForResultsEntryComponent } from "./samples-for-results-entry/samples-for-results-entry.component";
 import { SampleTrackingListComponent } from "./sample-tracking-list/sample-tracking-list.component";
-import { SharedSamplesListComponent } from "./shared-samples-list/shared-samples-list.component";
+import { SamplesRejectedAfterRegistrationComponent } from "./samples-rejected-after-registration/samples-rejected-after-registration.component";
+import { BarCodePrintModalComponent } from "./bar-code-print-modal/bar-code-print-modal.component";
+import { SampleToPrintResultsComponent } from "./sample-to-print-results/sample-to-print-results.component";
 
 export const components: any[] = [
   PatientsByVisitsListComponent,
@@ -91,7 +93,9 @@ export const components: any[] = [
   CompletedSamplesComponent,
   SamplesForResultsEntryComponent,
   SampleTrackingListComponent,
-  SharedSamplesListComponent,
+  SamplesRejectedAfterRegistrationComponent,
+  BarCodePrintModalComponent,
+  SampleToPrintResultsComponent,
 ];
 
 export const sampleAcceptanceAndResultsModals: any[] = [

@@ -1,14 +1,9 @@
 <div
   class="w-100"
   *ngIf="{
-    acceptedSamples: acceptedSamples$ | async,
     providerDetails: providerDetails$ | async
   } as params"
 >
-  <mat-progress-bar
-    mode="indeterminate"
-    *ngIf="!params?.acceptedSamples"
-  ></mat-progress-bar>
   <div class="loading-overlay" *ngIf="saving">
     <div class="text-center">
       <div>Saving ....</div>
@@ -17,15 +12,21 @@
       </div>
     </div>
   </div>
-  <div *ngIf="params?.acceptedSamples">
+  <div>
     <app-shared-samples-list
       [tabType]="'accepted-samples'"
-      [samples]="params?.acceptedSamples"
       [LISConfigurations]="LISConfigurations"
       [labSamplesDepartments]="labSamplesDepartments"
       (selectedSampleDetails)="
         onGetSelectedSampleDetails($event, params?.providerDetails)
       "
+      [category]="'ACCEPTED'"
+      [hasStatus]="'YES'"
+      [showLegend]="true"
+      [datesParameters]="datesParameters"
+      [excludeAllocations]="excludeAllocations"
+      [sampleTypes]="sampleTypes"
+      [codedSampleRejectionReasons]="codedSampleRejectionReasons"
     ></app-shared-samples-list>
   </div>
 </div>
