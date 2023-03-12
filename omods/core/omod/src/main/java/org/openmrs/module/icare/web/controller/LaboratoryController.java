@@ -61,7 +61,6 @@ public class LaboratoryController {
 			
 			//add the sample after creating its object
 			responseSamplesObject.add(sampleObject);
-			
 		}
 		Map<String,Object> retults = new HashMap<>();
 		retults.put("results", responseSamplesObject);
@@ -178,8 +177,7 @@ public class LaboratoryController {
 				}
 			}
 			catch (Exception e) {
-				System.out
-				        .println("Dates provided were not in correct format, please format in year-month-date e.g 1990-01-05");
+				System.out.println("Dates provided were not in correct format, please format in year-month-date e.g 1990-01-05");
 			}
 		}
 		
@@ -203,9 +201,7 @@ public class LaboratoryController {
 	@ResponseBody
 	public Map<String, Object> getSamplesByUuid(@PathVariable String sampleUuid) {
 		Sample sample = laboratoryService.getSampleByUuid(sampleUuid);
-		
-		Map<String, Object> sampleObject = sample.toMap();
-		return sampleObject;
+		return sample.toMap();
 	}
 	
 	@RequestMapping(value = "samples", method = RequestMethod.GET)
@@ -303,19 +299,17 @@ public class LaboratoryController {
 		}
 		
 		List<TestAllocation> savedAllocations = laboratoryService.createAllocationsForSample(allocationsToSave);
+
 		Map<String, Object> response = new HashMap<String, Object>();
 		List<Map<String, Object>> savedAllocationsListMap = new ArrayList<Map<String, Object>>();
+
 		for (TestAllocation savedAllocation : savedAllocations) {
-			
 			savedAllocationsListMap.add((savedAllocation.toMap()));
-			
 		}
-		
+
 		response.put("status", savedSampleStatus.toMap());
 		response.put("allocations", savedAllocationsListMap);
-		
 		return response;
-		
 	}
 	
 	@RequestMapping(value = "samplestatus", method = RequestMethod.POST)
@@ -351,9 +345,22 @@ public class LaboratoryController {
 			}
 		}
 		return orders;
-		
 	}
-	
+
+	@RequestMapping(value = "sampledorders/{visitUuid}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getSampledOrdersByVisit(@PathVariable String visitUuid) {
+		List<Map<String, Object>> orders = new ArrayList();
+		List<Sample> samples = laboratoryService.getSamplesByVisitOrPatientAndOrDates(visitUuid, null, null, null);
+		for(Sample sample: samples) {
+			for(SampleOrder sampleOrder: sample.getSampleOrders()) {
+				orders.add(sampleOrder.toMap(true));
+			}
+		}
+		return orders;
+	}
+
+
 	@RequestMapping(value = "assign", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateSampleOrder(@RequestBody Map<String, Object> sampleOrderObject) throws Exception {

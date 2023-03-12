@@ -154,6 +154,19 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		String data = response.getContentAsString();
 		System.out.println(data);
 	}
+
+	@Test
+	public  void testGetSampledOrders() throws Exception {
+		// Given visit uuid
+		//When
+		MockHttpServletRequest getRequest = newGetRequest("lab/sampledorders/d9c1d8ac-2b8e-427f-804d-b858c52e6f11");
+		MockHttpServletResponse handle = handle(getRequest);
+		List<Map<String, Object>> orders = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
+		System.out.println(orders);
+
+		//Then
+		assertThat("Samples orders available is 4:", orders.size(), is(4));
+	}
 	
 	@Test
 	public void testUpdateSampleOrder() throws Exception {
