@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { AfterViewInit, Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatRadioChange } from "@angular/material/radio";
 import { Observable, of, zip } from "rxjs";
@@ -34,13 +34,16 @@ import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import * as JSPM from "jsprintmanager"
+import { BarCodePrintModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-print-modal/bar-code-print-modal.component";
+import { webSocket } from 'rxjs/webSocket';
 
 @Component({
   selector: "app-single-registration",
   templateUrl: "./single-registration.component.html",
   styleUrls: ["./single-registration.component.scss"],
 })
-export class SingleRegistrationComponent implements OnInit {
+export class SingleRegistrationComponent implements OnInit,AfterViewInit {
   labSampleLabel$: Observable<string>;
   @Input() mrnGeneratorSourceUuid: string;
   @Input() preferredPersonIdentifier: string;
@@ -53,6 +56,8 @@ export class SingleRegistrationComponent implements OnInit {
   @Input() testsFromExternalSystemsConfigs: any[];
   @Input() currentUser: any;
   @Input() allRegistrationFields: any;
+  @Input() LISConfigurations: any;
+  @Input() barcodeSettings: any;
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -123,6 +128,7 @@ export class SingleRegistrationComponent implements OnInit {
   labLocations$: Observable<any>;
   currentLabLocation: any;
   existingFields: any;
+  connection: any;
 
   constructor(
     private samplesService: SamplesService,
@@ -141,6 +147,16 @@ export class SingleRegistrationComponent implements OnInit {
   ) {
     this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
   }
+  ngAfterViewInit(): void {
+    this.connection = webSocket(this.barcodeSettings?.socketUrl);
+
+    this.connection.subscribe({
+      next: msg => console.log('message received: ', msg), // Called whenever there is a message from the server.
+      error: err => console.log(err), // Called if at any point WebSocket API signals some kind of error.
+      complete: () => console.log('complete') // Called when connection is closed (for whatever reason).
+    });
+  }
+
 
   ngOnInit(): void {
     const userLocationsIds = JSON.parse(
@@ -156,10 +172,11 @@ export class SingleRegistrationComponent implements OnInit {
 
     this.specimenDetailsFields = Object.keys(
       this.allRegistrationFields?.specimenDetailFields
-    ).slice(0, 3)
+    )
+      .slice(0, 3)
       .map((key) => {
         const field = this.allRegistrationFields?.specimenDetailFields[key];
-        return field
+        return field;
       });
 
     // this.specimenDetailsFields = [
@@ -218,15 +235,27 @@ export class SingleRegistrationComponent implements OnInit {
     //   // }),
     // ];
 
-    this.receivedOnField = this.allRegistrationFields?.specimenDetailFields?.receivedOn;
-    this.receivedByField = this.allRegistrationFields?.specimenDetailFields?.receivedBy;
-    this.transportCondition = this.allRegistrationFields?.specimenDetailFields?.transportCondition;
-    this.transportationTemperature = this.allRegistrationFields?.specimenDetailFields?.transportationTemperature;
+    this.receivedOnField =
+      this.allRegistrationFields?.specimenDetailFields?.receivedOn;
+    this.receivedByField =
+      this.allRegistrationFields?.specimenDetailFields?.receivedBy;
+    this.transportCondition =
+      this.allRegistrationFields?.specimenDetailFields?.transportCondition;
+    this.transportationTemperature =
+      this.allRegistrationFields?.specimenDetailFields?.transportationTemperature;
 
-    this.sampleColectionDateField = this.allRegistrationFields?.specimenDetailFields?.collectedOn;
-    this.sampleCollectedByField = this.allRegistrationFields?.specimenDetailFields?.collectedBy;
-    this.broughtOnField = this.allRegistrationFields?.specimenDetailFields?.broughtOn;
-    this.broughtByField = this.allRegistrationFields?.specimenDetailFields?.broughtBy;
+    this.sampleColectionDateField =
+      this.allRegistrationFields?.specimenDetailFields?.collectedOn;
+    this.sampleCollectedByField =
+      this.allRegistrationFields?.specimenDetailFields?.collectedBy;
+    this.broughtOnField =
+      this.allRegistrationFields?.specimenDetailFields?.broughtOn;
+    this.broughtByField =
+      this.allRegistrationFields?.specimenDetailFields?.broughtBy;
+
+    this.receivedOnField.max = this.maximumDate;
+    this.broughtOnField.max = this.maximumDate;
+    this.sampleColectionDateField.max = this.maximumDate;
 
     const currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
     const labsAvailable =
@@ -407,8 +436,8 @@ export class SingleRegistrationComponent implements OnInit {
     };
   }
 
-  onGetDateTime(e: any){
-    console.log("==> Date time: ", e )
+  onGetDateTime(e: any) {
+    console.log("==> Date time: ", e);
   }
 
   onFormUpdate(formValues: FormValue, itemKey?: string): void {
@@ -1008,6 +1037,11 @@ export class SingleRegistrationComponent implements OnInit {
                                                                     ][0]
                                                                       ?.departmentUuid,
                                                                   },
+                                                                  specimenSource:
+                                                                    {
+                                                                      uuid: this
+                                                                        .selectedSpecimenUuid,
+                                                                    },
                                                                   location: {
                                                                     uuid: this
                                                                       .currentLabLocation
@@ -1554,6 +1588,7 @@ export class SingleRegistrationComponent implements OnInit {
                                                                                     sampleLabelsUsedDetails:
                                                                                       this
                                                                                         .sampleLabelsUsedDetails,
+                                                                                    isLis: this.LISConfigurations?.isLIS
                                                                                   };
                                                                                 this.dialog
                                                                                   .open(
@@ -1583,9 +1618,19 @@ export class SingleRegistrationComponent implements OnInit {
                                                                                   .afterClosed()
                                                                                   .subscribe(
                                                                                     () => {
-                                                                                      this.openBarCodeDialog(
-                                                                                        data
-                                                                                      );
+                                                                                      if( this.barcodeSettings?.barcode){
+                                                                                        this.connection.next(
+                                                                                          {
+                                                                                            Message: this.barcodeSettings?.barcode?.split("{{sampleID}}").join(data?.sampleLabelsUsedDetails[0]?.label), 
+                                                                                            Type: "print"})
+                                                                                      } else {
+                                                                                        // this.jsPrint(
+                                                                                        //   data
+                                                                                        // );
+                                                                                        this.openBarCodeDialog(
+                                                                                          data
+                                                                                        );
+                                                                                      }
                                                                                       this.isRegistrationReady =
                                                                                         false;
                                                                                       setTimeout(
@@ -1803,7 +1848,7 @@ export class SingleRegistrationComponent implements OnInit {
     this.dialog
       .open(BarCodeModalComponent, {
         height: "200px",
-        width: "15%",
+        width: "25%",
         data,
         disableClose: false,
         panelClass: "custom-dialog-container",
@@ -1870,12 +1915,93 @@ export class SingleRegistrationComponent implements OnInit {
     return (
       formatDateToYYMMDD(date) +
       "T" +
-      date.getHours() +
+      this.formatDimeChars(date.getHours().toString()) +
       ":" +
-      date.getMinutes() +
+      this.formatDimeChars(date.getMinutes().toString()) +
       ":" +
-      date.getSeconds() +
+      this.formatDimeChars(date.getSeconds().toString()) +
       ".000Z"
     );
   }
+
+  formatDimeChars(char: string): string {
+    return char.length == 1 ? "0" + char : char;
+  }
+
+    //Check JSPM WebSocket status
+  
+  
+  jsPrint(data: any = [{
+          visit: {
+              uuid: "330a23f2-83f6-4795-861c-71c22bcf230a"
+          },
+          label: "NPHL/23/0000115",
+          concept: {
+              uuid: "e61969c1-eb08-4c26-b9ce-fd7b02a4064e"
+          },
+          location: {
+              uuid: "7fdfa2cb-bc95-405a-88c6-32b7673c0453"
+          },
+          orders: [
+              {
+                  uuid: "36799ca6-bd8f-4dfb-8e47-3994c6775dde"
+              },
+              {
+                  uuid: "ad49832a-05e6-46af-bae4-3781b0e55749"
+              }
+          ],
+          uuid: "051b1294-b272-41bf-ba60-dbd95d308bf6"
+        }]) {
+    // WebSocket settings
+    JSPM.JSPrintManager.auto_reconnect = true;
+    JSPM.JSPrintManager.start();
+    JSPM.JSPrintManager.WS.onStatusChanged = () => {
+        if (this.jspmWSStatus()) {
+            // get client installed printers
+            JSPM.JSPrintManager.getPrinters().then((printers) => {
+              this.openBarCodeDialog({
+                sampleLabelsUsedDetails: data?.sampleLabelsUsedDetails ? data?.sampleLabelsUsedDetails : data,
+                printers: printers,
+                isLis: true,
+              });
+            })
+        }
+    };
+  }
+
+  jspmWSStatus() {
+    if (JSPM.JSPrintManager.websocket_status === JSPM.WSStatus.Open) {
+        return true;
+    } else if (JSPM.JSPrintManager.websocket_status === JSPM.WSStatus.Closed) {
+        this.errorMessage = 'JSPrintManager (JSPM) is not installed or not running! Download JSPM Client App from https://neodynamic.com/downloads/jspm';
+        return false;
+      } else if (JSPM.JSPrintManager.websocket_status === JSPM.WSStatus.Blocked) {
+      this.errorMessage = 'JSPM has blocked this website!';
+        return false;
+    }
+  }
+
+  // Do Zebra ZPL printing...
+  doPrintZPL(data?: any) {
+        // Create a ClientPrintJob
+    const cpj = new JSPM.ClientPrintJob();
+    if(data?.selectedPrinter){
+      cpj.clientPrinter = new JSPM.InstalledPrinter(data?.selectedPrinter)
+    } else {
+      cpj.clientPrinter = new JSPM.DefaultPrinter();
+    }
+        // Set content to print...
+        //Create Zebra ZPL commands for sample label
+		var cmds =  `
+      ^XA
+      ^FO10,30^BCB,100,Y,N,N,N^FD${data?.sampleDetails?.label}^FS
+      ^FO220,30^BCB,100,Y,N,N,N^FD${data?.sampleDetails?.label}^FS
+      ^FO400,30^BCB,100,Y,N,N,N^FD${data?.sampleDetails?.label}^FS
+      ^XZ
+    `;
+		cpj.printerCommands = cmds;
+
+    // Send print job to printer!
+    cpj.sendToClient();
+    }
 }

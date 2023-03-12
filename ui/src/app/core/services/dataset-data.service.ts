@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { from, Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { Api } from "src/app/shared/resources/openmrs";
@@ -32,5 +32,11 @@ export class DatasetDataService {
           return report;
         })
       );
+  }
+
+  getDataSets(): Observable<any[]> {
+    return from(this.api.reportingrest.getAllDataSetDefinitions()).pipe(
+      map((response) => response?.results)
+    );
   }
 }

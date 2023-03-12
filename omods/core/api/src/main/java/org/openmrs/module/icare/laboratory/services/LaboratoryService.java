@@ -22,7 +22,8 @@ public interface LaboratoryService extends OpenmrsService {
 	List<Sample> getAllSamples();
 	
 	ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
-	        String testCategory, String q, String hasStatus, String acceptedByUuid);
+	        String testCategory, String q, String hasStatus, String acceptedByUuid, String testConceptUuid,
+	        String departmentUuid, String specimenSourceUuid);
 	
 	List<Sample> getSampleByDates(Date startDate, Date endDate);
 	
@@ -107,9 +108,11 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	WorkloadSummary getWorkLoadSummary(Date startDate, Date endDate);
 	
-	List<Batch> getBatches(Date start, Date end, String q, Integer startIndex, Integer limit);
+	List<Batch> getBatches(Date start, Date end, String uuid, String q, Integer startIndex, Integer limit);
 	
 	Batch getBatchByUuid(String batchUuid);
+	
+	List<Sample> getSamplesByBatchSampleUuid(String batchUuid);
 	
 	Batch addBatch(Batch batch);
 	
@@ -161,5 +164,26 @@ public interface LaboratoryService extends OpenmrsService {
 	List<BatchSample> getBatchSamples(Date start, Date end, String q, Integer startIndex, Integer limit);
 	
 	ListResult<SampleExt> getSamplesWithoutAllocations(Date start, Date end, Pager pager, String locationUuid,
-	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid);
+	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
+	        String testConceptUuid, String departmentUuid, String specimenSourceUuid);
+	
+	AssociatedField addAssociatedField(AssociatedField associatedField);
+	
+	List<AssociatedField> getAssociatedFields(String q, Integer startIndex, Integer limit);
+	
+	TestAllocationAssociatedField addTestAllocationAssociatedField(
+	        TestAllocationAssociatedField testAllocationAssociatedField) throws Exception;
+	
+	List<TestAllocationAssociatedField> getTestAllocationAssociatedFields(String q, Integer startIndex, Integer limit,
+	        String allocationUuid, String associatedFieldUuid);
+	
+	AssociatedFieldResult addAssociatedFieldResult(AssociatedFieldResult associatedFieldResult) throws Exception;
+	
+	List<AssociatedFieldResult> getAssociatedFieldResults(Integer startIndex, Integer limit, String resultUuid,
+	        String associatedFieldUuid);
+	
+	AssociatedField getAssociatedFieldByUuid(String associatedFieldUuid);
+	
+	AssociatedField updateAssociatedField(String associatedFieldUuid, AssociatedField associatedField);
+	
 }

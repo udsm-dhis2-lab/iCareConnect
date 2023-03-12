@@ -9,13 +9,16 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 })
 export class SharedDashboardSingleValueContainerComponent implements OnInit {
   @Input() datesParams: any;
+  @Input() dashboardSingleValueDataSetsReferenceKey: string;
   singleValueSamplesDashboardItemsDataSetsReferences$: Observable<any[]>;
   constructor(private systemSettingsService: SystemSettingsService) {}
 
   ngOnInit(): void {
     this.singleValueSamplesDashboardItemsDataSetsReferences$ =
       this.systemSettingsService.getSystemSettingsMatchingAKey(
-        `iCare.laboratory.dashboard.settings.samples.singleValue`
+        !this.dashboardSingleValueDataSetsReferenceKey
+          ? `iCare.laboratory.dashboard.settings.samples.singleValue`
+          : this.dashboardSingleValueDataSetsReferenceKey
       );
   }
 }

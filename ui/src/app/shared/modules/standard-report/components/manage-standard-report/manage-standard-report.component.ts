@@ -5,6 +5,7 @@ import { Textbox } from "../../../form/models/text-box.model";
 import { TextArea } from "../../../form/models/text-area.model";
 import { FormValue } from "../../../form/models/form-value.model";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { MatCheckboxChange } from "@angular/material/checkbox";
 
 @Component({
   selector: "lib-manage-standard-report",
@@ -47,6 +48,10 @@ export class ManageStandardReportComponent implements OnInit {
   saving: boolean = false;
   errors: any[] = [];
   formData: any = {};
+  thereIsAssociatedDataSetQueries: boolean = false;
+  selectedQueries: any = [];
+  isFormValid: boolean = false;
+  useDefaultPeFilter: boolean = true;
   constructor(
     private domSanitizer: DomSanitizer,
     private systemSettingsService: SystemSettingsService
@@ -56,6 +61,9 @@ export class ManageStandardReportComponent implements OnInit {
     this.errors = [];
     this.htmlContent = this.report?.value ? this.report?.value?.htmlCode : null;
     this.createReportFields(this.report);
+    this.thereIsAssociatedDataSetQueries =
+      this.report?.value?.queries && this.report?.value?.queries?.length > 0;
+    this.selectedQueries = this.report?.value?.queries || [];
   }
 
   createReportFields(data?: any): void {
@@ -88,7 +96,17 @@ export class ManageStandardReportComponent implements OnInit {
       description: this.formData?.description?.value,
       category: "standard",
       htmlCode: htmlContent,
-      renderAs: "iframe",
+      useDefaultPeFilter: this.useDefaultPeFilter,
+      renderAs: this.thereIsAssociatedDataSetQueries
+        ? "datasets-based"
+        : "iframe",
+      queries:
+        this.selectedQueries.map((query: any) => {
+          return {
+            ...query,
+            name: query?.display,
+          };
+        }) || [],
     };
     const data = {
       value: JSON.stringify(value),
@@ -119,5 +137,18 @@ export class ManageStandardReportComponent implements OnInit {
 
   onFormUpdate(formValue: FormValue): void {
     this.formData = formValue.getValues();
+    this.isFormValid = formValue.isValid;
+  }
+
+  getIFThereisQueriesAssociated(event: MatCheckboxChange): void {
+    this.thereIsAssociatedDataSetQueries = event?.checked;
+  }
+
+  getSelected(selectedQueries: any[]): void {
+    this.selectedQueries = selectedQueries;
+  }
+
+  onGetHasDefaultPeriodFilter(event: MatCheckboxChange): void {
+    this.useDefaultPeFilter = event?.checked;
   }
 }

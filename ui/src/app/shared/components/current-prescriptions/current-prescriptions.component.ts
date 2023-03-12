@@ -83,7 +83,10 @@ export class CurrentPrescriptionComponent implements OnInit {
   }
 
   getDrugsPrescribed() {
-    this.drugsPrescribed = getGenericDrugPrescriptionsFromVisit(this.visit, this.genericPrescriptionOrderType);
+    this.drugsPrescribed = getGenericDrugPrescriptionsFromVisit(
+      this.visit,
+      this.genericPrescriptionOrderType
+    );
   }
 
   stopDrugOrder(e: Event, drugOrder: any, drugName: string) {

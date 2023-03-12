@@ -97,21 +97,84 @@ export class WorkSheetsService {
   getWorksheetDefinitionsByUuid(uuid: string): Observable<any> {
     return this.httpClient.get(`lab/worksheetdefinition?uuid=${uuid}`).pipe(
       map((response) => {
+        let testAllocationAssociatedFieldsCount = 1;
+        let associatedFieldsReference = [];
+        const formattedWorksheetSamples = response?.worksheetSamples?.map(
+          (worksheetSample) => {
+            const testAllocationAssociatedFields =
+              worksheetSample?.sample?.allocations[0]?.testAllocationAssociatedFields?.map(
+                (assocField) => {
+                  return {
+                    ...assocField,
+                    sample: worksheetSample?.sample,
+                  };
+                }
+              );
+
+            associatedFieldsReference = testAllocationAssociatedFields
+              ? testAllocationAssociatedFields
+              : associatedFieldsReference;
+            if (
+              testAllocationAssociatedFieldsCount <
+              testAllocationAssociatedFields?.length
+            ) {
+              testAllocationAssociatedFieldsCount =
+                testAllocationAssociatedFields?.length;
+            }
+            return {
+              ...worksheetSample,
+              searchText:
+                worksheetSample?.sample?.display +
+                " " +
+                worksheetSample?.sample?.allocations
+                  ?.map(
+                    (allocation) =>
+                      allocation?.concept?.display + " " + allocation?.label
+                  )
+                  ?.join(" "),
+              allocationsCount: worksheetSample?.sample?.allocations.length,
+              testAllocationAssociatedFieldsCount: 0,
+              testAllocationAssociatedFields: testAllocationAssociatedFields,
+              sample: {
+                ...worksheetSample?.sample,
+                allocations: worksheetSample?.sample?.allocations?.map(
+                  (allocation) => new SampleAllocation(allocation).toJson()
+                ),
+                hasResults:
+                  (
+                    worksheetSample?.sample?.statuses?.filter(
+                      (status) => status?.category === "HAS_RESULTS"
+                    ) || []
+                  )?.length > 0,
+                authorizationStatuses:
+                  worksheetSample?.sample?.statuses?.filter(
+                    (status) => status?.category === "RESULT_AUTHORIZATION"
+                  ) || [],
+              },
+            };
+          }
+        );
+        const countOfWSSamples = formattedWorksheetSamples?.length;
         return {
           ...response,
-          worksheetSamples: response?.worksheetSamples?.map(
-            (worksheetSample) => {
-              return {
-                ...worksheetSample,
-                sample: {
-                  ...worksheetSample?.sample,
-                  allocations: worksheetSample?.sample?.allocations?.map(
-                    (allocation) => new SampleAllocation(allocation)
+          worksheetSamples: formattedWorksheetSamples,
+          testAllocationAssociatedFieldsCount,
+          associatedFieldsReference,
+          groupedWorksheetSamples:
+            countOfWSSamples > 1
+              ? {
+                  group1: formattedWorksheetSamples.slice(
+                    0,
+                    countOfWSSamples / 2
                   ),
+                  group2: formattedWorksheetSamples.slice(
+                    Number((countOfWSSamples / 2).toFixed(0)),
+                    Number((2 * (countOfWSSamples / 2)).toFixed(0))
+                  ),
+                }
+              : {
+                  group1: formattedWorksheetSamples,
                 },
-              };
-            }
-          ),
         };
       }),
       catchError((error) => of(error))

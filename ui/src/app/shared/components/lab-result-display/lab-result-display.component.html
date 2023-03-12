@@ -15,6 +15,18 @@
         : "No result"
     }}
   </b>
+
+  <span>
+    {{
+      observationsKeyedByConcept &&
+      observationsKeyedByConcept[labTest?.concept?.uuid + "-" + labTest?.uuid]
+        ?.latest
+        ? observationsKeyedByConcept[
+            labTest?.concept?.uuid + "-" + labTest?.uuid
+          ]?.latest?.concept?.units
+        : ""
+    }}
+  </span>
   <span style="font-size: x-small">
     <em *ngIf="labTest?.result"
       >(Fed at:
@@ -41,15 +53,6 @@
         : "No result"
     }}
   </b>
-  <span>
-    {{
-      observationsKeyedByConcept &&
-      observationsKeyedByConcept[concept?.uuid + "-" + labTest?.uuid]?.latest
-        ? observationsKeyedByConcept[concept?.uuid + "-" + labTest?.uuid]
-            ?.latest?.concept?.units
-        : ""
-    }}
-  </span>
   <span>
     {{
       observationsKeyedByConcept &&

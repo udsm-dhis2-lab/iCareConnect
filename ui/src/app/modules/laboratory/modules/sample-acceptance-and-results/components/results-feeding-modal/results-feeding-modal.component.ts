@@ -296,11 +296,9 @@ export class ResultsFeedingModalComponent implements OnInit {
     // const index = newFiles.indexOf(availableFile);
     // newFiles = index < 0 ? [...newFiles, {}] : [...newFiles.slice(0, index), availableFile, newFiles.slice(index + 1)];
     let existingFile = this.files.find(
-          (file) => file.parameterUuid === parameter?.uuid
-        )
-    if (
-      parameter?.datatype?.display === "Complex"
-    ) {
+      (file) => file.parameterUuid === parameter?.uuid
+    );
+    if (parameter?.datatype?.display === "Complex") {
       this.files = [
         ...this.files.filter((file) => file.parameterUuid !== parameter?.uuid),
         existingFile
@@ -618,8 +616,7 @@ export class ResultsFeedingModalComponent implements OnInit {
         "file",
         this.file ||
           this.files.filter(
-            (fileObject) =>
-              fileObject.parameterUuid === parameter?.uuid
+            (fileObject) => fileObject.parameterUuid === parameter?.uuid
           )[0]?.valueFile
       );
       data.append("json", JSON.stringify(jsonData));
@@ -1154,7 +1151,6 @@ export class ResultsFeedingModalComponent implements OnInit {
       this.saveAllMessage = "Please feed results first";
     }
   }
-
 
   saveFilesAsObservations(fileObjects: any[]) {
     fileObjects.forEach((file) => {

@@ -1,14 +1,12 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { SampleResultsPrintingComponent } from "src/app/modules/laboratory/components/sample-results-printing/sample-results-printing.component";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
-import { filter, orderBy, groupBy } from "lodash";
-import { getCompletedOrders } from "src/app/modules/laboratory/resources/helpers";
+import { groupBy } from "lodash";
 import { PrintResultsModalComponent } from "../print-results-modal/print-results-modal.component";
 import { LabSample } from "src/app/modules/laboratory/resources/models";
 
@@ -42,6 +40,8 @@ export class CompletedSamplesComponent implements OnInit {
 
   samplesToViewMoreDetails: any = {};
   saving: boolean = false;
+  @Output() dataToPrint: EventEmitter<any> = new EventEmitter<any>();
+
   constructor(
     private store: Store<AppState>,
     private sampleService: SamplesService,
@@ -50,7 +50,6 @@ export class CompletedSamplesComponent implements OnInit {
 
   ngOnInit(): void {
     this.providerDetails$ = this.store.select(getProviderDetails);
-    this.getSamples();
   }
 
   getSamples(): void {
@@ -105,11 +104,11 @@ export class CompletedSamplesComponent implements OnInit {
                     samples: samplesKeyedByDepartments[depName].map(
                       (sampleObject) => {
                         const sample = new LabSample(
-                          sampleObject?.sample,
+                          sampleObject,
                           this.labSamplesDepartments,
                           this.sampleTypes,
                           this.codedSampleRejectionReasons
-                        );
+                        ).toJSon();
                         return sample;
                       }
                     ),
@@ -121,19 +120,14 @@ export class CompletedSamplesComponent implements OnInit {
         })
       )
       .subscribe((response) => {
-        console.log(response);
-        this.dialog.open(PrintResultsModalComponent, {
-          data: {
-            patientDetailsAndSamples: response[0],
-            labConfigs: this.labConfigs,
-            LISConfigurations: this.LISConfigurations,
-            user: providerDetails,
-            authorized: true,
-          },
-          width: "60%",
-          height: "100%",
-          disableClose: false,
-        });
+        const data = {
+          patientDetailsAndSamples: response[0],
+          labConfigs: this.labConfigs,
+          LISConfigurations: this.LISConfigurations,
+          user: providerDetails,
+          authorized: true,
+        };
+        this.dataToPrint.emit(data);
       });
   }
 }

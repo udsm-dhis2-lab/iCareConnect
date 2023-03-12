@@ -1,5 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { flatten, omit, keyBy } from "lodash";
+import { Observable } from "rxjs";
+import { tap } from "rxjs/operators";
+import { GenerateMetadataLabelsService } from "src/app/core/services";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { DropdownOption } from "src/app/shared/modules/form/models/dropdown-option.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
@@ -28,6 +32,9 @@ export class BatchRegistrationComponent implements OnInit {
   @Input() existingBatchsets: any[] = [];
   @Input() existingBatches: any[] = [];
   @Input() fromMaintenance: boolean;
+  @Input() LISConfigurations: boolean;
+  @Input() barcodeSettings: any;
+  
   @Output() reloadRegisterSample: EventEmitter<any> = new EventEmitter();
   formData: any;
   useExistingBatchset: boolean = false;
@@ -60,14 +67,19 @@ export class BatchRegistrationComponent implements OnInit {
   batchsetDescription: any;
   errors: any[] = [];
   selectedBatch: any;
-  isFormInstantiated: boolean = false
+  isFormInstantiated: boolean = false;
+  batchSampleCodeFormatReference$: Observable<any>;
 
-  constructor(private sampleService: SamplesService) {}
+  constructor(
+    private sampleService: SamplesService,
+    private systemSettingsService: SystemSettingsService
+  ) {}
 
   ngOnInit(): void {
     this.warning = {
       error: {
-        message: "This feature is still under development hence official usage is not allowed (Use it for testing purposes)!",
+        message:
+          "This feature is still under development hence official usage is not allowed (Use it for testing purposes)!",
       },
       type: "warning",
     };
@@ -130,6 +142,32 @@ export class BatchRegistrationComponent implements OnInit {
     setTimeout(() => {
       this.instantiateBatchRegistrationFields();
     }, 200);
+
+    if (!this.fromMaintenance) {
+      this.batchSampleCodeFormatReference$ = this.systemSettingsService
+        .getSystemSettingsDetailsByKey(
+          `iCare.laboratory.settings.batch.sample.registration.code.format`
+        )
+        .pipe(
+          tap((response) => {
+            if (response && !response?.error && response?.uuid) {
+              return response;
+            } else if (!response?.uuid && !response?.error) {
+              this.errors = [
+                ...this.errors,
+                {
+                  error: {
+                    message:
+                      "iCare.laboratory.settings.batch.sample.registration.code.format is not set",
+                  },
+                },
+              ];
+            } else {
+              this.errors = [...this.errors, response];
+            }
+          })
+        );
+    }
   }
 
   instantiateBatchRegistrationFields() {
@@ -178,9 +216,9 @@ export class BatchRegistrationComponent implements OnInit {
           value: batch?.name,
           name: batch?.name,
         };
-      })
-    }
-    
+      }),
+    };
+
     this.batchsetNameField =
       this.allRegistrationFields?.batchRegistrationFields?.batchsetNameField;
 
@@ -207,7 +245,6 @@ export class BatchRegistrationComponent implements OnInit {
         });
       }
       this.batchsetDescription.disabled = this.useExistingBatchset;
-      
     }
     if (key === "batch") {
       this.batchNameField.value = null;
@@ -370,18 +407,19 @@ export class BatchRegistrationComponent implements OnInit {
       let existingBatchset = this.existingBatchsets.filter(
         (batchset) => batchset.name === this.existingBatchsetField.value
       )[0];
-      this.useExistingBatch = false
+      this.useExistingBatch = false;
       setTimeout(() => {
-        this.existingBatchField.options = existingBatchset && existingBatchset?.batches?.length
+        this.existingBatchField.options =
+          existingBatchset && existingBatchset?.batches?.length
             ? existingBatchset?.batches?.map((batch) => {
-              return {
-                key: batch?.uuid,
+                return {
+                  key: batch?.uuid,
                   label: batch?.name,
                   value: batch?.name,
                   name: batch?.name,
                 };
               })
-              : this.existingBatches?.map((batch) => {
+            : this.existingBatches?.map((batch) => {
                 return {
                   key: batch?.uuid,
                   label: batch?.name,
@@ -389,9 +427,11 @@ export class BatchRegistrationComponent implements OnInit {
                   name: batch?.name,
                 };
               });
-        this.useExistingBatch = false
-      }, 100)
-      this.batchsetDescription.value = existingBatchset?.description?.length ? existingBatchset?.description : "";
+        this.useExistingBatch = false;
+      }, 100);
+      this.batchsetDescription.value = existingBatchset?.description?.length
+        ? existingBatchset?.description
+        : "";
       let existingBatchsetFields = existingBatchset?.fields;
       if (existingBatchsetFields?.length > 0) {
         this.selectedFixedFields =
@@ -412,13 +452,13 @@ export class BatchRegistrationComponent implements OnInit {
             : this.selectedDynamicFields.length
             ? this.selectedDynamicFields
             : [];
-        
+
         this.selectedFixedFields.map((field) => {
           if (field.allowCustomDateTime) {
             field = {
               ...field,
-              max: `${year}-${month}-${day}`,
-              disabled: true
+              // max: `${year}-${month}-${day}`,
+              disabled: true,
             };
             return field;
           }
@@ -429,7 +469,7 @@ export class BatchRegistrationComponent implements OnInit {
           if (field.allowCustomDateTime) {
             field = {
               ...field,
-              max: `${year}-${month}-${day}`,
+              // max: `${year}-${month}-${day}`,
             };
             return field;
           }
@@ -439,7 +479,7 @@ export class BatchRegistrationComponent implements OnInit {
           if (field.allowCustomDateTime) {
             field = {
               ...field,
-              max: `${year}-${month}-${day}`,
+              // max: `${year}-${month}-${day}`,
             };
             return field;
           }
@@ -460,7 +500,9 @@ export class BatchRegistrationComponent implements OnInit {
       this.selectedBatch = this.existingBatches.filter(
         (batch) => batch.name === this.existingBatchField.value
       )[0];
-      this.batchDescription.value = this.selectedBatch?.description?.length ? this.selectedBatch?.description : "";
+      this.batchDescription.value = this.selectedBatch?.description?.length
+        ? this.selectedBatch?.description
+        : "";
       let existingBatchFields = this.selectedBatch?.fields;
       if (existingBatchFields?.length > 0) {
         this.selectedFixedFields =
@@ -487,7 +529,7 @@ export class BatchRegistrationComponent implements OnInit {
             field = {
               ...field,
               max: `${year}-${month}-${day}`,
-              disabled: true
+              disabled: true,
             };
             return field;
           }
@@ -495,25 +537,25 @@ export class BatchRegistrationComponent implements OnInit {
         });
 
         this.selectedStaticFields.map((field) => {
-          if(field.allowCustomDateTime){
+          if (field.allowCustomDateTime) {
             field = {
               ...field,
-              max: `${year}-${month}-${day}`
+              max: `${year}-${month}-${day}`,
             };
-            return field; 
+            return field;
           }
-          return field
-        })
+          return field;
+        });
         this.selectedDynamicFields.map((field) => {
-          if(field.allowCustomDateTime){
+          if (field.allowCustomDateTime) {
             field = {
               ...field,
-              max : `${year}-${month}-${day}`,
-            }
-            return field; 
+              max: `${year}-${month}-${day}`,
+            };
+            return field;
           }
-          return field
-        })
+          return field;
+        });
       }
     }
     if (
@@ -545,19 +587,19 @@ export class BatchRegistrationComponent implements OnInit {
       this.validBatchsetName &&
       this.validBatchName &&
       !this.useExistingBatch &&
-      this.fieldsObjectValues?.fixedFieldsWithValues?.length ===
+      this.fieldsObjectValues?.fixedFieldsWithValues?.length >=
         this.selectedFixedFields.length
     ) {
       this.validForm = true;
     } else {
       this.validForm = false;
     }
-    if(!this.fromMaintenance){
+    if (!this.fromMaintenance) {
       this.useExistingBatch = true;
       this.useExistingBatchset = true;
     }
-    this.batchDescription.disabled = this.useExistingBatch
-    this.batchsetDescription.disabled = this.useExistingBatchset
+    this.batchDescription.disabled = this.useExistingBatch;
+    this.batchsetDescription.disabled = this.useExistingBatchset;
 
     this.addFixedField.disabled =
       this.useExistingBatchset || this.useExistingBatch;

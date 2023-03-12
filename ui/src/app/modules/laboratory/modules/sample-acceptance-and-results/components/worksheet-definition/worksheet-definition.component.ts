@@ -15,6 +15,8 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import htmlToPdfmake from "html-to-pdfmake";
+import { AdditionalFieldsModalComponent } from "src/app/modules/laboratory/modals/additional-fields-modal/additional-fields-modal.component";
+import { MatDialog } from "@angular/material/dialog";
 
 @Component({
   selector: "app-worksheet-definition",
@@ -53,7 +55,8 @@ export class WorksheetDefinitionComponent implements OnInit {
   constructor(
     private worksheetsService: WorkSheetsService,
     private datasetDataService: DatasetDataService,
-    private generateMetadataLabelsService: GenerateMetadataLabelsService
+    private generateMetadataLabelsService: GenerateMetadataLabelsService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -197,21 +200,26 @@ export class WorksheetDefinitionComponent implements OnInit {
               const worksheetSamples = Object.keys(this.selectedRowsColumns)
                 ?.map((key) => {
                   if (this.selectedRowsColumns[key]?.set) {
-                    return {
+                    const type =
+                      key?.indexOf("control") === -1 ? "SAMPLE" : "CONTROL";
+                    let returnObj = {
                       row: Number(key?.split("-")[0]),
                       column: Number(key?.split("-")[1]),
-                      sample: {
-                        uuid: this.selectedRowsColumns[key]?.value?.uuid,
-                      },
                       worksheetDefinition: {
                         uuid: responseWorkSheetDefn[0]?.uuid,
                       },
-                      type: "SAMPLE",
+                      type: type,
                     };
+                    returnObj[
+                      type === "SAMPLE" ? "sample" : "worksheetControl"
+                    ] = {
+                      uuid: this.selectedRowsColumns[key]?.value?.uuid,
+                    };
+                    return returnObj;
                   }
                 })
                 ?.filter((worksheetSample) => worksheetSample);
-
+              // console.log(JSON.stringify(worksheetSamples));
               this.worksheetsService
                 .createWorksheetSamples(worksheetSamples)
                 .subscribe((response) => {
@@ -253,10 +261,12 @@ export class WorksheetDefinitionComponent implements OnInit {
     this.selectedWorkSheetConfiguration = values?.worksheet?.value;
     this.worksheetDefnPayload = {
       code: null,
-      expirationDateTime: new Date(values?.expirationDateTime?.value)
-        ?.toISOString()
-        ?.replace("T", " ")
-        .replace(".000Z", ""),
+      expirationDateTime: values?.expirationDateTime?.value
+        ? new Date(values?.expirationDateTime?.value)
+            ?.toISOString()
+            ?.replace("T", " ")
+            .replace(".000Z", "")
+        : null,
       additionalFields: JSON.stringify(
         Object.keys(values).map((key) => {
           return values[key];
@@ -305,7 +315,13 @@ export class WorksheetDefinitionComponent implements OnInit {
                 (ws?.type === "SAMPLE" ? "sample" : "control")
             ] = {
               set: true,
-              value: { ...ws?.sample, label: ws?.sample?.display },
+              value:
+                ws?.type === "SAMPLE"
+                  ? { ...ws?.sample, label: ws?.sample?.display }
+                  : {
+                      ...ws.worksheetControl,
+                      label: ws?.worksheetControl?.display,
+                    },
             };
           });
           const additionalFields = JSON.parse(response?.additionFields);
@@ -335,7 +351,10 @@ export class WorksheetDefinitionComponent implements OnInit {
             },
           };
           this.isWorksheetRenderingReady = true;
-
+          console.log(
+            "currentWorksheetDefinition",
+            this.currentWorksheetDefinition
+          );
           // this.generateDefaultWorksheetRowsColumns();
         }
       });
@@ -458,6 +477,14 @@ export class WorksheetDefinitionComponent implements OnInit {
   onCloseMessage(event: Event): void {
     event.stopPropagation();
     this.message = null;
+  }
+
+  onAddNewFields(event: Event, currentWorksheetDefinition: any): void {
+    event.stopPropagation();
+    this.dialog.open(AdditionalFieldsModalComponent, {
+      width: "50%",
+      data: currentWorksheetDefinition,
+    });
   }
 
   printPDF(event: Event) {

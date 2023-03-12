@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from "@angular/core";
 import { FormGroup } from "@angular/forms";
 import { MomentDateAdapter } from "@angular/material-moment-adapter";
 import {
@@ -25,7 +32,7 @@ import { FormService } from "../../services";
     { provide: MAT_DATE_FORMATS, useValue: DATE_FORMATS_DD_MM_YYYY },
   ],
 })
-export class FieldComponent {
+export class FieldComponent implements AfterViewInit {
   @Input() field: Field<string>;
   @Input() isReport: boolean;
   @Input() value: any;
@@ -43,6 +50,14 @@ export class FieldComponent {
   @Output() fileFieldUpdate: EventEmitter<any> = new EventEmitter<any>();
 
   ngAfterViewInit() {
+    if (typeof this.field?.value === "object") {
+      this.value = (this.field?.value as any[])?.map((val) => {
+        return {
+          ...val,
+          value: val?.value ? val?.value : val?.uuid,
+        };
+      });
+    }
     if (
       this.field?.searchTerm ||
       this.field?.source ||
@@ -62,6 +77,8 @@ export class FieldComponent {
           v:
             this.field?.searchControlType === "concept"
               ? "custom:(uuid,display,datatype,conceptClass,mappings)"
+              : this.field?.searchControlType === "residenceLocation"
+              ? "custom:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display)))))"
               : "custom:(uuid,display)",
         },
         this.field?.searchControlType,

@@ -15,7 +15,7 @@
     </div>
 
     <div style="text-align: right">
-      <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
+      <button mat-stroked-button (click)="onCancel($event)">{{ data?.cancelButtonText ? data?.cancelButtonText : "Cancel" }}</button>
       <button
         id="btn-exemption-confirmed"
         class="ml-4"

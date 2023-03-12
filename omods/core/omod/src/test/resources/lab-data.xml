@@ -87,13 +87,27 @@
                   date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="1239b329-52b9-11e8-b60d-880027ae421d" />
 
+    <concept concept_id="819" retired="false" datatype_id="2" class_id="15" is_set="true" creator="1"
+             date_created="2023-02-14 15:51:57.0" version="" uuid="123111zz-0011-477v-8y8y-acc38ebc6222" />
+
+    <concept_name concept_name_id="519" concept_id="819" name="Test Department" locale="en_GB" creator="1"
+                  date_created="2013-02-15 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="1239b329-52b9-11e8-b60d-880027ae4222" />
+
     <!-- results concept * note the data type determines * -->
     <concept concept_id="900" retired="false" datatype_id="3" class_id="7" is_set="false" creator="1"
              date_created="2017-02-14 15:51:57.0" version="" uuid="334112yz-0111-488v-8yyy-acc38ebc6252" />
 
     <concept_name concept_name_id="600" concept_id="900" name="mrdt result" locale="en_GB" creator="1"
-                  date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  date_created="2023-02-27 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="9999bbb9-52b9-11zz-b60d-880027ae421d" />
+
+    <concept concept_id="904" retired="false" datatype_id="2" class_id="7" is_set="true" creator="1"
+             date_created="2023-02-28 15:51:57.0" version="" uuid="323111zz-0011-477v-8y8y-acc38ebc6215" />
+
+    <concept_name concept_name_id="600" concept_id="904" name="Specimen source" locale="en_GB" creator="1"
+                  date_created="2023-02-27 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="8987bbb9-52b9-11zz-b60d-880027ae421d" />
 
     <!--order -->
     <order_type order_type_id="211" name="Laboratory Order"  creator="400" java_class_name="org.openmrs.TestOrder"
@@ -126,17 +140,19 @@
 
     <item item_id="666" uuid="1odcd43560-z337-11e3-1234-08002007777" concept_id="500" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
 
-    <lb_sample uuid="d365e560-zz77-11e3-1111-08002007777" sample_id="201" visit_id="500" label="Sample Label y" concept_id="600" date_created="2020-12-27 00:00:00" voided="false" creator="1" batch_sample_id="1"/>
+    <lb_sample uuid="d365e560-zz77-11e3-1111-08002007777" sample_id="201" visit_id="500" label="Sample Label y" concept_id="819" date_created="2020-12-27 00:00:00" voided="false" creator="1" batch_sample_id="1"/>
 
-    <lb_sample uuid="x311y666-zz77-11e3-1111-08002007777" sample_id="202" visit_id="500" label="Sample Label y" concept_id="600" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
+    <lb_sample uuid="x311y666-zz77-11e3-1111-08002007777" sample_id="202" visit_id="500" label="LIS/23/0221" concept_id="600" date_created="2020-12-27 00:00:00" voided="false" creator="1" />
 
     <lb_sample uuid="231vb22d-zcy7-11e3-1111-08002007777" sample_id="203" visit_id="500" label="Sample Label x" concept_id="600" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
     <lb_sample uuid="ec2c9ec1-e742-4f89-979a-01560a607d0" sample_id="204" visit_id="500" label="LB/22/00078" concept_id="600" creator="1" date_created="2022-11-21 00:00:00" voided="false" date_time="2022-11-21 00:00:00"/>
 
-    <lb_sample uuid="ec2c9ec1-e742-4f89-979a-01560a60734" sample_id="205" visit_id="500" label="LB/22/00070" concept_id="600" creator="1" date_created="2022-11-21 00:00:00" voided="false" date_time="2022-11-21 00:00:00"/>
+    <lb_sample uuid="ec2c9ec1-e742-4f89-979a-01560a60734" sample_id="205" visit_id="500" label="LB/22/00070" specimen_source_id="904" concept_id="600" creator="1" date_created="2022-11-21 00:00:00" voided="false" date_time="2022-11-21 00:00:00"/>
 
     <!-- Sample Status    -->
     <lb_sample_status sample_status_id="1" sample_id="201" status="RECEIVED" category="RECEIVED" timestamp="2020-12-27 00:00:00" user_id="400" />
+
+    <lb_sample_status sample_status_id="2" sample_id="201" status="RECEIVED" category="RECEIVED" timestamp="2020-12-27 00:00:00" user_id="400" />
 
     <st_device_type device_type_id="201" uuid="245ff55-2200-11e3-1111-0sndiu87hsju" name="lab devices" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
     <!--<lb_device device_id="123" uuid="d365e560-zz77-11e3-1111-0sndiu87hsju" item_id="666" device_type="201" name="mrt test device" serial_no="6563"/>-->
@@ -182,5 +198,8 @@
     <lb_worksheet_sample worksheet_sample_id ="2" code="BCD" uuid = "iCARE890-TEST-OSDH-9beb-d30dcfc0c631" rows="1" columns="1" type="CONTROL"  worksheet_definition_id="1"  control_id="1" date_created="2022-12-10 15:51:57.0" voided="0" creator="1" />
 
     <global_property property="icare.laboratory.settings.sample.id.format" property_value="NPHL/WS/D{YYYY}/COUNT:5" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c631" description="For sample label format" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2022-12-10 15:51:57.0" changed_by="1" />
+
+    <!-- AssociatedField  -->
+    <lb_associated_field associated_field_id="1" name="assoc-field" description="assoc description" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c636" creator="1" voided="0" date_created="2022-12-10 15:51:57" />
 
 </dataset>

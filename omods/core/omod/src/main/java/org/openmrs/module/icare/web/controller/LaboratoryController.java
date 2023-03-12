@@ -61,7 +61,6 @@ public class LaboratoryController {
 			
 			//add the sample after creating its object
 			responseSamplesObject.add(sampleObject);
-			
 		}
 		Map<String,Object> retults = new HashMap<>();
 		retults.put("results", responseSamplesObject);
@@ -76,11 +75,11 @@ public class LaboratoryController {
 		
 		Visit existingVisit = visitService.getVisitByUuid(((Map) sample.get("visit")).get("uuid").toString());
 		Concept concept = conceptService.getConceptByUuid(((Map) sample.get("concept")).get("uuid").toString());
+		Concept specimenSource = conceptService.getConceptByUuid(((Map) sample.get("specimenSource")).get("uuid").toString());
 		
 		if (sample.get("location") != null) {
 			Location location = locationService.getLocationByUuid(((Map) sample.get("location")).get("uuid").toString());
 			newSample.setLocation(location);
-			System.out.println(location.getName());
 		}
 		if (sample.get("batchSample") != null) {
 			BatchSample batchSample = laboratoryService.getBatchSampleByUuid(((Map) sample.get("batchSample")).get("uuid").toString());
@@ -89,9 +88,10 @@ public class LaboratoryController {
 		
 		newSample.setVisit(existingVisit);
 		newSample.setConcept(concept);
+		newSample.setSpecimenSource(specimenSource);
 		
 		newSample.setLabel((String) sample.get("label"));
-		
+
 		List<SampleOrder> sampleOrders = new ArrayList<SampleOrder>();
 		
 		for (Map order : (List<Map>) sample.get("orders")) {
@@ -119,7 +119,14 @@ public class LaboratoryController {
 		
 		HashMap<String, Object> conceptObject = new HashMap<String, Object>();
 		conceptObject.put("uuid", createdSample.getConcept().getUuid());
+		conceptObject.put("display", createdSample.getConcept().getDisplayString());
 		response.put("concept", conceptObject);
+		response.put("department", conceptObject);
+
+		HashMap<String, Object> specimenSourceObject = new HashMap<String, Object>();
+		specimenSourceObject.put("uuid", createdSample.getSpecimenSource().getUuid());
+		specimenSourceObject.put("display", createdSample.getSpecimenSource().getDisplayString());
+		response.put("specimenSource", specimenSourceObject);
 		
 		List<Map<String, Object>> orders = new ArrayList<Map<String, Object>>();
 		for (SampleOrder sampleOrder : createdSample.getSampleOrders()) {
@@ -127,18 +134,7 @@ public class LaboratoryController {
 			Map<String, Object> order = new HashMap<String, Object>();
 			order.put("uuid", sampleOrder.getOrder().getUuid());
 			order.put("orderNumber", sampleOrder.getOrder().getOrderNumber());
-			//
-			//			List<TestTimeConfig> testTimeConfigs = laboratoryService.getTestTimeConfigByConcept(sampleOrder.getOrder()
-			//			        .getConcept().getUuid());
-			//			List<Map<String, Object>> mapListTestTimeConfigs = new ArrayList<Map<String, Object>>();
-			//			for (TestTimeConfig testTimeConfig : testTimeConfigs) {
-			//				mapListTestTimeConfigs.add(testTimeConfig.toMap());
-			//			}
-			//
-			//			order.put("tatconfigs", mapListTestTimeConfigs);
-			
 			orders.add(order);
-			
 		}
 		response.put("orders", orders);
 		
@@ -150,15 +146,14 @@ public class LaboratoryController {
 			sampleStatusesList.add(statusesObject);
 		}
 		if(createdSample.getBatchSample() != null){
-			HashMap<String,Object> batchObject = new HashMap<>();
-			batchObject.put("uuid",createdSample.getBatchSample().getUuid());
-			batchObject.put("display",createdSample.getBatchSample().getCode());
-			response.put("batch",batchObject);
+			HashMap<String,Object> batchSampleObject = new HashMap<>();
+			batchSampleObject.put("uuid",createdSample.getBatchSample().getUuid());
+			batchSampleObject.put("display",createdSample.getBatchSample().getCode());
+			response.put("batchSample",batchSampleObject);
 		}
 		
 		response.put("status", sampleStatusesList);
 		response.put("uuid", createdSample.getUuid());
-		
 		return response;
 	}
 	
@@ -207,9 +202,7 @@ public class LaboratoryController {
 	@ResponseBody
 	public Map<String, Object> getSamplesByUuid(@PathVariable String sampleUuid) {
 		Sample sample = laboratoryService.getSampleByUuid(sampleUuid);
-		
-		Map<String, Object> sampleObject = sample.toMap();
-		return sampleObject;
+		return sample.toMap();
 	}
 	
 	@RequestMapping(value = "samples", method = RequestMethod.GET)
@@ -225,7 +218,10 @@ public class LaboratoryController {
 	        @RequestParam(value = "hasStatus", required = false) String hasStatus,
 	        @RequestParam(value = "q", required = false) String q,
 	        @RequestParam(value = "excludeAllocations", required = false) boolean excludeAllocations,
-	        @RequestParam(value = "acceptedBy", required = false) String acceptedByUuid) throws ParseException {
+	        @RequestParam(value = "acceptedBy", required = false) String acceptedByUuid,
+	        @RequestParam(value = "test", required = false) String testConceptUuid,
+	        @RequestParam(value = "department", required = false) String departmentUuid,
+	        @RequestParam(value = "specimen", required = false) String specimenSourceUuid) throws ParseException {
 		
 		Date start = null;
 		Date end = null;
@@ -243,12 +239,13 @@ public class LaboratoryController {
 		pager.setPage(page);
 		if (!excludeAllocations) {
 			ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
-			    testCategory, q, hasStatus, acceptedByUuid);
+			    testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid);
 			return sampleResults.toMap();
 		}
 		if (excludeAllocations) {
 			ListResult<SampleExt> sampleResults = laboratoryService.getSamplesWithoutAllocations(start, end, pager,
-			    locationUuid, sampleCategory, testCategory, q, hasStatus, acceptedByUuid);
+			    locationUuid, sampleCategory, testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid,
+			    specimenSourceUuid);
 			return sampleResults.toMap();
 		}
 		
@@ -303,19 +300,17 @@ public class LaboratoryController {
 		}
 		
 		List<TestAllocation> savedAllocations = laboratoryService.createAllocationsForSample(allocationsToSave);
+		
 		Map<String, Object> response = new HashMap<String, Object>();
 		List<Map<String, Object>> savedAllocationsListMap = new ArrayList<Map<String, Object>>();
+		
 		for (TestAllocation savedAllocation : savedAllocations) {
-			
 			savedAllocationsListMap.add((savedAllocation.toMap()));
-			
 		}
 		
 		response.put("status", savedSampleStatus.toMap());
 		response.put("allocations", savedAllocationsListMap);
-		
 		return response;
-		
 	}
 	
 	@RequestMapping(value = "samplestatus", method = RequestMethod.POST)
@@ -351,7 +346,19 @@ public class LaboratoryController {
 			}
 		}
 		return orders;
-		
+	}
+	
+	@RequestMapping(value = "sampledorders/{visitUuid}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getSampledOrdersByVisit(@PathVariable String visitUuid) {
+		List<Map<String, Object>> orders = new ArrayList();
+		List<Sample> samples = laboratoryService.getSamplesByVisitOrPatientAndOrDates(visitUuid, null, null, null);
+		for (Sample sample : samples) {
+			for (SampleOrder sampleOrder : sample.getSampleOrders()) {
+				orders.add(sampleOrder.toMap(true));
+			}
+		}
+		return orders;
 	}
 	
 	@RequestMapping(value = "assign", method = RequestMethod.POST)
@@ -772,6 +779,7 @@ public class LaboratoryController {
 	@ResponseBody
 	public List<Map<String, Object>> getbatches(@RequestParam(value = "startDate", required = false) String startDate,
 	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "uuid", required = false) String uuid,
 	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
 	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
 		
@@ -784,16 +792,23 @@ public class LaboratoryController {
 			end = formatter.parse(endDate);
 		}
 		
-		List<Batch> batches = laboratoryService.getBatches(start, end, q, startIndex, limit);
+		List<Batch> batches = laboratoryService.getBatches(start, end, uuid, q, startIndex, limit);
 		
 		List<Map<String, Object>> responseBatchesObject = new ArrayList<Map<String, Object>>();
 		for (Batch batch : batches) {
 			Map<String, Object> batchObject = batch.toMap();
 			responseBatchesObject.add(batchObject);
 		}
-		
 		return responseBatchesObject;
+	}
+	
+	@RequestMapping(value = "batchSample", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getBatchSampleByUuid(@RequestParam(value = "uuid", required = true) String uuid)
+	        throws ParseException {
 		
+		BatchSample batchSample = laboratoryService.getBatchSampleByUuid(uuid);
+		return batchSample.toMap();
 	}
 	
 	@RequestMapping(value = "batchsamples",method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -1130,5 +1145,121 @@ public class LaboratoryController {
 		WorksheetSampleStatus newWorksheetSampleStatus = laboratoryService.addWorksheetSampleStatus(worksheetSampleStatus);
 		
 		return newWorksheetSampleStatus.toMap();
+	}
+	
+	@RequestMapping(value = "associatedfields", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addAssociatedFields(@RequestBody List<Map<String,Object>> associatedFieldListMap){
+
+		List<Map<String,Object>> createdAssociatedFieldsListMap = new ArrayList<>();
+		for( Map<String,Object> associatedFieldMap : associatedFieldListMap){
+
+			AssociatedField associatedField = AssociatedField.fromMap(associatedFieldMap);
+
+			AssociatedField createdAssociatedField = laboratoryService.addAssociatedField(associatedField);
+
+			createdAssociatedFieldsListMap.add(createdAssociatedField.toMap());
+		}
+
+		return createdAssociatedFieldsListMap;
+
+	}
+	
+	@RequestMapping(value = "associatedfields", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getAssociatedFields( @RequestParam(required = false, value = "q") String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit){
+
+		List<Map<String,Object>> responseAssociatedFields = new ArrayList<>();
+
+		List<AssociatedField> associatedFields = laboratoryService.getAssociatedFields(q, startIndex, limit);
+
+		for( AssociatedField associatedField : associatedFields){
+			responseAssociatedFields.add(associatedField.toMap());
+		}
+
+		return  responseAssociatedFields;
+	}
+	
+	@RequestMapping(value = "associatedfield/{associatedFieldUuid}", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getAssociatedFieldByUuid(@PathVariable String associatedFieldUuid) {
+		
+		AssociatedField associatedField = laboratoryService.getAssociatedFieldByUuid(associatedFieldUuid);
+		return associatedField.toMap();
+	}
+	
+	@RequestMapping(value = "associatedfield/{associatedFieldUuid}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> updateAssociatedField(@PathVariable String associatedFieldUuid,
+	        @RequestBody Map<String, Object> associatedFieldMap) {
+		
+		AssociatedField associatedField = AssociatedField.fromMap(associatedFieldMap);
+		AssociatedField updatedAssociatedField = laboratoryService.updateAssociatedField(associatedFieldUuid,
+		    associatedField);
+		
+		return updatedAssociatedField.toMap();
+	}
+	
+	@RequestMapping(value = "testallocationassociatedfields", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addTestAllocationAssociatedFields( @RequestBody List<Map<String,Object>> allocationAssociatedFieldListMap) throws Exception {
+
+		List<Map<String,Object>> createdAllocationAssociatedField = new ArrayList<>();
+
+		for(Map<String,Object> allocationAssociatedFieldMap : allocationAssociatedFieldListMap){
+
+			TestAllocationAssociatedField testAllocationAssociatedField = TestAllocationAssociatedField.fromMap(allocationAssociatedFieldMap);
+
+			TestAllocationAssociatedField savedTestAllocationAssociatedField = laboratoryService.addTestAllocationAssociatedField(testAllocationAssociatedField);
+
+			createdAllocationAssociatedField.add(savedTestAllocationAssociatedField.toMap());
+		}
+
+		return createdAllocationAssociatedField;
+	}
+	
+	@RequestMapping(value = "testallocationassociatedfields", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getTestAllocationAssociatedField(@RequestParam(value = "q" , required = false) String q, @RequestParam(value = "startIndex", defaultValue = "0") Integer startIndex, @RequestParam( value ="limit", defaultValue = "100") Integer limit, @RequestParam(value = "allocationUuid", required = false) String allocationUuid, @RequestParam(value = "associatedFieldUuid", required = false) String associatedFieldUuid){
+
+		List<Map<String,Object>> testAllocationAssociatedFieldsListMap = new ArrayList<>();
+
+		List<TestAllocationAssociatedField> testAllocationAssociatedFields = laboratoryService.getTestAllocationAssociatedFields(q,startIndex,limit,allocationUuid,associatedFieldUuid);
+
+		for(TestAllocationAssociatedField testAllocationAssociatedField : testAllocationAssociatedFields){
+			testAllocationAssociatedFieldsListMap.add(testAllocationAssociatedField.toMap());
+		}
+
+		return testAllocationAssociatedFieldsListMap;
+	}
+	
+	@RequestMapping(value = "associatedfieldresults", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> addAssociatedFieldResult(@RequestBody List<Map<String,Object>> associatedFieldResultListMap) throws Exception {
+
+		List<Map<String,Object>> createdAssociatedFieldResultListMap = new ArrayList<>();
+
+		for (Map<String,Object> associatedFieldResultMap : associatedFieldResultListMap){
+			AssociatedFieldResult associatedFieldResult = AssociatedFieldResult.fromMap(associatedFieldResultMap);
+
+			AssociatedFieldResult savedAssociatedFieldResult = laboratoryService.addAssociatedFieldResult(associatedFieldResult);
+			createdAssociatedFieldResultListMap.add(savedAssociatedFieldResult.toMap());
+		}
+		return createdAssociatedFieldResultListMap;
+	}
+	
+	@RequestMapping(value = "associatedfieldresults", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getAssociatedFieldResults(@RequestParam(value = "startIndex", defaultValue = "0") Integer startIndex, @RequestParam(value = "limit",defaultValue = "0") Integer limit, @RequestParam(value = "resultUuid", required = false) String resultUuid, @RequestParam(value = "associatedFieldUuid", required = false) String associatedFieldUuid){
+
+		List<Map<String,Object>> associatedFieldResultListMap = new ArrayList<>();
+
+		List<AssociatedFieldResult> associatedFieldResults = laboratoryService.getAssociatedFieldResults(startIndex,limit,resultUuid,associatedFieldUuid);
+
+		for( AssociatedFieldResult associatedFieldResult : associatedFieldResults){
+			associatedFieldResultListMap.add(associatedFieldResult.toMap());
+		}
+
+		return associatedFieldResultListMap;
 	}
 }

@@ -112,6 +112,11 @@ public class SampleOrder implements Serializable {
 		orderObject.put("voided", this.getOrder().getVoided());
 		orderObject.put("voidReason", this.getOrder().getVoidReason());
 		
+		Map<String, Object> concept = new HashMap<String, Object>();
+		concept.put("uuid", this.getOrder().getConcept().getUuid());
+		concept.put("display", this.getOrder().getConcept().getDisplayString());
+		orderObject.put("concept", concept);
+		
 		Map<String, Object> ordererObject = new HashMap<String, Object>();
 		ordererObject.put("uuid", this.getOrder().getOrderer().getUuid());
 		ordererObject.put("name", this.getOrder().getOrderer().getName());

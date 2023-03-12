@@ -74,6 +74,8 @@ export class RegisterSampleComponent implements OnInit {
   batchsets$: Observable<any>;
   batches$: Observable<any>;
   testFields: any;
+  barcodeSettings$: Observable<any>;
+  errors: any[] = [];
 
   get maximumDate() {
     let maxDate = new Date();
@@ -138,6 +140,29 @@ export class RegisterSampleComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsMatchingAKey(
         "lis.attributes.referringDoctor"
       );
+
+    this.barcodeSettings$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.laboratory.settings.print.barcodeFormat"
+      ).pipe(tap((response) => {
+        if(response === "none"){
+          this.errors = [
+            ...this.errors,
+            {
+              error: {
+                message: "iCare.laboratory.settings.print.barcodeFormat is not set. You won't be able to print barcode."
+              },
+              type: "warning"
+            },
+          ]
+        }
+        if(response?.error){
+           this.errors = [
+            ...this.errors,
+            response?.error
+          ]
+        }
+      }));
 
     this.identifierTypes$ =
       this.registrationService.getPatientIdentifierTypes();
@@ -215,7 +240,6 @@ export class RegisterSampleComponent implements OnInit {
         id: "receivedOn",
         key: "receivedOn",
         label: "Received On",
-        max: this.maximumDate,
         allowCustomDateTime: true,
       }),
       transportCondition: new Dropdown({
@@ -246,7 +270,6 @@ export class RegisterSampleComponent implements OnInit {
         id: "collectedOn",
         key: "collectedOn",
         label: "Collected On",
-        max: this.maximumDate,
         allowCustomDateTime: true
       }),
       collectedBy: new Textbox({
@@ -258,7 +281,6 @@ export class RegisterSampleComponent implements OnInit {
         id: "broughtOn",
         key: "broughtOn",
         label: "Delivered On",
-        max: this.maximumDate,
         allowCustomDateTime: true,
       }),
       broughtBy: new Textbox({
