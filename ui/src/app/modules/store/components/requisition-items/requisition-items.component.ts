@@ -29,6 +29,7 @@ export class RequisitionItemsComponent implements OnInit {
   specificRequisition$: Observable<any>;
   loadingRequisition: boolean = false;
   selectedItems: any = {};
+  selectAllItems: boolean;
   constructor(
     private requisitionService: RequisitionService,
     private dialog: MatDialog
@@ -114,7 +115,29 @@ export class RequisitionItemsComponent implements OnInit {
     this.receiveItem.emit({ event: e, item: item });
   }
 
+  selectAll(e: MatCheckboxChange, items: any[]) {
+    if (e?.checked) {
+      items.forEach((item) => {
+        this.selectedItems = {
+          ...this.selectedItems,
+          [item]: item
+        }
+        this.selectionChange.emit({ event: e, item: item });
+      })
+      this.selectAllItems = true;
+    } else {
+      this.selectAllItems = false;
+      this.selectedItems = {}
+      items.forEach((item) => {
+        this.selectionChange.emit({ event: e, item: item });
+      })
+    }
+  }
+
   getSelection(event: MatCheckboxChange, item: any): void {
+    if(!event.checked){
+      this.selectAllItems = false;
+    }
     this.selectionChange.emit({ event: event, item: item });
   }
 

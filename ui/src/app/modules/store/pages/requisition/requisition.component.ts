@@ -223,38 +223,50 @@ export class RequisitionComponent implements OnInit {
 
   receiveAllSelected(e: Event, requisition) {
     e?.stopPropagation();
-    let receiveIssuedItemsObject = {
-      issue: this.selectedItems[0]?.issue,
-      receivingLocation: {
-        uuid: requisition?.requestingLocation?.uuid,
-      },
-      issueingLocation: {
-        uuid: requisition?.requestedLocation?.uuid,
-      },
-    };
-
-    const items = Object.keys(this.selectedItems)?.map((key) => {
+    const issueItems = Object.keys(this.selectedItems)?.map((key) => {
       return {
-        item: {
-          uuid: this.selectedItems[key]?.item?.uuid,
+        issue: this.selectedItems[key]?.issue,
+        receivingLocation: {
+          uuid: requisition?.requestingLocation?.uuid,
         },
-        quantity: this.selectedItems[key]?.quantity,
-        batch: this.selectedItems[key]?.batch,
+        issueingLocation: {
+          uuid: requisition?.requestedLocation?.uuid,
+        },
+        receiptItems: [
+          {
+            item: {
+              uuid: this.selectedItems[key]?.item?.uuid,
+            },
+            quantity: this.selectedItems[key]?.quantity,
+            batch: this.selectedItems[key]?.batch,
+          }
+        ]
       };
     });
-
-    const receiveObject = {
-      ...receiveIssuedItemsObject,
-      receiptItems: items,
-    };
-
-    this.requisitionService
-      .receiveIssueItem(receiveObject)
-      .subscribe((response) => {
-        if (response) {
-          this.getAllRequisitions();
+    this.dialog
+      .open(SharedConfirmationComponent, {
+        width: "40%",
+        data: {
+          modalTitle: "Confirm Multiple Receive",
+          modalMessage: "Are you sure you want to receive all selected items?",
+          showRemarksInput: false,
+          confirmationButtonText: "Receive All",
+        },
+      })
+      .afterClosed()
+      .subscribe((issue) => {
+        if (issue?.confirmed) {
+          zip(
+            ...issueItems?.map((issueItem) => this.requisitionService
+              .receiveIssueItem(issueItem))
+          ).subscribe((response) => {
+            if (response) {
+              this.selectedItems = {};
+              this.getAllRequisitions();
+            }
+          });
         }
-      });
+      })
   }
 
   onReceiveRequisition(e: any, requisition: any) {
