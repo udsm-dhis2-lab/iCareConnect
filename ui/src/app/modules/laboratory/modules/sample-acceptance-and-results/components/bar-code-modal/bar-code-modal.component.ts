@@ -17,7 +17,7 @@ export class BarCodeModalComponent implements OnInit {
   lineColor = "#000000";
   width = 1.2;
   height = 40;
-  fontSize = "10";
+  fontSize = "20";
   displayValue = true;
   sample: any;
   ordersToDisplay: any[];
@@ -39,7 +39,7 @@ export class BarCodeModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.sampleData$ = this.sampleService.getSampleByUuid(
-      this.dialogData?.sample?.uuid
+      this.dialogData?.sample ? this.dialogData?.sample?.uuid : this.dialogData?.sampleLabelsUsedDetails[0]?.uuid
     )?.pipe(map((sample) => {
       return {
         ...sample,
@@ -253,8 +253,8 @@ export class BarCodeModalComponent implements OnInit {
     }, 500);
   }
 
-  onCancel(e) {
+  onCancel(e, sampleLabelsUsedDetails?: any, sampleData?: any) {
     e.stopPropagation();
-    this.dialogRef.close();
+    this.dialogRef.close({sampleLableUsedDetails: sampleLabelsUsedDetails, sampleData: sampleData});
   }
 }

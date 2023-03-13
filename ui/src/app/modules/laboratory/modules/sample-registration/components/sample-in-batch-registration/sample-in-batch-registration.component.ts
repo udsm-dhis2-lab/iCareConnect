@@ -2776,16 +2776,9 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
                                                                                                   },
                                                                                                   100
                                                                                                 );
-                                                                                                if( this.barcodeSettings?.barcode){
-                                                                                                  this.connection.next(
-                                                                                                    {
-                                                                                                      Message: this.barcodeSettings?.barcode?.split("{{sampleID}}").join(data?.sampleLabelsUsedDetails[0]?.label), 
-                                                                                                      Type: "print"})
-                                                                                                } else {
-                                                                                                  this.openBarCodeDialog(
+                                                                                                this.openBarCodeDialog(
                                                                                                     data
                                                                                                   );
-                                                                                                }
                                                                                                 this.isRegistrationReady =
                                                                                                   false;
                                                                                                 setTimeout(
@@ -2985,13 +2978,27 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
     this.dialog
       .open(BarCodeModalComponent, {
         height: "200px",
-        width: "25%",
+        width: "20%",
         data,
-        disableClose: false,
+        disableClose: true,
         panelClass: "custom-dialog-container",
       })
       .afterClosed()
-      .subscribe();
+      .subscribe((results) => {
+        if(results){
+          let message = this.barcodeSettings?.barcode?.split("{{SampleID}}").join(results?.sampleData?.label);
+          message = message.split("{{PatientNames}}").join(`${results?.sampleData?.patient?.givenName} ${results?.sampleData?.patient?.familyName}`);
+          message = message?.split("{{Date}}").join(formatDateToYYMMDD(new Date(results?.sampleData?.created), true));
+          message = message?.split("{{Storage}}").join("");
+          message = message?.split("{{Tests}}").join("");
+          this.connection.next(
+            {
+              Message: message, 
+              Type: "print"
+            }
+          )
+        }
+      });
   }
 
   //   onGetIsDataFromExternalSystem(fromExternalSystem: boolean): void {
