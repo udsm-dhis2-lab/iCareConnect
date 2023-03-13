@@ -162,6 +162,50 @@ public class StoreController {
 		return createdRequisition.toMap();
 	}
 	
+	@RequestMapping(value = "request/{requisitionUuid}", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> updateRequisition(@PathVariable("requisitionUuid") String requisitionUuid,
+	        @RequestBody Map<String, Object> requisitionMap) throws Exception {
+		
+		Requisition requisition = Requisition.fromMap(requisitionMap);
+		requisition.setUuid(requisitionUuid);
+		Requisition updateRequisition = storeService.updateRequisition(requisition);
+		
+		return requisition.toMap();
+		
+	}
+	
+	@RequestMapping(value = "request/{requisitionUuid}", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getRequisitionByUuid(@PathVariable("requisitionUuid") String requisitionUuid) {
+		
+		Requisition requisition = storeService.getRequestByUuid(requisitionUuid);
+		
+		return requisition.toMap();
+	}
+	
+	@RequestMapping(value = "requestitem", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> addRequisitionItem(@RequestBody Map<String, Object> requisitionItemMap) throws Exception {
+		RequisitionItem requisitionItem = RequisitionItem.fromMap(requisitionItemMap);
+		
+		RequisitionItem savedRequisitionItem = storeService.saveRequisitionItem(requisitionItem);
+		
+		return savedRequisitionItem.toMap();
+	}
+	
+	@RequestMapping(value = "requestitem/{requestItemUuid}", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> updateRequisitionItem(@PathVariable(value = "requestItemUuid") String requestItemUuid,
+	        @RequestBody Map<String, Object> requestItemObjectMap) throws Exception {
+		
+		RequisitionItem requisitionItem = RequisitionItem.fromMap(requestItemObjectMap);
+		requisitionItem.setUuid(requestItemUuid);
+		RequisitionItem updatedRequisitionItem = storeService.updateRequisitionItem(requisitionItem);
+		
+		return updatedRequisitionItem.toMap();
+	}
+	
 	@RequestMapping(value = "requeststatus", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addRequisitionStatus(@RequestBody Map<String, Object> requisitionStatusMap) {
@@ -283,6 +327,17 @@ public class StoreController {
 		issueStatus.setIssue(storeService.getIssueByUuid(issueStatus.getIssue().getUuid()));
 		
 		return storeService.saveIssueStatus(issueStatus).toMap();
+	}
+	
+	@RequestMapping(value = "issueitemstatus", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> addIssueItemStatus(@RequestBody Map<String, Object> issueItemStatusMap) {
+		
+		IssueItemStatus issueItemStatus = new IssueItemStatus().fromMap(issueItemStatusMap);
+		
+		issueItemStatus.setIssueItem(storeService.getIssueItemByUuid(issueItemStatus.getIssueItem().getUuid()));
+		
+		return storeService.saveIssueItemStatus(issueItemStatus).toMap();
 	}
 	
 	@RequestMapping(value = "issues", method = RequestMethod.GET)

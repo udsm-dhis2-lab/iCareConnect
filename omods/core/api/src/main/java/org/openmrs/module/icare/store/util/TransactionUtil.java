@@ -95,11 +95,11 @@ public class TransactionUtil {
         List<Transaction> transactionList = new ArrayList<>();
 
         List<Stock> stockList = storeService.getStockByItemLocation(stockable.getItem(), stockable.getLocation());
-
         List<Map<String, Object>> stockListMap = new ArrayList<>();
         double totalStock = 0.00;
 
         for (Stock stockItem : stockList) {
+
             stockListMap.add(stockItem.toMap());
             totalStock = totalStock + stockItem.getQuantity();
         }

@@ -1,6 +1,5 @@
 package org.openmrs.module.icare.web.controller;
 
-import groovy.util.ObservableMap;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -225,6 +224,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> requests2 = (new ObjectMapper()).readValue(handleGet2.getContentAsString(), Map.class);
 		
 		List<Map<String, Object>> requestObject2 = ((List<Map<String, Object>>) requests2.get("results"));
+		System.out.println("==>|-> " + requestObject2);
 		
 		assertThat("The requesting location id store B", ((List) requestObject2.get(0).get("requisitionStatuses")).size(),
 		    is(1));
@@ -837,6 +837,50 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 			}
 		}
 		assertThat("The stock is created from the stock invoice item", newBatchexist, is(true));
+		
+	}
+	
+	@Test
+	public void addRequisitionItem() throws Exception {
+		
+		String dto = this.readFile("dto/store/requisition-item-create.json");
+		Map<String, Object> requisitionMap = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest newPostRequest = newPostRequest("store/requestitem", requisitionMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		Map<String, Object> createdRequisition = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		assertThat("There is one created requisition item",
+		    ((Map) createdRequisition.get("item")).get("uuid").equals("8o00d43570-8y37-11f3-1234-08002007777"));
+		
+		//Update requisition Item
+		String dto2 = this.readFile("dto/store/requisition-item-update.json");
+		Map<String, Object> requisitionMap2 = (new ObjectMapper()).readValue(dto2, Map.class);
+		MockHttpServletRequest newPostRequest2 = newPostRequest("store/requestitem/8800zx3570-8z37-11ff-2234-01102007815",
+		    requisitionMap2);
+		MockHttpServletResponse handle2 = handle(newPostRequest2);
+		Map<String, Object> updateRequisition = (new ObjectMapper()).readValue(handle2.getContentAsString(), Map.class);
+		System.out.println(updateRequisition);
+		
+	}
+	
+	@Test
+	public void updateRequisition() throws Exception {
+		String dto = this.readFile("dto/store/requisition-update.json");
+		Map<String, Object> requisitionMap = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest newPostRequest = newPostRequest("store/request/8800zx3570-8z37-11ff-2234-01102007813",
+		    requisitionMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		Map<String, Object> updateRequisition = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		assertThat("There is 1 requisition updated",
+		    updateRequisition.get("uuid").equals("8800zx3570-8z37-11ff-2234-01102007813"));
+		
+		//updating statuses of requisition items
+		MockHttpServletRequest newGetRequest = newGetRequest("store/request/8800zx3570-8z37-11ff-2234-01102007813");
+		MockHttpServletResponse handleGet = handle(newGetRequest);
+		Map<String, Object> handleGetObject = new ObjectMapper().readValue(handleGet.getContentAsString(), Map.class);
+		//System.out.println(((List)handleGetObject.get("requisitionItems")).get("requisitionItemStatuses"));
+		assertThat("There is a pending requisition item status",
+		    (((Map) ((List) ((Map) ((List) handleGetObject.get("requisitionItems")).get(0)).get("requisitionItemStatuses"))
+		            .get(0)).get("status")).equals("PENDING"));
 		
 	}
 }

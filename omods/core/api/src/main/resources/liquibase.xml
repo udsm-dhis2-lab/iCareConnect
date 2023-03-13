@@ -4642,6 +4642,37 @@
                 referencedTableName="users"/>
     </changeSet>
 
+    <changeSet id="add_columns_to_st_requisition_item" author="dennis-kibahila" dbms="mysql">
+        <addColumn tableName="st_requisition_item" >
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created"  type="DATETIME"/>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" defaultValueBoolean="false" type="BOOLEAN"/>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid"  type="char(38)" >
+                <constraints nullable="true"  unique="true"></constraints>
+            </column>
+
+        </addColumn>
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_requisition_item"
+                constraintName="st_requisition_item_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_requisition_item"
+                constraintName="st_requisition_item_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+    </changeSet>
+
     <changeSet id="create_lb_test_allocation_associated_field" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4670,8 +4701,8 @@
             <column name="uuid" type="char(38)">
                 <constraints nullable="false" unique="true"></constraints>
             </column>
-
         </createTable>
+
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_test_allocation_associated_field"
@@ -4737,7 +4768,6 @@
             <column name="uuid" type="char(38)">
                 <constraints nullable="false" unique="true"></constraints>
             </column>
-
         </createTable>
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
@@ -4783,4 +4813,364 @@
         </sql>
     </changeSet>
 
+    <changeSet id="create_st_requisition_item_status" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_requisition_item_status"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_requisition_item_status table</comment>
+        <createTable tableName="st_requisition_item_status">
+            <column name="requisition_item_status_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="stock_requisition_item_status_id_pk"/>
+            </column>
+            <column name="item_id" type="INTEGER"/>
+            <column name="requisition_id" type="INTEGER"/>
+            <column name="status" type="TEXT"/>
+            <column name="remarks" type="TEXT"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_requisition_item_status"
+                constraintName="st_requisition_item_status_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_requisition_item_status"
+                constraintName="st_requisition_item_status_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="item_id"
+                baseTableName="st_requisition_item_status"
+                constraintName="st_requisition_item_status_item_fk"
+                referencedColumnNames="item_id"
+                referencedTableName="item"/>
+
+        <addForeignKeyConstraint
+                baseTableName="st_requisition_item_status"
+                baseColumnNames="requisition_id"
+                constraintName="st_requisition_item_status_st_requisition_requisition_id_fk"
+                referencedTableName="st_requisition"
+                referencedColumnNames="requisition_id"/>
+    </changeSet>
+
+    <changeSet id="update_st_requisition_add_column_code" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_requisition
+            ADD COLUMN code VARCHAR(50) NULL AFTER requisition_id;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_transaction_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_transaction
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_worksheet_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_retired DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_worksheet_control_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_control
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_retired DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_worksheet_sample_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_sample
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="update_lb_worksheet_sample_status_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_sample_status
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_worksheet_status_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_worksheet_status
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_batch_sample_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_batch_sample
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_requisition_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_requisition
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_requisition_status_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_requisition_status
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_stock_invoice_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_stock_invoice_attribute_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice_attribute
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_stock_invoice_attribute_type_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice_attribute_type
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_retired DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_stock_invoice_item_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice_item
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_stock_invoice_item_status_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice_item_status
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_stock_invoice_status_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice_status
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_supplier_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_supplier
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_supplier_attribute_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_supplier_attribute
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_supplier_attribute_type_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_supplier_attribute_type
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_retired DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_batch_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_batch
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_batch_set_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_batch_set
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_st_issue_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_issue
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="update_st_issue_status_date_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_issue_status
+            MODIFY date_created DATETIME,
+            MODIFY date_changed DATETIME,
+            MODIFY date_voided DATETIME;
+        </sql>
+    </changeSet>
+
+    <changeSet id="create_st_issue_item_status" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="st_issue_item_status"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs st_issue_item_status table</comment>
+        <createTable tableName="st_issue_item_status">
+            <column name="issue_item_status_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="stock_issue_item_status_id_pk"/>
+            </column>
+            <column name="item_id" type="INTEGER"/>
+            <column name="issue_id" type="INTEGER"/>
+            <column name="batch_no" type="INTEGER"/>
+            <column name="status" type="TEXT"/>
+            <column name="remarks" type="TEXT"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_requisition_item_status"
+                constraintName="st_requisition_item_status_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_requisition_item_status"
+                constraintName="st_requisition_item_status_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="item_id"
+                baseTableName="st_requisition_item_status"
+                constraintName="st_requisition_item_status_item_fk"
+                referencedColumnNames="item_id"
+                referencedTableName="item"/>
+
+        <addForeignKeyConstraint
+                baseTableName="st_requisition_item_status"
+                baseColumnNames="requisition_id"
+                constraintName="st_requisition_item_status_st_requisition_requisition_id_fk"
+                referencedTableName="st_requisition"
+                referencedColumnNames="requisition_id"/>
+    </changeSet>
+
+    <changeSet id="add_columns_to_st_issue_item" author="dennis-kibahila" dbms="mysql">
+        <addColumn tableName="st_issue_item" >
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created"  type="DATETIME"/>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" defaultValueBoolean="false" type="BOOLEAN"/>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid"  type="char(38)" >
+                <constraints nullable="true"  unique="true"></constraints>
+            </column>
+
+        </addColumn>
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_issue_item"
+                constraintName="st_issue_item_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_requisition_item"
+                constraintName="st_issue_item_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+    </changeSet>
 </databaseChangeLog>

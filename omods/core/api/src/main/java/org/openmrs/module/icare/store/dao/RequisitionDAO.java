@@ -22,8 +22,9 @@ public class RequisitionDAO extends BaseDAO<Requisition> {
 	public ListResult<Requisition> getRequisitionsByRequestingLocation(String requestingLocationUuid, Pager pager,
 	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
 		DbSession session = this.getSession();
-		String queryStr = "SELECT rq \n" + "FROM Requisition rq \n"
-		        + "WHERE rq.requestingLocation = (SELECT l FROM Location l WHERE l.uuid = :requestingLocationUuid)";
+		String queryStr = "SELECT rq \n"
+		        + "FROM Requisition rq \n"
+		        + "WHERE rq.requestingLocation = (SELECT l FROM Location l WHERE l.uuid = :requestingLocationUuid) AND rq.voided = false";
 		
 		if (status != null) {
 			if (!queryStr.contains("WHERE")) {
@@ -72,8 +73,9 @@ public class RequisitionDAO extends BaseDAO<Requisition> {
 	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection) {
 		DbSession session = this.getSession();
 		System.out.println(status);
-		String queryStr = "SELECT rq \n" + "FROM Requisition rq \n"
-		        + "WHERE rq.requestedLocation = (SELECT l FROM Location l WHERE l.uuid = :requestedLocationUuid)";
+		String queryStr = "SELECT rq \n"
+		        + "FROM Requisition rq \n"
+		        + "WHERE rq.requestedLocation = (SELECT l FROM Location l WHERE l.uuid = :requestedLocationUuid) AND rq.voided = false";
 		
 		if (status != null) {
 			if (!queryStr.contains("WHERE")) {
@@ -120,4 +122,36 @@ public class RequisitionDAO extends BaseDAO<Requisition> {
 		
 	}
 	
+	public Requisition updateRequisition(Requisition requisition) {
+		DbSession dbSession = this.getSession();
+		String queryStr = "UPDATE Requisition rq";
+		
+		if (requisition.getVoided() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " ,";
+			}
+			queryStr += " rq.voided = :voided";
+		}
+		
+		queryStr += " WHERE rq.uuid = :uuid";
+		
+		Query query = dbSession.createQuery(queryStr);
+		
+		query.setParameter("uuid", requisition.getUuid());
+		
+		if (requisition.getVoided() != null) {
+			query.setParameter("voided", requisition.getVoided());
+		}
+		
+		Integer success = query.executeUpdate();
+		
+		if (success == 1) {
+			return requisition;
+		} else {
+			return null;
+		}
+		
+	}
 }
