@@ -5116,31 +5116,31 @@
 
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
-                baseTableName="st_requisition_item_status"
-                constraintName="st_requisition_item_status_changed_by_users_user_id_fk"
+                baseTableName="st_issue_item_status"
+                constraintName="st_issue_item_status_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
 
         <addForeignKeyConstraint
                 baseColumnNames="creator"
-                baseTableName="st_requisition_item_status"
-                constraintName="st_requisition_item_status_creator_users_user_id_fk"
+                baseTableName="st_issue_item_status"
+                constraintName="st_issue_item_status_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
 
         <addForeignKeyConstraint
                 baseColumnNames="item_id"
-                baseTableName="st_requisition_item_status"
-                constraintName="st_requisition_item_status_item_fk"
+                baseTableName="st_issue_item_status"
+                constraintName="st_issue_item_status_item_fk"
                 referencedColumnNames="item_id"
                 referencedTableName="item"/>
 
         <addForeignKeyConstraint
-                baseTableName="st_requisition_item_status"
-                baseColumnNames="requisition_id"
-                constraintName="st_requisition_item_status_st_requisition_requisition_id_fk"
-                referencedTableName="st_requisition"
-                referencedColumnNames="requisition_id"/>
+                baseTableName="st_issue_item_status"
+                baseColumnNames="issue_id"
+                constraintName="st_issue_item_status_st_issue_issue_id_fk"
+                referencedTableName="st_issue"
+                referencedColumnNames="issue_id"/>
     </changeSet>
 
     <changeSet id="add_columns_to_st_issue_item" author="dennis-kibahila" dbms="mysql">
