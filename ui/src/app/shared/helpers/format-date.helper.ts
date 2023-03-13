@@ -28,8 +28,15 @@ function formatNumber(n) {
   }
 }
 
-export function formatDateToYYMMDD(dateValue) {
-  return (
+export function formatDateToYYMMDD(dateValue, reverse: boolean = false) {
+  return reverse ? (
+    formatMonthOrDate(dateValue.getDate(), "d") +
+    "-" +
+    formatMonthOrDate(dateValue.getMonth() + 1, "m") +
+    "-" +
+    dateValue.getFullYear()
+    
+  ) : (
     dateValue.getFullYear() +
     "-" +
     formatMonthOrDate(dateValue.getMonth() + 1, "m") +

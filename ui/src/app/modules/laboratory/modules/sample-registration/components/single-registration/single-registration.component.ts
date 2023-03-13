@@ -148,6 +148,30 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
     this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
   }
   ngAfterViewInit(): void {
+    // this.openBarCodeDialog({
+    //   sampleLabelsUsedDetails:  [{
+    //       visit: {
+    //           uuid: "330a23f2-83f6-4795-861c-71c22bcf230a"
+    //       },
+    //       label: "NPHL/23/0000115",
+    //       concept: {
+    //           uuid: "e61969c1-eb08-4c26-b9ce-fd7b02a4064e"
+    //       },
+    //       location: {
+    //           uuid: "7fdfa2cb-bc95-405a-88c6-32b7673c0453"
+    //       },
+    //       orders: [
+    //           {
+    //               uuid: "36799ca6-bd8f-4dfb-8e47-3994c6775dde"
+    //           },
+    //           {
+    //               uuid: "ad49832a-05e6-46af-bae4-3781b0e55749"
+    //           }
+    //       ],
+    //       uuid: "051b1294-b272-41bf-ba60-dbd95d308bf6"
+    //     }],
+    //     isLis: true
+    // })
     this.connection = webSocket(this.barcodeSettings?.socketUrl);
 
     this.connection.subscribe({
@@ -1618,19 +1642,9 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
                                                                                   .afterClosed()
                                                                                   .subscribe(
                                                                                     () => {
-                                                                                      if( this.barcodeSettings?.barcode){
-                                                                                        this.connection.next(
-                                                                                          {
-                                                                                            Message: this.barcodeSettings?.barcode?.split("{{sampleID}}").join(data?.sampleLabelsUsedDetails[0]?.label), 
-                                                                                            Type: "print"})
-                                                                                      } else {
-                                                                                        // this.jsPrint(
-                                                                                        //   data
-                                                                                        // );
-                                                                                        this.openBarCodeDialog(
+                                                                                    this.openBarCodeDialog(
                                                                                           data
                                                                                         );
-                                                                                      }
                                                                                       this.isRegistrationReady =
                                                                                         false;
                                                                                       setTimeout(
@@ -1848,13 +1862,27 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
     this.dialog
       .open(BarCodeModalComponent, {
         height: "200px",
-        width: "25%",
+        width: "20%",
         data,
-        disableClose: false,
+        disableClose: true,
         panelClass: "custom-dialog-container",
       })
       .afterClosed()
-      .subscribe();
+      .subscribe((results) => {
+        if(results){
+          let message = this.barcodeSettings?.barcode?.split("{{SampleID}}").join(results?.sampleData?.label);
+          message = message.split("{{PatientNames}}").join(`${results?.sampleData?.patient?.givenName} ${results?.sampleData?.patient?.familyName}`);
+          message = message?.split("{{Date}}").join(formatDateToYYMMDD(new Date(results?.sampleData?.created), true));
+          message = message?.split("{{Storage}}").join("");
+          message = message?.split("{{Tests}}").join("");
+          this.connection.next(
+            {
+              Message: message, 
+              Type: "print"
+            }
+          )
+        }
+      });
   }
 
   onGetIsDataFromExternalSystem(fromExternalSystem: boolean): void {
@@ -1994,9 +2022,34 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
         //Create Zebra ZPL commands for sample label
 		var cmds =  `
       ^XA
-      ^FO10,30^BCB,100,Y,N,N,N^FD${data?.sampleDetails?.label}^FS
-      ^FO220,30^BCB,100,Y,N,N,N^FD${data?.sampleDetails?.label}^FS
-      ^FO400,30^BCB,100,Y,N,N,N^FD${data?.sampleDetails?.label}^FS
+      ^FX Barcode: BC-NRIB for orientation,number for height, Y for show data,Y on top^FS
+      ^FT30,400^A@B,15,10^FD{{SampleID}}^FS
+      ^FT30,120^A@B,15,10^FD[FORM]^FS
+      ^FO40,45^BCB,80,N,N,N,N^FD{{SampleID}}^FS
+      ^FT150,400^A@B,20,10^FD{{PatientNames}}^FS
+      ^FT145,150^A@B,15,10^FD{{Date}}^FS
+      ^FT220,400^A@B,15,10^FD{{SampleID}}^FS
+      ^FT220,210^A@B,15,10^FD{{SampleID}}^FS
+      ^FT240,210^A@B,15,5^FD{{PatientNames}}^FS
+      ^FXMiddle label starts Here^FS
+      ^FT310,400^A@B,15,10^FD{{SampleID}}^FS
+      ^FT310,120^A@B,15,10^FD[FORM]^FS
+      ^FT360,400^A@B,15,10^FD{{Tests}}^FS
+      ^FT460,400^A@B,20,10^FD{{PatientNames}}^FS
+      ^FT460,140^A@B,15,10^FD{{Date}}^FS
+      ^FT510,400^A@B,15,10^FD{{SampleID}}^FS
+      ^FT510,210^A@B,15,10^FD{{SampleID}}^FS
+      ^FT530,210^A@B,15,5^FD{{PatientNames}}^FS
+      ^FXMiddle Label Ends Here^FS
+      ^FT610,40^A@N,15,10^FD{{Storage}}^FS
+      ^FT590,400^A@B,15,10^FD{{SampleID}}^FS
+      ^FO600,45^BCB,80,N,N,N,N^FD{{SampleID}}^FS
+      ^FT710,400^A@B,20,10^FD{{PatientNames}}^FS
+      ^FT740,400^A@B,15,10^FD{{Tests}}^FS
+      ^FT790,400^A@B,15,10^FD{{SampleID}}^FS
+      ^FT810,400^A@B,15,10^FD{{Storage}}^FS
+      ^FT790,210^A@B,15,10^FD{{SampleID}}^FS
+      ^FT810,210^A@B,15,5^FD{{PatientNames}}^FS
       ^XZ
     `;
 		cpj.printerCommands = cmds;
