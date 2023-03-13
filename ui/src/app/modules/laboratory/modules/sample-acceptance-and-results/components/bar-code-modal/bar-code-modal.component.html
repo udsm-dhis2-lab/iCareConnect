@@ -1,8 +1,8 @@
-<div style="padding: 2%" *ngIf="{
+<div style="padding: 5px" *ngIf="{
   sampleData: sampleData$ | async
 } as params">
 <P></P>
-  <div id="bar-code">
+  <div id="bar-code mb-4">
     <div *ngIf="!dialogData?.sampleLabelsUsedDetails">
       <!-- <p
         style="
@@ -37,15 +37,10 @@
       </p>
     </div>
     <div *ngIf="dialogData?.sampleLabelsUsedDetails && params?.sampleData && dialogData?.isLis">
-      <!-- To be printed -->
       <div *ngIf="dialogData?.sampleLabelsUsedDetails[0] as sampleDetails" id="barcode">
         <ngx-barcode
           [bc-value]="
-            sampleDetails?.label + '|' 
-            + params?.sampleData?.patient?.givenName + ' ' 
-            + (params?.sampleData?.patient?.middleName ? params?.sampleData?.patient?.middleName : '')
-            + ' ' + params?.sampleData?.patient?.familyName + '|' 
-            + params?.sampleData?.stringTests
+            sampleDetails?.label
           "
           [bc-display-value]="true"
           [bc-element-type]="elementType"
@@ -58,9 +53,20 @@
           [bc-text-position]="bcTextPosition"
           [bc-text-align]="bcTextAlign"
         ></ngx-barcode>
+
+        <p class="sample-info mt-1">
+          <span class="text-left">
+            {{ params?.sampleData?.patient?.givenName }}
+            {{ params?.sampleData?.patient?.middleName ? params?.sampleData?.patient?.middleName : '' }}
+            {{ params?.sampleData?.patient?.familyName }}
+          </span>
+          <span class="text-right">
+            {{ params?.sampleData?.dateTimeCreated | date:"dd/MM/yyyy" }}
+          </span>
+        </p>
       </div>
     </div>
-    <div *ngIf="dialogData?.sampleLabelsUsedDetails && params?.sampleData && dialogData?.isLis">
+    <!-- <div *ngIf="dialogData?.sampleLabelsUsedDetails && params?.sampleData && dialogData?.isLis">
       <div *ngIf="dialogData?.sampleLabelsUsedDetails[0] as sampleDetails">
         <ngx-barcode
           class="barcode"
@@ -199,17 +205,17 @@
           <p>{{ sampleDetails?.label }}</p>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
-  <div class="d-flex just-content-end mt-4">
-    <button mat-flat-button (click)="onCancel($event)">Cancel</button>
-    <button
+  <div class="d-flex justify-content-end mt-4">
+    <button mat-flat-button class="mt-4" color="primary" (click)="onCancel($event, dialogData?.sampleLabelsUsedDetails, params?.sampleData)">Done</button>
+    <!-- <button
       color="primary"
       mat-flat-button
       class="ml-2"
       (click)="onPrint($event, params?.sampleData, dialogData?.sampleLabelsUsedDetails[0])"
     >
       Print
-    </button>
+    </button> -->
   </div>
 </div>
