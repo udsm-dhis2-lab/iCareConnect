@@ -633,7 +633,7 @@ public class ICareDao extends BaseDAO<Item> {
 		return 0;
 		
 	}
-
+	
 	public List<String> generateCode(String globalPropertyUuid, String metadataType, Integer count) {
 
 		AdministrationService adminService = Context.getService(AdministrationService.class);
@@ -686,7 +686,6 @@ public class ICareDao extends BaseDAO<Item> {
 		return idLabels;
 
 	}
-
 	//	public String voidOrder(String uuid, String voidReason) {
 	//		DbSession session = getSession();
 	//		new Order();
