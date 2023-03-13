@@ -2,6 +2,7 @@ package org.openmrs.module.icare.store.models;
 
 // Generated Oct 7, 2020 12:48:40 PM by Hibernate Tools 5.2.10.Final
 
+import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Location;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.store.util.Stockable;
@@ -54,7 +55,7 @@ class IssueItemId implements java.io.Serializable {
 
 @Entity
 @Table(name = "st_issue_item")
-public class IssueItem implements java.io.Serializable, Stockable {
+public class IssueItem extends BaseOpenmrsData implements java.io.Serializable, Stockable {
 	
 	@EmbeddedId
 	private IssueItemId id;
@@ -65,6 +66,9 @@ public class IssueItem implements java.io.Serializable, Stockable {
 	@Temporal(TemporalType.DATE)
 	@Column(name = "expiry_date", length = 10)
 	private Date expiryDate;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "issueItem")
+	private List<IssueItemStatus> issueItemStatuses = new ArrayList<IssueItemStatus>(0);
 	
 	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "id")
 	//private List<ReceiptItem> receiptItems = new ArrayList<ReceiptItem>(0);
@@ -129,31 +133,69 @@ public class IssueItem implements java.io.Serializable, Stockable {
 		this.id.setItem(item);
 	}
 	
+	public List<IssueItemStatus> getIssueItemStatuses() {
+		return issueItemStatuses;
+	}
+	
+	public void setIssueItemStatuses(List<IssueItemStatus> issueItemStatuses) {
+		this.issueItemStatuses = issueItemStatuses;
+	}
+	
+	public void setId(IssueItemId id) {
+		this.id = id;
+		
+	}
+	
 	public Map<String, Object> toMap() {
 		Map<String, Object> issueItemObject = new HashMap<String, Object>();
 		
 		issueItemObject.put("quantity", this.getQuantity());
 		issueItemObject.put("batch", this.getBatchNo());
 		issueItemObject.put("expiryDate", this.getExpiryDate());
+		issueItemObject.put("uuid",this.getUuid());
 		
 		Map<String, Object> itemObject = new HashMap<String, Object>();
-		itemObject.put("uuid", this.getId().getItem().getUuid());
-		if (this.getId().getItem().getConcept() != null) {
-			itemObject.put("display", this.getId().getItem().getConcept().getDisplayString());
-		} else if (this.getId().getItem().getDrug() != null) {
-			itemObject.put("display", this.getId().getItem().getDrug().getDisplayName());
+		itemObject.put("uuid", this.getIssueItemId().getItem().getUuid());
+		if (this.getIssueItemId().getItem().getConcept() != null) {
+			itemObject.put("display", this.getIssueItemId().getItem().getConcept().getDisplayString());
+		} else if (this.getIssueItemId().getItem().getDrug() != null) {
+			itemObject.put("display", this.getIssueItemId().getItem().getDrug().getDisplayName());
 		}
 		issueItemObject.put("item", itemObject);
 		
 		Map<String, Object> issueObject = new HashMap<String, Object>();
-		issueObject.put("uuid", this.getId().getIssue().getUuid());
+		issueObject.put("uuid", this.getIssueItemId().getIssue().getUuid());
 		
 		issueItemObject.put("issue", issueObject);
+
+		if(this.getIssueItemStatuses() != null){
+
+			List<Map<String,Object>> issueItemStatusesMapList = new ArrayList<>();
+			Map<String,Object> issueItemStatusMap = new HashMap<>();
+			for(IssueItemStatus issueItemStatus : this.getIssueItemStatuses()){
+				issueItemStatusMap.put("status",issueItemStatus.getStatus());
+			}
+			issueItemStatusesMapList.add(issueItemStatusMap);
+			issueItemObject.put("issueItemStatuses",issueItemStatusesMapList);
+		}
+
+
 		
 		return issueItemObject;
 	}
 	
-	public IssueItemId getId() {
+	public IssueItemId getIssueItemId() {
 		return id;
 	}
+	
+	@Override
+	public Integer getId() {
+		return null;
+	}
+	
+	@Override
+	public void setId(Integer integer) {
+		
+	}
+	
 }

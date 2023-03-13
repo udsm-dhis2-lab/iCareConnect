@@ -11,7 +11,7 @@ import org.openmrs.module.icare.laboratory.models.SampleLable;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+	import java.util.*;
 import java.util.regex.Pattern;
 
 public class SampleLableDAO extends BaseDAO<SampleLable> {
@@ -98,6 +98,7 @@ public class SampleLableDAO extends BaseDAO<SampleLable> {
 				}
 				for (Integer labelCount =1; labelCount <= countOfIdLabels; labelCount++) {
 					idLabels.add(idFormat.replace( "COUNT:" + idFormat.split(":")[1], "" + String.format("%0" + idFormat.split(":")[1] +"d", data + labelCount)));
+
 				}
 			}
 		}

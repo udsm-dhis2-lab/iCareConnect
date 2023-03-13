@@ -66,6 +66,16 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
+	public void generateCode() throws Exception {
+		
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/codegen", new Parameter("count", "1"), new Parameter(
+		        "metadataType", "requisition"), new Parameter("globalProperty", "iCARE110-TEST-OSDH-9beb-d30dcfc0c632"));
+		MockHttpServletResponse response = handle(newGetRequest);
+		System.out.println(response.getContentAsString());
+		
+	}
+	
+	@Test
 	public void testCreatingItem() throws Exception {
 		
 		String dto = this.readFile("dto/item-create-dto.json");
