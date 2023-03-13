@@ -648,4 +648,17 @@ export class SamplesService {
         })
       );
   }
+
+  getSampledOrdersByVisit(visitUuid: string): Observable<any[]> {
+    return this.opeMRSHttpClientService
+      .get(`lab/sampledorders/${visitUuid}`)
+      .pipe(
+        map((response) => {
+          return response;
+        }),
+        catchError((err) => {
+          return err;
+        })
+      );
+  }
 }

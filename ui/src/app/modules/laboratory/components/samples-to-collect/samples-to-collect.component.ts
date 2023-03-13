@@ -108,7 +108,12 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
     this.labSamplesLoadingState$ = this.store.select(getLabSamplesLoadingState);
   }
 
-  saveAsSample(specimenType, count, patient) {
+  saveAsSample(
+    specimenType: any,
+    count: any,
+    patient: any,
+    department?: any
+  ): void {
     const identifierElement: any = document.getElementById(
       specimenType.specimenSourceUuid + count
     );
@@ -132,12 +137,14 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
       },
       label: sampleIdentifier,
       concept: {
+        uuid: specimenType?.departmentUuid,
+      },
+      specimenSource: {
         uuid: specimenType?.specimenSourceUuid,
       },
       orders: this.getOrders(specimenType?.orders),
     };
 
-    // JESSE TODO get uiser uid and sample uid
     const priorityData =
       this.samplePriority["sampleuid"] &&
       this.samplePriority["sampleuid"] == "HIGH"
@@ -150,6 +157,7 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
             },
             remarks: "high priority",
             status: "HIGH",
+            category: "PRIORITY",
           }
         : null;
 
