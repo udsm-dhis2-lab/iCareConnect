@@ -393,7 +393,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	@Override
 	public List<String> generateCode(String globalPropertyUuid, String metadataType, Integer count) {
-		return dao.generateCode(globalPropertyUuid, metadataType,count);
+		return dao.generateCode(globalPropertyUuid, metadataType, count);
 	}
 	
 	@Override
