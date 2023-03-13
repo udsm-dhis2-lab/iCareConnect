@@ -11,7 +11,6 @@ import {
 } from "src/app/shared/resources/concepts/helpers";
 import { catchError, map } from "rxjs/operators";
 import { getLabOrdersNotSampled } from "../helpers";
-
 @Injectable({
   providedIn: "root",
 })
@@ -69,283 +68,288 @@ export class SamplesService {
     isAdmitted?
   ): Observable<any> {
     return new Observable((observer) => {
-      this.httpClientService
-        .get("lab/sample?visit=" + visitUuid)
-        .subscribe((samplesResponse) => {
-          const samples = samplesResponse;
-          let allSamples = [];
+      zip(
+        this.httpClientService.get("lab/sample?visit=" + visitUuid),
+        this.httpClientService.get("lab/sampledorders/" + visitUuid)
+      ).subscribe((samplesResponse) => {
+        const samples = samplesResponse[0];
+        let allSamples = [];
+        const sampledOrders = samplesResponse[1]?.map((sampledOrder: any) => {
+          return {
+            ...sampledOrder,
+            ...sampledOrder?.order,
+          };
+        });
+        console.log("sampledOrders", sampledOrders);
+        const keyedDepartmentsByTestOrder =
+          createKeyValuePairForAllLabDepartments(labDepartments);
 
-          const keyedDepartmentsByTestOrder =
-            createKeyValuePairForAllLabDepartments(labDepartments);
+        const samplesToCollect = groupTestsBySpecimenSource(
+          orderedLabOrders,
+          specimenSources,
+          labDepartments,
+          patient
+        );
 
-          const samplesToCollect = groupTestsBySpecimenSource(
-            orderedLabOrders,
-            specimenSources,
-            labDepartments,
-            patient
-          );
+        let collectedOrders = _.keyBy(sampledOrders, "uuid");
 
-          let collectedOrders = {};
+        /**
+         * TODO: Review the all codes
+         */
 
-          /**
-           * TODO: Review the all codes
-           */
+        //merge orders for same specimen source and department
+        let samplesMerged = [];
+        _.each(samples, (sample) => {
+          const departmentAndSourceId =
+            keyedDepartmentsByTestOrder[sample?.orders[0]?.order?.concept?.uuid]
+              ?.department?.id +
+            "_" +
+            sample?.concept?.uuid;
+          // sample?.orders?.forEach((order) => {
+          //   collectedOrders[order?.order?.uuid] = order;
+          // });
+          if (
+            (
+              _.filter(samplesMerged, {
+                departmentSpecimentSource: departmentAndSourceId,
+              }) || []
+            )?.length > 0
+          ) {
+            const index = _.findIndex(samplesMerged, {
+              departmentSpecimentSource: departmentAndSourceId,
+            });
 
-          //merge orders for same specimen source and department
-          let samplesMerged = [];
-          _.each(samples, (sample) => {
+            // Replace item at index using native splice
+            samplesMerged.splice(index, 1, {
+              ...sample,
+              departmentName:
+                keyedDepartmentsByTestOrder[
+                  sample?.orders[0]?.order?.concept?.uuid
+                ]?.department?.name,
+              departmentUuid:
+                keyedDepartmentsByTestOrder[
+                  sample?.orders[0]?.order?.concept?.uuid
+                ]?.department?.id,
+              orders: [...samplesMerged[index]?.orders, ...sample?.orders],
+              departmentSpecimentSource: departmentAndSourceId,
+            });
+          } else {
+            samplesMerged = [
+              ...samplesMerged,
+              { ...sample, departmentSpecimentSource: departmentAndSourceId },
+            ];
+          }
+        });
+
+        let samplesNotMatchingToCollectedOnes = [];
+
+        const allSamplesAfterFiltering = _.map(
+          _.uniqBy(samplesMerged, "departmentSpecimentSource"),
+          (sample) => {
             const departmentAndSourceId =
               keyedDepartmentsByTestOrder[
                 sample?.orders[0]?.order?.concept?.uuid
               ]?.department?.id +
               "_" +
               sample?.concept?.uuid;
-            sample?.orders?.forEach((order) => {
-              collectedOrders[order?.order?.uuid] = order;
+            let matchedSamples = _.filter(samplesToCollect, {
+              departmentSpecimentSource: departmentAndSourceId,
+            });
+
+            samplesNotMatchingToCollectedOnes = _.filter(
+              samplesToCollect,
+              (possibleUnMatchingSample) => {
+                if (
+                  possibleUnMatchingSample?.departmentSpecimentSource !==
+                  departmentAndSourceId
+                ) {
+                  return sample;
+                }
+              }
+            );
+            matchedSamples = matchedSamples?.map((sample) => {
+              return {
+                ...sample,
+                orders: sample?.orders,
+              };
             });
             if (
-              (
-                _.filter(samplesMerged, {
-                  departmentSpecimentSource: departmentAndSourceId,
-                }) || []
-              )?.length > 0
+              matchedSamples.length > 0 &&
+              (matchedSamples || [])[0]?.orders?.length > sample?.orders?.length
             ) {
-              const index = _.findIndex(samplesMerged, {
-                departmentSpecimentSource: departmentAndSourceId,
-              });
-
-              // Replace item at index using native splice
-              samplesMerged.splice(index, 1, {
-                ...sample,
-                departmentName:
-                  keyedDepartmentsByTestOrder[
-                    sample?.orders[0]?.order?.concept?.uuid
-                  ]?.department?.name,
-                departmentUuid:
-                  keyedDepartmentsByTestOrder[
-                    sample?.orders[0]?.order?.concept?.uuid
-                  ]?.department?.id,
-                orders: [...samplesMerged[index]?.orders, ...sample?.orders],
-                departmentSpecimentSource: departmentAndSourceId,
-              });
-            } else {
-              samplesMerged = [
-                ...samplesMerged,
-                { ...sample, departmentSpecimentSource: departmentAndSourceId },
+              const unSampledOrders = getLabOrdersNotSampled(
+                (matchedSamples || [])[0]?.orders,
+                sample?.orders,
+                paidItems
+              );
+              allSamples = [
+                ...allSamples,
+                {
+                  ...(matchedSamples || [])[0],
+                  patient: patient?.patient,
+                  mrNo: getmRN(patient?.patient),
+                  orders: unSampledOrders,
+                },
               ];
+              return [
+                ...allSamples,
+                ...matchedSamples.map((sample) => {
+                  return {
+                    ...sample,
+                    orders:
+                      sample?.order?.filter(
+                        (order) => collectedOrders[order?.uuid]
+                      ) || [],
+                  };
+                }),
+              ];
+            } else {
+              return [];
+            }
+          }
+        );
+        allSamples = _.flatten([
+          ...allSamplesAfterFiltering,
+          ...samplesNotMatchingToCollectedOnes,
+        ]);
+        let collectedSamples = [];
+        samples && samples?.length > 0
+          ? _.each(samples, (sample) => {
+              this.api.concept
+                .getConcept(sample?.concept?.uuid)
+                .then((response) => {
+                  if (response) {
+                    collectedSamples = [
+                      ...collectedSamples,
+                      {
+                        id: sample?.label,
+                        uuid: sample?.uuid,
+                        specimenSourceName: response?.name?.display,
+                        specimenSourceUuid: sample?.concept?.uuid,
+                        departmentName:
+                          keyedDepartmentsByTestOrder[
+                            sample?.orders[0]?.order?.concept?.uuid
+                          ]?.department?.name,
+                        departmentUuid:
+                          keyedDepartmentsByTestOrder[
+                            sample?.orders[0]?.order?.concept?.uuid
+                          ]?.department?.id,
+                        departmentSpecimentSource:
+                          keyedDepartmentsByTestOrder[
+                            sample?.orders[0]?.order?.concept?.uuid
+                          ]?.department?.id +
+                          "_" +
+                          sample?.concept?.uuid,
+                        mrNo: getmRN(sample?.patient),
+                        patient: sample?.patient,
+                        orders: _.map(sample?.orders, (order) => {
+                          return {
+                            ...order?.order,
+                            paid: paidItems[order?.concept?.display]
+                              ? true
+                              : false,
+                            collected: true,
+                            isAdmitted: isAdmitted,
+                            technician: order?.technician,
+                            sample: order?.sample,
+                            testAllocations: order?.testAllocations,
+                          };
+                        }),
+                        isAdmitted,
+                        collected: true,
+                        priority: sample.priority ? "HIGH" : "None",
+                        allocation: sample?.testsAllocation,
+                        status:
+                          sample?.statuses && sample?.statuses?.length > 0
+                            ? getRejectOrAcceptStatus(sample?.statuses)
+                            : null,
+
+                        comments:
+                          sample?.statuses && sample?.statuses?.length > 0
+                            ? getCommentsForAcceptanceOrRejectioon(
+                                sample?.statuses
+                              )
+                            : null,
+                        user:
+                          sample?.statuses && sample?.statuses?.length > 0
+                            ? getUserRejectedOrAccepted(sample?.statuses)
+                            : null,
+                      },
+                    ];
+                    observer.next([
+                      ...(allSamples?.filter(
+                        (sample) =>
+                          (
+                            sample?.orders?.filter(
+                              (order) => !collectedOrders[order?.uuid]
+                            ) || []
+                          )?.length > 0
+                      ) || []),
+                      ...collectedSamples,
+                    ]);
+                  }
+                });
+            })
+          : observer.next(
+              groupTestsBySpecimenSource(
+                orderedLabOrders,
+                specimenSources,
+                labDepartments,
+                patient
+              )
+            );
+
+        function getRejectOrAcceptStatus(statusesInfo) {
+          let status = "";
+          _.each(statusesInfo, (statusInfo) => {
+            if (
+              statusInfo?.status.toUpperCase() == "ACCEPTED" ||
+              statusInfo?.status.toUpperCase() == "REJECTED"
+            ) {
+              status = statusInfo?.status.toUpperCase();
             }
           });
+          return status;
+        }
 
-          let samplesNotMatchingToCollectedOnes = [];
-
-          const allSamplesAfterFiltering = _.map(
-            _.uniqBy(samplesMerged, "departmentSpecimentSource"),
-            (sample) => {
-              const departmentAndSourceId =
-                keyedDepartmentsByTestOrder[
-                  sample?.orders[0]?.order?.concept?.uuid
-                ]?.department?.id +
-                "_" +
-                sample?.concept?.uuid;
-              let matchedSamples = _.filter(samplesToCollect, {
-                departmentSpecimentSource: departmentAndSourceId,
-              });
-
-              samplesNotMatchingToCollectedOnes = _.filter(
-                samplesToCollect,
-                (possibleUnMatchingSample) => {
-                  if (
-                    possibleUnMatchingSample?.departmentSpecimentSource !==
-                    departmentAndSourceId
-                  ) {
-                    return sample;
-                  }
-                }
-              );
-              matchedSamples = matchedSamples?.map((sample) => {
-                return {
-                  ...sample,
-                  orders: sample?.orders,
-                };
-              });
-              if (
-                matchedSamples.length > 0 &&
-                (matchedSamples || [])[0]?.orders?.length >
-                  sample?.orders?.length
-              ) {
-                const unSampledOrders = getLabOrdersNotSampled(
-                  (matchedSamples || [])[0]?.orders,
-                  sample?.orders,
-                  paidItems
-                );
-                allSamples = [
-                  ...allSamples,
-                  {
-                    ...(matchedSamples || [])[0],
-                    patient: patient?.patient,
-                    mrNo: getmRN(patient?.patient),
-                    orders: unSampledOrders,
-                  },
-                ];
-                return [
-                  ...allSamples,
-                  ...matchedSamples.map((sample) => {
-                    return {
-                      ...sample,
-                      orders:
-                        sample?.order?.filter(
-                          (order) => collectedOrders[order?.uuid]
-                        ) || [],
-                    };
-                  }),
-                ];
-              } else {
-                return [];
-              }
+        function getUserRejectedOrAccepted(statusesInfo) {
+          let user = null;
+          _.each(statusesInfo, (statusInfo) => {
+            if (
+              statusInfo?.status.toUpperCase() == "ACCEPTED" ||
+              statusInfo?.status.toUpperCase() == "REJECTED"
+            ) {
+              user = statusInfo?.user;
             }
-          );
-          allSamples = _.flatten([
-            ...allSamplesAfterFiltering,
-            ...samplesNotMatchingToCollectedOnes,
-          ]);
-          let collectedSamples = [];
-          samples && samples?.length > 0
-            ? _.each(samples, (sample) => {
-                this.api.concept
-                  .getConcept(sample?.concept?.uuid)
-                  .then((response) => {
-                    if (response) {
-                      collectedSamples = [
-                        ...collectedSamples,
-                        {
-                          id: sample?.label,
-                          uuid: sample?.uuid,
-                          specimenSourceName: response?.name?.display,
-                          specimenSourceUuid: sample?.concept?.uuid,
-                          departmentName:
-                            keyedDepartmentsByTestOrder[
-                              sample?.orders[0]?.order?.concept?.uuid
-                            ]?.department?.name,
-                          departmentUuid:
-                            keyedDepartmentsByTestOrder[
-                              sample?.orders[0]?.order?.concept?.uuid
-                            ]?.department?.id,
-                          departmentSpecimentSource:
-                            keyedDepartmentsByTestOrder[
-                              sample?.orders[0]?.order?.concept?.uuid
-                            ]?.department?.id +
-                            "_" +
-                            sample?.concept?.uuid,
-                          mrNo: getmRN(sample?.patient),
-                          patient: sample?.patient,
-                          orders: _.map(sample?.orders, (order) => {
-                            return {
-                              ...order?.order,
-                              paid: paidItems[order?.concept?.display]
-                                ? true
-                                : false,
-                              collected: true,
-                              isAdmitted: isAdmitted,
-                              technician: order?.technician,
-                              sample: order?.sample,
-                              testAllocations: order?.testAllocations,
-                            };
-                          }),
-                          isAdmitted,
-                          collected: true,
-                          priority: sample.priority ? "HIGH" : "None",
-                          allocation: sample?.testsAllocation,
-                          status:
-                            sample?.statuses && sample?.statuses?.length > 0
-                              ? getRejectOrAcceptStatus(sample?.statuses)
-                              : null,
+          });
+          return user;
+        }
 
-                          comments:
-                            sample?.statuses && sample?.statuses?.length > 0
-                              ? getCommentsForAcceptanceOrRejectioon(
-                                  sample?.statuses
-                                )
-                              : null,
-                          user:
-                            sample?.statuses && sample?.statuses?.length > 0
-                              ? getUserRejectedOrAccepted(sample?.statuses)
-                              : null,
-                        },
-                      ];
-                      observer.next([
-                        ...(allSamples?.filter(
-                          (sample) =>
-                            (
-                              sample?.orders?.filter(
-                                (order) => !collectedOrders[order?.uuid]
-                              ) || []
-                            )?.length > 0
-                        ) || []),
-                        ...collectedSamples,
-                      ]);
-                    }
-                  });
-              })
-            : observer.next(
-                groupTestsBySpecimenSource(
-                  orderedLabOrders,
-                  specimenSources,
-                  labDepartments,
-                  patient
-                )
-              );
+        function getCommentsForAcceptanceOrRejectioon(statusesInfo) {
+          let comments = null;
+          _.each(statusesInfo, (statusInfo) => {
+            if (
+              statusInfo?.status.toUpperCase() == "ACCEPTED" ||
+              statusInfo?.status.toUpperCase() == "REJECTED"
+            ) {
+              comments = statusInfo?.remarks;
+            }
+          });
+          return comments;
+        }
 
-          function getRejectOrAcceptStatus(statusesInfo) {
-            let status = "";
-            _.each(statusesInfo, (statusInfo) => {
-              if (
-                statusInfo?.status.toUpperCase() == "ACCEPTED" ||
-                statusInfo?.status.toUpperCase() == "REJECTED"
-              ) {
-                status = statusInfo?.status.toUpperCase();
-              }
-            });
-            return status;
-          }
-
-          function getUserRejectedOrAccepted(statusesInfo) {
-            let user = null;
-            _.each(statusesInfo, (statusInfo) => {
-              if (
-                statusInfo?.status.toUpperCase() == "ACCEPTED" ||
-                statusInfo?.status.toUpperCase() == "REJECTED"
-              ) {
-                user = statusInfo?.user;
-              }
-            });
-            return user;
-          }
-
-          function getCommentsForAcceptanceOrRejectioon(statusesInfo) {
-            let comments = null;
-            _.each(statusesInfo, (statusInfo) => {
-              if (
-                statusInfo?.status.toUpperCase() == "ACCEPTED" ||
-                statusInfo?.status.toUpperCase() == "REJECTED"
-              ) {
-                comments = statusInfo?.remarks;
-              }
-            });
-            return comments;
-          }
-
-          function getmRN(patient) {
-            let mrNo = "";
-            _.map(patient?.identifiers, (identifier) => {
-              if (identifier?.name == "MRN" || identifier?.display == "MRN") {
-                mrNo = identifier?.id;
-              } else if (identifier?.display?.indexOf("MRN") > -1) {
-                mrNo = identifier?.identifier;
-              }
-            });
-            return mrNo;
-          }
-        });
+        function getmRN(patient) {
+          let mrNo = "";
+          _.map(patient?.identifiers, (identifier) => {
+            if (identifier?.name == "MRN" || identifier?.display == "MRN") {
+              mrNo = identifier?.id;
+            } else if (identifier?.display?.indexOf("MRN") > -1) {
+              mrNo = identifier?.identifier;
+            }
+          });
+          return mrNo;
+        }
+      });
     });
   }
 
