@@ -75,8 +75,10 @@ public class LaboratoryController {
 		
 		Visit existingVisit = visitService.getVisitByUuid(((Map) sample.get("visit")).get("uuid").toString());
 		Concept concept = conceptService.getConceptByUuid(((Map) sample.get("concept")).get("uuid").toString());
-		Concept specimenSource = conceptService.getConceptByUuid(((Map) sample.get("specimenSource")).get("uuid").toString());
-		
+		if(sample.get("specimenSource") != null) {
+			Concept specimenSource = conceptService.getConceptByUuid(((Map) sample.get("specimenSource")).get("uuid").toString());
+			newSample.setSpecimenSource(specimenSource);
+		}
 		if (sample.get("location") != null) {
 			Location location = locationService.getLocationByUuid(((Map) sample.get("location")).get("uuid").toString());
 			newSample.setLocation(location);
@@ -88,7 +90,7 @@ public class LaboratoryController {
 		
 		newSample.setVisit(existingVisit);
 		newSample.setConcept(concept);
-		newSample.setSpecimenSource(specimenSource);
+
 		
 		newSample.setLabel((String) sample.get("label"));
 
