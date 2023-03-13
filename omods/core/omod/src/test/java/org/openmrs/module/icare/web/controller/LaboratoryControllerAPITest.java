@@ -224,7 +224,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 				System.out.println(((List<Map>) sample.get("statuses")).get(0));
 				
 				sampleFound = true;
-				assertThat("list of statuses is greater than 0", ((List<Map>) sample.get("statuses")).size(), is(2));
+				assertThat("list of statuses is greater than 0", ((List<Map>) sample.get("statuses")).size(), is(3));
 				Map<String, Object> status = ((List<Map>) sample.get("statuses")).get(0);
 				assertThat("list of statuses is greater than 0", (String) status.get("status"), is("RECEIVED"));
 			}

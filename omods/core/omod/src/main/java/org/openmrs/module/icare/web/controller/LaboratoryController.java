@@ -123,10 +123,12 @@ public class LaboratoryController {
 		response.put("concept", conceptObject);
 		response.put("department", conceptObject);
 
-		HashMap<String, Object> specimenSourceObject = new HashMap<String, Object>();
-		specimenSourceObject.put("uuid", createdSample.getSpecimenSource().getUuid());
-		specimenSourceObject.put("display", createdSample.getSpecimenSource().getDisplayString());
-		response.put("specimenSource", specimenSourceObject);
+		if(createdSample.getSpecimenSource() != null) {
+			HashMap<String, Object> specimenSourceObject = new HashMap<String, Object>();
+			specimenSourceObject.put("uuid", createdSample.getSpecimenSource().getUuid());
+			specimenSourceObject.put("display", createdSample.getSpecimenSource().getDisplayString());
+			response.put("specimenSource", specimenSourceObject);
+		}
 		
 		List<Map<String, Object>> orders = new ArrayList<Map<String, Object>>();
 		for (SampleOrder sampleOrder : createdSample.getSampleOrders()) {
