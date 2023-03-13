@@ -80,7 +80,6 @@ export class SamplesService {
             ...sampledOrder?.order,
           };
         });
-        console.log("sampledOrders", sampledOrders);
         const keyedDepartmentsByTestOrder =
           createKeyValuePairForAllLabDepartments(labDepartments);
 
