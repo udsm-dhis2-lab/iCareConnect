@@ -206,6 +206,7 @@ public class LaboratoryController {
 	@ResponseBody
 	public Map<String, Object> getSamplesByUuid(@PathVariable String sampleUuid) {
 		Sample sample = laboratoryService.getSampleByUuid(sampleUuid);
+		
 		return sample.toMap();
 	}
 	
