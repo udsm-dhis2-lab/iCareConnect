@@ -81,6 +81,7 @@
               [labNumberCharactersCount]="params?.labNumberCharactersCount"
               [referringDoctorAttributes]="params?.referringDoctorAttributes"
               [labSections]="labSections"
+              [specimenSources]=specimenSources
               [testsFromExternalSystemsConfigs]="
                 params?.testsFromExternalSystemsConfigs
               "
@@ -124,6 +125,7 @@
             [fromMaintenance]="fromMaintenance"
             [LISConfigurations]="LISConfigurations"
             [barcodeSettings]="params?.barcodeSettings"
+            [specimenSources]=specimenSources
             (reloadRegisterSample)="onReloadRegisterSample($event)"
           ></app-batch-registration>
         </div>

@@ -17,6 +17,7 @@ export class SampleRegistrationHomeComponent implements OnInit {
   provider$: Observable<any>;
   LISConfigurations$: Observable<LISConfigurationsModel>;
   labSections$: Observable<ConceptGetFull[]>;
+  specimenSources$: Observable<any[]>;
   constructor(
     private store: Store<AppState>,
     private conceptService: ConceptsService
@@ -27,5 +28,8 @@ export class SampleRegistrationHomeComponent implements OnInit {
     this.LISConfigurations$ = this.store.select(getLISConfigurations);
     this.labSections$ =
       this.conceptService.getConceptsBySearchTerm("LAB_DEPARTMENT");
+
+    this.specimenSources$ =
+      this.conceptService.getConceptsBySearchTerm("SPECIMEN_SOURCE");
   }
 }

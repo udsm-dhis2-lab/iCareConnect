@@ -58,6 +58,7 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
   @Input() allRegistrationFields: any;
   @Input() LISConfigurations: any;
   @Input() barcodeSettings: any;
+  @Input() specimenSources: ConceptGetFull[];
 
   departmentField: any = {};
   specimenDetailsFields: any;
