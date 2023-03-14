@@ -40,13 +40,16 @@ import { isMoment } from "moment";
 import { PersonService } from "src/app/core/services/person.service";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { webSocket } from "rxjs/webSocket";
+import { keySampleTypesByTestOrder } from "src/app/shared/helpers/sample-types.helper";
 
 @Component({
   selector: "app-sample-in-batch-registration",
   templateUrl: "./sample-in-batch-registration.component.html",
   styleUrls: ["./sample-in-batch-registration.component.scss"],
 })
-export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit {
+export class SampleInBatchRegistrationComponent
+  implements OnInit, AfterViewInit
+{
   labSampleLabel$: Observable<string>;
   @Input() mrnGeneratorSourceUuid: string;
   @Input() preferredPersonIdentifier: string;
@@ -64,7 +67,7 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
   @Input() batchSampleCodeFormatReference: any;
   @Input() barcodeSettings: any;
   @Input() LISConfigurations: any;
-  
+  @Input() specimenSources: ConceptGetFull[];
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -152,6 +155,7 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
   batchSampleCode: any;
   useExistingBatchSample: boolean = false;
   connection: any;
+  specimenSourcesKeyedByTestOrders: any = {};
 
   constructor(
     private samplesService: SamplesService,
@@ -177,13 +181,16 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
     this.connection = webSocket(this.barcodeSettings?.socketUrl);
 
     this.connection.subscribe({
-      next: msg => console.log('message received: ', msg), // Called whenever there is a message from the server.
-      error: err => console.log(err), // Called if at any point WebSocket API signals some kind of error.
-      complete: () => console.log('complete') // Called when connection is closed (for whatever reason).
+      next: (msg) => console.log("message received: ", msg), // Called whenever there is a message from the server.
+      error: (err) => console.log(err), // Called if at any point WebSocket API signals some kind of error.
+      complete: () => console.log("complete"), // Called when connection is closed (for whatever reason).
     });
   }
 
   ngOnInit(): void {
+    this.specimenSourcesKeyedByTestOrders = keySampleTypesByTestOrder(
+      this.specimenSources
+    );
     if (
       localStorage.getItem("batch") === this.batch?.uuid &&
       localStorage.getItem("batchSample")
@@ -1223,7 +1230,16 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
                                                                       specimenSource:
                                                                         {
                                                                           uuid: this
-                                                                            .selectedSpecimenUuid,
+                                                                            .selectedSpecimenUuid
+                                                                            ? this
+                                                                                .selectedSpecimenUuid
+                                                                            : this
+                                                                                .specimenSourcesKeyedByTestOrders[
+                                                                                this
+                                                                                  .testOrders[0]
+                                                                                  ?.value
+                                                                              ]
+                                                                                ?.specimenUuid,
                                                                         },
                                                                       location:
                                                                         {
@@ -2048,6 +2064,20 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
                                                                                     .currentLabLocation
                                                                                     ?.uuid,
                                                                                 },
+                                                                              specimenSource:
+                                                                                {
+                                                                                  uuid: this
+                                                                                    .selectedSpecimenUuid
+                                                                                    ? this
+                                                                                        .selectedSpecimenUuid
+                                                                                    : this
+                                                                                        .specimenSourcesKeyedByTestOrders[
+                                                                                        this
+                                                                                          .testOrders[0]
+                                                                                          ?.value
+                                                                                      ]
+                                                                                        ?.specimenUuid,
+                                                                                },
                                                                               orders:
                                                                                 encounterResponse?.orders.map(
                                                                                   (
@@ -2742,7 +2772,10 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
                                                                                               sampleLabelsUsedDetails:
                                                                                                 this
                                                                                                   .sampleLabelsUsedDetails,
-                                                                                                isLis: this.LISConfigurations?.isLIS
+                                                                                              isLis:
+                                                                                                this
+                                                                                                  .LISConfigurations
+                                                                                                  ?.isLIS,
                                                                                             };
                                                                                           this.dialog
                                                                                             .open(
@@ -2777,8 +2810,8 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
                                                                                                   100
                                                                                                 );
                                                                                                 this.openBarCodeDialog(
-                                                                                                    data
-                                                                                                  );
+                                                                                                  data
+                                                                                                );
                                                                                                 this.isRegistrationReady =
                                                                                                   false;
                                                                                                 setTimeout(
@@ -2985,18 +3018,26 @@ export class SampleInBatchRegistrationComponent implements OnInit, AfterViewInit
       })
       .afterClosed()
       .subscribe((results) => {
-        if(results){
-          let message = this.barcodeSettings?.barcode?.split("{{SampleID}}").join(results?.sampleData?.label);
-          message = message.split("{{PatientNames}}").join(`${results?.sampleData?.patient?.givenName} ${results?.sampleData?.patient?.familyName}`);
-          message = message?.split("{{Date}}").join(formatDateToYYMMDD(new Date(results?.sampleData?.created), true));
+        if (results) {
+          let message = this.barcodeSettings?.barcode
+            ?.split("{{SampleID}}")
+            .join(results?.sampleData?.label);
+          message = message
+            .split("{{PatientNames}}")
+            .join(
+              `${results?.sampleData?.patient?.givenName} ${results?.sampleData?.patient?.familyName}`
+            );
+          message = message
+            ?.split("{{Date}}")
+            .join(
+              formatDateToYYMMDD(new Date(results?.sampleData?.created), true)
+            );
           message = message?.split("{{Storage}}").join("");
           message = message?.split("{{Tests}}").join("");
-          this.connection.next(
-            {
-              Message: message, 
-              Type: "print"
-            }
-          )
+          this.connection.next({
+            Message: message,
+            Type: "print",
+          });
         }
       });
   }
