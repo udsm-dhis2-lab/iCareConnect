@@ -58,6 +58,7 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
   @Input() allRegistrationFields: any;
   @Input() LISConfigurations: any;
   @Input() barcodeSettings: any;
+  @Input() specimenSources: ConceptGetFull[];
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -1870,11 +1871,18 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
       .afterClosed()
       .subscribe((results) => {
         if(results){
+          let tests = []
+          results?.sampleData?.orders?.forEach((order) => {
+            tests = [
+              ...tests,
+              order?.order?.shortName?.split("TEST_ORDERS:")?.join("")
+            ]
+          })
           let message = this.barcodeSettings?.barcode?.split("{{SampleID}}").join(results?.sampleData?.label);
           message = message.split("{{PatientNames}}").join(`${results?.sampleData?.patient?.givenName} ${results?.sampleData?.patient?.familyName}`);
           message = message?.split("{{Date}}").join(formatDateToYYMMDD(new Date(results?.sampleData?.created), true));
           message = message?.split("{{Storage}}").join("");
-          message = message?.split("{{Tests}}").join("");
+          message = message?.split("{{Tests}}").join(tests?.join(","));
           this.connection.next(
             {
               Message: message, 
