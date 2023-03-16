@@ -10,6 +10,7 @@ import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { SamplesService } from "src/app/shared/services/samples.service";
 
 @Component({
@@ -34,7 +35,8 @@ export class BatchRegistrationComponent implements OnInit {
   @Input() fromMaintenance: boolean;
   @Input() LISConfigurations: boolean;
   @Input() barcodeSettings: any;
-  
+  @Input() specimenSources: ConceptGetFull[];
+
   @Output() reloadRegisterSample: EventEmitter<any> = new EventEmitter();
   formData: any;
   useExistingBatchset: boolean = false;

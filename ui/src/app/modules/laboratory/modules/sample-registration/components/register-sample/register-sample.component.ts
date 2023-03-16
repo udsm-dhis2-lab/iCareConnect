@@ -34,6 +34,7 @@ export class RegisterSampleComponent implements OnInit {
   @Input() LISConfigurations: LISConfigurationsModel;
   @Input() labSections: ConceptGetFull[];
   @Input() fromMaintenance: boolean;
+  @Input() specimenSources: ConceptGetFull[]
   registrationCategory: string = "single";
   currentUser$: Observable<any>;
 
