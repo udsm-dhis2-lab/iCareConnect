@@ -112,7 +112,7 @@ public interface StoreService extends OpenmrsService {
 	
 	ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status);
 	
-	Supplier saveSupplier(Supplier supplier);
+	Supplier saveSupplier(Supplier supplier) throws Exception;
 	
 	List<Supplier> getSuppliers(Integer startIndex, Integer limit);
 	
