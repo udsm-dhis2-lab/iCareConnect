@@ -5173,4 +5173,12 @@
                 referencedTableName="users"/>
 
     </changeSet>
+
+    <changeSet id="update_st_supplier_add_location_column" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_supplier
+            ADD COLUMN location_id INT AFTER description,
+            ADD FOREIGN KEY(location_id) REFERENCES location(location_id);
+        </sql>
+    </changeSet>
 </databaseChangeLog>

@@ -1,7 +1,9 @@
 package org.openmrs.module.icare.store.models;
 
 import org.openmrs.BaseOpenmrsData;
+import org.openmrs.Location;
 import org.openmrs.module.icare.core.JSONConverter;
+import org.openmrs.module.icare.laboratory.models.BatchSet;
 
 import javax.persistence.*;
 import java.util.HashMap;
@@ -21,7 +23,11 @@ public class Supplier extends BaseOpenmrsData implements java.io.Serializable, J
 	
 	@Column(name = "description", length = 100)
 	private String description;
-	
+
+	@ManyToOne
+	@JoinColumn(name = "location_id", nullable = true)
+	private Location location;
+
 	@Override
 	public Integer getId() {
 		return id;
@@ -47,7 +53,15 @@ public class Supplier extends BaseOpenmrsData implements java.io.Serializable, J
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
+	public Location getLocation() {
+		return location;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
+	}
+
 	@Override
     public Map<String, Object> toMap()
     {
@@ -56,6 +70,13 @@ public class Supplier extends BaseOpenmrsData implements java.io.Serializable, J
         supplierMap.put("description",this.getDescription());
         supplierMap.put("uuid",this.getUuid());
 		supplierMap.put("voided",this.getVoided());
+
+		if(this.getLocation() != null){
+			Map<String,Object> locationMap = new HashMap<>();
+			locationMap.put("uuid",this.getLocation().getUuid());
+			locationMap.put("display",this.getLocation().getDisplayString());
+			supplierMap.put("location",locationMap);
+		}
         return supplierMap;
     }
 	
@@ -67,6 +88,12 @@ public class Supplier extends BaseOpenmrsData implements java.io.Serializable, J
 		}
 		if (supplierMap.get("name") != null) {
 			supplier.setName(supplierMap.get("name").toString());
+		}
+
+		if(supplierMap.get("location") != null){
+			Location location = new Location();
+			location.setUuid(((Map)supplierMap.get("location")).get("uuid").toString());
+			supplier.setLocation(location);
 		}
 		
 		if (supplierMap.get("voided") != null) {
