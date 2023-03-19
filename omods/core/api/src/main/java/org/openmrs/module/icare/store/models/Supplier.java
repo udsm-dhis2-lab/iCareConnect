@@ -23,11 +23,11 @@ public class Supplier extends BaseOpenmrsData implements java.io.Serializable, J
 	
 	@Column(name = "description", length = 100)
 	private String description;
-
+	
 	@ManyToOne
 	@JoinColumn(name = "location_id", nullable = true)
 	private Location location;
-
+	
 	@Override
 	public Integer getId() {
 		return id;
@@ -53,15 +53,15 @@ public class Supplier extends BaseOpenmrsData implements java.io.Serializable, J
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
+	
 	public Location getLocation() {
 		return location;
 	}
-
+	
 	public void setLocation(Location location) {
 		this.location = location;
 	}
-
+	
 	@Override
     public Map<String, Object> toMap()
     {
@@ -89,10 +89,10 @@ public class Supplier extends BaseOpenmrsData implements java.io.Serializable, J
 		if (supplierMap.get("name") != null) {
 			supplier.setName(supplierMap.get("name").toString());
 		}
-
-		if(supplierMap.get("location") != null){
+		
+		if (supplierMap.get("location") != null) {
 			Location location = new Location();
-			location.setUuid(((Map)supplierMap.get("location")).get("uuid").toString());
+			location.setUuid(((Map) supplierMap.get("location")).get("uuid").toString());
 			supplier.setLocation(location);
 		}
 		

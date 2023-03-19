@@ -16,4 +16,8 @@ public interface Stockable {
 	Double getQuantity();
 	
 	Location getLocation();
+	
+	Location getSourceLocation();
+	
+	Location getDestinationLocation();
 }

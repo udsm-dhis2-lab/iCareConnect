@@ -82,6 +82,16 @@ public class IssueItem extends BaseOpenmrsData implements java.io.Serializable, 
 		return this.id.getIssue().getIssueingLocation();
 	}
 	
+	@Override
+	public Location getSourceLocation() {
+		return this.id.getIssue().getIssueingLocation();
+	}
+	
+	@Override
+	public Location getDestinationLocation() {
+		return this.id.getIssue().getIssuedLocation();
+	}
+	
 	public void setQuantity(Double quantity) {
 		this.quantity = quantity;
 	}

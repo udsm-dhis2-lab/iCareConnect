@@ -5181,4 +5181,12 @@
             ADD FOREIGN KEY(location_id) REFERENCES location(location_id);
         </sql>
     </changeSet>
+
+    <changeSet id="update_st_transaction_add_column_destination_location" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_transaction
+            ADD COLUMN destination_location_id INT AFTER source_location_id,
+            ADD FOREIGN KEY(destination_location_id) REFERENCES location(location_id);
+        </sql>
+    </changeSet>
 </databaseChangeLog>
