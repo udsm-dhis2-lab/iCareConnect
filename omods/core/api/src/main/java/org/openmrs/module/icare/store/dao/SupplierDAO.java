@@ -54,7 +54,7 @@ public class SupplierDAO extends BaseDAO<Supplier> {
 			}
 			queryStr += " sp.voided = :voided";
 		}
-
+		
 		if (supplier.getLocation() != null) {
 			if (!queryStr.contains("SET")) {
 				queryStr += " SET ";
@@ -79,8 +79,8 @@ public class SupplierDAO extends BaseDAO<Supplier> {
 		if (supplier.getVoided() != null) {
 			query.setParameter("voided", supplier.getVoided());
 		}
-
-		if(supplier.getLocation() != null){
+		
+		if (supplier.getLocation() != null) {
 			query.setParameter("location", supplier.getLocation());
 		}
 		
