@@ -572,7 +572,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			        + ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION + "'");
 		}
 		
-		if ((testAllocationStatus.getStatus().equals("AUTHORIZED") && labResultApprovalConfig.equals("2"))) {
+		if ((testAllocationStatus.getStatus().equals("AUTHORIZED"))) {
 			List<Result> resList = testAllocation.getTestAllocationResults();
 			
 			Collections.sort(resList, new Comparator<Result>() {
