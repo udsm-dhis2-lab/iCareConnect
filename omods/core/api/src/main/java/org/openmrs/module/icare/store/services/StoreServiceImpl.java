@@ -188,6 +188,9 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		ledgerToSave.setRemarks(ledger.getRemarks());
 		ledgerToSave.setExpiryDate(ledger.getExpiryDate());
 		ledgerToSave.setBatchNo(ledger.getBatchNo());
+		if (ledger.getSourceLocation() != null) {
+			ledgerToSave.setSourceLocation(ledger.getSourceLocation());
+		}
 		if (ledger.getItem() != null) {
 			ledgerToSave.setItem(this.dao.findByUuid(ledger.getItem().getUuid()));
 		}
@@ -484,6 +487,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 				stockableItem.setExpiryDate(stock.getExpiryDate());
 				stockableItem.setItem(item);
 				stockableItem.setLocation(Context.getLocationService().getLocationByUuid(locationUuid));
+				stockableItem.setSourceLocation(Context.getLocationService().getLocationByUuid(locationUuid));
 				stockableItem.setQuantity(quantityToDeduct);
 				TransactionUtil.deductStock(stockableItem);
 				totalQuantity -= quantityToDeduct;
@@ -537,6 +541,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 					stockableItem.setExpiryDate(stock.getExpiryDate());
 					stockableItem.setItem(item);
 					stockableItem.setLocation(Context.getLocationService().getLocationByUuid(locationUuid));
+					stockableItem.setSourceLocation(Context.getLocationService().getLocationByUuid(locationUuid));
 					stockableItem.setQuantity(quantityToDeduct);
 					TransactionUtil.deductStock(stockableItem);
 					totalQuantity -= quantityToDeduct;
@@ -576,6 +581,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 					stockableItem.setExpiryDate(stock.getExpiryDate());
 					stockableItem.setItem(item);
 					stockableItem.setLocation(Context.getLocationService().getLocationByUuid(locationUuid));
+					stockableItem.setSourceLocation(Context.getLocationService().getLocationByUuid(locationUuid));
 					stockableItem.setQuantity(quantityToDeduct);
 					TransactionUtil.deductStock(stockableItem);
 					totalQuantity -= quantityToDeduct;
@@ -605,7 +611,15 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public Supplier saveSupplier(Supplier supplier) {
+	public Supplier saveSupplier(Supplier supplier) throws Exception {
+		
+		if (supplier.getLocation() != null) {
+			Location location = Context.getLocationService().getLocationByUuid(supplier.getLocation().getUuid());
+			if (location == null) {
+				throw new Exception("Location with uuid " + supplier.getLocation().getUuid() + " does not exist");
+			}
+			supplier.setLocation(location);
+		}
 		return supplierDAO.save(supplier);
 	}
 	
@@ -780,6 +794,13 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		Supplier existingSupplier = this.supplierDAO.findByUuid(supplier.getUuid());
 		if (supplier == null) {
 			throw new Exception(" The supplier with uuid " + supplier.getUuid() + " does not exist");
+		}
+		if (supplier.getLocation() != null) {
+			Location location = Context.getLocationService().getLocationByUuid(supplier.getLocation().getUuid());
+			if (location == null) {
+				throw new Exception("The location with uuid " + supplier.getLocation().getUuid() + " does not exist");
+			}
+			supplier.setLocation(location);
 		}
 		return this.supplierDAO.updateSupplier(supplier);
 	}

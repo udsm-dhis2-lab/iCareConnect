@@ -60,6 +60,7 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "stockInvoiceItem")
 	private List<StockInvoiceItemStatus> stockInvoiceItemStatuses = new ArrayList<>(0);
+
 	
 	@Override
 	public Integer getId() {
@@ -118,6 +119,21 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 		return location;
 	}
 
+	@Override
+	public Location getSourceLocation() {
+		if (this.getStockInvoice() != null) {
+			return this.getStockInvoice().getSupplier().getLocation();
+		} else {
+			return null;
+		}
+	}
+
+
+	@Override
+	public Location getDestinationLocation() {
+		return location;
+	}
+
 	public void setLocation(Location location) {
 		this.location = location;
 	}
@@ -165,6 +181,7 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 	public void setStockInvoiceItemStatuses(List<StockInvoiceItemStatus> stockInvoiceItemStatuses) {
 		this.stockInvoiceItemStatuses = stockInvoiceItemStatuses;
 	}
+
 
 	@Override
     public Map<String, Object> toMap() {
@@ -235,6 +252,14 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 			creatorObject.put("uuid", this.getCreator().getUuid());
 			creatorObject.put("display", this.getCreator().getDisplayString());
 			stockInvoiceItemObject.put("creator", creatorObject);
+		}
+
+		if(this.getSourceLocation() != null){
+			HashMap<String,Object> locationObjectMap = new HashMap<>();
+			locationObjectMap.put("uuid",this.getSourceLocation().getUuid());
+			locationObjectMap.put("display",this.getSourceLocation().getDisplayString());
+			stockInvoiceItemObject.put("location",locationObjectMap);
+
 		}
 
 		if(this.getVoided() != null){
@@ -309,6 +334,7 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 			location.setUuid(((Map)stockInvoiceItemMap.get("location")).get("uuid").toString());
 			stockInvoiceItem.setLocation(location);
 		}
+
 
 		if(stockInvoiceItemMap.get("voided") != null){
 			stockInvoiceItem.setVoided((boolean) stockInvoiceItemMap.get("voided"));

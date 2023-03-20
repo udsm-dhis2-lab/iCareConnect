@@ -151,6 +151,7 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 						stockableItem.setItem(item);
 						stockableItem.setLocation(order.getEncounter().getLocation());
 						stockableItem.setQuantity(order.getQuantity());
+						stockableItem.setSourceLocation(order.getEncounter().getLocation());
 						TransactionUtil.deductStock(stockableItem);
 					}
 					

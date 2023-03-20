@@ -663,7 +663,7 @@ public class StoreController {
 	
 	@RequestMapping(value = "suppliers",method = RequestMethod.POST)
 	@ResponseBody
-	public List<Map<String,Object>> addSuppliers(@RequestBody List<Map<String,Object>> suppliersMap){
+	public List<Map<String,Object>> addSuppliers(@RequestBody List<Map<String,Object>> suppliersMap) throws Exception {
 
 		Supplier supplier = new Supplier();
 		List<Map<String,Object>> newSuppliersMapList = new ArrayList<>();
