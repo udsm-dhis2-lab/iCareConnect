@@ -160,6 +160,9 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 		HashMap<String, Object> conceptObject = new HashMap<String, Object>();
 		conceptObject.put("uuid", this.getConcept().getUuid());
 		conceptObject.put("display", this.getConcept().getDisplayString());
+		if(this.getConcept().getShortNameInLocale(new Locale("en")) != null) {
+			conceptObject.put("shortName", this.getConcept().getShortNameInLocale(new Locale("en")).getName());
+		}
 		
 		sampleObject.put("concept", conceptObject);
 		sampleObject.put("department", conceptObject);
