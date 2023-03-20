@@ -3018,35 +3018,45 @@ export class SampleInBatchRegistrationComponent
       })
       .afterClosed()
       .subscribe((results) => {
-        if(results){
-           let tests = []
+        if (results) {
+          let tests = [];
           results?.sampleData?.orders?.forEach((order) => {
             tests = [
               ...tests,
-              order?.order?.shortName?.split("TEST_ORDERS:")?.join("")
-            ]
-          })
+              order?.order?.shortName?.split("TEST_ORDERS:")?.join(""),
+            ];
+          });
           // let message = this.barcodeSettings?.barcode?.split("{{SampleID}}").join(results?.sampleData?.label);
           // message = message.split("{{PatientNames}}").join(`${results?.sampleData?.patient?.givenName} ${results?.sampleData?.patient?.middleName} ${results?.sampleData?.patient?.familyName}`);
           // message = message?.split("{{Date}}").join(formatDateToYYMMDD(new Date(results?.sampleData?.created), true));
           // message = message?.split("{{Storage}}").join("");
           // message = message?.split("{{Tests}}").join(tests?.join(","));
           const message = {
-                SampleID: results?.sampleData?.label,
-                Tests: tests?.join(","),
-                PatientNames: `${results?.sampleData?.patient?.givenName} ${results?.sampleData?.patient?.middleName?.length ? results?.sampleData?.patient?.middleName : ""} ${results?.sampleData?.patient?.familyName}`,
-                Date: formatDateToYYMMDD(new Date(results?.sampleData?.created), true),
-                Storage: "",
-                Department: results?.sampleData?.department?.shortName?.split("LAB_DEPARTMENT:").join("") || "",
-                BarcodeData: results?.sampleData?.label?.split(this.barcodeSettings?.textToIgnore).join("")
-              }
-          this.connection.next(
-            {
-              Message: message,
-              Description: "Message of data to be printed",
-              Type: "print"
-            }
-          )
+            SampleID: results?.sampleData?.label,
+            Tests: tests?.join(","),
+            PatientNames: `${results?.sampleData?.patient?.givenName} ${
+              results?.sampleData?.patient?.middleName?.length
+                ? results?.sampleData?.patient?.middleName
+                : ""
+            } ${results?.sampleData?.patient?.familyName}`,
+            Date: formatDateToYYMMDD(
+              new Date(results?.sampleData?.created),
+              true
+            ),
+            Storage: "",
+            Department:
+              results?.sampleData?.department?.shortName
+                ?.split("LAB_DEPARTMENT:")
+                .join("") || "",
+            BarcodeData: results?.sampleData?.label
+              ?.split(this.barcodeSettings?.textToIgnore)
+              .join(""),
+          };
+          this.connection.next({
+            Message: message,
+            Description: "Message of data to be printed",
+            Type: "print",
+          });
         }
       });
   }
@@ -3147,7 +3157,7 @@ export class SampleInBatchRegistrationComponent
           ...this.personDetailsData,
           ...personDetails,
           firstName: personDetails?.preferredName?.givenName,
-          middleName: personDetails?.preferredName?.middleName,
+          middleName: personDetails?.preferredName?.familyName2,
           lastName: personDetails?.preferredName?.familyName,
           mobileNumber: personDetails?.attributes?.filter((attribute) => {
             if (
