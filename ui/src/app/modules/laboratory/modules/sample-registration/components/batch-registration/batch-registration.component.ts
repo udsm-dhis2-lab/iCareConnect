@@ -347,8 +347,8 @@ export class BatchRegistrationComponent implements OnInit {
               [fieldKey]: {
                 ...this.staticFieldsOptionsObject[fieldKey],
                 value: this.formData[fieldKey].value,
-                disabled:
-                  this.formData[fieldKey].value.length > 0 ? true : false,
+                // disabled:
+                //   this.formData[fieldKey].value.length > 0 ? true : false,
               },
             }
           : this.staticFieldsOptionsObject;
@@ -362,8 +362,8 @@ export class BatchRegistrationComponent implements OnInit {
               [fieldKey]: {
                 ...this.dynamicFieldsOptionsObject[fieldKey],
                 value: this.formData[fieldKey].value,
-                disabled:
-                  this.formData[fieldKey].value.length > 0 ? true : false,
+                // disabled:
+                //   this.formData[fieldKey].value.length > 0 ? true : false,
               },
             }
           : this.dynamicFieldsOptionsObject;
