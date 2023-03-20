@@ -1890,7 +1890,7 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
                 Date: formatDateToYYMMDD(new Date(results?.sampleData?.created), true),
                 Storage: "",
                 Department: results?.sampleData?.department?.shortName?.split("LAB_DEPARTMENT:").join("") || "",
-                BarcodeData: results?.sampleData?.label?.split(this.barcodeSettings?.textToIngore).join("")
+                BarcodeData: results?.sampleData?.label?.split(this.barcodeSettings?.textToIgnore).join("")
               }
           this.connection.next(
             {
