@@ -180,9 +180,9 @@ export class PersonDetailsComponent implements OnInit {
       this.personAgeField = [
         {
           ...this.allRegistrationFields?.patientAgeFields?.age,
-          value: this.personDetailsData ? this.personDetailsData?.age : null
-        }
-      ]
+          value: this.personDetailsData ? this.personDetailsData?.age : null,
+        },
+      ];
     }
 
     this.personDetails.emit({
@@ -296,7 +296,7 @@ export class PersonDetailsComponent implements OnInit {
 
   setPersonDetails(personDetails?: any): void {
     this.patientUuid = personDetails?.uuid;
-    
+
     this.personFields = Object.keys(
       this.allRegistrationFields?.personFields
     ).map((key) => {
@@ -304,24 +304,30 @@ export class PersonDetailsComponent implements OnInit {
         personDetails = {
           ...personDetails,
           firstName: personDetails?.preferredName?.givenName,
-          middleName: personDetails?.preferredName?.middleName,
+          middleName: personDetails?.preferredName?.familyName2,
           lastName: personDetails?.preferredName?.familyName,
           mobileNumber: personDetails?.attributes?.filter((attribute) => {
-            if(attribute?.attributeType === 'aeb3a16c-f5b6-4848-aa51-d7e3146886d6'){
-              return attribute
+            if (
+              attribute?.attributeType ===
+              "aeb3a16c-f5b6-4848-aa51-d7e3146886d6"
+            ) {
+              return attribute;
             }
-          })[0]?.value
+          })[0]?.value,
         };
       }
       return {
         ...this.allRegistrationFields?.personFields[key],
-        value: personDetails ? personDetails[key] : null
+        value: personDetails ? personDetails[key] : null,
       };
     });
     this.personDOBField = [
       {
         ...this.allRegistrationFields?.patientAgeFields?.dob,
-        value: personDetails && personDetails?.birthdate ? new Date(personDetails?.birthdate) : null,
+        value:
+          personDetails && personDetails?.birthdate
+            ? new Date(personDetails?.birthdate)
+            : null,
       },
     ];
     this.personFieldsGroupThree = Object.keys(
