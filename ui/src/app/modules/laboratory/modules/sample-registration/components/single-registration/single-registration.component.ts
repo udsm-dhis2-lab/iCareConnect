@@ -1878,14 +1878,24 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
               order?.order?.shortName?.split("TEST_ORDERS:")?.join("")
             ]
           })
-          let message = this.barcodeSettings?.barcode?.split("{{SampleID}}").join(results?.sampleData?.label);
-          message = message.split("{{PatientNames}}").join(`${results?.sampleData?.patient?.givenName} ${results?.sampleData?.patient?.familyName}`);
-          message = message?.split("{{Date}}").join(formatDateToYYMMDD(new Date(results?.sampleData?.created), true));
-          message = message?.split("{{Storage}}").join("");
-          message = message?.split("{{Tests}}").join(tests?.join(","));
+          // let message = this.barcodeSettings?.barcode?.split("{{SampleID}}").join(results?.sampleData?.label);
+          // message = message.split("{{PatientNames}}").join(`${results?.sampleData?.patient?.givenName} ${results?.sampleData?.patient?.middleName} ${results?.sampleData?.patient?.familyName}`);
+          // message = message?.split("{{Date}}").join(formatDateToYYMMDD(new Date(results?.sampleData?.created), true));
+          // message = message?.split("{{Storage}}").join("");
+          // message = message?.split("{{Tests}}").join(tests?.join(","));
+          const message = {
+                SampleID: results?.sampleData?.label,
+                Tests: tests?.join(","),
+                PatientNames: `${results?.sampleData?.patient?.givenName} ${results?.sampleData?.patient?.middleName?.length ? results?.sampleData?.patient?.middleName : ""} ${results?.sampleData?.patient?.familyName}`,
+                Date: formatDateToYYMMDD(new Date(results?.sampleData?.created), true),
+                Storage: "",
+                Department: results?.sampleData?.department?.shortName?.split("LAB_DEPARTMENT:").join("") || "",
+                BarcodeData: results?.sampleData?.label?.split(this.barcodeSettings?.textToIngore).join("")
+              }
           this.connection.next(
             {
-              Message: message, 
+              Message: message,
+              Description: "Message of data to be printed",
               Type: "print"
             }
           )
