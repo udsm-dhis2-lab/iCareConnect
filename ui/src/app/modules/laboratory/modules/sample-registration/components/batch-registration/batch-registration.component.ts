@@ -1,11 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { FormControl } from "@angular/forms";
 import { flatten, omit, keyBy } from "lodash";
-import { Observable, ReplaySubject } from "rxjs";
+import { Observable } from "rxjs";
 import { tap } from "rxjs/operators";
-import { GenerateMetadataLabelsService } from "src/app/core/services";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { DropdownOption } from "src/app/shared/modules/form/models/dropdown-option.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -73,12 +70,16 @@ export class BatchRegistrationComponent implements OnInit {
   isFormInstantiated: boolean = false;
   batchSampleCodeFormatReference$: Observable<any>;
 
+  readyToRender: any = {};
   constructor(
     private sampleService: SamplesService,
     private systemSettingsService: SystemSettingsService
   ) {}
 
   ngOnInit(): void {
+    this.readyToRender["fixedFields"] = true;
+    this.readyToRender["dynamicFields"] = true;
+    this.readyToRender["staticFields"] = true;
     this.warning = {
       error: {
         message:
@@ -174,14 +175,22 @@ export class BatchRegistrationComponent implements OnInit {
   }
 
   getSelectedFixedFields(selectedItems: any[]): void {
+    if (selectedItems?.length !== this.selectedFixedFields?.length) {
+      this.readyToRender["staticFields"] = false;
+      this.readyToRender["dynamicFields"] = false;
+      setTimeout(() => {
+        this.readyToRender["staticFields"] = true;
+        this.readyToRender["dynamicFields"] = true;
+      }, 50);
+    }
     this.selectedFixedFields = selectedItems?.map((item) => item?.value);
     const selectedFixedFieldIDs = this.selectedFixedFields.map(
       (field) => field?.key
     );
 
-    this.staticFieldsOptions = this.staticFieldsOptions.filter((field) => {
-      return !selectedFixedFieldIDs.includes(field.key);
-    });
+    // this.staticFieldsOptions = this.staticFieldsOptions.filter((field) => {
+    //   return !selectedFixedFieldIDs.includes(field.key);
+    // });
     // this.addStaticField.options = [];
     setTimeout(() => {
       this.addStaticField.options = selectedFixedFieldIDs.length
@@ -199,14 +208,22 @@ export class BatchRegistrationComponent implements OnInit {
   }
 
   getSelectedStaticFields(selectedItems: any[]): void {
+    if (selectedItems?.length !== this.selectedStaticFields?.length) {
+      this.readyToRender["fixedFields"] = false;
+      this.readyToRender["dynamicFields"] = false;
+      setTimeout(() => {
+        this.readyToRender["fixedFields"] = true;
+        this.readyToRender["dynamicFields"] = true;
+      }, 50);
+    }
     this.selectedStaticFields = selectedItems?.map((item) => item?.value);
     const selectedStaticFieldIDs = this.selectedStaticFields.map(
       (field) => field?.key
     );
 
-    this.staticFieldsOptions = this.staticFieldsOptions.filter((field) => {
-      return !selectedStaticFieldIDs.includes(field.key);
-    });
+    // this.staticFieldsOptions = this.staticFieldsOptions.filter((field) => {
+    //   return !selectedStaticFieldIDs.includes(field.key);
+    // });
     // this.addStaticField.options = [];
     setTimeout(() => {
       this.addStaticField.options = selectedStaticFieldIDs.length
@@ -225,6 +242,14 @@ export class BatchRegistrationComponent implements OnInit {
   }
 
   getSelectedDynamicFields(selectedItems: any[]): void {
+    if (selectedItems?.length !== this.selectedDynamicFields?.length) {
+      this.readyToRender["fixedFields"] = false;
+      this.readyToRender["staticFields"] = false;
+      setTimeout(() => {
+        this.readyToRender["fixedFields"] = true;
+        this.readyToRender["staticFields"] = true;
+      }, 50);
+    }
     this.selectedDynamicFields = selectedItems?.map((item) => item?.value);
     this.setVariablesValues("SelectedDynamicField");
   }

@@ -4,7 +4,8 @@ import { Pipe, PipeTransform } from "@angular/core";
   name: "filterFields",
 })
 export class FilterFieldsPipe implements PipeTransform {
-  transform(items: any[], toFilter: any[]): any[] {
+  transform(items: any[], toFilter1: any[], toFilter2: any[]): any[] {
+    const toFilter = [...toFilter1, ...toFilter2];
     if (!items) {
       return [];
     }
@@ -12,17 +13,6 @@ export class FilterFieldsPipe implements PipeTransform {
     if (!toFilter || toFilter?.length === 0) {
       return items;
     }
-
-    // console.log(
-    //   items?.filter(
-    //     (item) =>
-    //       (
-    //         toFilter?.filter(
-    //           (itemToFilter) => item?.key == itemToFilter?.key
-    //         ) || []
-    //       )?.length === 0
-    //   ) || []
-    // );
     return (
       items?.filter(
         (item) =>

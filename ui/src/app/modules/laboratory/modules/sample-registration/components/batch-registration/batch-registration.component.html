@@ -165,8 +165,10 @@
                 (formUpdate)="onFormUpdate($event, 'Fixed')"
               ></app-form> -->
               <app-multiple-results-entry
+                *ngIf="readyToRender['fixedFields']"
                 [options]="
-                  fixedFieldsOptions | filterFields: selectedStaticFields
+                  fixedFieldsOptions
+                    | filterFields: selectedStaticFields:selectedDynamicFields
                 "
                 [value]="selectedFixedFields"
                 (selectedList)="getSelectedFixedFields($event)"
@@ -223,8 +225,10 @@
                 (formUpdate)="onFormUpdate($event, 'Static')"
               ></app-form> -->
               <app-multiple-results-entry
+                *ngIf="readyToRender['staticFields']"
                 [options]="
-                  staticFieldsOptions | filterFields: selectedFixedFields
+                  staticFieldsOptions
+                    | filterFields: selectedFixedFields:selectedDynamicFields
                 "
                 [value]="selectedStaticFields"
                 (selectedList)="getSelectedStaticFields($event)"
@@ -297,8 +301,10 @@
               ></app-form> -->
 
               <app-multiple-results-entry
+                *ngIf="readyToRender['dynamicFields']"
                 [options]="
-                  dynamicFieldsOptions | filterFields: selectedFixedFields
+                  dynamicFieldsOptions
+                    | filterFields: selectedFixedFields:selectedStaticFields
                 "
                 [value]="selectedDynamicFields"
                 (selectedList)="getSelectedDynamicFields($event)"
