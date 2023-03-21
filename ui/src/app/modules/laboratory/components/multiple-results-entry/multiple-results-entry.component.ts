@@ -56,7 +56,11 @@ export class MultipleResultsEntryComponent implements OnInit {
   private _onDestroy = new Subject<void>();
 
   ngOnInit() {
-    this.list = this.options;
+    this.setList(this.options);
+  }
+
+  setList(list: any[]) {
+    this.list = list;
     const defaultValues =
       this.list?.filter(
         (item) =>
