@@ -159,11 +159,18 @@
                 mode="indeterminate"
               >
               </mat-progress-bar>
-              <app-form
+              <!-- <app-form
                 *ngIf="addFixedField?.options?.length > 0"
                 [fields]="[addFixedField]"
                 (formUpdate)="onFormUpdate($event, 'Fixed')"
-              ></app-form>
+              ></app-form> -->
+              <app-multiple-results-entry
+                [options]="
+                  fixedFieldsOptions | filterFields: selectedStaticFields
+                "
+                [value]="selectedFixedFields"
+                (selectedList)="getSelectedFixedFields($event)"
+              ></app-multiple-results-entry>
             </div>
           </div>
         </div>
@@ -210,11 +217,18 @@
                 mode="indeterminate"
               >
               </mat-progress-bar>
-              <app-form
+              <!-- <app-form
                 *ngIf="addStaticField?.options?.length > 0"
                 [fields]="[addStaticField]"
                 (formUpdate)="onFormUpdate($event, 'Static')"
-              ></app-form>
+              ></app-form> -->
+              <app-multiple-results-entry
+                [options]="
+                  staticFieldsOptions | filterFields: selectedFixedFields
+                "
+                [value]="selectedStaticFields"
+                (selectedList)="getSelectedStaticFields($event)"
+              ></app-multiple-results-entry>
             </div>
             <!-- <div class="col-2">
                             <button 
@@ -276,11 +290,19 @@
                 mode="indeterminate"
               >
               </mat-progress-bar>
-              <app-form
+              <!-- <app-form
                 *ngIf="addDynamicField?.options?.length > 0"
                 [fields]="[addDynamicField]"
                 (formUpdate)="onFormUpdate($event, 'Dynamic')"
-              ></app-form>
+              ></app-form> -->
+
+              <app-multiple-results-entry
+                [options]="
+                  dynamicFieldsOptions | filterFields: selectedFixedFields
+                "
+                [value]="selectedDynamicFields"
+                (selectedList)="getSelectedDynamicFields($event)"
+              ></app-multiple-results-entry>
             </div>
           </div>
         </div>
@@ -340,7 +362,7 @@
               [currentUser]="currentUser"
               [labNumberCharactersCount]="labNumberCharactersCount"
               [labSections]="labSections"
-              [specimenSources]=specimenSources
+              [specimenSources]="specimenSources"
               [testsFromExternalSystemsConfigs]="
                 testsFromExternalSystemsConfigs
               "
