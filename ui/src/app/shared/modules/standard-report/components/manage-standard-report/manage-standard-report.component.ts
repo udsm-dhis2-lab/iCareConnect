@@ -72,14 +72,14 @@ export class ManageStandardReportComponent implements OnInit {
         id: "name",
         key: "name",
         label: "Name",
-        value: data?.value?.name,
+        value: data?.value ? data?.value?.name : data?.name,
         required: true,
       }),
       new TextArea({
         id: "description",
         key: "description",
         label: "Description",
-        value: data?.value?.description,
+        value: data?.value ? data?.value?.description : data?.description,
         required: true,
       }),
     ];

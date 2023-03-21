@@ -13,6 +13,7 @@
       ></lib-manage-standard-report>
     </div>
     <div
+      *ngIf="!hideList"
       class="col-md-4"
       [ngStyle]="{ display: reportToEdit ? 'none' : 'block' }"
     >
