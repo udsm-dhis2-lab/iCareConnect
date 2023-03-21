@@ -1,7 +1,6 @@
 import {
   Component,
   ViewChild,
-  AfterViewInit,
   OnInit,
   Input,
   Output,
@@ -56,7 +55,13 @@ export class MultipleResultsEntryComponent implements OnInit {
   private _onDestroy = new Subject<void>();
 
   ngOnInit() {
-    this.list = this.options;
+    // this.selectedList.emit(this.value);
+    this.setList(this.options);
+  }
+
+  setList(list: any[]) {
+    // console.log(list);
+    this.list = list;
     const defaultValues =
       this.list?.filter(
         (item) =>

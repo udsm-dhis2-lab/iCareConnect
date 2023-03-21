@@ -8,6 +8,7 @@ import { Component, Input, OnInit } from "@angular/core";
 export class ManageStandardReportsHomeComponent implements OnInit {
   report: any = "<p></p>";
   @Input() reportToEdit: any;
+  @Input() hideList: boolean;
   constructor() {}
 
   ngOnInit(): void {
@@ -19,7 +20,10 @@ export class ManageStandardReportsHomeComponent implements OnInit {
   onGetSelectedStandardReport(report: any): void {
     this.report = null;
     setTimeout(() => {
-      this.report = { ...report, value: JSON.parse(report?.value) };
+      this.report = {
+        ...report,
+        value: report?.value ? JSON.parse(report?.value) : report,
+      };
     }, 100);
   }
 }

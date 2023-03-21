@@ -30,10 +30,7 @@
               "node_modules/bootstrap/dist/css/bootstrap.css",
               "node_modules/font-awesome/css/font-awesome.css"
             ],
-            "scripts": [
-              "src/assets/js/zip-full.min.js",
-              "src/assets/js/JSPrintManager.js"
-            ],
+            "scripts": [],
             "vendorChunk": true,
             "extractLicenses": false,
             "buildOptimizer": false,
