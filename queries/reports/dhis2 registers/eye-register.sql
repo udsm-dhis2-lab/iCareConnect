@@ -12,7 +12,7 @@ SELECT
         GROUP_CONCAT(DISTINCT CASE WHEN ob2.concept_id='167014' THEN value_coded_concept_name.name ELSE NULL END) AS `VISUAL ACUITY GRADING IN THE BETTER EYE(RE) (PRESENTING)`,
         GROUP_CONCAT(DISTINCT CASE WHEN ob2.concept_id='167028' THEN value_coded_concept_name.name ELSE NULL END) AS `VISUAL ACUITY GRADING IN THE BETTER EYE(LE) (PRESENTING)`,
 		GROUP_CONCAT(DISTINCT CASE WHEN ot.name='Test Order' THEN test_order_concept_name.name ELSE NULL END) AS `VIPIMO`,
-		GROUP_CONCAT(DISTINCT CASE WHEN test_result_concept_name.name IS NULL THEN CONCAT(test_order_concept_name.name,'-',ob.value_text) ELSE CONCAT(test_order_concept_name.name,'-',test_result_concept_name.name) END)AS `MATOKEO YA VIPIMO`,
+		GROUP_CONCAT(DISTINCT CASE WHEN test_result_concept_name.name IS NULL THEN CONCAT(test_order_concept_name.name,'-[',test_result_concept_name2.name,'-',ob.value_text,']') ELSE CONCAT(test_order_concept_name.name,'-',test_result_concept_name.name) END)AS `MATOKEO YA VIPIMO`,
 		GROUP_CONCAT(DISTINCT CASE WHEN ed.certainty='CONFIRMED' THEN diagnosis_concept_name.name ELSE NULL END) AS DIAGNOSIS,
 		GROUP_CONCAT(DISTINCT d.name) AS `MATIBABU`,
 		GROUP_CONCAT(DISTINCT result_encounter_type.name) AS `MATOKEO YA MAHUDHURIO`,
@@ -37,6 +37,7 @@ SELECT
 	-- Addressing Matokeo ya vipimo
 	LEFT JOIN obs ob ON ob.order_id=test_order_order.order_id
 	LEFT JOIN concept_name test_result_concept_name ON test_result_concept_name.concept_id=ob.value_coded AND test_result_concept_name.concept_name_type = 'FULLY_SPECIFIED'
+    LEFT JOIN concept_name test_result_concept_name2 ON test_result_concept_name2.concept_id=ob.concept_id AND test_result_concept_name2.concept_name_type = 'FULLY_SPECIFIED'
 	-- Addressing other vitals obs
 	 LEFT JOIN obs ob2 ON ob2.encounter_id=test_order_encounter.encounter_id
      LEFT JOIN concept_name value_coded_concept_name ON value_coded_concept_name.concept_id=ob2.value_coded AND value_coded_concept_name.concept_name_type = 'FULLY_SPECIFIED'
@@ -58,6 +59,6 @@ SELECT
 	LEFT JOIN concept_name payment_concept_name ON payment_concept_name.concept_id=visit_attribute_concept.concept_id AND payment_concept_name.concept_name_type = 'FULLY_SPECIFIED'
 
 	-- ADDRESSING VISIT TYPE
-	WHERE v.location_id=45 AND v.voided=0 AND CAST(CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT') AS DATE) BETWEEN '2022-11-01' AND '2022-11-30'
+	WHERE v.location_id=45 AND v.voided=0 AND CAST(CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT') AS DATE) BETWEEN '2022-11-01' AND '2023-11-30'
 	GROUP BY v.visit_id,v.date_started,`JINA LA MGONJWA`,`MAHALI ANAISHI`,v.uuid,`NAMBA YA HUDHURIO`
 	ORDER BY v.date_started ASC) AS VISITDETAILS, (SELECT @row_number:=0) AS temp
