@@ -192,7 +192,7 @@ export class SampleInBatchRegistrationComponent
       this.specimenSources
     );
     if (
-      localStorage.getItem("batch") === this.batch?.uuid &&
+      localStorage.getItem("batch") &&
       localStorage.getItem("batchSample")
     ) {
       this.dialog
@@ -203,7 +203,7 @@ export class SampleInBatchRegistrationComponent
             )})`,
             modalMessage: `You have the exisiting batch instance with code (${localStorage.getItem(
               "batchSampleCode"
-            )}. Do you want to proceed with using it?`,
+            )}. Do you want to proceed using it?`,
             confirmationButtonText: "Proceed",
             cancelButtonText: "Stop",
           },
@@ -217,9 +217,13 @@ export class SampleInBatchRegistrationComponent
             localStorage.removeItem("batchSampleCode");
           }
         });
+    } else {
+      localStorage.removeItem("batch");
+      localStorage.removeItem("batchSample");
+      localStorage.removeItem("batchSampleCode");
+      localStorage.setItem("batch", this.batch?.uuid);
     }
 
-    localStorage.setItem("batch", this.batch?.uuid);
     this.assignFields();
     const userLocationsIds = JSON.parse(
       this.currentUser?.userProperties?.locations
