@@ -5,6 +5,7 @@ import { OpenmrsHttpClientService } from "../../../modules/openmrs-http-client/s
 import { omit } from "lodash";
 import { Api, EncounterCreate, OrderGetFull } from "../../openmrs";
 import { HttpErrorResponse } from "@angular/common/http";
+import { getDrugOrderPaymentStatus } from "../helpers/getDrugOrderPaymentStatus.helper";
 
 @Injectable({
   providedIn: "root",
@@ -77,16 +78,7 @@ export class OrdersService {
           return response?.results.map((orderDetails) => {
             return {
               ...orderDetails,
-              paid: !orderDetails?.invoiceItem
-                ? true
-                : orderDetails?.invoiceItem?.invoice?.paymentMode?.display.toLowerCase() ===
-                    "insurance" &&
-                  orderDetails?.invoiceItem?.invoice?.visit?.uuid == visit
-                ? true
-                : orderDetails?.invoiceItem?.invoice?.payments?.length > 0 &&
-                  orderDetails?.invoiceItem?.invoice?.visit?.uuid == visit
-                ? true
-                : false,
+              paid: getDrugOrderPaymentStatus(orderDetails, visit),
             };
           });
         })
