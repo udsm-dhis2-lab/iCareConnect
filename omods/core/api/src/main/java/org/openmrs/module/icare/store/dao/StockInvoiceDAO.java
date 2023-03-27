@@ -147,8 +147,10 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 		Query query = session.createQuery(queryStr);
 		
 		query.setParameter("stockInvoice", stockInvoice);
-		
-		return (double) query.list().get(0);
-		
+		if (query.list().get(0) != null) {
+			return (double) query.list().get(0);
+		} else {
+			return null;
+		}
 	}
 }
