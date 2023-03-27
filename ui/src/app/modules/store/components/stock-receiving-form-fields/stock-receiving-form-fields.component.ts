@@ -389,9 +389,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
           supplier: {
             uuid: this.formValues?.supplier?.value,
           },
-          receivingDate: new Date(
-            moment(this.formValues?.receivingDate?.value).toDate()
-          )?.toISOString(),
+          receivingDate: dateToISOStringMidnight(
+            new Date(moment(this.formValues?.receivingDate?.value).toDate())
+          ),
           stockInvoiceStatus: [
             {
               status: "DRAFT",
