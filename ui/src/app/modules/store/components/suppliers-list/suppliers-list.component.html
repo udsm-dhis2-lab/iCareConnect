@@ -1,6 +1,7 @@
 <div class="container-fluid"
   *ngIf="{
-    suppliers: suppliers$ | async
+    suppliers: suppliers$ | async,
+    supplierLocations: supplierLocations$ | async
   } as params"
 >
   <div class="row mt-3">
@@ -11,7 +12,7 @@
           class="float-right"
           color="primary"
           mat-stroked-button
-          (click)="onAddNewSupplier($event)"
+          (click)="onAddNewSupplier($event, params?.supplierLocations)"
         >
           Add New Supplier
         </button>
@@ -24,6 +25,7 @@
             <th>#</th>
             <th>Name</th>
             <th>Description</th>
+            <th>Location</th>
           </tr>
         </thead>
         <tbody>
@@ -31,6 +33,7 @@
             <td>{{ index + 1 }}</td>
             <td>{{ supplier?.name }}</td>
             <td>{{ supplier?.description }}</td>
+            <td>{{ supplier?.location?.display }}</td>
             <td>
               <button
                     mat-icon-button
@@ -41,7 +44,7 @@
                   <mat-menu #menu="matMenu">
                     <button
                       mat-menu-item
-                      (click)="onUpdateSupplier($event, supplier)"
+                      (click)="onUpdateSupplier($event, supplier, params?.supplierLocations)"
                     >
                       <mat-icon>edit</mat-icon>
                       <span>Update</span>
