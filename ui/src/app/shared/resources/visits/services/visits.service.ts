@@ -1,3 +1,4 @@
+import { query } from "@angular/animations";
 import { ClassGetter } from "@angular/compiler/src/output/output_ast";
 import { Injectable } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
@@ -507,6 +508,17 @@ export class VisitsService {
 
   updateVisit(uuid, data): Observable<any> {
     return from(this.api.visit.updateVisit(uuid, data)).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => {
+        return error;
+      })
+    );
+  }
+  
+  deleteVisit(uuid, purge: boolean  =  false): Observable<any> {
+    return from(this.api.visit.deleteVisit(uuid, { purge: purge})).pipe(
       map((response) => {
         return response;
       }),

@@ -21,7 +21,7 @@ export class SharedConfirmationComponent implements OnInit {
     this.remarksField = new TextArea({
       id: "remarks",
       key: "remarks",
-      label: "Remarks",
+      label: this.data?.remarksFieldLabel || "Remarks",
     });
   }
 
