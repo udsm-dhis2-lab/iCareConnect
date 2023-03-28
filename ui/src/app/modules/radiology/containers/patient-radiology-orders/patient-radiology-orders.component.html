@@ -63,17 +63,18 @@
       >
         No Radiology orders
       </div>
-      <div class="mt-2 p-3">
-        <app-patient-radiology-orders-list
-          *ngIf="
+      <div 
+        class="mt-2 p-3" 
+        *ngIf="
             params?.orders &&
             params?.orders?.length > 0 &&
             params?.userPrivileges &&
             params?.allUserRoles &&
             params?.activeVisitUuid && 
-            params?.currentBills &&
+            params?.currentBills && 
             params?.activeVisit
-          "
+          ">
+        <app-patient-radiology-orders-list
           [currentUser]="params?.currentUser"
           [allUserRoles]="params?.allUserRoles"
           [userPrivileges]="params?.userPrivileges"

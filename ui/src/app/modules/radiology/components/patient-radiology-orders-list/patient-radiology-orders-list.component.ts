@@ -29,7 +29,6 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
   obsKeyedByConcepts: any = {};
 
   saving: boolean = false;
-  activeVisit$: any;
   constructor(
     private httpClient: HttpClient,
     private visitService: VisitsService,

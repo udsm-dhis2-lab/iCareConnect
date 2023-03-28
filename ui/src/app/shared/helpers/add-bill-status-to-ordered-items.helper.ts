@@ -49,7 +49,6 @@ export function addBillStatusToOrderedItems(items, bills, encounters, visit) {
 
 
 export function addBillStatusToOrders(orders, bills, visit){
-  if(!visit?.isEnsured && !visit?.isEmergency && !visit?.isAdmitted){
     bills = bills?.map((bill) => {
       return {
         ...bill,
@@ -60,7 +59,7 @@ export function addBillStatusToOrders(orders, bills, visit){
     });
   
     return orders?.map((order) => {
-      if(bills?.length === 0){
+      if (bills?.length === 0 || visit?.isEnsured || visit?.isEmergency || !visit?.isAdmitted){
         return {
           ...order,
           paid: true
@@ -78,14 +77,5 @@ export function addBillStatusToOrders(orders, bills, visit){
       })
 
       return tempOrder
-  
     })
-  } else {
-    return orders?.map((order) => {
-      return {
-        ...order,
-        paid: true
-      }
-    })
-  }
 }
