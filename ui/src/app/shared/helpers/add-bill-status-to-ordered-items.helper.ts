@@ -48,32 +48,44 @@ export function addBillStatusToOrderedItems(items, bills, encounters, visit) {
 } 
 
 
-export function addBillStatusToOrders(orders, bills){
-  bills = bills?.map((bill) => {
-    return {
-      ...bill,
-      items: bill?.items?.map((item) => {
-        return item?.billItem;
-      }),
-    };
-  });
+export function addBillStatusToOrders(orders, bills, visit){
+  if(!visit?.isEnsured && !visit?.isEmergency && !visit?.isAdmitted){
+    bills = bills?.map((bill) => {
+      return {
+        ...bill,
+        items: bill?.items?.map((item) => {
+          return item?.billItem;
+        }),
+      };
+    });
+  
+    return orders?.map((order) => {
+      if(bills?.length === 0){
+        return {
+          ...order,
+          paid: true
+        }
+      }
+      
+      let tempOrder = order
+      bills?.map((bill) => {
+        bill?.items?.map((item) => {
+          tempOrder = {
+            ...order,
+            paid: item?.item?.concept?.uuid !== order?.concept?.uuid ? true : false
+          }
+        })
+      })
 
-  return orders?.map((order) => {
-    if(bills?.length === 0){
+      return tempOrder
+  
+    })
+  } else {
+    return orders?.map((order) => {
       return {
         ...order,
         paid: true
       }
-    }
-    
-    return bills?.map((bill) => {
-      return bill?.items?.map((item) => {
-        return {
-          ...order,
-          paid: item?.item?.uuid === order?.concept?.uuid ? true : false
-        }
-      })
     })
-
-  })
+  }
 }

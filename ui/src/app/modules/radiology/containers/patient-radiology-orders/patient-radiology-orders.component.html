@@ -7,7 +7,8 @@
       orders: orders$ | async,
       activeVisitUuid: activeVisitUuid$ | async,
       currentPatient: currentPatient$ | async,
-      currentBills: currentBills$ | async
+      currentBills: currentBills$ | async,
+      activeVisit: activeVisit$ | async
     } as params"
   >
     <!-- <app-nursing-data
@@ -70,7 +71,8 @@
             params?.userPrivileges &&
             params?.allUserRoles &&
             params?.activeVisitUuid && 
-            params?.currentBills
+            params?.currentBills &&
+            params?.activeVisit
           "
           [currentUser]="params?.currentUser"
           [allUserRoles]="params?.allUserRoles"
@@ -79,6 +81,7 @@
           [currentBills]="params?.currentBills"
           [patientId]="patientId"
           [activeVisitUuid]="params?.activeVisitUuid"
+          [activeVisit]="params?.activeVisit"
         ></app-patient-radiology-orders-list>
       </div>
 
