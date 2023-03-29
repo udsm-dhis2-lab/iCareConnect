@@ -145,7 +145,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         ? this.unitsOfMeasurements?.filter(
             (unit) => unit?.uuid === this.stockInvoiceItem?.uom?.uuid
           )[0]
-        : "",
+        : null,
     })),
       (this.orderQuantityField = new Textbox({
         id: "orderQuantity",
@@ -234,7 +234,11 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     this.selectedItem = this.formValues?.item?.value;
     this.unitOfMeasure = this.formValues?.unit?.value
       ? this.formValues?.unit?.value
-      : undefined;
+      : this.unitsOfMeasurements?.filter(
+        (unit) => unit?.uuid === this.stockInvoiceItem?.uom?.uuid
+      )?.length > 0 ? this.unitsOfMeasurements?.filter(
+        (unit) => unit?.uuid === this.stockInvoiceItem?.uom?.uuid
+      )[0]: undefined;
     if (this.formValues?.orderQuantity?.value && this.unitOfMeasure) {
       const unit =
         this.unitOfMeasure?.mappings?.filter(
@@ -254,16 +258,13 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       }, 100);
     }
     this.unitPrice = this.formValues?.unitPrice?.value;
-    if (this.batchQuantity && this.unitPrice?.length) {
-      this.amount = undefined;
+    this.amount = undefined;
+    if (this.batchQuantity && this.unitPrice && this.unitPrice !== "") {
       setTimeout(() => {
         this.amount = (parseFloat(this.unitPrice) * this.batchQuantity).toFixed(
           2
         );
       }, 100);
-    }
-    if (!this.batchQuantity || !this.unitPrice?.length) {
-      this.amount = undefined;
     }
   }
 
@@ -389,9 +390,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
           supplier: {
             uuid: this.formValues?.supplier?.value,
           },
-          receivingDate: new Date(
-            moment(this.formValues?.receivingDate?.value).toDate()
-          )?.toISOString(),
+          receivingDate: dateToISOStringMidnight(
+            new Date(moment(this.formValues?.receivingDate?.value).toDate())
+          ),
           stockInvoiceStatus: [
             {
               status: "DRAFT",

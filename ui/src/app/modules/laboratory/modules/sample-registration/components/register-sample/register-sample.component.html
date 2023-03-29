@@ -11,11 +11,15 @@
     currentUser: currentUser$ | async,
     identifierTypes: identifierTypes$ | async,
     batchsets: batchsets$ | async,
-    batches: batches$ | async
+    batches: batches$ | async,
+    barcodeSettings: barcodeSettings$ | async
   } as params"
 >
   <div class="row">
     <div class="col-12">
+      <div class="w-100" *ngIf="errors?.length">
+        <app-shared-error [errors]="errors"></app-shared-error>
+      </div>
       <div class="w-100 d-flex mb-4" *ngIf="!fromMaintenance">
         <mat-button-toggle-group>
           <mat-button-toggle
@@ -61,7 +65,8 @@
               params?.referFromFacilityVisitAttribute &&
               params?.labNumberCharactersCount &&
               params?.testsFromExternalSystemsConfigs && 
-              params?.identifierTypes
+              params?.identifierTypes && 
+              params?.barcodeSettings
             "
           >
             <app-single-registration
@@ -76,10 +81,13 @@
               [labNumberCharactersCount]="params?.labNumberCharactersCount"
               [referringDoctorAttributes]="params?.referringDoctorAttributes"
               [labSections]="labSections"
+              [specimenSources]=specimenSources
               [testsFromExternalSystemsConfigs]="
                 params?.testsFromExternalSystemsConfigs
               "
+              [barcodeSettings]="params?.barcodeSettings"
               [allRegistrationFields]="allRegistrationFields | createLabFields: params?.referringDoctorAttributes : params?.agencyConceptConfigs : params?.referFromFacilityVisitAttribute : params?.identifierTypes"
+              [LISConfigurations]="LISConfigurations"
             ></app-single-registration>
           </div>
         </div>
@@ -93,7 +101,8 @@
               params?.referringDoctorAttributes &&
               params?.referFromFacilityVisitAttribute && 
               params?.identifierTypes && 
-              params?.batchsets && params?.batches
+              params?.batchsets && params?.batches &&
+              params?.barcodeSettings
           ">
           <app-batch-registration
             [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
@@ -114,6 +123,9 @@
             [existingBatchsets]="params?.batchsets"
             [existingBatches]="params?.batches"
             [fromMaintenance]="fromMaintenance"
+            [LISConfigurations]="LISConfigurations"
+            [barcodeSettings]="params?.barcodeSettings"
+            [specimenSources]=specimenSources
             (reloadRegisterSample)="onReloadRegisterSample($event)"
           ></app-batch-registration>
         </div>

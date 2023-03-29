@@ -12,6 +12,7 @@ import { WorkSheetsService } from "src/app/modules/laboratory/resources/services
 export class ResultEntryByWorksheetHomeComponent implements OnInit {
   @Input() isLIS: boolean;
   @Input() datesParameters: any;
+  @Input() viewType: string;
   worksheetDefinitions$: Observable<any[]>;
   multipleResultsAttributeType$: Observable<any>;
   currentWorksheetDefinitionUuid: string;

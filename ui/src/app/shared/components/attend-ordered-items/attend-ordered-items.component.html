@@ -33,7 +33,7 @@
           params?.orderedProcedures && params?.orderedProcedures?.length > 0
         "
       >
-        <ng-container *ngFor="let orderedItem of params?.orderedProcedures">
+        <ng-container *ngFor="let orderedItem of params?.orderedProcedures | filterOrdersByOrder: orderedItems">
           <tr [ngClass]="{ 'text-danger': !orderedItem?.paid }">
             <td *ngIf="conceptsWithDepartmentsDetails">
               {{

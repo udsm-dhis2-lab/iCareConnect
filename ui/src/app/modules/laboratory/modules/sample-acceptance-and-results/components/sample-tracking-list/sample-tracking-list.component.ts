@@ -41,7 +41,6 @@ export class SampleTrackingListComponent implements OnInit {
 
   ngOnInit(): void {
     this.providerDetails$ = this.store.select(getProviderDetails);
-    this.getSamples();
   }
 
   getSamples(): void {

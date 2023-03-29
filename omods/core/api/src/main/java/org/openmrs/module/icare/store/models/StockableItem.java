@@ -18,6 +18,10 @@ public class StockableItem implements Stockable {
 	
 	private Location location;
 	
+	private Location sourceLocation;
+	
+	private Location destinationLocation;
+	
 	@Override
 	public Item getItem() {
 		return item;
@@ -43,6 +47,16 @@ public class StockableItem implements Stockable {
 		return location;
 	}
 	
+	@Override
+	public Location getSourceLocation() {
+		return sourceLocation;
+	}
+	
+	@Override
+	public Location getDestinationLocation() {
+		return destinationLocation;
+	}
+	
 	public void setItem(Item item) {
 		this.item = item;
 	}
@@ -61,5 +75,13 @@ public class StockableItem implements Stockable {
 	
 	public void setLocation(Location location) {
 		this.location = location;
+	}
+	
+	public void setSourceLocation(Location sourceLocation) {
+		this.sourceLocation = sourceLocation;
+	}
+	
+	public void setDestinationLocation(Location destinationLocation) {
+		this.destinationLocation = destinationLocation;
 	}
 }

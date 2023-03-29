@@ -19,7 +19,12 @@ public class TransactionUtil {
 		transaction.setLocation(stockable.getLocation());
 		transaction.setBatchNo(stockable.getBatchNo());
 		transaction.setExpireDate(stockable.getExpiryDate());
-		
+		if (stockable.getSourceLocation() != null) {
+			transaction.setSourceLocation(stockable.getSourceLocation());
+		}
+		if (stockable.getDestinationLocation() != null) {
+			transaction.setDestinationLocation(stockable.getDestinationLocation());
+		}
 		StoreService storeService = Context.getService(StoreService.class);
 		Stock stock = storeService.getStockByItemBatchLocation(stockable.getItem(), stockable.getBatchNo(),
 		    stockable.getExpiryDate(), stockable.getLocation());
@@ -50,7 +55,12 @@ public class TransactionUtil {
 		transaction.setLocation(stockable.getLocation());
 		transaction.setBatchNo(stockable.getBatchNo());
 		transaction.setExpireDate(stockable.getExpiryDate());
-		
+		if (stockable.getSourceLocation() != null) {
+			transaction.setSourceLocation(stockable.getSourceLocation());
+		}
+		if (stockable.getDestinationLocation() != null) {
+			transaction.setDestinationLocation(stockable.getDestinationLocation());
+		}
 		StoreService storeService = Context.getService(StoreService.class);
 		Stock stock = storeService.getStockByItemBatchLocation(stockable.getItem(), stockable.getBatchNo(),
 		    stockable.getExpiryDate(), stockable.getLocation());
@@ -78,6 +88,12 @@ public class TransactionUtil {
         transaction.setLocation(stockable.getLocation());
         transaction.setBatchNo(stockable.getBatchNo());
         transaction.setExpireDate(stockable.getExpiryDate());
+        if(stockable.getSourceLocation() != null) {
+            transaction.setSourceLocation(stockable.getSourceLocation());
+        }
+        if(stockable.getDestinationLocation() != null){
+            transaction.setDestinationLocation(stockable.getDestinationLocation());
+        }
 
         StoreService storeService = Context.getService(StoreService.class);
 
@@ -95,11 +111,11 @@ public class TransactionUtil {
         List<Transaction> transactionList = new ArrayList<>();
 
         List<Stock> stockList = storeService.getStockByItemLocation(stockable.getItem(), stockable.getLocation());
-
         List<Map<String, Object>> stockListMap = new ArrayList<>();
         double totalStock = 0.00;
 
         for (Stock stockItem : stockList) {
+
             stockListMap.add(stockItem.toMap());
             totalStock = totalStock + stockItem.getQuantity();
         }
@@ -148,6 +164,12 @@ public class TransactionUtil {
                         transactionList.add(newTransaction);
                         newTransaction.setItem(stockable.getItem());
                         newTransaction.setLocation(stockable.getLocation());
+                        if(stockable.getSourceLocation() != null) {
+                            newTransaction.setSourceLocation(stockable.getSourceLocation());
+                        }
+                        if(stockable.getDestinationLocation() != null){
+                            newTransaction.setDestinationLocation(stockable.getDestinationLocation());
+                        }
                         newTransaction.setBatchNo(stockList.get(i).getBatch());
                         newTransaction.setExpireDate(stockable.getExpiryDate());
                         newTransaction.setCurrentQuantity(0.0);
@@ -180,7 +202,12 @@ public class TransactionUtil {
                         newTransaction.setExpireDate(stockable.getExpiryDate());
                         newTransaction.setCurrentQuantity(stockList.get(i).getQuantity() - stockNeed);
                         newTransaction.setPreviousQuantity(stockList.get(i).getQuantity());
-
+                        if(stockable.getSourceLocation() != null) {
+                            newTransaction.setSourceLocation(stockable.getSourceLocation());
+                        }
+                        if(stockable.getDestinationLocation() != null){
+                            newTransaction.setDestinationLocation(stockable.getDestinationLocation());
+                        }
                         stockList.get(i).setQuantity(stockList.get(i).getQuantity() - stockNeed);
 
                         storeService.saveStock(stockList.get(i));

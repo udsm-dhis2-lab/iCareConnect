@@ -18,7 +18,13 @@ import { orderBy } from "lodash";
 export class RequisitionService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
-  getRequisitions(locationUuid?: string, page?: Number, pageSize?: number, status?: string, orderByDirection?: string) : Observable<any> {
+  getRequisitions(
+    locationUuid?: string,
+    page?: Number,
+    pageSize?: number,
+    status?: string,
+    orderByDirection?: string
+  ): Observable<any> {
     const pageNumber = page ? `&page=${page}` : ``;
     const pageSizeNumber = pageSize ? `&pageSize=${pageSize}` : ``;
     const filterStatus = status ? `&status=${status}` : ``;
@@ -33,20 +39,19 @@ export class RequisitionService {
         map((requestResponse) => {
           return {
             ...omit(requestResponse, "results"),
-            requisitions: (requestResponse?.results || [])
-              ?.map((requestItem) => {
-                const requisitionInstance = new Requisition(requestItem);
-
-                if (requisitionInstance.status === "CANCELLED") {
-                  return null;
-                }
-
-                return requisitionInstance.toJson();
-              })
-              .filter((requisition) => requisition),
+            requisitions: requestResponse?.results,
           };
         })
       );
+  }
+
+  getRequisitionByUuid(uuid: string): Observable<any> {
+    return this.httpClient.get(`store/request/${uuid}`).pipe(
+      map((requestResponse) => {
+        return requestResponse;
+      }),
+      catchError((error) => error)
+    );
   }
 
   getAllRequisitions(locationUuid?: string): Observable<RequisitionObject[]> {
@@ -69,6 +74,24 @@ export class RequisitionService {
       );
   }
 
+  createRequisition(requisitionInput: any): Observable<any> {
+    return this.httpClient.post("store/request", requisitionInput).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => error)
+    );
+  }
+
+  updateRequisition(uuid: string, requisitionInput: any): Observable<any> {
+    return this.httpClient.post(`store/request/${uuid}`, requisitionInput).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => error)
+    );
+  }
+
   createRequest(
     requisitionInput: RequisitionInput
   ): Observable<RequisitionObject | any> {
@@ -86,6 +109,50 @@ export class RequisitionService {
       }),
       catchError((error) => error)
     );
+  }
+
+  createRequisitionItem(requisitionItem: any): Observable<any> {
+    return this.httpClient.post("store/requestitem", requisitionItem).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => error)
+    );
+  }
+
+  updateRequisitionItem(uuid: string, requisitionItem: any): Observable<any> {
+    return this.httpClient
+      .post(`store/requestitem/${uuid}`, requisitionItem)
+      .pipe(
+        map((response) => {
+          return response;
+        }),
+        catchError((error) => error)
+      );
+  }
+
+  receiveIssueItem(requisitionObject: any): Observable<any> {
+    return this.httpClient.post("store/receive", requisitionObject).pipe(
+      map((response) => {
+        return {
+          ...requisitionObject,
+          status: "RECEIVED",
+          crudOperationStatus: null,
+        };
+      }),
+      catchError((err) => err)
+    );
+  }
+
+  createIssueItemStatus(issueItem: any): Observable<any> {
+    return this.httpClient
+      .post(`store/issueitemstatus/`, issueItem)
+      .pipe(
+        map((response) => {
+          return response;
+        }),
+        catchError((error) => error)
+      );
   }
 
   receiveRequisition(

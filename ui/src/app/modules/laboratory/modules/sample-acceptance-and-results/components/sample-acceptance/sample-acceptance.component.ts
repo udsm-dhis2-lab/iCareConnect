@@ -4,9 +4,8 @@ import { MatRadioChange } from "@angular/material/radio";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { map, take } from "rxjs/operators";
-import { SampleResultsPrintingComponent } from "src/app/modules/laboratory/components/sample-results-printing/sample-results-printing.component";
 import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import {
   setSampleStatus,
   loadLabSamplesByCollectionDates,
@@ -37,8 +36,6 @@ import { getProviderDetails } from "src/app/store/selectors/current-user.selecto
 
 import { PrintResultsModalComponent } from "../print-results-modal/print-results-modal.component";
 import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
-import { ResultReviewModalComponent } from "../result-review-modal/result-review-modal.component";
-import { ResultsFeedingModalComponent } from "../results-feeding-modal/results-feeding-modal.component";
 import { SharedResultsEntryAndViewModalComponent } from "../shared-results-entry-and-view-modal/shared-results-entry-and-view-modal.component";
 
 @Component({
@@ -83,6 +80,8 @@ export class SampleAcceptanceComponent implements OnInit {
 
   entryCategory: string = "INDIVIDUAL";
   currentTabWithDataLoaded: number = 0;
+  showPrintingPage: boolean = false;
+  dataToPrint: any;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -100,20 +99,16 @@ export class SampleAcceptanceComponent implements OnInit {
     this.settingLabSampleStatus$ = this.store.select(
       getSettingLabSampleStatusState
     );
+  }
 
-    // this.store.dispatch(
-    //   loadLabSamplesByCollectionDates({
-    //     datesParameters: this.datesParameters,
-    //     patients: this.patients,
-    //     sampleTypes: this.sampleTypes,
-    //     departments: this.labSamplesDepartments,
-    //     containers: this.labSamplesContainers,
-    //     hasStatus: "NO",
-    //     configs: this.labConfigs,
-    //     codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-    //   })
-    // );
-    // this.getSamples();
+  onGetDataToPrint(data: any): void {
+    this.dataToPrint = data;
+    this.showPrintingPage = true;
+  }
+
+  togglePrintAndList(event: Event): void {
+    event.stopPropagation();
+    this.showPrintingPage = !this.showPrintingPage;
   }
 
   onToggleViewSampleDetails(event: Event, sample: any): void {
@@ -532,16 +527,6 @@ export class SampleAcceptanceComponent implements OnInit {
     this.settingLabSampleStatus$ = this.store.select(
       getSettingLabSampleStatusState
     );
-  }
-
-  onPrintSampleResults(event: Event, sample: any): void {
-    event.stopPropagation();
-    this.dialog.open(SampleResultsPrintingComponent, {
-      width: "70%",
-      data: {
-        sample,
-      },
-    });
   }
 
   onReviewResults(event: Event, patient: any, sample: any): void {

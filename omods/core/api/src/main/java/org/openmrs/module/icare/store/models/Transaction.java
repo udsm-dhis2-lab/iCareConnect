@@ -35,6 +35,14 @@ public class Transaction extends BaseOpenmrsData implements java.io.Serializable
 	@JoinColumn(name = "location_id")
 	private Location location;
 	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "source_location_id")
+	private Location sourceLocation;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "destination_location_id")
+	private Location destinationLocation;
+	
 	@Column(name = "batch_no")
 	private String batchNo;
 	
@@ -110,5 +118,21 @@ public class Transaction extends BaseOpenmrsData implements java.io.Serializable
 	
 	public void setLocation(Location location) {
 		this.location = location;
+	}
+	
+	public Location getSourceLocation() {
+		return sourceLocation;
+	}
+	
+	public void setSourceLocation(Location sourceLocation) {
+		this.sourceLocation = sourceLocation;
+	}
+	
+	public Location getDestinationLocation() {
+		return destinationLocation;
+	}
+	
+	public void setDestinationLocation(Location destinationLocation) {
+		this.destinationLocation = destinationLocation;
 	}
 }

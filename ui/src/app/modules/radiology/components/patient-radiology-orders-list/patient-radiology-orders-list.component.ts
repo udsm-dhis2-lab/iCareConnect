@@ -22,13 +22,13 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
   @Input() currentBills: any[];
   @Input() patientId: string;
   @Input() activeVisitUuid: string;
+  @Input() activeVisit: any;
 
   file: any;
   values: any = {};
   obsKeyedByConcepts: any = {};
 
   saving: boolean = false;
-  activeVisit$: any;
   constructor(
     private httpClient: HttpClient,
     private visitService: VisitsService,
@@ -60,9 +60,7 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
           });
         }
       });
-
-    this.activeVisit$ = this.store.pipe(select(getActiveVisit));
-    this.orders = addBillStatusToOrders(this.orders, this.currentBills);
+    this.orders = addBillStatusToOrders(this.orders, this.currentBills, this.activeVisit);
   }
 
   fileSelection(event, order): void {

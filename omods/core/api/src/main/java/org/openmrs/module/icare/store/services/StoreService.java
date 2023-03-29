@@ -50,6 +50,8 @@ public interface StoreService extends OpenmrsService {
 	
 	public IssueStatus saveIssueStatus(IssueStatus issueStatus);
 	
+	public IssueItemStatus saveIssueItemStatus(IssueItemStatus issueItemStatus);
+	
 	public List<Issue> getIssuesByIssueingLocation(String issueingLocationUuid);
 	
 	public List<Issue> getIssuesForIssuedLocation(String issuedLocationUuid);
@@ -110,7 +112,7 @@ public interface StoreService extends OpenmrsService {
 	
 	ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status);
 	
-	Supplier saveSupplier(Supplier supplier);
+	Supplier saveSupplier(Supplier supplier) throws Exception;
 	
 	List<Supplier> getSuppliers(Integer startIndex, Integer limit);
 	
@@ -131,4 +133,14 @@ public interface StoreService extends OpenmrsService {
 	StockInvoiceItemStatus saveStockInvoiceItemStatus(StockInvoiceItemStatus stockInvoiceItemStatus);
 	
 	Supplier updateSupplier(Supplier supplier) throws Exception;
+	
+	Requisition updateRequisition(Requisition requisition) throws Exception;
+	
+	RequisitionItem saveRequisitionItem(RequisitionItem requisitionItem) throws Exception;
+	
+	RequisitionItemStatus saveRequisitionItemStatus(RequisitionItemStatus requisitionItemStatus);
+	
+	RequisitionItem updateRequisitionItem(RequisitionItem requisitionItem) throws Exception;
+	
+	public IssueItem getIssueItemByUuid(String IssueItemUuid);
 }

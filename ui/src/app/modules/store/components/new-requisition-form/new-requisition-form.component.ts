@@ -1,5 +1,5 @@
-import { Component, Inject, Input, OnInit } from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Component, EventEmitter, Inject, Input, OnInit, Output } from "@angular/core";
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { Field } from "src/app/shared/modules/form/models/field.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -9,6 +9,9 @@ import { keyBy } from "lodash";
 import { Observable } from "rxjs";
 import { StockService } from "src/app/shared/resources/store/services/stock.service";
 import { RequisitionService } from "src/app/shared/resources/store/services/requisition.service";
+import { ConfigsService } from "src/app/shared/services/configs.service";
+import { inpatientComponents } from "src/app/modules/inpatient/components";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 
 @Component({
   selector: "app-new-requisition-form",
@@ -22,6 +25,11 @@ export class NewRequisitionFormComponent implements OnInit {
   @Input() mainStoreLocationTagUuid: any;
   @Input() pharmacyLocationTagUuid: any;
   @Input() stores: any;
+  @Input() codeFormatSetting: any;
+  @Input() existingRequisitionItem: any;
+  @Input() existingRequisition: any;
+
+  @Output() closePopup: EventEmitter<any> = new EventEmitter();;
 
   requisitionFields: Field<string>[];
   quantityField: Field<string>[];
@@ -33,14 +41,42 @@ export class NewRequisitionFormComponent implements OnInit {
   targetStoreField: Dropdown[];
   storeUuid: string;
   itemUuid: string;
-  addedDataList: RequisitionInput;
+  requisitionObject: any;
   addingRequisitions: boolean = false;
+  requisition: any;
   constructor(
     private stockService: StockService,
-    private requisitionService: RequisitionService
+    private requisitionService: RequisitionService,
+    private configService: ConfigsService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
+    this.requisition = this.existingRequisition;
+    if (localStorage.getItem('availableRequisition') && !this.requisition) {
+      const availableRequisition = JSON.parse(localStorage.getItem('availableRequisition'));
+      this.dialog.open(SharedConfirmationComponent, {
+        width: "25%",
+        data: {
+          modalTitle: `Continue with last request (${availableRequisition?.code})`,
+          modalMessage: `Do you want to continue with the last request with number ${availableRequisition?.code}`,
+          showRemarksInput: false,
+          confirmationButtonText: "Continue",
+        },
+      }).afterClosed().subscribe((closingObject) => {
+        if (closingObject?.confirmed) {
+          this.requisition = availableRequisition;
+        } else {
+          localStorage.removeItem("availableRequisition");
+        }
+        this.initializeRequisitionForm();
+      });
+    } else {
+      this.initializeRequisitionForm();
+    }
+  }
+
+  initializeRequisitionForm(){
     const keyedMainStoreRequestEligibleTags = keyBy(
       this.referenceTagsThatCanRequestFromMainStoreConfigs,
       "value"
@@ -67,6 +103,7 @@ export class NewRequisitionFormComponent implements OnInit {
         key: "targetStore",
         label: "Target Store",
         required: true,
+        value: this.requisition?.requestedLocation?.uuid,
         options: (this.stores || [])
           .map((store) => {
             if (
@@ -124,13 +161,15 @@ export class NewRequisitionFormComponent implements OnInit {
         min: 1,
         required: true,
         type: "number",
+        value: this.existingRequisitionItem
+          ? this.existingRequisitionItem?.quantity
+          : "",
       }),
     ];
   }
-
   onRequest(e: Event) {
     e.stopPropagation();
-    this.addedDataList = {
+    this.requisitionObject = {
       requestingLocationUuid: this.currentStore?.id,
       requestedLocationUuid: this.formData?.targetStore?.value,
       items: [
@@ -142,7 +181,7 @@ export class NewRequisitionFormComponent implements OnInit {
     };
 
     this.requisitionService
-      .createRequest(this.addedDataList)
+      .createRequest(this.requisitionObject)
       .subscribe((response) => {
         if (response) {
           console.log("==> Response: ", response);
@@ -151,57 +190,112 @@ export class NewRequisitionFormComponent implements OnInit {
   }
 
   onAdd(e) {
-    if (
-      this.formData?.quantity?.value ===
-      this.addedDataList?.requestedLocationUuid
-    ) {
-      this.addedDataList = {
-        ...this.addedDataList,
-        requestingLocationUuid: this.currentStore?.id,
-        requestedLocationUuid: this.storeUuid,
-        items: this.addedDataList?.items?.length
-          ? [
-              ...this.addedDataList?.items,
-              {
-                itemUuid: this.formData?.requisitionItem?.value,
-                quantity: parseInt(String(this.formData?.quantity?.value), 10),
-              },
-            ]
-          : [
-              {
-                itemUuid: this.formData?.requisitionItem?.value,
-                quantity: parseInt(String(this.formData?.quantity?.value), 10),
-              },
-            ],
-      };
-    } else {
-      this.addedDataList = {
-        requestingLocationUuid: this.currentStore?.id,
-        requestedLocationUuid: this.formData?.targetStore?.value,
-        items: [
+    if (this.requisition) {
+      const item = {
+        item: {
+          uuid: this.formData?.requisitionItem?.value,
+        },
+        quantity: parseInt(this.formData?.quantity.value, 10),
+        requisition: {
+          uuid: this.requisition?.uuid,
+        },
+        requisitionItemStatus: [
           {
-            itemUuid: this.formData?.targetStore?.value,
-            quantity: parseInt(String(this.formData?.quantity?.value), 10),
+            status: "DRAFT",
           },
         ],
       };
-    }
-    this.addedDataList = {
-      requestingLocationUuid: this.currentStore?.id,
-      requestedLocationUuid: this.formData?.targetStore?.value,
-      items: [
-        {
-          itemUuid: this.formData?.requisitionItem?.value,
-          quantity: parseInt(this.formData?.quantity.value, 10),
+      this.requisitionService
+        .createRequisitionItem(item)
+        .subscribe((response) => {
+          if (!response?.error) {
+            const storedRequisition = this.requisition;
+            const reserveRequisitionFields = this.requisitionFields;
+            const reserveQuantityFields = this.quantityField;
+            this.requisition = undefined;
+            this.quantityField = [];
+            this.requisitionFields = [];
+            setTimeout(() => {
+              this.requisition = storedRequisition; 
+              this.requisitionFields = reserveRequisitionFields;
+              this.quantityField = reserveQuantityFields;
+            }, 100);
+          }
+        });
+    } else {
+      this.requisitionObject = {
+        requestingLocation: {
+          uuid: this.currentStore?.id,
         },
-      ],
+        requestedLocation: {
+          uuid: this.formData?.targetStore?.value,
+        },
+        requisitionStatuses: [
+          {
+            status: "DRAFT",
+          },
+        ],
+        requisitionItems: [
+          {
+            item: {
+              uuid: this.formData?.requisitionItem?.value,
+            },
+            quantity: parseInt(this.formData?.quantity.value, 10),
+            requisitionItemStatus: [
+              {
+                status: "DRAFT",
+              },
+            ],
+          },
+        ],
+      };
+
+      this.configService
+        .generateCode(this.codeFormatSetting?.uuid, "requisition", 1, 5)
+        .subscribe((response) => {
+          if (!response?.error) {
+            const requisitionObject = {
+              ...this.requisitionObject,
+              code: response[0] ? response[0] : "",
+            };
+            this.requisitionService
+              .createRequisition(requisitionObject)
+              .subscribe((response) => {
+                if (!response?.error) {
+                  this.requisition = response;
+                  const reserveRequisitionFields = this.requisitionFields;
+                  const reserveQuantityFields = this.quantityField;
+                  this.quantityField = [];
+                  this.requisitionFields = [];
+                  localStorage.setItem('availableRequisition', JSON.stringify(this.requisition));
+                  setTimeout(() => {
+                    this.requisitionFields = reserveRequisitionFields;
+                    this.quantityField = reserveQuantityFields;
+                  }, 100);
+                }
+              });
+          }
+        });
+    }
+  }
+
+  onUpdateItem(e: any) {
+    e?.stopPropagation();
+    const item = {
+      item: {
+        uuid: this.formData?.requisitionItem?.value?.length
+          ? this.formData?.requisitionItem?.value
+          : this.existingRequisitionItem?.item?.uuid,
+      },
+      quantity: this.formData?.quantity.value?.length
+        ? parseInt(this.formData?.quantity.value, 10)
+        : this.existingRequisitionItem?.quantity,
     };
-    
     this.requisitionService
-      .createRequest(this.addedDataList)
+      .updateRequisitionItem(this.existingRequisitionItem?.uuid, item)
       .subscribe((response) => {
         if (!response?.error) {
-          this.addedDataList = response
+          this.closePopup.emit();
         }
       });
   }

@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 import { map, tap } from "rxjs/operators";
 import { LocationService } from "src/app/core/services";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { StockInvoicesService } from "src/app/shared/resources/store/services/stockInvoice.service";
 import { SupplierService } from "src/app/shared/resources/store/services/supplier.service";

@@ -16,7 +16,7 @@ export class GenerateMetadataLabelsService {
       )
       .pipe(
         map((response) => response),
-        catchError((error) => of(error))
+        catchError((error) => of([error]))
       );
   }
 }

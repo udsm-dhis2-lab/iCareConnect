@@ -20,10 +20,8 @@ import { SampleObject } from "../../../../resources/models";
 import { getAllLabSamples } from "../../../../store/selectors/samples.selectors";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import { getSpecimenSources } from "../../../../store/selectors/specimen-sources-and-tests-management.selectors";
-import { take } from "rxjs/operators";
-import { go, loadCurrentPatient } from "src/app/store/actions";
+import { loadCurrentPatient } from "src/app/store/actions";
 import { getAllPayments } from "src/app/store/selectors/payment.selector";
-import { loadPatientPayments } from "src/app/store/actions/payment.actions";
 import { SampleTypesService } from "src/app/shared/services/sample-types.service";
 import { ActivatedRoute } from "@angular/router";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
@@ -50,6 +48,7 @@ export class LaboratorySampleCollectionComponent implements OnInit {
   countOfSamplesToCollect: number = 0;
   datesParameters$: Observable<any>;
   visitReferences$: Observable<any>;
+  sampledOrdersByVisit$: Observable<any[]>;
   constructor(
     private store: Store<AppState>,
     private sampleTypesService: SampleTypesService,

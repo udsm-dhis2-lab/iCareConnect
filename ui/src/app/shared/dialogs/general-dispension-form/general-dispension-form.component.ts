@@ -104,17 +104,17 @@ export class GeneralDispensingFormComponent implements OnInit {
     ]);
 
     if (
-      this.useSpecificDrugPrescription !== "none" &&
+      this.useSpecificDrugPrescription === "true" &&
       this.specificDrugConceptUuid
     ) {
       const drugs = await this.drugOrderService.getAllDrugs("full");
       this.drugConceptField = new Dropdown({
-        options: drugs,
+        id: "drug",
         key: "drug",
-        value: "drug",
+        options: drugs,
+        label: "Drug",
         required: true,
         locationUuid: "7f65d926-57d6-4402-ae10-a5b3bcbf7986",
-        label: "Drug",
         searchControlType: "drugStock",
         shouldHaveLiveSearchForDropDownFields: true,
       });
@@ -193,126 +193,142 @@ export class GeneralDispensingFormComponent implements OnInit {
   }
 
   saveOrder(e: any, conceptFields: any) {
-    this.savingOrder = true;
-    let encounterObject = {
-      patient: this.currentPatient?.id,
-      encounterType: this.encounterType,
-      location: this.currentLocation?.uuid,
-      encounterProviders: [
-        {
-          provider: this.provider?.uuid,
-          encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
-        },
-      ],
-      orders: [
-        {
-          orderType: this.orderType,
-          action: "NEW",
-          urgency: "ROUTINE",
-          careSetting: !this.currentVisit?.isAdmitted
-            ? "OUTPATIENT"
-            : "INPATIENT",
-          patient: this.currentPatient?.id,
-          concept:
-            this.useSpecificDrugPrescription && this.specificDrugConceptUuid
-              ? this.specificDrugConceptUuid || this.selectedDrug?.conceptUuid
-              : this.formValues["drug"].value,
-          orderer: this.provider?.uuid,
-          type: "order",
-        },
-      ],
-      visit: this.currentVisit?.uuid,
-    };
-
-    let obs = conceptFields.map((conceptField) => {
-      return {
-        person: this.currentPatient?.id,
-        concept: conceptField?.uuid,
-        obsDatetime: new Date(),
-        value: this.formValues[conceptField?.uuid].value,
+    if (!this.formValues?.drug?.value) {
+      this.errors = []
+      setTimeout(() => {
+        this.errors = [
+          ...this.errors,
+          {
+            error: {
+              message:
+                "Couldn't get the drug selection. Please, select drug to continue prescription!",
+            },
+          },
+        ];
+      })
+    }
+    else {
+      this.savingOrder = true;
+      let encounterObject = {
+        patient: this.currentPatient?.id,
+        encounterType: this.encounterType,
+        location: this.currentLocation?.uuid,
+        encounterProviders: [
+          {
+            provider: this.provider?.uuid,
+            encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
+          },
+        ],
+        orders: [
+          {
+            orderType: this.orderType,
+            action: "NEW",
+            urgency: "ROUTINE",
+            careSetting: !this.currentVisit?.isAdmitted
+              ? "OUTPATIENT"
+              : "INPATIENT",
+            patient: this.currentPatient?.id,
+            concept:
+              this.useSpecificDrugPrescription && this.specificDrugConceptUuid
+                ? this.specificDrugConceptUuid || this.selectedDrug?.conceptUuid
+                : this.formValues["drug"].value,
+            orderer: this.provider?.uuid,
+            type: "order",
+          },
+        ],
+        visit: this.currentVisit?.uuid,
       };
-    });
 
-    obs = [
-      ...obs,
-      this.useSpecificDrugPrescription && this.specificDrugConceptUuid
-        ? {
-            person: this.currentPatient?.id,
-            concept: this.specificDrugConceptUuid,
-            obsDatetime: new Date(),
-            value: this.formValues["drug"]?.value?.uuid.toString(),
-            comment: this.formValues["drug"]?.value?.name,
-          }
-        : {},
-      {
-        person: this.currentPatient?.id,
-        concept: this.generalPrescriptionFrequencyConcept,
-        obsDatetime: new Date(),
-        value: this.formValues["frequency"].value,
-      },
-      {
-        person: this.currentPatient?.id,
-        concept: this.durationUnitsSettings,
-        obsDatetime: new Date(),
-        value: this.formValues["durationUnit"].value,
-      },
-      {
-        person: this.currentPatient?.id,
-        concept: this.dosingUnitsSettings,
-        obsDatetime: new Date(),
-        value: this.formValues["dosingUnit"].value,
-      },
-      {
-        person: this.currentPatient?.id,
-        concept: this.drugRoutesSettings,
-        obsDatetime: new Date(),
-        value: this.formValues["route"].value,
-      },
-    ].filter((ob) => ob?.value && ob?.value !== "");
-
-    // console.log(JSON.stringify(obs));
-    this.ordersService
-      .createOrdersViaCreatingEncounter(encounterObject)
-      .subscribe((response) => {
-        if (response?.uuid) {
-          let data = {
-            encounterUuid: response?.uuid,
-            obs: [
-              ...(obs.filter((observation) => {
-                if (observation.value && observation.value.length > 0) {
-                  return observation;
-                }
-              }) || []),
-              this.strengthConceptUuid && !this.specificDrugConceptUuid
-                ? {
-                    person: this.currentPatient?.id,
-                    concept: this.strengthConceptUuid,
-                    obsDatetime: new Date(),
-                    value: this.formValues[this.strengthConceptUuid]?.value,
-                    order: (response?.orders || [])[0]?.uuid
-                  }
-                : null,
-            ]?.filter((observation) => observation),
-          };
-          this.observationService
-            .saveObservationsViaEncounter(data)
-            .subscribe((res) => {
-              if (res?.error) {
-                this.errors = [...this.errors, response?.error];
-              }
-
-              if (res) {
-                this.orderSaved.emit(true);
-              }
-              this.savingOrder = false;
-            });
-        }
-        if (response?.error) {
-          this.errors = [...this.errors, response?.error];
-        }
-        this.savingOrder = false;
+      let obs = conceptFields.map((conceptField) => {
+        return {
+          person: this.currentPatient?.id,
+          concept: conceptField?.uuid,
+          obsDatetime: new Date(),
+          value: this.formValues[conceptField?.uuid].value,
+        };
       });
 
-    this.updateConsultationOrder.emit();
+      obs = [
+        ...obs,
+        this.useSpecificDrugPrescription && this.specificDrugConceptUuid
+          ? {
+              person: this.currentPatient?.id,
+              concept: this.specificDrugConceptUuid,
+              obsDatetime: new Date(),
+              value: this.formValues["drug"]?.value?.uuid?.toString(),
+              comment: this.formValues["drug"]?.value?.name,
+            }
+          : {},
+        {
+          person: this.currentPatient?.id,
+          concept: this.generalPrescriptionFrequencyConcept,
+          obsDatetime: new Date(),
+          value: this.formValues["frequency"].value,
+        },
+        {
+          person: this.currentPatient?.id,
+          concept: this.durationUnitsSettings,
+          obsDatetime: new Date(),
+          value: this.formValues["durationUnit"].value,
+        },
+        {
+          person: this.currentPatient?.id,
+          concept: this.dosingUnitsSettings,
+          obsDatetime: new Date(),
+          value: this.formValues["dosingUnit"].value,
+        },
+        {
+          person: this.currentPatient?.id,
+          concept: this.drugRoutesSettings,
+          obsDatetime: new Date(),
+          value: this.formValues["route"].value,
+        },
+      ].filter((ob) => ob?.value && ob?.value !== "");
+
+      // console.log(JSON.stringify(obs));
+      this.ordersService
+        .createOrdersViaCreatingEncounter(encounterObject)
+        .subscribe((response) => {
+          if (response?.uuid) {
+            let data = {
+              encounterUuid: response?.uuid,
+              obs: [
+                ...(obs.filter((observation) => {
+                  if (observation.value && observation.value.length > 0) {
+                    return observation;
+                  }
+                }) || []),
+                this.strengthConceptUuid && !this.specificDrugConceptUuid
+                  ? {
+                      person: this.currentPatient?.id,
+                      concept: this.strengthConceptUuid,
+                      obsDatetime: new Date(),
+                      value: this.formValues[this.strengthConceptUuid]?.value,
+                      order: (response?.orders || [])[0]?.uuid,
+                    }
+                  : null,
+              ]?.filter((observation) => observation),
+            };
+            this.observationService
+              .saveObservationsViaEncounter(data)
+              .subscribe((res) => {
+                if (res?.error) {
+                  this.errors = [...this.errors, response?.error];
+                }
+
+                if (res) {
+                  this.orderSaved.emit(true);
+                }
+                this.savingOrder = false;
+              });
+          }
+          if (response?.error) {
+            this.errors = [...this.errors, response?.error];
+          }
+          this.savingOrder = false;
+        });
+
+      this.updateConsultationOrder.emit();
+    }
   }
 }
