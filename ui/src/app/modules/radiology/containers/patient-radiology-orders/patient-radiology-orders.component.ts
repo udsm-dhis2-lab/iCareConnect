@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { Store } from "@ngrx/store";
+import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { loadCurrentPatient, loadRolesDetails } from "src/app/store/actions";
@@ -15,7 +15,7 @@ import {
   getCurrentUserDetails,
   getCurrentUserPrivileges,
 } from "src/app/store/selectors/current-user.selectors";
-import { getActiveVisitUuid } from "src/app/store/selectors/visit.selectors";
+import { getActiveVisit, getActiveVisitUuid } from "src/app/store/selectors/visit.selectors";
 
 @Component({
   selector: "app-patient-radiology-orders",
@@ -35,6 +35,7 @@ export class PatientRadiologyOrdersComponent implements OnInit {
   activeVisitUuid$: Observable<string>;
   currentPatient$: Observable<any>;
   currentBills$: Observable<any>;
+  activeVisit$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private route: ActivatedRoute,
@@ -60,6 +61,7 @@ export class PatientRadiologyOrdersComponent implements OnInit {
     this.currentUser$ = this.store.select(getCurrentUserDetails);
     this.orders$ = this.store.select(getAllRadiologyOrders);
     this.activeVisitUuid$ = this.store.select(getActiveVisitUuid);
+    this.activeVisit$ = this.store.pipe(select(getActiveVisit));
     this.currentPatient$ = this.store.select(getCurrentPatient);
   }
 }
