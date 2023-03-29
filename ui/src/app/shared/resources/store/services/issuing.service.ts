@@ -44,9 +44,7 @@ export class IssuingService {
         map((issueResponse: any) => {
           return {
             ...omit(issueResponse, "results"),
-            issuings: (issueResponse?.results || [])?.map((issueItem) =>
-              new Issuing(issueItem).toJson()
-            ),
+            issuings: issueResponse?.results
           };
         })
       );
@@ -73,6 +71,14 @@ export class IssuingService {
       );
   }
 
+  issueItems(issueInput: any): Observable<any> {
+    const issueObject = Issuing.createIssue(issueInput);
+    return this.httpClient.post("store/issue", issueObject).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
+  
   issueRequest(issueInput: IssueInput): Observable<any> {
     if (!issueInput) {
       return throwError({ message: "You have provided incorrect parameters" });

@@ -17,6 +17,13 @@
     },
     "resultGroup": {
       "uuid": "222yyy70-7777-11e3-1221-0sndiu87hsj3"
+    },
+
+    "associatedFieldResult": {
+      "value" : "abc",
+      "associatedField": {
+        "uuid": "iCARE110-TEST-OSDH-9beb-d30dcfc0c636"
+      }
     }
   }
 ]

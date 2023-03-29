@@ -38,6 +38,9 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "stockInvoice")
     private List<StockInvoiceStatus> stockInvoiceStatuses = new ArrayList<>(0);
 
+    @Transient
+    private Double totalAmount;
+
 
     @Override
     public Integer getId() {
@@ -95,6 +98,14 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
 
     public void setStockInvoiceStatuses(List<StockInvoiceStatus> stockInvoiceStatuses) {
         this.stockInvoiceStatuses = stockInvoiceStatuses;
+    }
+
+    public Double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
     public static StockInvoice fromMap(Map<String,Object> stockInvoiceMap) throws ParseException {
@@ -175,6 +186,7 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
 
         }
 
+
         if (this.getCreator() != null) {
             Map<String, Object> creatorObject = new HashMap<String, Object>();
             creatorObject.put("uuid", this.getCreator().getUuid());
@@ -195,6 +207,10 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
 
         if(this.getVoided() != null){
             stockInvoiceObject.put("voided",this.getVoided());
+        }
+
+        if(this.getTotalAmount() != null){
+            stockInvoiceObject.put("totalAmount",this.getTotalAmount());
         }
 
         return stockInvoiceObject;

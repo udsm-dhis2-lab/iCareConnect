@@ -885,10 +885,14 @@ public class NHIFServiceImpl implements InsuranceService {
 		String consultation = "";
 		String medicine = "";
 		String tests = "";
+		String procedure = "";
+		String radiology = "";
 		String billingOrderType = adminService.getGlobalProperty(ICareConfig.CONSULTATION_ORDER_TYPE);
 		float consultationsubtotal = 0;
 		float medicinesubtotal = 0;
 		float testssubtotal = 0;
+		float proceduresubtotal = 0;
+		float radiologysubtotal = 0;
 		float grandtotal = 0;
 		String consultationFees = "";
 		for (Encounter encounter : visit.getEncounters()) {
@@ -932,6 +936,20 @@ public class NHIFServiceImpl implements InsuranceService {
 						        + folioItem.getUnitPrice() + "</td><td class='blue' align='right'>"
 						        + folioItem.getAmountClaimed() + "</td></tr>";
 						testssubtotal += folioItem.getAmountClaimed();
+					} else if (order.getOrderType().getName().equals("Procedure Order")) {
+						procedure += "<tr><td class='blue'>" + folioItem.getItemName() + "</td><td class='blue'>"
+						        + folioItem.getItemCode() + "</td><td class='blue' align='right'>"
+						        + folioItem.getItemQuantity() + "</td><td class='blue' align='right'>"
+						        + folioItem.getUnitPrice() + "</td><td class='blue' align='right'>"
+						        + folioItem.getAmountClaimed() + "</td></tr>";
+						proceduresubtotal += folioItem.getAmountClaimed();
+					} else if (order.getOrderType().getName().equals("Radiology Order")) {
+						radiology += "<tr><td class='blue'>" + folioItem.getItemName() + "</td><td class='blue'>"
+						        + folioItem.getItemCode() + "</td><td class='blue' align='right'>"
+						        + folioItem.getItemQuantity() + "</td><td class='blue' align='right'>"
+						        + folioItem.getUnitPrice() + "</td><td class='blue' align='right'>"
+						        + folioItem.getAmountClaimed() + "</td></tr>";
+						radiologysubtotal += folioItem.getAmountClaimed();
 					}
 				}
 			}
@@ -948,7 +966,17 @@ public class NHIFServiceImpl implements InsuranceService {
 			tests += "<tr><td colspan='4'>SUB TOTAL</td><td class='blue' align='right' style='font-weight:bold'>"
 			        + testssubtotal + "</td></tr>";
 		}
-		grandtotal += consultationsubtotal + medicinesubtotal + testssubtotal;
+		if (!procedure.equals("")) {
+			procedure = "<tr class='headings table-header'><td colspan='5'>Procedure</td></tr>" + procedure;
+			procedure += "<tr><td colspan='4'>SUB TOTAL</td><td class='blue' align='right' style='font-weight:bold'>"
+			        + proceduresubtotal + "</td></tr>";
+		}
+		if (!radiology.equals("")) {
+			radiology = "<tr class='headings table-header'><td colspan='5'>Radiology</td></tr>" + radiology;
+			radiology += "<tr><td colspan='4'>SUB TOTAL</td><td class='blue' align='right' style='font-weight:bold'>"
+			        + radiologysubtotal + "</td></tr>";
+		}
+		grandtotal += consultationsubtotal + medicinesubtotal + testssubtotal + proceduresubtotal + radiologysubtotal;
 		
 		//consultation += "<tr><td colspan='4'>GRAND TOTAL</td><td class='blue' align='right' style='font-weight:bold'>" + grandtotal + "</td></tr>";
 		String content = new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
@@ -960,6 +988,8 @@ public class NHIFServiceImpl implements InsuranceService {
 		content = content.replace("{Consultation}", consultation);
 		content = content.replace("{Tests}", tests);
 		content = content.replace("{Medicine}", medicine);
+		content = content.replace("{Procedure}", procedure);
+		content = content.replace("{Radiology}", radiology);
 		content = content.replace("{FacilityName}", adminService.getGlobalProperty(ICareConfig.FACILITY_NAME));
 		content = content.replace("{Address}", "");
 		//TODO Add consulation fee {ConsultationFees}

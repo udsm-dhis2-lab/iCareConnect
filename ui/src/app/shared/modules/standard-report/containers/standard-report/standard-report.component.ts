@@ -11,6 +11,7 @@ export class StandardReportComponent implements OnInit {
   @Input() actionType: string;
   @Input() additionalKey: string;
   @Input() reportToEdit: any;
+  @Input() hideList: boolean;
   constructor() {}
 
   ngOnInit(): void {

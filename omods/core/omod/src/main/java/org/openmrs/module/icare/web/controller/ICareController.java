@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.logic.op.In;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.BillingService;
@@ -75,6 +76,16 @@ public class ICareController {
         results.put("identifiers", ids);
         return results;
     }
+	
+	@RequestMapping(value = "codegen", method = RequestMethod.GET)
+	@ResponseBody
+	public List<String> onGenerateCode(@RequestParam(value = "globalProperty", required = true) String globalProperty,
+	        @RequestParam(value = "metadataType", required = true) String metadataType,
+	        @RequestParam(value = "count", defaultValue = "1", required = false) Integer count) {
+		List<String> generatedCode = iCareService.generateCode(globalProperty, metadataType, count);
+		
+		return generatedCode;
+	}
 	
 	/**
 	 * Initially called after the getUsers method to get the landing form name

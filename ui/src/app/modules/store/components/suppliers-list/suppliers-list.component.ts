@@ -3,7 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { from, interval, Observable, of } from "rxjs";
 import { debounceTime, map, tap } from "rxjs/operators";
 import { LocationService } from "src/app/core/services";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
@@ -24,9 +24,11 @@ export class SuppliersListComponent implements OnInit {
   suppliers$: Observable<any>;
   errors: any[] = [];
   loadingSuppliers: boolean = false;
+  supplierLocations$: Observable<any>;
   constructor(
     public dialog: MatDialog,
-    private supplierService: SupplierService
+    private supplierService: SupplierService,
+    private locationService: LocationService
   ) {}
 
   ngOnInit(): void {
@@ -42,14 +44,19 @@ export class SuppliersListComponent implements OnInit {
         }
       })
     );
+
+    this.supplierLocations$ = this.locationService.getLocationsByTagName("supplier+location");
   }
 
-  onAddNewSupplier(e: any) {
+  onAddNewSupplier(e: any, locations) {
     e?.stopPropagation();
     this.dialog
       .open(SupplierFormComponent, {
         width: "40%",
         panelClass: "custom-dialog-container",
+        data: {
+          locations: locations
+        }
       })
       .afterClosed()
       .subscribe((response) => {
@@ -57,13 +64,14 @@ export class SuppliersListComponent implements OnInit {
       });
   }
 
-  onUpdateSupplier(e: any, supplier: any) {
+  onUpdateSupplier(e: any, supplier: any, locations?: any[]) {
     e?.stopPropagation();
     this.dialog
       .open(SupplierFormComponent, {
         width: "40%",
         data: {
           supplier: supplier,
+          locations: locations
         },
       })
       .afterClosed()

@@ -76,6 +76,16 @@ public class ReceiptItem implements java.io.Serializable, Stockable {
 		return this.id.getReceipt().getReceivingLocation();
 	}
 	
+	@Override
+	public Location getSourceLocation() {
+		return this.id.getReceipt().getIssueingLocation();
+	}
+	
+	@Override
+	public Location getDestinationLocation() {
+		return this.id.getReceipt().getReceivingLocation();
+	}
+	
 	public void setQuantity(Double quantity) {
 		this.quantity = quantity;
 	}

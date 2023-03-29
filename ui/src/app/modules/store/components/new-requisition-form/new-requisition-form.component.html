@@ -1,8 +1,8 @@
  <div *ngIf="{
           stockStatusForSelectedStore: stockStatusForSelectedStore$ | async } as params">
-  <mat-toolbar>Requisition Form</mat-toolbar>
+  <mat-toolbar *ngIf="!existingRequisitionItem">Requisition Form</mat-toolbar>
   <div class="mt-4">
-      <ng-container *ngIf="addedDataList?.items?.length && !addingRequisitions">
+      <ng-container *ngIf="requisition">
         <mat-accordion>
           <mat-expansion-panel
             class="border mat-elevation-z0 mt-2"
@@ -12,58 +12,42 @@
               <mat-panel-title>
                 <div class="w-75">
                   <span> <strong>
-                    Items in draft
+                    {{ requisition?.code }}
                   </strong></span>
                 </div>
               </mat-panel-title>
             </mat-expansion-panel-header>
             <div class="items-table">
-              <div style="overflow: auto">
-                <table class="table">
-                  <tr>
-                    <td>#</td>
-                    <td>Store</td>
-                    <td>Item</td>
-                    <td>Quantity</td>
-                    <td><span class="float-right">Actions</span></td>
-                  </tr>
-                 
-
-                  <tr
-                    *ngFor="let item of addedDataList?.items; let itemIndex = index"
-                  >
-                    <td>{{ itemIndex + 1 }}</td>
-                    <td>Test Store {{ itemIndex + 1 }}</td>
-                    <td>Test Item {{ itemIndex + 1 }}</td>
-                    <td>{{item?.quantity}}</td>
-                    <td>
-                      ...
-                    </td>
-                  </tr>
-                </table>
+              <div class="container-fluid">
+                <app-requisition-items [requisition]="requisition"></app-requisition-items>
             </div>
             </div>
           </mat-expansion-panel>
         </mat-accordion>
       </ng-container>
-      <ng-container *ngIf="!addedDataList?.length && addingRequisitions">
-      </ng-container>
       <div class="requisition-form">
         <table class="table w-100">
           <tbody>
             <tr>
-              <td>
+              <td *ngIf="!existingRequisitionItem">
                 <app-form
                   [fields]="targetStoreField"
                   (formUpdate)="onUpdateForm($event)"
                 ></app-form>
               </td>
               <td>
+                <mat-progress-bar mode="indeterminate" *ngIf="!requisitionFields?.length"></mat-progress-bar>
                 <app-form
+                  *ngIf="requisitionFields?.length"
                   [fields]="requisitionFields"
                   [isFormHorizontal]="true"
                   (formUpdate)="onUpdateForm($event)"
                 ></app-form>
+                <span class="mt-2 text-small" *ngIf="existingRequisitionItem">
+                  <i>
+                   Previous item selected: {{ existingRequisitionItem?.item?.display }}
+                  </i>
+                </span>
                 <div
                   class="w-100 ml-2 mr-2 mb-2"
                   *ngIf="params?.stockStatusForSelectedStore"
@@ -82,38 +66,48 @@
               </td>
               <td>
                 <button
+                *ngIf="!existingRequisitionItem"
                 class="mt-1"
-                (click)="onRequest($event)"
+                (click)="onAdd($event)"
                 mat-flat-button
                 color="primary"
                 style="height: 45px"
               >
                 Add 
               </button>
+                <button
+                *ngIf="existingRequisitionItem"
+                class="mt-1"
+                (click)="onUpdateItem($event)"
+                mat-flat-button
+                color="primary"
+                style="height: 45px"
+              >
+                Update
+              </button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-     
-          <div
-              class="w-100 alert alert-warning"
-              role="alert"
-              *ngIf="
-                params?.stockStatusForSelectedStore?.eligibleQuantity && specifiedQuantity &&
-                specifiedQuantity >
-                  params?.stockStatusForSelectedStore?.eligibleQuantity
-              "
-            >
-              Request can not exceed availability. {{ params?.stockStatusForSelectedStore?.eligibleQuantity ? 'Available quantity is ' + params?.stockStatusForSelectedStore?.eligibleQuantity : '' }}
-              <button
-                type="button"
-                class="close"
-                data-dismiss="alert"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
+      <div
+        class="w-100 alert alert-warning"
+        role="alert"
+        *ngIf="
+          params?.stockStatusForSelectedStore?.eligibleQuantity && specifiedQuantity &&
+          specifiedQuantity >
+            params?.stockStatusForSelectedStore?.eligibleQuantity
+        "
+      >
+        Request can not exceed availability. {{ params?.stockStatusForSelectedStore?.eligibleQuantity ? 'Available quantity is ' + params?.stockStatusForSelectedStore?.eligibleQuantity : '' }}
+        <button
+          type="button"
+          class="close"
+          data-dismiss="alert"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
     </div>
 </div>

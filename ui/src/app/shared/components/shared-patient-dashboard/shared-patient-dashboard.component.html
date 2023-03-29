@@ -198,6 +198,7 @@
               Discharge
             </button>
             <button
+              *ngIf="!isInpatient"
               mat-stroked-button
               (click)="onToggleVisibityIcons($event)"
               class="mr-2 float-right"
@@ -437,7 +438,7 @@
                       selectedForm ? selectedForm : dashboardParams?.forms[0]
                     "
                     (saveObservations)="
-                      onSaveObservations($event, dashboardParams?.currentPatient, dashboardParams?.currentLocation, dashboardParams?.provider, activeVisit)
+                      onSaveObservations($event, params?.currentPatient)
                     "
                   >
                   </app-clinical-notes>
@@ -477,6 +478,9 @@
                         ? dashboardParams?.forms[0]
                         : {}
                     "
+                    (saveObservations)="
+                      onSaveObservations($event, params?.currentPatient)
+                    "
                   >
                   </app-patient-observations-chart>
                   <app-ipd-forms
@@ -515,7 +519,7 @@
                         : {}
                     "
                     (saveObservations)="
-                      onSaveObservations($event, dashboardParams?.currentPatient, dashboardParams?.currentLocation, dashboardParams?.provider, activeVisit)
+                      onSaveObservations($event, params?.currentPatient)
                     "
                   >
                   </app-ipd-forms>

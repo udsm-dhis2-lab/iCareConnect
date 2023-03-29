@@ -30,6 +30,8 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	RequisitionDAO requisitionDAO;
 	
+	RequisitionItemDAO requisitionItemDAO;
+	
 	IssueDAO issueDAO;
 	
 	ReceiptDAO receiptDAO;
@@ -55,6 +57,12 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	StockInvoiceItemDAO stockInvoiceItemDAO;
 	
 	StockInvoiceItemStatusDAO stockInvoiceItemStatusDAO;
+	
+	RequisitionItemStatusDAO requisitionItemStatusDAO;
+	
+	IssueItemStatusDAO issueItemStatusDAO;
+	
+	IssueItemDAO issueItemDAO;
 	
 	public void setLedgerDAO(LedgerDAO ledgerDAO) {
 		this.ledgerDAO = ledgerDAO;
@@ -120,6 +128,22 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		this.stockInvoiceItemStatusDAO = stockInvoiceItemStatusDAO;
 	}
 	
+	public void setRequisitionItemDAO(RequisitionItemDAO requisitionItemDAO) {
+		this.requisitionItemDAO = requisitionItemDAO;
+	}
+	
+	public void setRequisitionItemStatusDAO(RequisitionItemStatusDAO requisitionItemStatusDAO) {
+		this.requisitionItemStatusDAO = requisitionItemStatusDAO;
+	}
+	
+	public void setIssueItemStatusDAO(IssueItemStatusDAO issueItemStatusDAO) {
+		this.issueItemStatusDAO = issueItemStatusDAO;
+	}
+	
+	public void setIssueItemDAO(IssueItemDAO issueItemDAO) {
+		this.issueItemDAO = issueItemDAO;
+	}
+	
 	@Override
 	public ReorderLevel addReorderLevel(ReorderLevel reorderLevel) {
 		
@@ -164,6 +188,9 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		ledgerToSave.setRemarks(ledger.getRemarks());
 		ledgerToSave.setExpiryDate(ledger.getExpiryDate());
 		ledgerToSave.setBatchNo(ledger.getBatchNo());
+		if (ledger.getSourceLocation() != null) {
+			ledgerToSave.setSourceLocation(ledger.getSourceLocation());
+		}
 		if (ledger.getItem() != null) {
 			ledgerToSave.setItem(this.dao.findByUuid(ledger.getItem().getUuid()));
 		}
@@ -185,9 +212,18 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	@Override
 	public Requisition saveRequest(Requisition requisition) {
 		
-		this.requisitionDAO.save(requisition);
+		Requisition savedRequisition = this.requisitionDAO.save(requisition);
 		
-		return requisition;
+		if (requisition.getRequisitionStatuses() != null) {
+			for (RequisitionStatus requisitionStatus : requisition.getRequisitionStatuses()) {
+				requisitionStatus.setStatus(requisition.getRequisitionStatuses().get(0).getStatus());
+				requisitionStatus.setRemarks(requisition.getRequisitionStatuses().get(0).getStatus().toString());
+				requisitionStatus.setRequisition(savedRequisition);
+				this.requisitionStatusDAO.save(requisitionStatus);
+			}
+		}
+		
+		return savedRequisition;
 	}
 	
 	@Override
@@ -267,9 +303,18 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		issueStatus.setRemarks("Items have been issued");
 		issueStatus.setStatus(IssueStatus.IssueStatusCode.ISSUED);
 		this.saveIssueStatus(issueStatus);
+		if (newIssue != null) {
+			for (IssueItem issueItem : newIssue.getIssueItems()) {
+				IssueItemStatus issueItemStatus = new IssueItemStatus();
+				issueItemStatus.setStatus(IssueItemStatus.IssueItemStatusCode.ISSUED.toString());
+				issueItemStatus.setRemarks("Item has been issued");
+				issueItemStatus.setIssueItem(issueItem);
+				this.saveIssueItemStatus(issueItemStatus);
+			}
+		}
 		if (newIssue.getRequisition() != null) {
 			RequisitionStatus requisitionStatus = new RequisitionStatus();
-			requisitionStatus.setRemarks("Items have been received");
+			requisitionStatus.setRemarks("Items have been issued");
 			requisitionStatus.setRequisition(newIssue.getRequisition());
 			requisitionStatus.setStatus(RequisitionStatus.RequisitionStatusCode.ISSUED);
 			this.saveRequestStatus(requisitionStatus);
@@ -283,6 +328,11 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		
 		return this.issueStatusDAO.save(issueStatus);
 		
+	}
+	
+	@Override
+	public IssueItemStatus saveIssueItemStatus(IssueItemStatus issueItemStatus) {
+		return this.issueItemStatusDAO.save(issueItemStatus);
 	}
 	
 	@Override
@@ -336,6 +386,15 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			issueStatus.setRemarks("Items have been received");
 			issueStatus.setStatus(IssueStatus.IssueStatusCode.RECEIVED);
 			this.saveIssueStatus(issueStatus);
+			
+			for (IssueItem issueItem : receipt.getIssue().getIssueItems()) {
+				IssueItemStatus issueItemStatus = new IssueItemStatus();
+				issueItemStatus.setStatus(IssueItemStatus.IssueItemStatusCode.RECEIVED.toString());
+				issueItemStatus.setRemarks("Item has been received");
+				issueItemStatus.setIssueItem(issueItem);
+				this.saveIssueItemStatus(issueItemStatus);
+			}
+			
 			if (receipt.getIssue().getRequisition() != null) {
 				RequisitionStatus requisitionStatus = new RequisitionStatus();
 				requisitionStatus.setRemarks("Items have been received");
@@ -428,6 +487,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 				stockableItem.setExpiryDate(stock.getExpiryDate());
 				stockableItem.setItem(item);
 				stockableItem.setLocation(Context.getLocationService().getLocationByUuid(locationUuid));
+				stockableItem.setSourceLocation(Context.getLocationService().getLocationByUuid(locationUuid));
 				stockableItem.setQuantity(quantityToDeduct);
 				TransactionUtil.deductStock(stockableItem);
 				totalQuantity -= quantityToDeduct;
@@ -481,6 +541,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 					stockableItem.setExpiryDate(stock.getExpiryDate());
 					stockableItem.setItem(item);
 					stockableItem.setLocation(Context.getLocationService().getLocationByUuid(locationUuid));
+					stockableItem.setSourceLocation(Context.getLocationService().getLocationByUuid(locationUuid));
 					stockableItem.setQuantity(quantityToDeduct);
 					TransactionUtil.deductStock(stockableItem);
 					totalQuantity -= quantityToDeduct;
@@ -520,6 +581,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 					stockableItem.setExpiryDate(stock.getExpiryDate());
 					stockableItem.setItem(item);
 					stockableItem.setLocation(Context.getLocationService().getLocationByUuid(locationUuid));
+					stockableItem.setSourceLocation(Context.getLocationService().getLocationByUuid(locationUuid));
 					stockableItem.setQuantity(quantityToDeduct);
 					TransactionUtil.deductStock(stockableItem);
 					totalQuantity -= quantityToDeduct;
@@ -539,11 +601,25 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	@Override
 	public ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status) {
+		
+		ListResult<StockInvoice> stockInvoices = stockInvoiceDAO.getStockInvoices(pager, status);
+		for (StockInvoice stockInvoice : stockInvoices.getResults()) {
+			Double totalAmount = stockInvoiceDAO.getTotalStockItemsAmountByStockInvoice(stockInvoice);
+			stockInvoice.setTotalAmount(totalAmount);
+		}
 		return stockInvoiceDAO.getStockInvoices(pager, status);
 	}
 	
 	@Override
-	public Supplier saveSupplier(Supplier supplier) {
+	public Supplier saveSupplier(Supplier supplier) throws Exception {
+		
+		if (supplier.getLocation() != null) {
+			Location location = Context.getLocationService().getLocationByUuid(supplier.getLocation().getUuid());
+			if (location == null) {
+				throw new Exception("Location with uuid " + supplier.getLocation().getUuid() + " does not exist");
+			}
+			supplier.setLocation(location);
+		}
 		return supplierDAO.save(supplier);
 	}
 	
@@ -719,7 +795,122 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		if (supplier == null) {
 			throw new Exception(" The supplier with uuid " + supplier.getUuid() + " does not exist");
 		}
+		if (supplier.getLocation() != null) {
+			Location location = Context.getLocationService().getLocationByUuid(supplier.getLocation().getUuid());
+			if (location == null) {
+				throw new Exception("The location with uuid " + supplier.getLocation().getUuid() + " does not exist");
+			}
+			supplier.setLocation(location);
+		}
 		return this.supplierDAO.updateSupplier(supplier);
+	}
+	
+	@Override
+	public Requisition updateRequisition(Requisition requisition) throws Exception {
+		Requisition existingRequisition = this.requisitionDAO.findByUuid(requisition.getUuid());
+		if (existingRequisition == null) {
+			throw new Exception(" The requisition with uuid " + requisition.getUuid() + " does not exist");
+		}
+		if (requisition.getRequisitionStatuses().size() > 0) {
+			for (RequisitionStatus requisitionStatus : requisition.getRequisitionStatuses()) {
+				requisitionStatus.setRequisition(existingRequisition);
+				requisitionStatus.setRemarks(requisitionStatus.getRemarks());
+				this.saveRequestStatus(requisitionStatus);
+				
+				if (requisitionStatus.getStatus().equals(RequisitionStatus.RequisitionStatusCode.PENDING)) {
+					List<RequisitionItem> requisitionItems = requisitionItemDAO
+					        .getStockRequisitionItemsByRequisition(existingRequisition);
+					for (RequisitionItem requisitionItem : requisitionItems) {
+						RequisitionItemStatus requisitionItemStatus = new RequisitionItemStatus();
+						requisitionItemStatus.setStatus(RequisitionItemStatus.RequisitionItemStatusCode.PENDING.toString());
+						requisitionItemStatus.setRemarks(RequisitionItemStatus.RequisitionItemStatusCode.PENDING.toString());
+						requisitionItemStatus.setRequisitionItem(requisitionItem);
+						this.saveRequisitionItemStatus(requisitionItemStatus);
+					}
+				}
+				
+			}
+		}
+		return this.requisitionDAO.updateRequisition(requisition);
+	}
+	
+	@Override
+	public RequisitionItem saveRequisitionItem(RequisitionItem requisitionItem) throws Exception {
+		
+		Item item = this.dao.findByUuid(requisitionItem.getItem().getUuid());
+		if (item == null) {
+			throw new Exception(" The item with uuid" + requisitionItem.getItem().getUuid() + " does not exist");
+		}
+		requisitionItem.setItem(item);
+		
+		Requisition requisition = this.requisitionDAO.findByUuid(requisitionItem.getRequisition().getUuid());
+		if (requisition == null) {
+			throw new Exception(" The requisition with uuid " + requisitionItem.getRequisition().getUuid()
+			        + " does not exist");
+		}
+		requisitionItem.setRequisition(requisition);
+		
+		RequisitionItem saveRequisitionItem = requisitionItemDAO.save(requisitionItem);
+		
+		if (requisitionItem.getRequisitionItemStatuses().size() > 0) {
+			for (RequisitionItemStatus requisitionItemStatus : requisitionItem.getRequisitionItemStatuses()) {
+				//requisitionItemStatus.setRequisition(requisitionItem.getRequisition());
+				//requisitionItemStatus.setItem(requisitionItem.getItem());
+				//requisitionItemStatus.setStatus(requisitionItemStatus.getStatus());
+				requisitionItemStatus.setRequisitionItem(saveRequisitionItem);
+				requisitionItemStatus.setRemarks(requisitionItemStatus.getStatus().toString());
+				this.requisitionItemStatusDAO.save(requisitionItemStatus);
+			}
+		}
+		
+		return saveRequisitionItem;
+	}
+	
+	@Override
+	public RequisitionItemStatus saveRequisitionItemStatus(RequisitionItemStatus requisitionItemStatus) {
+		return requisitionItemStatusDAO.save(requisitionItemStatus);
+	}
+	
+	@Override
+	public RequisitionItem updateRequisitionItem(RequisitionItem requisitionItem) throws Exception {
+		
+		if (requisitionItem.getItem() != null) {
+			Item item = dao.findByUuid(requisitionItem.getItem().getUuid());
+			if (item == null) {
+				throw new Exception("The item with uuid " + requisitionItem.getItem().getUuid() + " does not exist");
+			}
+			
+			requisitionItem.setItem(item);
+		}
+		
+		if (requisitionItem.getRequisition() != null) {
+			Requisition requisition = this.requisitionDAO.findByUuid(requisitionItem.getRequisition().getUuid());
+			if (requisition == null) {
+				throw new Exception(" The requisition with uuid " + requisitionItem.getRequisition().getUuid()
+				        + " does not exist");
+			}
+			requisitionItem.setRequisition(requisition);
+		}
+		
+		if (requisitionItem.getRequisitionItemStatuses().size() > 0) {
+			
+			for (RequisitionItemStatus requisitionItemStatus : requisitionItem.getRequisitionItemStatuses()) {
+				RequisitionItem existingRequisitionItem = this.requisitionItemDAO.findByUuid(requisitionItem.getUuid());
+				//requisitionItemStatus.setRequisition(requisitionItem.getRequisition());
+				//requisitionItemStatus.setItem(requisitionItem.getItem());
+				requisitionItemStatus.setRemarks(requisitionItemStatus.getStatus().toString());
+				requisitionItemStatus.setRequisitionItem(existingRequisitionItem);
+				this.requisitionItemStatusDAO.save(requisitionItemStatus);
+			}
+			
+		}
+		
+		return requisitionItemDAO.updateRequisitionItem(requisitionItem);
+	}
+	
+	@Override
+	public IssueItem getIssueItemByUuid(String issueItemUuid) {
+		return issueItemDAO.findByUuid(issueItemUuid);
 	}
 	
 	@Override

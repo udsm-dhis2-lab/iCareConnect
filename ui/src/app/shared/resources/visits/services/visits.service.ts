@@ -1,3 +1,4 @@
+import { query } from "@angular/animations";
 import { ClassGetter } from "@angular/compiler/src/output/output_ast";
 import { Injectable } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
@@ -515,6 +516,17 @@ export class VisitsService {
       })
     );
   }
+  
+  deleteVisit(uuid, purge: boolean  =  false): Observable<any> {
+    return from(this.api.visit.deleteVisit(uuid, { purge: purge})).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => {
+        return error;
+      })
+    );
+  }
 
   getVisitClaim(visitUuid) {
     return this.httpClient.get(`icare/visit/${visitUuid}/claimForm`).pipe(
@@ -642,7 +654,7 @@ export class VisitsService {
         this.api.visit.getAllVisits({
           includeInactive: includeInactive,
           patient: patient,
-          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs:(accessionNumber,comment,concept:(uuid,display,units),display,encounter,groupMembers,obsDatetime,order,person,uuid,value,valueCodedName,valueModifier,voided),orders,diagnoses,encounterProviders,encounterDatetime,encounterType))`,
+          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs:(accessionNumber,comment,concept:(uuid,display,units),display,encounter,groupMembers,order,person,uuid,value,valueCodedName,valueModifier,voided),orders,diagnoses,encounterProviders,encounterDatetime,encounterType))`,
         } as any)
       )
     ).pipe(

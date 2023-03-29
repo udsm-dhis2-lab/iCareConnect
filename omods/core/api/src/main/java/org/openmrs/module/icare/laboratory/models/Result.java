@@ -75,6 +75,9 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "instrument_id", nullable = true)
 	private Concept instrument;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "result")
+	private List<AssociatedFieldResult> associatedFieldResults = new ArrayList<>(0);
 	
 	public Integer getId() {
 		return id;
@@ -187,7 +190,15 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	public void setValueComplex(String valueComplex) {
 		this.valueComplex = valueComplex;
 	}
-	
+
+	public List<AssociatedFieldResult> getAssociatedFieldResults() {
+		return associatedFieldResults;
+	}
+
+	public void setAssociatedFieldResults(List<AssociatedFieldResult> associatedFieldResults) {
+		this.associatedFieldResults = associatedFieldResults;
+	}
+
 	public static Result fromMap(Map<String, Object> map) {
 		Result result = new Result();
 		
@@ -264,6 +275,20 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		if (map.get("resultStatus") != null) {
 			result.setResultStatus(map.get("resultStatus").toString());
 		}
+
+		if(map.get("associatedFieldResult") != null){
+			List<AssociatedFieldResult> associatedFieldResultsList = new ArrayList<>();
+
+			AssociatedField associatedField = new AssociatedField();
+			associatedField.setUuid(((Map)((Map) map.get("associatedFieldResult")).get("associatedField")).get("uuid").toString());
+
+			AssociatedFieldResult associatedFieldResult = new AssociatedFieldResult();
+			associatedFieldResult.setValue(((Map) map.get("associatedFieldResult")).get("value").toString());
+			associatedFieldResult.setAssociatedField(associatedField);
+
+			associatedFieldResultsList.add(associatedFieldResult);
+			result.setAssociatedFieldResults(associatedFieldResultsList);
+		}
 		
 		Concept concept = new Concept();
 		concept.setUuid(((Map) map.get("concept")).get("uuid").toString());
@@ -328,6 +353,14 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		Map<String, Object> testObject = new HashMap<String, Object>();
 		testObject.put("uuid", this.getTestAllocation().getUuid());
 		resultsObject.put("testAllocation", testObject);
+
+		Map<String, Object> sampleDetails = new HashMap<>();
+		if (this.getTestAllocation().getSample() != null) {
+			sampleDetails.put("uuid", this.getTestAllocation().getSample().getUuid());
+			sampleDetails.put("label", this.getTestAllocation().getSample().getLabel());
+			sampleDetails.put("display", this.getTestAllocation().getSample().getLabel());
+		}
+		resultsObject.put("sample", sampleDetails);
 		
 		Map<String, Object> creatorObject = new HashMap<String, Object>();
 		if (this.getCreator() != null) {
@@ -350,6 +383,15 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		}
 		resultsObject.put("resultGroup", resultGroup);
 		resultsObject.put("creator", creatorObject);
+
+		if(this.getAssociatedFieldResults() != null){
+			List<Map<String,Object>> associatedFieldResultMapList = new ArrayList<>();
+			for(AssociatedFieldResult associatedFieldResult : this.getAssociatedFieldResults()){
+				associatedFieldResultMapList.add(associatedFieldResult.toMap());
+			}
+			resultsObject.put("associatedFieldResults",associatedFieldResultMapList);
+		}
+
 		return resultsObject;
 	}
 	

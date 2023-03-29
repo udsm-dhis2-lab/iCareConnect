@@ -82,6 +82,17 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 			
 			queryStr += " st.purchaseOrder = :purchaseOrder";
 		}
+		if (stockInvoice.getReceivingDate() != null) {
+			
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " ,";
+			}
+			
+			queryStr += " st.receivingDate = :receivingDate";
+			
+		}
 		
 		if (stockInvoice.getVoided() != null) {
 			if (!queryStr.contains("SET")) {
@@ -113,12 +124,31 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 			query.setParameter("voided", stockInvoice.getVoided());
 		}
 		
+		if (stockInvoice.getReceivingDate() != null) {
+			query.setParameter("receivingDate", stockInvoice.getReceivingDate());
+		}
+		
 		query.setParameter("uuid", stockInvoice.getUuid());
 		
 		Integer success = query.executeUpdate();
 		
 		if (success == 1) {
 			return stockInvoice;
+		} else {
+			return null;
+		}
+	}
+	
+	public Double getTotalStockItemsAmountByStockInvoice(StockInvoice stockInvoice) {
+		
+		DbSession session = this.getSession();
+		String queryStr = "SELECT SUM(sti.amount) FROM StockInvoiceItem sti WHERE sti.stockInvoice = :stockInvoice";
+		
+		Query query = session.createQuery(queryStr);
+		
+		query.setParameter("stockInvoice", stockInvoice);
+		if (query.list().get(0) != null) {
+			return (double) query.list().get(0);
 		} else {
 			return null;
 		}

@@ -7,7 +7,8 @@
       orders: orders$ | async,
       activeVisitUuid: activeVisitUuid$ | async,
       currentPatient: currentPatient$ | async,
-      currentBills: currentBills$ | async
+      currentBills: currentBills$ | async,
+      activeVisit: activeVisit$ | async
     } as params"
   >
     <!-- <app-nursing-data
@@ -62,16 +63,18 @@
       >
         No Radiology orders
       </div>
-      <div class="mt-2 p-3">
-        <app-patient-radiology-orders-list
-          *ngIf="
+      <div 
+        class="mt-2 p-3" 
+        *ngIf="
             params?.orders &&
             params?.orders?.length > 0 &&
             params?.userPrivileges &&
             params?.allUserRoles &&
             params?.activeVisitUuid && 
-            params?.currentBills
-          "
+            params?.currentBills && 
+            params?.activeVisit
+          ">
+        <app-patient-radiology-orders-list
           [currentUser]="params?.currentUser"
           [allUserRoles]="params?.allUserRoles"
           [userPrivileges]="params?.userPrivileges"
@@ -79,6 +82,7 @@
           [currentBills]="params?.currentBills"
           [patientId]="patientId"
           [activeVisitUuid]="params?.activeVisitUuid"
+          [activeVisit]="params?.activeVisit"
         ></app-patient-radiology-orders-list>
       </div>
 

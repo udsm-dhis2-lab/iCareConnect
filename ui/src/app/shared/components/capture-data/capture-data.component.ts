@@ -56,9 +56,6 @@ export class CaptureDataComponent implements OnInit {
       patient: this.patient?.id,
       encounterType: ICARE_CONFIG?.consultation?.encounterTypeUuid,
       location: this.location?.uuid,
-      form: {
-        uuid: this.currentCustomForm?.uuid
-      },
       obs: [],
       orders: [],
       encounterProviders: [
@@ -114,3 +111,4 @@ export class CaptureDataComponent implements OnInit {
     }, 20);
   }
 }
+                        

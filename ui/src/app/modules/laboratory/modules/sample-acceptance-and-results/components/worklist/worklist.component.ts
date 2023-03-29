@@ -42,7 +42,6 @@ export class WorklistComponent implements OnInit {
 
   ngOnInit(): void {
     this.providerDetails$ = this.store.select(getProviderDetails);
-    this.getSamples();
   }
 
   getSamples(): void {
@@ -61,6 +60,7 @@ export class WorklistComponent implements OnInit {
         },
         acceptedBy
       );
+    this.samplesAcceptedByMe$.subscribe((res) => console.log(res));
   }
 
   onToggleViewSampleDetails(event: Event, sample: any): void {
