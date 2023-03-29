@@ -86,7 +86,7 @@
               }}
             </td>
             <td>
-              {{ order?.paid ? "Yes" : "No" }}
+              {{ order?.isAdmitted ? 'Admitted' : order?.isEmergency ? 'Emergency' : order?.isEnsured ? 'Insured' : order?.paid ? "Yes" : "No" }}
             </td>
             <td
               *ngIf="ordersCount === 0"
@@ -132,7 +132,9 @@
               <button
                 [disabled]="
                   !specimenSourceWithOrders?.atLeastOnePaid &&
-                  !specimenSourceWithOrders?.isAdmitted
+                  !specimenSourceWithOrders?.isAdmitted && 
+                  !specimenSourceWithOrders?.isEmergency &&
+                  !specimenSourceWithOrders?.isEnsured  
                 "
                 (click)="
                   generateSampleId(
