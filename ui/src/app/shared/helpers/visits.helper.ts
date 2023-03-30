@@ -190,30 +190,30 @@ export function arrangeVisitDataChronologically(
   specificDrugConceptUuid?: string,
   prescriptionArrangementFields?: any
 ) {
-  let encountersByProvider = {};
 
+  // let encountersByProvider = {};
   // Restructure object to collect all related encounters in a single day
-  encountersByProvider = {
-    ...encountersByProvider,
-    encounters: visit?.encounters?.reduce(
-      (encounters, encounter) => ({
-        ...encounters,
-        [`${encounter.encounterProviders[0].uuid}|${
-          getStringDate(new Date(encounter.encounterDatetime)).date
-        }`]:
-          `${encounter.encounterProviders[0].uuid}|${
-            getStringDate(new Date(encounter.encounterDatetime)).date
-          }` in encounters
-            ? encounters[
-                `${encounter.encounterProviders[0].uuid}|${
-                  getStringDate(new Date(encounter.encounterDatetime)).date
-                }`
-              ].concat(encounter)
-            : [encounter],
-      }),
-      []
-    ),
-  };
+  // encountersByProvider = {
+  //   ...encountersByProvider,
+  //   encounters: visit?.encounters?.reduce(
+  //     (encounters, encounter) => ({
+  //       ...encounters,
+  //       [`${encounter.encounterProviders[0].uuid}|${
+  //         getStringDate(new Date(encounter.encounterDatetime)).date
+  //       }`]:
+  //         `${encounter.encounterProviders[0].uuid}|${
+  //           getStringDate(new Date(encounter.encounterDatetime)).date
+  //         }` in encounters
+  //           ? encounters[
+  //               `${encounter.encounterProviders[0].uuid}|${
+  //                 getStringDate(new Date(encounter.encounterDatetime)).date
+  //               }`
+  //             ].concat(encounter)
+  //           : [encounter],
+  //     }),
+  //     []
+  //   ),
+  // };
 
   // Find Observations and orders in a particular visit
   let visitData = {
@@ -232,26 +232,14 @@ export function arrangeVisitDataChronologically(
                             observation?.obs[formField?.key]?.map((ob) => {
                               return {
                                 ...ob,
-                                date: getStringDate(new Date(ob?.obsDatetime))
+                                obsDatetime: ob?.obsDatetime || ob?.encounter?.encounterDatetime,
+                                date: getStringDate(new Date(ob?.obsDatetime || ob?.encounter?.encounterDatetime))
                                   .date,
-                                time: getStringDate(new Date(ob?.obsDatetime))
+                                time: getStringDate(new Date(ob?.obsDatetime || ob?.encounter?.encounterDatetime))
                                   .time,
                               };
                             })
                           );
-                          return {
-                            ...observation?.obs[formField?.key][0],
-                            date: getStringDate(
-                              new Date(
-                                observation?.obs[formField?.key][0]?.obsDatetime
-                              )
-                            ).date,
-                            time: getStringDate(
-                              new Date(
-                                observation?.obs[formField?.key][0]?.obsDatetime
-                              )
-                            ).time,
-                          };
                         }
                       })
                       .filter((observation) => observation)
@@ -262,8 +250,9 @@ export function arrangeVisitDataChronologically(
                       observation?.obs[field?.formField?.key]?.map((ob) => {
                         return {
                           ...ob,
-                          date: getStringDate(new Date(ob?.obsDatetime)).date,
-                          time: getStringDate(new Date(ob?.obsDatetime)).time,
+                          obsDatetime: ob?.obsDatetime || ob?.encounter?.encounterDatetime,
+                          date: getStringDate(new Date(ob?.obsDatetime || ob?.encounter?.encounterDatetime)).date,
+                          time: getStringDate(new Date(ob?.obsDatetime || ob?.encounter?.encounterDatetime)).time,
                         };
                       })
                     );

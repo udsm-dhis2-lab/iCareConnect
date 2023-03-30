@@ -31,19 +31,93 @@ export class PatientHistoryDataComponent implements OnInit {
 
   ngOnInit(): void {
     let visit = new Visit(this.visit?.visit);
+
+    let observationsWithoutForm = this.visit?.obs?.filter((observation) => observation?.encounter?.form === null);
+    let observationsWithForm = this.visit?.obs?.filter((observation) => observation?.encounter?.form !== null);
+
+    // Handle observations linked to form
+    this.forms?.map((form) => {
+      let observations = []
+      observationsWithForm?.map((observation) => {
+        if(observation?.encounter?.form?.uuid === form?.uuid) {
+          let ob = {
+            ...observation,
+            encounterUuid: observation?.encounter?.uuid
+          }
+          observations = [
+            ...observations,
+            ob
+          ]
+        }
+      })
+
+      let observationsObject = _.groupBy(observations, "encounterUuid");
+
+      if (Object.keys(observationsObject)?.length > 0){
+        Object.keys(observationsObject).forEach((key) => {
+          this.obsBasedOnForms = [
+            ...this.obsBasedOnForms,
+            {
+              form: form?.name,
+              obs: observationsObject[key]?.reduce(
+                (obs, ob) => ({
+                  ...obs,
+                  [`${ob?.concept?.uuid}`]:
+                    `${ob?.concept?.uuid}` in obs
+                      ? obs[`${ob?.concept?.uuid}`].concat(ob)
+                      : [ob],
+                }),
+                []
+              ),
+              fields: form?.formFields,
+              obsDatetime: observationsObject[key][0]?.obsDatetime || observationsObject[key][0]?.encounter?.encounterDatetime,
+              // fields: flatten(
+              //   form?.formFields
+              //     ?.map((formField) => {
+              //       return formField?.formFields
+              //         ? formField?.formFields
+              //         : formField?.formField;
+              //     })
+              //     .filter((field) => field)
+              // )
+              //   .filter((field) => {
+              //     if (
+              //       field?.key in
+              //       observations?.reduce(
+              //         (obs, ob) => ({
+              //           ...obs,
+              //           [`${ob?.concept?.uuid}`]:
+              //             `${ob?.concept?.uuid}` in obs
+              //               ? obs[`${ob?.concept?.uuid}`].concat(ob)
+              //               : [ob],
+              //         }),
+              //         []
+              //       )
+              //     ) {
+              //       return field;
+              //     }
+              //   })
+              //   .filter((field) => field),
+            },
+          ];
+        })
+      }
+    })
+
+    // // Handle observations not linked to form
     this.forms?.map((form) => {
       let observations = [];
       form?.formFields?.forEach((field) => {
         if (field?.formFields?.length) {
           field?.formFields?.forEach((formField) => {
-            this.visit?.obs?.forEach((obs) => {
+            observationsWithoutForm?.forEach((obs) => {
               if (obs?.concept?.uuid === formField?.key) {
                 observations = [...observations, obs];
               }
             });
           });
         } else {
-          this.visit?.obs?.forEach((obs) => {
+          observationsWithoutForm?.forEach((obs) => {
             if (obs?.concept?.uuid === field?.formField?.key) {
               observations = [...observations, obs];
             }
@@ -66,7 +140,7 @@ export class PatientHistoryDataComponent implements OnInit {
               []
             ),
             fields: form?.formFields,
-            obsDatetime: observations[0]?.obsDatetime,
+            obsDatetime: observations[0]?.obsDatetime || observations[0]?.encounter?.encounterDatetime,
             // fields: flatten(
             //   form?.formFields
             //     ?.map((formField) => {

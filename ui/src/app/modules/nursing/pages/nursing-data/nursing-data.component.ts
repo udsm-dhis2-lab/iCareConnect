@@ -11,6 +11,7 @@ import { OpenMRSForm } from "src/app/shared/modules/form/models/custom-openmrs-f
 import { FormConfig } from "src/app/shared/modules/form/models/form-config.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
+import { ObservationService } from "src/app/shared/resources/observation/services";
 import { ProviderGetFull } from "src/app/shared/resources/openmrs";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { Visit } from "src/app/shared/resources/visits/models/visit.model";
@@ -81,7 +82,8 @@ export class NursingDataComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
-    private conceptsService: ConceptsService
+    private conceptsService: ConceptsService,
+    private observationService: ObservationService
   ) {}
 
   ngOnInit(): void {
@@ -121,12 +123,19 @@ export class NursingDataComponent implements OnInit {
   }
 
   onSaveObservations(data: any, patient): void {
-    this.store.dispatch(
-      saveObservationsUsingEncounter({
-        data,
-        patientId: patient?.patient?.uuid,
-      })
-    );
+    this.observationService
+      .saveEncounterWithObsDetails(data)
+      .subscribe((res) => {
+        if (res) {
+          this.ngOnInit();
+        }
+      });
+    // this.store.dispatch(
+    //   saveObservationsUsingEncounter({
+    //     data,
+    //     patientId: patient?.patient?.uuid,
+    //   })
+    // );
   }
 
   changeTab(index) {
