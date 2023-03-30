@@ -541,4 +541,8 @@ export class SharedPatientDashboardComponent implements OnInit {
       },
     });
   }
+
+  reload(){
+    this.ngOnInit();
+  }
 }

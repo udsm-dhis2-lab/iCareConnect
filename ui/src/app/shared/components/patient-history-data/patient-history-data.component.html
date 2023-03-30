@@ -300,10 +300,10 @@
         <li class="mini-event" *ngIf="visitData?.category === 'PROCEDURE_ORDER'">
             <p class="data-name"> 
                 <strong>
-                    {{visitData?.display}}
+                    {{visitData?.order?.display}}
                 </strong>
                 <span>
-                    <i *ngIf="visitData?.date" class="text-small"> ordered on {{ visitData?.date }} {{ visitData?.time }} by {{ visitData?.provider }} </i>
+                    <i *ngIf="visitData?.date" class="text-small"> ordered on {{ visitData?.order?.date }} {{ visitData?.time }} by {{ visitData?.provider }} </i>
                 </span>
             </p>
             <div>
@@ -351,7 +351,7 @@
                     </ng-container>
                     <ng-container *ngIf="visitData?.results?.length === 1">
                         <p>
-                            <strong>
+                            <!-- <strong>
                                 Results :
                             </strong>
                             <span *ngIf="visitData?.results[0]?.value?.links?.uri">
@@ -361,18 +361,18 @@
                             </span>
                             <span *ngIf="!visitData?.results[0]?.value?.links?.uri">
                                 {{ visitData?.results[0]?.value?.display ? visitData?.results[0]?.value?.display : visitData?.results[0]?.value }}
-                            </span>
+                            </span> -->
                             
                             <span class="text-small"> 
                                 <i>
-                                    fed on {{ visitData?.results[0]?.obsDatetime | date:"dd-MM-yyyy HH:mm:ss"}} by {{ visitData?.results[0]?.provider?.display }} 
+                                    Attended on {{ visitData?.results[0]?.obsDatetime | date:"dd-MM-yyyy HH:mm:ss"}} by {{ visitData?.results[0]?.provider?.display }} 
                                 </i>
                             </span>
                         </p>
                     </ng-container>
                     <ng-container *ngIf="!visitData?.results?.length">
                         <p>
-                            No results found
+                            Not Attended
                         </p>
                     </ng-container>
                 </table>

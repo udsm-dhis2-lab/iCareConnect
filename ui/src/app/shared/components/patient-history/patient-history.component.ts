@@ -33,13 +33,14 @@ export class PatientHistoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadingData = true
-    if(this.location){
-      this.customForms$ = this.store.select(
-        getCustomOpenMRSFormsByIds(this.location?.forms || [])
-      );
-    } else {
-      this.customForms$ = this.store.select(getAllForms);
-    }
+    // if(this.location){
+    //   this.customForms$ = this.store.select(
+    //     getCustomOpenMRSFormsByIds(this.location?.forms || [])
+    //   );
+    // } else {
+    //   this.customForms$ = this.store.select(getAllForms);
+    // }
+    this.customForms$ = this.store.select(getAllForms);
     this.generalPrescriptionOrderType$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.orderType"
