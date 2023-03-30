@@ -634,10 +634,13 @@ public class ICareDao extends BaseDAO<Item> {
 		
 	}
 	
-	public List<String> generateCode(String globalPropertyUuid, String metadataType, Integer count) {
+	public List<String> generateCode(String globalPropertyUuid, String metadataType, Integer count) throws Exception {
 
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		String idFormat = adminService.getGlobalPropertyByUuid(globalPropertyUuid).getValue().toString();
+		if(idFormat == null){
+			throw new Exception("The global property for generationg code is mot set. Please set ");
+		}
 		List<String> idLabels = new ArrayList<>();
 		if (idFormat.contains("D{YYYY}") || idFormat.contains("D{YYY}") || idFormat.contains("D{YY}")) {
 			SimpleDateFormat formatter = new SimpleDateFormat("YYYY", Locale.ENGLISH);
