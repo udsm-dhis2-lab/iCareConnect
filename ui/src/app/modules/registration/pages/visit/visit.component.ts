@@ -33,6 +33,9 @@ import { VisitClaimComponent } from "../../components/visit-claim/visit-claim.co
 import { RegistrationService } from "../../services/registration.services";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { map } from "rxjs/operators";
+import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.selectors";
+import { toISOStringFormat } from "src/app/shared/helpers/format-date.helper";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 
 @Component({
   selector: "app-visit",
@@ -103,6 +106,222 @@ export class VisitComponent implements OnInit {
   currentServiceConfigsSelected: any;
   authorizationNumberAvailable: boolean = true;
   patientVisist$: Observable<any>;
+  userPrivileges$: Observable<any>;
+
+
+
+
+  showVisitStartForn: boolean = false;
+  patientt: patientObj;
+  formatedServiceDetails: any = {};
+  currentLocation: any;
+  paymentsCategories$: Observable<any>;
+
+  constructor(
+    private store: Store<AppState>,
+    public dialog: MatDialog,
+    private _snackBar: MatSnackBar,
+    private registrationService: RegistrationService,
+    private router: Router,
+    private visitService: VisitsService
+  ) { }
+
+  ngOnInit(): void {
+    this.patientVisist$ = this.visitService
+      .getLastPatientVisit(this.patientDetails?.uuid)
+      .pipe(
+        map((patientvisit) => {
+          return (patientvisit[0]?.visit?.attributesToDisplay?.filter(
+            (values) => {
+              return (
+                values.attributeType.uuid ===
+                "INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE"
+              );
+            }
+          ) || [])[0]?.value;
+        })
+      );
+    this.patientVisist$.subscribe((data: any) => {
+      this.visitDetails["InsuranceID"] =
+        data?.length > 0
+          ? data
+          : (this.patientDetails?.person?.attributes?.filter(
+            (attribute) => attribute?.attributeType?.display === "ID"
+          ) || [])[0]?.value.length > 0
+            ? (this.patientDetails?.person?.attributes?.filter(
+              (attribute) => attribute?.attributeType?.display === "ID"
+            ) || [])[0]?.value
+            : null;
+    });
+    this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
+    this.activeVisit$ = this.store.pipe(select(getActiveVisit));
+    this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
+    this.visitErrorState$ = this.store.pipe(select(getVisitErrorState));
+    this.visitError$ = this.store.pipe(select(getVisitError));
+    this.activeVisitUuid$ = this.store.pipe(select(getActiveVisitUuid));
+    this.locations$ = this.store.pipe(select(getLocations));
+    this.userPrivileges$ = this.store.select(getCurrentUserPrivileges);
+    this.referralLocations$ = this.store.select(getLocationsByTagName, {
+      tagName: "Refer-from Location",
+    });
+
+    this.admissionLocations$ = this.store.select(getLocationsByTagName, {
+      tagName: "Admission Location",
+    });
+
+    this.registrationService
+      .getServicesConceptHierarchy()
+      .subscribe((response) => {
+        this.visitsHierarchy2 =
+          response["results"] && response["results"].length > 0
+            ? response["results"][0]["setMembers"]
+            : [];
+      });
+
+    this.paymentsCategories$ =
+      this.registrationService.getPaymentOptionsHierarchy();
+    this.paymentsCategories$.subscribe((response) => {
+      this.paymentsCategories =
+        response["results"] && response["results"].length > 0
+          ? response["results"][0]["setMembers"]
+          : [];
+    });
+  }
+
+  openDialog(locations) {
+    const dialogRef = this.dialog.open(SelectRoomComponent, {
+      width: "40%",
+      data: { locations, currentRoom: this.visitDetails?.Room },
+    });
+
+    dialogRef.afterClosed().subscribe((dialogData) => {
+      if (dialogData) {
+        this.visitDetails.Room = dialogData?.room;
+        this.visitDetails["RoomName"] = dialogData?.room?.name;
+      }
+    });
+  }
+
+  setReferral(referral) {
+    if (referral == "none") {
+      this.referralHospital = null;
+    } else {
+      if (this.referralHospital?.attributeUuid) {
+        this.referralHospital = {
+          ...referral,
+          attributeUuid: this.referralHospital?.attributeUuid,
+        };
+      } else {
+        this.referralHospital = referral;
+      }
+    }
+  }
+
+  startVisit(event) {
+    event.stopPropagation();
+    if (this.visitPayloadViable) {
+      let visitAttributes = [];
+      visitAttributes.push({
+        attributeType: "PSCHEME0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
+        value:
+          this.visitDetails?.Cash && this.visitDetails?.Cash?.uuid
+            ? this.visitDetails?.Cash?.uuid
+            : this.visitDetails?.insuranceScheme?.uuid
+              ? this.visitDetails?.insuranceScheme?.uuid
+              : null,
+      });
+
+      if (this.referralHospital) {
+        visitAttributes.push({
+          attributeType: "47da17a9-a910-4382-8149-736de57dab18",
+          value: this.referralHospital?.uuid,
+        });
+      }
+
+      if (this.visitDetails?.emergency?.value) {
+        visitAttributes.push({
+          attributeType: "f0cfcd18-5fd1-4c1b-9447-dc0e56be66d4",
+          value: this.visitDetails?.emergency?.value,
+        });
+      } else {
+        visitAttributes.push({
+          attributeType: "f0cfcd18-5fd1-4c1b-9447-dc0e56be66d4",
+          value: false,
+        });
+      }
+
+      if (this.visitDetails?.Insurance?.uuid) {
+        visitAttributes.push({
+          attributeType: "INSURANCEIIIIIIIIIIIIIIIIIIIIIIATYPE",
+          value: this.visitDetails?.Insurance?.uuid || null,
+        });
+
+        visitAttributes.push({
+          attributeType: "INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE",
+          value: this.visitDetails?.InsuranceID || null,
+        });
+
+        visitAttributes.push({
+          attributeType: "INSURANCEAUTHNOIIIIIIIIIIIIIIIIATYPE",
+          value: this.visitDetails?.InsuranceAuthNo || null,
+        });
+      }
+
+      let visitPayload = {
+        patient: { uuid: this.patientt?.uuid },
+        visitType: this.visitDetails?.visitType?.uuid,
+        location: this.visitDetails?.Room?.uuid,
+        attributes: [
+          ...visitAttributes,
+          {
+            attributeType: "PTYPE000IIIIIIIIIIIIIIIIIIIIIIIATYPE",
+            value: this.visitDetails?.Payment?.uuid,
+          },
+          {
+            attributeType: "SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
+            value: this.visitDetails?.service?.uuid,
+          },
+          {
+            attributeType: "ebc0a258-44a1-409f-908c-652338c411e8",
+            value: this.visitDetails?.insuranceVisitType,
+          },
+          {
+            attributeType: "1ada2d4f-e6b7-4a5d-a2d0-d6d58e96ac7a",
+            value: this.visitDetails?.referralNo,
+          },
+          {
+            attributeType: "66f3825d-1915-4278-8e5d-b045de8a5db9",
+            value: this.visitDetails?.visitService,
+          },
+          {
+            attributeType: "6eb602fc-ae4a-473c-9cfb-f11a60eeb9ac",
+            value: this.visitDetails?.visitRoom,
+          },
+          {
+            attributeType: "370e6cf0-539f-46f1-87a2-43446d8b17b0",
+            value: this.visitDetails?.voteNumber,
+          },
+        ],
+      };
+
+      visitPayload = {
+        ...visitPayload,
+        attributes:
+          visitPayload?.attributes.filter((attribute) => attribute?.value) ||
+          [],
+      };
+      this.store.dispatch(
+        startVisit({ visit: visitPayload, isEmergency: this.isEmergencyVisit })
+      );
+    } else {
+      this.openSnackBar("Error: location is not set", null);
+    }
+
+    this.store.dispatch(clearActiveVisit());
+    this.startVisitEvent.emit();
+  }
+
+
 
   searchRoom(event: Event) {
     event.stopPropagation();
@@ -334,216 +553,48 @@ export class VisitComponent implements OnInit {
     }
   }
 
-  showVisitStartForn: boolean = false;
-  patientt: patientObj;
-  formatedServiceDetails: any = {};
-  currentLocation: any;
-  paymentsCategories$: Observable<any>;
 
-  constructor(
-    private store: Store<AppState>,
-    public dialog: MatDialog,
-    private _snackBar: MatSnackBar,
-    private registrationService: RegistrationService,
-    private router: Router,
-    private visitService: VisitsService
-  ) {}
+  onCloseActiveVisit(e, activeVisit: any, key?: string){
+    e.stopPropagation();
+    this.dialog
+      .open(SharedConfirmationComponent, {
+        width: "20%",
+        data: {
+          modalTitle: key === 'close' ? `Close This Visit` : "Delete this Visit",
+          modalMessage: `Are you sure you want to ${key === 'close' ? 'close' : 'delete'} this visit?`,
+          showRemarksInput: false,
+          confirmationButtonText: key === 'close' ? 'Close' : 'Delete',
+          remarksFieldLabel: "Reason"
+        },
+      })
+      .afterClosed()
+      .subscribe((results) => {
+        if (results?.confirmed) {
+          let visitObject: any = {
+            stopDatetime: toISOStringFormat()
+          }
 
-  ngOnInit(): void {
-    this.visitService
-      .getLastPatientVisit(this.patientDetails?.uuid)
-      .subscribe((data) => console.log("visit", data));
-    this.patientVisist$ = this.visitService
-      .getLastPatientVisit(this.patientDetails?.uuid)
-      .pipe(
-        map((patientvisit) => {
-          return (patientvisit[0]?.visit?.attributesToDisplay?.filter(
-            (values) => {
-              return (
-                values.attributeType.uuid ===
-                "INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE"
-              );
+          if (key === 'void') {
+            visitObject = {
+              ...visitObject,
+              voided: true,
+              // voidReason: results?.remarks || "No reason provided"
             }
-          ) || [])[0]?.value;
-        })
-      );
-    this.patientVisist$.subscribe((data: any) => {
-      this.visitDetails["InsuranceID"] =
-        data?.length > 0
-          ? data
-          : (this.patientDetails?.person?.attributes?.filter(
-              (attribute) => attribute?.attributeType?.display === "ID"
-            ) || [])[0]?.value.length > 0
-          ? (this.patientDetails?.person?.attributes?.filter(
-              (attribute) => attribute?.attributeType?.display === "ID"
-            ) || [])[0]?.value
-          : null;
-    });
-    this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
-    this.activeVisit$ = this.store.pipe(select(getActiveVisit));
-    this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
-    this.visitErrorState$ = this.store.pipe(select(getVisitErrorState));
-    this.visitError$ = this.store.pipe(select(getVisitError));
-    this.activeVisitUuid$ = this.store.pipe(select(getActiveVisitUuid));
-    this.locations$ = this.store.pipe(select(getLocations));
-    this.referralLocations$ = this.store.select(getLocationsByTagName, {
-      tagName: "Refer-from Location",
-    });
-
-    this.admissionLocations$ = this.store.select(getLocationsByTagName, {
-      tagName: "Admission Location",
-    });
-
-    this.registrationService
-      .getServicesConceptHierarchy()
-      .subscribe((response) => {
-        this.visitsHierarchy2 =
-          response["results"] && response["results"].length > 0
-            ? response["results"][0]["setMembers"]
-            : [];
-      });
-
-    this.paymentsCategories$ =
-      this.registrationService.getPaymentOptionsHierarchy();
-    this.paymentsCategories$.subscribe((response) => {
-      this.paymentsCategories =
-        response["results"] && response["results"].length > 0
-          ? response["results"][0]["setMembers"]
-          : [];
-    });
-  }
-
-  openDialog(locations) {
-    const dialogRef = this.dialog.open(SelectRoomComponent, {
-      width: "40%",
-      data: { locations, currentRoom: this.visitDetails?.Room },
-    });
-
-    dialogRef.afterClosed().subscribe((dialogData) => {
-      if (dialogData) {
-        this.visitDetails.Room = dialogData?.room;
-        this.visitDetails["RoomName"] = dialogData?.room?.name;
-      }
-    });
-  }
-
-  setReferral(referral) {
-    if (referral == "none") {
-      this.referralHospital = null;
-    } else {
-      if (this.referralHospital?.attributeUuid) {
-        this.referralHospital = {
-          ...referral,
-          attributeUuid: this.referralHospital?.attributeUuid,
-        };
-      } else {
-        this.referralHospital = referral;
-      }
-    }
-  }
-
-  startVisit(event) {
-    event.stopPropagation();
-    if (this.visitPayloadViable) {
-      let visitAttributes = [];
-      visitAttributes.push({
-        attributeType: "PSCHEME0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
-        value:
-          this.visitDetails?.Cash && this.visitDetails?.Cash?.uuid
-            ? this.visitDetails?.Cash?.uuid
-            : this.visitDetails?.insuranceScheme?.uuid
-            ? this.visitDetails?.insuranceScheme?.uuid
-            : null,
-      });
-
-      if (this.referralHospital) {
-        visitAttributes.push({
-          attributeType: "47da17a9-a910-4382-8149-736de57dab18",
-          value: this.referralHospital?.uuid,
-        });
-      }
-
-      if (this.visitDetails?.emergency?.value) {
-        visitAttributes.push({
-          attributeType: "f0cfcd18-5fd1-4c1b-9447-dc0e56be66d4",
-          value: this.visitDetails?.emergency?.value,
-        });
-      } else {
-        visitAttributes.push({
-          attributeType: "f0cfcd18-5fd1-4c1b-9447-dc0e56be66d4",
-          value: false,
-        });
-      }
-
-      if (this.visitDetails?.Insurance?.uuid) {
-        visitAttributes.push({
-          attributeType: "INSURANCEIIIIIIIIIIIIIIIIIIIIIIATYPE",
-          value: this.visitDetails?.Insurance?.uuid || null,
-        });
-
-        visitAttributes.push({
-          attributeType: "INSURANCEIDIIIIIIIIIIIIIIIIIIIIATYPE",
-          value: this.visitDetails?.InsuranceID || null,
-        });
-
-        visitAttributes.push({
-          attributeType: "INSURANCEAUTHNOIIIIIIIIIIIIIIIIATYPE",
-          value: this.visitDetails?.InsuranceAuthNo || null,
-        });
-      }
-
-      let visitPayload = {
-        patient: { uuid: this.patientt?.uuid },
-        visitType: this.visitDetails?.visitType?.uuid,
-        location: this.visitDetails?.Room?.uuid,
-        attributes: [
-          ...visitAttributes,
-          {
-            attributeType: "PTYPE000IIIIIIIIIIIIIIIIIIIIIIIATYPE",
-            value: this.visitDetails?.Payment?.uuid,
-          },
-          {
-            attributeType: "SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
-            value: this.visitDetails?.service?.uuid,
-          },
-          {
-            attributeType: "ebc0a258-44a1-409f-908c-652338c411e8",
-            value: this.visitDetails?.insuranceVisitType,
-          },
-          {
-            attributeType: "1ada2d4f-e6b7-4a5d-a2d0-d6d58e96ac7a",
-            value: this.visitDetails?.referralNo,
-          },
-          {
-            attributeType: "66f3825d-1915-4278-8e5d-b045de8a5db9",
-            value: this.visitDetails?.visitService,
-          },
-          {
-            attributeType: "6eb602fc-ae4a-473c-9cfb-f11a60eeb9ac",
-            value: this.visitDetails?.visitRoom,
-          },
-          {
-            attributeType: "370e6cf0-539f-46f1-87a2-43446d8b17b0",
-            value: this.visitDetails?.voteNumber,
-          },
-        ],
-      };
-
-      visitPayload = {
-        ...visitPayload,
-        attributes:
-          visitPayload?.attributes.filter((attribute) => attribute?.value) ||
-          [],
-      };
-      this.store.dispatch(
-        startVisit({ visit: visitPayload, isEmergency: this.isEmergencyVisit })
-      );
-    } else {
-      this.openSnackBar("Error: location is not set", null);
-    }
-
-    this.store.dispatch(clearActiveVisit());
-    this.startVisitEvent.emit();
+            this.visitService.updateVisit(activeVisit?.uuid, visitObject).subscribe((response) => {
+              if (!response?.error) {
+                this.onCancel(e)
+              }
+            })
+          }
+          if (key === 'close') {
+            this.visitService.updateVisit(activeVisit?.uuid, visitObject).subscribe((response) => {
+              if (!response?.error) {
+                this.onCancel(e)
+              }
+            })
+          }
+        }
+      })
   }
 
   openSnackBar(message: string, action: string) {

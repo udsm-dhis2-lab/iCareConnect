@@ -5,7 +5,7 @@ import { OrdersService } from "../../resources/order/services/orders.service";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { VisitsService } from "../../resources/visits/services";
 import { flatten, orderBy, uniqBy } from "lodash";
-import { SharedConfirmationComponent } from "../shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
 import { MatDialog } from "@angular/material/dialog";
 
 @Component({

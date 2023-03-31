@@ -117,6 +117,7 @@ export class SampleAllocation {
         statuses: this.allocation?.statuses?.filter(
           (status) => status?.result && status?.result?.uuid === result?.uuid
         ),
+        parameter: this.allocation?.parameter,
         remarksStatus: (this.allocation?.statuses?.filter(
           (status) =>
             status?.result &&
@@ -153,6 +154,18 @@ export class SampleAllocation {
             this.allocation?.results?.map((result) => {
               return {
                 ...result,
+                parameter: this.allocation?.parameter,
+                value: result?.valueBoolean
+                  ? result?.valueBoolean
+                  : result?.valueCoded
+                  ? result?.valueCoded?.uuid
+                  : result?.valueComplex
+                  ? result?.valueComplex
+                  : result?.valueNumeric
+                  ? result?.valueNumeric
+                  : result?.valueText
+                  ? result?.valueText
+                  : result?.valueModifier,
                 resultGroupUuid: !result?.resultGroup?.uuid
                   ? "NONE"
                   : result?.resultGroup?.uuid,

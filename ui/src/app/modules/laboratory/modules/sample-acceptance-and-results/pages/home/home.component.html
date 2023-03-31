@@ -23,6 +23,14 @@
       params?.sampleTypes
     "
   >
+    <div class="mb-2">
+      <app-shared-samples-summary-dashboard
+        [datesParams]="params?.datesParameters"
+        [dashboardSingleValueDataSetsReferenceKey]="
+          'iCare.laboratory.sampleAcceptanceAndResults.dashboard.settings.samples.singleValue'
+        "
+      ></app-shared-samples-summary-dashboard>
+    </div>
     <app-sample-acceptance-dashboard
       [datesParameters]="params?.datesParameters"
       [patients]="params?.visitReferences"

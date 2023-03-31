@@ -25,7 +25,8 @@ export function getOrdersFromCurrentVisitEncounters(
               ? true
               : !isEnsured && bills && bills?.length === 0
               ? true
-              : isEnsured && bills && bills?.length === 0
+              // : isEnsured && bills && bills?.length === 0
+              : isEnsured
               ? true
               : (
                   bills?.filter(

@@ -45,7 +45,7 @@
           <td *ngIf="!order?.value?.display && !order?.value?.length">
             No results
           </td>
-          <td *ngIf="!order?.value?.display">
+          <td *ngIf="!order?.value?.display && order?.value?.length">
             <a
               *ngIf="order?.value?.links?.uri.split('openmrs').length > 2"
               href="{{

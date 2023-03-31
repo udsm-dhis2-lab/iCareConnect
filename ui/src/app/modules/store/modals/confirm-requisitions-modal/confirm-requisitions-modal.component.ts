@@ -22,16 +22,12 @@ export class ConfirmRequisitionsModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    let requisitionItems = [];
-    Object.keys(this.dialogData).forEach((key) => {
-      requisitionItems = [...requisitionItems, ...this.dialogData[key]];
-    });
-
+    
     this.stockStatusDifferentItemsOnRequestedStore$ = zip(
-      ...requisitionItems.map((item) => {
+      ...this.dialogData?.items?.map((item) => {
         return this.stockService.getAvailableStockOfAnItem(
-          item?.itemUuid,
-          item?.requestedLocation?.uuid
+          item?.item?.uuid,
+          this.dialogData?.issue?.requestedLocation?.uuid
         );
       })
     ).pipe(map((response) => flatten(response)));

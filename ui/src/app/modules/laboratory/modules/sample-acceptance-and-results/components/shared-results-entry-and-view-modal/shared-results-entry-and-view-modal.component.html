@@ -69,38 +69,32 @@
                     "
                   >
                     <tr>
-                      <td
-                        rowspan="4"
-                        *ngIf="order?.concept?.setMembers?.length > 0"
-                      >
+                      <td style="max-width: 10%" rowspan="4">
                         {{ order?.concept?.display }}
                       </td>
                       <td>
-                        <div class="row">
+                        <div class="row p-2">
                           <div
                             [ngClass]="{
                               'col-12':
-                                !allocationData?.allocation?.isSetMember ||
-                                order?.allocations?.length == 1,
-                              'parameter-test-default':
-                                (allocationData?.allocation?.parameter?.datatype
-                                  ?.name == 'Numeric' ||
-                                  allocationData?.allocation?.parameter
-                                    ?.datatype.name == 'Coded') &&
-                                allocationData?.allocation?.isSetMember &&
-                                order?.allocations?.length > 1,
-                              'parameter-test-text':
-                                allocationData?.allocation?.parameter?.datatype
-                                  .name != 'Numeric' &&
-                                allocationData?.allocation?.parameter?.datatype
-                                  .name != 'Coded' &&
-                                allocationData?.allocation?.isSetMember
+                                !allocationData?.isSetMember ||
+                                order?.allocations?.length < 2,
+                              'col-6':
+                                (allocationData?.parameter?.datatype?.name ==
+                                  'Numeric' ||
+                                  allocationData?.parameter?.datatype.name ==
+                                    'Coded') &&
+                                allocationData?.isSetMember &&
+                                order?.allocations?.length == 2,
+                              'col-2':
+                                allocationData?.parameter?.datatype.name !=
+                                  'Numeric' &&
+                                allocationData?.parameter?.datatype.name !=
+                                  'Coded' &&
+                                allocationData?.isSetMember
                             }"
                             (dblclick)="
-                              toggleSideNavigation(
-                                $event,
-                                allocationData?.allocation
-                              )
+                              toggleSideNavigation($event, allocationData)
                             "
                             matTooltip="Double Click to view history"
                             [matTooltipPosition]="'above'"
@@ -113,32 +107,30 @@
                                 order?.concept?.setMembers?.length == 0 ||
                                 (order?.concept?.setMembers?.length > 0 &&
                                   order?.concept?.uuid !==
-                                    allocationData?.allocation?.parameter?.uuid)
+                                    allocationData?.parameter?.uuid)
                               "
                             >
                               <app-test-parameter-entry
                                 *ngIf="preferredName"
                                 [parameterUuid]="
-                                  allocationData?.allocation?.parameter?.uuid
+                                  allocationData?.parameter?.uuid
                                 "
                                 [multipleResultsAttributeType]="
                                   params?.multipleResultsAttributeType
                                 "
-                                [allocation]="allocationData?.allocation"
+                                [allocation]="allocationData"
                                 [disabled]="
                                   data?.actionType === 'review' &&
                                   !data?.LISConfigurations?.isLIS
                                 "
-                                [finalResult]="
-                                  allocationData?.allocation?.finalResult
-                                "
+                                [finalResult]="allocationData?.finalResult"
                                 [isLIS]="data?.LISConfigurations?.isLIS"
                                 [conceptNameType]="preferredName"
                                 (data)="
                                   onGetFieldData(
                                     $event,
-                                    allocationData?.allocation?.parameter,
-                                    allocationData?.allocation
+                                    allocationData?.parameter,
+                                    allocationData
                                   )
                                 "
                               ></app-test-parameter-entry>
@@ -224,11 +216,12 @@
                     <tr>
                       <td colspan="100%">
                         <div
-                          class="w-75"
+                          class="w-75 ml-1"
                           *ngIf="data?.LISConfigurations?.isLIS"
                         >
                           <app-shared-instrument-selection
                             [conceptReferenceTerm]="'LIS_INSTRUMENT'"
+                            [order]="order"
                             (selectedInstrument)="
                               onGetSelectedInstrument($event, order)
                             "
@@ -254,8 +247,10 @@
                     *ngIf="order?.parametersWithDefinedRelationship?.length > 0"
                   >
                     <tr>
-                      <td rowspan="3">
+                      <td rowspan="3" style="max-width: 10%">
                         {{ order?.concept?.display }}
+
+                        <!-- {{ order?.parametersWithDefinedRelationship | json }} -->
                       </td>
                       <td>
                         <div
@@ -359,6 +354,7 @@
                         >
                           <app-shared-instrument-selection
                             [conceptReferenceTerm]="'LIS_INSTRUMENT'"
+                            [order]="order"
                             (selectedInstrument)="
                               onGetSelectedInstrument($event, order)
                             "
@@ -389,10 +385,7 @@
           </div>
         </div>
       </mat-tab>
-      <mat-tab
-        label="Update Sample Tests"
-        *ngIf="data?.actionType === 'entry' && data?.LISConfigurations?.isLIS"
-      >
+      <mat-tab label="Add Test Orders">
         <div class="p-3">
           <div
             class="w-100"
@@ -408,6 +401,7 @@
             [provider]="params?.providerDetails"
             [visit]="params?.visitDetails"
             [sample]="data?.sample"
+            [allocations]="params?.sampleAllocations"
             [currentUser]="data?.currentUser"
           ></app-shared-add-testorder-to-sample>
         </div>

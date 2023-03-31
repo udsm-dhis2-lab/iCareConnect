@@ -1,13 +1,12 @@
 <div
   class="w-100"
   *ngIf="{
-    samplesToAccept: samplesToAccept$ | async,
     providerDetails: providerDetails$ | async
   } as params"
 >
   <mat-progress-bar
     mode="indeterminate"
-    *ngIf="!params?.samplesToAccept"
+    *ngIf="!params?.providerDetails"
   ></mat-progress-bar>
   <div class="loading-overlay" *ngIf="saving">
     <div class="text-center">
@@ -17,15 +16,48 @@
       </div>
     </div>
   </div>
-  <div *ngIf="params?.samplesToAccept">
-    <app-shared-samples-list
-      [tabType]="'samples-to-accept'"
-      [samples]="params?.samplesToAccept"
-      [LISConfigurations]="LISConfigurations"
-      [labSamplesDepartments]="labSamplesDepartments"
-      (selectedSampleDetails)="
-        onGetSelectedSampleDetails($event, params?.providerDetails)
-      "
-    ></app-shared-samples-list>
+  <div *ngIf="params?.providerDetails && !saving">
+    <div class="w-100">
+      <app-shared-samples-list
+        [tabType]="'samples-to-accept'"
+        [samples]="params?.samplesToAccept"
+        [LISConfigurations]="LISConfigurations"
+        [labSamplesDepartments]="labSamplesDepartments"
+        (selectedSampleDetails)="
+          onGetSelectedSampleDetails($event, params?.providerDetails)
+        "
+        (samplesForAction)="onGetSelectedSamplesForAction($event)"
+        [category]="LISConfigurations?.isLIS ? 'NOT ACCEPTED' : null"
+        [hasStatus]="LISConfigurations?.isLIS ? 'YES' : 'NO'"
+        [datesParameters]="datesParameters"
+        [excludeAllocations]="excludeAllocations"
+        [sampleTypes]="sampleTypes"
+        [codedSampleRejectionReasons]="codedSampleRejectionReasons"
+      ></app-shared-samples-list>
+    </div>
+
+    <div class="d-flex justify-content-end mt-2">
+      <button
+        [disabled]="
+          !selectedSamplesForAction || selectedSamplesForAction?.length === 0
+        "
+        mat-stroked-button
+        class="btn btn-danger"
+        (click)="onRejectAll($event)"
+      >
+        Reject
+      </button>
+      <button
+        [disabled]="
+          !selectedSamplesForAction || selectedSamplesForAction?.length === 0
+        "
+        mat-flat-button
+        color="primary"
+        class="ml-2"
+        (click)="onAcceptAll($event)"
+      >
+        Accept
+      </button>
+    </div>
   </div>
 </div>

@@ -198,7 +198,6 @@
               Discharge
             </button>
             <button
-              *ngIf="!isInpatient"
               mat-stroked-button
               (click)="onToggleVisibityIcons($event)"
               class="mr-2 float-right"
@@ -437,14 +436,13 @@
                     [selectedForm]="
                       selectedForm ? selectedForm : dashboardParams?.forms[0]
                     "
-                    (saveObservations)="
-                      onSaveObservations($event, params?.currentPatient)
-                    "
+                    (saveObservations)="reload()"
                   >
                   </app-clinical-notes>
                   <app-patient-observations-chart
                     *ngIf="
                       isInpatient &&
+                      !showRoundDetails &&
                       !dashboardParams.loadingForms &&
                       dashboardParams.currentPatient &&
                       dashboardParams?.forms &&
@@ -478,14 +476,12 @@
                         ? dashboardParams?.forms[0]
                         : {}
                     "
-                    (saveObservations)="
-                      onSaveObservations($event, params?.currentPatient)
-                    "
                   >
                   </app-patient-observations-chart>
                   <app-ipd-forms
                     *ngIf="
                       isInpatient &&
+                      !showRoundDetails &&
                       readyForClinicalNotes &&
                       !dashboardParams.loadingForms &&
                       dashboardParams.currentPatient &&
@@ -518,9 +514,7 @@
                         ? dashboardParams?.forms[0]
                         : {}
                     "
-                    (saveObservations)="
-                      onSaveObservations($event, params?.currentPatient)
-                    "
+                    (saveObservations)="reload()"
                   >
                   </app-ipd-forms>
 
@@ -615,45 +609,50 @@
                             {{ tabToShow | titlecase }}
                           </mat-panel-title>
                         </mat-expansion-panel-header>
-                        <app-patient-investigations-and-procedures
-                          *ngIf="
-                            activeVisit &&
-                            dashboardParams?.formEntities['All orderables']
-                          "
-                          [observations]="
-                            dashboardParams?.observationsGroupedByConcept
-                          "
-                          [investigationAndProceduresFormsDetails]="
-                            dashboardParams?.formEntities['All orderables']
-                          "
-                          [patientVisit]="activeVisit"
-                          [isTheatre]="isTheatre"
-                          [forConsultation]="true"
-                          [provider]="dashboardParams?.provider"
-                          [orderTypes]="dashboardParams?.orderTypes"
-                          [iCareGeneralConfigurations]="
-                            iCareGeneralConfigurations
-                          "
-                          [clinicConfigurations]="clinicConfigurations"
-                          [userPrivileges]="userPrivileges"
-                          [fromConsultation]="true"
-                          [isInpatient]="isInpatient"
-                          [tabToShow]="tabToShow"
-                          (updateConsultationOrder)="
-                            onUpdateConsultationOrder()
-                          "
-                        ></app-patient-investigations-and-procedures>
 
-                        <mat-progress-bar
-                          *ngIf="
-                            dashboardParams?.loadingVisit ||
-                            !activeVisit ||
-                            !dashboardParams?.formEntities['All orderables'] ||
-                            !dashboardParams?.provider ||
-                            !dashboardParams?.orderTypes
-                          "
-                          mode="indeterminate"
-                        ></mat-progress-bar>
+                        <ng-template matExpansionPanelContent>
+                          <app-patient-investigations-and-procedures
+                            *ngIf="
+                              activeVisit &&
+                              dashboardParams?.formEntities['All orderables']
+                            "
+                            [observations]="
+                              dashboardParams?.observationsGroupedByConcept
+                            "
+                            [investigationAndProceduresFormsDetails]="
+                              dashboardParams?.formEntities['All orderables']
+                            "
+                            [patientVisit]="activeVisit"
+                            [isTheatre]="isTheatre"
+                            [forConsultation]="true"
+                            [provider]="dashboardParams?.provider"
+                            [orderTypes]="dashboardParams?.orderTypes"
+                            [iCareGeneralConfigurations]="
+                              iCareGeneralConfigurations
+                            "
+                            [clinicConfigurations]="clinicConfigurations"
+                            [userPrivileges]="userPrivileges"
+                            [fromConsultation]="true"
+                            [isInpatient]="isInpatient"
+                            [tabToShow]="tabToShow"
+                            (updateConsultationOrder)="
+                              onUpdateConsultationOrder()
+                            "
+                          ></app-patient-investigations-and-procedures>
+
+                          <mat-progress-bar
+                            *ngIf="
+                              dashboardParams?.loadingVisit ||
+                              !activeVisit ||
+                              !dashboardParams?.formEntities[
+                                'All orderables'
+                              ] ||
+                              !dashboardParams?.provider ||
+                              !dashboardParams?.orderTypes
+                            "
+                            mode="indeterminate"
+                          ></mat-progress-bar>
+                        </ng-template>
                       </mat-expansion-panel>
                     </mat-accordion>
                   </ng-container>

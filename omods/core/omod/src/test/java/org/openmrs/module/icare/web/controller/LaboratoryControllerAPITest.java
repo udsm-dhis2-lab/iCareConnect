@@ -23,6 +23,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.io.IOException;
+import java.security.spec.ECField;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -155,6 +156,19 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
+	public void testGetSampledOrders() throws Exception {
+		// Given visit uuid
+		//When
+		MockHttpServletRequest getRequest = newGetRequest("lab/sampledorders/d9c1d8ac-2b8e-427f-804d-b858c52e6f11");
+		MockHttpServletResponse handle = handle(getRequest);
+		List<Map<String, Object>> orders = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
+		System.out.println(orders);
+		
+		//Then
+		assertThat("Samples orders available is 4:", orders.size(), is(4));
+	}
+	
+	@Test
 	public void testUpdateSampleOrder() throws Exception {
 		//Given
 		String dto = this.readFile("dto/sample-order-create-dto.json");
@@ -210,7 +224,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 				System.out.println(((List<Map>) sample.get("statuses")).get(0));
 				
 				sampleFound = true;
-				assertThat("list of statuses is greater than 0", ((List<Map>) sample.get("statuses")).size(), is(2));
+				assertThat("list of statuses is greater than 0", ((List<Map>) sample.get("statuses")).size(), is(3));
 				Map<String, Object> status = ((List<Map>) sample.get("statuses")).get(0);
 				assertThat("list of statuses is greater than 0", (String) status.get("status"), is("RECEIVED"));
 			}
@@ -313,7 +327,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		Map<String, Object> sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
-		System.out.println(sampleResults);
+		//		System.out.println(sampleResults);
 		
 		Map<String, Object> pagerObject = (Map<String, Object>) sampleResults.get("pager");
 		assertThat("Page Count is 2", (Integer) pagerObject.get("pageCount") == 2, is(true));
@@ -355,6 +369,41 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle2 = handle(newGetRequest2);
 		Map<String, Object> samples = (new ObjectMapper()).readValue(handle2.getContentAsString(), Map.class);
 		
+		assertThat("There is 1 sample", ((List<Map>) samples.get("results")).size(), is(1));
+		
+		MockHttpServletRequest newGetRequest3 = newGetRequest("lab/samples", new Parameter("excludeAllocations", "true"),
+		    new Parameter("sampleCategory", "NOT ACCEPTED"), new Parameter("hasStatus", "yes"));
+		
+		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
+		MockHttpServletResponse handleGet3 = handle(newGetRequest3);
+		
+		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
+		Map<String, Object> sampleResults3 = (new ObjectMapper()).readValue(handleGet3.getContentAsString(), Map.class);
+		
+		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
+		    new Parameter("hasStatus", "NO"), new Parameter("excludeAllocations", "true"), new Parameter("test",
+		            "a8102d6d-c528-477a-80bd-acc38ebc6252"), new Parameter("q", "LIS/23/0221"));
+		
+		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
+		handleGet = handle(newGetRequest);
+		
+		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
+		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		
+		// SEARCH BY DEPARTMENT
+		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
+		    new Parameter("excludeAllocations", "true"), new Parameter("department", "123111zz-0011-477v-8y8y-acc38ebc6222"));
+		
+		handleGet = handle(newGetRequest);
+		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		
+		// SEARCH BY SPECIMEN SOURCE
+		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
+		    new Parameter("excludeAllocations", "true"), new Parameter("specimen", "323111zz-0011-477v-8y8y-acc38ebc6215"));
+		
+		handleGet = handle(newGetRequest);
+		Map<String, Object> sampleResultsFilteredBySpecimen = (new ObjectMapper()).readValue(handleGet.getContentAsString(),
+		    Map.class);
 		assertThat("There is 1 sample", ((List<Map>) samples.get("results")).size(), is(1));
 	}
 	
@@ -682,6 +731,14 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String, Object>> batchsamples = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
 		System.out.println(batchsamples);
 		assertThat("Has 1 batch sample", batchsamples.size(), is(1));
+		
+		//3. Getting a single batchSample
+		MockHttpServletRequest newGetRequest2 = newGetRequest("lab/batchSample", new Parameter("uuid",
+		        "iCARE890-TEST-GGGH-9beb-d30dcfc0cd35"));
+		MockHttpServletResponse handle3 = handle(newGetRequest2);
+		System.out.println(handle3.getContentAsString());
+		Map<String, Object> batchSample = new ObjectMapper().readValue(handle3.getContentAsString(), Map.class);
+		assertThat("Has 1 sample", ((Map) ((List) batchSample.get("samples")).get(0)).get("label").equals("Sample Label y"));
 	}
 	
 	@Test
@@ -697,7 +754,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String, Object>> createdbatchSets = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
 		
-		assertThat("created 1 batchSet", createdbatchSets.size(), is(2));
+		assertThat("created 2 batchSet", createdbatchSets.size(), is(2));
 		
 		//2. Getting batchSets
 		//When
@@ -903,6 +960,85 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		    Map.class);
 		
 		assertThat("created worksheet sample status", createdWorksheetSampleStatus.get("status") != null);
+	}
+	
+	@Test
+	public void createAndGetAssociatedFields() throws Exception {
+		
+		// Create associated fields
+		String dto = this.readFile("dto/associated-fields-dto.json");
+		List<Map<String, Object>> associatedFieldListMap = (new ObjectMapper()).readValue(dto, List.class);
+		
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/associatedfields", associatedFieldListMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String, Object>> createdAssociatedFields = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    List.class);
+		assertThat("Created two associated fields", createdAssociatedFields.size(), is(2));
+		
+		// Get associated fields
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/associatedfields", new Parameter("q", "first"));
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		List<Map<String, Object>> associatedfields = (new ObjectMapper())
+		        .readValue(handle2.getContentAsString(), List.class);
+		assertThat("There is one searched associated field", associatedfields.size(), is(1));
+		
+		//update associated field
+		String dto2 = this.readFile("dto/associated-field-update.json");
+		Map<String, Object> associatedFieldMap = (new ObjectMapper()).readValue(dto2, Map.class);
+		
+		MockHttpServletRequest newPostRequest2 = newPostRequest("lab/associatedfield/iCARE110-TEST-OSDH-9beb-d30dcfc0c636",
+		    associatedFieldMap);
+		MockHttpServletResponse handle3 = handle(newPostRequest2);
+		Map<String, Object> updatedAssociatedField = (new ObjectMapper()).readValue(handle3.getContentAsString(), Map.class);
+		System.out.println(handle3.getContentAsString());
+		//assertThat("The associated field has been updated",);
+		
+	}
+	
+	@Test
+	public void createAndGetTestAllocationAssociatedField() throws Exception {
+		
+		//Create test allocation associated fields
+		String dto = this.readFile("dto/allocation-associated-fields-dto.json");
+		List<Map<String, Object>> allocationFieldListMap = (new ObjectMapper()).readValue(dto, List.class);
+		
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/testallocationassociatedfields", allocationFieldListMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String, Object>> createdAllocationAssociatedFields = (new ObjectMapper()).readValue(
+		    handle.getContentAsString(), List.class);
+		assertThat("Created two allocation associated fields", createdAllocationAssociatedFields.size(), is(2));
+		
+		//Get allocation associated field
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/testallocationassociatedfields", new Parameter(
+		        "allocationUuid", "111xxx60-7777-11e3-1111-0sndiu87hsju"), new Parameter("associatedFieldUuid",
+		        "iCARE110-TEST-OSDH-9beb-d30dcfc0c636"));
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		List<Map<String, Object>> allocationAssociatedFields = (new ObjectMapper()).readValue(handle2.getContentAsString(),
+		    List.class);
+		assertThat("Get two allocation associated fields", allocationAssociatedFields.size(), is(2));
+	}
+	
+	@Test
+	public void createAndGetAssociatedFieldResult() throws Exception {
+		
+		String dto = this.readFile("dto/associated-field-result-create-dto.json");
+		List<Map<String, Object>> associatedFieldResultMap = (new ObjectMapper()).readValue(dto, List.class);
+		
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/associatedfieldresults", associatedFieldResultMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		List<Map<String, Object>> associatedFieldResults = (new ObjectMapper()).readValue(handle.getContentAsString(),
+		    List.class);
+		assertThat("Created two associated field results", associatedFieldResults.size(), is(2));
+		
+		//Get  associated field results
+		MockHttpServletRequest newGetRequest = newGetRequest("lab/associatedfieldresults", new Parameter("resultUuid",
+		        "222yyy70-7777-11e3-1221-0sndiu87hsj3"), new Parameter("associatedFieldUuid",
+		        "iCARE110-TEST-OSDH-9beb-d30dcfc0c636"));
+		MockHttpServletResponse handle2 = handle(newGetRequest);
+		List<Map<String, Object>> AssociatedFieldResults = (new ObjectMapper()).readValue(handle2.getContentAsString(),
+		    List.class);
+		assertThat("Get two allocation associated fields", AssociatedFieldResults.size(), is(2));
+		
 	}
 	
 	@Override

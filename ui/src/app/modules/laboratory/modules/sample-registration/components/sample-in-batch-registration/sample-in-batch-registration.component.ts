@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { AfterViewInit, Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatRadioChange } from "@angular/material/radio";
 import { Observable, of, zip } from "rxjs";
@@ -9,7 +9,10 @@ import {
 import { formulateSamplesByDepartments } from "src/app/core/helpers/create-samples-as-per-departments.helper";
 import { Location } from "src/app/core/models";
 import { SystemSettingsWithKeyDetails } from "src/app/core/models/system-settings.model";
-import { LocationService } from "src/app/core/services";
+import {
+  GenerateMetadataLabelsService,
+  LocationService,
+} from "src/app/core/services";
 import { IdentifiersService } from "src/app/core/services/identifiers.service";
 import { LabOrdersService } from "src/app/modules/laboratory/resources/services/lab-orders.service";
 import { LabTestsService } from "src/app/modules/laboratory/resources/services/lab-tests.service";
@@ -27,22 +30,26 @@ import { uniqBy, keyBy, omit } from "lodash";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { SampleRegistrationFinalizationComponent } from "../sample-registration-finalization/sample-registration-finalization.component";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
-import { map, tap } from "rxjs/operators";
+import { tap } from "rxjs/operators";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation /shared-confirmation.component";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";
 import { isMoment } from "moment";
 import { PersonService } from "src/app/core/services/person.service";
-import { Field } from "src/app/shared/modules/form/models/field.model";
+import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { webSocket } from "rxjs/webSocket";
+import { keySampleTypesByTestOrder } from "src/app/shared/helpers/sample-types.helper";
 
 @Component({
   selector: "app-sample-in-batch-registration",
   templateUrl: "./sample-in-batch-registration.component.html",
   styleUrls: ["./sample-in-batch-registration.component.scss"],
 })
-export class SampleInBatchRegistrationComponent implements OnInit {
+export class SampleInBatchRegistrationComponent
+  implements OnInit, AfterViewInit
+{
   labSampleLabel$: Observable<string>;
   @Input() mrnGeneratorSourceUuid: string;
   @Input() preferredPersonIdentifier: string;
@@ -57,6 +64,10 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   @Input() allRegistrationFields: any;
   @Input() fieldsObject: any;
   @Input() batch: any;
+  @Input() batchSampleCodeFormatReference: any;
+  @Input() barcodeSettings: any;
+  @Input() LISConfigurations: any;
+  @Input() specimenSources: ConceptGetFull[];
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -140,6 +151,11 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   personDetailsCategory: string;
   selectedClientData: any;
   identifierTypes: any[];
+  batchSampleCode$: Observable<any[]>;
+  batchSampleCode: any;
+  useExistingBatchSample: boolean = false;
+  connection: any;
+  specimenSourcesKeyedByTestOrders: any = {};
 
   constructor(
     private samplesService: SamplesService,
@@ -156,11 +172,58 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     private otherSystemsService: OtherClientLevelSystemsService,
     private store: Store<AppState>,
     private personService: PersonService,
+    private generateMetadataLabelsService: GenerateMetadataLabelsService
   ) {
     this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
   }
 
+  ngAfterViewInit(): void {
+    this.connection = webSocket(this.barcodeSettings?.socketUrl);
+
+    this.connection.subscribe({
+      next: (msg) => console.log("message received: ", msg), // Called whenever there is a message from the server.
+      error: (err) => console.log(err), // Called if at any point WebSocket API signals some kind of error.
+      complete: () => console.log("complete"), // Called when connection is closed (for whatever reason).
+    });
+  }
+
   ngOnInit(): void {
+    this.specimenSourcesKeyedByTestOrders = keySampleTypesByTestOrder(
+      this.specimenSources
+    );
+    if (
+      localStorage.getItem("batch") &&
+      localStorage.getItem("batchSample")
+    ) {
+      this.dialog
+        .open(SharedConfirmationComponent, {
+          data: {
+            modalTitle: `Last Batch Instance (${localStorage.getItem(
+              "batchSampleCode"
+            )})`,
+            modalMessage: `You have the exisiting batch instance with code (${localStorage.getItem(
+              "batchSampleCode"
+            )}. Do you want to proceed using it?`,
+            confirmationButtonText: "Proceed",
+            cancelButtonText: "Stop",
+          },
+          disableClose: true,
+        })
+        .afterClosed()
+        .subscribe((data) => {
+          if (!data?.confirm) {
+            localStorage.removeItem("batch");
+            localStorage.removeItem("batchSample");
+            localStorage.removeItem("batchSampleCode");
+          }
+        });
+    } else {
+      localStorage.removeItem("batch");
+      localStorage.removeItem("batchSample");
+      localStorage.removeItem("batchSampleCode");
+      localStorage.setItem("batch", this.batch?.uuid);
+    }
+
     this.assignFields();
     const userLocationsIds = JSON.parse(
       this.currentUser?.userProperties?.locations
@@ -184,7 +247,9 @@ export class SampleInBatchRegistrationComponent implements OnInit {
       }),
       ...this.fixedFields.map((field) => {
         return {
-          [field.key]: isMoment(field.value) ? field.value.toString() : field.value,
+          [field.key]: isMoment(field.value)
+            ? field.value.toString()
+            : field.value,
         };
       }),
     ];
@@ -243,8 +308,9 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   }
 
   assignFields() {
-    this.gettingBatches = true
-    this.samplesService.getBatches(null, null, this.batch?.name)
+    this.gettingBatches = true;
+    this.samplesService
+      .getBatches(null, null, this.batch?.name)
       .pipe(
         tap((response) => {
           if (!response?.error) {
@@ -252,10 +318,23 @@ export class SampleInBatchRegistrationComponent implements OnInit {
             this.gettingBatches = false;
           }
         })
-      ).subscribe();
+      )
+      .subscribe();
     this.fixedFields = this.fieldsObject?.fixedFieldsWithValues;
     this.staticFields = this.fieldsObject?.staticFieldsWithValues;
     this.dynamicFields = this.fieldsObject?.dynamicFields;
+    this.batchSampleCode$ = this.generateMetadataLabelsService
+      .getLabMetadatalabels({
+        globalProperty: this.batchSampleCodeFormatReference?.uuid,
+        metadataType: "batch",
+      })
+      .pipe(
+        tap((response) => {
+          if (!response[0]?.error) {
+            this.batchSampleCode = response[0];
+          }
+        })
+      );
   }
 
   getDateStringFromDate(date) {
@@ -280,7 +359,9 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   // }
 
   getTimestampFromDateAndTime(date: string, time?: string): number {
-    return time ? new Date(`${date} ${time}`).getTime() : new Date(date).getTime() ;
+    return time
+      ? new Date(`${date} ${time}`).getTime()
+      : new Date(date).getTime();
   }
 
   //   getSelectedReceivedOnTime(event: Event): void {
@@ -720,7 +801,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
       width: "25%",
       data: {
         modalTitle: `Save samples`,
-        modalMessage: `Proceed with saving samples?`,
+        modalMessage: `Proceed with saving sample?`,
         showRemarksInput: false,
         confirmationButtonText: "Proceed",
       },
@@ -796,7 +877,8 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                           /**
                             1. Create user
                             2. Create visit (Orders should be added in)
-                            3. Create sample
+                            3. Create BatchSample
+                            4. Create sample including batch sample uuid
                           */
 
                           this.patientPayload = {
@@ -856,6 +938,12 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                             ? this.personDetailsData[
                                                 personIdentifierType.id
                                               ]
+                                            : this.formData[
+                                                "26742868-a38c-4e6a-ac1d-ae283c414c2e"
+                                              ]?.value
+                                            ? this.formData[
+                                                "26742868-a38c-4e6a-ac1d-ae283c414c2e"
+                                              ]?.value
                                             : identifierResponse[0],
                                           identifierType:
                                             personIdentifierType.id,
@@ -1106,647 +1194,685 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                             ordersResponse,
                                                             "uuid"
                                                           );
-
-                                                        this.samplesService
-                                                          .getIncreamentalSampleLabel()
-                                                          .subscribe(
-                                                            (sampleLabel) => {
-                                                              if (sampleLabel) {
-                                                                const sample = {
-                                                                  visit: {
-                                                                    uuid: visitResponse?.uuid,
-                                                                  },
-                                                                  label:
-                                                                    sampleLabel,
-                                                                  concept: {
-                                                                    uuid: this
-                                                                      .groupedTestOrdersByDepartments[
-                                                                      index
-                                                                    ][0]
-                                                                      ?.departmentUuid,
-                                                                  },
-                                                                  location: {
-                                                                    uuid: this
-                                                                      .currentLabLocation
-                                                                      ?.uuid,
-                                                                  },
-                                                                  orders:
-                                                                    encounterResponse?.orders.map(
-                                                                      (
-                                                                        order
-                                                                      ) => {
-                                                                        return {
-                                                                          uuid: order?.uuid,
-                                                                        };
-                                                                      }
-                                                                    ),
-                                                                  batch: {
-                                                                    uuid: this
-                                                                      .batch
-                                                                      ?.uuid,
-                                                                  },
-                                                                };
-                                                                // Create sample
-                                                                this.samplesService
-                                                                  .createLabSample(
-                                                                    sample
-                                                                  )
-                                                                  .subscribe(
-                                                                    (
-                                                                      sampleResponse
-                                                                    ) => {
-                                                                      this.savingDataResponse =
-                                                                        sampleResponse;
-                                                                      this.sampleLabelsUsedDetails =
-                                                                        [
-                                                                          ...this
-                                                                            .sampleLabelsUsedDetails,
-                                                                          {
-                                                                            ...sample,
-                                                                          },
-                                                                        ];
-
-                                                                      this.samplesCreated =
-                                                                        [
-                                                                          ...this
-                                                                            .samplesCreated,
-                                                                          sampleResponse,
-                                                                        ];
-                                                                      // TODO: Find a better way to control three labels to be printed
-
-                                                                      this.sampleLabelsUsedDetails =
-                                                                        [
-                                                                          ...this
-                                                                            .sampleLabelsUsedDetails,
-                                                                          sample,
-                                                                        ];
-                                                                      this.sampleLabelsUsedDetails =
-                                                                        [
-                                                                          ...this
-                                                                            .sampleLabelsUsedDetails,
-                                                                          sample,
-                                                                        ];
-
-                                                                      // Create sample allocations
-
-                                                                      if (
-                                                                        sampleResponse
-                                                                      ) {
-                                                                        let ordersWithConceptsDetails =
-                                                                          [];
-
-                                                                        sampleResponse?.orders?.forEach(
+                                                        const batchSampleObject =
+                                                          [
+                                                            {
+                                                              code: this
+                                                                .batchSampleCode,
+                                                              batch: {
+                                                                uuid: this.batch
+                                                                  .uuid,
+                                                              },
+                                                            },
+                                                          ];
+                                                        if (
+                                                          localStorage.getItem(
+                                                            "batchSample"
+                                                          )?.length
+                                                        ) {
+                                                          this.samplesService
+                                                            .getIncreamentalSampleLabel()
+                                                            .subscribe(
+                                                              (sampleLabel) => {
+                                                                if (
+                                                                  sampleLabel
+                                                                ) {
+                                                                  const sample =
+                                                                    {
+                                                                      visit: {
+                                                                        uuid: visitResponse?.uuid,
+                                                                      },
+                                                                      label:
+                                                                        sampleLabel,
+                                                                      concept: {
+                                                                        uuid: this
+                                                                          .groupedTestOrdersByDepartments[
+                                                                          index
+                                                                        ][0]
+                                                                          ?.departmentUuid,
+                                                                      },
+                                                                      specimenSource:
+                                                                        {
+                                                                          uuid: this
+                                                                            .selectedSpecimenUuid
+                                                                            ? this
+                                                                                .selectedSpecimenUuid
+                                                                            : this
+                                                                                .specimenSourcesKeyedByTestOrders[
+                                                                                this
+                                                                                  .testOrders[0]
+                                                                                  ?.value
+                                                                              ]
+                                                                                ?.specimenUuid,
+                                                                        },
+                                                                      location:
+                                                                        {
+                                                                          uuid: this
+                                                                            .currentLabLocation
+                                                                            ?.uuid,
+                                                                        },
+                                                                      orders:
+                                                                        encounterResponse?.orders.map(
                                                                           (
                                                                             order
                                                                           ) => {
-                                                                            ordersWithConceptsDetails =
-                                                                              [
-                                                                                ...ordersWithConceptsDetails,
-                                                                                {
-                                                                                  sample:
-                                                                                    sampleResponse,
-                                                                                  order:
-                                                                                    {
-                                                                                      sample:
-                                                                                        sampleResponse,
-                                                                                      ...keyedOrders[
-                                                                                        order
-                                                                                          ?.uuid
-                                                                                      ],
-                                                                                    },
-                                                                                },
-                                                                              ];
+                                                                            return {
+                                                                              uuid: order?.uuid,
+                                                                            };
                                                                           }
+                                                                        ),
+                                                                      batchSample:
+                                                                        {
+                                                                          uuid: localStorage.getItem(
+                                                                            "batchSample"
+                                                                          ),
+                                                                        },
+                                                                    };
+                                                                  // Create sample
+                                                                  this.samplesService
+                                                                    .createLabSample(
+                                                                      sample
+                                                                    )
+                                                                    .subscribe(
+                                                                      (
+                                                                        sampleResponse: any
+                                                                      ) => {
+                                                                        localStorage.setItem(
+                                                                          "batchSample",
+                                                                          sampleResponse?.batchSample
+                                                                            ? sampleResponse
+                                                                                ?.batchSample
+                                                                                ?.uuid
+                                                                            : sampleResponse
+                                                                                ?.batch
+                                                                                ?.uuid
                                                                         );
-
-                                                                        this.savingData =
-                                                                          this
-                                                                            .formData[
-                                                                            "agency"
-                                                                          ]
-                                                                            ?.value ||
-                                                                          this
-                                                                            .fieldsWithValues[
-                                                                            "agency"
-                                                                          ]
-                                                                            ? true
-                                                                            : false;
-                                                                        let statuses =
-                                                                          [];
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "agency"
-                                                                          ]
-                                                                            ?.value ||
-                                                                          this
-                                                                            .fieldsWithValues[
-                                                                            "agency"
-                                                                          ]
-                                                                        ) {
-                                                                          const agencyStatus =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this
-                                                                                  .formData[
-                                                                                  "agency"
-                                                                                ]
-                                                                                  ?.value ||
-                                                                                this
-                                                                                  .fieldsWithValues[
-                                                                                  "agency"
-                                                                                ],
-                                                                              category:
-                                                                                "PRIORITY",
-                                                                              status:
-                                                                                "PRIORITY",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              agencyStatus,
-                                                                            ];
-                                                                        }
-
-                                                                        if (
-                                                                          this.formData[
-                                                                            "receivedOn"
-                                                                          ]?.value ||
-                                                                          this.fieldsWithValues?.receivedOn
-                                                                        ) {
-                                                                          const receivedOnStatus =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this.fieldsWithValues?.receivedOn ? this.getTimestampFromDateAndTime(this.fieldsWithValues?.receivedOn) : this.getTimestampFromDateAndTime(
-                                                                                  this
-                                                                                    .receivedOnDateLatestValue,
-                                                                                  this
-                                                                                    .receivedOnTime
-                                                                                ),
-                                                                              status:
-                                                                                "RECEIVED_ON",
-                                                                              category:
-                                                                                "RECEIVED_ON",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              receivedOnStatus,
-                                                                            ];
-                                                                        }
-
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "broughtOn"
-                                                                          ]
-                                                                            ?.value ||
-                                                                          this
-                                                                            .fieldsWithValues
-                                                                            ?.broughtOn
-                                                                        ) {
-                                                                          const broughtOnStatus =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this
-                                                                                  .fieldsWithValues
-                                                                                  ?.broughtOn
-                                                                                  ? this.getTimestampFromDateAndTime(
-                                                                                      this
-                                                                                        .fieldsWithValues
-                                                                                        ?.broughtOn
-                                                                                    )
-                                                                                  : this.getTimestampFromDateAndTime(
-                                                                                      this
-                                                                                        .broughtOnDateLatestValue,
-                                                                                      this
-                                                                                        .broughtOnTime
-                                                                                    ),
-                                                                              status:
-                                                                                "BROUGHT_ON",
-                                                                              category:
-                                                                                "BROUGHT_ON",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              broughtOnStatus,
-                                                                            ];
-                                                                        }
-
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "collectedOn"
-                                                                          ]
-                                                                            ?.value ||
-                                                                          this
-                                                                            .fieldsWithValues
-                                                                            ?.collectedOn
-                                                                        ) {
-                                                                          const collectedOnStatus =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this.fieldsWithValues?.collectedOn ? this.getTimestampFromDateAndTime(this.fieldsWithValues?.broughtOn) :this.getTimestampFromDateAndTime(
-                                                                                  this
-                                                                                    .collectedOnDateLatestValue,
-                                                                                  this
-                                                                                    .collectedOnTime
-                                                                                ),
-                                                                              status:
-                                                                                "COLLECTED_ON",
-                                                                              category:
-                                                                                "COLLECTED_ON",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              collectedOnStatus,
-                                                                            ];
-                                                                        }
-
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "condition"
-                                                                          ]
-                                                                            ?.value ||
-                                                                          this
-                                                                            .fieldsWithValues[
-                                                                            "condition"
-                                                                          ]
-                                                                        ) {
-                                                                          const conditionStatus =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this
-                                                                                  .formData[
-                                                                                  "condition"
-                                                                                ]
-                                                                                  ?.value ||
-                                                                                this
-                                                                                  .fieldsWithValues[
-                                                                                  "condition"
-                                                                                ],
-                                                                              category:
-                                                                                "CONDITION",
-                                                                              status:
-                                                                                this
-                                                                                  .formData[
-                                                                                  "condition"
-                                                                                ]
-                                                                                  ?.value,
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              conditionStatus,
-                                                                            ];
-                                                                        }
-
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "receivedBy"
-                                                                          ]
-                                                                            ?.value || this
-                                                                            .fieldsWithValues[
-                                                                            "receivedBy"
-                                                                          ]
-                                                                        ) {
-                                                                          const receivedByStatus =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: this
-                                                                                  .formData[
-                                                                                  "receivedBy"
-                                                                                ]
-                                                                                  ?.value
-                                                                                  ? this
-                                                                                      .formData[
-                                                                                      "receivedBy"
-                                                                                    ]
-                                                                                      ?.value
-                                                                                  : this
-                                                                                      .fieldsWithValues[
-                                                                                      "receivedBy"
-                                                                                    ]
-                                                                                  ? this
-                                                                                      .fieldsWithValues[
-                                                                                      "receivedBy"
-                                                                                    ]
-                                                                                  : localStorage.getItem(
-                                                                                      "userUuid"
-                                                                                    ),
-                                                                              },
-                                                                              category:
-                                                                                "RECEIVED_BY",
-                                                                              remarks:
-                                                                                "RECEIVED_BY",
-                                                                              status:
-                                                                                "RECEIVED_BY",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              receivedByStatus,
-                                                                            ];
-                                                                        }
-
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "collectedBy"
-                                                                          ]
-                                                                            ?.value ||
-                                                                          this
-                                                                            .fieldsWithValues[
-                                                                            "collectedBy"
-                                                                          ]
-                                                                        ) {
-                                                                          const collectedByStatus =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this
-                                                                                  .formData[
-                                                                                  "collectedBy"
-                                                                                ]
-                                                                                  ?.value ? 
-                                                                                this
-                                                                                  .formData[
-                                                                                  "collectedBy"
-                                                                                ]
-                                                                                  ?.value : this
-                                                                            .fieldsWithValues[
-                                                                            "receivedBy"
-                                                                          ] ? this
-                                                                            .fieldsWithValues[
-                                                                            "receivedBy"
-                                                                          ] :
-                                                                                "NO COLLECTOR SPECIFIED",
-                                                                              status:
-                                                                                "COLLECTED_BY",
-                                                                              category:
-                                                                                "COLLECTED_BY",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              collectedByStatus,
-                                                                            ];
-                                                                        }
-
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "broughtBy"
-                                                                          ]
-                                                                            ?.value ||
-                                                                          this
-                                                                            .fieldsWithValues[
-                                                                            "broughtBy"
-                                                                          ]
-                                                                        ) {
-                                                                          const broughtdByStatus =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this
-                                                                                  .formData[
-                                                                                  "broughtBy"
-                                                                                ]
-                                                                                  ?.value ?
-                                                                                this
-                                                                                  .formData[
-                                                                                  "broughtBy"
-                                                                                ]
-                                                                                  ?.value : this
-                                                                            .fieldsWithValues[
-                                                                            "broughtBy"
-                                                                          ] ? this
-                                                                            .fieldsWithValues[
-                                                                            "broughtBy"
-                                                                          ] :
-                                                                                "NO PERSON SPECIFIED",
-                                                                              status:
-                                                                                "DELIVERED_BY",
-                                                                              category:
-                                                                                "DELIVERED_BY",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              broughtdByStatus,
-                                                                            ];
-                                                                        }
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "transportCondition"
-                                                                          ]
-                                                                            ?.value
-                                                                            .length >
-                                                                            0 ||
-                                                                          this
-                                                                            .fieldsWithValues[
-                                                                            "transportCondition"
-                                                                          ]
-                                                                        ) {
-                                                                          const transportCondition =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this
-                                                                                  .formData[
-                                                                                  "transportCondition"
-                                                                                ]
-                                                                                  ?.value?
-                                                                                this
-                                                                                  .formData[
-                                                                                  "transportCondition"
-                                                                                ]
-                                                                                  ?.value : this
-                                                                            .fieldsWithValues[
-                                                                            "transportCondition"
-                                                                          ] ? this
-                                                                            .fieldsWithValues[
-                                                                            "transportCondition"
-                                                                          ] :
-                                                                                "NO TRANSPORT CONDITION SPECIFIED",
-                                                                              category:
-                                                                                "TRANSPORT_CONDITION",
-                                                                              status:
-                                                                                "TRANSPORT_CONDITION",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              transportCondition,
-                                                                            ];
-                                                                        }
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "transportationTemperature"
-                                                                          ]
-                                                                            ?.value
-                                                                            ?.length >
-                                                                            0 ||
-                                                                          this
-                                                                            .fieldsWithValues[
-                                                                            "transportationTemperature"
-                                                                          ]
-                                                                        ) {
-                                                                          const transportationTemperature =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this
-                                                                                  .formData[
-                                                                                  "transportationTemperature"
-                                                                                ]
-                                                                                  ?.value
-                                                                                  ? this
-                                                                                      .formData[
-                                                                                      "transportationTemperature"
-                                                                                    ]
-                                                                                      ?.value
-                                                                                  : this
-                                                                                      .fieldsWithValues[
-                                                                                      "transportationTemperature"
-                                                                                    ]
-                                                                                  ? this
-                                                                                      .fieldsWithValues[
-                                                                                      "transportationTemperature"
-                                                                                    ]
-                                                                                  : "NO TRANSPORTATION TEMPERATURE SPECIFIED",
-                                                                              category:
-                                                                                "TRANSPORT_TEMPERATURE",
-                                                                              status:
-                                                                                "TRANSPORT_TEMPERATURE",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              transportationTemperature,
-                                                                            ];
-                                                                        }
-
-                                                                        statuses =
+                                                                        this.savingDataResponse =
+                                                                          sampleResponse;
+                                                                        this.sampleLabelsUsedDetails =
                                                                           [
-                                                                            ...statuses,
+                                                                            ...this
+                                                                              .sampleLabelsUsedDetails,
                                                                             {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              category:
-                                                                                "SAMPLE_REGISTRATION_CATEGORY",
-                                                                              remarks:
-                                                                                "Sample registration form type reference",
-                                                                              status:
-                                                                                this
-                                                                                  .registrationCategory,
+                                                                              ...sample,
                                                                             },
                                                                           ];
 
-                                                                        // console.log(
-                                                                        //   "statuses",
-                                                                        //   statuses
-                                                                        // );
+                                                                        this.samplesCreated =
+                                                                          [
+                                                                            ...this
+                                                                              .samplesCreated,
+                                                                            sampleResponse,
+                                                                          ];
+                                                                        // TODO: Find a better way to control three labels to be printed
+
+                                                                        this.sampleLabelsUsedDetails =
+                                                                          [
+                                                                            ...this
+                                                                              .sampleLabelsUsedDetails,
+                                                                            sample,
+                                                                          ];
+                                                                        this.sampleLabelsUsedDetails =
+                                                                          [
+                                                                            ...this
+                                                                              .sampleLabelsUsedDetails,
+                                                                            sample,
+                                                                          ];
+
+                                                                        // Create sample allocations
 
                                                                         if (
-                                                                          this
-                                                                            .personDetailsData
-                                                                            ?.pimaCOVIDLinkDetails
+                                                                          sampleResponse
                                                                         ) {
+                                                                          let ordersWithConceptsDetails =
+                                                                            [];
+
+                                                                          sampleResponse?.orders?.forEach(
+                                                                            (
+                                                                              order
+                                                                            ) => {
+                                                                              ordersWithConceptsDetails =
+                                                                                [
+                                                                                  ...ordersWithConceptsDetails,
+                                                                                  {
+                                                                                    sample:
+                                                                                      sampleResponse,
+                                                                                    order:
+                                                                                      {
+                                                                                        sample:
+                                                                                          sampleResponse,
+                                                                                        ...keyedOrders[
+                                                                                          order
+                                                                                            ?.uuid
+                                                                                        ],
+                                                                                      },
+                                                                                  },
+                                                                                ];
+                                                                            }
+                                                                          );
+
+                                                                          this.savingData =
+                                                                            this
+                                                                              .formData[
+                                                                              "agency"
+                                                                            ]
+                                                                              ?.value ||
+                                                                            this
+                                                                              .fieldsWithValues[
+                                                                              "agency"
+                                                                            ]
+                                                                              ? true
+                                                                              : false;
+                                                                          let statuses =
+                                                                            [];
+                                                                          if (
+                                                                            this
+                                                                              .formData[
+                                                                              "agency"
+                                                                            ]
+                                                                              ?.value ||
+                                                                            this
+                                                                              .fieldsWithValues[
+                                                                              "agency"
+                                                                            ]
+                                                                          ) {
+                                                                            const agencyStatus =
+                                                                              {
+                                                                                sample:
+                                                                                  {
+                                                                                    uuid: sampleResponse?.uuid,
+                                                                                  },
+                                                                                user: {
+                                                                                  uuid: localStorage.getItem(
+                                                                                    "userUuid"
+                                                                                  ),
+                                                                                },
+                                                                                remarks:
+                                                                                  this
+                                                                                    .formData[
+                                                                                    "agency"
+                                                                                  ]
+                                                                                    ?.value ||
+                                                                                  this
+                                                                                    .fieldsWithValues[
+                                                                                    "agency"
+                                                                                  ],
+                                                                                category:
+                                                                                  "PRIORITY",
+                                                                                status:
+                                                                                  "PRIORITY",
+                                                                              };
+                                                                            statuses =
+                                                                              [
+                                                                                ...statuses,
+                                                                                agencyStatus,
+                                                                              ];
+                                                                          }
+
+                                                                          if (
+                                                                            this
+                                                                              .formData[
+                                                                              "receivedOn"
+                                                                            ]
+                                                                              ?.value ||
+                                                                            this
+                                                                              .fieldsWithValues
+                                                                              ?.receivedOn
+                                                                          ) {
+                                                                            const receivedOnStatus =
+                                                                              {
+                                                                                sample:
+                                                                                  {
+                                                                                    uuid: sampleResponse?.uuid,
+                                                                                  },
+                                                                                user: {
+                                                                                  uuid: localStorage.getItem(
+                                                                                    "userUuid"
+                                                                                  ),
+                                                                                },
+                                                                                remarks:
+                                                                                  this
+                                                                                    .fieldsWithValues
+                                                                                    ?.receivedOn
+                                                                                    ? this.getTimestampFromDateAndTime(
+                                                                                        this
+                                                                                          .fieldsWithValues
+                                                                                          ?.receivedOn
+                                                                                      )
+                                                                                    : this.getTimestampFromDateAndTime(
+                                                                                        this
+                                                                                          .receivedOnDateLatestValue,
+                                                                                        this
+                                                                                          .receivedOnTime
+                                                                                      ),
+                                                                                status:
+                                                                                  "RECEIVED_ON",
+                                                                                category:
+                                                                                  "RECEIVED_ON",
+                                                                              };
+                                                                            statuses =
+                                                                              [
+                                                                                ...statuses,
+                                                                                receivedOnStatus,
+                                                                              ];
+                                                                          }
+
+                                                                          if (
+                                                                            this
+                                                                              .formData[
+                                                                              "broughtOn"
+                                                                            ]
+                                                                              ?.value ||
+                                                                            this
+                                                                              .fieldsWithValues
+                                                                              ?.broughtOn
+                                                                          ) {
+                                                                            const broughtOnStatus =
+                                                                              {
+                                                                                sample:
+                                                                                  {
+                                                                                    uuid: sampleResponse?.uuid,
+                                                                                  },
+                                                                                user: {
+                                                                                  uuid: localStorage.getItem(
+                                                                                    "userUuid"
+                                                                                  ),
+                                                                                },
+                                                                                remarks:
+                                                                                  this
+                                                                                    .fieldsWithValues
+                                                                                    ?.broughtOn
+                                                                                    ? this.getTimestampFromDateAndTime(
+                                                                                        this
+                                                                                          .fieldsWithValues
+                                                                                          ?.broughtOn
+                                                                                      )
+                                                                                    : this.getTimestampFromDateAndTime(
+                                                                                        this
+                                                                                          .broughtOnDateLatestValue,
+                                                                                        this
+                                                                                          .broughtOnTime
+                                                                                      ),
+                                                                                status:
+                                                                                  "BROUGHT_ON",
+                                                                                category:
+                                                                                  "BROUGHT_ON",
+                                                                              };
+                                                                            statuses =
+                                                                              [
+                                                                                ...statuses,
+                                                                                broughtOnStatus,
+                                                                              ];
+                                                                          }
+
+                                                                          if (
+                                                                            this
+                                                                              .formData[
+                                                                              "collectedOn"
+                                                                            ]
+                                                                              ?.value ||
+                                                                            this
+                                                                              .fieldsWithValues
+                                                                              ?.collectedOn
+                                                                          ) {
+                                                                            const collectedOnStatus =
+                                                                              {
+                                                                                sample:
+                                                                                  {
+                                                                                    uuid: sampleResponse?.uuid,
+                                                                                  },
+                                                                                user: {
+                                                                                  uuid: localStorage.getItem(
+                                                                                    "userUuid"
+                                                                                  ),
+                                                                                },
+                                                                                remarks:
+                                                                                  this
+                                                                                    .fieldsWithValues
+                                                                                    ?.collectedOn
+                                                                                    ? this.getTimestampFromDateAndTime(
+                                                                                        this
+                                                                                          .fieldsWithValues
+                                                                                          ?.broughtOn
+                                                                                      )
+                                                                                    : this.getTimestampFromDateAndTime(
+                                                                                        this
+                                                                                          .collectedOnDateLatestValue,
+                                                                                        this
+                                                                                          .collectedOnTime
+                                                                                      ),
+                                                                                status:
+                                                                                  "COLLECTED_ON",
+                                                                                category:
+                                                                                  "COLLECTED_ON",
+                                                                              };
+                                                                            statuses =
+                                                                              [
+                                                                                ...statuses,
+                                                                                collectedOnStatus,
+                                                                              ];
+                                                                          }
+
+                                                                          if (
+                                                                            this
+                                                                              .formData[
+                                                                              "condition"
+                                                                            ]
+                                                                              ?.value ||
+                                                                            this
+                                                                              .fieldsWithValues[
+                                                                              "condition"
+                                                                            ]
+                                                                          ) {
+                                                                            const conditionStatus =
+                                                                              {
+                                                                                sample:
+                                                                                  {
+                                                                                    uuid: sampleResponse?.uuid,
+                                                                                  },
+                                                                                user: {
+                                                                                  uuid: localStorage.getItem(
+                                                                                    "userUuid"
+                                                                                  ),
+                                                                                },
+                                                                                remarks:
+                                                                                  this
+                                                                                    .formData[
+                                                                                    "condition"
+                                                                                  ]
+                                                                                    ?.value ||
+                                                                                  this
+                                                                                    .fieldsWithValues[
+                                                                                    "condition"
+                                                                                  ],
+                                                                                category:
+                                                                                  "CONDITION",
+                                                                                status:
+                                                                                  this
+                                                                                    .formData[
+                                                                                    "condition"
+                                                                                  ]
+                                                                                    ?.value,
+                                                                              };
+                                                                            statuses =
+                                                                              [
+                                                                                ...statuses,
+                                                                                conditionStatus,
+                                                                              ];
+                                                                          }
+
+                                                                          if (
+                                                                            this
+                                                                              .formData[
+                                                                              "receivedBy"
+                                                                            ]
+                                                                              ?.value ||
+                                                                            this
+                                                                              .fieldsWithValues[
+                                                                              "receivedBy"
+                                                                            ]
+                                                                          ) {
+                                                                            const receivedByStatus =
+                                                                              {
+                                                                                sample:
+                                                                                  {
+                                                                                    uuid: sampleResponse?.uuid,
+                                                                                  },
+                                                                                user: {
+                                                                                  uuid: this
+                                                                                    .formData[
+                                                                                    "receivedBy"
+                                                                                  ]
+                                                                                    ?.value
+                                                                                    ? this
+                                                                                        .formData[
+                                                                                        "receivedBy"
+                                                                                      ]
+                                                                                        ?.value
+                                                                                    : this
+                                                                                        .fieldsWithValues[
+                                                                                        "receivedBy"
+                                                                                      ]
+                                                                                    ? this
+                                                                                        .fieldsWithValues[
+                                                                                        "receivedBy"
+                                                                                      ]
+                                                                                    : localStorage.getItem(
+                                                                                        "userUuid"
+                                                                                      ),
+                                                                                },
+                                                                                category:
+                                                                                  "RECEIVED_BY",
+                                                                                remarks:
+                                                                                  "RECEIVED_BY",
+                                                                                status:
+                                                                                  "RECEIVED_BY",
+                                                                              };
+                                                                            statuses =
+                                                                              [
+                                                                                ...statuses,
+                                                                                receivedByStatus,
+                                                                              ];
+                                                                          }
+
+                                                                          if (
+                                                                            this
+                                                                              .formData[
+                                                                              "collectedBy"
+                                                                            ]
+                                                                              ?.value ||
+                                                                            this
+                                                                              .fieldsWithValues[
+                                                                              "collectedBy"
+                                                                            ]
+                                                                          ) {
+                                                                            const collectedByStatus =
+                                                                              {
+                                                                                sample:
+                                                                                  {
+                                                                                    uuid: sampleResponse?.uuid,
+                                                                                  },
+                                                                                user: {
+                                                                                  uuid: localStorage.getItem(
+                                                                                    "userUuid"
+                                                                                  ),
+                                                                                },
+                                                                                remarks:
+                                                                                  this
+                                                                                    .formData[
+                                                                                    "collectedBy"
+                                                                                  ]
+                                                                                    ?.value
+                                                                                    ? this
+                                                                                        .formData[
+                                                                                        "collectedBy"
+                                                                                      ]
+                                                                                        ?.value
+                                                                                    : this
+                                                                                        .fieldsWithValues[
+                                                                                        "receivedBy"
+                                                                                      ]
+                                                                                    ? this
+                                                                                        .fieldsWithValues[
+                                                                                        "receivedBy"
+                                                                                      ]
+                                                                                    : "NO COLLECTOR SPECIFIED",
+                                                                                status:
+                                                                                  "COLLECTED_BY",
+                                                                                category:
+                                                                                  "COLLECTED_BY",
+                                                                              };
+                                                                            statuses =
+                                                                              [
+                                                                                ...statuses,
+                                                                                collectedByStatus,
+                                                                              ];
+                                                                          }
+
+                                                                          if (
+                                                                            this
+                                                                              .formData[
+                                                                              "broughtBy"
+                                                                            ]
+                                                                              ?.value ||
+                                                                            this
+                                                                              .fieldsWithValues[
+                                                                              "broughtBy"
+                                                                            ]
+                                                                          ) {
+                                                                            const broughtdByStatus =
+                                                                              {
+                                                                                sample:
+                                                                                  {
+                                                                                    uuid: sampleResponse?.uuid,
+                                                                                  },
+                                                                                user: {
+                                                                                  uuid: localStorage.getItem(
+                                                                                    "userUuid"
+                                                                                  ),
+                                                                                },
+                                                                                remarks:
+                                                                                  this
+                                                                                    .formData[
+                                                                                    "broughtBy"
+                                                                                  ]
+                                                                                    ?.value
+                                                                                    ? this
+                                                                                        .formData[
+                                                                                        "broughtBy"
+                                                                                      ]
+                                                                                        ?.value
+                                                                                    : this
+                                                                                        .fieldsWithValues[
+                                                                                        "broughtBy"
+                                                                                      ]
+                                                                                    ? this
+                                                                                        .fieldsWithValues[
+                                                                                        "broughtBy"
+                                                                                      ]
+                                                                                    : "NO PERSON SPECIFIED",
+                                                                                status:
+                                                                                  "DELIVERED_BY",
+                                                                                category:
+                                                                                  "DELIVERED_BY",
+                                                                              };
+                                                                            statuses =
+                                                                              [
+                                                                                ...statuses,
+                                                                                broughtdByStatus,
+                                                                              ];
+                                                                          }
+                                                                          if (
+                                                                            this
+                                                                              .formData[
+                                                                              "transportCondition"
+                                                                            ]
+                                                                              ?.value
+                                                                              .length >
+                                                                              0 ||
+                                                                            this
+                                                                              .fieldsWithValues[
+                                                                              "transportCondition"
+                                                                            ]
+                                                                          ) {
+                                                                            const transportCondition =
+                                                                              {
+                                                                                sample:
+                                                                                  {
+                                                                                    uuid: sampleResponse?.uuid,
+                                                                                  },
+                                                                                user: {
+                                                                                  uuid: localStorage.getItem(
+                                                                                    "userUuid"
+                                                                                  ),
+                                                                                },
+                                                                                remarks:
+                                                                                  this
+                                                                                    .formData[
+                                                                                    "transportCondition"
+                                                                                  ]
+                                                                                    ?.value
+                                                                                    ? this
+                                                                                        .formData[
+                                                                                        "transportCondition"
+                                                                                      ]
+                                                                                        ?.value
+                                                                                    : this
+                                                                                        .fieldsWithValues[
+                                                                                        "transportCondition"
+                                                                                      ]
+                                                                                    ? this
+                                                                                        .fieldsWithValues[
+                                                                                        "transportCondition"
+                                                                                      ]
+                                                                                    : "NO TRANSPORT CONDITION SPECIFIED",
+                                                                                category:
+                                                                                  "TRANSPORT_CONDITION",
+                                                                                status:
+                                                                                  "TRANSPORT_CONDITION",
+                                                                              };
+                                                                            statuses =
+                                                                              [
+                                                                                ...statuses,
+                                                                                transportCondition,
+                                                                              ];
+                                                                          }
+                                                                          if (
+                                                                            this
+                                                                              .formData[
+                                                                              "transportationTemperature"
+                                                                            ]
+                                                                              ?.value
+                                                                              ?.length >
+                                                                              0 ||
+                                                                            this
+                                                                              .fieldsWithValues[
+                                                                              "transportationTemperature"
+                                                                            ]
+                                                                          ) {
+                                                                            const transportationTemperature =
+                                                                              {
+                                                                                sample:
+                                                                                  {
+                                                                                    uuid: sampleResponse?.uuid,
+                                                                                  },
+                                                                                user: {
+                                                                                  uuid: localStorage.getItem(
+                                                                                    "userUuid"
+                                                                                  ),
+                                                                                },
+                                                                                remarks:
+                                                                                  this
+                                                                                    .formData[
+                                                                                    "transportationTemperature"
+                                                                                  ]
+                                                                                    ?.value
+                                                                                    ? this
+                                                                                        .formData[
+                                                                                        "transportationTemperature"
+                                                                                      ]
+                                                                                        ?.value
+                                                                                    : this
+                                                                                        .fieldsWithValues[
+                                                                                        "transportationTemperature"
+                                                                                      ]
+                                                                                    ? this
+                                                                                        .fieldsWithValues[
+                                                                                        "transportationTemperature"
+                                                                                      ]
+                                                                                    : "NO TRANSPORTATION TEMPERATURE SPECIFIED",
+                                                                                category:
+                                                                                  "TRANSPORT_TEMPERATURE",
+                                                                                status:
+                                                                                  "TRANSPORT_TEMPERATURE",
+                                                                              };
+                                                                            statuses =
+                                                                              [
+                                                                                ...statuses,
+                                                                                transportationTemperature,
+                                                                              ];
+                                                                          }
+
                                                                           statuses =
                                                                             [
                                                                               ...statuses,
@@ -1761,104 +1887,962 @@ export class SampleInBatchRegistrationComponent implements OnInit {
                                                                                   ),
                                                                                 },
                                                                                 category:
-                                                                                  "INTEGRATION_PIMACOVID",
+                                                                                  "SAMPLE_REGISTRATION_CATEGORY",
                                                                                 remarks:
-                                                                                  "Sample registration from external systems",
+                                                                                  "Sample registration form type reference",
                                                                                 status:
-                                                                                  "INTEGRATION WITH PimaCOVID",
+                                                                                  this
+                                                                                    .registrationCategory,
                                                                               },
                                                                             ];
-                                                                        }
 
-                                                                        if (
-                                                                          statuses?.length >
-                                                                          0
-                                                                        ) {
-                                                                          zip(
-                                                                            this.samplesService.saveTestContainerAllocation(
-                                                                              ordersWithConceptsDetails,
-                                                                              configs
-                                                                            ),
-                                                                            this.samplesService.setMultipleSampleStatuses(
-                                                                              statuses
-                                                                            )
-                                                                          ).subscribe(
-                                                                            (
-                                                                              sampleStatusResponse
-                                                                            ) => {
-                                                                              this.savingDataResponse =
-                                                                                sampleStatusResponse;
-                                                                              if (
-                                                                                sampleStatusResponse
-                                                                              ) {
-                                                                                const data =
-                                                                                  {
-                                                                                    identifier:
-                                                                                      this
-                                                                                        .currentSampleLabel,
-                                                                                    sample:
-                                                                                      sampleResponse,
-                                                                                    sampleLabelsUsedDetails:
-                                                                                      this
-                                                                                        .sampleLabelsUsedDetails,
-                                                                                  };
-                                                                                this.dialog
-                                                                                  .open(
-                                                                                    SampleRegistrationFinalizationComponent,
+                                                                          // console.log(
+                                                                          //   "statuses",
+                                                                          //   statuses
+                                                                          // );
+
+                                                                          if (
+                                                                            this
+                                                                              .personDetailsData
+                                                                              ?.pimaCOVIDLinkDetails
+                                                                          ) {
+                                                                            statuses =
+                                                                              [
+                                                                                ...statuses,
+                                                                                {
+                                                                                  sample:
                                                                                     {
-                                                                                      height:
-                                                                                        "100px",
-                                                                                      width:
-                                                                                        "30%",
-                                                                                      data: {
-                                                                                        ...data,
-                                                                                        popupHeader:
-                                                                                          "Sample Saved",
-                                                                                      },
-                                                                                      disableClose:
-                                                                                        true,
-                                                                                      panelClass:
-                                                                                        "custom-dialog-container",
-                                                                                    }
-                                                                                  )
-                                                                                  .afterClosed()
-                                                                                  .subscribe(
-                                                                                    () => {
-                                                                                      this.dynamicFields =
-                                                                                        [];
-                                                                                      this.getBatch = [];
-                                                                                      setTimeout(
-                                                                                        () => {
-                                                                                          this.assignFields();
+                                                                                      uuid: sampleResponse?.uuid,
+                                                                                    },
+                                                                                  user: {
+                                                                                    uuid: localStorage.getItem(
+                                                                                      "userUuid"
+                                                                                    ),
+                                                                                  },
+                                                                                  category:
+                                                                                    "INTEGRATION_PIMACOVID",
+                                                                                  remarks:
+                                                                                    "Sample registration from external systems",
+                                                                                  status:
+                                                                                    "INTEGRATION WITH PimaCOVID",
+                                                                                },
+                                                                              ];
+                                                                          }
+
+                                                                          if (
+                                                                            statuses?.length >
+                                                                            0
+                                                                          ) {
+                                                                            zip(
+                                                                              this.samplesService.setMultipleSampleStatuses(
+                                                                                statuses
+                                                                              )
+                                                                            ).subscribe(
+                                                                              (
+                                                                                sampleStatusResponse
+                                                                              ) => {
+                                                                                this.savingDataResponse =
+                                                                                  sampleStatusResponse;
+                                                                                if (
+                                                                                  sampleStatusResponse
+                                                                                ) {
+                                                                                  const data =
+                                                                                    {
+                                                                                      identifier:
+                                                                                        this
+                                                                                          .currentSampleLabel,
+                                                                                      sample:
+                                                                                        sampleResponse,
+                                                                                      sampleLabelsUsedDetails:
+                                                                                        this
+                                                                                          .sampleLabelsUsedDetails,
+                                                                                    };
+                                                                                  this.dialog
+                                                                                    .open(
+                                                                                      SampleRegistrationFinalizationComponent,
+                                                                                      {
+                                                                                        height:
+                                                                                          "100px",
+                                                                                        width:
+                                                                                          "30%",
+                                                                                        data: {
+                                                                                          ...data,
+                                                                                          popupHeader:
+                                                                                            "Sample Saved",
                                                                                         },
-                                                                                        100
-                                                                                      );
-                                                                                      this.openBarCodeDialog(
-                                                                                        data
-                                                                                      );
-                                                                                      this.isRegistrationReady =
-                                                                                        false;
-                                                                                      setTimeout(
-                                                                                        () => {
-                                                                                          this.isRegistrationReady =
-                                                                                            true;
-                                                                                        },
-                                                                                        200
-                                                                                      );
-                                                                                    }
-                                                                                  );
-                                                                                this.savingData =
-                                                                                  false;
+                                                                                        disableClose:
+                                                                                          true,
+                                                                                        panelClass:
+                                                                                          "custom-dialog-container",
+                                                                                      }
+                                                                                    )
+                                                                                    .afterClosed()
+                                                                                    .subscribe(
+                                                                                      () => {
+                                                                                        this.dynamicFields =
+                                                                                          [];
+                                                                                        this.getBatch =
+                                                                                          [];
+                                                                                        setTimeout(
+                                                                                          () => {
+                                                                                            this.assignFields();
+                                                                                          },
+                                                                                          100
+                                                                                        );
+                                                                                        this.openBarCodeDialog(
+                                                                                          data
+                                                                                        );
+                                                                                        this.isRegistrationReady =
+                                                                                          false;
+                                                                                        setTimeout(
+                                                                                          () => {
+                                                                                            this.isRegistrationReady =
+                                                                                              true;
+                                                                                          },
+                                                                                          200
+                                                                                        );
+                                                                                      }
+                                                                                    );
+                                                                                  this.savingData =
+                                                                                    false;
+                                                                                }
                                                                               }
-                                                                            }
-                                                                          );
+                                                                            );
+                                                                          }
                                                                         }
                                                                       }
-                                                                    }
-                                                                  );
+                                                                    );
+                                                                }
                                                               }
-                                                            }
-                                                          );
+                                                            );
+                                                        } else {
+                                                          this.samplesService
+                                                            .createBatchSample(
+                                                              batchSampleObject
+                                                            )
+                                                            .subscribe(
+                                                              (
+                                                                batchSampleResponse
+                                                              ) => {
+                                                                if (
+                                                                  !batchSampleResponse?.error
+                                                                ) {
+                                                                  localStorage.setItem(
+                                                                    "batchSample",
+                                                                    batchSampleResponse[0]
+                                                                      ?.uuid
+                                                                  );
+                                                                  localStorage.setItem(
+                                                                    "batchSampleCode",
+                                                                    batchSampleResponse[0]
+                                                                      ?.code
+                                                                  );
+                                                                  this.samplesService
+                                                                    .getIncreamentalSampleLabel()
+                                                                    .subscribe(
+                                                                      (
+                                                                        sampleLabel
+                                                                      ) => {
+                                                                        if (
+                                                                          sampleLabel
+                                                                        ) {
+                                                                          const sample =
+                                                                            {
+                                                                              visit:
+                                                                                {
+                                                                                  uuid: visitResponse?.uuid,
+                                                                                },
+                                                                              label:
+                                                                                sampleLabel,
+                                                                              concept:
+                                                                                {
+                                                                                  uuid: this
+                                                                                    .groupedTestOrdersByDepartments[
+                                                                                    index
+                                                                                  ][0]
+                                                                                    ?.departmentUuid,
+                                                                                },
+                                                                              location:
+                                                                                {
+                                                                                  uuid: this
+                                                                                    .currentLabLocation
+                                                                                    ?.uuid,
+                                                                                },
+                                                                              specimenSource:
+                                                                                {
+                                                                                  uuid: this
+                                                                                    .selectedSpecimenUuid
+                                                                                    ? this
+                                                                                        .selectedSpecimenUuid
+                                                                                    : this
+                                                                                        .specimenSourcesKeyedByTestOrders[
+                                                                                        this
+                                                                                          .testOrders[0]
+                                                                                          ?.value
+                                                                                      ]
+                                                                                        ?.specimenUuid,
+                                                                                },
+                                                                              orders:
+                                                                                encounterResponse?.orders.map(
+                                                                                  (
+                                                                                    order
+                                                                                  ) => {
+                                                                                    return {
+                                                                                      uuid: order?.uuid,
+                                                                                    };
+                                                                                  }
+                                                                                ),
+                                                                              batchSample:
+                                                                                {
+                                                                                  uuid: batchSampleResponse[0]
+                                                                                    ?.uuid,
+                                                                                },
+                                                                            };
+                                                                          // Create sample
+                                                                          this.samplesService
+                                                                            .createLabSample(
+                                                                              sample
+                                                                            )
+                                                                            .subscribe(
+                                                                              (
+                                                                                sampleResponse
+                                                                              ) => {
+                                                                                this.savingDataResponse =
+                                                                                  sampleResponse;
+                                                                                this.sampleLabelsUsedDetails =
+                                                                                  [
+                                                                                    ...this
+                                                                                      .sampleLabelsUsedDetails,
+                                                                                    {
+                                                                                      ...sample,
+                                                                                    },
+                                                                                  ];
+
+                                                                                this.samplesCreated =
+                                                                                  [
+                                                                                    ...this
+                                                                                      .samplesCreated,
+                                                                                    sampleResponse,
+                                                                                  ];
+                                                                                // TODO: Find a better way to control three labels to be printed
+
+                                                                                this.sampleLabelsUsedDetails =
+                                                                                  [
+                                                                                    ...this
+                                                                                      .sampleLabelsUsedDetails,
+                                                                                    sample,
+                                                                                  ];
+                                                                                this.sampleLabelsUsedDetails =
+                                                                                  [
+                                                                                    ...this
+                                                                                      .sampleLabelsUsedDetails,
+                                                                                    sample,
+                                                                                  ];
+
+                                                                                // Create sample allocations
+
+                                                                                if (
+                                                                                  sampleResponse
+                                                                                ) {
+                                                                                  let ordersWithConceptsDetails =
+                                                                                    [];
+
+                                                                                  sampleResponse?.orders?.forEach(
+                                                                                    (
+                                                                                      order
+                                                                                    ) => {
+                                                                                      ordersWithConceptsDetails =
+                                                                                        [
+                                                                                          ...ordersWithConceptsDetails,
+                                                                                          {
+                                                                                            sample:
+                                                                                              sampleResponse,
+                                                                                            order:
+                                                                                              {
+                                                                                                sample:
+                                                                                                  sampleResponse,
+                                                                                                ...keyedOrders[
+                                                                                                  order
+                                                                                                    ?.uuid
+                                                                                                ],
+                                                                                              },
+                                                                                          },
+                                                                                        ];
+                                                                                    }
+                                                                                  );
+
+                                                                                  this.savingData =
+                                                                                    this
+                                                                                      .formData[
+                                                                                      "agency"
+                                                                                    ]
+                                                                                      ?.value ||
+                                                                                    this
+                                                                                      .fieldsWithValues[
+                                                                                      "agency"
+                                                                                    ]
+                                                                                      ? true
+                                                                                      : false;
+                                                                                  let statuses =
+                                                                                    [];
+                                                                                  if (
+                                                                                    this
+                                                                                      .formData[
+                                                                                      "agency"
+                                                                                    ]
+                                                                                      ?.value ||
+                                                                                    this
+                                                                                      .fieldsWithValues[
+                                                                                      "agency"
+                                                                                    ]
+                                                                                  ) {
+                                                                                    const agencyStatus =
+                                                                                      {
+                                                                                        sample:
+                                                                                          {
+                                                                                            uuid: sampleResponse?.uuid,
+                                                                                          },
+                                                                                        user: {
+                                                                                          uuid: localStorage.getItem(
+                                                                                            "userUuid"
+                                                                                          ),
+                                                                                        },
+                                                                                        remarks:
+                                                                                          this
+                                                                                            .formData[
+                                                                                            "agency"
+                                                                                          ]
+                                                                                            ?.value ||
+                                                                                          this
+                                                                                            .fieldsWithValues[
+                                                                                            "agency"
+                                                                                          ],
+                                                                                        category:
+                                                                                          "PRIORITY",
+                                                                                        status:
+                                                                                          "PRIORITY",
+                                                                                      };
+                                                                                    statuses =
+                                                                                      [
+                                                                                        ...statuses,
+                                                                                        agencyStatus,
+                                                                                      ];
+                                                                                  }
+
+                                                                                  if (
+                                                                                    this
+                                                                                      .formData[
+                                                                                      "receivedOn"
+                                                                                    ]
+                                                                                      ?.value ||
+                                                                                    this
+                                                                                      .fieldsWithValues
+                                                                                      ?.receivedOn
+                                                                                  ) {
+                                                                                    const receivedOnStatus =
+                                                                                      {
+                                                                                        sample:
+                                                                                          {
+                                                                                            uuid: sampleResponse?.uuid,
+                                                                                          },
+                                                                                        user: {
+                                                                                          uuid: localStorage.getItem(
+                                                                                            "userUuid"
+                                                                                          ),
+                                                                                        },
+                                                                                        remarks:
+                                                                                          this
+                                                                                            .fieldsWithValues
+                                                                                            ?.receivedOn
+                                                                                            ? this.getTimestampFromDateAndTime(
+                                                                                                this
+                                                                                                  .fieldsWithValues
+                                                                                                  ?.receivedOn
+                                                                                              )
+                                                                                            : this.getTimestampFromDateAndTime(
+                                                                                                this
+                                                                                                  .receivedOnDateLatestValue,
+                                                                                                this
+                                                                                                  .receivedOnTime
+                                                                                              ),
+                                                                                        status:
+                                                                                          "RECEIVED_ON",
+                                                                                        category:
+                                                                                          "RECEIVED_ON",
+                                                                                      };
+                                                                                    statuses =
+                                                                                      [
+                                                                                        ...statuses,
+                                                                                        receivedOnStatus,
+                                                                                      ];
+                                                                                  }
+
+                                                                                  if (
+                                                                                    this
+                                                                                      .formData[
+                                                                                      "broughtOn"
+                                                                                    ]
+                                                                                      ?.value ||
+                                                                                    this
+                                                                                      .fieldsWithValues
+                                                                                      ?.broughtOn
+                                                                                  ) {
+                                                                                    const broughtOnStatus =
+                                                                                      {
+                                                                                        sample:
+                                                                                          {
+                                                                                            uuid: sampleResponse?.uuid,
+                                                                                          },
+                                                                                        user: {
+                                                                                          uuid: localStorage.getItem(
+                                                                                            "userUuid"
+                                                                                          ),
+                                                                                        },
+                                                                                        remarks:
+                                                                                          this
+                                                                                            .fieldsWithValues
+                                                                                            ?.broughtOn
+                                                                                            ? this.getTimestampFromDateAndTime(
+                                                                                                this
+                                                                                                  .fieldsWithValues
+                                                                                                  ?.broughtOn
+                                                                                              )
+                                                                                            : this.getTimestampFromDateAndTime(
+                                                                                                this
+                                                                                                  .broughtOnDateLatestValue,
+                                                                                                this
+                                                                                                  .broughtOnTime
+                                                                                              ),
+                                                                                        status:
+                                                                                          "BROUGHT_ON",
+                                                                                        category:
+                                                                                          "BROUGHT_ON",
+                                                                                      };
+                                                                                    statuses =
+                                                                                      [
+                                                                                        ...statuses,
+                                                                                        broughtOnStatus,
+                                                                                      ];
+                                                                                  }
+
+                                                                                  if (
+                                                                                    this
+                                                                                      .formData[
+                                                                                      "collectedOn"
+                                                                                    ]
+                                                                                      ?.value ||
+                                                                                    this
+                                                                                      .fieldsWithValues
+                                                                                      ?.collectedOn
+                                                                                  ) {
+                                                                                    const collectedOnStatus =
+                                                                                      {
+                                                                                        sample:
+                                                                                          {
+                                                                                            uuid: sampleResponse?.uuid,
+                                                                                          },
+                                                                                        user: {
+                                                                                          uuid: localStorage.getItem(
+                                                                                            "userUuid"
+                                                                                          ),
+                                                                                        },
+                                                                                        remarks:
+                                                                                          this
+                                                                                            .fieldsWithValues
+                                                                                            ?.collectedOn
+                                                                                            ? this.getTimestampFromDateAndTime(
+                                                                                                this
+                                                                                                  .fieldsWithValues
+                                                                                                  ?.broughtOn
+                                                                                              )
+                                                                                            : this.getTimestampFromDateAndTime(
+                                                                                                this
+                                                                                                  .collectedOnDateLatestValue,
+                                                                                                this
+                                                                                                  .collectedOnTime
+                                                                                              ),
+                                                                                        status:
+                                                                                          "COLLECTED_ON",
+                                                                                        category:
+                                                                                          "COLLECTED_ON",
+                                                                                      };
+                                                                                    statuses =
+                                                                                      [
+                                                                                        ...statuses,
+                                                                                        collectedOnStatus,
+                                                                                      ];
+                                                                                  }
+
+                                                                                  if (
+                                                                                    this
+                                                                                      .formData[
+                                                                                      "condition"
+                                                                                    ]
+                                                                                      ?.value ||
+                                                                                    this
+                                                                                      .fieldsWithValues[
+                                                                                      "condition"
+                                                                                    ]
+                                                                                  ) {
+                                                                                    const conditionStatus =
+                                                                                      {
+                                                                                        sample:
+                                                                                          {
+                                                                                            uuid: sampleResponse?.uuid,
+                                                                                          },
+                                                                                        user: {
+                                                                                          uuid: localStorage.getItem(
+                                                                                            "userUuid"
+                                                                                          ),
+                                                                                        },
+                                                                                        remarks:
+                                                                                          this
+                                                                                            .formData[
+                                                                                            "condition"
+                                                                                          ]
+                                                                                            ?.value ||
+                                                                                          this
+                                                                                            .fieldsWithValues[
+                                                                                            "condition"
+                                                                                          ],
+                                                                                        category:
+                                                                                          "CONDITION",
+                                                                                        status:
+                                                                                          this
+                                                                                            .formData[
+                                                                                            "condition"
+                                                                                          ]
+                                                                                            ?.value,
+                                                                                      };
+                                                                                    statuses =
+                                                                                      [
+                                                                                        ...statuses,
+                                                                                        conditionStatus,
+                                                                                      ];
+                                                                                  }
+
+                                                                                  if (
+                                                                                    this
+                                                                                      .formData[
+                                                                                      "receivedBy"
+                                                                                    ]
+                                                                                      ?.value ||
+                                                                                    this
+                                                                                      .fieldsWithValues[
+                                                                                      "receivedBy"
+                                                                                    ]
+                                                                                  ) {
+                                                                                    const receivedByStatus =
+                                                                                      {
+                                                                                        sample:
+                                                                                          {
+                                                                                            uuid: sampleResponse?.uuid,
+                                                                                          },
+                                                                                        user: {
+                                                                                          uuid: this
+                                                                                            .formData[
+                                                                                            "receivedBy"
+                                                                                          ]
+                                                                                            ?.value
+                                                                                            ? this
+                                                                                                .formData[
+                                                                                                "receivedBy"
+                                                                                              ]
+                                                                                                ?.value
+                                                                                            : this
+                                                                                                .fieldsWithValues[
+                                                                                                "receivedBy"
+                                                                                              ]
+                                                                                            ? this
+                                                                                                .fieldsWithValues[
+                                                                                                "receivedBy"
+                                                                                              ]
+                                                                                            : localStorage.getItem(
+                                                                                                "userUuid"
+                                                                                              ),
+                                                                                        },
+                                                                                        category:
+                                                                                          "RECEIVED_BY",
+                                                                                        remarks:
+                                                                                          "RECEIVED_BY",
+                                                                                        status:
+                                                                                          "RECEIVED_BY",
+                                                                                      };
+                                                                                    statuses =
+                                                                                      [
+                                                                                        ...statuses,
+                                                                                        receivedByStatus,
+                                                                                      ];
+                                                                                  }
+
+                                                                                  if (
+                                                                                    this
+                                                                                      .formData[
+                                                                                      "collectedBy"
+                                                                                    ]
+                                                                                      ?.value ||
+                                                                                    this
+                                                                                      .fieldsWithValues[
+                                                                                      "collectedBy"
+                                                                                    ]
+                                                                                  ) {
+                                                                                    const collectedByStatus =
+                                                                                      {
+                                                                                        sample:
+                                                                                          {
+                                                                                            uuid: sampleResponse?.uuid,
+                                                                                          },
+                                                                                        user: {
+                                                                                          uuid: localStorage.getItem(
+                                                                                            "userUuid"
+                                                                                          ),
+                                                                                        },
+                                                                                        remarks:
+                                                                                          this
+                                                                                            .formData[
+                                                                                            "collectedBy"
+                                                                                          ]
+                                                                                            ?.value
+                                                                                            ? this
+                                                                                                .formData[
+                                                                                                "collectedBy"
+                                                                                              ]
+                                                                                                ?.value
+                                                                                            : this
+                                                                                                .fieldsWithValues[
+                                                                                                "receivedBy"
+                                                                                              ]
+                                                                                            ? this
+                                                                                                .fieldsWithValues[
+                                                                                                "receivedBy"
+                                                                                              ]
+                                                                                            : "NO COLLECTOR SPECIFIED",
+                                                                                        status:
+                                                                                          "COLLECTED_BY",
+                                                                                        category:
+                                                                                          "COLLECTED_BY",
+                                                                                      };
+                                                                                    statuses =
+                                                                                      [
+                                                                                        ...statuses,
+                                                                                        collectedByStatus,
+                                                                                      ];
+                                                                                  }
+
+                                                                                  if (
+                                                                                    this
+                                                                                      .formData[
+                                                                                      "broughtBy"
+                                                                                    ]
+                                                                                      ?.value ||
+                                                                                    this
+                                                                                      .fieldsWithValues[
+                                                                                      "broughtBy"
+                                                                                    ]
+                                                                                  ) {
+                                                                                    const broughtdByStatus =
+                                                                                      {
+                                                                                        sample:
+                                                                                          {
+                                                                                            uuid: sampleResponse?.uuid,
+                                                                                          },
+                                                                                        user: {
+                                                                                          uuid: localStorage.getItem(
+                                                                                            "userUuid"
+                                                                                          ),
+                                                                                        },
+                                                                                        remarks:
+                                                                                          this
+                                                                                            .formData[
+                                                                                            "broughtBy"
+                                                                                          ]
+                                                                                            ?.value
+                                                                                            ? this
+                                                                                                .formData[
+                                                                                                "broughtBy"
+                                                                                              ]
+                                                                                                ?.value
+                                                                                            : this
+                                                                                                .fieldsWithValues[
+                                                                                                "broughtBy"
+                                                                                              ]
+                                                                                            ? this
+                                                                                                .fieldsWithValues[
+                                                                                                "broughtBy"
+                                                                                              ]
+                                                                                            : "NO PERSON SPECIFIED",
+                                                                                        status:
+                                                                                          "DELIVERED_BY",
+                                                                                        category:
+                                                                                          "DELIVERED_BY",
+                                                                                      };
+                                                                                    statuses =
+                                                                                      [
+                                                                                        ...statuses,
+                                                                                        broughtdByStatus,
+                                                                                      ];
+                                                                                  }
+                                                                                  if (
+                                                                                    this
+                                                                                      .formData[
+                                                                                      "transportCondition"
+                                                                                    ]
+                                                                                      ?.value
+                                                                                      .length >
+                                                                                      0 ||
+                                                                                    this
+                                                                                      .fieldsWithValues[
+                                                                                      "transportCondition"
+                                                                                    ]
+                                                                                  ) {
+                                                                                    const transportCondition =
+                                                                                      {
+                                                                                        sample:
+                                                                                          {
+                                                                                            uuid: sampleResponse?.uuid,
+                                                                                          },
+                                                                                        user: {
+                                                                                          uuid: localStorage.getItem(
+                                                                                            "userUuid"
+                                                                                          ),
+                                                                                        },
+                                                                                        remarks:
+                                                                                          this
+                                                                                            .formData[
+                                                                                            "transportCondition"
+                                                                                          ]
+                                                                                            ?.value
+                                                                                            ? this
+                                                                                                .formData[
+                                                                                                "transportCondition"
+                                                                                              ]
+                                                                                                ?.value
+                                                                                            : this
+                                                                                                .fieldsWithValues[
+                                                                                                "transportCondition"
+                                                                                              ]
+                                                                                            ? this
+                                                                                                .fieldsWithValues[
+                                                                                                "transportCondition"
+                                                                                              ]
+                                                                                            : "NO TRANSPORT CONDITION SPECIFIED",
+                                                                                        category:
+                                                                                          "TRANSPORT_CONDITION",
+                                                                                        status:
+                                                                                          "TRANSPORT_CONDITION",
+                                                                                      };
+                                                                                    statuses =
+                                                                                      [
+                                                                                        ...statuses,
+                                                                                        transportCondition,
+                                                                                      ];
+                                                                                  }
+                                                                                  if (
+                                                                                    this
+                                                                                      .formData[
+                                                                                      "transportationTemperature"
+                                                                                    ]
+                                                                                      ?.value
+                                                                                      ?.length >
+                                                                                      0 ||
+                                                                                    this
+                                                                                      .fieldsWithValues[
+                                                                                      "transportationTemperature"
+                                                                                    ]
+                                                                                  ) {
+                                                                                    const transportationTemperature =
+                                                                                      {
+                                                                                        sample:
+                                                                                          {
+                                                                                            uuid: sampleResponse?.uuid,
+                                                                                          },
+                                                                                        user: {
+                                                                                          uuid: localStorage.getItem(
+                                                                                            "userUuid"
+                                                                                          ),
+                                                                                        },
+                                                                                        remarks:
+                                                                                          this
+                                                                                            .formData[
+                                                                                            "transportationTemperature"
+                                                                                          ]
+                                                                                            ?.value
+                                                                                            ? this
+                                                                                                .formData[
+                                                                                                "transportationTemperature"
+                                                                                              ]
+                                                                                                ?.value
+                                                                                            : this
+                                                                                                .fieldsWithValues[
+                                                                                                "transportationTemperature"
+                                                                                              ]
+                                                                                            ? this
+                                                                                                .fieldsWithValues[
+                                                                                                "transportationTemperature"
+                                                                                              ]
+                                                                                            : "NO TRANSPORTATION TEMPERATURE SPECIFIED",
+                                                                                        category:
+                                                                                          "TRANSPORT_TEMPERATURE",
+                                                                                        status:
+                                                                                          "TRANSPORT_TEMPERATURE",
+                                                                                      };
+                                                                                    statuses =
+                                                                                      [
+                                                                                        ...statuses,
+                                                                                        transportationTemperature,
+                                                                                      ];
+                                                                                  }
+
+                                                                                  statuses =
+                                                                                    [
+                                                                                      ...statuses,
+                                                                                      {
+                                                                                        sample:
+                                                                                          {
+                                                                                            uuid: sampleResponse?.uuid,
+                                                                                          },
+                                                                                        user: {
+                                                                                          uuid: localStorage.getItem(
+                                                                                            "userUuid"
+                                                                                          ),
+                                                                                        },
+                                                                                        category:
+                                                                                          "SAMPLE_REGISTRATION_CATEGORY",
+                                                                                        remarks:
+                                                                                          "Sample registration form type reference",
+                                                                                        status:
+                                                                                          this
+                                                                                            .registrationCategory,
+                                                                                      },
+                                                                                    ];
+
+                                                                                  // console.log(
+                                                                                  //   "statuses",
+                                                                                  //   statuses
+                                                                                  // );
+
+                                                                                  if (
+                                                                                    this
+                                                                                      .personDetailsData
+                                                                                      ?.pimaCOVIDLinkDetails
+                                                                                  ) {
+                                                                                    statuses =
+                                                                                      [
+                                                                                        ...statuses,
+                                                                                        {
+                                                                                          sample:
+                                                                                            {
+                                                                                              uuid: sampleResponse?.uuid,
+                                                                                            },
+                                                                                          user: {
+                                                                                            uuid: localStorage.getItem(
+                                                                                              "userUuid"
+                                                                                            ),
+                                                                                          },
+                                                                                          category:
+                                                                                            "INTEGRATION_PIMACOVID",
+                                                                                          remarks:
+                                                                                            "Sample registration from external systems",
+                                                                                          status:
+                                                                                            "INTEGRATION WITH PimaCOVID",
+                                                                                        },
+                                                                                      ];
+                                                                                  }
+
+                                                                                  if (
+                                                                                    statuses?.length >
+                                                                                    0
+                                                                                  ) {
+                                                                                    zip(
+                                                                                      this.samplesService.setMultipleSampleStatuses(
+                                                                                        statuses
+                                                                                      )
+                                                                                    ).subscribe(
+                                                                                      (
+                                                                                        sampleStatusResponse
+                                                                                      ) => {
+                                                                                        this.savingDataResponse =
+                                                                                          sampleStatusResponse;
+                                                                                        if (
+                                                                                          sampleStatusResponse
+                                                                                        ) {
+                                                                                          const data =
+                                                                                            {
+                                                                                              identifier:
+                                                                                                this
+                                                                                                  .currentSampleLabel,
+                                                                                              sample:
+                                                                                                sampleResponse,
+                                                                                              sampleLabelsUsedDetails:
+                                                                                                this
+                                                                                                  .sampleLabelsUsedDetails,
+                                                                                              isLis:
+                                                                                                this
+                                                                                                  .LISConfigurations
+                                                                                                  ?.isLIS,
+                                                                                            };
+                                                                                          this.dialog
+                                                                                            .open(
+                                                                                              SampleRegistrationFinalizationComponent,
+                                                                                              {
+                                                                                                height:
+                                                                                                  "100px",
+                                                                                                width:
+                                                                                                  "30%",
+                                                                                                data: {
+                                                                                                  ...data,
+                                                                                                  popupHeader:
+                                                                                                    "Sample Saved",
+                                                                                                },
+                                                                                                disableClose:
+                                                                                                  true,
+                                                                                                panelClass:
+                                                                                                  "custom-dialog-container",
+                                                                                              }
+                                                                                            )
+                                                                                            .afterClosed()
+                                                                                            .subscribe(
+                                                                                              () => {
+                                                                                                this.dynamicFields =
+                                                                                                  [];
+                                                                                                this.getBatch =
+                                                                                                  [];
+                                                                                                setTimeout(
+                                                                                                  () => {
+                                                                                                    this.assignFields();
+                                                                                                  },
+                                                                                                  100
+                                                                                                );
+                                                                                                this.openBarCodeDialog(
+                                                                                                  data
+                                                                                                );
+                                                                                                this.isRegistrationReady =
+                                                                                                  false;
+                                                                                                setTimeout(
+                                                                                                  () => {
+                                                                                                    this.isRegistrationReady =
+                                                                                                      true;
+                                                                                                  },
+                                                                                                  200
+                                                                                                );
+                                                                                              }
+                                                                                            );
+                                                                                          this.savingData =
+                                                                                            false;
+                                                                                        }
+                                                                                      }
+                                                                                    );
+                                                                                  }
+                                                                                }
+                                                                              }
+                                                                            );
+                                                                        }
+                                                                      }
+                                                                    );
+                                                                }
+                                                              }
+                                                            );
+                                                        }
                                                       }
                                                     }
                                                   );
@@ -2031,13 +3015,54 @@ export class SampleInBatchRegistrationComponent implements OnInit {
     this.dialog
       .open(BarCodeModalComponent, {
         height: "200px",
-        width: "15%",
+        width: "20%",
         data,
-        disableClose: false,
+        disableClose: true,
         panelClass: "custom-dialog-container",
       })
       .afterClosed()
-      .subscribe();
+      .subscribe((results) => {
+        if (results) {
+          let tests = [];
+          results?.sampleData?.orders?.forEach((order) => {
+            tests = [
+              ...tests,
+              order?.order?.shortName?.split("TEST_ORDERS:")?.join(""),
+            ];
+          });
+          // let message = this.barcodeSettings?.barcode?.split("{{SampleID}}").join(results?.sampleData?.label);
+          // message = message.split("{{PatientNames}}").join(`${results?.sampleData?.patient?.givenName} ${results?.sampleData?.patient?.middleName} ${results?.sampleData?.patient?.familyName}`);
+          // message = message?.split("{{Date}}").join(formatDateToYYMMDD(new Date(results?.sampleData?.created), true));
+          // message = message?.split("{{Storage}}").join("");
+          // message = message?.split("{{Tests}}").join(tests?.join(","));
+          const message = {
+            SampleID: results?.sampleData?.label,
+            Tests: tests?.join(","),
+            PatientNames: `${results?.sampleData?.patient?.givenName} ${
+              results?.sampleData?.patient?.middleName?.length
+                ? results?.sampleData?.patient?.middleName
+                : ""
+            } ${results?.sampleData?.patient?.familyName}`,
+            Date: formatDateToYYMMDD(
+              new Date(results?.sampleData?.created),
+              true
+            ),
+            Storage: "",
+            Department:
+              results?.sampleData?.department?.shortName
+                ?.split("LAB_DEPARTMENT:")
+                .join("") || "",
+            BarcodeData: results?.sampleData?.label
+              ?.split(this.barcodeSettings?.textToIgnore)
+              .join(""),
+          };
+          this.connection.next({
+            Message: message,
+            Description: "Message of data to be printed",
+            Type: "print",
+          });
+        }
+      });
   }
 
   //   onGetIsDataFromExternalSystem(fromExternalSystem: boolean): void {
@@ -2050,6 +3075,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
   //   }
 
   createLabRequestPayload(data): any {
+    // TODO: Remove hardcoded UIDS
     this.labRequestPayload = {
       program: data?.program,
       programStage: "emVt37lHjub",
@@ -2057,15 +3083,38 @@ export class SampleInBatchRegistrationComponent implements OnInit {
       trackedEntityInstance: data?.trackedEntityInstance,
       enrollment: data?.enrollment,
       dataValues: [
-        { dataElement: "Q98LhagGLFj", value: new Date().toISOString() },
+        {
+          dataElement: "Q98LhagGLFj",
+          value: this.formatDateAndTime(new Date()),
+        },
         { dataElement: "D0RBm3alWd9", value: "RT - PCR" },
-        { dataElement: "RfWBPHo9MnC", value: new Date() },
+        {
+          dataElement: "RfWBPHo9MnC",
+          value: this.formatDateAndTime(new Date()),
+        },
         { dataElement: "HTBFvtjeztu", value: true },
         { dataElement: "xzuzLYN1f0J", value: true },
       ],
-      eventDate: new Date().toISOString(),
+      eventDate: this.formatDateAndTime(new Date()),
     };
     return this.labRequestPayload;
+  }
+
+  formatDateAndTime(date: Date): string {
+    return (
+      formatDateToYYMMDD(date) +
+      "T" +
+      this.formatDimeChars(date.getHours().toString()) +
+      ":" +
+      this.formatDimeChars(date.getMinutes().toString()) +
+      ":" +
+      this.formatDimeChars(date.getSeconds().toString()) +
+      ".000Z"
+    );
+  }
+
+  formatDimeChars(char: string): string {
+    return char.length == 1 ? "0" + char : char;
   }
 
   onPageChange(e: any) {
@@ -2105,14 +3154,14 @@ export class SampleInBatchRegistrationComponent implements OnInit {
 
   setPersonDetails(personDetails?: any): void {
     this.patientUuid = personDetails?.uuid;
-    this.dynamicFields = []
+    this.dynamicFields = [];
     setTimeout(() => {
       if (personDetails) {
         this.personDetailsData = {
           ...this.personDetailsData,
           ...personDetails,
           firstName: personDetails?.preferredName?.givenName,
-          middleName: personDetails?.preferredName?.middleName,
+          middleName: personDetails?.preferredName?.familyName2,
           lastName: personDetails?.preferredName?.familyName,
           mobileNumber: personDetails?.attributes?.filter((attribute) => {
             if (
@@ -2130,36 +3179,35 @@ export class SampleInBatchRegistrationComponent implements OnInit {
         };
       }
       this.dynamicFields = this.fieldsObject?.dynamicFields?.map((field) => {
-          
-          
-          const id = (this.personDetailsData?.identifiers?.filter(
-                (identifier) => identifier?.identifierType?.uuid === field?.id
-              ) || [])
-          console.log("==> Field ID: ", field?.id);
+        const id =
+          this.personDetailsData?.identifiers?.filter(
+            (identifier) => identifier?.identifierType?.uuid === field?.id
+          ) || [];
+        console.log("==> Field ID: ", field?.id);
+        field = {
+          ...field,
+          value:
+            this.personDetailsData &&
+            this.personDetailsData?.identifiers?.length &&
+            id.length
+              ? id[0]?.identifier
+              : this.personDetailsData[field.id]
+              ? this.personDetailsData[field.id]
+              : null,
+        };
+        if (field.id === "dob") {
           field = {
             ...field,
             value:
-              this.personDetailsData &&
-              this.personDetailsData?.identifiers?.length &&
-              id.length
-                ? id[0]?.identifier
-                : this.personDetailsData[field.id]
-                ? this.personDetailsData[field.id]
+              this.personDetailsData && this.personDetailsData?.birthdate
+                ? new Date(personDetails?.birthdate)
                 : null,
           };
-          if (field.id === "dob") {
-            field = {
-              ...field,
-              value:
-                this.personDetailsData && this.personDetailsData?.birthdate
-                  ? new Date(personDetails?.birthdate)
-                  : null,
-            };
-          }
-          
-          return field;
-        });
-    }, 100)
+        }
+
+        return field;
+      });
+    }, 100);
   }
 
   getSelectedClientRequest(clientRequest: any): void {
@@ -2189,7 +3237,7 @@ export class SampleInBatchRegistrationComponent implements OnInit {
               phoneNumber: clientRequest?.phoneNumber,
               birthdate: clientRequest?.dob,
             };
-            this.setPersonDetails(this.personDetailsData)
+            this.setPersonDetails(this.personDetailsData);
           }
         }
       });

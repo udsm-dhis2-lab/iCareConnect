@@ -28,53 +28,75 @@ public class FolioItem {
 		}
 		folioItem.setFolioID(order.getEncounter().getVisit().getUuid());
 		folioItem.setFolioItemID(order.getUuid());
+		//		if (invoiceItem.getItem().getConcept() != null) {
+		//			for (ConceptMap map : invoiceItem.getItem().getConcept().getConceptMappings()) {
+		//				if (map.getConceptReferenceTerm().getConceptSource().getName().toLowerCase().equals("nhif")) {
+		//					if (map.getConceptReferenceTerm().getCode() == null) {
+		//						folioItem.setItemCode("[Code Does not exist]");
+		//					} else {
+		//						folioItem.setItemCode(map.getConceptReferenceTerm().getCode());
+		//					}
+		//					if (map.getConceptReferenceTerm().getName() == null) {
+		//						folioItem.setItemName("[Item is not mapped]");
+		//					} else {
+		//						folioItem.setItemName(invoiceItem.getItem().getConcept().getName().getName());
+		//					}
+		//				}
+		//			}
+		//			//folioItem.setItemCode();
+		//		} else if (invoiceItem.getItem().getDrug() != null) {
+		//			for (ConceptMap map : invoiceItem.getItem().getDrug().getConcept().getConceptMappings()) {
+		//				if (map.getConceptReferenceTerm().getConceptSource().getName().toLowerCase().equals("nhif")) {
+		//					if (map.getConceptReferenceTerm().getCode() == null) {
+		//						folioItem.setItemCode("[Code Does not exist]");
+		//					} else {
+		//						folioItem.setItemCode(map.getConceptReferenceTerm().getCode());
+		//					}
+		//					if (map.getConceptReferenceTerm().getName() == null) {
+		//						folioItem.setItemName("[Item is not mapped]");
+		//					} else {
+		//						folioItem.setItemName(invoiceItem.getItem().getDrug().getName());
+		//					}
+		//				}
+		//			}
+		/*for (DrugReferenceMap map : invoiceItem.getItem().getDrug().getDrugReferenceMaps()) {
+			if (map.getConceptReferenceTerm().getConceptSource().getName().toLowerCase().equals("nhif")) {
+				if (map.getConceptReferenceTerm().getCode() == null) {
+					folioItem.setItemCode("[Code Does not exist]");
+				} else {
+					folioItem.setItemCode(map.getConceptReferenceTerm().getCode());
+				}
+				if (map.getConceptReferenceTerm().getName() == null) {
+					folioItem.setItemName("[Item is not mapped]");
+				} else {
+					folioItem.setItemName(map.getConceptReferenceTerm().getName());
+				}
+			}
+		}*/
+		//}
 		if (invoiceItem.getItem().getConcept() != null) {
 			for (ConceptMap map : invoiceItem.getItem().getConcept().getConceptMappings()) {
 				if (map.getConceptReferenceTerm().getConceptSource().getName().toLowerCase().equals("nhif")) {
-					if (map.getConceptReferenceTerm().getCode() == null) {
+					if (map.getConceptReferenceTerm().getCode().equals(null)) {
 						folioItem.setItemCode("[Code Does not exist]");
 					} else {
 						folioItem.setItemCode(map.getConceptReferenceTerm().getCode());
 					}
-					if (map.getConceptReferenceTerm().getName() == null) {
-						folioItem.setItemName("[Item is not mapped]");
-					} else {
-						folioItem.setItemName(map.getConceptReferenceTerm().getName());
-					}
 				}
 			}
-			//folioItem.setItemCode();
-		} else if (invoiceItem.getItem().getDrug() != null) {
+		} else {
 			for (ConceptMap map : invoiceItem.getItem().getDrug().getConcept().getConceptMappings()) {
 				if (map.getConceptReferenceTerm().getConceptSource().getName().toLowerCase().equals("nhif")) {
-					if (map.getConceptReferenceTerm().getCode() == null) {
+					if (map.getConceptReferenceTerm().getCode().equals(null)) {
 						folioItem.setItemCode("[Code Does not exist]");
 					} else {
 						folioItem.setItemCode(map.getConceptReferenceTerm().getCode());
-					}
-					if (map.getConceptReferenceTerm().getName() == null) {
-						folioItem.setItemName("[Item is not mapped]");
-					} else {
-						folioItem.setItemName(map.getConceptReferenceTerm().getName());
 					}
 				}
 			}
-			/*for (DrugReferenceMap map : invoiceItem.getItem().getDrug().getDrugReferenceMaps()) {
-				if (map.getConceptReferenceTerm().getConceptSource().getName().toLowerCase().equals("nhif")) {
-					if (map.getConceptReferenceTerm().getCode() == null) {
-						folioItem.setItemCode("[Code Does not exist]");
-					} else {
-						folioItem.setItemCode(map.getConceptReferenceTerm().getCode());
-					}
-					if (map.getConceptReferenceTerm().getName() == null) {
-						folioItem.setItemName("[Item is not mapped]");
-					} else {
-						folioItem.setItemName(map.getConceptReferenceTerm().getName());
-					}
-				}
-			}*/
 		}
 		
+		folioItem.setItemName(invoiceItem.getItem().getDisplayString());
 		folioItem.setItemQuantity(invoiceItem.getQuantity().intValue());
 		folioItem.setUnitPrice(invoiceItem.getPrice().intValue());
 		folioItem.setAmountClaimed((int) (invoiceItem.getQuantity() * invoiceItem.getPrice()));

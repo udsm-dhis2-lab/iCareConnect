@@ -33,6 +33,9 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 	@JoinColumn(name = "requested_location_id")
 	private Location requestedLocation;
 	
+	@Column(name = "code")
+	private String code;
+	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "requisition")
 	private List<RequisitionStatus> requisitionStatuses = new ArrayList<RequisitionStatus>(0);
 	
@@ -41,21 +44,39 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "requisition")
 	private List<Issue> issues = new ArrayList<Issue>(0);
-
 	
 	public static Requisition fromMap(Map<String, Object> requisitionMap) {
 		
 		Requisition requisition = new Requisition();
-		
-		Location requestedLocation = new Location();
-		
-		requestedLocation.setUuid(((Map) requisitionMap.get("requestedLocation")).get("uuid").toString());
-		requisition.setRequestedLocation(requestedLocation);
-		
-		Location requestingLocation = new Location();
-		requestingLocation.setUuid(((Map) requisitionMap.get("requestingLocation")).get("uuid").toString());
-		requisition.setRequestingLocation(requestingLocation);
-		
+
+		if(requisitionMap.get("requestedLocation") != null) {
+			Location requestedLocation = new Location();
+			requestedLocation.setUuid(((Map) requisitionMap.get("requestedLocation")).get("uuid").toString());
+			requisition.setRequestedLocation(requestedLocation);
+		}
+
+		if(requisitionMap.get("requestingLocation") != null) {
+			Location requestingLocation = new Location();
+			requestingLocation.setUuid(((Map) requisitionMap.get("requestingLocation")).get("uuid").toString());
+			requisition.setRequestingLocation(requestingLocation);
+		}
+
+		if(requisitionMap.get("code") != null) {
+			requisition.setCode(requisitionMap.get("code").toString());
+		}
+
+		if(requisitionMap.get("voided") != null){
+			requisition.setVoided((Boolean) requisitionMap.get("voided"));
+		}
+		if(requisitionMap.get("requisitionStatuses") != null){
+			List<RequisitionStatus> requisitionStatusList = new ArrayList<>();
+			for(Map<String,Object> requisitionStatusMap : (List<Map<String,Object>>) requisitionMap.get("requisitionStatuses") ){
+				RequisitionStatus requisitionStatus = new RequisitionStatus();
+				requisitionStatus.setStatus(RequisitionStatus.RequisitionStatusCode.valueOf(requisitionStatusMap.get("status").toString()));
+				requisitionStatusList.add(requisitionStatus);
+			}
+			requisition.setRequisitionStatuses(requisitionStatusList);
+		}
 		return requisition;
 		
 	}
@@ -107,9 +128,17 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 	public void setIssues(List<Issue> issues) {
 		this.issues = issues;
 	}
-
+	
 	public enum OrderByDirection {
 		ASC, DESC;
+	}
+	
+	public String getCode() {
+		return code;
+	}
+	
+	public void setCode(String code) {
+		this.code = code;
 	}
 	
 	public Map<String, Object> toMap() {
@@ -129,15 +158,15 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 		if (this.getRequestingLocation() != null) {
 			requestingLocationObject.put("uuid", this.getRequestingLocation().getUuid());
 			requestingLocationObject.put("display", this.getRequestingLocation().getDisplayString());
+			requisitionObject.put("requestingLocation", requestingLocationObject);
 		}
-		requisitionObject.put("requestingLocation", requestingLocationObject);
-		
-		List<Map<String, Object>> requisitionStatuses = new ArrayList<Map<String, Object>>();
-		for (RequisitionStatus requisitionStatus : this.getRequisitionStatuses()) {
-			requisitionStatuses.add(requisitionStatus.toMap());
+		if (this.getRequisitionStatuses() != null) {
+			List<Map<String, Object>> requisitionStatuses = new ArrayList<Map<String, Object>>();
+			for (RequisitionStatus requisitionStatus : this.getRequisitionStatuses()) {
+				requisitionStatuses.add(requisitionStatus.toMap());
+			}
+			requisitionObject.put("requisitionStatuses", requisitionStatuses);
 		}
-		requisitionObject.put("requisitionStatuses", requisitionStatuses);
-		
 		List<Map<String, Object>> requisitionIssues = new ArrayList<Map<String, Object>>();
 		for (Issue issue : this.getIssues()) {
 			requisitionIssues.add(issue.toMap());
@@ -150,15 +179,25 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 		}
 		requisitionObject.put("requisitionItems", requisitionItems);
 		
-		Map<String, Object> creatorObject = new HashMap<String, Object>();
 		if (this.getCreator() != null) {
-			creatorObject.put("uuid", this.getCreator().getUuid());
-			creatorObject.put("display", this.getCreator().getDisplayString());
+			Map<String, Object> creatorObject = new HashMap<String, Object>();
+			if (this.getCreator() != null) {
+				creatorObject.put("uuid", this.getCreator().getUuid());
+				creatorObject.put("display", this.getCreator().getDisplayString());
+			}
+			requisitionObject.put("creator", creatorObject);
+			Date date = this.getDateCreated();
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+			requisitionObject.put("created", dateFormat.format(date));
 		}
-		requisitionObject.put("creator", creatorObject);
-		Date date = this.getDateCreated();
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		requisitionObject.put("created", dateFormat.format(date));
+		
+		if (this.getCode() != null) {
+			requisitionObject.put("code", this.getCode());
+		}
+		
+		if (this.getVoided() != null) {
+			requisitionObject.put("voided", this.getVoided());
+		}
 		
 		return requisitionObject;
 	}

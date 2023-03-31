@@ -62,6 +62,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	BatchSampleDAO batchSampleDAO;
 	
+	AssociatedFieldDAO associatedFieldDAO;
+	
+	TestAllocationAssociatedFieldDAO testAllocationAssociatedFieldDAO;
+	
+	AssociatedFieldResultDAO associatedFieldResultDAO;
+	
 	public void setSampleDAO(SampleDAO sampleDAO) {
 		this.sampleDAO = sampleDAO;
 	}
@@ -146,6 +152,18 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		this.worksheetSampleStatusDAO = worksheetSampleStatusDAO;
 	}
 	
+	public void setAssociatedFieldDAO(AssociatedFieldDAO associatedFieldDAO) {
+		this.associatedFieldDAO = associatedFieldDAO;
+	}
+	
+	public void setTestAllocationAssociatedFieldDAO(TestAllocationAssociatedFieldDAO testAllocationAssociatedFieldDAO) {
+		this.testAllocationAssociatedFieldDAO = testAllocationAssociatedFieldDAO;
+	}
+	
+	public void setAssociatedFieldResultDAO(AssociatedFieldResultDAO associatedFieldResultDAO) {
+		this.associatedFieldResultDAO = associatedFieldResultDAO;
+	}
+	
 	@Override
 	public Sample createSample(Sample sample) {
 		this.sampleDAO.save(sample);
@@ -164,9 +182,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
-	        String testCategory, String q, String hasStatus, String acceptedByUuid) {
+	        String testCategory, String q, String hasStatus, String acceptedByUuid, String testConceptUuid,
+	        String departmentUuid, String specimenSourceUuid) {
 		return this.sampleDAO.getSamples(startDate, endDate, pager, location, sampleCategory, testCategory, q, hasStatus,
-		    acceptedByUuid);
+		    acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid);
 	}
 	
 	@Override
@@ -448,12 +467,23 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		resultStatus.setTestAllocation(response.getTestAllocation());
 		this.testAllocationStatusDAO.save(resultStatus);
 		
-		if (result.getResultStatus() == "AMEND") {
+		//Save associated field via result
+		if (result.getAssociatedFieldResults().size() > 0) {
+			AssociatedFieldResult associatedFieldResult = new AssociatedFieldResult();
+			AssociatedField associatedField = this.associatedFieldDAO.findByUuid(result.getAssociatedFieldResults().get(0)
+			        .getAssociatedField().getUuid());
 			
+			if (associatedField == null) {
+				throw new Exception("The associated field with uuid "
+				        + result.getAssociatedFieldResults().get(0).getAssociatedField().getUuid() + " does not exist");
+			}
+			
+			associatedFieldResult.setValue(result.getAssociatedFieldResults().get(0).getValue());
+			associatedFieldResult.setAssociatedField(associatedField);
+			associatedFieldResult.setResult(response);
+			this.associatedFieldResultDAO.save(associatedFieldResult);
 		}
-		
 		return result;
-		
 	}
 	
 	public List<Map<String, Object>> saveMultipleResults(List<Result> results) throws Exception {
@@ -542,7 +572,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			        + ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION + "'");
 		}
 		
-		if ((testAllocationStatus.getStatus().equals("AUTHORIZED") && labResultApprovalConfig.equals("2"))) {
+		if ((testAllocationStatus.getStatus().equals("AUTHORIZED"))) {
 			List<Result> resList = testAllocation.getTestAllocationResults();
 			
 			Collections.sort(resList, new Comparator<Result>() {
@@ -801,13 +831,19 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
-	public List<Batch> getBatches(Date startDate, Date endDate, String q, Integer startIndex, Integer limit) {
-		return batchDAO.getBatches(startDate, endDate, q, startIndex, limit);
+	public List<Batch> getBatches(Date startDate, Date endDate, String uuid, String q, Integer startIndex, Integer limit) {
+		return batchDAO.getBatches(startDate, endDate, uuid, q, startIndex, limit);
 	}
 	
 	@Override
 	public Batch getBatchByUuid(String batchUuid) {
 		return batchDAO.findByUuid(batchUuid);
+	}
+	
+	@Override
+	public List<Sample> getSamplesByBatchSampleUuid(String batchUuid) {
+		
+		return sampleDAO.getSamplesByBatchSampleUuid(batchUuid);
 	}
 	
 	@Override
@@ -838,9 +874,97 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager, String location,
-	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid) {
+	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
+	        String testConceptUuid, String departmentUuid, String specimenSourceUuid) {
 		return sampleDAO.getSamplesWithoutAllocations(startDate, endDate, pager, location, sampleCategory, testCategory, q,
-		    hasStatus, acceptedByUuid);
+		    hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid);
+	}
+	
+	@Override
+	public AssociatedField addAssociatedField(AssociatedField associatedField) {
+		return associatedFieldDAO.save(associatedField);
+	}
+	
+	@Override
+	public List<AssociatedField> getAssociatedFields(String q, Integer startIndex, Integer limit) {
+		return associatedFieldDAO.getAssociatedFields(q, startIndex, limit);
+	}
+	
+	@Override
+	public TestAllocationAssociatedField addTestAllocationAssociatedField(
+	        TestAllocationAssociatedField testAllocationAssociatedField) throws Exception {
+		
+		if (testAllocationAssociatedField.getTestAllocation() != null) {
+			TestAllocation testAllocation = this.testAllocationDAO.findByUuid(testAllocationAssociatedField
+			        .getTestAllocation().getUuid());
+			
+			if (testAllocation == null) {
+				throw new Exception("The test allocation with uuid "
+				        + testAllocationAssociatedField.getTestAllocation().getUuid() + " does not exist");
+			}
+			testAllocationAssociatedField.setTestAllocation(testAllocation);
+		}
+		
+		if (testAllocationAssociatedField.getAssociatedField() != null) {
+			AssociatedField associatedField = this.associatedFieldDAO.findByUuid(testAllocationAssociatedField
+			        .getAssociatedField().getUuid());
+			
+			if (associatedField == null) {
+				throw new Exception(" The associated field with uuid "
+				        + testAllocationAssociatedField.getAssociatedField().getUuid() + " does not exist");
+			}
+			testAllocationAssociatedField.setAssociatedField(associatedField);
+		}
+		return testAllocationAssociatedFieldDAO.save(testAllocationAssociatedField);
+	}
+	
+	@Override
+	public List<TestAllocationAssociatedField> getTestAllocationAssociatedFields(String q, Integer startIndex,
+	        Integer limit, String allocationUuid, String associatedFieldUuid) {
+		return testAllocationAssociatedFieldDAO.getTestAllocationAssociatedField(q, startIndex, limit, allocationUuid,
+		    associatedFieldUuid);
+	}
+	
+	@Override
+	public AssociatedFieldResult addAssociatedFieldResult(AssociatedFieldResult associatedFieldResult) throws Exception {
+		
+		if (associatedFieldResult.getAssociatedField() != null) {
+			
+			AssociatedField associatedField = this.associatedFieldDAO.findByUuid(associatedFieldResult.getAssociatedField()
+			        .getUuid());
+			if (associatedField == null) {
+				throw new Exception(" The associated field with uuid "
+				        + associatedFieldResult.getAssociatedField().getUuid() + " does not exist");
+			}
+			associatedFieldResult.setAssociatedField(associatedField);
+		}
+		
+		if (associatedFieldResult.getResult() != null) {
+			Result result = this.resultDAO.findByUuid(associatedFieldResult.getResult().getUuid());
+			if (result == null) {
+				throw new Exception(" The result with uuid" + associatedFieldResult.getResult().getUuid()
+				        + " does not exist");
+			}
+			associatedFieldResult.setResult(result);
+		}
+		
+		return associatedFieldResultDAO.save(associatedFieldResult);
+	}
+	
+	@Override
+	public List<AssociatedFieldResult> getAssociatedFieldResults(Integer startIndex, Integer limit, String resultUuid,
+	        String associatedFieldUuid) {
+		return associatedFieldResultDAO.getAssociatedFieldResult(startIndex, limit, resultUuid, associatedFieldUuid);
+	}
+	
+	@Override
+	public AssociatedField getAssociatedFieldByUuid(String associatedFieldUuid) {
+		return associatedFieldDAO.findByUuid(associatedFieldUuid);
+	}
+	
+	@Override
+	public AssociatedField updateAssociatedField(String associatedFieldUuid, AssociatedField associatedField) {
+		return associatedFieldDAO.updateAssociatedField(associatedFieldUuid, associatedField);
 	}
 	
 	public BatchSet addBatchSet(BatchSet batchSet) {

@@ -18,6 +18,18 @@
     </thead>
     <tbody>
       <ng-container
+        *ngIf="
+          !labOrdersResultsInformation ||
+          labOrdersResultsInformation?.length === 0
+        "
+      >
+        <tr>
+          <td colspan="100%">
+            <div class="alert alert-warning" role="alert">No test ordered</div>
+          </td>
+        </tr>
+      </ng-container>
+      <ng-container
         *ngFor="let labTest of labOrdersResultsInformation; let count = index"
       >
         <ng-container
@@ -59,7 +71,7 @@
               </a>
             </td>
             <td>
-                <!-- <a
+              <!-- <a
                   style="display: table-cell; vertical-align: bottom"
                   (click)="
                     setCurrentOrderedItemForOtherDetailsView($event, labTest)
@@ -78,17 +90,21 @@
                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAAA2ElEQVRoge3YQQrCMBSE4bmeuyyULvT0yTFa0EU7IDUJpk3yUpgPulEL/+gmFhARERGRVhyAsF3OuKXYA8AM4L1dC4CXaVGBffylRqTiLzFiwm/8nHhtMmpMin3zC4AngHvivWF+iVw8DTvin3gabkRJPA0z4kg8mY84E09mI2rEU/cRNeOp24gW8dR8RMt4ajaiRzxVH9EznqqNsIin0yMs4+nwCBe50er4mzqeZ/+ehsgNlmf32IiQu+F7gHU87Uf43IdvWEd4jPUkgU84PNZGEREREbm6DyOF4ZDs7v8cAAAAAElFTkSuQmCC"
                   />
                 </a> -->
+              <button
+                *ngIf="!isInpatient"
+                mat-icon-button
+                [matMenuTriggerFor]="menu"
+                aria-label="Options"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
                 <button
-                  *ngIf="!isInpatient"
-                  mat-icon-button
-                  [matMenuTriggerFor]="menu"
-                  aria-label="Options"
+                  mat-menu-item
+                  (click)="
+                    setCurrentOrderedItemForOtherDetailsView($event, labTest)
+                  "
                 >
-                  <mat-icon>more_vert</mat-icon>
-                </button>
-                <mat-menu #menu="matMenu">
-                  <button mat-menu-item (click)="setCurrentOrderedItemForOtherDetailsView($event, labTest)">
-                    
                   <img
                     height="10"
                     class="text-muted"
@@ -101,16 +117,16 @@
                     *ngIf="showOtherDetails"
                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAAA2ElEQVRoge3YQQrCMBSE4bmeuyyULvT0yTFa0EU7IDUJpk3yUpgPulEL/+gmFhARERGRVhyAsF3OuKXYA8AM4L1dC4CXaVGBffylRqTiLzFiwm/8nHhtMmpMin3zC4AngHvivWF+iVw8DTvin3gabkRJPA0z4kg8mY84E09mI2rEU/cRNeOp24gW8dR8RMt4ajaiRzxVH9EznqqNsIin0yMs4+nwCBe50er4mzqeZ/+ehsgNlmf32IiQu+F7gHU87Uf43IdvWEd4jPUkgU84PNZGEREREbm6DyOF4ZDs7v8cAAAAAElFTkSuQmCC"
                   />
-                    <span>More details</span>
-                  </button>
-                  <!-- <button
+                  <span>More details</span>
+                </button>
+                <!-- <button
                     mat-menu-item
                     (click)="onDeleteTest($event, labTest)"
                   >
                     <mat-icon>delete</mat-icon>
                     <span>Delete</span>
                   </button> -->
-                </mat-menu>
+              </mat-menu>
             </td>
           </tr>
           <tr
@@ -148,6 +164,7 @@
               <td colspan="1" class="text-muted">- {{ member?.display }}</td>
               <td colspan="1">
                 <app-lab-result-display
+                  [labTest]="labTest"
                   [observationsKeyedByConcept]="observationsKeyedByConcept"
                   [codedResultsData]="codedResultsData"
                   [concept]="member"
@@ -180,7 +197,7 @@
               ></app-lab-result-display>
             </td>
             <td>
-                <!-- <a
+              <!-- <a
                   style="display: table-cell; vertical-align: bottom"
                   (click)="
                     setCurrentOrderedItemForOtherDetailsView($event, labTest)
@@ -199,17 +216,21 @@
                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAAA2ElEQVRoge3YQQrCMBSE4bmeuyyULvT0yTFa0EU7IDUJpk3yUpgPulEL/+gmFhARERGRVhyAsF3OuKXYA8AM4L1dC4CXaVGBffylRqTiLzFiwm/8nHhtMmpMin3zC4AngHvivWF+iVw8DTvin3gabkRJPA0z4kg8mY84E09mI2rEU/cRNeOp24gW8dR8RMt4ajaiRzxVH9EznqqNsIin0yMs4+nwCBe50er4mzqeZ/+ehsgNlmf32IiQu+F7gHU87Uf43IdvWEd4jPUkgU84PNZGEREREbm6DyOF4ZDs7v8cAAAAAElFTkSuQmCC"
                   />
                 </a> -->
+              <button
+                *ngIf="!isInpatient"
+                mat-icon-button
+                [matMenuTriggerFor]="menu"
+                aria-label="Options"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
                 <button
-                  *ngIf="!isInpatient"
-                  mat-icon-button
-                  [matMenuTriggerFor]="menu"
-                  aria-label="Options"
+                  mat-menu-item
+                  (click)="
+                    setCurrentOrderedItemForOtherDetailsView($event, labTest)
+                  "
                 >
-                  <mat-icon>more_vert</mat-icon>
-                </button>
-                <mat-menu #menu="matMenu">
-                  <button mat-menu-item (click)="setCurrentOrderedItemForOtherDetailsView($event, labTest)">
-                    
                   <img
                     height="10"
                     class="text-muted"
@@ -222,16 +243,16 @@
                     *ngIf="showOtherDetails"
                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAAA2ElEQVRoge3YQQrCMBSE4bmeuyyULvT0yTFa0EU7IDUJpk3yUpgPulEL/+gmFhARERGRVhyAsF3OuKXYA8AM4L1dC4CXaVGBffylRqTiLzFiwm/8nHhtMmpMin3zC4AngHvivWF+iVw8DTvin3gabkRJPA0z4kg8mY84E09mI2rEU/cRNeOp24gW8dR8RMt4ajaiRzxVH9EznqqNsIin0yMs4+nwCBe50er4mzqeZ/+ehsgNlmf32IiQu+F7gHU87Uf43IdvWEd4jPUkgU84PNZGEREREbm6DyOF4ZDs7v8cAAAAAElFTkSuQmCC"
                   />
-                    <span>More details</span>
-                  </button>
-                  <!-- <button
+                  <span>More details</span>
+                </button>
+                <!-- <button
                     mat-menu-item
                     (click)="onDeleteTest($event, labTest)"
                   >
                     <mat-icon>delete</mat-icon>
                     <span>Delete</span>
                   </button> -->
-                </mat-menu>
+              </mat-menu>
             </td>
           </tr>
           <tr

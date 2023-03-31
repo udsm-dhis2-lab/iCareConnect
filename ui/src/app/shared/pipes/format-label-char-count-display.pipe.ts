@@ -9,6 +9,10 @@ export class FormatLabelCharCountDisplayPipe implements PipeTransform {
       return label;
     }
 
-    return label.substring(label?.length - count, label?.length);
+    if (!label) {
+      return null;
+    }
+
+    return label?.substring(label?.length - count, label?.length);
   }
 }
