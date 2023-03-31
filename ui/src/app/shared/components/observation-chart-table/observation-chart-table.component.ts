@@ -67,6 +67,7 @@ export class ObservationChartTableComponent implements OnInit {
       obs,
       obsChartEncounterType: this.obsChartEncounterType,
       visit: this.activeVisit,
+      form: this.selectedForm,
     });
   }
 }

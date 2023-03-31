@@ -16,7 +16,9 @@ import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import { AppState } from "src/app/store/reducers";
 import { getSavingObservationStatus } from "src/app/store/selectors/observation.selectors";
+import { ICARE_CONFIG } from "../../resources/config";
 import { OrdersService } from "../../resources/order/services/orders.service";
+import { ObservationService } from "../../resources/observation/services";
 
 @Component({
   selector: "app-ipd-forms",
@@ -46,7 +48,8 @@ export class IpdFormsComponent implements OnInit {
   @Output() currentSelectedFormForEmitting = new EventEmitter<any>();
   constructor(
     private store: Store<AppState>,
-    private ordersService: OrdersService
+    private ordersService: OrdersService,
+    private observationService: ObservationService
   ) {}
 
   ngOnInit(): void {
@@ -75,17 +78,53 @@ export class IpdFormsComponent implements OnInit {
 
   onConfirm(e: Event, visit: any): void {
     e.stopPropagation();
-    this.saveObservations.emit(
-      getObservationsFromForm(
-        this.formData[this.currentCustomForm?.id],
-        this.patient?.personUuid,
-        this.location?.id,
-        this.visit?.encounterUuid
-          ? this.visit?.encounterUuid
-          : JSON.parse(localStorage.getItem("patientConsultation"))[
-              "encounterUuid"
-            ]
-      )
-    );
+    let obs = getObservationsFromForm(
+      this.formData[this.currentCustomForm?.id],
+      this.patient?.personUuid,
+      this.location?.id,
+      this.visit?.encounterUuid
+        ? this.visit?.encounterUuid
+        : JSON.parse(localStorage.getItem("patientConsultation"))[
+        "encounterUuid"
+        ]
+    )
+    let encounterObject = {
+      patient: this.patient?.id,
+      encounterType: this.currentCustomForm?.encounterType?.uuid,
+      location: this.location?.uuid,
+      encounterProviders: [
+        {
+          provider: this.provider?.uuid,
+          encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
+        },
+      ],
+      visit: this.visit?.uuid,
+      obs: obs,
+      form: {
+        uuid: this.currentCustomForm?.uuid
+      }
+    };
+
+    this.observationService
+      .saveEncounterWithObsDetails(encounterObject)
+      .subscribe((res) => {
+        if (res) {
+          this.saveObservations.emit();
+        }
+      });
+
+
+    // this.saveObservations.emit(
+    //   getObservationsFromForm(
+    //     this.formData[this.currentCustomForm?.id],
+    //     this.patient?.personUuid,
+    //     this.location?.id,
+    //     this.visit?.encounterUuid
+    //       ? this.visit?.encounterUuid
+    //       : JSON.parse(localStorage.getItem("patientConsultation"))[
+    //           "encounterUuid"
+    //         ]
+    //   )
+    // );
   }
 }
