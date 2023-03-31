@@ -9,36 +9,24 @@
  */
 package org.openmrs.module.icare.core.dao;
 
-import ca.uhn.hl7v2.model.v26.group.EHC_E01_INVOICE_PROCESSING;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.Session;
 import org.openmrs.*;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSession;
-import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
-import org.openmrs.module.icare.core.IntegrationWithExternalPatientLevelSystems;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 
-import javax.persistence.EntityManager;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 
@@ -633,6 +621,74 @@ public class ICareDao extends BaseDAO<Item> {
 		return query.list();
 	}
 	
+	public long countYearlyGeneratedMetadataCodes(String metadataType) {
+		DbSession session = this.getSession();
+		if (metadataType.equals("requisition")) {
+			String queryStr = " SELECT COUNT(req) FROM Requisition req WHERE YEAR(req.dateCreated) = :year";
+			Query query = session.createQuery(queryStr);
+			Calendar calendar = Calendar.getInstance();
+			query.setParameter("year", calendar.get(Calendar.YEAR));
+			return (long) query.list().get(0);
+		}
+		return 0;
+		
+	}
+	
+	public List<String> generateCode(String globalPropertyUuid, String metadataType, Integer count) throws Exception {
+
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		String idFormat = adminService.getGlobalPropertyByUuid(globalPropertyUuid).getValue().toString();
+		if(idFormat == null){
+			throw new Exception("The global property for generationg code is mot set. Please set ");
+		}
+		List<String> idLabels = new ArrayList<>();
+		if (idFormat.contains("D{YYYY}") || idFormat.contains("D{YYY}") || idFormat.contains("D{YY}")) {
+			SimpleDateFormat formatter = new SimpleDateFormat("YYYY", Locale.ENGLISH);
+			Integer substringCount = 2;
+			if (idFormat.contains("D{YY}")) {
+				substringCount = 2;
+				idFormat = idFormat.replace("D{YY}", formatter.format(new Date()).substring(substringCount));
+			} else if (idFormat.contains("D{YYY}")) {
+				substringCount = 1;
+				idFormat = idFormat.replace("D{YYY}", formatter.format(new Date()).substring(substringCount));
+			} else if (idFormat.contains("D{YYYY}")) {
+				substringCount = 0;
+				idFormat = idFormat.replace("D{YYYY}", formatter.format(new Date()).substring(substringCount));
+			}
+			DbSession session = this.getSession();
+			String queryStr = null;
+			if (metadataType.equals("sample")) {
+				queryStr = "SELECT COUNT(sp) FROM Sample sp WHERE YEAR(sp.dateTime) = :year";
+			} else if (metadataType.equals("worksheetdefinition")) {
+				queryStr = "SELECT COUNT(wd) FROM WorksheetDefinition wd WHERE YEAR(wd.dateCreated) = :year";
+			} else if (metadataType.equals("worksheet")){
+				queryStr = "SELECT COUNT(ws) FROM Worksheet ws WHERE YEAR(ws.dateCreated) = :year";
+			} else if (metadataType.equals("batchset")){
+				queryStr = "SELECT COUNT(bs) FROM BatchSet bs WHERE YEAR(bs.dateCreated) = :year";
+			} else if (metadataType.equals("batch")){
+				queryStr = "SELECT COUNT(b) FROM Batch b WHERE YEAR(b.dateCreated) = :year";
+			} else if(metadataType.equals("requisition")){
+				queryStr = " SELECT COUNT(req) FROM Requisition req WHERE YEAR(req.dateCreated) = :year";
+			}
+
+			if (queryStr != null) {
+				Calendar calendar = Calendar.getInstance();
+				Query query = session.createQuery(queryStr);
+				query.setParameter("year", calendar.get(Calendar.YEAR));
+				long data = (long) query.list().get(0);
+				Integer countOfIdLabels = 1;
+				if (count != null) {
+					countOfIdLabels =  count;
+				}
+				for (Integer labelCount =1; labelCount <= countOfIdLabels; labelCount++) {
+					idLabels.add(idFormat.replace( "COUNT:" + idFormat.split(":")[1], "" + String.format("%0" + idFormat.split(":")[1] +"d", data + labelCount)));
+
+				}
+			}
+		}
+		return idLabels;
+
+	}
 	//	public String voidOrder(String uuid, String voidReason) {
 	//		DbSession session = getSession();
 	//		new Order();

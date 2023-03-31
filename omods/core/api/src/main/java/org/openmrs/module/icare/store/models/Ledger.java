@@ -56,6 +56,12 @@ public class Ledger extends BaseOpenmrsData implements java.io.Serializable, Sto
 	@Column(name = "quantity")
 	private Double quantity;
 	
+	@Transient
+	private Location sourceLocation;
+	
+	@Transient
+	private Location destinationLocation;
+	
 	public Item getItem() {
 		return this.item;
 	}
@@ -84,6 +90,16 @@ public class Ledger extends BaseOpenmrsData implements java.io.Serializable, Sto
 		return this.remarks;
 	}
 	
+	@Override
+	public Location getSourceLocation() {
+		return sourceLocation;
+	}
+	
+	@Override
+	public Location getDestinationLocation() {
+		return destinationLocation;
+	}
+	
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
 	}
@@ -99,6 +115,10 @@ public class Ledger extends BaseOpenmrsData implements java.io.Serializable, Sto
 	@Override
 	public void setId(Integer id) {
 		this.id = id;
+	}
+	
+	public void setSourceLocation(Location sourceLocation) {
+		this.sourceLocation = sourceLocation;
 	}
 	
 	public Integer getId() {
@@ -182,6 +202,12 @@ public class Ledger extends BaseOpenmrsData implements java.io.Serializable, Sto
 		Location location = new Location();
 		location.setUuid(((Map) ledgerMap.get("location")).get("uuid").toString());
 		ledger.setLocation(location);
+		
+		if (ledgerMap.get("sourceLocation") != null) {
+			Location sourceLocation = new Location();
+			sourceLocation.setUuid(((Map) ledgerMap.get("sourceLocation")).get("uuid").toString());
+			ledger.setSourceLocation(sourceLocation);
+		}
 		
 		return ledger;
 		

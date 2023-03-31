@@ -16,6 +16,7 @@
   } as params"
 >
   <div
+    style="margin-top: -20px"
     *ngIf="
       params?.datesParameters &&
       params?.sampleTypesLoadedState &&
@@ -27,6 +28,14 @@
       params?.labSamplesDepartments
     "
   >
+    <div class="mb-2" style="margin-top: -10px">
+      <app-shared-samples-summary-dashboard
+        [datesParams]="params?.datesParameters"
+        [dashboardSingleValueDataSetsReferenceKey]="
+          'iCare.laboratory.sampleStorage.dashboard.settings.samples.singleValue'
+        "
+      ></app-shared-samples-summary-dashboard>
+    </div>
     <app-sample-storage-dashboard
       [datesParameters]="params?.datesParameters"
       [patients]="params?.visitReferences"

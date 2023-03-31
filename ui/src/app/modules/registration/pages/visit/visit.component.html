@@ -10,7 +10,8 @@
     locations: locations$ | async,
     paymentsCategories: paymentsCategories$ | async,
     admissionLocations: admissionLocations$ | async,
-    insuranceSchemes: insuranceSchemes$ | async
+    insuranceSchemes: insuranceSchemes$ | async,
+    userPrivileges: userPrivileges$ | async
   } as params"
 >
   <!-- <div class="centered-container" *ngIf="!params?.currentPatient">
@@ -114,8 +115,27 @@
           >
             Edit Visit
           </button> -->
+          <ng-container *ngIf="params?.activeVisit">
+            <button
+              mat-stroked-button
+              class="bg-secondary text-white"
+              (click)="onCloseActiveVisit($event, params?.activeVisit, 'close')"
+            >
+              Close Visit
+            </button>
+            <button
+              mat-stroked-button
+              class="ml-2 bg-danger text-white"
+              color="danger"
+              *ngIf="params?.userPrivileges['REGISTRATION_DELETE_ACTIVE_VISIT']"
+              (click)="onCloseActiveVisit($event, params?.activeVisit, 'void')"
+            >
+              Delete Visit
+            </button>
+          </ng-container>
           <button
             mat-stroked-button
+            class="ml-2"
             (click)="
               onSetEditPatient(
                 $event,

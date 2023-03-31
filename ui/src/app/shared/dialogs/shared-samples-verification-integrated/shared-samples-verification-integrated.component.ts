@@ -5,6 +5,7 @@ import { catchError, map } from "rxjs/operators";
 import { DHIS2BasedSystems } from "src/app/core/constants/external-dhis2-based-systems.constants";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
+import { formatDateToYYMMDD } from "../../helpers/format-date.helper";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
 import { Field } from "../../modules/form/models/field.model";
 import { FormValue } from "../../modules/form/models/form-value.model";
@@ -84,9 +85,11 @@ export class SharedSamplesVerificationIntegratedComponent implements OnInit {
     });
   }
 
-  onClose(event: Event): void {
+  onClose(event: Event, clientDetails: any): void {
     event.stopPropagation();
-    this.dialogRef.close();
+    this.dialogRef.close(
+      clientDetails ? { ...clientDetails, sendResults: true } : null
+    );
   }
 
   onVerify(
@@ -172,13 +175,19 @@ export class SharedSamplesVerificationIntegratedComponent implements OnInit {
       trackedEntityInstance: labRequest?.trackedEntityInstance,
       enrollment: labRequest?.enrollment,
       dataValues: [
-        { dataElement: "Q98LhagGLFj", value: new Date().toISOString() },
+        {
+          dataElement: "Q98LhagGLFj",
+          value: this.formatDateAndTime(new Date()),
+        },
         { dataElement: "D0RBm3alWd9", value: "RT - PCR" },
-        { dataElement: "RfWBPHo9MnC", value: new Date() },
+        {
+          dataElement: "RfWBPHo9MnC",
+          value: this.formatDateAndTime(new Date()),
+        },
         { dataElement: "HTBFvtjeztu", value: true },
         { dataElement: "xzuzLYN1f0J", value: true },
       ],
-      eventDate: new Date().toISOString(),
+      eventDate: this.formatDateAndTime(new Date()),
     };
 
     zip(
@@ -217,5 +226,22 @@ export class SharedSamplesVerificationIntegratedComponent implements OnInit {
         this.saving = false;
       }
     });
+  }
+
+  formatDateAndTime(date: Date): string {
+    return (
+      formatDateToYYMMDD(date) +
+      "T" +
+      this.formatDimeChars(date.getHours().toString()) +
+      ":" +
+      this.formatDimeChars(date.getMinutes().toString()) +
+      ":" +
+      this.formatDimeChars(date.getSeconds().toString()) +
+      ".000Z"
+    );
+  }
+
+  formatDimeChars(char: string): string {
+    return char.length == 1 ? "0" + char : char;
   }
 }

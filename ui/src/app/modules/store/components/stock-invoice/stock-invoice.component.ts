@@ -15,6 +15,7 @@ export class StockInvoiceComponent implements OnInit {
   errors: any[];
   suppliers$: Observable<any>;
   unitsOfMeasurementSettings$: Observable<any>;
+  loading: boolean;
   constructor(
     private locationService: LocationService,
     private supplierService: SupplierService,
@@ -36,7 +37,14 @@ export class StockInvoiceComponent implements OnInit {
 
     this.unitsOfMeasurementSettings$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.store.mapping.items.unitOfMeasure.mappingSource"
+        "iCare.store.mappings.items.unitOfMeasure.mappingSource"
       );
+  }
+
+  reloadForm(){
+    this.loading = true;
+    setTimeout(() => {
+      this.loading = false;
+    }, 100)
   }
 }

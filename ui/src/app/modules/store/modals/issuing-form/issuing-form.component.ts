@@ -42,19 +42,19 @@ export class IssuingFormComponent implements OnInit {
   constructor(
     private dialogRef: MatDialogRef<IssuingFormComponent>,
     @Inject(MAT_DIALOG_DATA)
-    public data: { issue: IssuingObject; currentStore: LocationGet },
+    public data: { issue: any; item: any; currentStore: LocationGet },
     private stockService: StockService
   ) {}
 
   ngOnInit() {
     this.stockStatusOfTheItemOnRequestingStore$ =
       this.stockService.getAvailableStockOfAnItem(
-        this.data?.issue?.itemUuid,
+        this.data?.item?.item?.uuid,
         this.data?.issue?.requestingLocation?.uuid
       );
     this.stockStatusOfTheItemOnRequestedStore$ =
       this.stockService.getAvailableStockOfAnItem(
-        this.data?.issue?.itemUuid,
+        this.data?.item?.item?.uuid,
         this.data?.issue?.requestedLocation?.uuid
       );
     this.issueFormFields = [
@@ -63,21 +63,21 @@ export class IssuingFormComponent implements OnInit {
         label: "Item",
         key: "item",
         disabled: true,
-        value: this.data?.issue?.name,
+        value: this.data?.item?.item?.display,
       }),
       new Textbox({
         id: "requesting_store",
         key: "requestingStore",
         label: "Requesting Store",
         disabled: true,
-        value: this.data?.issue?.requestingLocation?.name,
+        value: this.data?.issue?.requestingLocation?.display,
       }),
       new Textbox({
         id: "requested_store",
         key: "requestedStore",
         label: "Requested Store",
         disabled: true,
-        value: this.data?.issue?.requestedLocation?.name,
+        value: this.data?.issue?.requestedLocation?.display,
       }),
     ];
 
@@ -85,10 +85,10 @@ export class IssuingFormComponent implements OnInit {
       id: "quantity",
       key: "quantity",
       required: true,
-      label: `Quantity max(${this.data?.issue?.quantityRequested})`,
+      label: `Quantity max(${this.data?.item?.quantity})`,
       type: "number",
       min: 0,
-      max: this.data?.issue?.quantityRequested,
+      max: this.data?.item?.quantity,
     });
   }
 
@@ -134,19 +134,20 @@ export class IssuingFormComponent implements OnInit {
     const formValues = this.formData;
     let remainedQuantityToIssue = Number(formValues?.quantity.value);
     const issueInput: IssueInput = {
-      requisitionUuid: this.data?.issue.requisitionUuid,
+      requisitionUuid: this.data?.issue?.uuid,
       issuedLocationUuid: this.data?.issue?.requestingLocation.uuid,
       issuingLocationUuid: this.data?.issue?.requestedLocation.uuid,
       issueItems: this.eligibleBatches?.map((batch) => {
         let quantityToIssue =
           remainedQuantityToIssue > batch?.quantity
             ? batch?.quantity
-            : remainedQuantityToIssue
-        remainedQuantityToIssue = remainedQuantityToIssue > batch?.quantity
-          ? remainedQuantityToIssue - Number(batch?.quantity)
-          : 0;
+            : remainedQuantityToIssue;
+        remainedQuantityToIssue =
+          remainedQuantityToIssue > batch?.quantity
+            ? remainedQuantityToIssue - Number(batch?.quantity)
+            : 0;
         return {
-          itemUuid: this.data?.issue?.itemUuid,
+          itemUuid: this.data?.item?.item?.uuid,
           quantity: parseInt(quantityToIssue.toString(), 10),
           batch: batch?.batch,
           expiryDate: new Date(batch?.expiryDate),

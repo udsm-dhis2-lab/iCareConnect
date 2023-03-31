@@ -19,6 +19,10 @@ export class RelatedTestParametersEntryComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    console.log(
+      "parametersWithDefinedRelationship",
+      this.parametersWithDefinedRelationship
+    );
     this.relatedAllocation =
       this.parametersWithDefinedRelationship[0]?.relatedAllocation;
     this.finalResultsForParentTestParameter =

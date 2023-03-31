@@ -28,7 +28,7 @@ export class RequestCancelComponent implements OnInit {
 
   onConfirmRejection(){
     this.dialogRef.close(
-      { type: this.dataReceived, reason: this.reason}
+      { confirmed: true, type: this.dataReceived, reason: this.reason}
     );
   }
 

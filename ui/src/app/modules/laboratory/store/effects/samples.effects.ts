@@ -279,10 +279,12 @@ export class SamplesEffects {
                       {
                         ...order,
                         paid:
-                          action.visit.isEnsured ||
                           action.paidItems[order?.concept?.display]
                             ? true
                             : false,
+                        isEnsured: action.visit.isEnsured,
+                        isEmergency: action.visit.isEmergency,
+                        isAdmitted: action.visit.isAdmitted
                       },
                     ];
                   });
@@ -291,6 +293,9 @@ export class SamplesEffects {
                     ...samplesToCollect,
                     {
                       ...sample,
+                      isEnsured: action.visit.isEnsured,
+                      isEmergency: action.visit.isEmergency,
+                      isAdmitted: action.visit.isAdmitted,
                       atLeastOnePaid:
                         (_.filter(formattedOrders, { paid: true }) || [])
                           ?.length > 0
