@@ -22,8 +22,8 @@ export function getFilterIssuedItemsInRequisitions(requisitionItems: any[], issu
     });
 
     const requisitionItemsModified = issues?.length ? requisitionItems?.map((requisitionItem) => {
-        let issuedItems = issueItems?.filter((issueItem) => issueItem?.item?.uuid === requisitionItem?.item?.uuid)
-        if (!issuedItems && issuedItems?.length === 0) {
+        const issuedItems = issueItems?.filter((issueItem) => issueItem?.item?.uuid === requisitionItem?.item?.uuid)
+        if (!issuedItems?.length) {
           return requisitionItem
         }
         return null
