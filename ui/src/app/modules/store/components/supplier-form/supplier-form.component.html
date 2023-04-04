@@ -1,5 +1,5 @@
 <div class="content">
-  <mat-toolbar color="primary">Add Supplier</mat-toolbar>
+  <mat-toolbar color="primary">{{data?.supplier ? 'Add' : 'Update'}} Supplier</mat-toolbar>
   <div class="m-3">
     <div class="row mt-2">
       <mat-progress-bar mode="indeterminate" *ngIf="!supplierFields?.length "></mat-progress-bar>
@@ -10,7 +10,7 @@
     <div class="d-flex justify-content-end">
       <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
       <button
-        *ngIf="!data"
+        *ngIf="!data?.supplier"
         color="primary"
         mat-flat-button
         color="primary"
@@ -20,7 +20,7 @@
         Save
       </button>
       <button
-        *ngIf="data"
+        *ngIf="data?.supplier"
         color="primary"
         mat-flat-button
         color="primary"
