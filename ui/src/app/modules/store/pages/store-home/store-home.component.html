@@ -15,25 +15,28 @@
         <h3 class="pl-3 pt-3">Store: {{ params?.currentStore?.name }}</h3>
         <mat-nav-list>
           <ng-container *ngFor="let storePage of storePages">
-            <mat-list-item
-              *ngIf="
-                (storePage?.privilege &&
-                  params?.privileges[storePage?.privilege]) ||
-                !storePage?.privilege
-              "
-              [ngClass]="{
-                'not-allowed-menu-item':
-                  params?.currentStore?.isMainStore &&
-                  (storePage?.id === 'requisition' ||
-                    storePage?.id === 'received'),
-                'store-active': storePage?.id === currentStorePage?.id,
-                'page': true
-              } "
-              (click)="onChangeRoute($event, storePage.url, storePage)"
-              routerLinkActive="store-active"
-            >
-              <a matLine>{{ storePage?.name }}</a>
-            </mat-list-item>
+            <ng-container *ngIf="(!params?.currentStore?.isMainStore && storePage?.id !== 'settings' ) || (params?.currentStore?.isMainStore &&
+                    (storePage?.id !== 'requisition' &&
+                    storePage?.id !== 'received'))">
+                    <mat-list-item
+                      *ngIf="((storePage?.privilege &&
+                          params?.privileges[storePage?.privilege]) ||
+                        !storePage?.privilege)
+                      "
+                      [ngClass]="{
+                        'not-allowed-menu-item':
+                          params?.currentStore?.isMainStore &&
+                          (storePage?.id === 'requisition' ||
+                            storePage?.id === 'received'),
+                        'store-active': storePage?.id === currentStorePage?.id,
+                        'page': true
+                      } "
+                      (click)="onChangeRoute($event, storePage.url, storePage)"
+                      routerLinkActive="store-active"
+                    >
+                      <a matLine>{{ storePage?.name }}</a>
+                    </mat-list-item>
+            </ng-container>
           </ng-container>
         </mat-nav-list>
     </div>
