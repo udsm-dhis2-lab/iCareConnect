@@ -35,6 +35,7 @@ import { getIsPatientSentForExemption } from "src/app/store/selectors/visit.sele
 import { go, loadCurrentPatient } from "src/app/store/actions";
 import { MatDialog } from "@angular/material/dialog";
 import { ExemptionConfirmationComponent } from "../../components/exemption-confirmation/exemption-confirmation.component";
+import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
 
 @Component({
   selector: "app-current-patient-billing",
@@ -504,15 +505,16 @@ export class CurrentPatientBillingComponent implements OnInit {
           payment.items.forEach((item) => {
             let paymentDate = new Date(payment.created);
             // Date to string
-            let date_paid = `${
-              paymentDate.getDate().toString().length > 1
-                ? paymentDate.getDate()
-                : "0" + paymentDate.getDate()
-            }-${
-              paymentDate.getMonth().toString().length > 1
-                ? paymentDate.getMonth() + 1
-                : "0" + paymentDate.getMonth() + 1
-            }-${paymentDate.getFullYear()}`;
+            let date_paid = formatDateToString(paymentDate);
+            // let date_paid = `${
+            //   paymentDate.getDate().toString().length > 1
+            //     ? paymentDate.getDate()
+            //     : "0" + paymentDate.getDate()
+            // }-${
+            //   paymentDate.getMonth().toString().length > 1
+            //     ? paymentDate.getMonth() + 1
+            //     : "0" + paymentDate.getMonth() + 1
+            // }-${paymentDate.getFullYear()}`;
             contents = `
                 <tr>
                   <td>${item.name}</td> 
