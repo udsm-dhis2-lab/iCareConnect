@@ -540,7 +540,7 @@ export class DrugOrdersService {
         });
 
         const instructionField = new Textbox({
-          value: drugOrder?.instructions,
+          value: drugOrder?.instructions || metadataConfigs?.drugInstructions,
           key: "instructions",
           id: "instructions",
           label: "Instructions",

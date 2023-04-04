@@ -3,7 +3,8 @@
     isThereDiagnosisProvided: isThereDiagnosisProvided$ | async,
     visitLoadingState: visitLoadingState$ | async,
     genericPrescriptionConceptUuids: genericPrescriptionConceptUuids$ | async,
-    specificDrugConceptUuid: specificDrugConceptUuid$ | async
+    specificDrugConceptUuid: specificDrugConceptUuid$ | async,
+    prescriptionArrangementFields: prescriptionArrangementFields$ | async
   } as params"
 >
   <div class="d-flex justify-content-between p-3">
@@ -78,21 +79,40 @@
               }}
             </td>
             <td>
-              <ng-container
+              <ng-container *ngIf="params?.prescriptionArrangementFields">
+                <span>
+                  ({{ drugOrder.obs[params?.prescriptionArrangementFields['2']?.uuid]?.value?.display ?
+                  drugOrder.obs[params?.prescriptionArrangementFields['2']?.uuid]?.value?.display :
+                  drugOrder.obs[params?.prescriptionArrangementFields['2']?.uuid]?.value }})
+                  {{ drugOrder.obs[params?.prescriptionArrangementFields['3']?.uuid]?.value?.display ?
+                  drugOrder.obs[params?.prescriptionArrangementFields['3']?.uuid]?.value?.display :
+                  drugOrder.obs[params?.prescriptionArrangementFields['3']?.uuid]?.value }}
+                  {{ drugOrder.obs[params?.prescriptionArrangementFields['4']?.uuid]?.value?.display ?
+                  drugOrder.obs[params?.prescriptionArrangementFields['4']?.uuid]?.value?.display :
+                  drugOrder.obs[params?.prescriptionArrangementFields['4']?.uuid]?.value }}
+                  {{ drugOrder.obs[params?.prescriptionArrangementFields['5']?.uuid]?.value?.display ?
+                  drugOrder.obs[params?.prescriptionArrangementFields['5']?.uuid]?.value?.display :
+                  drugOrder.obs[params?.prescriptionArrangementFields['5']?.uuid]?.value }}
+                  {{ drugOrder.obs[params?.prescriptionArrangementFields['6']?.uuid]?.value?.display ?
+                  drugOrder.obs[params?.prescriptionArrangementFields['6']?.uuid]?.value?.display :
+                  drugOrder.obs[params?.prescriptionArrangementFields['6']?.uuid]?.value }}
+                </span>
+              </ng-container>
+              <!-- <ng-container
                 *ngFor="
                   let conceptSetting of params?.genericPrescriptionConceptUuids
                 "
               >
-                <!-- <span
+                <span
                   >{{
                     drugOrder?.obs[conceptSetting?.value]?.value?.display
                       ? drugOrder?.obs[conceptSetting?.value]?.value?.display
                       : drugOrder?.obs[conceptSetting?.value]?.value
                   }}
                 </span>
-                <br /> -->
+                <br />
                 {{ drugOrder?.instructions }}
-              </ng-container>
+              </ng-container> -->
             </td>
             <td>
               {{ drugOrder?.orderer?.display }}
@@ -104,7 +124,7 @@
               {{ drugOrder?.careSetting?.display }}
             </td>
             <td>
-              <button class="btn colored-button" (click)="onVerify(drugOrder)">
+              <button class="btn colored-button" (click)="onVerify(drugOrder, params?.specificDrugConceptUuid,params?.prescriptionArrangementFields)">
                 Verify
               </button>
             </td>

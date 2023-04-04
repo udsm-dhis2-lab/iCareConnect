@@ -19,6 +19,7 @@ import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { map, tap } from "rxjs/operators";
 import { Api } from "../../resources/openmrs";
+import { arrangeDrugDetails } from "../../helpers/drugs.helper";
 
 @Component({
   selector: "app-patient-generic-drug-order-list",
@@ -54,6 +55,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   specificDrugConceptUuid$: Observable<string>;
   errors: any[] = [];
   encounter$: Observable<any>;
+  prescriptionArrangementFields$: Observable<any>;
 
   constructor(
     private dialog: MatDialog,
@@ -129,6 +131,32 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
           }
         })
       );
+    
+    this.prescriptionArrangementFields$ = this.systemSettingsService
+      .getSystemSettingsByKey("iCare.clinic.prescription.arrangement")
+      .pipe(
+        map((response) => {
+          if (response === "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "Arrangement setting isn't defined, Set 'iCare.clinic.prescription.arrangement' or Contact IT (Close to continue)",
+                },
+                type: "warning",
+              },
+            ];
+          }
+          if (response?.error) {
+            this.errors = [...this.errors, response?.error];
+          }
+          return {
+            ...response,
+            keys: Object.keys(response).length,
+          };
+        })
+      );
   }
 
   getDrugOrders() {
@@ -175,7 +203,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
     );
   }
 
-  onVerify(order: any) {
+  onVerify(order: any, specificDrugConceptUuid: any, prescriptionArrangementFields: any) {
     const dialog = this.dialog.open(DispensingFormComponent, {
       width: "100%",
       disableClose: true,
@@ -185,6 +213,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
         visit: this.visit,
         location: this.currentLocation,
         encounterUuid: this.encounterUuid,
+        drugInstructions: arrangeDrugDetails(order, specificDrugConceptUuid, prescriptionArrangementFields)?.description,
         fromDispensing: true,
         showAddButton: false,
         useGenericPrescription: this.useGenericPrescription,
