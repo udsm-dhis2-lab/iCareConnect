@@ -34,6 +34,7 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
   @Input() showAddButton: boolean;
   @Input() hideActionButtons: boolean;
   @Input() encounterUuid: string;
+  @Input() drugInstructions: string;
   @Input() patient: Patient;
   @Input() isFromDoctor: boolean;
   @Input() locations: any[];
@@ -107,6 +108,7 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
             this.generalPrescriptionFrequencyConcept,
           specificDrugConceptUuid: this.specicDrugConceptUuid,
           fromDispensing: this.fromDispensing,
+          drugInstructions: this.drugInstructions || "",
         }
       )
       .pipe(

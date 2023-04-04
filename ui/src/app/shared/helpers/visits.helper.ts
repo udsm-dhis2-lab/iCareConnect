@@ -1,4 +1,5 @@
 import * as _ from "lodash";
+import { arrangeDrugDetails } from "./drugs.helper";
 
 export function getEncountersForLabSample(details) {
   let encounters = [];
@@ -278,53 +279,7 @@ export function arrangeVisitDataChronologically(
       })
     ),
     drugs: visit?.drugs?.map((drugOrder) => {
-      return {
-        ...drugOrder,
-        name: drugOrder.obs[specificDrugConceptUuid]
-          ? drugOrder.obs[specificDrugConceptUuid]?.comment
-          : drugOrder?.display,
-        description: `${
-          drugOrder.obs[prescriptionArrangementFields["1"]?.uuid]?.value
-            ?.display
-            ? drugOrder.obs[prescriptionArrangementFields["1"]?.uuid]?.value
-                ?.display
-            : drugOrder.obs[prescriptionArrangementFields["1"]?.uuid]?.value
-        } (${
-          drugOrder.obs[prescriptionArrangementFields["2"]?.uuid]?.value
-            ?.display
-            ? drugOrder.obs[prescriptionArrangementFields["2"]?.uuid]?.value
-                ?.display
-            : drugOrder.obs[prescriptionArrangementFields["2"]?.uuid]?.value
-        }) ${
-          drugOrder.obs[prescriptionArrangementFields["3"]?.uuid]?.value
-            ?.display
-            ? drugOrder.obs[prescriptionArrangementFields["3"]?.uuid]?.value
-                ?.display
-            : drugOrder.obs[prescriptionArrangementFields["3"]?.uuid]?.value
-        } ${
-          drugOrder.obs[prescriptionArrangementFields["4"]?.uuid]?.value
-            ?.display
-            ? drugOrder.obs[prescriptionArrangementFields["4"]?.uuid]?.value
-                ?.display
-            : drugOrder.obs[prescriptionArrangementFields["4"]?.uuid]?.value
-        } ${
-          drugOrder.obs[prescriptionArrangementFields["5"]?.uuid]?.value
-            ?.display
-            ? drugOrder.obs[prescriptionArrangementFields["5"]?.uuid]?.value
-                ?.display
-            : drugOrder.obs[prescriptionArrangementFields["5"]?.uuid]?.value
-        } ${
-          drugOrder.obs[prescriptionArrangementFields["6"]?.uuid]?.value
-            ?.display
-            ? drugOrder.obs[prescriptionArrangementFields["6"]?.uuid]?.value
-                ?.display
-            : drugOrder.obs[prescriptionArrangementFields["6"]?.uuid]?.value
-        }`,
-        date: getStringDate(new Date(drugOrder.dateActivated)).date,
-        time: getStringDate(new Date(drugOrder.dateActivated)).time,
-        provider: drugOrder?.orderer?.display?.split('-')[1],
-        category: "DRUG_ORDER",
-      };
+      return arrangeDrugDetails(drugOrder, specificDrugConceptUuid, prescriptionArrangementFields);
     }),
     labOrders: visit?.labOrders?.map((order) => {
       return {
@@ -387,7 +342,7 @@ export function arrangeVisitDataChronologically(
   return remadeVisitObject;
 }
 
-function getStringDate(date: Date, separator?: string) {
+export function getStringDate(date: Date, separator?: string) {
   separator = separator || "-";
   return {
     date: `${date.getDate()}${separator}${
