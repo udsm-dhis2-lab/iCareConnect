@@ -10,6 +10,8 @@ import org.openmrs.Visit;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.module.icare.store.models.Stock;
@@ -219,15 +221,19 @@ public class StockDAO extends BaseDAO<Stock> {
 		
 	}
 	
-	public List<Item> getStockedOut() {
+	public ListResult<Item> getStockedOut(Pager pager) {
 		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT item FROM Item item \n"
 		        + "WHERE item.stockable = true AND item.voided=false AND (item NOT IN(SELECT stock.item FROM Stock stock) OR item IN(SELECT stock.item FROM Stock stock WHERE stock.quantity = 0))";
 		
 		Query query = session.createQuery(queryStr);
-		
-		return query.list();
+
+		ListResult<Item> listResults = new ListResult();
+		listResults.setPager(pager);
+		listResults.setResults(query.list());
+		return listResults;
+
 	}
 	
 	//	public List<Item> getNearlyStockedOut() {
@@ -242,8 +248,7 @@ public class StockDAO extends BaseDAO<Stock> {
 	//	}
 	
 	//TODO fix getting by location query
-	public List<Item> getStockedOutByLocation(String locationUuid, String q, Integer startIndex, Integer limit,
-	        String conceptClassName) {
+	public ListResult<Item> getStockedOutByLocation(String locationUuid, Pager pager, String q, String conceptClassName) {
 		DbSession session = this.getSession();
 		//String queryStr = "SELECT item FROM Item item \n"
 		//        + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
@@ -267,8 +272,6 @@ public class StockDAO extends BaseDAO<Stock> {
 		//		query.setMaxResults(limit);
 		
 		if (q != null) {
-			query.setFirstResult(startIndex);
-			query.setMaxResults(limit);
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
 		}
 		//		if (conceptClassName != null) {
@@ -276,8 +279,17 @@ public class StockDAO extends BaseDAO<Stock> {
 		//		}
 		
 		query.setParameter("locationUuid", locationUuid);
-		
-		return query.list();
+
+		if (pager.isAllowed()) {
+			pager.setTotal(query.list().size());
+			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+			query.setMaxResults(pager.getPageSize());
+		}
+
+		ListResult<Item> listResults = new ListResult<>();
+		listResults.setPager(pager);
+		listResults.setResults(query.list());
+		return listResults;
 	}
 	
 	public Map<String, Object> getStockMetricsByLocation(String locationUuid) {
@@ -327,10 +339,12 @@ public class StockDAO extends BaseDAO<Stock> {
 		
 		/* ------------------------
 		-----------------------
-		query for out of stock
+		query for out of stocknull
 		------------------------
 		------------------------- */
-		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid, null, 0, 0, null).size());
+		Pager pager = new Pager();
+		pager.setAllowed(false);
+		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid, pager, null, null).getResults().size());
 		
 		/* ------------------------
 		-----------------------

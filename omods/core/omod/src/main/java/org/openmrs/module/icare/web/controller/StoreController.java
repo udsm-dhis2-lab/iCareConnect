@@ -556,21 +556,29 @@ public class StoreController {
 	
 	@RequestMapping(value = "stockout", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getItemsStockedOut(
-	        @RequestParam(required = false, value = "location") String locationUuid,
-	        @RequestParam(required = false) String q, @RequestParam(defaultValue = "1000000") Integer limit,
-	        @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String conceptClassName) {
-		List<Item> stockObjects = null;
+	public Map<String, Object> getItemsStockedOut(
+	        @RequestParam(required = false, value = "location") String locationUuid,@RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+			@RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+			@RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+
+			@RequestParam(required = false) String q, @RequestParam(required = false) String conceptClassName) {
+
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+
+		ListResult<Item> stockObjects = null;
 		if (locationUuid != null) {
-			stockObjects = storeService.getStockoutByLocation(locationUuid, q, startIndex, limit, conceptClassName);
+			stockObjects = storeService.getStockoutByLocation(locationUuid,pager, q, conceptClassName);
 		} else {
-			stockObjects = storeService.getStockout();
+			stockObjects = storeService.getStockout(pager);
 		}
-		List<Map<String, Object>> stockStatusResponse = new ArrayList<Map<String, Object>>();
-		for (Item item : stockObjects) {
-			stockStatusResponse.add(item.toMap());
-		}
-		return stockStatusResponse;
+//		List<Map<String, Object>> stockStatusResponse = new ArrayList<Map<String, Object>>();
+//		for (Item item : stockObjects) {
+//			stockStatusResponse.add(item.toMap());
+//		}
+		return stockObjects.toMap();
 	}
 	
 	@RequestMapping(value = "metrics", method = RequestMethod.GET)

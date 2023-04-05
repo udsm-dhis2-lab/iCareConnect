@@ -73,7 +73,7 @@ public interface StoreService extends OpenmrsService {
 	public List<Stock> getStockByLocation(String locationUuid, String search, Integer startIndex, Integer limit,
 	        String conceptClassName);
 	
-	public List<Item> getStockout();
+	public ListResult<Item> getStockout(Pager pager);
 	
 	public List<Stock> getItemStockMetrics(String itemUuid);
 	
@@ -83,7 +83,7 @@ public interface StoreService extends OpenmrsService {
 	
 	public Issue getIssueByUuid(String issueUuid);
 	
-	List<Item> getStockoutByLocation(String locationUuid, String q, Integer startIndex, Integer limit,
+	ListResult<Item> getStockoutByLocation(String locationUuid,Pager pager, String q,
 	        String conceptClassName);
 	
 	Stock saveStock(Stock stock);

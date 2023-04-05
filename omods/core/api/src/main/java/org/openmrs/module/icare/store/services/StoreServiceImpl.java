@@ -433,8 +433,8 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public List<Item> getStockout() {
-		return this.stockDAO.getStockedOut();
+	public ListResult<Item> getStockout(Pager pager) {
+		return this.stockDAO.getStockedOut(pager);
 	}
 	
 	@Override
@@ -978,9 +978,11 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public List<Item> getStockoutByLocation(String locationUuid, String q, Integer startIndex, Integer limit,
-	        String conceptClassName) {
-		return this.stockDAO.getStockedOutByLocation(locationUuid, q, startIndex, limit, conceptClassName);
+	public ListResult<Item> getStockoutByLocation(String locationUuid,Pager pager, String q, String conceptClassName) {
+		ListResult<Item> items = this.stockDAO.getStockedOutByLocation(locationUuid,pager, q, conceptClassName);
+
+
+		return items;
 	}
 	
 	@Override
