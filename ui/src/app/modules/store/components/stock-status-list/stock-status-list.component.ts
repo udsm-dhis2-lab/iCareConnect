@@ -35,6 +35,10 @@ export class StockStatusListComponent implements OnInit {
   suppliers$: Observable<any>;
   unitsOfMeasurementSettings$: Observable<any>;
   unitsOfMeasurement$: Observable<any>;
+  pageSize: number = 10;
+  page: number = 1;
+  pager: number;
+  pageSizeOptions: number[] = [5, 10, 15, 25, 50];
   constructor(
     private stockService: StockService,
     private dialog: MatDialog,
@@ -80,8 +84,11 @@ export class StockStatusListComponent implements OnInit {
       );
     } else {
       this.stocksList$ = this.stockService.getStockOuts(
-        this.currentLocation?.uuid
-      );
+        this.currentLocation?.uuid, this.page, this.pageSize
+      ).pipe(map((response) => {
+        this.pager = response?.pager
+        return response?.results;
+      }));
     }
   }
 
@@ -130,6 +137,13 @@ export class StockStatusListComponent implements OnInit {
   onShowReceivingForm(e: any) {
     e.stopPropagation();
     this.showReceivingForm = true;
+  }
+
+  onPageChange(event) {
+    this.page =
+      event.pageIndex - this.page >= 0 ? this.page + 1 : this.page - 1;
+    this.pageSize = Number(event?.pageSize);
+    this.getStock();
   }
 
 }
