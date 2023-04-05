@@ -105,6 +105,7 @@ export class DispensingFormComponent implements OnInit {
       visit: Visit;
       location: any;
       encounterUuid: string;
+      drugInstructions: string;
       useGenericPrescription?: any;
       forConsultation: boolean;
     }

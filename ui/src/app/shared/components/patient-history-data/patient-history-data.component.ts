@@ -230,12 +230,4 @@ export class PatientHistoryDataComponent implements OnInit {
       this.prescriptionArrangementFields
     );
   }
-
-  getStringDate(date: Date) {
-    return `${date.getDate()}/${
-      (date.getMonth() + 1).toString().length > 1
-        ? date.getMonth() + 1
-        : "0" + date.getMonth() + 1
-    }/${date.getFullYear()}`;
-  }
 }
