@@ -230,6 +230,17 @@ public class StockDAO extends BaseDAO<Stock> {
 		return query.list();
 	}
 	
+	//	public List<Item> getNearlyStockedOut() {
+	//
+	//		DbSession session = this.getSession();
+	//		String queryStr = "SELECT item FROM Item item \n"
+	//				+ "WHERE item.stockable = true AND item.voided=false AND (item NOT IN(SELECT stock.item FROM Stock stock) OR item IN(SELECT stock.item FROM Stock stock WHERE stock.quantity = 0))";
+	//
+	//		Query query = session.createQuery(queryStr);
+	//
+	//		return query.list();
+	//	}
+	
 	//TODO fix getting by location query
 	public List<Item> getStockedOutByLocation(String locationUuid, String q, Integer startIndex, Integer limit,
 	        String conceptClassName) {
@@ -249,7 +260,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		} else {
 			queryStr += " AND ";
 		}
-		queryStr += "  item.stockable = true AND item.voided=false AND (item NOT IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid) OR item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND stock.quantity = 0))";
+		queryStr += "  item.stockable = true AND item.voided=false AND (item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND stock.quantity = 0))";
 		
 		Query query = session.createQuery(queryStr);
 		//		query.setFirstResult(startIndex);
