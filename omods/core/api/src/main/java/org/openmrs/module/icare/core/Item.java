@@ -20,7 +20,7 @@ import java.util.*;
  */
 @Entity
 @Table(name = "item")
-public class Item extends BaseOpenmrsData {
+public class Item extends BaseOpenmrsData implements JSONConverter {
 	
 	@Id
 	@GeneratedValue
