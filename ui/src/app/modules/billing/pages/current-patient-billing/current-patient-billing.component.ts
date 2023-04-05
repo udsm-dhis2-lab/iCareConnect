@@ -1,5 +1,5 @@
 import { Payment } from "src/app/modules/billing/models/payment.model";
-import { keys, sumBy, sum } from "lodash";
+import { keys, sumBy, sum, groupBy } from "lodash";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 
@@ -260,7 +260,9 @@ export class CurrentPatientBillingComponent implements OnInit {
               return bill;
             }
           }),
-          payments,
+          payments: payments,
+          paymentKeys: Object.keys(groupBy(payments, "visit")),
+          currentPayments: groupBy(payments, "visit")[visit?.uuid],
           paymentItemCount: payments
             .map((payment) => payment?.items?.length || 0)
             .reduce((sum, count) => sum + count, 0),
