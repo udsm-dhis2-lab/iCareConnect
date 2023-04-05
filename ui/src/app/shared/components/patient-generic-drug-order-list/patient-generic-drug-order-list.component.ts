@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { Store } from "@ngrx/store";
+import { select, Store } from "@ngrx/store";
 import { Observable, of } from "rxjs";
 import { DispensingFormComponent } from "src/app/shared/dialogs/dispension-form/dispension-form.component";
 import { AppState } from "src/app/store/reducers";
-import { getIfThereIsAnyDiagnosisInTheCurrentActiveVisit } from "src/app/store/selectors";
+import { getCurrentLocation, getIfThereIsAnyDiagnosisInTheCurrentActiveVisit, getParentLocation } from "src/app/store/selectors";
 import { getVisitLoadingState } from "src/app/store/selectors/visit.selectors";
 import { TableActionOption } from "../../models/table-action-options.model";
 import { TableColumn } from "../../models/table-column.model";
@@ -20,6 +20,9 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 import { map, tap } from "rxjs/operators";
 import { Api } from "../../resources/openmrs";
 import { arrangeDrugDetails } from "../../helpers/drugs.helper";
+import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
+import { formatDateToString } from "../../helpers/format-date.helper";
+import { ConfigsService } from "../../services/configs.service";
 
 @Component({
   selector: "app-patient-generic-drug-order-list",
@@ -56,13 +59,15 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   errors: any[] = [];
   encounter$: Observable<any>;
   prescriptionArrangementFields$: Observable<any>;
+  facilityLogo$: any;
+  facilityDetails$: Observable<any>;
+  currentUser$: Observable<any>;
 
   constructor(
     private dialog: MatDialog,
     private store: Store<AppState>,
-    private ordersService: OrdersService,
-    private api: Api,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private configService: ConfigsService,
   ) {}
 
   ngOnInit() {
@@ -157,6 +162,10 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
           };
         })
       );
+
+    this.facilityLogo$ = this.configService.getLogo();
+    this.facilityDetails$ = this.store.select(getParentLocation);
+    this.currentUser$ = this.store.select(getCurrentUserDetails);
   }
 
   getDrugOrders() {
@@ -226,5 +235,213 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
       // );
       this.loadPatientVisit.emit();
     });
+  }
+
+  onPrintPrescriptions(event: Event, drugOrders: any, specificDrugConceptUuid: any, prescriptionArrangementFields: any,  e: any){
+    event?.stopPropagation();
+
+    //Reconstruct drug details first
+    const orders = drugOrders?.map((order) => arrangeDrugDetails(order, specificDrugConceptUuid, prescriptionArrangementFields));
+    
+    let contents: string;
+
+    const frame1: any = document.createElement("iframe");
+    frame1.name = "frame1";
+    frame1.style.position = "absolute";
+    frame1.style.width = "100%";
+    frame1.style.top = "-1000000px";
+    document.body.appendChild(frame1);
+
+    var frameDoc = frame1.contentWindow
+      ? frame1.contentWindow
+      : frame1.contentDocument.document
+        ? frame1.contentDocument.document
+        : frame1.contentDocument;
+
+    frameDoc.document.open();
+
+    frameDoc.document.write(`
+      <html>
+        <head> 
+          <style> 
+              @page { size: auto;  margin: 0mm; }
+              
+              body {
+                padding: 30px;
+                margin: 0 auto;
+                width: 100mm;
+              }
+
+              #top .logo img{
+                //float: left;
+                height: 100px;
+                width: 100px;
+                background-size: 100px 100px;
+              }
+              .info h2 {
+                font-size: 1.3em;
+              }
+              h3 {
+                font-size: 1em;
+              }
+              h5 {
+                font-size: .7em;
+              }
+              p {
+                font-size: .7em;
+              }
+              #table {
+                font-family: Arial, Helvetica, sans-serif;
+                border-collapse: collapse;
+                width: 100%;
+                background-color: #000;
+              } 
+              #table td, #table  th {
+                border: 1px solid #ddd;
+                padding: 5px;
+              } 
+              
+              #table tbody tr:nth-child(even){
+                background-color: #f2f2f2;
+              } 
+
+              #table thead tr th { 
+                padding-top:6px; 
+                padding-bottom: 6px; 
+                text-align: left; 
+                background-color: #cecece;
+                font-size: .7em;
+              }
+              tbody tr td {
+                font-size: .7em;
+              }
+              .footer {
+                display: flex;
+                margin-top:50px;
+              }
+              .footer .doctorDetails .signature {
+                margin-top: 10px;
+              }
+              .footer .userDetails {
+                margin-left: 10vw;
+              }
+              .footer .userDetails .signature {
+                margin-top: 10px;
+              }
+          </style>
+        </head>
+        <body> 
+         <div id="printOut">
+        `);
+
+    // Change image from base64 then replace some text with empty string to get an image
+
+    let image = "";
+
+    e.FacilityDetails.attributes.map((attribute) => {
+      let attributeTypeName =
+        attribute && attribute.attributeType
+          ? attribute?.attributeType?.name.toLowerCase()
+          : "";
+      if (attributeTypeName === "logo") {
+        image = attribute?.value;
+      }
+    });
+
+    let patientMRN =
+      e.CurrentPatient?.MRN ||
+      e.CurrentPatient?.patient?.identifiers[0]?.identifier.replace(
+        "MRN = ",
+        ""
+      );
+
+    frameDoc.document.write(`
+      <center id="top">
+        <div class="logo">
+          <img src="${image}" alt="Facility's Logo"> 
+        </div>
+        
+
+        <div class="info">
+          <h2>${e.FacilityDetails.display}</h2>
+          <h3>P.O Box ${e.FacilityDetails.postalCode} ${e.FacilityDetails.stateProvince}</h3>
+          <h3>${e.FacilityDetails.country}</h3>
+        </div>
+        <!--End Info-->
+      </center>
+      <!--End Document top-->
+      
+      
+      <div id="mid">
+        <div class="patient-info">
+          <p> 
+              Patient Name : ${e.CurrentPatient.name}</br>
+          </p>
+          <p> 
+              MRN : ${patientMRN}</br>
+          </p>
+        </div>
+      </div>`);
+
+    //Prescriptions
+    if (orders.length > 0) {
+      frameDoc.document.write(`
+      <div>
+        <h5>Prescriptions</h5>
+      </div>
+      <table id="table">
+        <thead>
+          <tr>
+            <th>Drug</th>
+            <th>Instructions</th>
+            <th>Prescription Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>`);
+
+      orders.forEach((order) => {
+
+        contents = `
+              <tr>
+                <td>${order?.name}</td> 
+                <td>${order?.description}</td>  
+                <td>${formatDateToString(new Date(order?.date), "DD-MM-YYYY")}</td>
+                <td>Not-despensed</td>
+              </tr>`;
+        frameDoc.document.write(contents);
+        ;
+      });
+
+      frameDoc.document.write(`
+        </tbody>
+      </table>`);
+    }
+
+    frameDoc.document.write(`
+          <div class="footer">
+            <div class="doctorDetails">
+              <p class="name">Authorized by: ..............................</p>
+              <p class="signature">Signature : ..............................</p>
+            </div>
+            <div class="userDetails">
+              <p class="name">Printed By: ${e.CurrentUser?.person?.display}</p>
+              <p class="signature">Signature : ..............................</p>
+            </div>
+          </div>
+          <div class=""printDate>
+            <p>Printed on: ${formatDateToString(new Date(), "DD-MM-YYYY")}</p>
+          </div>
+        </div>
+      </body>
+    </html>`);
+
+    frameDoc.document.close();
+
+    setTimeout(function () {
+      window.frames["frame1"].focus();
+      window.frames["frame1"].print();
+      document.body.removeChild(frame1);
+    }, 500); 
   }
 }
