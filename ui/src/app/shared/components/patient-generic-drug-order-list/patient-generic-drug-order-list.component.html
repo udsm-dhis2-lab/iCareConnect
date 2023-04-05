@@ -4,7 +4,10 @@
     visitLoadingState: visitLoadingState$ | async,
     genericPrescriptionConceptUuids: genericPrescriptionConceptUuids$ | async,
     specificDrugConceptUuid: specificDrugConceptUuid$ | async,
-    prescriptionArrangementFields: prescriptionArrangementFields$ | async
+    prescriptionArrangementFields: prescriptionArrangementFields$ | async,
+    facilityDetails: facilityDetails$ | async,
+    logo: facilityLogo$ | async,
+    currentUser: currentUser$ | async
   } as params"
 >
   <div class="d-flex justify-content-between p-3">
@@ -38,6 +41,38 @@
         *ngIf="!params?.isThereDiagnosisProvided && !params?.visitLoadingState"
       >
         No diagnosis provided, hence you can not do prescription
+      </div>
+    </div>
+    <div class="row" 
+      *ngIf="
+        params?.specificDrugConceptUuid && 
+        params?.prescriptionArrangementFields && 
+        drugOrders?.length && 
+        params?.facilityDetails && 
+        params?.currentUser &&
+        params?.logo
+      ">
+      <div class="col-12">
+        <button 
+          class="mr-4 float-right" 
+          mat-flat-button 
+          color="primary" 
+          (click)="onPrintPrescriptions(
+            $event, 
+            drugOrders, 
+            params?.specificDrugConceptUuid, 
+            params?.prescriptionArrangementFields,
+            {
+              CurrentPatient: currentPatient,
+              FacilityDetails: params?.facilityDetails,
+              Logo: params?.logo,
+              CurrentUser: params?.currentUser
+            }  
+          )"
+          cdkFocusInitial>
+          <mat-icon>print</mat-icon>
+          Print Prescriptions
+        </button>
       </div>
     </div>
   </div>
