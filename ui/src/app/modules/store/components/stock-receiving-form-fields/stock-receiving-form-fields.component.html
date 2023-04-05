@@ -55,7 +55,7 @@
     <div class="col-1">
       <button
       *ngIf="!stockInvoiceItem"
-        class="button-round mt-3"
+        class="button-round mt-3 {{ validForm ?  '' : 'disabled-button'}}"
         color="primary"
         mat-flat-button
         (click)="saveInvoices($event)"

@@ -60,6 +60,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   itemField: Textbox;
   unitOfMeasure: any;
   stockInvoice: any;
+  validForm: boolean = false;
 
   constructor(
     private api: Api,
@@ -266,6 +267,16 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         );
       }, 100);
     }
+
+    this.validForm = this.formValues?.supplier?.value?.toString()?.length &&
+    this.formValues?.invoiceNumber?.value?.toString()?.length &&
+    this.formValues?.receivingDate?.value?.toString()?.length &&
+    this.formValues?.item?.value?.toString()?.length &&
+    this.formValues?.unit?.value?.toString()?.length &&
+    this.formValues?.orderQuantity?.value?.toString()?.length &&
+    this.formValues?.mfgBatchNumber?.value?.toString()?.length &&
+    this.formValues?.expiryDate?.value?.toString()?.length &&
+    this.formValues?.batchQuantity?.value?.toString()?.length ? true : false;
   }
 
   onPageChange(event) {
