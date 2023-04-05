@@ -24,12 +24,12 @@ import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.s
 })
 export class StoreHomeComponent implements OnInit {
   storePages: any[];
-  stockMetrics: any[];
   currentStore$: Observable<any>;
   stockMetrics$: Observable<any>;
   settingCurrentLocationStatus$: Observable<boolean>;
   currentStorePage: any;
   privileges$: Observable<any>;
+  showStoreMetrics: boolean =  false;
   constructor(private store: Store<AppState>) {
     this.store.dispatch(clearStockMetrics());
   }
@@ -70,15 +70,18 @@ export class StoreHomeComponent implements OnInit {
       },
     ];
     this.currentStorePage = this.storePages[0];
-
-    this.stockMetrics$ = this.store.select(getMetrics);
-
     this.privileges$ = this.store.select(getCurrentUserPrivileges);
+    this.showStoreMetrics = true;
   }
 
-  onChangeRoute(event: Event, url: string, page: any): void {
-    event.stopPropagation();
-    this.currentStorePage = page;
-    this.store.dispatch(go({ path: ["/store/" + url] }));
+  onChangeRoute(event: any, url?: string, page?: any): void {
+    const e = event?.e ? event?.e : event
+    e.stopPropagation();
+    this.currentStorePage = page ? page : event?.currentStorePage;
+    this.showStoreMetrics = false;
+    this.store.dispatch(go({ path: [`/store/${url ? url : event?.url}`] }));
+    setTimeout(() => {
+      this.showStoreMetrics = true;
+    }, 200)
   }
 }

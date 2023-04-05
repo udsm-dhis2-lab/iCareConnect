@@ -42,70 +42,14 @@
     </div>
     <!-- end of store sidebar -->
 
+    <!-- Stock Metrics -->
     <!-- store-content -->
-    <div class="store-content col-10">
-      <!-- stock summary -->
-      <div class="row" *ngIf="!(stockMetrics$ | async)">
-        <div class="col p-2">
-          <mat-card class="border p-2">
-            <p>Loading Metrics . . .</p>
-            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-          </mat-card>
-        </div>
-      </div>
-
-      <div class="row" *ngIf="stockMetrics$ | async as metrics">
-        <div class="col mb-2">
-          <mat-card class="border p-3">
-            <mat-card-subtitle class="mb-3 h5 text-center">
-              Nearly Stocked Out
-            </mat-card-subtitle>
-            <mat-card-title class="h2 text-center">{{
-              metrics?.nearlyStockedOut
-            }}</mat-card-title>
-          </mat-card>
-        </div>
-        <div class="col mb-2">
-          <mat-card
-            class="border p-3"
-            style="cursor: pointer"
-            (click)="
-              onChangeRoute(
-                $event,
-                'stockout-items/' + params?.currentStore?.uuid,
-                currentStorePage
-              )
-            "
-          >
-            <mat-card-subtitle class="mb-3 h5 text-center">
-              Stocked Out
-            </mat-card-subtitle>
-            <mat-card-title class="h2 text-center">{{
-              metrics?.stockedOut
-            }}</mat-card-title>
-          </mat-card>
-        </div>
-        <div class="col mb-2">
-          <mat-card class="border p-3">
-            <mat-card-subtitle class="mb-3 h5 text-center">
-              Expired
-            </mat-card-subtitle>
-            <mat-card-title class="h2 text-center">{{
-              metrics?.expired
-            }}</mat-card-title>
-          </mat-card>
-        </div>
-        <div class="col mb-2">
-          <mat-card class="border p-3">
-            <mat-card-subtitle class="mb-3 h5 text-center">
-              Nearly Expired
-            </mat-card-subtitle>
-            <mat-card-title class="h2 text-center">{{
-              metrics?.nearlyExpired
-            }}</mat-card-title>
-          </mat-card>
-        </div>
-      </div>
+    <div class="store-content col-10" *ngIf="showStoreMetrics && params?.currentStore && currentStorePage">
+      <app-stock-metrics 
+        [currentStorePage]="currentStorePage"
+        [currentStore]="params?.currentStore"
+        (changeRoute)="onChangeRoute($event)"
+        ></app-stock-metrics>
       <!-- end of stock summary -->
       <router-outlet></router-outlet>
     </div>
