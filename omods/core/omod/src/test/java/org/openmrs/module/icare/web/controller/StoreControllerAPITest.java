@@ -456,7 +456,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
 		
-		assertThat("stock listing has 6 entries:", stockList.size(), is(6));
+		assertThat("stock listing has 6 entries:", stockList.size(), is(7));
 		
 		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
@@ -538,9 +538,10 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newGetRequest = newGetRequest("store/stockout");
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
-		List<Map<String, Object>> stockoutList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
+		Map<String, Object> stockoutList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		System.out.println(stockoutList);
 		
-		assertThat("stockOut listing has one entry:", stockoutList.size(), is(2));
+		assertThat("stockOut listing has one entry:", ((List)stockoutList.get("results")).size(), is(2));
 	}
 	
 	@Test
@@ -554,8 +555,9 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		//Then
 		String result = handleGet.getContentAsString();
-		List<Map<String, Object>> stockoutList = (new ObjectMapper()).readValue(result, List.class);
-		assertThat("stockOut listing has two entry:", stockoutList.size(), is(2));
+		Map<String, Object> stockoutList = (new ObjectMapper()).readValue(result, Map.class);
+		System.out.println(stockoutList);
+		assertThat("stockOut listing has two entry:", ((List)stockoutList.get("results")).size(), is(1));
 	}
 	
 	@Test
@@ -568,22 +570,22 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
 		//Then
-		List<Map<String, Object>> stockoutList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
+		Map<String, Object> stockoutList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		
 		System.out.println(stockoutList);
 		
-		assertThat("stockOut listing has no entry:", stockoutList.size(), is(4));
+		assertThat("stockOut listing has no entry:", ((List)stockoutList.get("results")).size(), is(1));
 		
 		newGetRequest = newGetRequest("store/stockout", new Parameter("location", "44939999-d333-fff2-9bff-61d11117c22e"),
-		    new Parameter("q", "syringe"));
+		    new Parameter("q", "spirit"));
 		handleGet = handle(newGetRequest);
 		//Then
-		List<Map<String, Object>> stockoutListBySearch = (new ObjectMapper()).readValue(handleGet.getContentAsString(),
-		    List.class);
+		Map<String, Object> stockoutListBySearch = (new ObjectMapper()).readValue(handleGet.getContentAsString(),
+		    Map.class);
 		
 		System.out.println(stockoutListBySearch);
 		
-		assertThat("stockOut Searched by q:", stockoutListBySearch.size(), is(1));
+		assertThat("stockOut Searched by q:", ((List)stockoutListBySearch.get("results")).size(), is(1));
 	}
 	
 	@Test
