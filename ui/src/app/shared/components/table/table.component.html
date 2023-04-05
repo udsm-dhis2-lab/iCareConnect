@@ -16,7 +16,20 @@
     >
       {{ params?.patientDrugOrdersStatuses["error"]["error"]["message"] }}
     </p>
-    <table class="table" *ngIf="useNormalTable">
+    <div class="row" *ngIf="useNormalTable && drugOrders?.length">
+      <div class="col-12">
+        <button
+          class="mr-4 float-right" 
+          mat-flat-button 
+          color="primary"
+          (click)="onPrintPrescriptions($event, drugOrders)"
+          cdkFocusInitial>
+          <mat-icon>print</mat-icon>
+          Print Verified Prescriptions
+        </button>
+      </div>
+    </div>
+    <table class="table" *ngIf="useNormalTable && drugOrders?.length">
       <thead>
         <tr>
           <th>SN</th>
@@ -93,6 +106,13 @@
             </td>
           </tr>
         </ng-container>
+      </tbody>
+    </table>
+    <table *ngIf="useNormalTable && !drugOrders?.length" class="table table-striped">
+      <tbody>
+        <tr>
+          <td>No dispensions found</td>
+        </tr>
       </tbody>
     </table>
     <table
