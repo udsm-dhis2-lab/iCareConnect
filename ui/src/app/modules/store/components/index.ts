@@ -10,6 +10,7 @@ import { StockInOtherUnitsComponent } from "./stock-in-other-units/stock-in-othe
 import { StockInvoiceItemsComponent } from "./stock-invoice-items/stock-invoice-items.component";
 import { StockInvoiceComponent } from "./stock-invoice/stock-invoice.component";
 import { StockInvoicesListComponent } from "./stock-invoices-list/stock-invoices-list.component";
+import { StockMetricsComponent } from "./stock-metrics/stock-metrics.component";
 import { StockOutItemsComponent } from "./stock-out-items/stock-out-items.component";
 import { StockReceivingFormFieldsComponent } from "./stock-receiving-form-fields/stock-receiving-form-fields.component";
 import { StockReceivingFormComponent } from "./stock-receiving-form/stock-receiving-form.component";
@@ -38,4 +39,5 @@ export const stockComponents: any[] = [
   NewRequisitionFormComponent,
   RequisitionItemsComponent,
   IssueItemsComponent,
+  StockMetricsComponent
 ];

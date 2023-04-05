@@ -38,6 +38,17 @@
         </div>
       </div>
     </div>
+    <div class="row">
+      <div class="col-12">
+        <mat-paginator 
+          class="float-right" 
+          [length]="pager?.total" 
+          [pageSize]="pageSize" 
+          [pageSizeOptions]="pageSizeOptions"
+          (page)="onPageChange($event)">
+        </mat-paginator>
+      </div>
+    </div>
     <div class="overflow-x-auto">
       <table class="table border-bottom table-fit">
         <tr>
