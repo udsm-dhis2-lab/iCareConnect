@@ -560,7 +560,6 @@ public class StoreController {
 	        @RequestParam(required = false, value = "location") String locationUuid,@RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 			@RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
 			@RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
-
 			@RequestParam(required = false) String q, @RequestParam(required = false) String conceptClassName) {
 
 		Pager pager = new Pager();
@@ -579,6 +578,48 @@ public class StoreController {
 //			stockStatusResponse.add(item.toMap());
 //		}
 		return stockObjects.toMap();
+	}
+
+	@RequestMapping(value = "nearlystockoutitems", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String,Object> getNearlyStockedOutItems(@RequestParam(required = false, value = "location") String locationUuid,@RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging, @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize, @RequestParam(defaultValue = "1", value = "page", required = false) Integer page){
+
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+
+		ListResult<Item> nearlyStockedItems = storeService.getNearlyStockedOutByLocation(locationUuid,pager);
+
+		return  nearlyStockedItems.toMap();
+	}
+
+	@RequestMapping(value = "nearlyexpireditems", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String,Object> getNearlyExpiredItems(@RequestParam(required = false, value = "location") String locationUuid,@RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging, @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize, @RequestParam(defaultValue = "1", value = "page", required = false) Integer page){
+
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+
+		ListResult<Item> nearlyExpiredItems = storeService.getNearlyExpiredByLocation(locationUuid,pager);
+
+		return nearlyExpiredItems.toMap();
+	}
+
+	@RequestMapping(value = "expireditems", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String,Object> getExpiredItems(@RequestParam(required = false, value = "location") String locationUuid,@RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging, @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize, @RequestParam(defaultValue = "1", value = "page", required = false) Integer page){
+
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+
+		ListResult<Item> expiredItems = storeService.getExpiredItemsByLocation(locationUuid,pager);
+
+		return expiredItems.toMap();
 	}
 	
 	@RequestMapping(value = "metrics", method = RequestMethod.GET)

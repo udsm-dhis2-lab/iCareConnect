@@ -225,7 +225,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT item FROM Item item \n"
-		        + "WHERE item.stockable = true AND item.voided=false AND (item NOT IN(SELECT stock.item FROM Stock stock) OR item IN(SELECT stock.item FROM Stock stock WHERE stock.quantity = 0))";
+		        + "WHERE item.stockable = true AND item.voided=false AND ( item IN(SELECT stock.item FROM Stock stock WHERE stock.quantity = 0))";
 		
 		Query query = session.createQuery(queryStr);
 
@@ -236,16 +236,80 @@ public class StockDAO extends BaseDAO<Stock> {
 
 	}
 	
-	//	public List<Item> getNearlyStockedOut() {
-	//
-	//		DbSession session = this.getSession();
-	//		String queryStr = "SELECT item FROM Item item \n"
-	//				+ "WHERE item.stockable = true AND item.voided=false AND (item NOT IN(SELECT stock.item FROM Stock stock) OR item IN(SELECT stock.item FROM Stock stock WHERE stock.quantity = 0))";
-	//
-	//		Query query = session.createQuery(queryStr);
-	//
-	//		return query.list();
-	//	}
+		public ListResult<Item> getNearlyStockedOut(String locationUuid,Pager pager) {
+
+			DbSession session = this.getSession();
+
+//			String queryStr = "SELECT stc.item,SUM(stc.quantity) FROM Stock stc \n"
+//					+ "WHERE stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) \n" + "GROUP BY stc.item \n"
+//					+ "HAVING SUM(stc.quantity) <=  (SELECT rol.quantity FROM ReorderLevel rol \n"
+//					+ "WHERE rol.id.location = (SELECT loc FROM Location loc WHERE loc.uuid = :locationUuid) AND rol.id.item = stc.item)";
+//
+//			String queryStr = "SELECT s FROM Stock s JOIN (SELECT s.item, SUM(s.quantity) as totalQuantity FROM Stock s WHERE s.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) GROUP BY s.item) AS sq ON s.item = sq.item JOIN ReorderLevel r ON s.item = r.id.item WHERE sq.totalQuantity <= r.quantity";
+
+//			String queryStr = "SELECT s FROM Stock s INNER JOIN ReorderLevel r ON s.item = r.id.item WHERE s.item IN ( SELECT s2.item FROM Stock s2 WHERE s2.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) GROUP BY s2.item HAVING SUM(s2.quantity) < r.quantity)";
+
+			String queryStr = "SELECT item FROM Item item WHERE item IN( SELECT s.item FROM Stock s WHERE s.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) AND  s.item IN ( SELECT r.id.item FROM ReorderLevel r WHERE ( SELECT SUM(s2.quantity) FROM Stock s2 WHERE s2.item = r.id.item AND s2.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) GROUP BY s2.item) <= r.quantity)) ";
+
+
+			Query query = session.createQuery(queryStr);
+			query.setParameter("locationUuid", locationUuid);
+
+			if (pager.isAllowed()) {
+				pager.setTotal(query.list().size());
+				query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+				query.setMaxResults(pager.getPageSize());
+			}
+
+			ListResult<Item> listResults = new ListResult<>();
+			listResults.setPager(pager);
+			listResults.setResults(query.list());
+			return listResults;
+		}
+
+	public ListResult<Item> getNearlyExpiredByLocation(String locationUuid, Pager pager) {
+
+		DbSession session = this.getSession();
+
+		String queryStr = "SELECT stc FROM Stock stc INNER JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN it.drug d WHERE stc.expiryDate <= current_date + 30 AND stc.expiryDate > current_date AND (d.retired = false OR c.retired = false) AND stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) ";;
+
+		Query query = session.createQuery(queryStr);
+		query.setParameter("locationUuid", locationUuid);
+
+		if (pager.isAllowed()) {
+			pager.setTotal(query.list().size());
+			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+			query.setMaxResults(pager.getPageSize());
+		}
+
+		ListResult<Item> listResults = new ListResult<>();
+		listResults.setPager(pager);
+		listResults.setResults(query.list());
+		return listResults;
+
+	}
+
+	public ListResult<Item> getExpiredItemsByLocation(String locationUuid, Pager pager) {
+
+		DbSession session = this.getSession();
+
+		String queryStr = "SELECT stc FROM Stock stc INNER JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN it.drug d WHERE stc.expiryDate <= current_date AND (d.retired = false OR c.retired = false) AND  stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) ";
+
+		Query query = session.createQuery(queryStr);
+		query.setParameter("locationUuid", locationUuid);
+
+		if (pager.isAllowed()) {
+			pager.setTotal(query.list().size());
+			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+			query.setMaxResults(pager.getPageSize());
+		}
+		//Stock
+		ListResult<Item> listResults = new ListResult<>();
+		listResults.setPager(pager);
+		listResults.setResults(query.list());
+		return listResults;
+
+	}
 	
 	//TODO fix getting by location query
 	public ListResult<Item> getStockedOutByLocation(String locationUuid, Pager pager, String q, String conceptClassName) {
@@ -293,71 +357,15 @@ public class StockDAO extends BaseDAO<Stock> {
 	}
 	
 	public Map<String, Object> getStockMetricsByLocation(String locationUuid) {
-		
-		//		{
-		//			nearly stocked out;
-		//			stocked out;
-		//			expired;
-		//			nearly expired;
-		//		}
-		
-		/* ------------------------
-		-----------------------
-		query for nearly out of stock
-		------------------------
-		------------------------- */
-		
-		DbSession session = this.getSession();
-		
-		String queryStr = "SELECT stc.item,SUM(stc.quantity) FROM Stock stc \n"
-		
-		+ "WHERE stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) \n" + "GROUP BY stc.item \n"
-		        + "HAVING SUM(stc.quantity) <=  (SELECT rol.quantity FROM ReorderLevel rol \n"
-		        + "WHERE rol.id.location = (SELECT loc FROM Location loc WHERE loc.uuid = :locationUuid))";
-		
-		Query query = session.createQuery(queryStr);
-		query.setParameter("locationUuid", locationUuid);
-		
-		Map<String, Object> metricsMap = new HashMap<String, Object>();
-		
-		metricsMap.put("nearlyStockedOut", query.list().size());
-		
-		/* ------------------------
-		-----------------------
-		query for nearly expired
-		------------------------
-		------------------------- */
-		String nearlyExpired = "SELECT stc,(stc.expiryDate - current_date) FROM Stock stc LEFT JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN it.drug d WHERE stc.expiryDate <= current_date + 30 AND (d.retired = false OR c.retired = false) AND stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) ";
-		
-		Query queryNearlyExpired = session.createQuery(nearlyExpired);
-		
-		queryNearlyExpired.setParameter("locationUuid", locationUuid);
-		
-		Integer nearExpiredCountlist = queryNearlyExpired.list().size();
-		
-		metricsMap.put("nearlyExpired", nearExpiredCountlist);
-		
-		/* ------------------------
-		-----------------------
-		query for out of stocknull
-		------------------------
-		------------------------- */
+
 		Pager pager = new Pager();
 		pager.setAllowed(false);
+
+		Map<String, Object> metricsMap = new HashMap<String, Object>();
+		metricsMap.put("nearlyStockedOut", this.getNearlyStockedOut(locationUuid,pager).getResults().size());
+		metricsMap.put("nearlyExpired", this.getNearlyExpiredByLocation(locationUuid,pager).getResults().size());
 		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid, pager, null, null).getResults().size());
-		
-		/* ------------------------
-		-----------------------
-		query for expired stock
-		------------------------
-		------------------------- */
-		String expiredQueryString = "SELECT stc FROM Stock stc LEFT JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN it.drug d WHERE stc.expiryDate <= current_date AND (d.retired = false OR c.retired = false) AND  stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) ";
-		
-		Query queryExpired = session.createQuery(expiredQueryString);
-		
-		queryExpired.setParameter("locationUuid", locationUuid);
-		
-		metricsMap.put("expired", queryExpired.list().size());
+		metricsMap.put("expired", this.getExpiredItemsByLocation(locationUuid,pager).getResults().size());
 		
 		return metricsMap;
 		
@@ -394,4 +402,5 @@ public class StockDAO extends BaseDAO<Stock> {
 		session.flush();
 		return entity;
 	}
+
 }
