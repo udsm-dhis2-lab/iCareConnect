@@ -143,4 +143,10 @@ public interface StoreService extends OpenmrsService {
 	RequisitionItem updateRequisitionItem(RequisitionItem requisitionItem) throws Exception;
 	
 	public IssueItem getIssueItemByUuid(String IssueItemUuid);
+
+	ListResult<Item> getNearlyStockedOutByLocation(String locationUuid, Pager pager);
+
+	ListResult<Item> getNearlyExpiredByLocation(String locationUuid, Pager pager);
+
+	ListResult<Item> getExpiredItemsByLocation(String locationUuid, Pager pager);
 }

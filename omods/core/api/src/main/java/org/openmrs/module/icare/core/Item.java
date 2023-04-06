@@ -20,7 +20,7 @@ import java.util.*;
  */
 @Entity
 @Table(name = "item")
-public class Item extends BaseOpenmrsData implements JSONConverter {
+public class Item extends BaseOpenmrsData implements java.io.Serializable,JSONConverter {
 	
 	@Id
 	@GeneratedValue
@@ -136,8 +136,9 @@ public class Item extends BaseOpenmrsData implements JSONConverter {
 		if (this.getCreator() != null) {
 			creatorObject.put("uuid", this.getCreator().getUuid());
 			creatorObject.put("display", this.getCreator().getDisplayString());
+			itemMap.put("creator", creatorObject);
 		}
-		itemMap.put("creator", creatorObject);
+
 		Date date = this.getDateCreated();
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 		itemMap.put("created", dateFormat.format(date));

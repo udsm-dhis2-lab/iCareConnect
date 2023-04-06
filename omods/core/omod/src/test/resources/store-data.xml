@@ -81,7 +81,7 @@
 
     <st_stock stock_id="10" item_id="123" batch="batch-xyz" expiry_date="2040-12-08 00:00:00" location_id="200" quantity="100"/>
 
-    <st_stock stock_id="11" item_id="123" batch="batch-xyz1" expiry_date="2020-12-30 00:00:00" location_id="200" quantity="100"/>
+    <st_stock stock_id="11" item_id="123" batch="batch-xyz1" expiry_date="2023-04-30 00:00:00" location_id="200" quantity="100"/>
 
     <st_stock stock_id="12" item_id="124" batch="batch-xyz3" expiry_date="2020-12-30 00:00:00" location_id="200" quantity="100"/>
 
@@ -93,7 +93,7 @@
 
     <st_stock stock_id="17" item_id="127" batch="batch-xyz7" expiry_date="2022-11-30 00:00:00" location_id="201" quantity="0"/>
 
-    <st_reorder_level location_id="200" item_id="123" quantity="150"/>
+    <st_reorder_level location_id="200" item_id="123" quantity="221"/>
 
 
     <!-- Supplier  -->

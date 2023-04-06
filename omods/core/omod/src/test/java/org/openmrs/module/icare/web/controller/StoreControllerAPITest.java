@@ -541,7 +541,12 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> stockoutList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		System.out.println(stockoutList);
 		
-		assertThat("stockOut listing has one entry:", ((List)stockoutList.get("results")).size(), is(2));
+		assertThat("stockOut listing has one entry:", ((List)stockoutList.get("results")).size(), is(1));
+	}
+
+	@Test
+	public void testGettingNearlyStockedOutItems() throws Exception{
+
 	}
 	
 	@Test
@@ -884,5 +889,29 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		    (((Map) ((List) ((Map) ((List) handleGetObject.get("requisitionItems")).get(0)).get("requisitionItemStatuses"))
 		            .get(0)).get("status")).equals("PENDING"));
 		
+	}
+
+	@Test
+	public void getStockMetricsList() throws Exception{
+
+		//expired items
+		MockHttpServletRequest newGetRequest = newGetRequest("store/expireditems", new Parameter("location","44939999-d333-fff2-9bff-61d11117c22e"));
+		MockHttpServletResponse handleGet = handle(newGetRequest);
+		Map<String,Object> handleGetObject = new ObjectMapper().readValue(handleGet.getContentAsString(),Map.class);
+		assertThat("The list of expired drugs",((List)handleGetObject.get("results")).size() == 3);
+
+		//nearly stockout items
+		MockHttpServletRequest newGetRequest1 = newGetRequest("store/nearlystockoutitems",new Parameter("location","44939999-d333-fff2-9bff-61d11117c22e"));
+		MockHttpServletResponse handleGet1 = handle(newGetRequest1);
+		Map<String,Object> handleGetObject1 = new ObjectMapper().readValue(handleGet1.getContentAsString(), Map.class);
+		assertThat("The list of nearly stockout items",((List)handleGetObject1.get("results")).size()==1);
+
+		//nearly expired items
+		MockHttpServletRequest newGetRequest2 = newGetRequest("store/nearlyexpireditems", new Parameter("location","44939999-d333-fff2-9bff-61d11117c22e"));
+		MockHttpServletResponse handleGet2 = handle(newGetRequest2);
+		Map<String,Object> handleGetObject2 = new ObjectMapper().readValue(handleGet2.getContentAsString(),Map.class);
+		assertThat("The list of nearly expired items",((List)handleGetObject2.get("results")).size()==1);
+
+
 	}
 }
