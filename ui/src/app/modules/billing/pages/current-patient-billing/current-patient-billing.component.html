@@ -251,6 +251,7 @@
                   No completed payments
                 </div>
                 <div>
+                  
                   <app-payments
                     *ngIf="
                       patientBillingDetails?.payments.length > 0 &&
@@ -282,7 +283,7 @@
                         "
                         [showText]="'Print All'"
                         [ElementToBePrinted]="{
-                          Payments: patientBillingDetails?.payments,
+                          Payments: patientBillingDetails.currentPayments,
                           Bill: patientBillingDetails.bills,
                           CurrentPatient: params?.currentPatient,
                           FacilityDetails: params?.facilityDetails,
@@ -299,7 +300,7 @@
                         [toolTipText]="'Click to print receipt'"
                         [showText]="'Print Receipt'"
                         [ElementToBePrinted]="{
-                          Payments: patientBillingDetails?.payments,
+                          Payments: patientBillingDetails.currentPayments,
                           CurrentPatient: params?.currentPatient,
                           FacilityDetails: params?.facilityDetails,
                           Logo: params?.logo
