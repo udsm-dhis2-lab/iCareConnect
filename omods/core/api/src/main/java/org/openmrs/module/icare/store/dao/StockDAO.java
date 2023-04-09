@@ -228,15 +228,15 @@ public class StockDAO extends BaseDAO<Stock> {
 		        + "WHERE item.stockable = true AND item.voided=false AND ( item IN(SELECT stock.item FROM Stock stock WHERE stock.quantity = 0))";
 		
 		Query query = session.createQuery(queryStr);
-
+		
 		ListResult<Item> listResults = new ListResult();
 		listResults.setPager(pager);
 		listResults.setResults(query.list());
 		return listResults;
-
+		
 	}
 	
-		public ListResult<Item> getNearlyStockedOut(String locationUuid,Pager pager) {
+	public ListResult<Item> getNearlyStockedOut(String locationUuid,Pager pager) {
 
 			DbSession session = this.getSession();
 
@@ -266,7 +266,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			listResults.setResults(query.list());
 			return listResults;
 		}
-
+	
 	public ListResult<Item> getNearlyExpiredByLocation(String locationUuid, Pager pager) {
 
 		DbSession session = this.getSession();
@@ -288,7 +288,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		return listResults;
 
 	}
-
+	
 	public ListResult<Item> getExpiredItemsByLocation(String locationUuid, Pager pager) {
 
 		DbSession session = this.getSession();
@@ -357,15 +357,15 @@ public class StockDAO extends BaseDAO<Stock> {
 	}
 	
 	public Map<String, Object> getStockMetricsByLocation(String locationUuid) {
-
+		
 		Pager pager = new Pager();
 		pager.setAllowed(false);
-
+		
 		Map<String, Object> metricsMap = new HashMap<String, Object>();
-		metricsMap.put("nearlyStockedOut", this.getNearlyStockedOut(locationUuid,pager).getResults().size());
-		metricsMap.put("nearlyExpired", this.getNearlyExpiredByLocation(locationUuid,pager).getResults().size());
+		metricsMap.put("nearlyStockedOut", this.getNearlyStockedOut(locationUuid, pager).getResults().size());
+		metricsMap.put("nearlyExpired", this.getNearlyExpiredByLocation(locationUuid, pager).getResults().size());
 		metricsMap.put("stockedOut", this.getStockedOutByLocation(locationUuid, pager, null, null).getResults().size());
-		metricsMap.put("expired", this.getExpiredItemsByLocation(locationUuid,pager).getResults().size());
+		metricsMap.put("expired", this.getExpiredItemsByLocation(locationUuid, pager).getResults().size());
 		
 		return metricsMap;
 		
@@ -402,5 +402,5 @@ public class StockDAO extends BaseDAO<Stock> {
 		session.flush();
 		return entity;
 	}
-
+	
 }

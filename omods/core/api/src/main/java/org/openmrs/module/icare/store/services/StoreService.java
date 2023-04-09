@@ -83,8 +83,7 @@ public interface StoreService extends OpenmrsService {
 	
 	public Issue getIssueByUuid(String issueUuid);
 	
-	ListResult<Item> getStockoutByLocation(String locationUuid,Pager pager, String q,
-	        String conceptClassName);
+	ListResult<Item> getStockoutByLocation(String locationUuid, Pager pager, String q, String conceptClassName);
 	
 	Stock saveStock(Stock stock);
 	
@@ -143,10 +142,10 @@ public interface StoreService extends OpenmrsService {
 	RequisitionItem updateRequisitionItem(RequisitionItem requisitionItem) throws Exception;
 	
 	public IssueItem getIssueItemByUuid(String IssueItemUuid);
-
+	
 	ListResult<Item> getNearlyStockedOutByLocation(String locationUuid, Pager pager);
-
+	
 	ListResult<Item> getNearlyExpiredByLocation(String locationUuid, Pager pager);
-
+	
 	ListResult<Item> getExpiredItemsByLocation(String locationUuid, Pager pager);
 }
