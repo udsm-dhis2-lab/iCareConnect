@@ -912,29 +912,29 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	public IssueItem getIssueItemByUuid(String issueItemUuid) {
 		return issueItemDAO.findByUuid(issueItemUuid);
 	}
-
+	
 	@Override
 	public ListResult<Item> getNearlyStockedOutByLocation(String locationUuid, Pager pager) {
-
-		ListResult<Item> items = stockDAO.getNearlyStockedOut(locationUuid,pager);
-
+		
+		ListResult<Item> items = stockDAO.getNearlyStockedOut(locationUuid, pager);
+		
 		return items;
 	}
-
+	
 	@Override
 	public ListResult<Item> getNearlyExpiredByLocation(String locationUuid, Pager pager) {
-
-		ListResult<Item> items = stockDAO.getNearlyExpiredByLocation(locationUuid,pager);
+		
+		ListResult<Item> items = stockDAO.getNearlyExpiredByLocation(locationUuid, pager);
 		return items;
 	}
-
+	
 	@Override
 	public ListResult<Item> getExpiredItemsByLocation(String locationUuid, Pager pager) {
-
-		ListResult<Item> items = stockDAO.getExpiredItemsByLocation(locationUuid,pager);
+		
+		ListResult<Item> items = stockDAO.getExpiredItemsByLocation(locationUuid, pager);
 		return items;
 	}
-
+	
 	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		
@@ -1000,10 +1000,9 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public ListResult<Item> getStockoutByLocation(String locationUuid,Pager pager, String q, String conceptClassName) {
-		ListResult<Item> items = this.stockDAO.getStockedOutByLocation(locationUuid,pager, q, conceptClassName);
-
-
+	public ListResult<Item> getStockoutByLocation(String locationUuid, Pager pager, String q, String conceptClassName) {
+		ListResult<Item> items = this.stockDAO.getStockedOutByLocation(locationUuid, pager, q, conceptClassName);
+		
 		return items;
 	}
 	
