@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Observable, of } from "rxjs";
-import { map } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { LocationService } from "src/app/core/services";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
@@ -23,6 +23,7 @@ export class StockStatusListComponent implements OnInit {
   @Input() userPrivileges: any;
   @Input() isCurrentLocationMainStore: boolean;
   @Input() isStockOutPage: boolean;
+  @Input() status: string;
   stocksList$: Observable<StockObject[]>;
   searchTerm: string;
   currentItemStock: StockObject;
@@ -77,17 +78,32 @@ export class StockStatusListComponent implements OnInit {
   }
 
   getStock(): void {
-    if (!this.isStockOutPage) {
+    if (!this.isStockOutPage && !this.status) {
       this.stocksList$ = this.stockService.getAvailableStocks(
         this.currentLocation?.uuid,
         { q: this.searchTerm }
       );
-    } else {
+    } else if (this.isStockOutPage) {
       this.stocksList$ = this.stockService.getStockOuts(
         this.currentLocation?.uuid, this.page, this.pageSize
       ).pipe(map((response) => {
         this.pager = response?.pager
         return response?.results;
+      }));
+    } else if(this.status === 'EXPIRED'){
+      this.stocksList$ = this.stockService.getExpiredItems(this.currentLocation?.uuid).pipe(map((response) => {
+        this.pager = response?.pager
+        return response?.results
+      }));
+    } else if (this.status === 'NEARLYSTOCKEDOUT') {
+      this.stocksList$ = this.stockService.getNearlyStockedOutItems(this.currentLocation?.uuid).pipe(map((response) => {
+        this.pager = response?.pager
+        return response?.results
+      }));
+    } else if (this.status === 'NEARLYEXPIRED') {
+      this.stocksList$ = this.stockService.getNearlyExpiredItems(this.currentLocation?.uuid).pipe(map((response) => {
+        this.pager = response?.pager
+        return response?.results
       }));
     }
   }

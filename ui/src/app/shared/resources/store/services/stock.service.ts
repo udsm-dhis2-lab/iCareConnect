@@ -75,11 +75,12 @@ export class StockService {
   getStockOuts(locationUuid?: string, page?: number, pageSize?: number): Observable<any> {
     const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
     const pageSizeNumber =
-      locationUuid || (pageSize && page)
+      locationUuid && pageSize && page
         ? `&pageSize=${pageSize}`
-        : pageSize
-          ? `pageSize=${pageSize}`
-          : ``;
+        : pageSize && page
+          ? `&pageSize=${pageSize}`
+          : pageSize
+            ? `pageSize=${pageSize}` : ``;
     const location =
       locationUuid ? `location=${locationUuid}` : '';
     const args = `?${location}${pageNumber}${pageSizeNumber}` ;
@@ -102,6 +103,101 @@ export class StockService {
         }
       }))
     return this._getStocks("store/stockout", locationUuid, null, true);
+  }
+  getExpiredItems(locationUuid?: string, page?: number, pageSize?: number): Observable<any> {
+    const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
+    const pageSizeNumber =
+      locationUuid && pageSize && page
+        ? `&pageSize=${pageSize}`
+        : pageSize && page 
+        ? `&pageSize=${pageSize}`
+        : pageSize 
+        ? `pageSize=${pageSize}` : ``;
+    const location =
+      locationUuid ? `location=${locationUuid}` : '';
+    const args = `?${location}${pageNumber}${pageSizeNumber}` ;
+
+    return this.httpClient
+      .get(
+        `store/expireditems${args}`
+      )?.pipe(map((response) => {
+        const stockBatches: StockBatch[] = (response?.results || []).map(
+          (stockItem) => new StockBatch(stockItem)
+        )
+        const groupedStockBatches =
+          StockBatch.getGroupedStockBatches(stockBatches);
+
+        return {
+          ...response,
+          results: Object.keys(groupedStockBatches).map((stockItemKey) => {
+            return new Stock(groupedStockBatches[stockItemKey]).toJson();
+          })
+        }
+      }))
+  }
+
+  getNearlyStockedOutItems(locationUuid?: string, page?: number, pageSize?: number): Observable<any> {
+    const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
+    const pageSizeNumber =
+      locationUuid && pageSize && page
+        ? `&pageSize=${pageSize}`
+        : pageSize && page 
+        ? `&pageSize=${pageSize}`
+        : pageSize 
+        ? `pageSize=${pageSize}` : ``;
+    const location =
+      locationUuid ? `location=${locationUuid}` : '';
+    const args = `?${location}${pageNumber}${pageSizeNumber}` ;
+
+    return this.httpClient
+      .get(
+        `store/nearlystockoutitems${args}`
+      )?.pipe(map((response) => {
+        const stockBatches: StockBatch[] = (response?.results || []).map(
+          (stockItem) => new StockBatch(stockItem)
+        )
+        const groupedStockBatches =
+          StockBatch.getGroupedStockBatches(stockBatches);
+
+        return {
+          ...response,
+          results: Object.keys(groupedStockBatches).map((stockItemKey) => {
+            return new Stock(groupedStockBatches[stockItemKey]).toJson();
+          })
+        }
+      }))
+  }
+  
+  getNearlyExpiredItems(locationUuid?: string, page?: number, pageSize?: number): Observable<any> {
+    const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
+    const pageSizeNumber =
+      locationUuid && pageSize && page
+        ? `&pageSize=${pageSize}`
+        : pageSize && page 
+        ? `&pageSize=${pageSize}`
+        : pageSize 
+        ? `pageSize=${pageSize}` : ``;
+    const location =
+      locationUuid ? `location=${locationUuid}` : '';
+    const args = `?${location}${pageNumber}${pageSizeNumber}` ;
+
+    return this.httpClient
+      .get(
+        `store/nearlyexpireditems${args}`
+      )?.pipe(map((response) => {
+        const stockBatches: StockBatch[] = (response?.results || []).map(
+          (stockItem) => new StockBatch(stockItem)
+        )
+        const groupedStockBatches =
+          StockBatch.getGroupedStockBatches(stockBatches);
+
+        return {
+          ...response,
+          results: Object.keys(groupedStockBatches).map((stockItemKey) => {
+            return new Stock(groupedStockBatches[stockItemKey]).toJson();
+          })
+        }
+      }))
   }
 
   saveStockLedger(ledgerInput: LedgerInput): Observable<any> {

@@ -10,7 +10,16 @@
 
 <div class="row" *ngIf="stockMetrics$ | async as metrics">
   <div class="col mb-2">
-    <mat-card class="border p-3">
+    <mat-card 
+      class="border p-3"
+      style="cursor: pointer" 
+      (click)="onChangeRoute(
+              $event,
+              'nearly-stocked-out-items/' + currentStore?.uuid,
+              currentStorePage
+            )
+          "
+      >
       <mat-card-subtitle class="mb-3 h5 text-center">
         Nearly Stocked Out
       </mat-card-subtitle>
@@ -20,8 +29,10 @@
     </mat-card>
   </div>
   <div class="col mb-2">
-    <mat-card class="border p-3" style="cursor: pointer" (click)="
-              onChangeRoute(
+    <mat-card 
+      class="border p-3" 
+      style="cursor: pointer" 
+      (click)="onChangeRoute(
                 $event,
                 'stockout-items/' + currentStore?.uuid,
                 currentStorePage
@@ -36,7 +47,16 @@
     </mat-card>
   </div>
   <div class="col mb-2">
-    <mat-card class="border p-3">
+    <mat-card 
+      class="border p-3"
+      style="cursor: pointer" 
+      (click)="onChangeRoute(
+              $event,
+              'expired-items/' + currentStore?.uuid,
+              currentStorePage
+            )
+          "
+      >
       <mat-card-subtitle class="mb-3 h5 text-center">
         Expired
       </mat-card-subtitle>
@@ -46,7 +66,16 @@
     </mat-card>
   </div>
   <div class="col mb-2">
-    <mat-card class="border p-3">
+    <mat-card 
+      class="border p-3"
+      style="cursor: pointer" 
+      (click)="onChangeRoute(
+              $event,
+              'nearly-expired-items/' + currentStore?.uuid,
+              currentStorePage
+            )
+          "
+      >
       <mat-card-subtitle class="mb-3 h5 text-center">
         Nearly Expired
       </mat-card-subtitle>
