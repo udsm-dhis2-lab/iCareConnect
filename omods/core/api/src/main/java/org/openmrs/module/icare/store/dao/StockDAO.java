@@ -222,10 +222,12 @@ public class StockDAO extends BaseDAO<Stock> {
 	}
 	
 	public ListResult<Item> getStockedOut(Pager pager) {
-		
+
+//		((item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date AND stock2.location.uuid =:locationUuid) <= 0)) OR (item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date AND stock2.location.uuid =:locationUuid) = NULL))
+
 		DbSession session = this.getSession();
 		String queryStr = "SELECT item FROM Item item \n"
-		        + "WHERE item.stockable = true AND item.voided=false AND ( item IN(SELECT stock.item FROM Stock stock WHERE stock.quantity = 0))";
+		        + "WHERE item.stockable = true AND item.voided=false AND ( item IN(SELECT stock.item FROM Stock stock WHERE (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date) <= 0)) OR (item IN(SELECT stock.item FROM Stock stock WHERE (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date) = NULL))";
 		
 		Query query = session.createQuery(queryStr);
 		
@@ -317,6 +319,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		//String queryStr = "SELECT item FROM Item item \n"
 		//        + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
 		//String queryStr = "SELECT item FROM Item item, Stock stock WHERE item.stockable = true AND stock.item=item AND stock.location.uuid =:locationUuid";
+
 		String queryStr = "SELECT item FROM Item item LEFT JOIN item.concept c WITH c.retired = false LEFT JOIN item.drug d WITH d.retired = false \n";
 		
 		if (q != null) {
@@ -329,7 +332,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		} else {
 			queryStr += " AND ";
 		}
-		queryStr += "  item.stockable = true AND item.voided=false AND (item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND stock.quantity = 0))";
+		queryStr += "item.stockable = true AND item.voided=false AND ((item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date AND stock2.location.uuid =:locationUuid) <= 0) ) OR (item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date AND stock2.location.uuid =:locationUuid) = NULL)))";
 		
 		Query query = session.createQuery(queryStr);
 		//		query.setFirstResult(startIndex);
