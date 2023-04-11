@@ -253,14 +253,14 @@ export class FormService {
         ...["stock?locationUuid", "stockout?location"].map((stockApiPath) => {
           return this.httpClient
             .get(
-              `store/${stockApiPath}=${field?.locationUuid}&q=${parameters?.q}`
+              `store/${stockApiPath}=${field?.locationUuid}&q=${parameters?.q}&paging=false`
             )
             .pipe(
               map((response) => {
                 let formattedResponse = [];
                 // TODO: Accomodate pager or think how this can be accomodated
                 if (stockApiPath === "stockout?location") {
-                  formattedResponse = (response?.results || [])?.map((responseItem) => {
+                  formattedResponse = (response || [])?.map((responseItem) => {
                     stockOutItemsReference[responseItem?.uuid] = responseItem;
                     return {
                       ...responseItem,
@@ -272,7 +272,7 @@ export class FormService {
                     };
                   });
                 } else {
-                  formattedResponse = response?.results;
+                  formattedResponse = response;
                 }
                 const groupedByItemUuid = groupBy(
                   formattedResponse?.map((batch) => {
