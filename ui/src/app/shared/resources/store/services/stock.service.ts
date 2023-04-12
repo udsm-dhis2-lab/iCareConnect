@@ -39,19 +39,19 @@ export class StockService {
           : pageSize
             ? `pageSize=${pageSize}` : ``;
     const location =
-      locationUuid ? `location=${locationUuid}` : '';
-    const args = `?${location}${pageNumber}${pageSizeNumber}` ;
+      locationUuid ? `locationUuid=${locationUuid}` : '';
+    const q = params?.q && locationUuid ? `&q=${params?.q}` : params?.q ? `q=${params?.q}` : ''; 
+    const args = `?${location}${q}${pageNumber}${pageSizeNumber}` ;
 
     return this.httpClient
       .get(
-        `store/stockout${args}`
+        `store/stock${args}`
       )?.pipe(map((response) => {
         const stockBatches: StockBatch[] = (response?.results || []).map(
           (stockItem) => new StockBatch(stockItem)
         )
         const groupedStockBatches =
           StockBatch.getGroupedStockBatches(stockBatches);
-
         return {
           ...response,
           results: Object.keys(groupedStockBatches).map((stockItemKey) => {
