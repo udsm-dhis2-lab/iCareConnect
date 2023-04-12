@@ -13,6 +13,7 @@ import {
 } from "src/app/store/selectors";
 import { getAllStockableItems } from "src/app/store/selectors/pricing-item.selectors";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
+import { dateToISOStringMidnight } from "src/app/shared/helpers/format-date.helper";
 
 @Component({
   selector: "app-requisition",
@@ -239,6 +240,7 @@ export class RequisitionComponent implements OnInit {
             },
             quantity: this.selectedItems[key]?.quantity,
             batch: this.selectedItems[key]?.batch,
+            expiryDate: dateToISOStringMidnight(new Date(this.selectedItems[key]?.expiryDate))
           }
         ]
       };
@@ -373,6 +375,7 @@ export class RequisitionComponent implements OnInit {
           },
           quantity: e?.item?.quantity,
           batch: e?.item?.batch,
+          expiryDate: dateToISOStringMidnight(new Date(e?.item?.expiryDate))
         },
       ],
     };

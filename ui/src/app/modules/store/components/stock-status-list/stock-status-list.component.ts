@@ -82,7 +82,10 @@ export class StockStatusListComponent implements OnInit {
       this.stocksList$ = this.stockService.getAvailableStocks(
         this.currentLocation?.uuid,
         { q: this.searchTerm }
-      );
+      ).pipe(map((response) => {
+        this.pager = response?.pager
+        return response?.results ? response?.results : response;
+      }));;
     } else if (this.isStockOutPage) {
       this.stocksList$ = this.stockService.getStockOuts(
         this.currentLocation?.uuid, this.page, this.pageSize
