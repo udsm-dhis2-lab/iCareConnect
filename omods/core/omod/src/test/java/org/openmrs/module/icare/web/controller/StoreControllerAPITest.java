@@ -181,9 +181,12 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		        ((Map) ledgerEntry.get("location")).get("uuid").toString()));
 		MockHttpServletResponse handleGet1 = handle(newGetRequest1);
 		
-		List<Map<String, Object>> stocks = (new ObjectMapper()).readValue(handleGet1.getContentAsString(), List.class);
-		assertThat("Only 7 stock items", stocks.size(), is(7));
-		assertThat("Only two stock items", stocks.get(3).get("quantity").toString(), is("10.0"));
+		Map<String, Object> stocks = (new ObjectMapper()).readValue(handleGet1.getContentAsString(), Map.class);
+		assertThat("Only 7 stock items", ((List) stocks.get("results")).size(), is(7));
+		System.out.println(stocks);
+		assertThat("Only two stock items", ((Map) ((List) stocks.get("results")).get(3)).get("quantity").toString(),
+		    is("10.0"));
+		//		assertThat("Only two stock items", stocks.get(3).get("quantity").toString(), is("10.0"));
 		
 	}
 	
@@ -454,9 +457,9 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newGetRequest = newGetRequest("store/stock");
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
-		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
+		Map<String, Object> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		
-		assertThat("stock listing has 6 entries:", stockList.size(), is(7));
+		assertThat("stock listing has 6 entries:", ((List) stockList.get("results")).size(), is(7));
 		
 		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
@@ -467,12 +470,14 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		//get stock status
 		MockHttpServletRequest newGetRequest = newGetRequest("store/stock", new Parameter("locationUuid",
-		        "44939999-d333-fff2-9bff-61d11117c22e"));
+		        "44939999-d333-fff2-9bff-61d11117c22e"), new Parameter("paging", "true"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
-		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
+		Map<String, Object> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		
-		assertThat("stock listing has 6 entries:", stockList.size(), is(6));
+		System.out.println(stockList);
+		
+		assertThat("stock listing has 6 entries:", ((List) stockList.get("results")).size(), is(6));
 		
 		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
@@ -486,9 +491,9 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		        "55555999-d333-fff2-9bff-61d11117c22e"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
-		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
+		Map<String, Object> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		
-		assertThat("stock listing has no entry:", stockList.size(), is(0));
+		assertThat("stock listing has no entry:", ((List) stockList.get("results")).size(), is(0));
 		
 	}
 	
@@ -658,10 +663,10 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		        "44939999-d333-fff2-9bff-61d11117c22e"), new Parameter("conceptClassName", "Test"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
-		List<Map<String, Object>> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), List.class);
+		Map<String, Object> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		
-		System.out.println(stockList);
-		assertThat("stock listing has 4 entries:", stockList.size(), is(5));
+		System.out.println((List) stockList.get("results"));
+		assertThat("stock listing has 4 entries:", ((List) stockList.get("results")).size(), is(5));
 	}
 	
 	@Test
@@ -815,7 +820,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newGetRequest = newGetRequest("store/stock", new Parameter("locationUuid",
 		        ((Map) invoiceItemMap.get("location")).get("uuid").toString()));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
-		List<Map<String, Object>> stockItemGet = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+		Map<String, Object> stockItemGet = (new ObjectMapper()).readValue(handle2.getContentAsString(), Map.class);
 		System.out.println(handle2.getContentAsString());
 		
 	}
@@ -835,10 +840,10 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletRequest newGetRequest = newGetRequest("store/stock", new Parameter("locationUuid",
 		        ((Map) stockInvoiceItemMap.get("location")).get("uuid").toString()));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
-		List<Map<String, Object>> stockItemGet = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
+		Map<String, Object> stockItemGet = (new ObjectMapper()).readValue(handle2.getContentAsString(), Map.class);
 		boolean newBatchexist = false;
-		for (Map<String, Object> stockItem : stockItemGet) {
-			if (stockItem.get("batch").equals("batch-9")) {
+		for (Object stockItem : (List) stockItemGet.get("results")) {
+			if (stockItem.toString().contains("batch-9")) {
 				newBatchexist = true;
 			}
 		}
