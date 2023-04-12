@@ -253,13 +253,14 @@ export class FormService {
         ...["stock?locationUuid", "stockout?location"].map((stockApiPath) => {
           return this.httpClient
             .get(
-              `store/${stockApiPath}=${field?.locationUuid}&q=${parameters?.q}`
+              `store/${stockApiPath}=${field?.locationUuid}&q=${parameters?.q}&paging=false`
             )
             .pipe(
               map((response) => {
                 let formattedResponse = [];
+                // TODO: Accomodate pager or think how this can be accomodated
                 if (stockApiPath === "stockout?location") {
-                  formattedResponse = response?.map((responseItem) => {
+                  formattedResponse = (response || [])?.map((responseItem) => {
                     stockOutItemsReference[responseItem?.uuid] = responseItem;
                     return {
                       ...responseItem,
@@ -274,7 +275,7 @@ export class FormService {
                   formattedResponse = response;
                 }
                 const groupedByItemUuid = groupBy(
-                  formattedResponse.map((batch) => {
+                  formattedResponse?.map((batch) => {
                     return {
                       ...batch,
                       itemUuid: batch?.item?.uuid,
@@ -282,10 +283,10 @@ export class FormService {
                   }),
                   "itemUuid"
                 );
-                return Object.keys(groupedByItemUuid).map((itemUuid) => {
+                return (Object.keys(groupedByItemUuid) || [])?.map((itemUuid) => {
                   const totalQuantity = Number(
                     sumBy(
-                      groupedByItemUuid[itemUuid].map((batchData) => {
+                      (groupedByItemUuid[itemUuid] || [])?.map((batchData) => {
                         return batchData;
                       }),
                       "quantity"
@@ -318,12 +319,12 @@ export class FormService {
             ["asc"]["asc"]
           );
           const drugIitemsGroupedByItemUuid = groupBy(allDrugItems, "itemUuid");
-          const formattedDrugItems = Object.keys(
+          const formattedDrugItems = (Object.keys(
             drugIitemsGroupedByItemUuid
-          ).map((itemUuid) => {
+          ) || [])?.map((itemUuid) => {
             const totalQuantity = Number(
               sumBy(
-                drugIitemsGroupedByItemUuid[itemUuid].map((batchData) => {
+                (drugIitemsGroupedByItemUuid[itemUuid] || []).map((batchData) => {
                   return batchData;
                 }),
                 "quantity"

@@ -1,6 +1,9 @@
+import { ExpiredItemsComponent } from "./expired-items/expired-items.component";
 import { IssueItemsComponent } from "./issue-items/issue-items.component";
 import { IssuingStockByStoreComponent } from "./issuing-stock-by-store/issuing-stock-by-store.component";
 import { LedgersListComponent } from "./ledgers-list/ledgers-list.component";
+import { NearlyExpiredItemsComponent } from "./nearly-expired/nearly-expired-items.component";
+import { NearlyStockedOutItemsComponent } from "./nearly-stocked-out/nearly-stocked-out-items.component";
 import { NewRequisitionFormComponent } from "./new-requisition-form/new-requisition-form.component";
 import { ReOrderLevelItemsListComponent } from "./re-order-level-items-list/re-order-level-items-list.component";
 import { RequisitionItemsComponent } from "./requisition-items/requisition-items.component";
@@ -39,5 +42,8 @@ export const stockComponents: any[] = [
   NewRequisitionFormComponent,
   RequisitionItemsComponent,
   IssueItemsComponent,
-  StockMetricsComponent
+  StockMetricsComponent,
+  ExpiredItemsComponent,
+  NearlyStockedOutItemsComponent,
+  NearlyExpiredItemsComponent
 ];
