@@ -426,10 +426,15 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public List<Stock> getStockByLocation(String locationUuid, String search, Integer startIndex, Integer limit,
-	        String conceptClassName) {
+	public ListResult<Stock> getAllStock(Pager pager) {
+		return this.stockDAO.getStockByLocation(null, pager, null, null, null, null);
+	}
+	
+	@Override
+	public ListResult<Stock> getStockByLocation(String locationUuid, Pager pager, String search, Integer startIndex,
+	        Integer limit, String conceptClassName) {
 		
-		return this.stockDAO.getStockByLocation(locationUuid, search, startIndex, limit, conceptClassName);
+		return this.stockDAO.getStockByLocation(locationUuid, pager, search, startIndex, limit, conceptClassName);
 	}
 	
 	@Override
