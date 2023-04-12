@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Entity
-@Table(name = "st_stock_invoice")
+@Table(name = "st_stock_invoice", uniqueConstraints = {@UniqueConstraint(columnNames = {"invoice_number","supplier_id"})})
 public class StockInvoice extends BaseOpenmrsData implements java.io.Serializable, JSONConverter {
 
     @Id

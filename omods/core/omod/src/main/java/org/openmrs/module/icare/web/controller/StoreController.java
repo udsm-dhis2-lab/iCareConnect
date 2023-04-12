@@ -468,23 +468,33 @@ public class StoreController {
 	
 	@RequestMapping(value = "stock", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> listAllStockStatus(@RequestParam(required = false) String locationUuid,
+	public Map<String, Object> listAllStockStatus(@RequestParam(required = false) String locationUuid,
 	        @RequestParam(required = false) String q, @RequestParam(defaultValue = "100000") Integer limit,
-	        @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String conceptClassName) {
+	        @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String conceptClassName,
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) {
 		
-		List<Stock> stocksStatus;
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+		
+		ListResult<Stock> stocklist;
 		
 		if (locationUuid != null) {
-			stocksStatus = this.storeService.getStockByLocation(locationUuid, q, startIndex, limit, conceptClassName);
+			stocklist = this.storeService.getStockByLocation(locationUuid, pager, q, startIndex, limit, conceptClassName);
 		} else {
-			stocksStatus = this.storeService.getAllStockStatusMetrics();
+			//			stocksStatus = this.storeService.getAllStockStatusMetrics();
+			stocklist = this.storeService.getAllStock(pager);
+			
 		}
 		
-		List<Map<String, Object>> stockStatusResponse = new ArrayList<Map<String, Object>>();
-		for (Stock stock : stocksStatus) {
-			stockStatusResponse.add(stock.toMap());
-		}
-		return stockStatusResponse;
+		//		List<Map<String, Object>> stockStatusResponse = new ArrayList<Map<String, Object>>();
+		//		for (Stock stock : stocksStatus) {
+		//			stockStatusResponse.add(stock.toMap());
+		//		}
+		return stocklist.toMap();
 	}
 	
 	@RequestMapping(value = "item/{itemUuid}/stock", method = RequestMethod.GET)

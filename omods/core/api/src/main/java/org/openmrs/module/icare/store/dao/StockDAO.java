@@ -170,7 +170,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		
 	}
 	
-	public List<Stock> getStockByLocation(String locationUuid, String search, Integer startIndex, Integer limit,
+	public ListResult<Stock> getStockByLocation(String locationUuid,Pager pager, String search, Integer startIndex, Integer limit,
 	        String conceptClassName) {
 		
 		DbSession session = this.getSession();
@@ -180,10 +180,15 @@ public class StockDAO extends BaseDAO<Stock> {
 		if (search != null) {
 			queryStr += " LEFT JOIN c.names cn WHERE (lower(d.name) LIKE lower(:search) OR lower(cn.name) like lower(:search) ) ";
 		}
-		if (search != null) {
-			queryStr += " AND st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
-		} else {
-			queryStr += " WHERE st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
+		if (locationUuid != null) {
+
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+
+			queryStr += "st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
 		}
 		
 		if (conceptClassName != null) {
@@ -203,10 +208,11 @@ public class StockDAO extends BaseDAO<Stock> {
 			queryStr += " AND ";
 		}
 		queryStr += " (d.retired = false OR c.retired = false) AND it.voided=false";
+
 		
 		Query query = session.createQuery(queryStr);
-		query.setFirstResult(startIndex);
-		query.setMaxResults(limit);
+//		query.setFirstResult(startIndex);
+//		query.setMaxResults(limit);
 		
 		if (search != null) {
 			query.setParameter("search", "%" + search.replace(" ", "%") + "%");
@@ -217,14 +223,22 @@ public class StockDAO extends BaseDAO<Stock> {
 		if (locationUuid != null) {
 			query.setParameter("locationUuid", locationUuid);
 		}
-		return query.list();
+
+		if (pager.isAllowed()) {
+			pager.setTotal(query.list().size());
+			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+			query.setMaxResults(pager.getPageSize());
+		}
+
+		ListResult<Stock> listResults = new ListResult<>();
+		listResults.setPager(pager);
+		listResults.setResults(query.list());
+		return listResults;
 		
 	}
 	
 	public ListResult<Item> getStockedOut(Pager pager) {
-
-//		((item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date AND stock2.location.uuid =:locationUuid) <= 0)) OR (item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date AND stock2.location.uuid =:locationUuid) = NULL))
-
+		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT item FROM Item item \n"
 		        + "WHERE item.stockable = true AND item.voided=false AND ( item IN(SELECT stock.item FROM Stock stock WHERE (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date) <= 0)) OR (item IN(SELECT stock.item FROM Stock stock WHERE (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date) = NULL))";
