@@ -27,8 +27,38 @@ export class StockService {
 
   getAvailableStocks(
     locationUuid?: string,
-    params?: { q?: string; limit?: number; startIndex?: number }
+    params?: { q?: string; limit?: number; startIndex?: number },
+    page?: number, pageSize?: number
   ): Observable<any | StockObject[]> {
+    const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
+    const pageSizeNumber =
+      locationUuid && pageSize && page
+        ? `&pageSize=${pageSize}`
+        : pageSize && page
+          ? `&pageSize=${pageSize}`
+          : pageSize
+            ? `pageSize=${pageSize}` : ``;
+    const location =
+      locationUuid ? `locationUuid=${locationUuid}` : '';
+    const q = params?.q && locationUuid ? `&q=${params?.q}` : params?.q ? `q=${params?.q}` : ''; 
+    const args = `?${location}${q}${pageNumber}${pageSizeNumber}` ;
+
+    return this.httpClient
+      .get(
+        `store/stock${args}`
+      )?.pipe(map((response) => {
+        const stockBatches: StockBatch[] = (response?.results || []).map(
+          (stockItem) => new StockBatch(stockItem)
+        )
+        const groupedStockBatches =
+          StockBatch.getGroupedStockBatches(stockBatches);
+        return {
+          ...response,
+          results: Object.keys(groupedStockBatches).map((stockItemKey) => {
+            return new Stock(groupedStockBatches[stockItemKey]).toJson();
+          })
+        }
+      }))
     return this._getStocks("store/stock", locationUuid, params);
   }
 

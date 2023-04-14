@@ -13,7 +13,7 @@
                 <th>Status</th>
                 <th></th>
                 <th>
-                  <section *ngIf="params?.specificRequisition?.requisitionStatuses[params?.specificRequisition?.requisitionStatuses?.length - 1]?.status === 'ISSUED'">
+                  <section *ngIf="params?.specificRequisition?.requisitionStatuses[params?.specificRequisition?.requisitionStatuses?.length - 1]?.status === 'ISSUED' || markAll">
                     <mat-checkbox color="primary" (change)="selectAll($event, params?.specificRequisition?.requisitionItems)"
                       [checked]="selectAllItems"></mat-checkbox>
                   </section>
