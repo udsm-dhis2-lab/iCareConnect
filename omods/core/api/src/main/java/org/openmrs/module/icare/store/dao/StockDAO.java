@@ -16,6 +16,8 @@ import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.module.icare.store.models.Stock;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 /**
@@ -285,12 +287,17 @@ public class StockDAO extends BaseDAO<Stock> {
 	
 	public ListResult<Item> getNearlyExpiredByLocation(String locationUuid, Pager pager) {
 
+		LocalDate endDate = LocalDate.now().plusDays(30);
+		Date endDateUtil = Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
 		DbSession session = this.getSession();
 
-		String queryStr = "SELECT stc FROM Stock stc INNER JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN it.drug d WHERE stc.expiryDate <= current_date + 30 AND stc.expiryDate > current_date AND (d.retired = false OR c.retired = false) AND stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) ";;
+		String queryStr = "SELECT stc FROM Stock stc INNER JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN it.drug d WHERE stc.expiryDate <= :endDate AND stc.expiryDate > current_date AND (d.retired = false OR c.retired = false) AND stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) AND stc.quantity > 0 ";
 
 		Query query = session.createQuery(queryStr);
 		query.setParameter("locationUuid", locationUuid);
+		query.setParameter("endDate",endDateUtil);
+		System.out.println(query);
 
 		if (pager.isAllowed()) {
 			pager.setTotal(query.list().size());
