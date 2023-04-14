@@ -15,7 +15,7 @@
                 <th></th>
                 <th>
                   <section
-                    *ngIf="issue?.requisitionStatuses[issue?.requisitionStatuses?.length - 1]?.status === 'PENDING'">
+                    *ngIf="markAll">
                     <mat-checkbox color="primary" (change)="selectAll($event, params?.specificRequisition?.items)" [checked]="selectAllItems"></mat-checkbox>
                   </section>
                 </th>

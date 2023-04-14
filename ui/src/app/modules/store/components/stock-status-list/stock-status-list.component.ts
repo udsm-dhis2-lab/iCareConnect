@@ -81,8 +81,13 @@ export class StockStatusListComponent implements OnInit {
     if (!this.isStockOutPage && !this.status) {
       this.stocksList$ = this.stockService.getAvailableStocks(
         this.currentLocation?.uuid,
-        { q: this.searchTerm }
-      );
+        { q: this.searchTerm },
+        this.page, 
+        this.pageSize
+      ).pipe(map((response) => {
+        this.pager = response?.pager
+        return response?.results;
+      }));;
     } else if (this.isStockOutPage) {
       this.stocksList$ = this.stockService.getStockOuts(
         this.currentLocation?.uuid, this.page, this.pageSize

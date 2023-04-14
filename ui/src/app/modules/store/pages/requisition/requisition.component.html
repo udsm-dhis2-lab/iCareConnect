@@ -186,7 +186,7 @@
       </tr>
     </table> -->
     <div *ngIf="!showRequisitionForm">
-      <mat-progress-bar mode="indeterminate" *ngIf="!requisitions?.length && !loadedRequisitions"></mat-progress-bar>
+      <mat-progress-bar mode="indeterminate" *ngIf="!loadedRequisitions"></mat-progress-bar>
       <mat-paginator 
         [hidden]="!requisitions?.length"
         [length]="pager?.total"
