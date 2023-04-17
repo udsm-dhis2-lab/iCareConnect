@@ -243,7 +243,7 @@ export class PatientDrugOrderListComponent implements OnInit {
     if (drugOrders.length > 0) {
       frameDoc.document.write(`
       <div>
-        <h5>Prescriptions</h5>
+        <h5>Dispensed Prescriptions</h5>
       </div>
       <table id="table">
         <thead>
@@ -251,7 +251,6 @@ export class PatientDrugOrderListComponent implements OnInit {
             <th>Drug</th>
             <th>Instructions</th>
             <th>Prescription Date</th>
-            <th>Status</th>
           </tr>
         </thead>
         <tbody>`);
@@ -261,9 +260,8 @@ export class PatientDrugOrderListComponent implements OnInit {
           contents = `
               <tr>
                 <td>${order?.drug?.display}</td> 
-                <td>${order?.instructions}</td>  
+                <td>${order?.instructions || "No instructions"}</td>  
                 <td>${formatDateToString(new Date(order?.dateActivated), "DD-MM-YYYY")}</td>
-                <td>Already Dispensed</td>
               </tr>`;
           frameDoc.document.write(contents);
         ;
