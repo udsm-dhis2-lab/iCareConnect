@@ -10,6 +10,8 @@
 package org.openmrs.module.icare.core.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
@@ -30,44 +32,60 @@ import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
+import org.openmrs.module.icare.report.ReportData;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.validator.ValidateUtil;
 
+import javax.activation.DataHandler;
+import javax.mail.Authenticator;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
 import javax.naming.ConfigurationException;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMessage.RecipientType;
+import javax.mail.internet.MimeMultipart;
 import java.io.*;
 import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang.StringUtils;
+//import org.openmrs.module.reporting.report.Report;
+//import org.springframework.stereotype.Component;
 
 public class ICareServiceImpl extends BaseOpenmrsService implements ICareService {
-	
+
 	ICareDao dao;
-	
+
 	PatientDAO patientDAO;
-	
+
 	UserService userService;
-	
+
 	/**
 	 * Injected in moduleApplicationContext.xml
 	 */
 	public void setDao(ICareDao dao) {
 		this.dao = dao;
 	}
-	
+
 	/**
 	 * Injected in moduleApplicationContext.xml
 	 */
 	public void setUserService(UserService userService) {
 		this.userService = userService;
 	}
-	
+
 	@Override
 	public Item getItemByUuid(String uuid) throws APIException {
 		return dao.findByUuid(uuid);
 	}
-	
+
 	@Override
 	public Item saveItem(Item item) throws APIException {
 		if ((item.getConcept() == null && item.getDrug() == null) || (item.getConcept() != null && item.getDrug() != null)) {
@@ -98,18 +116,18 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return dao.saveItem(item);
 	}
-	
+
 	@Override
 	public Item getItemByConceptId(Integer id) {
 		return dao.getItemByConceptId(id);
 	}
-	
+
 	@Override
 	public ItemPrice getItemPriceByConceptId(Integer serviceConceptId, Integer paymentSchemeConceptId,
 	        Integer paymentTypeConceptId) {
 		return dao.getItemPriceByConceptId(serviceConceptId, paymentSchemeConceptId, paymentTypeConceptId);
 	}
-	
+
 	@Override
 	public ItemPrice getItemPrice(Visit visit, Concept billableConcept) throws Exception {
 		//VisitMetaData visitMetaData = VisitExtrapolator.extrapolateMetaData(visit);
@@ -125,12 +143,12 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		return this.getItemPriceByConceptId(billableConcept.getId(), paymentSchemeConcept.getId(),
 		    paymentTypeConcept.getId());
 	}
-	
+
 	@Override
 	public ItemPrice getItemPrice(Visit visit, Drug drug) throws ItemNotPayableException, ConfigurationException {
 		VisitWrapper visitWrapper = new VisitWrapper(visit);
 		String serviceConceptUuidForVisit = visitWrapper.getServiceConceptUuid();
-		
+
 		Concept paymentSchemeConcept = visitWrapper.getPaymentScheme();
 		Concept paymentTypeConcept = visitWrapper.getPaymentType();
 		if (serviceConceptUuidForVisit == null) {
@@ -144,12 +162,12 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return dao.getItemPriceByDrugId(drug.getId(), paymentSchemeConcept.getId(), paymentTypeConcept.getId());
 	}
-	
+
 	@Override
 	public List<ItemPrice> getItemPrices() {
 		return dao.getItemPrices();
 	}
-	
+
 	@Override
 	public List<ItemPrice> getItemPrices(String paymentType, Integer limit, Integer startIndex) {
 		if (paymentType == null) {
@@ -158,7 +176,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			return dao.getItemPricesByPaymentType(paymentType, limit, startIndex);
 		}
 	}
-	
+
 	@Override
 	public ItemPrice saveItemPrice(ItemPrice itemPrice) throws APIException {
 		ConceptService conceptService = Context.getService(ConceptService.class);
@@ -187,17 +205,17 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		itemPrice.setPaymentType(paymentType);
 		return dao.saveItemPrice(itemPrice);
 	}
-	
+
 	@Override
 	public List<Item> getItems() {
 		return dao.getItems();
 	}
-	
+
 	@Override
 	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type) {
 		return dao.getItems(search, limit, startIndex, department, type);
 	}
-	
+
 	@Override
 	public Prescription savePrescription(Prescription prescription) {
 		if (prescription.getUuid() != null) {
@@ -213,7 +231,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 					}
 				}
 				existingPrescription.updatePrescription(prescription);
-				
+
 				dao.updatePrescription(prescription);
 				prescription = existingPrescription;
 			}
@@ -227,7 +245,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		administrationService.setGlobalProperty("validation.disable", "false");
 		return prescription;
 	}
-	
+
 	@Override
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
 	        String locationUuid, OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus,
@@ -236,13 +254,13 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		return this.dao.getVisitsByOrderType(search, orderTypeUuid, encounterTypeUuid, locationUuid, prescriptionStatus,
 		    fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus);
 	}
-	
+
 	@Override
 	public List<Order> getOrdersByVisitAndOrderType(String visitUuid, String orderTypeUuid,
 	        Order.FulfillerStatus fulfillerStatus, Integer limit, Integer startIndex) {
 		return this.dao.getOrdersByVisitAndOrderType(visitUuid, orderTypeUuid, fulfillerStatus, limit, startIndex);
 	}
-	
+
 	@Override
 	public Message sendMessage(Message message) throws Exception {
 		String messagePhoneNumber = Context.getAdministrationService().getGlobalProperty(ICareConfig.MESSAGE_PHONE_NUMBER);
@@ -296,7 +314,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			throw e;
 		}*/
 	}
-	
+
 	public Message sendMessageRequest(Message message) throws Exception {
 		String urlString = "https://us-central1-maximal-journey-328212.cloudfunctions.net/messaging";
 		URL url = new URL(urlString);
@@ -309,12 +327,12 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		con.addRequestProperty("Content-Type", "application/json");
 		con.setDoInput(true);
 		con.setDoOutput(true);
-		
+
 		OutputStream os = con.getOutputStream();
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
 		String json = new ObjectMapper().writeValueAsString(message.toMap());
 		writer.write(json);
-		
+
 		writer.flush();
 		writer.close();
 		os.close();
@@ -342,7 +360,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			throw e;
 		}
 	}
-	
+
 	@Override
 	public List<Message> sendMessages(List<Message> messages) throws MalformedURLException, IOException, Exception {
 		for (Message message : messages) {
@@ -350,7 +368,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return messages;
 	}
-	
+
 	@Override
 	public List<String> generatePatientIds() {
 		AdministrationService adminService = Context.getService(AdministrationService.class);
@@ -390,30 +408,30 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		identifiers.add(idFormat);
 		return identifiers;
 	}
-	
+
 	@Override
 	public List<String> generateCode(String globalPropertyUuid, String metadataType, Integer count) throws Exception {
 		return dao.generateCode(globalPropertyUuid, metadataType, count);
 	}
-	
+
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);
 	}
-	
+
 	@Override
 	public Item getItemByDrugConceptUuid(String uuid) {
 		return dao.getItemByDrugConceptUuid(uuid);
 	}
-	
+
 	@Override
 	public void stopVisits() throws APIException {
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		String hoursVisitEnd = adminService.getGlobalProperty(ICareConfig.VISIT_LENGTH_IN_HOURS);
-		
+
 		if (hoursVisitEnd == null || hoursVisitEnd.trim().equals("")) {
 			//newDate = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(24));
-			
+
 		} else {
 			Date newDate = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(Integer.valueOf(hoursVisitEnd)));
 			List<Visit> visits = dao.getOpenVisit();
@@ -423,7 +441,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 					//try {
 					//if (!(visitWrapper.isInsurance() && visitWrapper.getInsuranceName().toLowerCase().equals("nhif"))) {
 					Context.getVisitService().endVisit(visit, new Date());
-					
+
 					//}
 					//}
 					//catch (ConfigurationException e) {
@@ -433,12 +451,12 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			}
 		}
 	}
-	
+
 	@Override
 	public long getVisitSerialNumber(Visit visit) {
 		return dao.getVisitSerialNumber(visit);
 	}
-	
+
 	@Override
 	public Claim getClaimByVisitUuid(String visitUuid) throws Exception {
 		VisitService visitService = Context.getVisitService();
@@ -451,7 +469,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return null;
 	}
-	
+
 	@Override
 	public ClaimResult claimByVisitUuid(String visitUuid) throws Exception {
 		VisitService visitService = Context.getVisitService();
@@ -464,43 +482,43 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Item getItemByDrugUuid(String uuid) {
 		return dao.getItemByDrugUuid(uuid);
 	}
-	
+
 	@Override
 	public ItemPrice getItemPriceByDrugId(Integer drugId, Integer paymentSchemeConceptId, Integer paymentTypeConceptId) {
 		return dao.getItemPriceByDrugId(drugId, paymentSchemeConceptId, paymentTypeConceptId);
 	}
-	
+
 	@Override
 	public List<Concept> getConcepts(String q, String conceptClass, String searchTerm, Integer limit, Integer startIndex) {
 		return dao.getConceptsBySearchParams(q, conceptClass, searchTerm, limit, startIndex);
 	}
-	
+
 	@Override
 	public List<ConceptReferenceTerm> getConceptReferenceTerms(String q, String source, Integer limit, Integer startIndex) {
 		return dao.getConceptReferenceTermsBySearchParams(q, source, limit, startIndex);
 	}
-	
+
 	@Override
 	public List<ConceptSet> getConceptsSetsByConcept(String concept) {
 		return dao.getConceptsSetsByConcept(concept);
 	}
-	
+
 	@Override
 	public List<PatientWrapper> getPatients(String search, String patientUUID, PatientWrapper.VisitStatus visitStatus,
 	        Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection) {
 		return dao.getPatients(search, patientUUID, visitStatus, startIndex, limit, orderByDirection);
 	}
-	
+
 	@Override
 	public Patient savePatient(Patient patient) {
 		return patientDAO.savePatient(patient);
 	}
-	
+
 	Boolean patientIsAdmitted(Visit visit) {
 		if (visit.getStopDatetime() == null) {
 			for (Encounter encounter : visit.getEncounters()) {
@@ -513,7 +531,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return false;
 	}
-	
+
 	Boolean patientIsDischarged(Visit visit) {
 		Boolean dischargeState = false;
 		for (Encounter encounter : visit.getEncounters()) {
@@ -523,16 +541,90 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return dischargeState;
 	}
-	
+
 	public Summary getSummary() {
 		return dao.getSummary();
 	}
-	
+
 	@Override
 	public List<Drug> getDrugs(String concept, Integer limit, Integer startIndex) {
 		return dao.getDrugs(concept, limit, startIndex);
 	}
-	
+	private Session session = null;
+	/**
+	 * Returns the email session
+	 */
+	@Override
+	public Session getEmailSession() throws Exception {
+		if (session == null) {
+			AdministrationService as = Context.getAdministrationService();
+			Properties p = new Properties();
+			p.put("mail.transport.protocol", as.getGlobalProperty("mail.transport_protocol", "smtp"));
+			p.put("mail.smtp.host", as.getGlobalProperty("mail.smtp_host", "localhost"));
+			p.put("mail.smtp.port", as.getGlobalProperty("mail.smtp_port", "25")); // mail.smtp_port
+			p.put("mail.smtp.auth", as.getGlobalProperty("mail.smtp_auth", "false")); // mail.smtp_auth
+			p.put("mail.smtp.starttls.enable", as.getGlobalProperty("mail.smtp.starttls.enable", "false"));
+			p.put("mail.debug", as.getGlobalProperty("mail.debug", "false"));
+			p.put("mail.from", as.getGlobalProperty("mail.from", ""));
+			final String user = as.getGlobalProperty("mail.user", "");
+			final String password = as.getGlobalProperty("mail.password", "");
+
+			if (StringUtils.isNotBlank(user) && StringUtils.isNotBlank(password.toString())) {
+				session = Session.getInstance(p, new Authenticator() {
+					public PasswordAuthentication getPasswordAuthentication() {
+						return new PasswordAuthentication(user, password);
+					}
+				});
+			}
+			else {
+				session = Session.getInstance(p);
+			}
+		}
+		System.out.println(session.getDebug());
+		return session;
+	}
+
+	/**
+	 * Performs some action on the given report
+	 */
+	@Override
+	public String processEmail(Properties configuration) throws Exception {
+		try {
+			MimeMessage m = new MimeMessage(getEmailSession());
+
+			m.setFrom(new InternetAddress(configuration.getProperty("from")));
+			for (String recipient : configuration.getProperty("to", "").split("\\,")) {
+				m.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(recipient));
+			}
+
+			// TODO: Make these such that they can contain report information
+			m.setSubject(configuration.getProperty("subject"));
+
+			Multipart multipart = new MimeMultipart();
+
+			MimeBodyPart contentBodyPart = new MimeBodyPart();
+			String content = configuration.getProperty("content", "");
+			contentBodyPart.setContent(content, "text/html");
+			multipart.addBodyPart(contentBodyPart);
+
+//			if (report.getRenderedOutput() != null && "true".equalsIgnoreCase(configuration.getProperty("addOutputAsAttachment"))) {
+				MimeBodyPart attachment = new MimeBodyPart();
+				Object output = null;
+				attachment.setDataHandler(new DataHandler(output, "text/html"));
+				attachment.setFileName(configuration.getProperty("attachmentName"));
+				multipart.addBodyPart(attachment);
+//			}
+
+			m.setContent(multipart);
+
+			Transport.send(m);
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Error occurred while sending  email", e);
+		}
+		return  "TESTING";
+	}
+
 	public String getClientsFromExternalSystems(String identifier, String identifierReference, String basicAuthKey)
 	        throws IOException, URISyntaxException {
 		AdministrationService administrationService = Context.getService(AdministrationService.class);
@@ -557,12 +649,12 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		        + "&ouMode=DESCENDANTS&program=" + program
 		        + "&fields=attributes[attribute,code,value],enrollments[*],orgUnit,trackedEntityInstance&paging=false";
 		url = new URL(baseUrl.concat(path));
-		
+
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		
+
 		String userCredentials = username.concat(":").concat(password);
 		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
-		
+
 		con.setRequestMethod("GET");
 		con.setRequestProperty("Content-Type", "application/json; utf-8");
 		con.setRequestProperty("Accept", "application/json");
@@ -588,11 +680,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			return String.valueOf(content);
 		}
 	}
-	
+
 	public String createPimaCovidLabRequest(Map<String, Object> request, String basicAuthKey)
 	        throws IOException {
 		AdministrationService administrationService = Context.getService(AdministrationService.class);
-		
+
 		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
 		String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
 		String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
@@ -609,13 +701,13 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		BufferedReader reader;
 		String line;
 		StringBuffer responseContent = new StringBuffer();
-		
+
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		
+
 //		String basicAuth = "Basic " + basicAuthKey;
 		String userCredentials = username.concat(":").concat(password);
 		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
-		
+
 		con.setRequestMethod("POST");
 		con.setRequestProperty("Content-Type", "application/json; utf-8");
 		con.setRequestProperty("Accept", "application/json");
@@ -641,7 +733,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		reader.close();
 		return responseContent.toString();
 	}
-	
+
 	public String savePimaCovidLabResult(Map<String, Object> results)
 			throws IOException {
 		AdministrationService administrationService = Context.getService(AdministrationService.class);
@@ -698,10 +790,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		reader.close();
 		return responseContent.toString();
 	}
-	
+
 	public String verifyExternalSystemCredentials(String username, String password, String systemKey) throws IOException {
 		AdministrationService administrationService = Context.getService(AdministrationService.class);
-		
+
 		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
 		        + ".baseUrl");
 		URL url;
@@ -709,16 +801,16 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			throw new VerificationException("Destination server address url is not set. Please set base url for system"
 			        + systemKey + ".");
 		}
-		
+
 		// TODO: Consider to change this to /api/me.json?fields=name
 		String path = "/api/organisationUnits.json?";
 		url = new URL(baseUrl.concat(path));
-		
+
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		
+
 		String userCredentials = username.concat(":").concat(password);
 		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
-		
+
 		con.setRequestMethod("GET");
 		con.setRequestProperty("Content-Type", "application/json; utf-8");
 		con.setRequestProperty("Accept", "application/json");
@@ -744,7 +836,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			return String.valueOf(content);
 		}
 	}
-	
+
 	//	public String voidOrder(String uuid, String voidReason) {
 	//		return dao.voidOrder(uuid, voidReason);
 	//	}
