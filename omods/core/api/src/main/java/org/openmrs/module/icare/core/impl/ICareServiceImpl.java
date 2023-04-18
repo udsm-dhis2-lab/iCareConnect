@@ -10,8 +10,6 @@
 package org.openmrs.module.icare.core.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
@@ -32,7 +30,6 @@ import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
-import org.openmrs.module.icare.report.ReportData;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.validator.ValidateUtil;
@@ -45,10 +42,8 @@ import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.naming.ConfigurationException;
 import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMessage.RecipientType;
 import javax.mail.internet.MimeMultipart;
 import java.io.*;
 import java.net.*;
@@ -124,7 +119,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 
 	@Override
 	public ItemPrice getItemPriceByConceptId(Integer serviceConceptId, Integer paymentSchemeConceptId,
-	        Integer paymentTypeConceptId) {
+											 Integer paymentTypeConceptId) {
 		return dao.getItemPriceByConceptId(serviceConceptId, paymentSchemeConceptId, paymentTypeConceptId);
 	}
 
@@ -141,7 +136,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			throw new ItemNotPayableException("Payment Type has not been specified in the visit");
 		}
 		return this.getItemPriceByConceptId(billableConcept.getId(), paymentSchemeConcept.getId(),
-		    paymentTypeConcept.getId());
+				paymentTypeConcept.getId());
 	}
 
 	@Override
@@ -220,7 +215,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public Prescription savePrescription(Prescription prescription) {
 		if (prescription.getUuid() != null) {
 			Prescription existingPrescription = (Prescription) Context.getOrderService().getOrderByUuid(
-			    prescription.getUuid());
+					prescription.getUuid());
 			if (existingPrescription != null) {
 				if (existingPrescription.getQuantity() != prescription.getQuantity()) {
 					List<OrderStatus> orderStatuses = this.dao.getOrderStatusByOrderUuid(prescription.getUuid());
@@ -248,16 +243,16 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 
 	@Override
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
-	        String locationUuid, OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus,
-	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus) {
+											String locationUuid, OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus,
+											Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
+											String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus) {
 		return this.dao.getVisitsByOrderType(search, orderTypeUuid, encounterTypeUuid, locationUuid, prescriptionStatus,
-		    fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus);
+				fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus);
 	}
 
 	@Override
 	public List<Order> getOrdersByVisitAndOrderType(String visitUuid, String orderTypeUuid,
-	        Order.FulfillerStatus fulfillerStatus, Integer limit, Integer startIndex) {
+													Order.FulfillerStatus fulfillerStatus, Integer limit, Integer startIndex) {
 		return this.dao.getOrdersByVisitAndOrderType(visitUuid, orderTypeUuid, fulfillerStatus, limit, startIndex);
 	}
 
@@ -266,11 +261,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		String messagePhoneNumber = Context.getAdministrationService().getGlobalProperty(ICareConfig.MESSAGE_PHONE_NUMBER);
 		if (messagePhoneNumber == null) {
 			throw new Exception("Message Phone Number is not configured. Please check " + ICareConfig.MESSAGE_PHONE_NUMBER
-			        + ".");
+					+ ".");
 		}
 		message.setPhoneNumber(messagePhoneNumber);
 		return sendMessageRequest(message);
-		/*String urlString = "https://us-central1-maximal-journey-328212.cloudfunctions.net/messaging";
+        /*String urlString = "https://us-central1-maximal-journey-328212.cloudfunctions.net/messaging";
 		URL url = new URL(urlString);
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		//con.setReadTimeout(15000);
@@ -345,11 +340,9 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			}
 			in.close();
 			return message;
-		}
-		catch (SocketTimeoutException e) {
+		} catch (SocketTimeoutException e) {
 			throw e;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
 			String inputLine;
 			StringBuffer content = new StringBuffer();
@@ -510,7 +503,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 
 	@Override
 	public List<PatientWrapper> getPatients(String search, String patientUUID, PatientWrapper.VisitStatus visitStatus,
-	        Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection) {
+											Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection) {
 		return dao.getPatients(search, patientUUID, visitStatus, startIndex, limit, orderByDirection);
 	}
 
@@ -550,61 +543,71 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public List<Drug> getDrugs(String concept, Integer limit, Integer startIndex) {
 		return dao.getDrugs(concept, limit, startIndex);
 	}
-	private Session session = null;
-	/**
-	 * Returns the email session
-	 */
-	@Override
-	public Session getEmailSession() throws Exception {
-		if (session == null) {
-			AdministrationService as = Context.getAdministrationService();
-			Properties p = new Properties();
-			p.put("mail.transport.protocol", as.getGlobalProperty("mail.transport_protocol", "smtp"));
-			p.put("mail.smtp.host", as.getGlobalProperty("mail.smtp_host", "localhost"));
-			p.put("mail.smtp.port", as.getGlobalProperty("mail.smtp_port", "25")); // mail.smtp_port
-			p.put("mail.smtp.auth", as.getGlobalProperty("mail.smtp_auth", "false")); // mail.smtp_auth
-			p.put("mail.smtp.starttls.enable", as.getGlobalProperty("mail.smtp.starttls.enable", "false"));
-			p.put("mail.debug", as.getGlobalProperty("mail.debug", "false"));
-			p.put("mail.from", as.getGlobalProperty("mail.from", ""));
-			final String user = as.getGlobalProperty("mail.user", "");
-			final String password = as.getGlobalProperty("mail.password", "");
 
-			if (StringUtils.isNotBlank(user) && StringUtils.isNotBlank(password.toString())) {
-				session = Session.getInstance(p, new Authenticator() {
-					public PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(user, password);
-					}
-				});
-			}
-			else {
-				session = Session.getInstance(p);
-			}
-		}
-		return session;
-	}
-
-	/**
-	 * Performs some action on the given report
-	 */
 	@Override
-	public String processEmail(Properties emailProperties) throws Exception {
+	public Map<String, Object> createWorkFlowState(ProgramWorkflowState state) throws Exception {
 		try {
-			MimeMessage m = new MimeMessage(getEmailSession());
+			ProgramWorkflowService programWorkflowService = Context.getProgramWorkflowService();
+			programWorkflowService.getWorkflow(state.getProgramWorkflow().getId()).addState(state);
+		} catch (Exception e) {
+			throw new RuntimeException("Error occurred while sending  email", e);
+		}
+		return  null;
+		}
+		private Session emailSession = null;
+		/**
+		 * Returns the email session
+		 */
+		@Override
+		public Session getEmailSession() throws Exception {
+			if (emailSession == null) {
+				AdministrationService as = Context.getAdministrationService();
+				Properties p = new Properties();
+				p.put("mail.transport.protocol", as.getGlobalProperty("mail.transport_protocol", "smtp"));
+				p.put("mail.smtp.host", as.getGlobalProperty("mail.smtp_host", "localhost"));
+				p.put("mail.smtp.port", as.getGlobalProperty("mail.smtp_port", "25")); // mail.smtp_port
+				p.put("mail.smtp.auth", as.getGlobalProperty("mail.smtp_auth", "false")); // mail.smtp_auth
+				p.put("mail.smtp.starttls.enable", as.getGlobalProperty("mail.smtp.starttls.enable", "false"));
+				p.put("mail.debug", as.getGlobalProperty("mail.debug", "false"));
+				p.put("mail.from", as.getGlobalProperty("mail.from", ""));
+				final String user = as.getGlobalProperty("mail.user", "");
+				final String password = as.getGlobalProperty("mail.password", "");
 
-			m.setFrom(new InternetAddress(emailProperties.getProperty("from")));
-			for (String recipient : emailProperties.getProperty("to", "").split("\\,")) {
-				m.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(recipient));
+				if (StringUtils.isNotBlank(user) && StringUtils.isNotBlank(password.toString())) {
+					emailSession = Session.getInstance(p, new Authenticator() {
+						public PasswordAuthentication getPasswordAuthentication() {
+							return new PasswordAuthentication(user, password);
+						}
+					});
+				} else {
+					emailSession = Session.getInstance(p);
+				}
 			}
+			return emailSession;
+		}
 
-			// TODO: Make these such that they can contain report information
-			m.setSubject(emailProperties.getProperty("subject"));
+		/**
+		 * Performs some action on the given report
+		 */
+		@Override
+		public String processEmail(Properties emailProperties) throws Exception {
+			try {
+				MimeMessage m = new MimeMessage(getEmailSession());
 
-			Multipart multipart = new MimeMultipart();
+				m.setFrom(new InternetAddress(emailProperties.getProperty("from")));
+				for (String recipient : emailProperties.getProperty("to", "").split("\\,")) {
+					m.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(recipient));
+				}
 
-			MimeBodyPart contentBodyPart = new MimeBodyPart();
-			String content = emailProperties.getProperty("content", "");
-			contentBodyPart.setContent(content, "text/html");
-			multipart.addBodyPart(contentBodyPart);
+				// TODO: Make these such that they can contain report information
+				m.setSubject(emailProperties.getProperty("subject"));
+
+				Multipart multipart = new MimeMultipart();
+
+				MimeBodyPart contentBodyPart = new MimeBodyPart();
+				String content = emailProperties.getProperty("content", "");
+				contentBodyPart.setContent(content, "text/html");
+				multipart.addBodyPart(contentBodyPart);
 
 //			if (report.getRenderedOutput() != null && "true".equalsIgnoreCase(configuration.getProperty("addOutputAsAttachment"))) {
 				MimeBodyPart attachment = new MimeBodyPart();
@@ -614,228 +617,225 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 				multipart.addBodyPart(attachment);
 //			}
 
-			m.setContent(multipart);
-			Transport.send(m);
-		}
-		catch (Exception e) {
-			throw new RuntimeException("Error occurred while sending  email", e);
-		}
-		return  "TESTING";
-	}
-
-	public String getClientsFromExternalSystems(String identifier, String identifierReference, String basicAuthKey)
-	        throws IOException, URISyntaxException {
-		AdministrationService administrationService = Context.getService(AdministrationService.class);
-		String systemKey = "pimaCovid";
-		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
-		        + ".baseUrl");
-		String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
-		        + ".username");
-		String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
-		        + ".password");
-		String ou = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
-		        + ".referenceOuUid");
-		String program = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
-		        + ".programUid");
-		//		TODO: Find a way to softcode the API References
-		URL url;
-		if (baseUrl == null || baseUrl.trim().equals("")) {
-			throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
-		}
-		//		this.getCreator().getUserProperties().get("")
-		String path = "/api/trackedEntityInstances.json?filter=" + identifierReference + ":EQ:" + identifier + "&ou=" + ou
-		        + "&ouMode=DESCENDANTS&program=" + program
-		        + "&fields=attributes[attribute,code,value],enrollments[*],orgUnit,trackedEntityInstance&paging=false";
-		url = new URL(baseUrl.concat(path));
-
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-		String userCredentials = username.concat(":").concat(password);
-		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
-
-		con.setRequestMethod("GET");
-		con.setRequestProperty("Content-Type", "application/json; utf-8");
-		con.setRequestProperty("Accept", "application/json");
-		con.setRequestProperty("Authorization", basicAuth);
-		try {
-			BufferedReader bufferIn = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			String inputLine;
-			StringBuffer content = new StringBuffer();
-			while ((inputLine = bufferIn.readLine()) != null) {
-				content.append(inputLine);
+				m.setContent(multipart);
+				Transport.send(m);
+			} catch (Exception e) {
+				throw new RuntimeException("Error occurred while sending  email", e);
 			}
-			bufferIn.close();
-			return String.valueOf(content);
+			return  "TESTING";
 		}
-		catch (Exception e) {
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-			String inputLine;
-			StringBuffer content = new StringBuffer();
-			while ((inputLine = in.readLine()) != null) {
-				content.append(inputLine);
+
+		public String getClientsFromExternalSystems(String identifier, String identifierReference, String basicAuthKey)
+            throws IOException, URISyntaxException {
+			AdministrationService administrationService = Context.getService(AdministrationService.class);
+			String systemKey = "pimaCovid";
+			String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
+					+ ".baseUrl");
+			String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
+					+ ".username");
+			String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
+					+ ".password");
+			String ou = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
+					+ ".referenceOuUid");
+			String program = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
+					+ ".programUid");
+			//		TODO: Find a way to softcode the API References
+			URL url;
+			if (baseUrl == null || baseUrl.trim().equals("")) {
+				throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
 			}
-			in.close();
-			return String.valueOf(content);
+			//		this.getCreator().getUserProperties().get("")
+			String path = "/api/trackedEntityInstances.json?filter=" + identifierReference + ":EQ:" + identifier + "&ou=" + ou
+					+ "&ouMode=DESCENDANTS&program=" + program
+					+ "&fields=attributes[attribute,code,value],enrollments[*],orgUnit,trackedEntityInstance&paging=false";
+			url = new URL(baseUrl.concat(path));
+
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+			String userCredentials = username.concat(":").concat(password);
+			String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+
+			con.setRequestMethod("GET");
+			con.setRequestProperty("Content-Type", "application/json; utf-8");
+			con.setRequestProperty("Accept", "application/json");
+			con.setRequestProperty("Authorization", basicAuth);
+			try {
+				BufferedReader bufferIn = new BufferedReader(new InputStreamReader(con.getInputStream()));
+				String inputLine;
+				StringBuffer content = new StringBuffer();
+				while ((inputLine = bufferIn.readLine()) != null) {
+					content.append(inputLine);
+				}
+				bufferIn.close();
+				return String.valueOf(content);
+			} catch (Exception e) {
+				BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+				String inputLine;
+				StringBuffer content = new StringBuffer();
+				while ((inputLine = in.readLine()) != null) {
+					content.append(inputLine);
+				}
+				in.close();
+				return String.valueOf(content);
+			}
 		}
-	}
 
-	public String createPimaCovidLabRequest(Map<String, Object> request, String basicAuthKey)
-	        throws IOException {
-		AdministrationService administrationService = Context.getService(AdministrationService.class);
+		public String createPimaCovidLabRequest(Map<String, Object> request, String basicAuthKey)
+            throws IOException {
+			AdministrationService administrationService = Context.getService(AdministrationService.class);
 
-		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
-		String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
-		String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
-		URL url;
-		if (baseUrl == null || baseUrl.trim().equals("")) {
-			throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
-		}
-		//		this.getCreator().getUserProperties().get("")
-		String path = "/api/events.json?";
-		url = new URL(baseUrl.concat(path));
-		System.out.println(request);
-		String returnValue = "";
+			String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
+			String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
+			String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
+			URL url;
+			if (baseUrl == null || baseUrl.trim().equals("")) {
+				throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
+			}
+			//		this.getCreator().getUserProperties().get("")
+			String path = "/api/events.json?";
+			url = new URL(baseUrl.concat(path));
+			System.out.println(request);
+			String returnValue = "";
 
-		BufferedReader reader;
-		String line;
-		StringBuffer responseContent = new StringBuffer();
+			BufferedReader reader;
+			String line;
+			StringBuffer responseContent = new StringBuffer();
 
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
 //		String basicAuth = "Basic " + basicAuthKey;
-		String userCredentials = username.concat(":").concat(password);
-		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+			String userCredentials = username.concat(":").concat(password);
+			String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
 
-		con.setRequestMethod("POST");
-		con.setRequestProperty("Content-Type", "application/json; utf-8");
-		con.setRequestProperty("Accept", "application/json");
-		con.setRequestProperty("Authorization", basicAuth);
-		con.setDoOutput(true);
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/json; utf-8");
+			con.setRequestProperty("Accept", "application/json");
+			con.setRequestProperty("Authorization", basicAuth);
+			con.setDoOutput(true);
 
-		ObjectMapper mapper = new ObjectMapper();
-		// Converting the Object to JSONString
-		String jsonString = mapper.writeValueAsString(request);
-		System.out.println(jsonString);
+			ObjectMapper mapper = new ObjectMapper();
+			// Converting the Object to JSONString
+			String jsonString = mapper.writeValueAsString(request);
+			System.out.println(jsonString);
 
-		// int status = httpURLConnection.getResponseCode();
+			// int status = httpURLConnection.getResponseCode();
 
-		try (OutputStream outputStream = con.getOutputStream()) {
-			byte[] input = jsonString.getBytes("utf-8");
-			outputStream.write(input, 0, input.length);
+			try (OutputStream outputStream = con.getOutputStream()) {
+				byte[] input = jsonString.getBytes("utf-8");
+				outputStream.write(input, 0, input.length);
+			}
+
+			reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			while ((line = reader.readLine()) != null) {
+				responseContent.append(line);
+			}
+			reader.close();
+			return responseContent.toString();
 		}
 
-		reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		while ((line = reader.readLine()) != null) {
-			responseContent.append(line);
-		}
-		reader.close();
-		return responseContent.toString();
-	}
+		public String savePimaCovidLabResult(Map<String, Object> results)
+            throws IOException {
+			AdministrationService administrationService = Context.getService(AdministrationService.class);
 
-	public String savePimaCovidLabResult(Map<String, Object> results)
-			throws IOException {
-		AdministrationService administrationService = Context.getService(AdministrationService.class);
+			String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
+			String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
+			String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
+			String usernamePropertyKey = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.usernamePropertyKey");
+			String passwordPropertyKey = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.passwordPropertyKey");
+			URL url;
+			if (baseUrl == null || baseUrl.trim().equals("")) {
+				throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
+			}
+			//		this.getCreator().getUserProperties().get("")
+			String usernameProperty = Context.getAuthenticatedUser().getUserProperties().get(usernamePropertyKey);
+			String passwordPropertyEncrypted = Context.getAuthenticatedUser().getUserProperties().get(passwordPropertyKey);
 
-		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
-		String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
-		String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
-		String usernamePropertyKey = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.usernamePropertyKey");
-		String passwordPropertyKey = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.passwordPropertyKey");
-		URL url;
-		if (baseUrl == null || baseUrl.trim().equals("")) {
-			throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
-		}
-		//		this.getCreator().getUserProperties().get("")
-		String usernameProperty = Context.getAuthenticatedUser().getUserProperties().get(usernamePropertyKey);
-		String passwordPropertyEncrypted = Context.getAuthenticatedUser().getUserProperties().get(passwordPropertyKey);
+			String path = "/api/events.json?";
+			url = new URL(baseUrl.concat(path));
+			System.out.println(results);
 
-		String path = "/api/events.json?";
-		url = new URL(baseUrl.concat(path));
-		System.out.println(results);
+			BufferedReader reader;
+			String line;
+			StringBuffer responseContent = new StringBuffer();
 
-		BufferedReader reader;
-		String line;
-		StringBuffer responseContent = new StringBuffer();
-
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
 //		String basicAuth = "Basic " + basicAuthKey;
-		String userCredentials = username.concat(":").concat(password);
-		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+			String userCredentials = username.concat(":").concat(password);
+			String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
 
-		con.setRequestMethod("POST");
-		con.setRequestProperty("Content-Type", "application/json; utf-8");
-		con.setRequestProperty("Accept", "application/json");
-		con.setRequestProperty("Authorization", basicAuth);
-		con.setDoOutput(true);
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/json; utf-8");
+			con.setRequestProperty("Accept", "application/json");
+			con.setRequestProperty("Authorization", basicAuth);
+			con.setDoOutput(true);
 
-		ObjectMapper mapper = new ObjectMapper();
-		// Converting the Object to JSONString
-		String jsonString = mapper.writeValueAsString(results);
-		System.out.println(jsonString);
+			ObjectMapper mapper = new ObjectMapper();
+			// Converting the Object to JSONString
+			String jsonString = mapper.writeValueAsString(results);
+			System.out.println(jsonString);
 
-		// int status = httpURLConnection.getResponseCode();
+			// int status = httpURLConnection.getResponseCode();
 
-		try (OutputStream outputStream = con.getOutputStream()) {
-			byte[] input = jsonString.getBytes("utf-8");
-			outputStream.write(input, 0, input.length);
-		}
-
-		reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		while ((line = reader.readLine()) != null) {
-			responseContent.append(line);
-		}
-		reader.close();
-		return responseContent.toString();
-	}
-
-	public String verifyExternalSystemCredentials(String username, String password, String systemKey) throws IOException {
-		AdministrationService administrationService = Context.getService(AdministrationService.class);
-
-		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
-		        + ".baseUrl");
-		URL url;
-		if (baseUrl == null || baseUrl.trim().equals("")) {
-			throw new VerificationException("Destination server address url is not set. Please set base url for system"
-			        + systemKey + ".");
-		}
-
-		// TODO: Consider to change this to /api/me.json?fields=name
-		String path = "/api/organisationUnits.json?";
-		url = new URL(baseUrl.concat(path));
-
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-		String userCredentials = username.concat(":").concat(password);
-		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
-
-		con.setRequestMethod("GET");
-		con.setRequestProperty("Content-Type", "application/json; utf-8");
-		con.setRequestProperty("Accept", "application/json");
-		con.setRequestProperty("Authorization", basicAuth);
-		try {
-			BufferedReader bufferIn = new BufferedReader(new InputStreamReader(con.getInputStream()));
-			String inputLine;
-			StringBuffer content = new StringBuffer();
-			while ((inputLine = bufferIn.readLine()) != null) {
-				content.append(inputLine);
+			try (OutputStream outputStream = con.getOutputStream()) {
+				byte[] input = jsonString.getBytes("utf-8");
+				outputStream.write(input, 0, input.length);
 			}
-			bufferIn.close();
-			return String.valueOf(content);
-		}
-		catch (Exception e) {
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-			String inputLine;
-			StringBuffer content = new StringBuffer();
-			while ((inputLine = in.readLine()) != null) {
-				content.append(inputLine);
-			}
-			in.close();
-			return String.valueOf(content);
-		}
-	}
 
-	//	public String voidOrder(String uuid, String voidReason) {
-	//		return dao.voidOrder(uuid, voidReason);
-	//	}
+			reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			while ((line = reader.readLine()) != null) {
+				responseContent.append(line);
+			}
+			reader.close();
+			return responseContent.toString();
+		}
+
+		public String verifyExternalSystemCredentials(String username, String password, String systemKey) throws IOException {
+			AdministrationService administrationService = Context.getService(AdministrationService.class);
+
+			String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated." + systemKey
+					+ ".baseUrl");
+			URL url;
+			if (baseUrl == null || baseUrl.trim().equals("")) {
+				throw new VerificationException("Destination server address url is not set. Please set base url for system"
+						+ systemKey + ".");
+			}
+
+			// TODO: Consider to change this to /api/me.json?fields=name
+			String path = "/api/organisationUnits.json?";
+			url = new URL(baseUrl.concat(path));
+
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+			String userCredentials = username.concat(":").concat(password);
+			String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+
+			con.setRequestMethod("GET");
+			con.setRequestProperty("Content-Type", "application/json; utf-8");
+			con.setRequestProperty("Accept", "application/json");
+			con.setRequestProperty("Authorization", basicAuth);
+			try {
+				BufferedReader bufferIn = new BufferedReader(new InputStreamReader(con.getInputStream()));
+				String inputLine;
+				StringBuffer content = new StringBuffer();
+				while ((inputLine = bufferIn.readLine()) != null) {
+					content.append(inputLine);
+				}
+				bufferIn.close();
+				return String.valueOf(content);
+			} catch (Exception e) {
+				BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+				String inputLine;
+				StringBuffer content = new StringBuffer();
+				while ((inputLine = in.readLine()) != null) {
+					content.append(inputLine);
+				}
+				in.close();
+				return String.valueOf(content);
+			}
+		}
+
+		//	public String voidOrder(String uuid, String voidReason) {
+		//		return dao.voidOrder(uuid, voidReason);
+		//	}
 }

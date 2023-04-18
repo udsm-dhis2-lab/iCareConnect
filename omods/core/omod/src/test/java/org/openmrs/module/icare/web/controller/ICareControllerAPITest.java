@@ -748,7 +748,12 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public  void testProcessEmail() throws Exception {
 		Properties emailProperties = new Properties();
+		AdministrationService administrationService = Context.getAdministrationService();
+		String fromMail = administrationService.getGlobalProperty("mail.from");
 		emailProperties.setProperty("to","josephatjulius24@gmail.com");
+		emailProperties.setProperty("from",fromMail);
+		emailProperties.setProperty("content", "TESTING EMAIL BODY");
+		emailProperties.setProperty("subject", "TESTING");
 		MockHttpServletRequest emailRequest = newPostRequest("icare/processemail", emailProperties);
 		MockHttpServletResponse returnResponse = handle(emailRequest);
 		System.out.println(returnResponse);

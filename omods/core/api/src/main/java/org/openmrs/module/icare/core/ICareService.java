@@ -131,7 +131,10 @@ public interface ICareService extends OpenmrsService {
 	List<Drug> getDrugs(String concept, Integer limit, Integer startIndex);
 
 	String processEmail(Properties configuration) throws Exception;
-	Session getEmailSession() throws Exception;
+
+    Map<String, Object> createWorkFlowState(ProgramWorkflowState state) throws Exception;
+
+    Session getEmailSession() throws Exception;
 
 	String getClientsFromExternalSystems(String identifier, String identifierReference, String basicAuthKey)
 	        throws IOException, URISyntaxException;
