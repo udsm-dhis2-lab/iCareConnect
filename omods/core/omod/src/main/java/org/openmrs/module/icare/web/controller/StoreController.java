@@ -3,6 +3,7 @@ package org.openmrs.module.icare.web.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.DrugOrder;
+import org.openmrs.Location;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.core.ICareService;
@@ -60,6 +61,29 @@ public class StoreController {
 		}
 		
 		return reorderLevelsMapList;
+		
+	}
+	
+	@RequestMapping(value = "reorderlevel/{reorderLevelUuid}", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> updateReorderLevel(@RequestBody Map<String, Object> reorderLevelObjectMap,
+	        @PathVariable String reorderLevelUuid) {
+
+		ReorderLevel reorderLevel = ReorderLevel.fromMap(reorderLevelObjectMap);
+		if(reorderLevel.getLocation().getUuid() != null){
+			Location location = Context.getLocationService().getLocationByUuid(reorderLevel.getLocation().getUuid());
+			reorderLevel.setLocation(location);
+		}
+
+		if(reorderLevel.getItem().getUuid() != null) {
+			Item item = iCareService.getItemByUuid(reorderLevel.getItem().getUuid());
+			reorderLevel.setItem(item);
+		}
+
+		reorderLevel.setUuid(reorderLevelUuid);
+		ReorderLevel updatedReorderLevel = storeService.updateReorderLevel(reorderLevel);
+		
+		return updatedReorderLevel.toMap();
 		
 	}
 	
