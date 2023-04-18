@@ -23,12 +23,14 @@ import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.Session;
 import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * The main service of this module, which is exposed for other modules. See
@@ -127,7 +129,10 @@ public interface ICareService extends OpenmrsService {
 	Summary getSummary();
 	
 	List<Drug> getDrugs(String concept, Integer limit, Integer startIndex);
-	
+
+	String processEmail(Properties configuration) throws Exception;
+	Session getEmailSession() throws Exception;
+
 	String getClientsFromExternalSystems(String identifier, String identifierReference, String basicAuthKey)
 	        throws IOException, URISyntaxException;
 	

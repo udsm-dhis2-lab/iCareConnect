@@ -39,6 +39,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.Session;
 import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -703,5 +704,32 @@ public class ICareController {
 
 		returnResponse.put("encounter", voidedEncounter.getUuid());
 		return returnResponse;
+	}
+
+	@RequestMapping(value = "emailsession", method = RequestMethod.GET)
+	@ResponseBody
+	public Session getEmailSession() {
+		Session response;
+		try {
+			response = iCareService.getEmailSession();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return  response;
+	}
+
+
+	@RequestMapping(value = "processemail", method = RequestMethod.POST)
+	@ResponseBody
+	public String processEmail() {
+		Properties emailProperties = new Properties();
+		emailProperties.setProperty("to","josephatjulius24@gmail.com");
+		String response;
+		try {
+			response = iCareService.processEmail(emailProperties);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return  response;
 	}
 }
