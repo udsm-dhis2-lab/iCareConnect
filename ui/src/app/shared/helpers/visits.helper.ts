@@ -283,6 +283,7 @@ export function arrangeVisitDataChronologically(
     labOrders: visit?.labOrders?.map((order) => {
       return {
         ...order,
+        results: order?.results,
         date: formatDateToString(new Date(order?.order?.dateActivated), "DD-MM-YYYY"),
         time: formatDateToString(new Date(order?.order?.dateActivated), "hh:mm:ss"),
         provider: order?.order?.orderer?.display?.split("-")[1],
@@ -292,6 +293,7 @@ export function arrangeVisitDataChronologically(
     radiologyOrders: visit?.radiologyOrders?.map((order) => {
       return {
         ...order,
+        results: order?.results,
         date: formatDateToString(new Date(order?.order?.dateActivated), "DD-MM-YYYY"),
         time: formatDateToString(new Date(order?.order?.dateActivated), "hh:mm:ss"),
         provider: order?.order?.orderer?.display?.split("-")[1],
@@ -301,6 +303,7 @@ export function arrangeVisitDataChronologically(
     procedureOrders: visit?.procedureOrders?.map((order) => {
       return {
         ...order?.order,
+        results: order?.results,
         date: formatDateToString(new Date(order?.order?.dateActivated), "DD-MM-YYYY"),
         time: formatDateToString(new Date(order?.order?.dateActivated), "hh:mm:ss"),
         provider: order?.order?.orderer?.display?.split("-")[1],
