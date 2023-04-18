@@ -31,9 +31,9 @@ public class BillingController extends BaseController {
 	
 	@Autowired
 	BillingService billingService;
-
-//	@Autowired
-//	InsuranceService insuranceService;
+	
+	//	@Autowired
+	//	InsuranceService insuranceService;
 	
 	@RequestMapping(value = "invoice", method = RequestMethod.GET)
 	@ResponseBody
@@ -87,16 +87,16 @@ public class BillingController extends BaseController {
 		SyncResult syncResult = billingService.syncInsurance(insurance);
 		return syncResult.toMap();
 	}
-
-//	@RequestMapping(value = "insurance/verification", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
-//	@ResponseBody
-//	public Map<String,Object> verifyInsurance(@RequestBody Map<String, Object> verificationRequestMap) throws Exception {
-//
-//		VerificationRequest verificationRequest = VerificationRequest.fromMap(verificationRequestMap);
-//		VerificationResponse verificationResponse = insuranceService.request(verificationRequest);
-//
-//		return verificationResponse.toMap();
-//	}
+	
+	//	@RequestMapping(value = "insurance/verification", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	//	@ResponseBody
+	//	public Map<String,Object> verifyInsurance(@RequestBody Map<String, Object> verificationRequestMap) throws Exception {
+	//
+	//		VerificationRequest verificationRequest = VerificationRequest.fromMap(verificationRequestMap);
+	//		VerificationResponse verificationResponse = insuranceService.request(verificationRequest);
+	//
+	//		return verificationResponse.toMap();
+	//	}
 	
 	public List<Payment> onGetPatientPayments(@RequestParam("patient") String patient) {
 		return billingService.getPatientPayments(patient);

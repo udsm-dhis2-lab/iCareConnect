@@ -157,7 +157,7 @@ public class VerificationResponse {
 	public void setPaymentScheme(Concept paymentScheme) {
 		this.paymentScheme = paymentScheme;
 	}
-
+	
 	public Map<String, Object> toMap(){
 
 		Map<String, Object> verificationResponseMap = new HashMap<>();

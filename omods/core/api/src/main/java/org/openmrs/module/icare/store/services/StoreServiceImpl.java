@@ -941,6 +941,11 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
+	public ReorderLevel updateReorderLevel(ReorderLevel reorderLevel) {
+		return stockDAO.updateReorderLevel(reorderLevel);
+	}
+	
+	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		
 		Supplier supplier = this.getSupplierByUuid(stockInvoice.getSupplier().getUuid());
