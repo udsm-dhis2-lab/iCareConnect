@@ -580,7 +580,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 				session = Session.getInstance(p);
 			}
 		}
-		System.out.println(session.getDebug());
 		return session;
 	}
 
@@ -588,22 +587,22 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	 * Performs some action on the given report
 	 */
 	@Override
-	public String processEmail(Properties configuration) throws Exception {
+	public String processEmail(Properties emailProperties) throws Exception {
 		try {
 			MimeMessage m = new MimeMessage(getEmailSession());
 
-			m.setFrom(new InternetAddress(configuration.getProperty("from")));
-			for (String recipient : configuration.getProperty("to", "").split("\\,")) {
+			m.setFrom(new InternetAddress(emailProperties.getProperty("from")));
+			for (String recipient : emailProperties.getProperty("to", "").split("\\,")) {
 				m.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(recipient));
 			}
 
 			// TODO: Make these such that they can contain report information
-			m.setSubject(configuration.getProperty("subject"));
+			m.setSubject(emailProperties.getProperty("subject"));
 
 			Multipart multipart = new MimeMultipart();
 
 			MimeBodyPart contentBodyPart = new MimeBodyPart();
-			String content = configuration.getProperty("content", "");
+			String content = emailProperties.getProperty("content", "");
 			contentBodyPart.setContent(content, "text/html");
 			multipart.addBodyPart(contentBodyPart);
 
@@ -611,12 +610,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 				MimeBodyPart attachment = new MimeBodyPart();
 				Object output = null;
 				attachment.setDataHandler(new DataHandler(output, "text/html"));
-				attachment.setFileName(configuration.getProperty("attachmentName"));
+				attachment.setFileName(emailProperties.getProperty("attachmentName"));
 				multipart.addBodyPart(attachment);
 //			}
 
 			m.setContent(multipart);
-
 			Transport.send(m);
 		}
 		catch (Exception e) {
