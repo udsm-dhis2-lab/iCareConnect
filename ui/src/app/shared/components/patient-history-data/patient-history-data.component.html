@@ -298,9 +298,9 @@
             </div>
         </li>
         <li class="mini-event" *ngIf="visitData?.category === 'PROCEDURE_ORDER'">
-            <p class="data-name"> 
+            <p class="data-name">
                 <strong>
-                    {{visitData?.order?.display}}
+                    {{visitData?.concept?.display}}
                 </strong>
                 <span>
                     <i *ngIf="visitData?.date" class="text-small"> ordered on {{ visitData?.order?.date }} {{ visitData?.time }} by {{ visitData?.provider }} </i>
@@ -362,10 +362,13 @@
                             <span *ngIf="!visitData?.results[0]?.value?.links?.uri">
                                 {{ visitData?.results[0]?.value?.display ? visitData?.results[0]?.value?.display : visitData?.results[0]?.value }}
                             </span> -->
-                            
                             <span class="text-small"> 
                                 <i>
-                                    Attended on {{ visitData?.results[0]?.obsDatetime | date:"dd-MM-yyyy HH:mm:ss"}} by {{ visitData?.results[0]?.provider?.display }} 
+                                    Attended 
+                                    <span *ngIf="visitData?.results[0]?.obsDatetime">
+                                        on {{ visitData?.results[0]?.obsDatetime | date:"dd-MM-yyyy HH:mm:ss"}}
+                                    </span>
+                                    by {{ visitData?.results[0]?.provider?.display }} 
                                 </i>
                             </span>
                         </p>
