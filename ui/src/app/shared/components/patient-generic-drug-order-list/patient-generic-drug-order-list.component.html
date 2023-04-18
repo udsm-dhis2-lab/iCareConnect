@@ -116,9 +116,9 @@
             <td>
               <ng-container *ngIf="params?.prescriptionArrangementFields">
                 <span>
-                  ({{ drugOrder.obs[params?.prescriptionArrangementFields['2']?.uuid]?.value?.display ?
-                  drugOrder.obs[params?.prescriptionArrangementFields['2']?.uuid]?.value?.display :
-                  drugOrder.obs[params?.prescriptionArrangementFields['2']?.uuid]?.value }})
+                  {{ drugOrder.obs[params?.prescriptionArrangementFields['2']?.uuid]?.value?.display ?
+                  "( " + drugOrder.obs[params?.prescriptionArrangementFields['2']?.uuid]?.value?.display + ")" :
+                  drugOrder.obs[params?.prescriptionArrangementFields['2']?.uuid]?.value }}
                   {{ drugOrder.obs[params?.prescriptionArrangementFields['3']?.uuid]?.value?.display ?
                   drugOrder.obs[params?.prescriptionArrangementFields['3']?.uuid]?.value?.display :
                   drugOrder.obs[params?.prescriptionArrangementFields['3']?.uuid]?.value }}
