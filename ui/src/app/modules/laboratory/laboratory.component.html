@@ -195,17 +195,6 @@
           <mat-chip
             class="w-20"
             routerLinkActive="active-route"
-            (click)="changeRoute($event, 'settings', true)"
-            [ngClass]="{
-              'active-route': currentRoutePath === 'settings'
-            }"
-            *ngIf="params?.privileges && params?.privileges['Tests Settings']"
-          >
-            Maintenance
-          </mat-chip>
-          <mat-chip
-            class="w-20"
-            routerLinkActive="active-route"
             (click)="changeRoute($event, 'reports', false)"
             [ngClass]="{
               'active-route': currentRoutePath === 'reports'
@@ -215,6 +204,17 @@
             "
           >
             Reports
+          </mat-chip>
+          <mat-chip
+            class="w-20"
+            routerLinkActive="active-route"
+            (click)="changeRoute($event, 'settings', true)"
+            [ngClass]="{
+              'active-route': currentRoutePath === 'settings'
+            }"
+            *ngIf="params?.privileges && params?.privileges['Tests Settings']"
+          >
+            Maintenance
           </mat-chip>
         </mat-chip-list>
       </div>
