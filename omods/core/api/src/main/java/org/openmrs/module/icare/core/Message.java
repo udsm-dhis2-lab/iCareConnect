@@ -69,10 +69,10 @@ public class Message {
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
-
+	
 	public void addRecipient(javax.mail.Message.RecipientType to, InternetAddress internetAddress) {
 	}
-
+	
 	public enum Status {
 		WAITING, SENT, DELIVERED
 	}
