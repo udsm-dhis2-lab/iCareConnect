@@ -721,20 +721,15 @@ public class ICareController {
 
 	@RequestMapping(value = "processemail", method = RequestMethod.POST)
 	@ResponseBody
-	public String processEmail() {
-		Properties emailProperties = new Properties();
-		System.out.println("a");
-		emailProperties.setProperty("to","josephatjulius24@gmail.com");
-		System.out.println("b");
+	public String processEmail(@RequestBody Properties emailProperties) {
+
 		String response;
-		System.out.println("c");
 		try {
-			System.out.println("d");
 			response = iCareService.processEmail(emailProperties);
-			System.out.println("e");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		System.out.println(response);
 		return  response;
 	}
 }
