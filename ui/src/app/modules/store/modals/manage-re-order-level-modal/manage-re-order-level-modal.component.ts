@@ -94,8 +94,8 @@ export class ManageReOrderLevelModalComponent implements OnInit {
           }
         }
         this.reOrderLevelService.updateReOrderLevel(this.data?.reOrderLevel?.uuid, reOrderLevel).subscribe((response) => {
-          this.savingData = false;
-          this.dialogRef.close(true);
+        this.savingData = false;
+        this.dialogRef.close(true);
         })
       }
     } else {

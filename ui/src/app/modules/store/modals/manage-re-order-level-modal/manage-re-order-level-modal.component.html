@@ -24,7 +24,7 @@
       <button mat-stroked-button (click)="onClose($event)">Close</button>
       <button
         *ngIf="!shouldConfirm"
-        [disabled]="!isFormValid"
+        [disabled]="!isFormValid && !data"
         mat-flat-button
         (click)="onSave($event)"
         class="ml-2"
