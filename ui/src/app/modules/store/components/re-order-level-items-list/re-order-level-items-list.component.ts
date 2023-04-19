@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
+import { tap } from "rxjs/operators";
 import { ReOrderLevelService } from "src/app/shared/resources/store/services/re-order-level.service";
 import { ManageReOrderLevelModalComponent } from "../../modals/manage-re-order-level-modal/manage-re-order-level-modal.component";
 
@@ -25,7 +26,7 @@ export class ReOrderLevelItemsListComponent implements OnInit {
       localStorage.getItem("currentLocation")
     )?.uuid;
     this.reOrderLevelsList$ =
-      this.reOrderLevelService.getReOrderLevelOfItems(locationUuid);
+      this.reOrderLevelService.getReOrderLevelOfItems(locationUuid).pipe(tap((response) => console.log("==> ReOrderLevel: ", response)));
   }
 
   onAddNew(event: Event): void {
@@ -40,5 +41,23 @@ export class ReOrderLevelItemsListComponent implements OnInit {
           this.getReOrderLevels();
         }
       });
+  }
+
+  onUpdate(e: any, reOrderLevel: any){
+    e?.stopPropagation();
+    this.dialog
+      .open(ManageReOrderLevelModalComponent, {
+        width: "30%",
+        data: {
+          reOrderLevel: reOrderLevel
+        }
+      })
+      .afterClosed()
+      .subscribe((shouldLoadData) => {
+        if (shouldLoadData) {
+          this.getReOrderLevels();
+        }
+      });
+
   }
 }
