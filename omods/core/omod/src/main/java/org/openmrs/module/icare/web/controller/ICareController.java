@@ -723,10 +723,15 @@ public class ICareController {
 	@ResponseBody
 	public String processEmail() {
 		Properties emailProperties = new Properties();
+		System.out.println("a");
 		emailProperties.setProperty("to","josephatjulius24@gmail.com");
+		System.out.println("b");
 		String response;
+		System.out.println("c");
 		try {
+			System.out.println("d");
 			response = iCareService.processEmail(emailProperties);
+			System.out.println("e");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
