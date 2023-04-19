@@ -5,6 +5,7 @@ import { map, tap } from "rxjs/operators";
 import { LocationService } from "src/app/core/services";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
+import { toISOStringFormat } from "src/app/shared/helpers/format-date.helper";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { StockInvoicesService } from "src/app/shared/resources/store/services/stockInvoice.service";
 import { SupplierService } from "src/app/shared/resources/store/services/supplier.service";
@@ -36,8 +37,12 @@ export class StockInvoiceItemsComponent implements OnInit {
     this.specificStockInvoice$ = this.stockInvoicesService
       .getStockInvoice(this.stockInvoice?.uuid)
       .pipe(
-        tap(() => {
+        map((response) => {
           this.loadingInvoice = false;
+          return {
+            ...response,
+            InvoiceItems: response?.InvoiceItems?.filter((item) => !item?.voided)
+          }
         })
       );
   }
@@ -114,6 +119,7 @@ export class StockInvoiceItemsComponent implements OnInit {
           if (data?.confirmed) {
             const invoicesItemObject = {
               ...stockInvoiceItem,
+              expiryDate: toISOStringFormat({ date: new Date(stockInvoiceItem?.expiryDate), timezoneOffset: false, exactTimezoneOffset: false}),
               location: {
                 uuid: this.currentLocation?.uuid,
               },
