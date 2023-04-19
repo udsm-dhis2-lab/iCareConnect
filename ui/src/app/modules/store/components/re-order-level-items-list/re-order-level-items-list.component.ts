@@ -1,7 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
-import { tap } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { ReOrderLevelService } from "src/app/shared/resources/store/services/re-order-level.service";
 import { ManageReOrderLevelModalComponent } from "../../modals/manage-re-order-level-modal/manage-re-order-level-modal.component";
 
@@ -26,7 +27,7 @@ export class ReOrderLevelItemsListComponent implements OnInit {
       localStorage.getItem("currentLocation")
     )?.uuid;
     this.reOrderLevelsList$ =
-      this.reOrderLevelService.getReOrderLevelOfItems(locationUuid).pipe(tap((response) => console.log("==> ReOrderLevel: ", response)));
+      this.reOrderLevelService.getReOrderLevelOfItems(locationUuid).pipe(map((response) => response?.filter((reOrderLevel) => !reOrderLevel?.voided)));
   }
 
   onAddNew(event: Event): void {
@@ -56,6 +57,28 @@ export class ReOrderLevelItemsListComponent implements OnInit {
       .subscribe((shouldLoadData) => {
         if (shouldLoadData) {
           this.getReOrderLevels();
+        }
+      });
+
+  }
+  onDelete(e: any, reOrderLevel: any){
+    e?.stopPropagation();
+    this.dialog
+      .open(SharedConfirmationComponent, {
+        width: "30%",
+        data: {
+          modalTitle: `Delete Reorder level`,
+          modalMessage: `Are you sure to delete re-order level for ${reOrderLevel?.item?.display}`,
+          confirmationButtonText: `Delete`,
+          showRemarksInput: false
+        }
+      })
+      .afterClosed()
+      .subscribe((response) => {
+        if (response?.confirmed) {
+          this.reOrderLevelService.updateReOrderLevel(reOrderLevel?.uuid, {...reOrderLevel, voided: true}).pipe(tap(() => {
+            this.getReOrderLevels();
+          })).subscribe()
         }
       });
 
