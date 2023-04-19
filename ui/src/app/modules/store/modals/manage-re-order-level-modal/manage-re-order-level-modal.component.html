@@ -1,5 +1,5 @@
 <div>
-  <mat-toolbar color="primary">Add Re-Order Level</mat-toolbar>
+  <mat-toolbar color="primary">{{ data ? 'update' : 'Add' }} Re-Order Level</mat-toolbar>
   <div class="p-3">
     <div class="loading-overlay" *ngIf="savingData">
       <div class="text-center">
@@ -10,6 +10,7 @@
       </div>
     </div>
     <div>
+      <p *ngIf="data"> Selected Item: <i class="text-small">{{data?.reOrderLevel?.item?.display}}</i></p>
       <app-form
         *ngIf="formFields && formFields?.length > 0"
         [fields]="formFields"

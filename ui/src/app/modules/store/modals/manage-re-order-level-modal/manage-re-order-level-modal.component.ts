@@ -1,5 +1,6 @@
-import { Component, OnInit } from "@angular/core";
-import { MatDialogRef } from "@angular/material/dialog";
+import { Component, Inject, OnInit } from "@angular/core";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { tap } from "rxjs/operators";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { Field } from "src/app/shared/modules/form/models/field.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -20,6 +21,7 @@ export class ManageReOrderLevelModalComponent implements OnInit {
   shouldConfirm: boolean = false;
   constructor(
     private dialogRef: MatDialogRef<ManageReOrderLevelModalComponent>,
+    @Inject(MAT_DIALOG_DATA) public data,
     private reOrderLevelService: ReOrderLevelService
   ) {}
 
@@ -47,6 +49,7 @@ export class ManageReOrderLevelModalComponent implements OnInit {
         type: "number",
         min: 0,
         label: "Re-Order Level",
+        value: this.data?.reOrderLevel?.quantity || null,
       }),
     ];
   }
@@ -59,25 +62,42 @@ export class ManageReOrderLevelModalComponent implements OnInit {
   onSave(event: Event, confirmed?: boolean): void {
     event.stopPropagation();
     if (confirmed) {
-      const data = {
-        item: {
-          uuid: this.formData?.item?.value,
-        },
-        location: {
-          uuid: JSON.parse(localStorage.getItem("currentLocation"))?.uuid,
-        },
-        quantity: this.formData?.level?.value,
-      };
-      this.savingData = true;
-      this.shouldConfirm = false;
-      this.reOrderLevelService
-        .createReOrderLevelOfAnItem(data)
-        .subscribe((response: any) => {
-          if (response && !response?.error) {
-            this.savingData = false;
-            this.dialogRef.close(true);
+      if(!this.data){
+        const data = {
+          item: {
+            uuid: this.formData?.item?.value,
+          },
+          location: {
+            uuid: JSON.parse(localStorage.getItem("currentLocation"))?.uuid,
+          },
+          quantity: this.formData?.level?.value,
+        };
+        this.savingData = true;
+        this.shouldConfirm = false;
+        this.reOrderLevelService
+          .createReOrderLevelOfAnItem(data)
+          .subscribe((response: any) => {
+            if (response && !response?.error) {
+              this.savingData = false;
+              this.dialogRef.close(true);
+            }
+          });
+      } else {
+        this.savingData = true;
+        const reOrderLevel = {
+          quantity: this.formData?.level?.value,
+          item: {
+            uuid: this.formData?.item?.value,
+          },
+          location: {
+            uuid: this.data?.reOrderLevel?.location?.uuid
           }
-        });
+        }
+        this.reOrderLevelService.updateReOrderLevel(this.data?.reOrderLevel?.uuid, reOrderLevel).subscribe((response) => {
+          this.savingData = false;
+          this.dialogRef.close(true);
+        })
+      }
     } else {
       this.savingData = false;
       this.shouldConfirm = true;
