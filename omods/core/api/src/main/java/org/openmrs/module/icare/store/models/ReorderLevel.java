@@ -127,6 +127,9 @@ public class ReorderLevel extends BaseOpenmrsData implements java.io.Serializabl
 		if(this.getQuantity() != null) {
 			reorderLevelObject.put("quantity", this.getQuantity());
 		}
+		if(this.getUuid() != null) {
+			reorderLevelObject.put("uuid", this.getUuid());
+		}
 		return reorderLevelObject;
 		
 	}
