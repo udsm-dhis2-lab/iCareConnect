@@ -570,8 +570,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			Properties p = new Properties();
 			p.put("mail.transport.protocol", as.getGlobalProperty("mail.transport_protocol", "smtp"));
 			p.put("mail.smtp.host", as.getGlobalProperty("mail.smtp_host", "localhost"));
-			p.put("mail.smtp.port", as.getGlobalProperty("mail.smtp_port", "25")); // mail.smtp_port
-			p.put("mail.smtp.auth", as.getGlobalProperty("mail.smtp_auth", "false")); // mail.smtp_auth
+			p.put("mail.smtp.port", as.getGlobalProperty("mail.smtp_port", "26")); // mail.smtp_port
+			p.put("mail.smtp.auth", as.getGlobalProperty("mail.smtp_auth", "test")); // mail.smtp_auth
 			p.put("mail.smtp.starttls.enable", as.getGlobalProperty("mail.smtp.starttls.enable", "false"));
 			p.put("mail.debug", as.getGlobalProperty("mail.debug", "false"));
 			p.put("mail.from", as.getGlobalProperty("mail.from", ""));
@@ -599,28 +599,20 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public String processEmail(Properties emailProperties) throws Exception {
 		try {
 			MimeMessage m = new MimeMessage(getEmailSession());
-			System.out.println("00");
-			System.out.println(emailProperties);
 			m.setFrom(new InternetAddress(emailProperties.getProperty("from")));
-			System.out.println("11");
+
 			for (String recipient : emailProperties.getProperty("to", "").split("\\,")) {
-				System.out.println("22");
+
 				m.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(recipient));
 			}
 			System.out.println("33");
 			// TODO: Make these such that they can contain report information
 			m.setSubject(emailProperties.getProperty("subject"));
-			System.out.println(1);
 			Multipart multipart = new MimeMultipart();
-			System.out.println(2);
 			MimeBodyPart contentBodyPart = new MimeBodyPart();
-			System.out.println(3);
 			String content = emailProperties.getProperty("content", "");
-			System.out.println(4);
 			contentBodyPart.setContent(content, "text/html");
-			System.out.println(5);
 			multipart.addBodyPart(contentBodyPart);
-			System.out.println(6);
 			
 			//			if (report.getRenderedOutput() != null && "true".equalsIgnoreCase(configuration.getProperty("addOutputAsAttachment"))) {
 //			MimeBodyPart attachment = new MimeBodyPart();
@@ -631,9 +623,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			//			}
 			
 			m.setContent(multipart);
-			System.out.println(7);
 			Transport.send(m);
-			System.out.println(8);
 		}
 		catch (Exception e) {
 			throw new RuntimeException("Error occurred while sending  email: "+ e);
