@@ -573,6 +573,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		}
 		
 		if ((testAllocationStatus.getStatus().equals("AUTHORIZED"))) {
+			Sample sample = testResult.getTestAllocation().getSample();
 			List<Result> resList = testAllocation.getTestAllocationResults();
 			
 			Collections.sort(resList, new Comparator<Result>() {
@@ -672,7 +673,18 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				observationService.saveObs(observation, "");
 				
 			}
-			
+			// Add logic to send email
+			// 1. The subject of the email should be stored on a global property.
+			// 2. The body of the email should also be stored on a global property
+			// 3. Results structure html should be stored on a global property
+			String body = "";
+			String subject = administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_SUBJECT_CONFIGURATION_HTML).toString();
+			String bodyHeaderHtml = administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_HEADER_CONFIGURATION_HTML).toString();
+			body = body + bodyHeaderHtml;
+			// Process results for each of the order with
+			for(SampleOrder sampleOrder: sample.getSampleOrders()) {
+
+			}
 		}
 		
 		return createdStatus;
