@@ -34,7 +34,9 @@ export class RegisterSampleComponent implements OnInit {
   @Input() LISConfigurations: LISConfigurationsModel;
   @Input() labSections: ConceptGetFull[];
   @Input() fromMaintenance: boolean;
-  @Input() specimenSources: ConceptGetFull[]
+  @Input() specimenSources: ConceptGetFull[];
+  @Input() personEmailAttributeTypeUuid: string;
+  @Input() personPhoneAttributeTypeUuid: string;
   registrationCategory: string = "single";
   currentUser$: Observable<any>;
 
@@ -142,28 +144,27 @@ export class RegisterSampleComponent implements OnInit {
         "lis.attributes.referringDoctor"
       );
 
-    this.barcodeSettings$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.laboratory.settings.print.barcodeFormat"
-      ).pipe(tap((response) => {
-        if(response === "none"){
-          this.errors = [
-            ...this.errors,
-            {
-              error: {
-                message: "iCare.laboratory.settings.print.barcodeFormat is not set. You won't be able to print barcode."
+    this.barcodeSettings$ = this.systemSettingsService
+      .getSystemSettingsByKey("iCare.laboratory.settings.print.barcodeFormat")
+      .pipe(
+        tap((response) => {
+          if (response === "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "iCare.laboratory.settings.print.barcodeFormat is not set. You won't be able to print barcode.",
+                },
+                type: "warning",
               },
-              type: "warning"
-            },
-          ]
-        }
-        if(response?.error){
-           this.errors = [
-            ...this.errors,
-            response?.error
-          ]
-        }
-      }));
+            ];
+          }
+          if (response?.error) {
+            this.errors = [...this.errors, response?.error];
+          }
+        })
+      );
 
     this.identifierTypes$ =
       this.registrationService.getPatientIdentifierTypes();
@@ -271,7 +272,7 @@ export class RegisterSampleComponent implements OnInit {
         id: "collectedOn",
         key: "collectedOn",
         label: "Collected On",
-        allowCustomDateTime: true
+        allowCustomDateTime: true,
       }),
       collectedBy: new Textbox({
         id: "collectedBy",

@@ -35,14 +35,14 @@ import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { BarCodePrintModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-print-modal/bar-code-print-modal.component";
-import { webSocket } from 'rxjs/webSocket';
+import { webSocket } from "rxjs/webSocket";
 
 @Component({
   selector: "app-single-registration",
   templateUrl: "./single-registration.component.html",
   styleUrls: ["./single-registration.component.scss"],
 })
-export class SingleRegistrationComponent implements OnInit,AfterViewInit {
+export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   labSampleLabel$: Observable<string>;
   @Input() mrnGeneratorSourceUuid: string;
   @Input() preferredPersonIdentifier: string;
@@ -58,6 +58,8 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
   @Input() LISConfigurations: any;
   @Input() barcodeSettings: any;
   @Input() specimenSources: ConceptGetFull[];
+  @Input() personEmailAttributeTypeUuid: string;
+  @Input() personPhoneAttributeTypeUuid: string;
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -175,12 +177,11 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
     this.connection = webSocket(this.barcodeSettings?.socketUrl);
 
     this.connection.subscribe({
-      next: msg => console.log('message received: ', msg), // Called whenever there is a message from the server.
-      error: err => console.log(err), // Called if at any point WebSocket API signals some kind of error.
-      complete: () => console.log('complete') // Called when connection is closed (for whatever reason).
+      next: (msg) => console.log("message received: ", msg), // Called whenever there is a message from the server.
+      error: (err) => console.log(err), // Called if at any point WebSocket API signals some kind of error.
+      complete: () => console.log("complete"), // Called when connection is closed (for whatever reason).
     });
   }
-
 
   ngOnInit(): void {
     const userLocationsIds = JSON.parse(
@@ -772,8 +773,13 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
                               attributes: [
                                 {
                                   attributeType:
-                                    "aeb3a16c-f5b6-4848-aa51-d7e3146886d6", //TODO: Find a way to softcode this
+                                    this.personPhoneAttributeTypeUuid,
                                   value: this.personDetailsData?.mobileNumber,
+                                },
+                                {
+                                  attributeType:
+                                    this.personEmailAttributeTypeUuid,
+                                  value: this.personDetailsData?.email,
                                 },
                               ],
                             },
@@ -1612,7 +1618,10 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
                                                                                     sampleLabelsUsedDetails:
                                                                                       this
                                                                                         .sampleLabelsUsedDetails,
-                                                                                    isLis: this.LISConfigurations?.isLIS
+                                                                                    isLis:
+                                                                                      this
+                                                                                        .LISConfigurations
+                                                                                        ?.isLIS,
                                                                                   };
                                                                                 this.dialog
                                                                                   .open(
@@ -1642,9 +1651,9 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
                                                                                   .afterClosed()
                                                                                   .subscribe(
                                                                                     () => {
-                                                                                    this.openBarCodeDialog(
-                                                                                          data
-                                                                                        );
+                                                                                      this.openBarCodeDialog(
+                                                                                        data
+                                                                                      );
                                                                                       this.isRegistrationReady =
                                                                                         false;
                                                                                       setTimeout(
@@ -1869,35 +1878,45 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
       })
       .afterClosed()
       .subscribe((results) => {
-        if(results){
-          let tests = []
+        if (results) {
+          let tests = [];
           results?.sampleData?.orders?.forEach((order) => {
             tests = [
               ...tests,
-              order?.order?.shortName?.split("TEST_ORDERS:")?.join("")
-            ]
-          })
+              order?.order?.shortName?.split("TEST_ORDERS:")?.join(""),
+            ];
+          });
           // let message = this.barcodeSettings?.barcode?.split("{{SampleID}}").join(results?.sampleData?.label);
           // message = message.split("{{PatientNames}}").join(`${results?.sampleData?.patient?.givenName} ${results?.sampleData?.patient?.middleName} ${results?.sampleData?.patient?.familyName}`);
           // message = message?.split("{{Date}}").join(formatDateToYYMMDD(new Date(results?.sampleData?.created), true));
           // message = message?.split("{{Storage}}").join("");
           // message = message?.split("{{Tests}}").join(tests?.join(","));
           const message = {
-                SampleID: results?.sampleData?.label,
-                Tests: tests?.join(","),
-                PatientNames: `${results?.sampleData?.patient?.givenName} ${results?.sampleData?.patient?.middleName?.length ? results?.sampleData?.patient?.middleName : ""} ${results?.sampleData?.patient?.familyName}`,
-                Date: formatDateToYYMMDD(new Date(results?.sampleData?.created), true),
-                Storage: "",
-                Department: results?.sampleData?.department?.shortName?.split("LAB_DEPARTMENT:").join("") || "",
-                BarcodeData: results?.sampleData?.label?.split(this.barcodeSettings?.textToIgnore).join("")
-              }
-          this.connection.next(
-            {
-              Message: message,
-              Description: "Message of data to be printed",
-              Type: "print"
-            }
-          )
+            SampleID: results?.sampleData?.label,
+            Tests: tests?.join(","),
+            PatientNames: `${results?.sampleData?.patient?.givenName} ${
+              results?.sampleData?.patient?.middleName?.length
+                ? results?.sampleData?.patient?.middleName
+                : ""
+            } ${results?.sampleData?.patient?.familyName}`,
+            Date: formatDateToYYMMDD(
+              new Date(results?.sampleData?.created),
+              true
+            ),
+            Storage: "",
+            Department:
+              results?.sampleData?.department?.shortName
+                ?.split("LAB_DEPARTMENT:")
+                .join("") || "",
+            BarcodeData: results?.sampleData?.label
+              ?.split(this.barcodeSettings?.textToIgnore)
+              .join(""),
+          };
+          this.connection.next({
+            Message: message,
+            Description: "Message of data to be printed",
+            Type: "print",
+          });
         }
       });
   }
@@ -1973,9 +1992,8 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
     return char.length == 1 ? "0" + char : char;
   }
 
-    //Check JSPM WebSocket status
-  
-  
+  //Check JSPM WebSocket status
+
   // jsPrint(data: any = [{
   //         visit: {
   //             uuid: "330a23f2-83f6-4795-861c-71c22bcf230a"
@@ -2037,7 +2055,7 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
   //   }
   //       // Set content to print...
   //       //Create Zebra ZPL commands for sample label
-	// 	var cmds =  `
+  // 	var cmds =  `
   //     ^XA
   //     ^FX Barcode: BC-NRIB for orientation,number for height, Y for show data,Y on top^FS
   //     ^FT30,400^A@B,15,10^FD{{SampleID}}^FS
@@ -2069,7 +2087,7 @@ export class SingleRegistrationComponent implements OnInit,AfterViewInit {
   //     ^FT810,210^A@B,15,5^FD{{PatientNames}}^FS
   //     ^XZ
   //   `;
-	// 	cpj.printerCommands = cmds;
+  // 	cpj.printerCommands = cmds;
 
   //   // Send print job to printer!
   //   cpj.sendToClient();

@@ -69,6 +69,9 @@ export class SampleInBatchRegistrationComponent
   @Input() LISConfigurations: any;
   @Input() specimenSources: ConceptGetFull[];
 
+  @Input() personEmailAttributeTypeUuid: string;
+  @Input() personPhoneAttributeTypeUuid: string;
+
   departmentField: any = {};
   specimenDetailsFields: any;
   testsFormField: any = {};
@@ -191,10 +194,7 @@ export class SampleInBatchRegistrationComponent
     this.specimenSourcesKeyedByTestOrders = keySampleTypesByTestOrder(
       this.specimenSources
     );
-    if (
-      localStorage.getItem("batch") &&
-      localStorage.getItem("batchSample")
-    ) {
+    if (localStorage.getItem("batch") && localStorage.getItem("batchSample")) {
       this.dialog
         .open(SharedConfirmationComponent, {
           data: {
@@ -915,8 +915,13 @@ export class SampleInBatchRegistrationComponent
                               attributes: [
                                 {
                                   attributeType:
-                                    "aeb3a16c-f5b6-4848-aa51-d7e3146886d6", //TODO: Find a way to softcode this
+                                    this.personPhoneAttributeTypeUuid,
                                   value: this.personDetailsData?.mobileNumber,
+                                },
+                                {
+                                  attributeType:
+                                    this.personEmailAttributeTypeUuid,
+                                  value: this.personDetailsData?.email,
                                 },
                               ],
                             },
@@ -3165,8 +3170,7 @@ export class SampleInBatchRegistrationComponent
           lastName: personDetails?.preferredName?.familyName,
           mobileNumber: personDetails?.attributes?.filter((attribute) => {
             if (
-              attribute?.attributeType ===
-              "aeb3a16c-f5b6-4848-aa51-d7e3146886d6"
+              attribute?.attributeType === this.personPhoneAttributeTypeUuid
             ) {
               return attribute;
             }
