@@ -4,7 +4,9 @@
     provider: provider$ | async,
     LISConfigurations: LISConfigurations$ | async,
     labSections: labSections$ | async,
-    specimenSources: specimenSources$ | async
+    specimenSources: specimenSources$ | async,
+    personEmailAttributeTypeUuid: personEmailAttributeTypeUuid$ | async,
+    personPhoneAttributeTypeUuid: personPhoneAttributeTypeUuid$ | async
   } as params"
 >
   <div
@@ -12,7 +14,9 @@
       params?.provider &&
       params?.LISConfigurations &&
       params?.labSections &&
-      params?.specimenSources
+      params?.specimenSources &&
+      params?.personEmailAttributeTypeUuid &&
+      params?.personPhoneAttributeTypeUuid
     "
   >
     <app-register-sample
@@ -20,6 +24,8 @@
       [labSections]="params?.labSections"
       [LISConfigurations]="params?.LISConfigurations"
       [specimenSources]="params?.specimenSources"
+      [personPhoneAttributeTypeUuid]="params?.personPhoneAttributeTypeUuid"
+      [personEmailAttributeTypeUuid]="params?.personEmailAttributeTypeUuid"
     ></app-register-sample>
   </div>
 
@@ -28,7 +34,9 @@
       !params?.provider ||
       !params?.LISConfigurations ||
       !params?.labSections ||
-      !params?.specimenSources
+      !params?.specimenSources ||
+      !params?.personEmailAttributeTypeUuid ||
+      !params?.personPhoneAttributeTypeUuid
     "
     mode="indeterminate"
   ></mat-progress-bar>

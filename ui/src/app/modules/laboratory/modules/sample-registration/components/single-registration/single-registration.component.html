@@ -60,6 +60,8 @@
           [referFromFacilityVisitAttribute]="referFromFacilityVisitAttribute"
           [allRegistrationFields]="allRegistrationFields"
           [maximumDate]="maximumDate"
+          [personPhoneAttributeTypeUuid]="personPhoneAttributeTypeUuid"
+          [personEmailAttributeTypeUuid]="personEmailAttributeTypeUuid"
           (personDetails)="onGetPersonDetails($event)"
           (fromExternalSystem)="onGetIsDataFromExternalSystem($event)"
           (selectedSystem)="onGetSelectedSystem($event)"
@@ -309,7 +311,9 @@
                     <div class="col-4">
                       <input
                         (change)="getSelectedBroughtOnTime($event)"
-                        [ngClass]="{ 'invalid-time-input': !broughtOnTimeValid }"
+                        [ngClass]="{
+                          'invalid-time-input': !broughtOnTimeValid
+                        }"
                         class="time-input-field"
                         placeholder="Brought At"
                         type="time"
@@ -338,7 +342,9 @@
                     <div class="col-1">
                       <input
                         (change)="getSelectedReceivedOnTime($event)"
-                        [ngClass]="{ 'invalid-time-input': !receivedOnTimeValid }"
+                        [ngClass]="{
+                          'invalid-time-input': !receivedOnTimeValid
+                        }"
                         class="time-input-field"
                         placeholder="Received At"
                         type="time"
@@ -507,7 +513,7 @@
           !collectedOnTimeValid
         "
         class="ml-2"
-        (click)="onSave($event, false,  params?.labLocations)"
+        (click)="onSave($event, false, params?.labLocations)"
       >
         Save & Continue
       </button>

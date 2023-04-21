@@ -677,14 +677,31 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			// 1. The subject of the email should be stored on a global property.
 			// 2. The body of the email should also be stored on a global property
 			// 3. Results structure html should be stored on a global property
-			String body = "";
+			String content = "";
+			Properties emailProperties = new Properties();
 			String subject = administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_SUBJECT_CONFIGURATION_HTML).toString();
 			String bodyHeaderHtml = administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_HEADER_CONFIGURATION_HTML).toString();
-			body = body + bodyHeaderHtml;
-			// Process results for each of the order with
-			for(SampleOrder sampleOrder: sample.getSampleOrders()) {
-
+			String clientEmailAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.)
+			content = content + bodyHeaderHtml + "\n";
+			String fromMail = administrationService.getGlobalProperty("mail.from");
+			emailProperties.setProperty("from",fromMail);
+			emailProperties.setProperty("subject", subject);
+			Visit visit = sample.getVisit();
+			Set<PersonAttribute> personAttributes = visit.getPatient().getPerson().getAttributes();
+			for(PersonAttribute personAttribute: personAttributes) {
+				if (personAttribute.getAttributeType().getUuid() == clientEmailAttributeTypeUuid) {
+					// TODO: Validate the email address
+					emailProperties.setProperty("to",personAttribute.getValue().toString());
+				}
 			}
+			// Process results for each of the order with
+			content = content + "<table>";
+			for(SampleOrder sampleOrder: sample.getSampleOrders()) {
+				content = content +"<tr><td>" + sampleOrder.getOrder().getConcept().getDisplayString();
+				content = content +"<td></tr>";
+			}
+			content = content + "</table>";
+			emailProperties.setProperty("content", content);
 		}
 		
 		return createdStatus;
