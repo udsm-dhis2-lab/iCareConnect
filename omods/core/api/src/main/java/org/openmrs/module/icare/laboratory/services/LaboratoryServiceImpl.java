@@ -681,7 +681,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			Properties emailProperties = new Properties();
 			String subject = administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_SUBJECT_CONFIGURATION_HTML).toString();
 			String bodyHeaderHtml = administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_HEADER_CONFIGURATION_HTML).toString();
-			String clientEmailAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.)
+			String clientEmailAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE).toString();
 			content = content + bodyHeaderHtml + "\n";
 			String fromMail = administrationService.getGlobalProperty("mail.from");
 			emailProperties.setProperty("from",fromMail);
