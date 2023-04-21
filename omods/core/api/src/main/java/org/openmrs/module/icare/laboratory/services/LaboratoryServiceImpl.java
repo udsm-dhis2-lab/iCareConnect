@@ -8,6 +8,7 @@ import org.openmrs.api.ObsService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.icare.ICareConfig;
+import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.laboratory.dao.*;
@@ -602,7 +603,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 
 					Concept concept = Context.getConceptService().getConceptByUuid(allocationResults.getConcept().getUuid());
 
-					Person person = testAllocation.getSampleOrder().getOrder().getPatient();
+					Person person = testAllocation.getSampleOrder().getOrder().getPatient().getPerson();
 
 					List<TestAllocationStatus> testAllocationStatuses = testAllocation.getTestAllocationStatuses();
 
@@ -671,7 +672,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 							observation.setValueNumeric(allocationResults.getValueNumeric());
 						}
 					}
-
+					System.out.println(observation);
 					observationService.saveObs(observation, "");
 
 				}
@@ -691,9 +692,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				Visit visit = sample.getVisit();
 				Set<PersonAttribute> personAttributes = visit.getPatient().getPerson().getAttributes();
 				for(PersonAttribute personAttribute: personAttributes) {
-					if (personAttribute.getAttributeType().getUuid() == clientEmailAttributeTypeUuid) {
+					if (personAttribute.getAttributeType().getUuid().toString().equals(clientEmailAttributeTypeUuid)) {
 						// TODO: Validate the email address
-						emailProperties.setProperty("to",personAttribute.getValue().toString());
+						emailProperties.setProperty("to",personAttribute.getValue());
 					}
 				}
 				// Process results for each of the order with
@@ -704,6 +705,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				}
 				content = content + "</table>";
 				emailProperties.setProperty("content", content);
+				ICareService iCareService = Context.getService(ICareService.class);
+				iCareService.processEmail(emailProperties);
 			}
 		}
 		return createdStatus;
