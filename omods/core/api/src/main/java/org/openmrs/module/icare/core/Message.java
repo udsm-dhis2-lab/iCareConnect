@@ -2,6 +2,7 @@ package org.openmrs.module.icare.core;
 
 import org.openmrs.module.icare.billing.models.ItemPrice;
 
+import javax.mail.internet.InternetAddress;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -68,7 +69,10 @@ public class Message {
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
-	
+
+	public void addRecipient(javax.mail.Message.RecipientType to, InternetAddress internetAddress) {
+	}
+
 	public enum Status {
 		WAITING, SENT, DELIVERED
 	}

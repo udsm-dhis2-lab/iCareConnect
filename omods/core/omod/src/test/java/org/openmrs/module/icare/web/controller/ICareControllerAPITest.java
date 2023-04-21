@@ -41,7 +41,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testIdGeneration() throws Exception {
-		
+
 		String dto = this.readFile("dto/core/id-generator.json");
 		Map<String, Object> idDtop = (new ObjectMapper()).readValue(dto, Map.class);
 		AdministrationService adminService = Context.getService(AdministrationService.class);
@@ -737,6 +737,26 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Encounter voidedEncounter = encounterService.getEncounterByUuid(encounterVoidDetails.get("uuid").toString());
 		
 		assertThat("The encounter is voided", voidedEncounter.getVoided() == true);
-		
+	}
+
+	@Test
+	public  void testGetEmailSession() throws Exception {
+		MockHttpServletRequest emailSessionRequest = newGetRequest("icare/emailsession");
+		MockHttpServletResponse returnResponse = handle(emailSessionRequest);
+		System.out.println(returnResponse);
+	}
+
+	@Test
+	public  void testProcessEmail() throws Exception {
+		Properties emailProperties = new Properties();
+		AdministrationService administrationService = Context.getAdministrationService();
+		String fromMail = administrationService.getGlobalProperty("mail.from");
+		emailProperties.setProperty("to","josephatjulius24@gmail.com");
+		emailProperties.setProperty("from",fromMail);
+		emailProperties.setProperty("content", "TESTING EMAIL BODY");
+		emailProperties.setProperty("subject", "TESTING");
+		MockHttpServletRequest emailRequest = newPostRequest("icare/processemail", emailProperties);
+		MockHttpServletResponse returnResponse = handle(emailRequest);
+		System.out.println(returnResponse);
 	}
 }

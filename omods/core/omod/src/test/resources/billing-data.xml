@@ -275,4 +275,15 @@
 
     <global_property property="icare.store.settings.requisition.id.format" property_value="RQ/D{YYYY}/COUNT:5" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c632" description="For requisition code format" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2022-12-10 15:51:57.0" changed_by="1" />
 
+    <global_property property="mail.debug" property_value="false" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c111" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.default_content_type" property_value="text/plain" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c222" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.from" property_value="info@openmrs.org" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c555" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.password" property_value="test" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c333" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.smtp.starttls.enable" property_value="false" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c666" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.smtp_auth" property_value="false" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c444" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.smtp_host" property_value="localhost" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c777" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.transport_protocol" property_value="smtp" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c888" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.smtp_port" property_value="25" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c616" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.user" property_value="test" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c999" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+
 </dataset>
