@@ -10,7 +10,10 @@ import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.Payment;
 import org.openmrs.module.icare.billing.services.BillingService;
+import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.SyncResult;
+import org.openmrs.module.icare.billing.services.insurance.VerificationRequest;
+import org.openmrs.module.icare.billing.services.insurance.VerificationResponse;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,9 @@ public class BillingController extends BaseController {
 	
 	@Autowired
 	BillingService billingService;
+	
+	//	@Autowired
+	//	InsuranceService insuranceService;
 	
 	@RequestMapping(value = "invoice", method = RequestMethod.GET)
 	@ResponseBody
@@ -81,6 +87,16 @@ public class BillingController extends BaseController {
 		SyncResult syncResult = billingService.syncInsurance(insurance);
 		return syncResult.toMap();
 	}
+	
+	//	@RequestMapping(value = "insurance/verification", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	//	@ResponseBody
+	//	public Map<String,Object> verifyInsurance(@RequestBody Map<String, Object> verificationRequestMap) throws Exception {
+	//
+	//		VerificationRequest verificationRequest = VerificationRequest.fromMap(verificationRequestMap);
+	//		VerificationResponse verificationResponse = insuranceService.request(verificationRequest);
+	//
+	//		return verificationResponse.toMap();
+	//	}
 	
 	public List<Payment> onGetPatientPayments(@RequestParam("patient") String patient) {
 		return billingService.getPatientPayments(patient);

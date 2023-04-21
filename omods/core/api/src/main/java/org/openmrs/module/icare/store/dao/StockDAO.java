@@ -14,6 +14,7 @@ import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.store.models.OrderStatus;
+import org.openmrs.module.icare.store.models.ReorderLevel;
 import org.openmrs.module.icare.store.models.Stock;
 
 import java.time.LocalDate;
@@ -427,4 +428,64 @@ public class StockDAO extends BaseDAO<Stock> {
 		return entity;
 	}
 	
+	public ReorderLevel updateReorderLevel(ReorderLevel reorderLevel) {
+		
+		DbSession session = this.getSession();
+		String queryStr = " UPDATE ReorderLevel ro ";
+		
+		if (reorderLevel.getItem() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " ,";
+			}
+			queryStr += " ro.id.item = :item ";
+		}
+		
+		if (reorderLevel.getLocation() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " ,";
+			}
+			queryStr += " ro.id.location = :location";
+		}
+		
+		if (reorderLevel.getQuantity() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " ,";
+			}
+			queryStr += " ro.quantity = :quantity";
+			
+		}
+		
+		queryStr += " WHERE uuid = :uuid";
+		
+		Query query = session.createQuery(queryStr);
+		
+		if (reorderLevel.getItem() != null) {
+			query.setParameter("item", reorderLevel.getItem());
+		}
+		
+		if (reorderLevel.getLocation() != null) {
+			query.setParameter("location", reorderLevel.getLocation());
+		}
+		
+		if (reorderLevel.getQuantity() != null) {
+			query.setParameter("quantity", reorderLevel.getQuantity());
+		}
+
+		query.setParameter("uuid",reorderLevel.getUuid());
+		
+		Integer success = query.executeUpdate();
+		
+		if (success == 1) {
+			return reorderLevel;
+		} else {
+			return null;
+		}
+		
+	}
 }

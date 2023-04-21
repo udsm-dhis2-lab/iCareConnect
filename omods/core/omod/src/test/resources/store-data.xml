@@ -93,7 +93,7 @@
 
     <st_stock stock_id="17" item_id="127" batch="batch-xyz7" expiry_date="2022-11-30 00:00:00" location_id="201" quantity="0"/>
 
-    <st_reorder_level location_id="200" item_id="123" quantity="219"/>
+    <st_reorder_level location_id="200" item_id="123" quantity="219" creator="1" voided="0" uuid="8800zx3570-8z37-11ff-2234-01102007896" date_created="2023-01-25 00:00:00"/>
 
 
     <!-- Supplier  -->

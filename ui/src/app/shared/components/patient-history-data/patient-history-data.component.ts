@@ -190,7 +190,7 @@ export class PatientHistoryDataComponent implements OnInit {
         ...order,
         results: this.visit?.obs
           ?.filter((ob) => {
-            if (order?.uuid == ob?.order?.uuid) {
+            if (order?.uuid === ob?.order?.uuid) {
               return ob;
             }
           })
@@ -201,7 +201,7 @@ export class PatientHistoryDataComponent implements OnInit {
       return {
         ...order,
         results: this.visit?.obs?.filter((ob) => {
-          if (order?.uuid == ob?.order?.uuid) {
+          if (order?.uuid === ob?.order?.uuid) {
             return ob;
           }
         })?.filter((ob) => ob),
