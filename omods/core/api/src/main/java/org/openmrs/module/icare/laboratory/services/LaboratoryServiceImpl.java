@@ -701,7 +701,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				content = content + "<table>";
 				for(SampleOrder sampleOrder: sample.getSampleOrders()) {
 					content = content +"<tr><td>" + sampleOrder.getOrder().getConcept().getDisplayString();
-					content = content +"<td></tr>";
+					content = content +"</td></tr>";
 				}
 				content = content + "</table>";
 				emailProperties.setProperty("content", content);

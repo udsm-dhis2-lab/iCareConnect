@@ -570,7 +570,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			Properties p = new Properties();
 			p.put("mail.transport.protocol", as.getGlobalProperty("mail.transport_protocol", "smtp"));
 			p.put("mail.smtp.host", as.getGlobalProperty("mail.smtp_host", "localhost"));
-			p.put("mail.smtp.port", as.getGlobalProperty("mail.smtp_port", "26")); // mail.smtp_port
+			p.put("mail.smtp.port", as.getGlobalProperty("mail.smtp_port", "587")); // mail.smtp_port
 			p.put("mail.smtp.auth", as.getGlobalProperty("mail.smtp_auth", "test")); // mail.smtp_auth
 			p.put("mail.smtp.starttls.enable", as.getGlobalProperty("mail.smtp.starttls.enable", "false"));
 			p.put("mail.debug", as.getGlobalProperty("mail.debug", "false"));
@@ -598,6 +598,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public String processEmail(Properties emailProperties) throws Exception {
 		try {
+			System.out.println(emailProperties);
 			MimeMessage m = new MimeMessage(getEmailSession());
 			m.setFrom(new InternetAddress(emailProperties.getProperty("from")));
 
