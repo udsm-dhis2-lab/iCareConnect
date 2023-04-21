@@ -5202,4 +5202,38 @@
             ADD CONSTRAINT invoice_number_supplier_unique UNIQUE (invoice_number,supplier_id);
         </sql>
     </changeSet>
+
+    <changeSet id="add_columns_to_st_reorder_level" author="dennis-kibahila" dbms="mysql">
+        <addColumn tableName="st_reorder_level" >
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created"  type="DATETIME"/>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" defaultValueBoolean="false" type="BOOLEAN"/>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid"  type="char(38)" >
+                <constraints nullable="true"  unique="true"></constraints>
+            </column>
+
+        </addColumn>
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_reorder_level"
+                constraintName="st_reorder_level_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_reorder_level"
+                constraintName="st_reorder_level_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+    </changeSet>
+
+
+
 </databaseChangeLog>

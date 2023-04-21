@@ -273,7 +273,7 @@ public class ICareDao extends BaseDAO<Item> {
 	        String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
 	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
 	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus) {
-		
+		//PatientIdentifier
 		Query query = null;
 		DbSession session = this.getSession();
 		new Patient();

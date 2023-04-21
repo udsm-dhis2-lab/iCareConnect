@@ -454,7 +454,8 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		
 		MockHttpServletResponse handle = handle(newGetRequest);
 		Map<String, Object> patients = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		//		System.out.println(patients);
+		
+		System.out.println("AAB =>" + handle.getContentAsString());
 		assertThat("Should return a patient visit ", ((List) patients.get("results")).size() > 0);
 		
 		newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid", "2msir5eb-5345-11e8-9922-40b034c3cfee")

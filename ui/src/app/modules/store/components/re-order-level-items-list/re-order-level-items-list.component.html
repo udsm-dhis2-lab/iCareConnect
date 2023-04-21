@@ -36,6 +36,21 @@
             <td>
               {{ reOrderLevel?.quantity }}
             </td>
+            <td>
+              <button mat-icon-button [matMenuTriggerFor]="menu">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="onUpdate($event, reOrderLevel)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Update</span>
+                </button>
+                <button mat-menu-item (click)="onDelete($event, reOrderLevel)">
+                  <mat-icon>delete</mat-icon>
+                  <span>Remove</span>
+                </button>
+              </mat-menu>
+            </td>
           </tr>
         </ng-container>
         <ng-container *ngIf="params?.reOrderLevelsList?.length === 0">

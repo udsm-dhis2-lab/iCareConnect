@@ -11,10 +11,12 @@ import org.openmrs.module.icare.store.models.IssueStatus;
 import org.openmrs.module.icare.store.models.RequisitionStatus;
 import org.openmrs.module.icare.store.services.StoreService;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
+import org.powermock.core.classloader.annotations.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -922,5 +924,17 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		System.out.println("nearly exp " + handleGet2.getContentAsString());
 		assertThat("The list of nearly expired items", ((List) handleGetObject2.get("results")).size() == 1);
 		
+	}
+
+	@Test
+	public void updateReorderLevel() throws Exception {
+
+		String dto = this.readFile("dto/store/reorder-level-update.json");
+		Map<String, Object> reorderLevelMap = (new ObjectMapper()).readValue(dto,Map.class);
+
+		MockHttpServletRequest newPostRequest = newPostRequest("store/reorderlevel/8800zx3570-8z37-11ff-2234-01102007896",reorderLevelMap);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		Map<String,Object> updatedReorderLevel = (new ObjectMapper()).readValue(handle.getContentAsString(),Map.class);
+		System.out.println(handle.getContentAsString());
 	}
 }
