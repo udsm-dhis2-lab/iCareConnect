@@ -723,6 +723,8 @@ public class ICareController {
 	@ResponseBody
 	public String processEmail(@RequestBody Properties emailProperties) {
 
+		System.out.println(emailProperties);
+
 		String response;
 		try {
 			response = iCareService.processEmail(emailProperties);
