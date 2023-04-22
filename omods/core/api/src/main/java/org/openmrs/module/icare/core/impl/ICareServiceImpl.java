@@ -30,11 +30,14 @@ import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
+import org.openmrs.module.icare.report.ReportData;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.validator.ValidateUtil;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.Authenticator;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
@@ -605,7 +608,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 
 				m.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(recipient));
 			}
-			System.out.println("33");
+
+
 			// TODO: Make these such that they can contain report information
 			m.setSubject(emailProperties.getProperty("subject"));
 			Multipart multipart = new MimeMultipart();
@@ -613,6 +617,15 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			String content = emailProperties.getProperty("content", "");
 			contentBodyPart.setContent(content, "text/html");
 			multipart.addBodyPart(contentBodyPart);
+
+			if(emailProperties.getProperty("attachment") != null) {
+				MimeBodyPart attachmentPart = new MimeBodyPart();
+				DataSource source = new FileDataSource(new File(emailProperties.getProperty("attachment")));
+				attachmentPart.setDataHandler(new DataHandler(source));
+				attachmentPart.setFileName(source.getName());
+				multipart.addBodyPart(attachmentPart);
+			}
+
 			
 			//			if (report.getRenderedOutput() != null && "true".equalsIgnoreCase(configuration.getProperty("addOutputAsAttachment"))) {
 //			MimeBodyPart attachment = new MimeBodyPart();
