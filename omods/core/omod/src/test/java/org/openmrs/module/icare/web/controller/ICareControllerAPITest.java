@@ -19,6 +19,9 @@ import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import java.io.File;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -750,12 +753,20 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	public  void testProcessEmail() throws Exception {
 		Properties emailProperties = new Properties();
 		AdministrationService administrationService = Context.getAdministrationService();
+
+//		File attachmentFile = new File("/home/kiba/Downloads/Docker+Slides.pdf");
+//		byte[] attachmentBytes = Files.readAllBytes(attachmentFile.toPath());
+//		String attachmentBase64 = DatatypeConverter.printBase64Binary(bytes);
+
 		String fromMail = administrationService.getGlobalProperty("mail.from");
 		emailProperties.setProperty("to","kibahiladennis@gmail.com");
 		emailProperties.setProperty("cc","josephatjulius24@gmail.com");
 		emailProperties.setProperty("from",fromMail);
-		emailProperties.setProperty("content", "<b>TESTING EMAIL BODYY</b>");
+		emailProperties.setProperty("content", "<b>TESTING EMAIL HALOL</b>");
 		emailProperties.setProperty("subject", "TESTING");
+
+		//put your local file path for testing
+		emailProperties.setProperty("attachment","/home/kiba/Downloads/Docker+Slides.pdf");
 		MockHttpServletRequest emailRequest = newPostRequest("icare/processemail", emailProperties);
 		MockHttpServletResponse returnResponse = handle(emailRequest);
 		System.out.println(returnResponse);
