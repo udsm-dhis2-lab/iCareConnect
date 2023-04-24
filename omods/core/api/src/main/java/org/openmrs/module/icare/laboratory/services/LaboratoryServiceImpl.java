@@ -17,6 +17,13 @@ import org.openmrs.module.icare.laboratory.models.*;
 import javax.naming.ConfigurationException;
 import java.util.*;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 public class LaboratoryServiceImpl extends BaseOpenmrsService implements LaboratoryService {
 	
 	SampleDAO sampleDAO;
@@ -686,6 +693,13 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				String bodyHeaderHtml = administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_HEADER_CONFIGURATION_HTML).toString();
 				String clientEmailAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE).toString();
 				content = content + bodyHeaderHtml + "\n";
+				Date date = new Date();
+				content =content.replace("{date}", date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getYear());
+
+				String regex = "<tbody>(.*?)</tbody>";
+				Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
+				Matcher matcher = pattern.matcher(content.toString());
+				String tbodyContent = "";
 				String fromMail = administrationService.getGlobalProperty("mail.from");
 				emailProperties.setProperty("from",fromMail);
 				emailProperties.setProperty("subject", subject);
@@ -698,12 +712,30 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 					}
 				}
 				// Process results for each of the order with
-				content = content + "<table>";
-				for(SampleOrder sampleOrder: sample.getSampleOrders()) {
-					content = content +"<tr><td>" + sampleOrder.getOrder().getConcept().getDisplayString();
-					content = content +"</td></tr>";
+				if (matcher.find()) {
+					tbodyContent = matcher.group(1);
+					String newTableBodies = "";
+					for(SampleOrder sampleOrder: sample.getSampleOrders()) {
+						newTableBodies = newTableBodies + tbodyContent.replace("{test}",sampleOrder.getOrder().getConcept().getDisplayString());
+						String regExpForParameterRow = "<tr parameterrepeatable>.*?</tr>";
+						Pattern parameterPattern = Pattern.compile(regExpForParameterRow, Pattern.DOTALL);
+						Matcher parameterRowMatcher = parameterPattern.matcher(tbodyContent.toString());
+						String parameterRow = "";
+						String newRows = "";
+
+//						System.out.println(sampleOrder.getOrder().getConcept().getSetMembers().size());
+						if (parameterRowMatcher.find() && sampleOrder.getOrder().getConcept().getSetMembers().size() > 0) {
+							parameterRow =  parameterRowMatcher.group(0);
+							Integer count = 1;
+							for(Concept concept: sampleOrder.getOrder().getConcept().getSetMembers()) {
+								newRows = newRows + parameterRow.replace("{sn}", count.toString()).replace("{parameter}",concept.getDisplayString().toString());
+								newTableBodies = newTableBodies.replace(parameterRow, newRows);
+								count = count + 1;
+							}
+						}
+						content = content.toString().replace(matcher.group(0), newTableBodies);
+					}
 				}
-				content = content + "</table>";
 				emailProperties.setProperty("content", content);
 				ICareService iCareService = Context.getService(ICareService.class);
 				iCareService.processEmail(emailProperties);
