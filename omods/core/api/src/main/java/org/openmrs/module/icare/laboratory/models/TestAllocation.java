@@ -247,7 +247,11 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 		sample.put("uuid", this.sampleOrder.getSample().getUuid());
 		sample.put("label", this.sampleOrder.getSample().getLabel());
 		testAllocationMap.put("sample", sample);
-		testAllocationMap.put("isSetMember", this.getSampleOrder().getOrder().getConcept().getSetMembers().size() > 0 && this.getTestConcept().getUuid().toString() != this.getSampleOrder().getOrder().getConcept().getUuid().toString());
+		Boolean isSetMember = false;
+		if (this.getSampleOrder() != null && this.getSampleOrder().getOrder() != null && this.getSampleOrder().getOrder().getConcept() != null && this.getTestConcept() != null && this.getTestConcept().getUuid() != null && this.getSampleOrder().getOrder().getConcept().getSetMembers().size() > 0 && this.getTestConcept().getUuid().toString() != this.getSampleOrder().getOrder().getConcept().getUuid().toString()) {
+			isSetMember= this.getSampleOrder().getOrder().getConcept().getSetMembers().size() > 0 && this.getTestConcept().getUuid().toString() != this.getSampleOrder().getOrder().getConcept().getUuid().toString();
+		}
+		testAllocationMap.put("isSetMember", isSetMember);
 
 		if(this.getTestAllocationAssociatedFields() != null){
 			List<Map<String,Object>> allocationAssociatedfieldsListMap = new ArrayList<>();

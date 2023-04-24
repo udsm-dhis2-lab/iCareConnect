@@ -60,8 +60,9 @@
                     retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfee"/>
 
     <!-- Concepts -->
-    <concept concept_id="500" retired="false" datatype_id="2" class_id="7" is_set="false" creator="1"
+    <concept concept_id="500" retired="false" datatype_id="2" class_id="7" is_set="true" creator="1"
              date_created="2017-02-14 15:51:57.0" version="" uuid="a8102d6d-c528-477a-80bd-acc38ebc6252" />
+    <concept_set concept_set_id="1" concept_id="500" concept_set="500" creator="1" uuid="a8102d6d-c528-477a-80bd-acc38ebc6252"/>
 
 
     <concept concept_id="600" retired="false" datatype_id="2" class_id="7" is_set="false" creator="1"
@@ -208,7 +209,7 @@
 
     <person_attribute_type person_attribute_type_id="1" uuid="iCARE110-TEST-YUDA-1234-d30dcfc0c632" name="email" description="Person email" format="org.openmrs.String" searchable="true" creator="1" date_created="2023-04-21 15:51:57.0" changed_by="1" date_changed="2023-04-21 15:51:57.0" retired="false" />
 
-    <person_attribute person_attribute_id="1" person_id="500" uuid="iCARE110-TEST-11DA-1234-d30dcfc0c632" value="josephatjulius24@gmail.com" person_attribute_type_id="1" creator="1" date_created="2023-04-21 15:51:57.0" changed_by="1" date_changed="2023-04-21 15:51:57.0" voided="false" />
+    <person_attribute person_attribute_id="1" person_id="500" uuid="iCARE110-TEST-11DA-1234-d30dcfc0c632" value="kibahiladennis@gmail.com" person_attribute_type_id="1" creator="1" date_created="2023-04-21 15:51:57.0" changed_by="1" date_changed="2023-04-21 15:51:57.0" voided="false" />
 
     <global_property property="mail.icare.laboratory.results.subject.html" property_value="TESTING SENDING AUTHORIZED RESULTS" uuid="iCARE110-TEST-2341-9ueb-d30dcfc0c632" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-21 15:51:57.0" changed_by="1" />
     <global_property property="mail.icare.laboratory.results.body.header.html" property_value="TESTING SENDING AUTHORIZED RESULTS" uuid="iCARE110-TEST-9272-9beb-d30dcfc0c632" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-21 15:51:57.0" changed_by="1" />

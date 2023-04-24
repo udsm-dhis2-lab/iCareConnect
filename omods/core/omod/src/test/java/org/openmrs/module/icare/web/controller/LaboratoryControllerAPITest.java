@@ -412,6 +412,8 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		adminService.setGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION, "2");
+		String bodyHeaderHtml = this.readFile("dto/laboratory/body-header.html");
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_BODY_HEADER_CONFIGURATION_HTML, bodyHeaderHtml);
 		
 		// creating sample status
 		String dto = this.readFile("dto/sample-status-create-dto.json");
