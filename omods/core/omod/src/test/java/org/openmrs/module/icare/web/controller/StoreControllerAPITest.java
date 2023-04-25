@@ -925,16 +925,17 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("The list of nearly expired items", ((List) handleGetObject2.get("results")).size() == 1);
 		
 	}
-
+	
 	@Test
 	public void updateReorderLevel() throws Exception {
-
+		
 		String dto = this.readFile("dto/store/reorder-level-update.json");
-		Map<String, Object> reorderLevelMap = (new ObjectMapper()).readValue(dto,Map.class);
-
-		MockHttpServletRequest newPostRequest = newPostRequest("store/reorderlevel/8800zx3570-8z37-11ff-2234-01102007896",reorderLevelMap);
+		Map<String, Object> reorderLevelMap = (new ObjectMapper()).readValue(dto, Map.class);
+		
+		MockHttpServletRequest newPostRequest = newPostRequest("store/reorderlevel/8800zx3570-8z37-11ff-2234-01102007896",
+		    reorderLevelMap);
 		MockHttpServletResponse handle = handle(newPostRequest);
-		Map<String,Object> updatedReorderLevel = (new ObjectMapper()).readValue(handle.getContentAsString(),Map.class);
+		Map<String, Object> updatedReorderLevel = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		System.out.println(handle.getContentAsString());
 	}
 }

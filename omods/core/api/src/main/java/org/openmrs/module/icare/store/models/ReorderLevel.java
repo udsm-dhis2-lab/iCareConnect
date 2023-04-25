@@ -88,20 +88,20 @@ public class ReorderLevel extends BaseOpenmrsData implements java.io.Serializabl
 	
 	public static ReorderLevel fromMap(Map<String, Object> map) {
 		ReorderLevel reorderLevel = new ReorderLevel();
-
-		if(map.get("item") != null) {
+		
+		if (map.get("item") != null) {
 			Item item = new Item();
 			item.setUuid(((Map) map.get("item")).get("uuid").toString());
 			reorderLevel.setItem(item);
 		}
-
-		if(map.get("location") != null) {
+		
+		if (map.get("location") != null) {
 			Location location = new Location();
 			location.setUuid(((Map) map.get("location")).get("uuid").toString());
 			reorderLevel.setLocation(location);
 		}
-
-		if(map.get("quantity") != null) {
+		
+		if (map.get("quantity") != null) {
 			reorderLevel.setQuantity(Double.valueOf(map.get("quantity").toString()));
 		}
 		
@@ -110,37 +110,37 @@ public class ReorderLevel extends BaseOpenmrsData implements java.io.Serializabl
 	
 	public Map<String, Object> toMap() {
 		Map<String, Object> reorderLevelObject = new HashMap<String, Object>();
-
-		if(this.getLocation() != null) {
+		
+		if (this.getLocation() != null) {
 			Map<String, Object> locationObject = new HashMap<String, Object>();
-
+			
 			locationObject.put("uuid", this.getLocation().getUuid());
 			locationObject.put("display", this.getLocation().getDisplayString());
-
+			
 			reorderLevelObject.put("location", locationObject);
 		}
-
-		if(this.getItem() != null) {
+		
+		if (this.getItem() != null) {
 			reorderLevelObject.put("item", this.getItem().toMap());
 		}
-
-		if(this.getQuantity() != null) {
+		
+		if (this.getQuantity() != null) {
 			reorderLevelObject.put("quantity", this.getQuantity());
 		}
-		if(this.getUuid() != null) {
+		if (this.getUuid() != null) {
 			reorderLevelObject.put("uuid", this.getUuid());
 		}
 		return reorderLevelObject;
 		
 	}
-
+	
 	@Override
 	public Integer getId() {
 		return null;
 	}
-
+	
 	@Override
 	public void setId(Integer integer) {
-
+		
 	}
 }

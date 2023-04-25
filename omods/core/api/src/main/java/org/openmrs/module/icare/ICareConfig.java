@@ -96,9 +96,12 @@ public class ICareConfig {
 	public static final String LAB_RESULT_APPROVAL_CONFIGURATION = "iCare.laboratory.resultApprovalConfiguration";
 	
 	public static final String ITEM_EXPIRATION_NOTIFICATION_IN_DAYS = "iCare.store.item.expiration.nofication";
-
+	
 	public static final String LAB_RESULTS_SUBJECT_CONFIGURATION_HTML = "mail.icare.laboratory.results.subject.html";
+	
 	public static final String LAB_RESULTS_BODY_HEADER_CONFIGURATION_HTML = "mail.icare.laboratory.results.body.header.html";
+	
 	public static final String LAB_RESULTS_BODY_CONFIGURATION_HTML = "mail.icare.laboratory.results.body.testorder.html";
+	
 	public static final String ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE = "icare.person.attribute.email";
 }

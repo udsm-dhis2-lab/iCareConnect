@@ -44,7 +44,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testIdGeneration() throws Exception {
-
+		
 		String dto = this.readFile("dto/core/id-generator.json");
 		Map<String, Object> idDtop = (new ObjectMapper()).readValue(dto, Map.class);
 		AdministrationService adminService = Context.getService(AdministrationService.class);
@@ -741,32 +741,32 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		
 		assertThat("The encounter is voided", voidedEncounter.getVoided() == true);
 	}
-
+	
 	@Test
-	public  void testGetEmailSession() throws Exception {
+	public void testGetEmailSession() throws Exception {
 		MockHttpServletRequest emailSessionRequest = newGetRequest("icare/emailsession");
 		MockHttpServletResponse returnResponse = handle(emailSessionRequest);
 		System.out.println(returnResponse);
 	}
-
+	
 	@Test
-	public  void testProcessEmail() throws Exception {
+	public void testProcessEmail() throws Exception {
 		Properties emailProperties = new Properties();
 		AdministrationService administrationService = Context.getAdministrationService();
-
-//		File attachmentFile = new File("/home/kiba/Downloads/Docker+Slides.pdf");
-//		byte[] attachmentBytes = Files.readAllBytes(attachmentFile.toPath());
-//		String attachmentBase64 = DatatypeConverter.printBase64Binary(bytes);
-
+		
+		//		File attachmentFile = new File("/home/kiba/Downloads/Docker+Slides.pdf");
+		//		byte[] attachmentBytes = Files.readAllBytes(attachmentFile.toPath());
+		//		String attachmentBase64 = DatatypeConverter.printBase64Binary(bytes);
+		
 		String fromMail = administrationService.getGlobalProperty("mail.from");
-		emailProperties.setProperty("to","kibahiladennis@gmail.com");
-		emailProperties.setProperty("cc","josephatjulius24@gmail.com");
-		emailProperties.setProperty("from",fromMail);
+		emailProperties.setProperty("to", "kibahiladennis@gmail.com");
+		emailProperties.setProperty("cc", "josephatjulius24@gmail.com");
+		emailProperties.setProperty("from", fromMail);
 		emailProperties.setProperty("content", "<b>TESTING EMAIL HALOL</b>");
 		emailProperties.setProperty("subject", "TESTING");
-
+		
 		//put your local file path for testing
-		emailProperties.setProperty("attachment","/home/kiba/Downloads/Docker+Slides.pdf");
+		//		emailProperties.setProperty("attachment","/home/kiba/Downloads/Docker+Slides.pdf");
 		MockHttpServletRequest emailRequest = newPostRequest("icare/processemail", emailProperties);
 		MockHttpServletResponse returnResponse = handle(emailRequest);
 		System.out.println(returnResponse);
