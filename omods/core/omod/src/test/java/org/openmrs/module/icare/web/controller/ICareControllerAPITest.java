@@ -759,7 +759,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		//		String attachmentBase64 = DatatypeConverter.printBase64Binary(bytes);
 
 		String fromMail = administrationService.getGlobalProperty("mail.from");
-		emailProperties.setProperty("to", "josephatjulius24@gmail.com");
+		emailProperties.setProperty("to", "kibahiladennis@gmail.com");
 		emailProperties.setProperty("cc", "josephatjulius24@gmail.com");
 		emailProperties.setProperty("from", fromMail);
 		emailProperties.setProperty("content", "<b>TESTING EMAIL HALOL</b>");
