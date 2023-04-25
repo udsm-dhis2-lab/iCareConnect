@@ -23,7 +23,7 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
 	        String testCategory, String q, String hasStatus, String acceptedByUuid, String testConceptUuid,
-	        String departmentUuid, String specimenSourceUuid);
+	        String departmentUuid, String specimenSourceUuid, String instrumentUuid);
 	
 	List<Sample> getSampleByDates(Date startDate, Date endDate);
 	
@@ -165,7 +165,7 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	ListResult<SampleExt> getSamplesWithoutAllocations(Date start, Date end, Pager pager, String locationUuid,
 	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
-	        String testConceptUuid, String departmentUuid, String specimenSourceUuid);
+	        String testConceptUuid, String departmentUuid, String specimenSourceUuid, String instrumentUuid);
 	
 	AssociatedField addAssociatedField(AssociatedField associatedField);
 	

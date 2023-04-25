@@ -12,6 +12,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.laboratory.dao.TestOrderLocationDAO;
+import org.openmrs.module.icare.laboratory.models.Sample;
 import org.openmrs.module.icare.laboratory.models.TestOrderLocation;
 import org.openmrs.module.icare.laboratory.models.WorkloadSummary;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
@@ -327,14 +328,13 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		Map<String, Object> sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
-		//		System.out.println(sampleResults);
-		
+//		System.out.println(((List) sampleResults.get("results")));
 		Map<String, Object> pagerObject = (Map<String, Object>) sampleResults.get("pager");
 		assertThat("Page Count is 2", (Integer) pagerObject.get("pageCount") == 2, is(true));
-		assertThat("Total is 4", (Integer) pagerObject.get("total") == 4, is(true));
+		assertThat("Total is 3", (Integer) pagerObject.get("total") == 3, is(true));
 		assertThat("Page Size is 2", (Integer) pagerObject.get("pageSize") == 2, is(true));
 		assertThat("Page is 2", (Integer) pagerObject.get("page") == 2, is(true));
-		assertThat("List count is 2", ((List) sampleResults.get("results")).size() == 2, is(true));
+		assertThat("List count is 1", ((List) sampleResults.get("results")).size() == 1, is(true));
 		assertThat(
 		    "There is atleast 1 sample for the visit from lab-data.xml with visit id = d9c1d8ac-2b8e-427f-804d-b858c52e6f11",
 		    handleGet.getContentAsString().contains("d9c1d8ac-2b8e-427f-804d-b858c52e6f11"));
@@ -349,13 +349,12 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		//System.out.println("aaaa "+sampleResults);
 		
 		pagerObject = (Map<String, Object>) sampleResults.get("pager");
-		System.out.println((Integer) pagerObject.get("pageCount"));
 		assertThat("Page Count is 2", (Integer) pagerObject.get("pageCount") == 0, is(true));
 		assertThat("Total is 3", (Integer) pagerObject.get("total") == 0, is(true));
 		assertThat("Page Size is 2", (Integer) pagerObject.get("pageSize") == 50, is(true));
 		assertThat("Page is 2", (Integer) pagerObject.get("page") == 1, is(true));
 		assertThat("List by location count is 1", ((List) sampleResults.get("results")).size() == 0, is(true));
-		
+
 		//	Search test section
 		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
 		    new Parameter("q", "x"));
@@ -368,8 +367,15 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		        "excludeAllocations", "TRUE"));
 		MockHttpServletResponse handle2 = handle(newGetRequest2);
 		Map<String, Object> samples = (new ObjectMapper()).readValue(handle2.getContentAsString(), Map.class);
-		
-		assertThat("There is 1 sample", ((List<Map>) samples.get("results")).size(), is(1));
+		assertThat("There is 2 sample", ((List<Map>) samples.get("results")).size(), is(2));
+
+
+		MockHttpServletRequest instrumentRequest = newGetRequest("lab/samples", new Parameter("instrument",
+				"123111zz-0011-477v-8y8y-acc38ebc6252"), new Parameter(
+				"excludeAllocations", "TRUE"));
+		MockHttpServletResponse instrumentResponse = handle(instrumentRequest);
+		Map<String, Object> samplesByInstrument = (new ObjectMapper()).readValue(instrumentResponse.getContentAsString(), Map.class);
+		assertThat("There is 1 sample with instrument used", ((List<Map>) samplesByInstrument.get("results")).size(), is(1));
 		
 		MockHttpServletRequest newGetRequest3 = newGetRequest("lab/samples", new Parameter("excludeAllocations", "true"),
 		    new Parameter("sampleCategory", "NOT ACCEPTED"), new Parameter("hasStatus", "yes"));
@@ -404,7 +410,11 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		handleGet = handle(newGetRequest);
 		Map<String, Object> sampleResultsFilteredBySpecimen = (new ObjectMapper()).readValue(handleGet.getContentAsString(),
 		    Map.class);
-		assertThat("There is 1 sample", ((List<Map>) samples.get("results")).size(), is(1));
+//		System.out.println(((List<Map>) samples.get("results")).size());
+//		for(Map<String, Object> sample: ((List<Map>) samples.get("results"))) {
+//			System.out.println(sample.get("label"));
+//		}
+		assertThat("There is 2 sample", ((List<Map>) samples.get("results")).size(), is(2));
 	}
 	
 	@Test

@@ -35,7 +35,8 @@ export class SamplesService {
     acceptedBy?: string,
     q?: string,
     department?: string,
-    testUuid?: string
+    testUuid?: string,
+    instrument?: string
   ): Observable<any> {
     let parameters = [];
     if (pagerInfo) {
@@ -72,6 +73,10 @@ export class SamplesService {
 
     if (testUuid) {
       parameters = [...parameters, "test=" + testUuid];
+    }
+
+    if (instrument) {
+      parameters = [...parameters, "instrument=" + instrument];
     }
 
     if (excludeAllocations) {

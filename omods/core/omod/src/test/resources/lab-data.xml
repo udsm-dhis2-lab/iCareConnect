@@ -91,7 +91,7 @@
                   uuid="2289b311-52b9-11e8-b60d-880027ae421d" />
 
     <!-- instrument concept -->
-    <concept concept_id="810" retired="false" datatype_id="2" class_id="15" is_set="false" creator="1"
+    <concept concept_id="810" retired="false" datatype_id="3" class_id="15" is_set="false" creator="1"
              date_created="2017-02-14 15:51:57.0" version="" uuid="123111zz-0011-477v-8y8y-acc38ebc6252" />
 
     <concept_name concept_name_id="510" concept_id="810" name="Cobas Taqman" locale="en_GB" creator="1"
@@ -165,6 +165,8 @@
 
     <lb_sample_status sample_status_id="2" sample_id="201" status="RECEIVED" category="RECEIVED" timestamp="2020-12-27 00:00:00" user_id="400" />
 
+    <lb_sample_status sample_status_id="3" sample_id="202" status="RESULTS" category="HAS_RESULTS" timestamp="2020-12-27 00:00:00" user_id="400" />
+
     <st_device_type device_type_id="201" uuid="245ff55-2200-11e3-1111-0sndiu87hsju" name="lab devices" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
     <!--<lb_device device_id="123" uuid="d365e560-zz77-11e3-1111-0sndiu87hsju" item_id="666" device_type="201" name="mrt test device" serial_no="6563"/>-->
     <lb_device device_id="123"  uuid="d365e560-zz77-11e3-1111-0sndiu87hsju"  item_id="666" device_type_id="201" name="mrt test device"  serial_no="6563" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
@@ -190,7 +192,7 @@
     <lb_test_result uuid="222yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="123" test_allocation_id="323" concept_id="900" value_text="positive" date_created="2020-12-27 00:00:00" voided="false" creator="1" instrument_id="10"/>
 
     <lb_test_result uuid="223yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="223" test_allocation_id="322" concept_id="500" value_text="positive" date_created="2020-12-27 00:00:00" voided="false" creator="1" instrument_id="10"/>
-    <lb_test_result uuid="245yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="223" test_allocation_id="322" concept_id="501" value_text="DETECTED" date_created="2020-12-27 00:00:00" voided="false" creator="1" instrument_id="10"/>
+    <lb_test_result uuid="245yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="223" test_allocation_id="322" concept_id="501" value_text="DETECTED" date_created="2020-12-27 00:00:00" voided="false" creator="1" instrument_id="810"/>
 
     <lb_test_allocation_status test_allocation_status_id="1" test_allocation_id="323" user_id="400" status="APPROVED" remarks="" timestamp="2020-10-14 13:56:44" />
 

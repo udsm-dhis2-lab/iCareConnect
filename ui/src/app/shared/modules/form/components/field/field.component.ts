@@ -175,7 +175,13 @@ export class FieldComponent implements AfterViewInit {
 
   searchItem(event: any, field?: any): void {
     // event.stopPropagation();
-    const searchingText = event.target.value;
+    const searchingText = (event.target as HTMLInputElement).value;
+    if (!searchingText) {
+      let objectToUpdate = {};
+      objectToUpdate[field?.key] = null;
+      this.form.patchValue(objectToUpdate);
+      this.fieldUpdate.emit(this.form);
+    }
     const parameters = {
       q: searchingText,
       limit: 50,
@@ -211,7 +217,7 @@ export class FieldComponent implements AfterViewInit {
     );
   }
 
-  getSelectedItemFromOption(event: Event, item, field): void {
+  getSelectedItemFromOption(event: Event, item: any, field: any): void {
     event.stopPropagation();
     const value = item?.isDrug
       ? item?.formattedKey
