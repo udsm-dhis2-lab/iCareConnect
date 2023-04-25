@@ -779,6 +779,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				emailProperties.setProperty("attachmentFileName", "NPHL_results.pdf");
 //				emailProperties.setProperty("attachment", content);
 				ICareService iCareService = Context.getService(ICareService.class);
+				System.out.println(emailProperties);
 				iCareService.processEmail(emailProperties);
 			}
 		}
