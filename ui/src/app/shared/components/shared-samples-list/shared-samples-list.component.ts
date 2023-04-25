@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatCheckboxChange } from "@angular/material/checkbox";
 import { MatSelectChange } from "@angular/material/select";
 import { omit, keyBy } from "lodash";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { SamplesService } from "src/app/shared/services/samples.service";
@@ -35,11 +35,15 @@ export class SharedSamplesListComponent implements OnInit {
   @Output() samplesForAction: EventEmitter<any[]> = new EventEmitter<any[]>();
 
   samples$: Observable<{ pager: any; results: any[] }>;
+  labEquipments$: Observable<any[]>;
 
   pageCounts: any[] = [1, 5, 10, 20, 25, 50, 100, 200];
 
   searchingTestField: any;
+  searchingEquipmentsField: any;
   keyedSelectedSamples: any = {};
+  instrumentUuid: string;
+  testUuid: string;
   constructor(private sampleService: SamplesService) {}
 
   ngOnInit(): void {
@@ -58,28 +62,42 @@ export class SharedSamplesListComponent implements OnInit {
       conceptClass: "Test",
       shouldHaveLiveSearchForDropDownFields: true,
     });
+    // TODO: Consider to put class name for instruments on global property
+    this.searchingEquipmentsField = new Dropdown({
+      id: "instrument",
+      key: "instrument",
+      label: "Search by Equipment",
+      searchControlType: "concept",
+      searchTerm: "LIS_INSTRUMENT",
+      conceptClass: "LIS instrument",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
   }
 
   getSamples(params?: any): void {
-    this.samples$ = this.sampleService.getLabSamplesByCollectionDates(
-      this.datesParameters,
-      params?.category,
-      params?.hasStatus,
-      this.excludeAllocations,
-      {
-        pageSize: params?.pageSize,
-        page: params?.page,
-      },
-      {
-        departments: this.labSamplesDepartments,
-        specimenSources: this.sampleTypes,
-        codedRejectionReasons: this.codedSampleRejectionReasons,
-      },
-      this.acceptedBy,
-      params?.q,
-      params?.dapartment,
-      params?.testUuid
-    );
+    this.samples$ = of(null);
+    setTimeout(() => {
+      this.samples$ = this.sampleService.getLabSamplesByCollectionDates(
+        this.datesParameters,
+        params?.category,
+        params?.hasStatus,
+        this.excludeAllocations,
+        {
+          pageSize: params?.pageSize,
+          page: params?.page,
+        },
+        {
+          departments: this.labSamplesDepartments,
+          specimenSources: this.sampleTypes,
+          codedRejectionReasons: this.codedSampleRejectionReasons,
+        },
+        this.acceptedBy,
+        params?.q,
+        params?.dapartment,
+        params?.testUuid,
+        params?.instrument
+      );
+    }, 50);
   }
 
   onPageChange(event: any): void {
@@ -172,13 +190,27 @@ export class SharedSamplesListComponent implements OnInit {
   }
 
   onSearchByTest(formValue: FormValue): void {
+    this.testUuid = formValue.getValues()?.test?.value;
     this.getSamples({
       category: this.category,
       hasStatus: this.hasStatus,
       pageSize: this.pageSize,
       page: 1,
       q: this.searchingText,
-      testUuid: formValue.getValues()?.test?.value,
+      testUuid: this.testUuid,
+    });
+  }
+
+  onSearchByEquipment(formValue: FormValue): void {
+    this.instrumentUuid = formValue.getValues()?.instrument?.value;
+    this.getSamples({
+      instrument: this.instrumentUuid,
+      category: this.category,
+      hasStatus: this.hasStatus,
+      pageSize: this.pageSize,
+      page: 1,
+      q: this.searchingText,
+      testUuid: this.testUuid,
     });
   }
 }
