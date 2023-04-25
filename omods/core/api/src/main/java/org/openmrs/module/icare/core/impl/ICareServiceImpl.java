@@ -10,6 +10,10 @@
 package org.openmrs.module.icare.core.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.html.simpleparser.HTMLWorker;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.sun.istack.internal.ByteArrayDataSource;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
@@ -624,6 +628,34 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 				attachmentPart.setFileName(source.getName());
 				multipart.addBodyPart(attachmentPart);
 			}
+
+			if (emailProperties.getProperty("attachmentFile") != null) {
+				String htmlContent = emailProperties.getProperty("attachmentFile");
+				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+				Document document = new Document();
+
+				PdfWriter writer = PdfWriter.getInstance(document, outputStream);
+				document.open();
+				HTMLWorker htmlWorker = new HTMLWorker(document);
+				htmlWorker.parse(new StringReader(htmlContent));
+				document.close();
+
+				//File encryption implementation
+//				PdfReader reader = new PdfReader(outputStream.toByteArray());
+//				PdfStamper stamper = new PdfStamper(reader, outputStream);
+//				stamper.setEncryption("a".getBytes("UTF-8"), "b".getBytes("UTF-8"), PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
+//				stamper.close();
+//				reader.close();
+//
+				byte[] pdfContent = outputStream.toByteArray();
+
+				MimeBodyPart attachmentPart = new MimeBodyPart();
+				DataSource dataSource = new ByteArrayDataSource(pdfContent, "application/pdf");
+				attachmentPart.setDataHandler(new DataHandler(dataSource));
+				attachmentPart.setFileName(emailProperties.getProperty("attachmentFileName"));
+				multipart.addBodyPart(attachmentPart);
+			}
+
 			
 			//			if (report.getRenderedOutput() != null && "true".equalsIgnoreCase(configuration.getProperty("addOutputAsAttachment"))) {
 			//			MimeBodyPart attachment = new MimeBodyPart();
