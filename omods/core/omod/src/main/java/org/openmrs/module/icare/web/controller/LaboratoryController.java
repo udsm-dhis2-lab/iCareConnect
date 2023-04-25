@@ -226,7 +226,8 @@ public class LaboratoryController {
 	        @RequestParam(value = "acceptedBy", required = false) String acceptedByUuid,
 	        @RequestParam(value = "test", required = false) String testConceptUuid,
 	        @RequestParam(value = "department", required = false) String departmentUuid,
-	        @RequestParam(value = "specimen", required = false) String specimenSourceUuid) throws ParseException {
+	        @RequestParam(value = "specimen", required = false) String specimenSourceUuid,
+			@RequestParam( value = "instrument", required = false) String instrumentUuid) throws ParseException {
 		
 		Date start = null;
 		Date end = null;
@@ -244,13 +245,13 @@ public class LaboratoryController {
 		pager.setPage(page);
 		if (!excludeAllocations) {
 			ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
-			    testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid);
+			    testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid, instrumentUuid);
 			return sampleResults.toMap();
 		}
 		if (excludeAllocations) {
 			ListResult<SampleExt> sampleResults = laboratoryService.getSamplesWithoutAllocations(start, end, pager,
 			    locationUuid, sampleCategory, testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid,
-			    specimenSourceUuid);
+			    specimenSourceUuid, instrumentUuid);
 			return sampleResults.toMap();
 		}
 		
