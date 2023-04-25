@@ -60,9 +60,11 @@
                     retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfee"/>
 
     <!-- Concepts -->
-    <concept concept_id="500" retired="false" datatype_id="2" class_id="7" is_set="true" creator="1"
+    <concept concept_id="500" retired="false" datatype_id="3" class_id="7" is_set="true" creator="1"
              date_created="2017-02-14 15:51:57.0" version="" uuid="a8102d6d-c528-477a-80bd-acc38ebc6252" />
-    <concept_set concept_set_id="1" concept_id="500" concept_set="500" creator="1" uuid="a8102d6d-c528-477a-80bd-acc38ebc6252"/>
+    <concept concept_id="501" retired="false" datatype_id="3" class_id="7" is_set="false" creator="1"
+             date_created="2017-02-14 15:51:57.0" version="" uuid="11102d6d-c528-477a-80bd-acc38ebc6252" />
+    <concept_set concept_set_id="1" concept_id="501" concept_set="500" creator="1" uuid="a8102d6d-c528-477a-80bd-acc38ebc6252"/>
 
 
     <concept concept_id="600" retired="false" datatype_id="2" class_id="7" is_set="false" creator="1"
@@ -73,12 +75,20 @@
              date_created="2017-02-14 15:51:57.0" version="" uuid="111111xx-0000-477a-8u8u-acc38ebc6252" />
 
     <!-- container concept -->
-    <concept concept_id="800" retired="false" datatype_id="2" class_id="7" is_set="false" creator="1"
+    <concept concept_id="800" retired="false" datatype_id="3" class_id="7" is_set="false" creator="1"
              date_created="2017-02-14 15:51:57.0" version="" uuid="333111zz-0011-477v-8y8y-acc38ebc6252" />
 
     <concept_name concept_name_id="500" concept_id="800" name="mrdt" locale="en_GB" creator="1"
                   date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="8889b329-52b9-11e8-b60d-880027ae421d" />
+
+    <concept_name concept_name_id="501" concept_id="500" name="COVID PCR Test" locale="en_GB" creator="1"
+                  date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="8889b311-52b9-11e8-b60d-880027ae421d" />
+
+    <concept_name concept_name_id="502" concept_id="501" name="COVID-19" locale="en_GB" creator="1"
+                  date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="2289b311-52b9-11e8-b60d-880027ae421d" />
 
     <!-- instrument concept -->
     <concept concept_id="810" retired="false" datatype_id="2" class_id="15" is_set="false" creator="1"
@@ -169,7 +179,7 @@
 
     <!--<lb_test_allocation test_allocation_id="322" uuid="111xxx60-7777-11e3-1111-0sndiu87hsju" device_id="123" sample_id="202" order_id="301" label="Allocation Label Y"/> -->
 
-    <lb_test_allocation test_allocation_id="322" uuid="111xxx60-7777-11e3-1111-0sndiu87hsju" sample_id="202" order_id="301" label="Allocation Label Y" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
+    <lb_test_allocation test_allocation_id="322" uuid="111xxx60-7777-11e3-1111-0sndiu87hsju" sample_id="202" order_id="301" label="Allocation Label Y" concept_id="501" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
 
     <lb_test_allocation test_allocation_id="324" uuid="222yyy70-7777-11e3-1221-0sndiu87hsja" sample_id="203" order_id="300" label="Allocation Lable z" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
 
@@ -180,6 +190,7 @@
     <lb_test_result uuid="222yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="123" test_allocation_id="323" concept_id="900" value_text="positive" date_created="2020-12-27 00:00:00" voided="false" creator="1" instrument_id="10"/>
 
     <lb_test_result uuid="223yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="223" test_allocation_id="322" concept_id="500" value_text="positive" date_created="2020-12-27 00:00:00" voided="false" creator="1" instrument_id="10"/>
+    <lb_test_result uuid="245yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="223" test_allocation_id="322" concept_id="501" value_text="DETECTED" date_created="2020-12-27 00:00:00" voided="false" creator="1" instrument_id="10"/>
 
     <lb_test_allocation_status test_allocation_status_id="1" test_allocation_id="323" user_id="400" status="APPROVED" remarks="" timestamp="2020-10-14 13:56:44" />
 
@@ -209,7 +220,7 @@
 
     <person_attribute_type person_attribute_type_id="1" uuid="iCARE110-TEST-YUDA-1234-d30dcfc0c632" name="email" description="Person email" format="org.openmrs.String" searchable="true" creator="1" date_created="2023-04-21 15:51:57.0" changed_by="1" date_changed="2023-04-21 15:51:57.0" retired="false" />
 
-    <person_attribute person_attribute_id="1" person_id="500" uuid="iCARE110-TEST-11DA-1234-d30dcfc0c632" value="kibahiladennis@gmail.com" person_attribute_type_id="1" creator="1" date_created="2023-04-21 15:51:57.0" changed_by="1" date_changed="2023-04-21 15:51:57.0" voided="false" />
+    <person_attribute person_attribute_id="1" person_id="500" uuid="iCARE110-TEST-11DA-1234-d30dcfc0c632" value="josephatjulius24@gmail.com" person_attribute_type_id="1" creator="1" date_created="2023-04-21 15:51:57.0" changed_by="1" date_changed="2023-04-21 15:51:57.0" voided="false" />
 
     <global_property property="mail.icare.laboratory.results.subject.html" property_value="TESTING SENDING AUTHORIZED RESULTS" uuid="iCARE110-TEST-2341-9ueb-d30dcfc0c632" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-21 15:51:57.0" changed_by="1" />
     <global_property property="mail.icare.laboratory.results.body.header.html" property_value="TESTING SENDING AUTHORIZED RESULTS" uuid="iCARE110-TEST-9272-9beb-d30dcfc0c632" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-21 15:51:57.0" changed_by="1" />
