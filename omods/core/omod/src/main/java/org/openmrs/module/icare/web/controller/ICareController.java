@@ -705,33 +705,34 @@ public class ICareController {
 		returnResponse.put("encounter", voidedEncounter.getUuid());
 		return returnResponse;
 	}
-
+	
 	@RequestMapping(value = "emailsession", method = RequestMethod.GET)
 	@ResponseBody
 	public Session getEmailSession() {
 		Session response;
 		try {
 			response = iCareService.getEmailSession();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		return  response;
+		return response;
 	}
-
-
+	
 	@RequestMapping(value = "processemail", method = RequestMethod.POST)
 	@ResponseBody
 	public String processEmail(@RequestBody Properties emailProperties) {
-
+		
 		System.out.println(emailProperties);
-
+		
 		String response;
 		try {
 			response = iCareService.processEmail(emailProperties);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		System.out.println(response);
-		return  response;
+		return response;
 	}
 }

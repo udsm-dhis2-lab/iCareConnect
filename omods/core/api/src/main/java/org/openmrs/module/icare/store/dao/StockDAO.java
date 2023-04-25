@@ -476,8 +476,8 @@ public class StockDAO extends BaseDAO<Stock> {
 		if (reorderLevel.getQuantity() != null) {
 			query.setParameter("quantity", reorderLevel.getQuantity());
 		}
-
-		query.setParameter("uuid",reorderLevel.getUuid());
+		
+		query.setParameter("uuid", reorderLevel.getUuid());
 		
 		Integer success = query.executeUpdate();
 		

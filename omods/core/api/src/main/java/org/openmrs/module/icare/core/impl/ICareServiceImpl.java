@@ -575,7 +575,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			p.put("mail.smtp.host", as.getGlobalProperty("mail.smtp_host", "localhost"));
 			p.put("mail.smtp.port", as.getGlobalProperty("mail.smtp_port", "587")); // mail.smtp_port
 			p.put("mail.smtp.auth", as.getGlobalProperty("mail.smtp_auth", "test")); // mail.smtp_auth
-			p.put("mail.smtp.starttls.enable", as.getGlobalProperty("mail.smtp.starttls.enable", "false"));
+			p.put("mail.smtp.starttls.enable", as.getGlobalProperty("mail.smtp.starttls.enable"));
 			p.put("mail.debug", as.getGlobalProperty("mail.debug", "false"));
 			p.put("mail.from", as.getGlobalProperty("mail.from", ""));
 			final String user = as.getGlobalProperty("mail.user", "");
@@ -601,16 +601,14 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public String processEmail(Properties emailProperties) throws Exception {
 		try {
-			System.out.println(emailProperties);
 			MimeMessage m = new MimeMessage(getEmailSession());
 			m.setFrom(new InternetAddress(emailProperties.getProperty("from")));
-
+			
 			for (String recipient : emailProperties.getProperty("to", "").split("\\,")) {
-
+				
 				m.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(recipient));
 			}
-
-
+			
 			// TODO: Make these such that they can contain report information
 			m.setSubject(emailProperties.getProperty("subject"));
 			Multipart multipart = new MimeMultipart();
@@ -618,29 +616,28 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			String content = emailProperties.getProperty("content", "");
 			contentBodyPart.setContent(content, "text/html");
 			multipart.addBodyPart(contentBodyPart);
-
-			if(emailProperties.getProperty("attachment") != null) {
+			
+			if (emailProperties.getProperty("attachment") != null) {
 				MimeBodyPart attachmentPart = new MimeBodyPart();
 				DataSource source = new FileDataSource(new File(emailProperties.getProperty("attachment")));
 				attachmentPart.setDataHandler(new DataHandler(source));
 				attachmentPart.setFileName(source.getName());
 				multipart.addBodyPart(attachmentPart);
 			}
-
 			
 			//			if (report.getRenderedOutput() != null && "true".equalsIgnoreCase(configuration.getProperty("addOutputAsAttachment"))) {
-//			MimeBodyPart attachment = new MimeBodyPart();
-//			Object output = null;
-//			attachment.setDataHandler(new DataHandler(output, "text/html"));
-//			attachment.setFileName(emailProperties.getProperty("attachmentName"));
-//			multipart.addBodyPart(attachment);
+			//			MimeBodyPart attachment = new MimeBodyPart();
+			//			Object output = null;
+			//			attachment.setDataHandler(new DataHandler(output, "text/html"));
+			//			attachment.setFileName(emailProperties.getProperty("attachmentName"));
+			//			multipart.addBodyPart(attachment);
 			//			}
 			
 			m.setContent(multipart);
 			Transport.send(m);
 		}
 		catch (Exception e) {
-			throw new RuntimeException("Error occurred while sending  email: "+ e);
+			throw new RuntimeException("Error occurred while sending  email: " + e);
 		}
 		return "TESTING";
 	}

@@ -556,7 +556,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			throw new Exception("Test Allocation with ID '" + testAllocationStatus.getTestAllocation().getUuid()
 			        + "' does not exist.");
 		}
-
+		
 		TestAllocationStatus createdStatus = new TestAllocationStatus();
 		User user = Context.getUserService().getUserByUuid(testAllocationStatus.getUser().getUuid());
 		if (user == null) {
@@ -572,64 +572,64 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				testAllocationStatus.setTestResult(testResult);
 			}
 			createdStatus = this.testAllocationStatusDAO.save(testAllocationStatus);
-
+			
 			//		if (countTestAllocationApprovedStatuses(testAllocation.getUuid()) == 2) {
-
+			
 			AdministrationService administrationService = Context.getAdministrationService();
 			String labResultApprovalConfig = administrationService
-					.getGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION);
+			        .getGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION);
 			if (labResultApprovalConfig == null) {
 				throw new ConfigurationException("Lab result approval configuration is not set. Please set '"
-						+ ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION + "'");
+				        + ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION + "'");
 			}
 			if ((testAllocationStatus.getStatus().equals("AUTHORIZED")) && testResult != null) {
 				Sample sample = testResult.getTestAllocation().getSample();
 				List<Result> resList = testAllocation.getTestAllocationResults();
-
+				
 				Collections.sort(resList, new Comparator<Result>() {
-
+					
 					@Override
 					public int compare(Result r1, Result r2) {
 						return r2.getDateCreated().compareTo(r1.getDateCreated());
 					}
 				});
-
+				
 				Result allocationResults = testResult;
 				//					resList.get(resList.size() - 1);
 				//			for (Result allocationResults : testAllocation.getTestAllocationResults()) {
-
+				
 				if (allocationResults != null) {
-
+					
 					ObsService observationService = Context.getObsService();
-
+					
 					Encounter encounter = testAllocation.getSampleOrder().getOrder().getEncounter();
-
+					
 					//						testAllocation.getSampleOrder().getOrder().getEncounter();
-
+					
 					Order order = testAllocation.getSampleOrder().getOrder();
-
+					
 					Concept concept = Context.getConceptService().getConceptByUuid(allocationResults.getConcept().getUuid());
-
+					
 					Person person = testAllocation.getSampleOrder().getOrder().getPatient().getPerson();
-
+					
 					List<TestAllocationStatus> testAllocationStatuses = testAllocation.getTestAllocationStatuses();
-
+					
 					List<TestAllocationStatus> resultsRemarks = new ArrayList<TestAllocationStatus>();
 					for (TestAllocationStatus status : testAllocationStatuses) {
 						if (status.getStatus() != null && status.getTestResult().getUuid().equals(testResult.getUuid())
-								&& (status.getCategory().equals("RESULT_REMARKS"))) {
+						        && (status.getCategory().equals("RESULT_REMARKS"))) {
 							resultsRemarks.add(status);
 						}
 					}
-
+					
 					List<TestAllocationStatus> resultStatuses = new ArrayList<TestAllocationStatus>();
 					for (TestAllocationStatus status : testAllocationStatuses) {
 						if (status.getStatus() != null && status.getTestResult().getUuid().equals(testResult.getUuid())
-								&& (status.getCategory().equals("RESULT_AMENDMENT"))) {
+						        && (status.getCategory().equals("RESULT_AMENDMENT"))) {
 							resultStatuses.add(status);
 						}
 					}
-
+					
 					Obs observation = new Obs();
 					observation.setConcept(concept);
 					observation.setEncounter(encounter);
@@ -651,7 +651,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 					} else {
 						observation.setStatus(Obs.Status.FINAL);
 					}
-
+					
 					//quick fix for lab - to capture coded results
 					Concept codedAnswer = Context.getConceptService().getConceptByUuid(allocationResults.getValueText());
 					if (codedAnswer != null) {
@@ -660,28 +660,28 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 						if (allocationResults.getValueText() != null) {
 							observation.setValueText(allocationResults.getValueText());
 						}
-
+						
 						if (allocationResults.getValueCoded() != null) {
 							observation.setValueCoded(Context.getConceptService().getConceptByUuid(
-									allocationResults.getValueCoded().getUuid()));
+							    allocationResults.getValueCoded().getUuid()));
 						}
-
+						
 						if (allocationResults.getValueDrug() != null) {
 							observation.setValueDrug(Context.getConceptService().getDrugByUuid(
-									allocationResults.getValueDrug().getUuid()));
+							    allocationResults.getValueDrug().getUuid()));
 						}
-
+						
 						if (allocationResults.getValueBoolean() != null) {
 							observation.setValueBoolean(allocationResults.getValueBoolean());
 						}
-
+						
 						if (allocationResults.getValueNumeric() != null) {
 							observation.setValueNumeric(allocationResults.getValueNumeric());
 						}
 					}
-					System.out.println(observation);
+//					System.out.println(observation);
 					observationService.saveObs(observation, "");
-
+					
 				}
 				// Add logic to send email
 				// 1. The subject of the email should be stored on a global property.
@@ -689,46 +689,52 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				// 3. Results structure html should be stored on a global property
 				String content = "";
 				Properties emailProperties = new Properties();
-				String subject = administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_SUBJECT_CONFIGURATION_HTML).toString();
-				String bodyHeaderHtml = administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_HEADER_CONFIGURATION_HTML).toString();
-				String clientEmailAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE).toString();
+				String subject = administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_SUBJECT_CONFIGURATION_HTML)
+				        .toString();
+				String bodyHeaderHtml = administrationService.getGlobalProperty(
+				    ICareConfig.LAB_RESULTS_BODY_HEADER_CONFIGURATION_HTML).toString();
+				String clientEmailAttributeTypeUuid = administrationService.getGlobalProperty(
+				    ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE).toString();
 				content = content + bodyHeaderHtml + "\n";
 				Date date = new Date();
-				content =content.replace("{date}", date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getYear());
-
+				content = content.replace("{date}", date.getDate() + "-" + (date.getMonth() + 1) + "-" + date.getYear());
+				
 				String regex = "<tbody>(.*?)</tbody>";
 				Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
 				Matcher matcher = pattern.matcher(content.toString());
 				String tbodyContent = "";
 				String fromMail = administrationService.getGlobalProperty("mail.from");
-				emailProperties.setProperty("from",fromMail);
+				emailProperties.setProperty("from", fromMail);
 				emailProperties.setProperty("subject", subject);
 				Visit visit = sample.getVisit();
 				Set<PersonAttribute> personAttributes = visit.getPatient().getPerson().getAttributes();
-				for(PersonAttribute personAttribute: personAttributes) {
+				for (PersonAttribute personAttribute : personAttributes) {
 					if (personAttribute.getAttributeType().getUuid().toString().equals(clientEmailAttributeTypeUuid)) {
 						// TODO: Validate the email address
-						emailProperties.setProperty("to",personAttribute.getValue());
+						emailProperties.setProperty("to", personAttribute.getValue());
 					}
 				}
 				// Process results for each of the order with
 				if (matcher.find()) {
 					tbodyContent = matcher.group(1);
 					String newTableBodies = "";
-					for(SampleOrder sampleOrder: sample.getSampleOrders()) {
-						newTableBodies = newTableBodies + tbodyContent.replace("{test}",sampleOrder.getOrder().getConcept().getDisplayString());
+					for (SampleOrder sampleOrder : sample.getSampleOrders()) {
+						newTableBodies = newTableBodies
+						        + tbodyContent.replace("{test}", sampleOrder.getOrder().getConcept().getDisplayString());
 						String regExpForParameterRow = "<tr parameterrepeatable>.*?</tr>";
 						Pattern parameterPattern = Pattern.compile(regExpForParameterRow, Pattern.DOTALL);
 						Matcher parameterRowMatcher = parameterPattern.matcher(tbodyContent.toString());
 						String parameterRow = "";
 						String newRows = "";
-
-//						System.out.println(sampleOrder.getOrder().getConcept().getSetMembers().size());
+						
+						//						System.out.println(sampleOrder.getOrder().getConcept().getSetMembers().size());
 						if (parameterRowMatcher.find() && sampleOrder.getOrder().getConcept().getSetMembers().size() > 0) {
-							parameterRow =  parameterRowMatcher.group(0);
+							parameterRow = parameterRowMatcher.group(0);
 							Integer count = 1;
-							for(Concept concept: sampleOrder.getOrder().getConcept().getSetMembers()) {
-								newRows = newRows + parameterRow.replace("{sn}", count.toString()).replace("{parameter}",concept.getDisplayString().toString());
+							for (Concept concept : sampleOrder.getOrder().getConcept().getSetMembers()) {
+								newRows = newRows
+								        + parameterRow.replace("{sn}", count.toString()).replace("{parameter}",
+								            concept.getDisplayString().toString());
 								newTableBodies = newTableBodies.replace(parameterRow, newRows);
 								count = count + 1;
 							}

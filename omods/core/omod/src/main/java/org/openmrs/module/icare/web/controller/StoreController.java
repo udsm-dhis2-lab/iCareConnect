@@ -68,18 +68,18 @@ public class StoreController {
 	@ResponseBody
 	public Map<String, Object> updateReorderLevel(@RequestBody Map<String, Object> reorderLevelObjectMap,
 	        @PathVariable String reorderLevelUuid) {
-
+		
 		ReorderLevel reorderLevel = ReorderLevel.fromMap(reorderLevelObjectMap);
-		if(reorderLevel.getLocation().getUuid() != null){
+		if (reorderLevel.getLocation().getUuid() != null) {
 			Location location = Context.getLocationService().getLocationByUuid(reorderLevel.getLocation().getUuid());
 			reorderLevel.setLocation(location);
 		}
-
-		if(reorderLevel.getItem().getUuid() != null) {
+		
+		if (reorderLevel.getItem().getUuid() != null) {
 			Item item = iCareService.getItemByUuid(reorderLevel.getItem().getUuid());
 			reorderLevel.setItem(item);
 		}
-
+		
 		reorderLevel.setUuid(reorderLevelUuid);
 		ReorderLevel updatedReorderLevel = storeService.updateReorderLevel(reorderLevel);
 		
