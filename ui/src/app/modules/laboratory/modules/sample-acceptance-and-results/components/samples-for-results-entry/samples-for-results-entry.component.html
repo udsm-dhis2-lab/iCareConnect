@@ -33,6 +33,14 @@
         (change)="getSelectedResultEntryCategory($event)"
         >By Worksheet</mat-radio-button
       >
+      <mat-radio-button
+        [value]="'Batch'"
+        [checked]="selectedResultEntryCategory === 'Batch'"
+        color="primary"
+        class="ml-3"
+        (change)="getSelectedResultEntryCategory($event)"
+        >By Batch</mat-radio-button
+      >
     </mat-radio-group>
     <div class="p-2" *ngIf="selectedResultEntryCategory === 'Worksheet'">
       <app-result-entry-by-worksheet-home
@@ -40,6 +48,10 @@
         [datesParameters]="datesParameters"
         [viewType]="viewType"
       ></app-result-entry-by-worksheet-home>
+    </div>
+    <div class="p-2" *ngIf="selectedResultEntryCategory === 'Batch'">
+      <app-result-entry-by-batch-home [isLIS]="LISConfigurations?.isLIS" [datesParameters]="datesParameters"
+        [viewType]="viewType"></app-result-entry-by-batch-home>
     </div>
     <app-shared-samples-list
       *ngIf="selectedResultEntryCategory === 'Normal'"
