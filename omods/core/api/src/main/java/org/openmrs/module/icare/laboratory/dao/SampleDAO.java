@@ -170,7 +170,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 			
 		}
-
+		
 		if (instrumentUuid != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -270,7 +270,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (testConceptUuid != null) {
 			query.setParameter("testConceptUuid", testConceptUuid);
 		}
-
+		
 		if (instrumentUuid != null) {
 			System.out.println("HEREEEEEEEEEEEE");
 			query.setParameter("instrumentUuid", instrumentUuid);
@@ -414,7 +414,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 	
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager,
 	        String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
-	        String acceptedByUuid, String testConceptUuid, String departmentUuid, String specimenSourceUuid, String instrumentUuid) {
+	        String acceptedByUuid, String testConceptUuid, String departmentUuid, String specimenSourceUuid,
+	        String instrumentUuid) {
 		
 		DbSession session = this.getSession();
 		
@@ -473,7 +474,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 			queryStr += "sp.specimenSource.uuid =:specimenSourceUuid";
 		}
-
+		
 		if (instrumentUuid != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -482,8 +483,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 			queryStr += " sp IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS' AND sst.sample IN (SELECT testAllocation.sampleOrder.id.sample FROM TestAllocation testAllocation WHERE testAllocation IN (SELECT res.testAllocation FROM Result res WHERE res.instrument.uuid =:instrumentUuid)))) ";
 		}
-
-
+		
 		if (locationUuid != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -614,7 +614,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (testConceptUuid != null) {
 			query.setParameter("testConceptUuid", testConceptUuid);
 		}
-
+		
 		if (instrumentUuid != null) {
 			query.setParameter("instrumentUuid", instrumentUuid);
 		}
