@@ -8,7 +8,7 @@
   } as params"
 >
   <mat-progress-bar mode="indeterminate"
-    *ngIf="filteringBatches || !(params?.batchsets && params?.batches)">
+    *ngIf="filteringBatches || !(params?.batchsets && params?.batches) || loadingBatchSamples">
   </mat-progress-bar>
   <div class="row" *ngIf="params?.batchsets && params?.batches">
     <div class="d-flex">
@@ -23,6 +23,13 @@
         <app-form 
           [fields]="[batchesField]"
           (formUpdate)="onFormUpdate($event, 'batch')"
+          >
+        </app-form>
+      </div>
+      <div class="w-50" *ngIf="!loadingBatchSamples">
+        <app-form 
+          [fields]="[batchSampleseField]"
+          (formUpdate)="onFormUpdate($event, 'batchsample')"
           >
         </app-form>
       </div>
