@@ -258,9 +258,9 @@ export class FormService {
             .pipe(
               map((response) => {
                 let formattedResponse = [];
-                // TODO: Accomodate pager or think how this can be accomodated
+              
                 if (stockApiPath === "stockout?location") {
-                  formattedResponse = (response || [])?.map((responseItem) => {
+                  formattedResponse = (response?.results || [])?.map((responseItem) => {
                     stockOutItemsReference[responseItem?.uuid] = responseItem;
                     return {
                       ...responseItem,
@@ -272,7 +272,7 @@ export class FormService {
                     };
                   });
                 } else {
-                  formattedResponse = response;
+                  formattedResponse = response?.results || [];
                 }
                 const groupedByItemUuid = groupBy(
                   formattedResponse?.map((batch) => {

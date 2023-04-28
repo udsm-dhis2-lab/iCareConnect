@@ -45,6 +45,7 @@ import { SampleTrackingListComponent } from "./sample-tracking-list/sample-track
 import { SamplesRejectedAfterRegistrationComponent } from "./samples-rejected-after-registration/samples-rejected-after-registration.component";
 import { BarCodePrintModalComponent } from "./bar-code-print-modal/bar-code-print-modal.component";
 import { SampleToPrintResultsComponent } from "./sample-to-print-results/sample-to-print-results.component";
+import { ResultEntryByBatchHomeComponent } from "./result-entry-by-batch-home/result-entry-by-batch-home.component";
 
 export const components: any[] = [
   PatientsByVisitsListComponent,
@@ -94,6 +95,7 @@ export const components: any[] = [
   SamplesRejectedAfterRegistrationComponent,
   BarCodePrintModalComponent,
   SampleToPrintResultsComponent,
+  ResultEntryByBatchHomeComponent,
 ];
 
 export const sampleAcceptanceAndResultsModals: any[] = [

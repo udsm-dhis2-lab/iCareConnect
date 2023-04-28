@@ -640,6 +640,37 @@ export class SamplesService {
       })
     );
   }
+  
+  getBatchSamples(
+    batchUuid?: string,
+    startDate?: string,
+    endDate?: string,
+    q?: string
+  ): Observable<any> {
+    let startDateParam = startDate?.length ? `?startDate=${startDate}` : "";
+    let endDateParam =
+      endDate?.length && startDateParam.length
+        ? `&endDate=${endDate}`
+        : endDate?.length
+        ? `&endDate=${endDate}`
+        : "";
+    let qParam =
+      q?.length && (startDateParam.length || endDateParam.length)
+        ? `&q=${q}`
+        : q?.length
+        ? `?q=${q}`
+        : "";
+    let batchParam = q || endDate || startDate ? `&batchUuid=${batchUuid}` :  `?batchUuid=${batchUuid}`;
+    const queryParams = startDateParam + endDateParam + qParam + batchParam;
+    return this.httpClient.get(BASE_URL + "lab/batchsamples" + queryParams).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((err) => {
+        return err;
+      })
+    );
+  }
 
   createBatchSample(batchSampleObject): Observable<any> {
     return this.httpClient
