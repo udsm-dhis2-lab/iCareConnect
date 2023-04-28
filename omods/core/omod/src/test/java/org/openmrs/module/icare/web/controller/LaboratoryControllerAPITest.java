@@ -743,7 +743,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		List<Map<String, Object>> batchsamples = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
-		System.out.println(batchsamples);
+		System.out.println("aa "+handle2.getContentAsString());
 		assertThat("Has 1 batch sample", batchsamples.size(), is(1));
 		
 		//3. Getting a single batchSample

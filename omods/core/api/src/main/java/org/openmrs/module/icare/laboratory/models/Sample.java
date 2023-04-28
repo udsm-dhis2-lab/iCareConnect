@@ -49,6 +49,7 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	@JsonSerialize(using = ChildIdOnlySerializer.class)
 	@JsonDeserialize(using = ChildIdOnlyDeserializer.class)
 	private Concept concept;
+
 	
 	@ManyToOne
 	@JoinColumn(name = "specimen_source_id")
@@ -75,6 +76,8 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	@ManyToOne
 	@JoinColumn(name = "batch_sample_id")
 	private BatchSample batchSample;
+
+	private WorksheetSample worksheetSample;
 	
 	public Sample() {
 	}
@@ -243,6 +246,17 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 			batchObject.put("display",this.getBatchSample().getCode());
 			sampleObject.put("batchSample",batchObject);
 		}
+
+		if(this.worksheetSample != null){
+			Map<String,Object> worksheetSampleObject = new HashMap<>();
+			worksheetSampleObject.put("uuid", this.getWorksheetSample().getUuid());
+			worksheetSampleObject.put("display", this.getWorksheetSample().getCode());
+			Map<String,Object> worksheetDefinitionObject = new HashMap<>();
+			worksheetDefinitionObject.put("uuid", this.getWorksheetSample().getWorksheetDefinition().getUuid());
+			worksheetDefinitionObject.put("code",this.getWorksheetSample().getWorksheetDefinition().getCode());
+			worksheetSampleObject.put("worksheetDefinition", worksheetDefinitionObject);
+			sampleObject.put("worksheetSample",worksheetSampleObject);
+		}
 		
 		return sampleObject;
 	}
@@ -325,5 +339,13 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	
 	public BatchSample getBatchSample() {
 		return batchSample;
+	}
+
+	public WorksheetSample getWorksheetSample() {
+		return worksheetSample;
+	}
+
+	public void setWorksheetSample(WorksheetSample worksheetSample) {
+		this.worksheetSample = worksheetSample;
 	}
 }
