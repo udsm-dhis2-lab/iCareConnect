@@ -1016,6 +1016,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		return batchSampleDAO.save(batchSample);
 	}
 
+
 	@Override
 	public BatchSample getBatchSampleByUuid(String batchSampleUuid) {
 		return batchSampleDAO.findByUuid(batchSampleUuid);
@@ -1023,7 +1024,18 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 
 	@Override
 	public List<BatchSample> getBatchSamples(Date startDate, Date endDate, String q, Integer startIndex, Integer limit, String batchUuid) {
-		return batchSampleDAO.getBatchSamples(startDate, endDate, q, startIndex, limit, batchUuid);
+
+		List<BatchSample> batchSamples = batchSampleDAO.getBatchSamples(startDate, endDate, q, startIndex, limit, batchUuid);
+
+		for(BatchSample batchSample : batchSamples){
+			for(Sample sample : batchSample.getSamples()){
+				List<WorksheetSample> worksheetSamples = this.worksheetSampleDAO.getWorksheetSampleBySample(sample.getUuid());
+				if(worksheetSamples.get(0) != null) {
+					sample.setWorksheetSample(worksheetSamples.get(0));
+				}
+			}
+		}
+		return batchSamples;
 	}
 
 	@Override
