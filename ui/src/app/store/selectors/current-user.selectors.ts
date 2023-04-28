@@ -39,7 +39,10 @@ export const getAuthenticationState = createSelector(
 export const getCurrentUserDetails = createSelector(
   getCurrentUserState,
   (state: CurrentUserState) => {
-    return state.currentUser;
+    return {
+      ...state.currentUser,
+      userPrivileges: keyBy(state.currentUser?.privileges, "name"),
+    };
   }
 );
 

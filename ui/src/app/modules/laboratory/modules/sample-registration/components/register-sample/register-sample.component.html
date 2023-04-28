@@ -8,7 +8,6 @@
     referringDoctorAttributes: referringDoctorAttributes$ | async,
     labNumberCharactersCount: labNumberCharactersCount$ | async,
     testsFromExternalSystemsConfigs: testsFromExternalSystemsConfigs$ | async,
-    currentUser: currentUser$ | async,
     identifierTypes: identifierTypes$ | async,
     batchsets: batchsets$ | async,
     batches: batches$ | async,
@@ -37,6 +36,11 @@
           </mat-button-toggle>
 
           <mat-button-toggle
+            *ngIf="
+              currentUser?.userPrivileges[
+                'SAMPLE RECEPTION AND REGISTRATION_SAMPLE_IMPORT_EXPORT'
+              ]
+            "
             (click)="setTabGroup($event, 'IMPORT-EXPORT')"
             [value]="'IMPORT-EXPORT'"
             [ngClass]="{
@@ -86,7 +90,7 @@
               [referFromFacilityVisitAttribute]="
                 params?.referFromFacilityVisitAttribute
               "
-              [currentUser]="params?.currentUser"
+              [currentUser]="currentUser"
               [labNumberCharactersCount]="params?.labNumberCharactersCount"
               [referringDoctorAttributes]="params?.referringDoctorAttributes"
               [labSections]="labSections"
@@ -137,7 +141,7 @@
             [referFromFacilityVisitAttribute]="
               params?.referFromFacilityVisitAttribute
             "
-            [currentUser]="params?.currentUser"
+            [currentUser]="currentUser"
             [labNumberCharactersCount]="params?.labNumberCharactersCount"
             [referringDoctorAttributes]="params?.referringDoctorAttributes"
             [labSections]="labSections"
@@ -177,7 +181,7 @@
           </mat-radio-button>
           <mat-radio-button
             (change)="getSelectionCategory($event)"
-            class="registration-category-btn"
+            class="registration-category-btn ml-2"
             [value]="'CLINICAL'"
             [checked]="importExportCategory === 'CLINICAL'"
             color="primary"

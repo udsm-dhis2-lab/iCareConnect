@@ -1,6 +1,7 @@
 <div
   class="sample-registration-page"
   *ngIf="{
+    currentUser: currentUser$ | async,
     provider: provider$ | async,
     LISConfigurations: LISConfigurations$ | async,
     labSections: labSections$ | async,
@@ -16,7 +17,8 @@
       params?.labSections &&
       params?.specimenSources &&
       params?.personEmailAttributeTypeUuid &&
-      params?.personPhoneAttributeTypeUuid
+      params?.personPhoneAttributeTypeUuid &&
+      params?.currentUser
     "
   >
     <app-register-sample
@@ -24,6 +26,7 @@
       [labSections]="params?.labSections"
       [LISConfigurations]="params?.LISConfigurations"
       [specimenSources]="params?.specimenSources"
+      [currentUser]="params?.currentUser"
       [personPhoneAttributeTypeUuid]="params?.personPhoneAttributeTypeUuid"
       [personEmailAttributeTypeUuid]="params?.personEmailAttributeTypeUuid"
     ></app-register-sample>
@@ -36,7 +39,8 @@
       !params?.labSections ||
       !params?.specimenSources ||
       !params?.personEmailAttributeTypeUuid ||
-      !params?.personPhoneAttributeTypeUuid
+      !params?.personPhoneAttributeTypeUuid ||
+      !params?.currentUser
     "
     mode="indeterminate"
   ></mat-progress-bar>
