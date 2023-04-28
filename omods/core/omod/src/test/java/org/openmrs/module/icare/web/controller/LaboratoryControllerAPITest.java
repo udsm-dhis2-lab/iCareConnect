@@ -422,9 +422,11 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		adminService.setGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION, "2");
-		String bodyHeaderHtml = this.readFile("dto/laboratory/body-header.html");
-		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_BODY_HEADER_CONFIGURATION_HTML, bodyHeaderHtml);
-		
+		String bodyAttachmentHtml = this.readFile("dto/laboratory/body-attachment.html");
+		String bodySummaryHtml = this.readFile("dto/laboratory/body-summary.html");
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_BODY_ATTACHMENT_CONFIGURATION_HTML, bodyAttachmentHtml);
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_BODY_SUMMARY_CONFIGURATION_HTML, bodySummaryHtml);
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS, "true");
 		// creating sample status
 		String dto = this.readFile("dto/sample-status-create-dto.json");
 		Map<String, Object> sampleStatus = (new ObjectMapper()).readValue(dto, Map.class);
