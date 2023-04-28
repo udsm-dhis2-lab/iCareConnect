@@ -10,8 +10,9 @@ import java.util.List;
 
 public class BatchSampleDAO extends BaseDAO<BatchSample> {
 	
-	public List<BatchSample> getBatchSamples(Date startDate, Date endDate, String q, Integer startIndex, Integer limit, String batchUuid) {
-
+	public List<BatchSample> getBatchSamples(Date startDate, Date endDate, String q, Integer startIndex, Integer limit,
+	        String batchUuid) {
+		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT bs FROM BatchSample bs INNER JOIN bs.batch bt";
 		
@@ -21,14 +22,14 @@ public class BatchSampleDAO extends BaseDAO<BatchSample> {
 			}
 			queryStr += " (cast(bs.dateCreated as date) BETWEEN :startDate AND :endDate)";
 		}
-
-		if(batchUuid != null){
+		
+		if (batchUuid != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
-			queryStr +=" bt.uuid = :batchUuid";
+			queryStr += " bt.uuid = :batchUuid";
 		}
 		
 		if (q != null) {
@@ -55,12 +56,12 @@ public class BatchSampleDAO extends BaseDAO<BatchSample> {
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
 		}
-		if(batchUuid != null){
-			query.setParameter("batchUuid",batchUuid);
+		if (batchUuid != null) {
+			query.setParameter("batchUuid", batchUuid);
 		}
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
-
+		
 		return query.list();
 	}
 }

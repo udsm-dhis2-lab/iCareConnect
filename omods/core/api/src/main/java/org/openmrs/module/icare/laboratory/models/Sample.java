@@ -49,7 +49,6 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	@JsonSerialize(using = ChildIdOnlySerializer.class)
 	@JsonDeserialize(using = ChildIdOnlyDeserializer.class)
 	private Concept concept;
-
 	
 	@ManyToOne
 	@JoinColumn(name = "specimen_source_id")
@@ -76,7 +75,8 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	@ManyToOne
 	@JoinColumn(name = "batch_sample_id")
 	private BatchSample batchSample;
-
+	
+	@Transient
 	private WorksheetSample worksheetSample;
 	
 	public Sample() {
@@ -340,11 +340,11 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	public BatchSample getBatchSample() {
 		return batchSample;
 	}
-
+	
 	public WorksheetSample getWorksheetSample() {
 		return worksheetSample;
 	}
-
+	
 	public void setWorksheetSample(WorksheetSample worksheetSample) {
 		this.worksheetSample = worksheetSample;
 	}

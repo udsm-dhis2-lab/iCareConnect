@@ -227,7 +227,7 @@ public class LaboratoryController {
 	        @RequestParam(value = "test", required = false) String testConceptUuid,
 	        @RequestParam(value = "department", required = false) String departmentUuid,
 	        @RequestParam(value = "specimen", required = false) String specimenSourceUuid,
-			@RequestParam( value = "instrument", required = false) String instrumentUuid) throws ParseException {
+	        @RequestParam(value = "instrument", required = false) String instrumentUuid) throws ParseException {
 		
 		Date start = null;
 		Date end = null;
@@ -245,7 +245,8 @@ public class LaboratoryController {
 		pager.setPage(page);
 		if (!excludeAllocations) {
 			ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
-			    testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid, instrumentUuid);
+			    testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid,
+			    instrumentUuid);
 			return sampleResults.toMap();
 		}
 		if (excludeAllocations) {
@@ -858,8 +859,6 @@ public class LaboratoryController {
 		return  responseBatchSampleObject;
 
 	}
-
-
 	
 	@RequestMapping(value = "batchsets", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
