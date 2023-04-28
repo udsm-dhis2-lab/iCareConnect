@@ -24,13 +24,15 @@ export class SampleImportExportComponent implements OnInit {
     this.exportTemplateDataReferences$ = this.systemSettingsService
       .getSystemSettingsMatchingAKey(`lis.icare.importExport.template.`)
       .pipe(
-        map((response: any[]) => {
-          return response?.map((globalProperty: any) => {
-            return globalProperty?.value?.indexOf("{") > -1 ||
-              globalProperty?.value?.indexOf("[") > -1
-              ? JSON.parse(globalProperty?.value)
-              : globalProperty?.value;
-          });
+        map((response: any) => {
+          return response
+            ? response?.map((globalProperty: any) => {
+                return globalProperty?.value?.indexOf("{") > -1 ||
+                  globalProperty?.value?.indexOf("[") > -1
+                  ? JSON.parse(globalProperty?.value)
+                  : globalProperty?.value;
+              })
+            : [];
         })
       );
   }
