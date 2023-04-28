@@ -1,4 +1,9 @@
-<div class="w-100">
+<div
+  class="w-100"
+  *ngIf="{
+    exportTemplateDataReferences: exportTemplateDataReferences$ | async
+  } as params"
+>
   <mat-radio-group class="registration-category mb-2">
     <mat-radio-button
       (change)="getSelectionCategory($event)"
@@ -28,6 +33,12 @@
       Export template
     </mat-radio-button>
   </mat-radio-group>
+  <div class="w-100">
+    <mat-progress-bar
+      mode="indeterminate"
+      *ngIf="!params?.exportTemplateDataReferences"
+    ></mat-progress-bar>
+  </div>
   <div class="w-100 mt-2" *ngIf="actionCategory">
     <div class="row">
       <div class="col-12" *ngIf="actionCategory === 'IMPORT'">
@@ -65,7 +76,6 @@
           <button
             mat-flat-button
             color="primary"
-            [disabled]="!file"
             (click)="onExportDataToImportExportTemplate($event)"
           >
             Export
@@ -73,13 +83,23 @@
         </div>
       </div>
       <div class="col-12" *ngIf="actionCategory === 'TEMPLATE'">
-        <div class="w-100">Get sample template</div>
+        <div class="w-100">
+          <table id="table-template" class="table table-bordered">
+            <thead>
+              <tr>
+                <th *ngFor="let field of params?.exportTemplateDataReferences">
+                  {{ field?.exportKey }}
+                </th>
+              </tr>
+            </thead>
+          </table>
+        </div>
         <div class="w-100 mt-2 d-flex justify-content-left">
           <button
             mat-flat-button
+            [disabled]="!params?.exportTemplateDataReferences"
             color="primary"
-            [disabled]="!file"
-            (click)="onDownloadTemplate($event)"
+            (click)="onDownloadTemplate($event, 'table-template')"
           >
             Download template
           </button>
