@@ -58,6 +58,7 @@ export class SampleStorageDashboardComponent implements OnInit {
   message: any = {};
   testResultsMapping$: Observable<any>;
   externalSystemsReferenceConceptUuid$: Observable<string>;
+  shouldRerenderSamplesList: boolean = false;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -140,7 +141,7 @@ export class SampleStorageDashboardComponent implements OnInit {
   }
 
   onDispose(sample: any): void {
-    event.stopPropagation();
+    this.shouldRerenderSamplesList = true;
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
       width: "25%",
       data: {
@@ -166,6 +167,8 @@ export class SampleStorageDashboardComponent implements OnInit {
           category: "DISPOSED",
         };
 
+        this.shouldRerenderSamplesList = false;
+
         this.samplesService
           .setSampleStatus(sampleStatus)
           .subscribe((response) => {
@@ -177,7 +180,6 @@ export class SampleStorageDashboardComponent implements OnInit {
             }
           });
       }
-      this.getCompletedSamples();
     });
   }
 
@@ -202,6 +204,6 @@ export class SampleStorageDashboardComponent implements OnInit {
   }
 
   onGetSelectedSampleDetails(sample: any): void {
-    console.log(sample);
+    this.onDispose(sample);
   }
 }

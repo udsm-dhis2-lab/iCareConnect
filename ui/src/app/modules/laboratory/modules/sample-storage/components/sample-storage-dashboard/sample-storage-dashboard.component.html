@@ -30,6 +30,7 @@
         ></app-sample-disposal> -->
 
         <app-shared-samples-list
+          *ngIf="!shouldRerenderSamplesList"
           [tabType]="'sample-disposal'"
           [LISConfigurations]="LISConfigurations"
           [labSamplesDepartments]="labSamplesDepartments"
