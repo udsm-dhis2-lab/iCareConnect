@@ -739,7 +739,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		//2. Getting batchSamples
 		//when
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/batchsamples", new Parameter("startDate", "2022-12-10"),
-		    new Parameter("endDate", "2022-12-10"), new Parameter("q", "BS01"));
+		    new Parameter("endDate", "2022-12-10"), new Parameter("q", "BS01"), new Parameter("batchUuid","iCARE890-TEST-MOTR-9beb-d30dcfc0c635"));
 		
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		List<Map<String, Object>> batchsamples = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);

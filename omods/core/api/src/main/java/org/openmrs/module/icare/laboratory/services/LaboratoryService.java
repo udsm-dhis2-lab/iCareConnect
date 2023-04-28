@@ -161,7 +161,7 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	WorksheetSampleStatus addWorksheetSampleStatus(WorksheetSampleStatus worksheetSampleStatus) throws Exception;
 	
-	List<BatchSample> getBatchSamples(Date start, Date end, String q, Integer startIndex, Integer limit);
+	List<BatchSample> getBatchSamples(Date start, Date end, String q, Integer startIndex, Integer limit, String batchUuid);
 	
 	ListResult<SampleExt> getSamplesWithoutAllocations(Date start, Date end, Pager pager, String locationUuid,
 	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
