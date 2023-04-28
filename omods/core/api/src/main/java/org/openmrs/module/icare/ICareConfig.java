@@ -99,9 +99,11 @@ public class ICareConfig {
 	
 	public static final String LAB_RESULTS_SUBJECT_CONFIGURATION_HTML = "mail.icare.laboratory.results.subject.html";
 	
-	public static final String LAB_RESULTS_BODY_HEADER_CONFIGURATION_HTML = "mail.icare.laboratory.results.body.header.html";
+	public static final String LAB_RESULTS_BODY_ATTACHMENT_CONFIGURATION_HTML = "mail.icare.laboratory.results.body.attachment.html";
 	
-	public static final String LAB_RESULTS_BODY_CONFIGURATION_HTML = "mail.icare.laboratory.results.body.testorder.html";
+	public static final String LAB_RESULTS_BODY_SUMMARY_CONFIGURATION_HTML = "mail.icare.laboratory.results.body.summary.html";
+	public static final String LAB_RESULTS_BODY_FOOTER_CONFIGURATION_HTML = "mail.icare.laboratory.results.body.footer.html";
+	public static final String LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS = "mail.icare.laboratory.results.authorized.autorelease";
 	
 	public static final String ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE = "icare.person.attribute.email";
 }
