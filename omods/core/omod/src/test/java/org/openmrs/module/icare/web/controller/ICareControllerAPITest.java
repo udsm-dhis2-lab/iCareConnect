@@ -748,16 +748,16 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse returnResponse = handle(emailSessionRequest);
 		System.out.println(returnResponse);
 	}
-
+	
 	@Test
 	public void testProcessEmail() throws Exception {
 		Properties emailProperties = new Properties();
 		AdministrationService administrationService = Context.getAdministrationService();
-
+		
 		//		File attachmentFile = new File("/home/kiba/Downloads/Docker+Slides.pdf");
 		//		byte[] attachmentBytes = Files.readAllBytes(attachmentFile.toPath());
 		//		String attachmentBase64 = DatatypeConverter.printBase64Binary(bytes);
-
+		
 		String fromMail = administrationService.getGlobalProperty("mail.from");
 		emailProperties.setProperty("to", "kibahiladennis@gmail.com");
 		emailProperties.setProperty("cc", "josephatjulius24@gmail.com");
@@ -766,7 +766,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		emailProperties.setProperty("subject", "TESTING");
 		emailProperties.setProperty("attachmentFile", "<b>HELLO</b>");
 		emailProperties.setProperty("attachmentFileName", "AttachmentFile");
-
+		
 		//put your local file path for testing
 		//emailProperties.setProperty("attachment","/home/kiba/Downloads/Docker+Slides.pdf");
 		MockHttpServletRequest emailRequest = newPostRequest("icare/processemail", emailProperties);
