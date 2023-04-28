@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { keyBy } from "lodash";
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { WorkSheetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
@@ -25,10 +26,14 @@ export class ResultEntryByBatchHomeComponent implements OnInit {
   batches$: Observable<any>;
   batchsetsField: any;
   batchesField: any;
-  formData: any;
+  formValues: any;
   batches: any;
   batchsets: any;
   filteringBatches: boolean = false;
+  loadingBatchSamples: boolean = false;
+  batchSamples: any;
+  batchSampleseField: Dropdown;
+  samples: any;
   constructor(
     private worksheetsService: WorkSheetsService,
     private systemSettingsService: SystemSettingsService,
@@ -46,10 +51,18 @@ export class ResultEntryByBatchHomeComponent implements OnInit {
       label: "Select batch",
       shouldHaveLiveSearchForDropDownFields: false,
     })
+    
     this.batchsetsField = new Dropdown({
       id: "batchset",
       key: "batchset",
       label: "Select batch set",
+      shouldHaveLiveSearchForDropDownFields: false,
+    })
+    
+    this.batchSampleseField = new Dropdown({
+      id: "batchsample",
+      key: "batchsample",
+      label: "Select batch sample",
       shouldHaveLiveSearchForDropDownFields: false,
     })
 
@@ -111,11 +124,14 @@ export class ResultEntryByBatchHomeComponent implements OnInit {
   }
 
   onFormUpdate(formValues: FormValue, key?: string){
-    this.formData = formValues.getValues();
+    this.formValues = {
+      ...this.formValues,
+      ...formValues.getValues()
+    }
     if(key === 'batchset'){
       this.filteringBatches = true
       setTimeout(() => {
-        this.batchesField.options = this.batchsets?.filter((batchset) => batchset?.uuid === this.formData['batchset']?.value)[0]?.batches?.map((batch) => {
+        this.batchesField.options = this.batchsets?.filter((batchset) => batchset?.uuid === this.formValues['batchset']?.value)[0]?.batches?.map((batch) => {
           return {
             key: batch?.uuid,
             label: batch?.name,
@@ -126,5 +142,37 @@ export class ResultEntryByBatchHomeComponent implements OnInit {
         this.filteringBatches = false
       }, 100)
     }
+
+    if(key === 'batch'){
+      var batch = this.formValues['batch']?.value?.length ? this.formValues['batch']?.value : undefined
+      if(batch){
+        this.getBatchSamples(batch)
+      }
+    }
+
+    if (key === 'batchsample'){
+      var batchsample = this.formValues['batchsample']?.value?.length ? this.formValues['batchsample']?.value : undefined;
+      if(batchsample){
+        this.samples = this.batchSamples[batchsample]?.samples;
+      }
+    }
+  }
+
+  getBatchSamples(batchUuid: any){
+    this.loadingBatchSamples = true;
+    this.samplesService.getBatchSamples(batchUuid).pipe(tap((response) => {
+      if(!response.error){
+        this.batchSamples = keyBy(response, "uuid");
+        this.batchSampleseField.options = response?.map((batchSample) => {
+          return {
+            key: batchSample?.uuid,
+            value: batchSample?.uuid,
+            name: batchSample?.code,
+            label: batchSample?.code
+          }
+        })
+      }
+      this.loadingBatchSamples = false;
+    })).subscribe()
   }
 }
