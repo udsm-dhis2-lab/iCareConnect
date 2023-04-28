@@ -18,6 +18,8 @@ import { AdditionalFieldsModalComponent } from "src/app/modules/laboratory/modal
 })
 export class ResultEntryByWorksheetComponent implements OnInit {
   @Input() worksheetDefinitions: any[];
+  @Input() samples: any[];
+  @Input() forSamples: boolean;
   @Input() isLIS: boolean;
   @Input() conceptNameType: string;
   @Input() multipleResultsAttributeType: string;

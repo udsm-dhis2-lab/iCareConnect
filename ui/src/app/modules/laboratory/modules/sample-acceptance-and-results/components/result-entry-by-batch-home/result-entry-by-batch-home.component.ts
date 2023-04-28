@@ -1,11 +1,13 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { keyBy } from "lodash";
+import { MatRadioChange } from "@angular/material/radio";
+import { keyBy, groupBy, flatten } from "lodash";
 import { Observable } from "rxjs";
 import { map, tap } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { WorkSheetsService } from "src/app/modules/laboratory/resources/services/worksheets.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { SampleAllocation } from "src/app/shared/resources/sample-allocations/models/allocation.model";
 import { SamplesService } from "src/app/shared/services/samples.service";
 
 @Component({
@@ -34,6 +36,8 @@ export class ResultEntryByBatchHomeComponent implements OnInit {
   batchSamples: any;
   batchSampleseField: Dropdown;
   samples: any;
+  worksheetDefinitions: any;
+  sampleDisplay: string = 'Normal';
   constructor(
     private worksheetsService: WorkSheetsService,
     private systemSettingsService: SystemSettingsService,
@@ -51,7 +55,6 @@ export class ResultEntryByBatchHomeComponent implements OnInit {
       label: "Select batch",
       shouldHaveLiveSearchForDropDownFields: false,
     })
-    
     this.batchsetsField = new Dropdown({
       id: "batchset",
       key: "batchset",
@@ -153,9 +156,41 @@ export class ResultEntryByBatchHomeComponent implements OnInit {
     if (key === 'batchsample'){
       var batchsample = this.formValues['batchsample']?.value?.length ? this.formValues['batchsample']?.value : undefined;
       if(batchsample){
-        this.samples = this.batchSamples[batchsample]?.samples;
+        this.samples = this.batchSamples[batchsample]?.samples?.map((sample) => {
+          return {
+            ...sample,
+            display: sample?.label,
+            searchText:sample?.label,
+            hasResults:
+              (
+                sample?.statuses?.filter(
+                  (status) => status?.category === "HAS_RESULTS"
+                ) || []
+              )?.length > 0,
+            authorizationStatuses:
+              sample?.statuses?.filter(
+                (status) => status?.category === "RESULT_AUTHORIZATION"
+              ) || [],
+            allocationsCount: flatten(sample?.orders?.map((order) => {
+              return order?.testAllocations
+            })).length,
+            allocations: flatten(sample?.orders?.map((order) =>{
+              return order?.testAllocations
+            }))?.map((allocation) => new SampleAllocation(allocation).toJson())
+          }
+        });
+        
+        const availableWorksheets = keyBy(
+          this.batchSamples[batchsample]?.samples?.map((sample) => sample?.worksheetSample?.worksheetDefinition), "uuid")
+        this.worksheetDefinitions = Object.keys(availableWorksheets)?.map((worksheetDefinition) => {
+          return availableWorksheets[worksheetDefinition]
+        });
       }
     }
+  }
+
+  byWorksheetChoice(e: MatRadioChange){
+    this.sampleDisplay = e?.value; 
   }
 
   getBatchSamples(batchUuid: any){
