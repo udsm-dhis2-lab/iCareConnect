@@ -328,7 +328,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		Map<String, Object> sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
-//		System.out.println(((List) sampleResults.get("results")));
+		//		System.out.println(((List) sampleResults.get("results")));
 		Map<String, Object> pagerObject = (Map<String, Object>) sampleResults.get("pager");
 		assertThat("Page Count is 2", (Integer) pagerObject.get("pageCount") == 2, is(true));
 		assertThat("Total is 3", (Integer) pagerObject.get("total") == 3, is(true));
@@ -354,7 +354,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Page Size is 2", (Integer) pagerObject.get("pageSize") == 50, is(true));
 		assertThat("Page is 2", (Integer) pagerObject.get("page") == 1, is(true));
 		assertThat("List by location count is 1", ((List) sampleResults.get("results")).size() == 0, is(true));
-
+		
 		//	Search test section
 		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
 		    new Parameter("q", "x"));
@@ -368,13 +368,12 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle2 = handle(newGetRequest2);
 		Map<String, Object> samples = (new ObjectMapper()).readValue(handle2.getContentAsString(), Map.class);
 		assertThat("There is 2 sample", ((List<Map>) samples.get("results")).size(), is(2));
-
-
+		
 		MockHttpServletRequest instrumentRequest = newGetRequest("lab/samples", new Parameter("instrument",
-				"123111zz-0011-477v-8y8y-acc38ebc6252"), new Parameter(
-				"excludeAllocations", "TRUE"));
+		        "123111zz-0011-477v-8y8y-acc38ebc6252"), new Parameter("excludeAllocations", "TRUE"));
 		MockHttpServletResponse instrumentResponse = handle(instrumentRequest);
-		Map<String, Object> samplesByInstrument = (new ObjectMapper()).readValue(instrumentResponse.getContentAsString(), Map.class);
+		Map<String, Object> samplesByInstrument = (new ObjectMapper()).readValue(instrumentResponse.getContentAsString(),
+		    Map.class);
 		assertThat("There is 1 sample with instrument used", ((List<Map>) samplesByInstrument.get("results")).size(), is(1));
 		
 		MockHttpServletRequest newGetRequest3 = newGetRequest("lab/samples", new Parameter("excludeAllocations", "true"),
@@ -410,10 +409,10 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		handleGet = handle(newGetRequest);
 		Map<String, Object> sampleResultsFilteredBySpecimen = (new ObjectMapper()).readValue(handleGet.getContentAsString(),
 		    Map.class);
-//		System.out.println(((List<Map>) samples.get("results")).size());
-//		for(Map<String, Object> sample: ((List<Map>) samples.get("results"))) {
-//			System.out.println(sample.get("label"));
-//		}
+		//		System.out.println(((List<Map>) samples.get("results")).size());
+		//		for(Map<String, Object> sample: ((List<Map>) samples.get("results"))) {
+		//			System.out.println(sample.get("label"));
+		//		}
 		assertThat("There is 2 sample", ((List<Map>) samples.get("results")).size(), is(2));
 	}
 	
@@ -739,11 +738,12 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		//2. Getting batchSamples
 		//when
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/batchsamples", new Parameter("startDate", "2022-12-10"),
-		    new Parameter("endDate", "2022-12-10"), new Parameter("q", "BS01"), new Parameter("batchUuid","iCARE890-TEST-MOTR-9beb-d30dcfc0c635"));
+		    new Parameter("endDate", "2022-12-10"), new Parameter("q", "BS01"), new Parameter("batchUuid",
+		            "iCARE890-TEST-MOTR-9beb-d30dcfc0c635"));
 		
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		List<Map<String, Object>> batchsamples = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
-		System.out.println(batchsamples);
+		System.out.println("aa " + handle2.getContentAsString());
 		assertThat("Has 1 batch sample", batchsamples.size(), is(1));
 		
 		//3. Getting a single batchSample
