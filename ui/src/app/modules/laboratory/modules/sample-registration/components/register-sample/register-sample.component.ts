@@ -80,6 +80,8 @@ export class RegisterSampleComponent implements OnInit {
   barcodeSettings$: Observable<any>;
   errors: any[] = [];
 
+  importExportCategory: string = "CLINICAL";
+
   get maximumDate() {
     let maxDate = new Date();
     let maxMonth =
@@ -483,5 +485,12 @@ export class RegisterSampleComponent implements OnInit {
       clinicalFormFields: this.clinicalFormFields,
       testFields: this.testFields,
     };
+  }
+
+  getSelectionCategory(event: MatRadioChange): void {
+    this.importExportCategory = null;
+    setTimeout(() => {
+      this.importExportCategory = event.value;
+    }, 10);
   }
 }
