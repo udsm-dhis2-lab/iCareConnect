@@ -63,7 +63,7 @@ export class SharedSampleDetailsComponent implements OnInit {
       .getVisitDiagnosesByVisitUuid({
         uuid: this.sample?.visit?.uuid,
         query: {
-          v: "custom:(uuid,startDatetime,encounters:(uuid,encounterDatetime,encounterType,location,obs,orders,diagnoses,encounterProviders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
+          v: "custom:(uuid,startDatetime,encounters:(uuid,encounterDatetime,encounterType,location,diagnoses,encounterProviders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
         },
       })
       .pipe(
