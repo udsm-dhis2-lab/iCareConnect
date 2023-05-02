@@ -760,7 +760,6 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		//post stock invoices status
 		MockHttpServletRequest newPostRequest = newPostRequest("store/stockinvoicesstatus", stockInvoiceStatusMapList);
 		MockHttpServletResponse handle = handle(newPostRequest);
-		
 		List<Map<String, Object>> createdStockInvoicesStatus = (new ObjectMapper()).readValue(handle.getContentAsString(),
 		    List.class);
 		assertThat("Created 1 stock invoice status", createdStockInvoicesStatus.size() == 1);

@@ -272,13 +272,14 @@ public class ICareDao extends BaseDAO<Item> {
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
 	        String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
 	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus) {
+	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid) {
 		//PatientIdentifier
 		Query query = null;
 		DbSession session = this.getSession();
 		new Patient();
+
 		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p" + " LEFT JOIN p.names pname "
-		        + "LEFT JOIN p.identifiers pi ";
+		        + "LEFT JOIN p.identifiers pi INNER JOIN v.attributes va LEFT JOIN va.attributeType vat ";
 		//				+ " INNER JOIN p.attributes pattr";
 		
 		if (orderTypeUuid != null && encounterTypeUuid == null) {
@@ -338,6 +339,18 @@ public class ICareDao extends BaseDAO<Item> {
 				
 			}
 		}
+
+		if(visitAttributeTypeUuid != null){
+
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+
+			queryStr += " vat.uuid = :visitAttributeTypeUuid";
+
+		}
 		
 		if (orderBy == VisitWrapper.OrderBy.VISIT) {
 			queryStr += " ORDER BY v.startDatetime ";
@@ -384,6 +397,9 @@ public class ICareDao extends BaseDAO<Item> {
 		}
 		if (attributeValueReference != null) {
 			query.setParameter("attributeValueReference", attributeValueReference);
+		}
+		if(visitAttributeTypeUuid != null){
+			query.setParameter("visitAttributeTypeUuid",visitAttributeTypeUuid);
 		}
 		
 		query.setFirstResult(startIndex);
