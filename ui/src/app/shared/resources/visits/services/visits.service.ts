@@ -92,6 +92,41 @@ export class VisitsService {
     );
   }
 
+  getVisitDiagnosesByVisitUuid(parameters: any): Observable<any> {
+    console.log(parameters);
+    return from(
+      this.api.visit.getVisit(parameters?.uuid, parameters?.query)
+    ).pipe(
+      map((response) => {
+        let formattedDiagnoses = [];
+        response.encounters.map((encounter: any) => {
+          const encounterProvider = encounter?.encounterProviders[0];
+          formattedDiagnoses = [
+            ...formattedDiagnoses,
+            ...encounter?.diagnoses.map((diagnosis) => {
+              return {
+                ...diagnosis,
+                encounterProvider: {
+                  ...encounterProvider?.provider,
+                  name:
+                    encounterProvider?.provider &&
+                    encounterProvider?.provider?.display?.indexOf(":") > -1
+                      ? encounterProvider?.provider?.display?.split(":")[0]
+                      : encounterProvider?.provider?.display?.split("- ")[1],
+                },
+                encounterType: encounter.encounterType,
+              };
+            }),
+          ];
+        });
+        return formattedDiagnoses;
+      }),
+      catchError((error) => {
+        return of(error);
+      })
+    );
+  }
+
   updateVisitExisting(visitPayload): Observable<any> {
     let url = `visit/${visitPayload?.uuid}`;
 
@@ -516,9 +551,9 @@ export class VisitsService {
       })
     );
   }
-  
-  deleteVisit(uuid, purge: boolean  =  false): Observable<any> {
-    return from(this.api.visit.deleteVisit(uuid, { purge: purge})).pipe(
+
+  deleteVisit(uuid, purge: boolean = false): Observable<any> {
+    return from(this.api.visit.deleteVisit(uuid, { purge: purge })).pipe(
       map((response) => {
         return response;
       }),

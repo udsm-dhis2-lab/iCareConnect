@@ -26,6 +26,7 @@ export class SharedSampleDetailsComponent implements OnInit {
 
   sampleDetails$: Observable<any>;
   externalSystems$: Observable<any[]>;
+  diagnoses$: Observable<any>;
   constructor(
     private visitService: VisitsService,
     private conceptService: ConceptsService,
@@ -48,7 +49,7 @@ export class SharedSampleDetailsComponent implements OnInit {
       .getVisitObservationsByVisitUuid({
         uuid: this.sample?.visit?.uuid,
         query: {
-          v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,encounterDatetime,encounterType,location,obs,orders,encounterProviders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
+          v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,encounterDatetime,encounterType,location,obs,orders,diagnoses,encounterProviders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
         },
       })
       .pipe(
@@ -56,6 +57,18 @@ export class SharedSampleDetailsComponent implements OnInit {
           return !obs?.error && obs["3a010ff3-6361-4141-9f4e-dd863016db5a"]
             ? obs["3a010ff3-6361-4141-9f4e-dd863016db5a"]
             : "";
+        })
+      );
+    this.diagnoses$ = this.visitService
+      .getVisitDiagnosesByVisitUuid({
+        uuid: this.sample?.visit?.uuid,
+        query: {
+          v: "custom:(uuid,startDatetime,encounters:(uuid,encounterDatetime,encounterType,location,obs,orders,diagnoses,encounterProviders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
+        },
+      })
+      .pipe(
+        map((visitDetails) => {
+          return visitDetails;
         })
       );
     this.sampleConditions$ = zip(
