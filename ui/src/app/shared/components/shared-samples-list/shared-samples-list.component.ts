@@ -213,4 +213,9 @@ export class SharedSamplesListComponent implements OnInit {
       testUuid: this.testUuid,
     });
   }
+
+  onDispose(event: Event, sample: any): void {
+    event.stopPropagation();
+    this.selectedSampleDetails.emit(sample);
+  }
 }
