@@ -1,9 +1,8 @@
-import { Component, Inject, Input, OnInit } from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Component, Input, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 import * as _ from "lodash";
 import { Observable } from "rxjs";
-import { catchError, map, sample, tap } from "rxjs/operators";
+import { map, sample, tap } from "rxjs/operators";
 import { LocationService } from "src/app/core/services/location.service";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { SampleAllocation } from "src/app/shared/resources/sample-allocations/models/allocation.model";
@@ -39,6 +38,7 @@ export class PrintResultsModalComponent implements OnInit {
   phoneNumber$: Observable<any>;
   keyedRemarks: any;
   @Input() data: any;
+  diagnoses$: Observable<any>;
   constructor(
     private patientService: PatientService,
     private visitService: VisitsService,
@@ -206,6 +206,19 @@ export class PrintResultsModalComponent implements OnInit {
           return !obs?.error && obs["3a010ff3-6361-4141-9f4e-dd863016db5a"]
             ? obs["3a010ff3-6361-4141-9f4e-dd863016db5a"]
             : "";
+        })
+      );
+    this.diagnoses$ = this.visitService
+      .getVisitDiagnosesByVisitUuid({
+        uuid: this.patientDetailsAndSamples?.departments[0]?.samples[0]?.visit
+          ?.uuid,
+        query: {
+          v: "custom:(uuid,startDatetime,encounters:(uuid,encounterDatetime,encounterType,location,diagnoses,encounterProviders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
+        },
+      })
+      .pipe(
+        map((visitDetails) => {
+          return visitDetails;
         })
       );
 
