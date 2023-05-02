@@ -8,7 +8,6 @@
     referringDoctorAttributes: referringDoctorAttributes$ | async,
     labNumberCharactersCount: labNumberCharactersCount$ | async,
     testsFromExternalSystemsConfigs: testsFromExternalSystemsConfigs$ | async,
-    currentUser: currentUser$ | async,
     identifierTypes: identifierTypes$ | async,
     batchsets: batchsets$ | async,
     batches: batches$ | async,
@@ -34,6 +33,20 @@
             [value]="'BATCH'"
             [ngClass]="{ 'selected-tab-group': selectedTabGroup === 'BATCH' }"
             >Batch Registration
+          </mat-button-toggle>
+
+          <mat-button-toggle
+            *ngIf="
+              currentUser?.userPrivileges[
+                'SAMPLE RECEPTION AND REGISTRATION_SAMPLE_IMPORT_EXPORT'
+              ]
+            "
+            (click)="setTabGroup($event, 'IMPORT-EXPORT')"
+            [value]="'IMPORT-EXPORT'"
+            [ngClass]="{
+              'selected-tab-group': selectedTabGroup === 'IMPORT-EXPORT'
+            }"
+            >Import/Export
           </mat-button-toggle>
 
           <mat-button-toggle
@@ -77,7 +90,7 @@
               [referFromFacilityVisitAttribute]="
                 params?.referFromFacilityVisitAttribute
               "
-              [currentUser]="params?.currentUser"
+              [currentUser]="currentUser"
               [labNumberCharactersCount]="params?.labNumberCharactersCount"
               [referringDoctorAttributes]="params?.referringDoctorAttributes"
               [labSections]="labSections"
@@ -128,7 +141,7 @@
             [referFromFacilityVisitAttribute]="
               params?.referFromFacilityVisitAttribute
             "
-            [currentUser]="params?.currentUser"
+            [currentUser]="currentUser"
             [labNumberCharactersCount]="params?.labNumberCharactersCount"
             [referringDoctorAttributes]="params?.referringDoctorAttributes"
             [labSections]="labSections"
@@ -153,6 +166,53 @@
             [personEmailAttributeTypeUuid]="personEmailAttributeTypeUuid"
             (reloadRegisterSample)="onReloadRegisterSample($event)"
           ></app-batch-registration>
+        </div>
+      </div>
+      <div class="w-100" *ngIf="selectedTabGroup === 'IMPORT-EXPORT'">
+        <mat-radio-group class="registration-category">
+          <mat-radio-button
+            (change)="getSelectionCategory($event)"
+            class="registration-category-btn"
+            [value]="'ALL'"
+            [checked]="importExportCategory === 'ALL'"
+            color="primary"
+          >
+            All
+          </mat-radio-button>
+          <mat-radio-button
+            (change)="getSelectionCategory($event)"
+            class="registration-category-btn ml-2"
+            [value]="'CLINICAL'"
+            [checked]="importExportCategory === 'CLINICAL'"
+            color="primary"
+          >
+            Clinical
+          </mat-radio-button>
+          <mat-radio-button
+            (change)="getSelectionCategory($event)"
+            class="registration-category-btn ml-2"
+            [value]="'NON_CLINICAL'"
+            [checked]="importExportCategory === 'NON_CLINICAL'"
+            color="primary"
+          >
+            Non-Clinical
+          </mat-radio-button>
+          <mat-radio-button
+            (change)="getSelectionCategory($event)"
+            class="registration-category-btn ml-2"
+            [value]="'EQA'"
+            [checked]="importExportCategory === 'EQA'"
+            color="primary"
+          >
+            EQA
+          </mat-radio-button>
+        </mat-radio-group>
+        <div class="row">
+          <div class="col-12 mt-2" *ngIf="importExportCategory">
+            <app-sample-import-export
+              [category]="importExportCategory"
+            ></app-sample-import-export>
+          </div>
         </div>
       </div>
       <div

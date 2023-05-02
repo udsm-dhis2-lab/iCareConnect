@@ -1,0 +1,110 @@
+<div
+  class="w-100"
+  *ngIf="{
+    exportTemplateDataReferences: exportTemplateDataReferences$ | async
+  } as params"
+>
+  <mat-radio-group class="registration-category mb-2">
+    <mat-radio-button
+      (change)="getSelectionCategory($event)"
+      class="action-category-btn"
+      [value]="'IMPORT'"
+      [checked]="actionCategory === 'IMPORT'"
+      color="primary"
+    >
+      Import
+    </mat-radio-button>
+    <mat-radio-button
+      (change)="getSelectionCategory($event)"
+      class="action-category-btn ml-2"
+      [value]="'EXPORT'"
+      [checked]="actionCategory === 'EXPORT'"
+      color="primary"
+    >
+      Export exisiting samples
+    </mat-radio-button>
+    <mat-radio-button
+      (change)="getSelectionCategory($event)"
+      class="action-category-btn ml-2"
+      [value]="'TEMPLATE'"
+      [checked]="actionCategory === 'TEMPLATE'"
+      color="primary"
+    >
+      Export template
+    </mat-radio-button>
+  </mat-radio-group>
+  <div class="w-100">
+    <mat-progress-bar
+      mode="indeterminate"
+      *ngIf="!params?.exportTemplateDataReferences"
+    ></mat-progress-bar>
+  </div>
+  <div class="w-100 mt-2" *ngIf="actionCategory">
+    <div class="row">
+      <div class="col-12" *ngIf="actionCategory === 'IMPORT'">
+        <div class="w-100 file-selection">
+          <input
+            type="file"
+            style="
+              border: none;
+              background-color: transparent;
+              margin-left: -10px;
+            "
+            class="form-control"
+            name="file"
+            accept=".csv, .xls, .xlsx"
+            id="fileSelector"
+            (change)="fileSelection($event)"
+          />
+        </div>
+        <div class="w-100 mt-2 d-flex justify-content-left">
+          <button
+            mat-flat-button
+            color="primary"
+            [disabled]="!file"
+            (click)="onImport($event)"
+          >
+            Import
+          </button>
+        </div>
+      </div>
+      <div class="col-12" *ngIf="actionCategory === 'EXPORT'">
+        <div class="w-100">
+          Export samples by selecting selection parameters
+        </div>
+        <div class="w-100 mt-2 d-flex justify-content-left">
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="onExportDataToImportExportTemplate($event)"
+          >
+            Export
+          </button>
+        </div>
+      </div>
+      <div class="col-12" *ngIf="actionCategory === 'TEMPLATE'">
+        <div class="w-100">
+          <table id="table-template" class="table table-bordered">
+            <thead>
+              <tr>
+                <th *ngFor="let field of params?.exportTemplateDataReferences">
+                  {{ field?.exportKey }}
+                </th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+        <div class="w-100 mt-2 d-flex justify-content-left">
+          <button
+            mat-flat-button
+            [disabled]="!params?.exportTemplateDataReferences"
+            color="primary"
+            (click)="onDownloadTemplate($event, 'table-template')"
+          >
+            Download template
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

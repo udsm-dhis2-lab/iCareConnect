@@ -4,7 +4,8 @@
     obs: obs$ | async,
     sampleConditions: sampleConditions$ | async,
     sampleDetails: sampleDetails$ | async,
-    externalSystems: externalSystems$ | async
+    externalSystems: externalSystems$ | async,
+    diagnoses: diagnoses$ | async
   } as params"
 >
   <ng-container *ngIf="!params?.sampleDetails">
@@ -47,11 +48,20 @@
           </p>
         </div>
         <div class="w-50">
-          <p *ngIf="params.obs">
-            <span
-              >Clinical Information / History: <br />
-              {{ params.obs?.latest?.value }}</span
-            >
+          <div *ngIf="params?.diagnoses">
+            Diagnosis:
+            <p *ngFor="let diagnosis of params?.diagnoses">
+              <b> {{ diagnosis?.display }}</b>
+            </p>
+          </div>
+          Clinical Observation:
+          <p *ngIf="params.obs" class="mt-2">
+            <b>
+              <span
+                >Clinical Information / History: <br />
+                {{ params.obs?.latest?.value }}</span
+              >
+            </b>
           </p>
         </div>
       </div>

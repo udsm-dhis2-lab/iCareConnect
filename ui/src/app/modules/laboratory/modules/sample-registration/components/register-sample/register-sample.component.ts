@@ -30,6 +30,7 @@ import { getCurrentUserDetails } from "src/app/store/selectors/current-user.sele
   styleUrls: ["./register-sample.component.scss"],
 })
 export class RegisterSampleComponent implements OnInit {
+  @Input() currentUser: any;
   @Input() provider: any;
   @Input() LISConfigurations: LISConfigurationsModel;
   @Input() labSections: ConceptGetFull[];
@@ -80,6 +81,8 @@ export class RegisterSampleComponent implements OnInit {
   barcodeSettings$: Observable<any>;
   errors: any[] = [];
 
+  importExportCategory: string = "CLINICAL";
+
   get maximumDate() {
     let maxDate = new Date();
     let maxMonth =
@@ -101,8 +104,7 @@ export class RegisterSampleComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.currentUser$ = this.store.select(getCurrentUserDetails);
-
+    // console.log(this.currentUser);
     this.store.dispatch(
       loadLocationsByTagNames({ tagNames: ["Lab+Location"] })
     );
@@ -483,5 +485,12 @@ export class RegisterSampleComponent implements OnInit {
       clinicalFormFields: this.clinicalFormFields,
       testFields: this.testFields,
     };
+  }
+
+  getSelectionCategory(event: MatRadioChange): void {
+    this.importExportCategory = null;
+    setTimeout(() => {
+      this.importExportCategory = event.value;
+    }, 10);
   }
 }
