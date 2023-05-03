@@ -48,6 +48,10 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	public void setUp() throws SQLException {
 		initializeInMemoryDatabase();
 		executeDataSet("lab-data.xml");
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		adminService.setGlobalProperty(ICareConfig.LAB_TEST_ORDER_CONCEPT_ATTRIBUTE_TYPE, "8987bbb9-52b9-11zz-b60d-880027ae421d1");
+		adminService.setGlobalProperty(ICareConfig.LAB_TEST_METHOD_CONCEPT_SOURCE,"8987bbb9-52b9-11zz-b60d-880027ae421s");
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS,"false");
 	}
 	
 	@Test
@@ -158,9 +162,6 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testGetSampledOrders() throws Exception {
-		AdministrationService adminService = Context.getService(AdministrationService.class);
-		adminService.setGlobalProperty(ICareConfig.LAB_TEST_ORDER_CONCEPT_ATTRIBUTE_TYPE, "8987bbb9-52b9-11zz-b60d-880027ae421d1");
-		adminService.setGlobalProperty(ICareConfig.LAB_TEST_METHOD_CONCEPT_SOURCE,"8987bbb9-52b9-11zz-b60d-880027ae421s");
 		// Given visit uuid
 		//When
 		MockHttpServletRequest getRequest = newGetRequest("lab/sampledorders/d9c1d8ac-2b8e-427f-804d-b858c52e6f11");
