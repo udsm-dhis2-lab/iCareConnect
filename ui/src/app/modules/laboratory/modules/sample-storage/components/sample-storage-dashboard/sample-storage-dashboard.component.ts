@@ -141,7 +141,6 @@ export class SampleStorageDashboardComponent implements OnInit {
   }
 
   onDispose(sample: any): void {
-    this.shouldRerenderSamplesList = true;
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
       width: "25%",
       data: {
@@ -155,30 +154,33 @@ export class SampleStorageDashboardComponent implements OnInit {
 
     confirmDialog.afterClosed().subscribe((res) => {
       if (res.confirmed) {
-        const sampleStatus = {
-          sample: {
-            uuid: sample?.uuid,
-          },
-          user: {
-            uuid: this.userUuid,
-          },
-          remarks: res?.remarks,
-          status: "DISPOSED",
-          category: "DISPOSED",
-        };
+        this.shouldRerenderSamplesList = true;
+        setTimeout(() => {
+          const sampleStatus = {
+            sample: {
+              uuid: sample?.uuid,
+            },
+            user: {
+              uuid: this.userUuid,
+            },
+            remarks: res?.remarks,
+            status: "DISPOSED",
+            category: "DISPOSED",
+          };
 
-        this.shouldRerenderSamplesList = false;
+          this.shouldRerenderSamplesList = false;
 
-        this.samplesService
-          .setSampleStatus(sampleStatus)
-          .subscribe((response) => {
-            if (response.error) {
-              // console.log("Error: " + response.error);
-            }
-            if (!response.error) {
-              // console.log("Response: " + response);
-            }
-          });
+          this.samplesService
+            .setSampleStatus(sampleStatus)
+            .subscribe((response) => {
+              if (response.error) {
+                // console.log("Error: " + response.error);
+              }
+              if (!response.error) {
+                // console.log("Response: " + response);
+              }
+            });
+        }, 50);
       }
     });
   }
