@@ -457,7 +457,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		
 		MockHttpServletResponse handle = handle(newGetRequest);
 		Map<String, Object> patients = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-
+		
 		assertThat("Should return a patient visit ", ((List) patients.get("results")).size() > 0);
 		
 		newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid", "2msir5eb-5345-11e8-9922-40b034c3cfee")
@@ -497,12 +497,12 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		
 		orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("Should return a visit", ((List) orderResult.get("results")).size() > 0);
-
-
-		newGetRequest = newGetRequest("icare/visit",new Parameter("visitAttributeTypeUuid","298b75eb-er45-12e8-9c7c-42b0yt63cfee"));
+		
+		newGetRequest = newGetRequest("icare/visit", new Parameter("visitAttributeTypeUuid",
+		        "298b75eb-er45-12e8-9c7c-42b0yt63cfee"));
 		handle = handle(newGetRequest);
-		orderResult =  (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		assertThat("Should return a visit", ((List)orderResult.get("results")).size() == 1);
+		orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		assertThat("Should return a visit", ((List) orderResult.get("results")).size() == 1);
 		
 	}
 	

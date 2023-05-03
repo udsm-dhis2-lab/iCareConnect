@@ -120,6 +120,22 @@
                   date_created="2023-02-27 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="8987bbb9-52b9-11zz-b60d-880027ae421d" />
 
+    <!-- concept attribute type-->
+    <concept_attribute_type concept_attribute_type_id="1"  name="Related metadata type" datatype="org.openmrs.customdatatype.datatype.FreeTextDatatype" retired="false" creator="1" min_occurs="0" max_occurs="1" date_created="2023-02-27 00:00:00.0" uuid="8987bbb9-52b9-11zz-b60d-880027ae421d1" />
+
+    <!-- concept attribute -->
+    <concept_attribute concept_attribute_id="1" concept_id="500" attribute_type_id="1" value_reference="11102d6d-c528-477a-80bd-acc38ebc6252"  creator="1"  voided="false" date_created="2023-02-27 00:00:00.0" uuid="8987bbb9-52b9-11zz-b60d-880027ae421d" />
+
+    <concept_attribute concept_attribute_id="1" concept_id="500" attribute_type_id="1" value_reference="11102d6d-c528-477a-80bd-acc38ebc6252"  creator="1"  voided="false" date_created="2023-02-27 00:00:00.0" uuid="8987bbb9-52b9-11zz-b60d-880027ae421d" />
+
+    <concept_map_type concept_map_type_id="1" name="SAME-AS" creator="1" date_created="2023-02-27 00:00:00.0" retired="false" is_hidden="false" uuid="8987bbb9-52b9-11zz-b60d-880027ae4212" description="SAME AS DESCRIPTION" />
+
+    <concept_reference_source concept_source_id="1" name="SNOMED" description="THIS IS SNOMED" hl7_code="SCT" creator="1" date_created="2023-02-27 00:00:00.0" retired="false" uuid="8987bbb9-52b9-11zz-b60d-880027ae421s"/>
+
+    <concept_reference_term concept_reference_term_id="2"  concept_source_id="1" code="123" creator="1" date_created="2023-02-27 00:00:00.0"  retired="false"  uuid="8987bbb9-52b9-11zz-b60d-880027ae4211"/>
+
+    <concept_reference_map concept_map_id="1" concept_reference_term_id="2" concept_map_type_id="1" creator="1" date_created="2023-02-27 00:00:00.0" concept_id="501" uuid="8987bbb9-52b9-11zz-b60d-880027ae4211"/>
+
     <!--order -->
     <order_type order_type_id="211" name="Laboratory Order"  creator="400" java_class_name="org.openmrs.TestOrder"
                 retired="false" date_created="2018-12-27 00:00:00" uuid="2msisdeb-5345-11e8-9922-40b034c3cfee"/>

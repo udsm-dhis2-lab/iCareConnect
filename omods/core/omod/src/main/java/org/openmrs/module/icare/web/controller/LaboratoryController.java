@@ -166,7 +166,7 @@ public class LaboratoryController {
 	public List<Map<String, Object>> getSamplesByVisit(@RequestParam(value = "visit", required = false) String visitId,
 	        @RequestParam(value = "patient", required = false) String patient,
 	        @RequestParam(value = "startDate", required = false) String startDate,
-	        @RequestParam(value = "endDate", required = false) String endDate) {
+	        @RequestParam(value = "endDate", required = false) String endDate) throws Exception {
 		
 		Date sampleCreatedStartDate = null;
 		Date sampleCreatedEndDate = null;
@@ -204,7 +204,7 @@ public class LaboratoryController {
 	
 	@RequestMapping(value = "sample/{sampleUuid}", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getSamplesByUuid(@PathVariable String sampleUuid) {
+	public Map<String, Object> getSamplesByUuid(@PathVariable String sampleUuid) throws Exception {
 		Sample sample = laboratoryService.getSampleByUuid(sampleUuid);
 		
 		return sample.toMap();
@@ -227,7 +227,7 @@ public class LaboratoryController {
 	        @RequestParam(value = "test", required = false) String testConceptUuid,
 	        @RequestParam(value = "department", required = false) String departmentUuid,
 	        @RequestParam(value = "specimen", required = false) String specimenSourceUuid,
-	        @RequestParam(value = "instrument", required = false) String instrumentUuid) throws ParseException {
+	        @RequestParam(value = "instrument", required = false) String instrumentUuid) throws Exception {
 		
 		Date start = null;
 		Date end = null;
@@ -344,7 +344,7 @@ public class LaboratoryController {
 	
 	@RequestMapping(value = "sample/{sampleUuid}/orders", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getSampleOrdersBySampleUuid(@PathVariable String sampleUuid) {
+	public List<Map<String, Object>> getSampleOrdersBySampleUuid(@PathVariable String sampleUuid) throws Exception {
 		List<Map<String, Object>> orders = new ArrayList();
 		List<Sample> samples = laboratoryService.getSampleOrdersBySampleUuid(sampleUuid);
 		for (Sample sample : samples) {
@@ -357,7 +357,7 @@ public class LaboratoryController {
 	
 	@RequestMapping(value = "sampledorders/{visitUuid}", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getSampledOrdersByVisit(@PathVariable String visitUuid) {
+	public List<Map<String, Object>> getSampledOrdersByVisit(@PathVariable String visitUuid) throws Exception {
 		List<Map<String, Object>> orders = new ArrayList();
 		List<Sample> samples = laboratoryService.getSamplesByVisitOrPatientAndOrDates(visitUuid, null, null, null);
 		for (Sample sample : samples) {
@@ -812,7 +812,7 @@ public class LaboratoryController {
 	@RequestMapping(value = "batchSample", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getBatchSampleByUuid(@RequestParam(value = "uuid", required = true) String uuid)
-	        throws ParseException {
+			throws Exception {
 		
 		BatchSample batchSample = laboratoryService.getBatchSampleByUuid(uuid);
 		return batchSample.toMap();
@@ -837,7 +837,7 @@ public class LaboratoryController {
 	
 	@RequestMapping(value = "batchsamples",method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String,Object>> getBatchSamples(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit, @RequestParam(value = "batchUuid", required = false) String batchUuid) throws ParseException{
+	public List<Map<String,Object>> getBatchSamples(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit, @RequestParam(value = "batchUuid", required = false) String batchUuid) throws Exception {
 
 		Date start = null;
 		Date end = null;
