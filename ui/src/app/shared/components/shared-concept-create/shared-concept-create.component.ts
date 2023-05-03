@@ -79,7 +79,6 @@ export class SharedConceptCreateComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.conceptData);
     this.createBasicConceptFields(this.conceptData);
     this.createCodesMappingSourceField(this.conceptData);
     this.selectedSetMembers =

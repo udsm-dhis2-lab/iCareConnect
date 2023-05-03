@@ -6,12 +6,13 @@
   <div class="row" *ngIf="params?.conceptSources">
     <div class="col-md-8">
       <app-shared-concept-create
-        *ngIf="params?.conceptSources"
+        *ngIf="params?.conceptSources && conceptComponentReady"
         [conceptClass]="conceptClass"
         [standardSearchTerm]="standardSearchTerm"
         [dataType]="'N/A'"
         [setMembersHeaderName]="'Tests Performed'"
         [isSet]="false"
+        [conceptData]="conceptToEdit"
         [conceptSources]="params?.conceptSources"
         [saveOnTheComponent]="true"
         [multipleSelectionCompHeight]="'10vh'"
