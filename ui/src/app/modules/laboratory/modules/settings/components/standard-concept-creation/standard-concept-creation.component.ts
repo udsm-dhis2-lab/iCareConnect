@@ -48,7 +48,6 @@ export class StandardConceptCreationComponent implements OnInit {
   conceptUuid: string;
 
   selectedSetMembers: ConceptGetFull[] = [];
-
   testMethodField: any;
   testMethodSelected: boolean = false;
   selectedTestMethodDetails$: Observable<ConceptGetFull[]>;
@@ -63,6 +62,7 @@ export class StandardConceptCreationComponent implements OnInit {
 
   testMethodUuid: string;
   conceptBeingEdited: ConceptGetFull;
+  setMembersReadySet: boolean = true;
   constructor(
     private conceptService: ConceptsService,
     private billableItemService: BillableItemsService,
@@ -222,6 +222,7 @@ export class StandardConceptCreationComponent implements OnInit {
       )
       .subscribe((response) => {
         if (response) {
+          this.setMembersReadySet = false;
           this.createBasicConceptFields(response);
           this.editingSet = true;
           this.readyToCollectCodes = false;
@@ -236,6 +237,7 @@ export class StandardConceptCreationComponent implements OnInit {
           this.mappings = response?.mappings;
           setTimeout(() => {
             this.editingSet = false;
+            this.setMembersReadySet = true;
             this.readyToCollectCodes = true;
             this.selectedSetMembers = response?.setMembers;
           }, 200);
