@@ -42,7 +42,6 @@ export class CodedAnswersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.createCodedAnswersFields();
     this.codedAnswers$ = this.conceptService.searchConcept({
       q: "LIS_CODED_ANSWERS",
       limit: this.pageSize,
@@ -62,35 +61,6 @@ export class CodedAnswersComponent implements OnInit {
       startIndex: (this.page - 1) * this.pageSize,
       searchTerm: "LIS_CODED_ANSWERS",
     });
-  }
-
-  createCodedAnswersFields(data?: any): void {
-    const shortName =
-      data && data?.names
-        ? (data?.names.filter((name) => name?.conceptNameType === "SHORT") ||
-            [])[0]?.name
-        : null;
-    this.codedAnswersFields = [
-      new Textbox({
-        id: "name",
-        key: "name",
-        label: "Name",
-        value: data && data?.display ? data?.display : null,
-        required: true,
-      }),
-      new Textbox({
-        id: "shortName",
-        key: "shortName",
-        label: "Short name",
-        value: shortName,
-        required: true,
-      }),
-      new Textbox({
-        id: "description",
-        key: "description",
-        label: "Description",
-      }),
-    ];
   }
 
   onFormUpdate(formValue: FormValue): void {
@@ -204,7 +174,6 @@ export class CodedAnswersComponent implements OnInit {
         if (response) {
           this.conceptBeingEdited = response;
           this.category = "New";
-          this.createCodedAnswersFields(response);
         }
       });
   }
