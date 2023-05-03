@@ -247,7 +247,7 @@ public class StoreController {
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
 	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
 	        @RequestParam(value = "status", required = false) RequisitionStatus.RequisitionStatusCode status,
-	        @RequestParam(value = "orderByDirection", required = false) Requisition.OrderByDirection orderByDirection) {
+	        @RequestParam(value = "orderByDirection", required = false) Requisition.OrderByDirection orderByDirection) throws Exception {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
@@ -497,7 +497,7 @@ public class StoreController {
 	        @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String conceptClassName,
 	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) {
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) throws Exception {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
@@ -594,7 +594,7 @@ public class StoreController {
 	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
 	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
-	        @RequestParam(required = false) String q, @RequestParam(required = false) String conceptClassName) {
+	        @RequestParam(required = false) String q, @RequestParam(required = false) String conceptClassName) throws Exception {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
@@ -620,7 +620,7 @@ public class StoreController {
 	        @RequestParam(required = false, value = "location") String locationUuid,
 	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) {
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) throws Exception {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
@@ -638,7 +638,7 @@ public class StoreController {
 	        @RequestParam(required = false, value = "location") String locationUuid,
 	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) {
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) throws Exception {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
@@ -655,7 +655,7 @@ public class StoreController {
 	public Map<String, Object> getExpiredItems(@RequestParam(required = false, value = "location") String locationUuid,
 	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) {
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) throws Exception {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
@@ -735,7 +735,7 @@ public class StoreController {
 	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
 	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
-	        @RequestParam(required = false, value = "status") StockInvoiceStatus.Type status) {
+	        @RequestParam(required = false, value = "status") StockInvoiceStatus.Type status) throws Exception {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);

@@ -593,7 +593,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 						return r2.getDateCreated().compareTo(r1.getDateCreated());
 					}
 				});
-				
+
 				Result allocationResults = testResult;
 				//					resList.get(resList.size() - 1);
 				//			for (Result allocationResults : testAllocation.getTestAllocationResults()) {
@@ -690,6 +690,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				
 				String shouldSendEmail = administrationService
 				        .getGlobalProperty(ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS);
+				
+				if (shouldSendEmail == null) {
+					throw new Exception("The configuration of "
+					        + ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS
+					        + " is missing please configure");
+				}
 				
 				if (shouldSendEmail.equals("true")
 				        && administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_SUBJECT_CONFIGURATION_HTML) != null

@@ -19,7 +19,7 @@ import java.util.Map;
 public class SampleExt extends Sample {
 	
 	@Override
-    public Map<String, Object> toMap() {
+    public Map<String, Object> toMap() throws Exception {
         HashMap<String, Object> sampleObject = (new HashMap<String, Object>());
         sampleObject.put("label", this.getLabel());
 
