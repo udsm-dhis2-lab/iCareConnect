@@ -158,12 +158,15 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testGetSampledOrders() throws Exception {
+		AdministrationService adminService = Context.getService(AdministrationService.class);
+		adminService.setGlobalProperty(ICareConfig.LAB_TEST_ORDER_CONCEPT_ATTRIBUTE_TYPE, "8987bbb9-52b9-11zz-b60d-880027ae421d1");
+		adminService.setGlobalProperty(ICareConfig.LAB_TEST_METHOD_CONCEPT_SOURCE,"8987bbb9-52b9-11zz-b60d-880027ae421s");
 		// Given visit uuid
 		//When
 		MockHttpServletRequest getRequest = newGetRequest("lab/sampledorders/d9c1d8ac-2b8e-427f-804d-b858c52e6f11");
 		MockHttpServletResponse handle = handle(getRequest);
 		List<Map<String, Object>> orders = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
-		System.out.println(orders);
+		System.out.println(handle.getContentAsString());
 		
 		//Then
 		assertThat("Samples orders available is 4:", orders.size(), is(4));
