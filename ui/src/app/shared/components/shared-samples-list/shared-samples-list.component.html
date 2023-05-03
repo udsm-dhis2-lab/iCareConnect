@@ -4,8 +4,8 @@
     labEquipments: labEquipments$ | async
   } as params"
 >
-  <div class="filter-and-legend w-100 d-flex justify-content-between">
-    <div class="w-50 d-flex justify-content-left">
+  <div class="filter-and-legend row d-flex justify-content-between">
+    <div class="col-md-12 col-sx-12 col-sm-12 d-flex justify-content-left">
       <mat-form-field class="w-50">
         <mat-label>Search</mat-label>
         <mat-icon matPrefix>search</mat-icon
@@ -27,6 +27,12 @@
       <app-form
         style="margin-top: -4px"
         class="ml-1"
+        [fields]="[searchingSpecimenSourceField]"
+        (formUpdate)="onSearchBySpecimen($event)"
+      ></app-form>
+      <app-form
+        style="margin-top: -4px"
+        class="ml-1"
         [fields]="[searchingTestField]"
         (formUpdate)="onSearchByTest($event)"
       ></app-form>
@@ -39,8 +45,12 @@
       ></app-form>
     </div>
 
-    <div class="w-50 d-flex" style="height: 20px" *ngIf="showLegend">
-      <table style="border: none; margin-left: 15px" class="w-100">
+    <div
+      class="col-md-12 col-sx-12 col-sm-12 d-flex justify-content-end"
+      style="height: 20px"
+      *ngIf="showLegend"
+    >
+      <table style="border: none; margin-left: 15px">
         <tr style="height: 30px">
           <td style="width: 40px; border: solid 1px #eee"></td>
           <td>
@@ -103,7 +113,7 @@
     mode="indeterminate"
     *ngIf="!params?.samples"
   ></mat-progress-bar>
-  <table class="table table-bordered">
+  <table class="table table-bordered mt-3">
     <thead class="table-header">
       <tr>
         <th rowspan="2">SN</th>

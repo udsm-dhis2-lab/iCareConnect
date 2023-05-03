@@ -36,7 +36,8 @@ export class SamplesService {
     q?: string,
     department?: string,
     testUuid?: string,
-    instrument?: string
+    instrument?: string,
+    specimenUuid?: string
   ): Observable<any> {
     let parameters = [];
     if (pagerInfo) {
@@ -77,6 +78,10 @@ export class SamplesService {
 
     if (instrument) {
       parameters = [...parameters, "instrument=" + instrument];
+    }
+
+    if (specimenUuid) {
+      parameters = [...parameters, "specimen=" + specimenUuid];
     }
 
     if (excludeAllocations) {
@@ -640,7 +645,7 @@ export class SamplesService {
       })
     );
   }
-  
+
   getBatchSamples(
     batchUuid?: string,
     startDate?: string,
@@ -660,16 +665,21 @@ export class SamplesService {
         : q?.length
         ? `?q=${q}`
         : "";
-    let batchParam = q || endDate || startDate ? `&batchUuid=${batchUuid}` :  `?batchUuid=${batchUuid}`;
+    let batchParam =
+      q || endDate || startDate
+        ? `&batchUuid=${batchUuid}`
+        : `?batchUuid=${batchUuid}`;
     const queryParams = startDateParam + endDateParam + qParam + batchParam;
-    return this.httpClient.get(BASE_URL + "lab/batchsamples" + queryParams).pipe(
-      map((response) => {
-        return response;
-      }),
-      catchError((err) => {
-        return err;
-      })
-    );
+    return this.httpClient
+      .get(BASE_URL + "lab/batchsamples" + queryParams)
+      .pipe(
+        map((response) => {
+          return response;
+        }),
+        catchError((err) => {
+          return err;
+        })
+      );
   }
 
   createBatchSample(batchSampleObject): Observable<any> {
