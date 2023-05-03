@@ -6,6 +6,7 @@
     referringDoctorAttributes: referringDoctorAttributes$ | async,
     refferedFromFacility: refferedFromFacility$ | async,
     obs: obs$ | async,
+    diagnoses: diagnoses$ | async,
     phoneNumber: phoneNumber$ | async
   } as params"
 >
@@ -124,7 +125,7 @@
                       </td>
                     </ng-container>
                   </tr>
-                  <!-- <tr *ngIf="LISConfigurations?.isLIS">
+                  <tr *ngIf="LISConfigurations?.isLIS">
                     <td></td>
                     <td></td>
                     <td>
@@ -136,7 +137,7 @@
                           | date: "medium"
                       }}
                     </td>
-                  </tr> -->
+                  </tr>
                   <tr>
                     <td>
                       <b> Patient Name </b>
@@ -338,8 +339,18 @@
                       </span>
                     </td>
                     <td>
+                      <div
+                        class="w-100"
+                        *ngIf="params?.diagnoses && LISConfigurations?.isLIS"
+                      >
+                        <p *ngFor="let diagnosis of params?.diagnoses">
+                          <b>
+                            {{ diagnosis?.display }}
+                          </b>
+                        </p>
+                      </div>
                       <span *ngIf="params.obs && LISConfigurations?.isLIS">
-                        {{ params.obs?.latest?.value }}
+                        History: {{ params.obs?.latest?.value }}
                       </span>
                     </td>
                     <td *ngIf="!LISConfigurations?.isLIS">
@@ -359,13 +370,13 @@
                       <b>Results Fed By</b>
                     </td>
                     <td>
-                      <!-- {{
+                      {{
                         samplesGroupedByDepartment?.samples[0]?.orders[0]
                           ?.testAllocations[0]?.results[
                           samplesGroupedByDepartment?.samples[0]?.orders[0]
                             ?.testAllocations[0]?.results?.length - 1
                         ]?.resultsFedBy?.name
-                      }} -->
+                      }}
                     </td>
                   </tr>
 
@@ -376,13 +387,13 @@
                       <b>Results Fed At</b>
                     </td>
                     <td>
-                      <!-- {{
+                      {{
                         samplesGroupedByDepartment?.samples[0]?.orders[0]
                           ?.testAllocations[0]?.resultsCommentsStatuses[
                           samplesGroupedByDepartment?.samples[0]?.orders[0]
                             ?.testAllocations[0]?.results?.length - 1
                         ]?.timestamp | date: "medium"
-                      }} -->
+                      }}
                     </td>
                   </tr>
                   <tr *ngIf="!LISConfigurations?.isLIS">
@@ -392,13 +403,13 @@
                       <b>Requested By</b>
                     </td>
                     <td>
-                      <!-- {{
+                      {{
                         samplesGroupedByDepartment?.samples[0]?.orders[0]
                           ?.testAllocations[0]?.resultsCommentsStatuses[
                           samplesGroupedByDepartment?.samples[0]?.orders[0]
                             ?.testAllocations[0]?.results?.length - 1
                         ]?.timestamp | date: "medium"
-                      }} -->
+                      }}
                     </td>
                   </tr>
                 </table>

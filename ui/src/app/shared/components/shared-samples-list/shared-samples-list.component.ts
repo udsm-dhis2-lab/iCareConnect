@@ -40,10 +40,12 @@ export class SharedSamplesListComponent implements OnInit {
   pageCounts: any[] = [1, 5, 10, 20, 25, 50, 100, 200];
 
   searchingTestField: any;
+  searchingSpecimenSourceField: any;
   searchingEquipmentsField: any;
   keyedSelectedSamples: any = {};
   instrumentUuid: string;
   testUuid: string;
+  specimenUuid: string;
   constructor(private sampleService: SamplesService) {}
 
   ngOnInit(): void {
@@ -60,6 +62,16 @@ export class SharedSamplesListComponent implements OnInit {
       searchControlType: "concept",
       searchTerm: "TEST_ORDERS",
       conceptClass: "Test",
+      shouldHaveLiveSearchForDropDownFields: true,
+    });
+
+    this.searchingSpecimenSourceField = new Dropdown({
+      id: "specimen",
+      key: "specimen",
+      label: "Search by Specimen source",
+      searchControlType: "concept",
+      searchTerm: "SPECIMEN_SOURCE",
+      conceptClass: "Specimen",
       shouldHaveLiveSearchForDropDownFields: true,
     });
     // TODO: Consider to put class name for instruments on global property
@@ -95,7 +107,8 @@ export class SharedSamplesListComponent implements OnInit {
         params?.q,
         params?.dapartment,
         params?.testUuid,
-        params?.instrument
+        params?.instrument,
+        params?.specimenUuid
       );
     }, 50);
   }
@@ -198,6 +211,22 @@ export class SharedSamplesListComponent implements OnInit {
       page: 1,
       q: this.searchingText,
       testUuid: this.testUuid,
+      specimenUuid: this.specimenUuid,
+      instrument: this.instrumentUuid,
+    });
+  }
+
+  onSearchBySpecimen(formValue: FormValue): void {
+    this.specimenUuid = formValue.getValues()?.specimen?.value;
+    this.getSamples({
+      category: this.category,
+      hasStatus: this.hasStatus,
+      pageSize: this.pageSize,
+      page: 1,
+      q: this.searchingText,
+      testUuid: this.testUuid,
+      specimenUuid: this.specimenUuid,
+      instrument: this.instrumentUuid,
     });
   }
 
@@ -211,6 +240,7 @@ export class SharedSamplesListComponent implements OnInit {
       page: 1,
       q: this.searchingText,
       testUuid: this.testUuid,
+      specimenUuid: this.specimenUuid,
     });
   }
 

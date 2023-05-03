@@ -141,13 +141,13 @@ export class SampleStorageDashboardComponent implements OnInit {
   }
 
   onDispose(sample: any): void {
-    this.shouldRerenderSamplesList = true;
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
-      width: "25%",
+      minWidth: "30%",
       data: {
         modalTitle: `Dispose sample`,
-        modalMessage: `Are you sure to dispose results of ${sample?.label}?`,
+        modalMessage: `Are you sure to dispose ${sample?.label}?`,
         showRemarksInput: true,
+        captureDisposeMethods: true,
       },
       disableClose: false,
       panelClass: "custom-dialog-container",
@@ -155,30 +155,53 @@ export class SampleStorageDashboardComponent implements OnInit {
 
     confirmDialog.afterClosed().subscribe((res) => {
       if (res.confirmed) {
-        const sampleStatus = {
-          sample: {
-            uuid: sample?.uuid,
-          },
-          user: {
-            uuid: this.userUuid,
-          },
-          remarks: res?.remarks,
-          status: "DISPOSED",
-          category: "DISPOSED",
-        };
+        this.shouldRerenderSamplesList = true;
+        setTimeout(() => {
+          let sampleStatuses = [];
+          const sampleStatus = {
+            sample: {
+              uuid: sample?.uuid,
+            },
+            user: {
+              uuid: this.userUuid,
+            },
+            remarks: res?.remarks,
+            status: "DISPOSED",
+            category: "DISPOSED",
+          };
+          sampleStatuses = [...sampleStatuses, sampleStatus];
 
-        this.shouldRerenderSamplesList = false;
+          if (res?.disposeMethods && res?.disposeMethods?.length > 0) {
+            sampleStatuses = [
+              ...sampleStatuses,
+              ...res?.disposeMethods?.map((testMethod) => {
+                return {
+                  sample: {
+                    uuid: sample?.uuid,
+                  },
+                  user: {
+                    uuid: this.userUuid,
+                  },
+                  remarks: testMethod?.name,
+                  status: testMethod?.uuid,
+                  category: "DISPOSE_METHOD",
+                };
+              }),
+            ];
+          }
+          this.shouldRerenderSamplesList = false;
 
-        this.samplesService
-          .setSampleStatus(sampleStatus)
-          .subscribe((response) => {
-            if (response.error) {
-              // console.log("Error: " + response.error);
-            }
-            if (!response.error) {
-              // console.log("Response: " + response);
-            }
-          });
+          this.samplesService
+            .setMultipleSampleStatuses(sampleStatuses)
+            .subscribe((response) => {
+              if (response.error) {
+                // console.log("Error: " + response.error);
+              }
+              if (!response.error) {
+                // console.log("Response: " + response);
+              }
+            });
+        }, 50);
       }
     });
   }
