@@ -47,6 +47,7 @@
             {{ setMembersHeaderName }}
           </div>
           <app-concept-set-members
+            *ngIf="setMembersReadySet"
             [setMembersSearchTerm]="setMembersSearchTerm"
             [selectedSetMembersItems]="selectedSetMembers"
             [standardSearchTerm]="standardSearchTerm"

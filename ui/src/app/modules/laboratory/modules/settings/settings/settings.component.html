@@ -132,5 +132,12 @@
         </div>
       </ng-template>
     </mat-tab>
+    <mat-tab label="System logs" *ngIf="params?.LISConfigurations?.isLIS">
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-system-logs></app-system-logs>
+        </div>
+      </ng-template>
+    </mat-tab>
   </mat-tab-group>
 </div>
