@@ -2,10 +2,10 @@ package org.openmrs.module.icare.laboratory.models;
 
 // Generated Oct 7, 2020 12:48:40 PM by Hibernate Tools 5.2.10.Final
 
-import org.apache.xpath.operations.Bool;
-import org.openmrs.Order;
-import org.openmrs.User;
-
+import org.openmrs.*;
+import org.openmrs.api.*;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.ICareConfig;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
@@ -84,7 +84,7 @@ public class SampleOrder implements Serializable {
 		return sampleOrder;
 	}
 	
-	public Map<String, Object> toMap(Boolean excludeAllocations) {
+	public Map<String, Object> toMap(Boolean excludeAllocations) throws Exception {
 		Map<String, Object> sampleOrderObject = new HashMap<String, Object>();
 		
 		Map<String, Object> technicianObject = new HashMap<String, Object>();
@@ -112,6 +112,50 @@ public class SampleOrder implements Serializable {
 		Map<String, Object> concept = new HashMap<String, Object>();
 		concept.put("uuid", this.getOrder().getConcept().getUuid());
 		concept.put("display", this.getOrder().getConcept().getDisplayString());
+
+
+		if(Context.getAuthenticatedUser().hasPrivilege("SAMPLE RECEPTION AND REGISTRATION_SAMPLE_IMPORT_EXPORT")) {
+
+			Map<String, Object> conceptAttributeMap = new HashMap<>();
+			for (ConceptAttribute conceptAttribute : this.getOrder().getConcept().getAttributes()) {
+
+				AdministrationService administrationService = Context.getService(AdministrationService.class);
+				String conceptAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.LAB_TEST_ORDER_CONCEPT_ATTRIBUTE_TYPE);
+				if(conceptAttributeTypeUuid == null){
+					throw new Exception("The setting of property "+ICareConfig.LAB_TEST_ORDER_CONCEPT_ATTRIBUTE_TYPE+" is not configured. Please configure ");
+				}
+
+				if (conceptAttribute.getAttributeType().getUuid().equals(conceptAttributeTypeUuid)) {
+					conceptAttributeMap.put("uuid", conceptAttribute.getUuid());
+					conceptAttributeMap.put("value", conceptAttribute.getValue().toString());
+					Concept testMethodConcept = Context.getConceptService().getConceptByUuid(conceptAttribute.getValue().toString());
+					if(testMethodConcept == null){
+						throw new Exception("The concept with uuid "+ conceptAttribute.getValue().toString() +" does not exist");
+					}
+					Map<String, Object> testMethodConceptMap = new HashMap<>();
+					testMethodConceptMap.put("uuid", testMethodConcept.getUuid());
+					testMethodConceptMap.put("display", testMethodConcept.getDisplayString());
+					conceptAttributeMap.put("testMethod", testMethodConceptMap);
+
+					Map<String, Object> testMethodMapping = new HashMap<>();
+					String conceptSourceUuid = administrationService.getGlobalProperty(ICareConfig.LAB_TEST_METHOD_CONCEPT_SOURCE);
+					if(conceptSourceUuid == null){
+						throw new Exception("The setting of property "+ICareConfig.LAB_TEST_METHOD_CONCEPT_SOURCE+" is not configured. Please configure ");
+					}
+					for (ConceptMap conceptMap : testMethodConcept.getConceptMappings()) {
+						if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(conceptSourceUuid)) {
+							testMethodMapping.put("code", conceptMap.getConceptReferenceTerm().getCode());
+							testMethodMapping.put("source", conceptMap.getConceptReferenceTerm().getConceptSource().getName());
+							testMethodMapping.put("relationship", conceptMap.getConceptMapType().getName());
+							testMethodConceptMap.put("testMethodMap", testMethodMapping);
+
+						}
+					}
+				}
+			}
+
+			concept.put("conceptAttribute", conceptAttributeMap);
+		}
 		orderObject.put("concept", concept);
 		
 		Map<String, Object> ordererObject = new HashMap<String, Object>();
@@ -121,10 +165,10 @@ public class SampleOrder implements Serializable {
 		orderObject.put("voidReason", this.getOrder().getVoidReason());
 		orderObject.put("orderer", ordererObject);
 		
-		Map<String, Object> conceptObject = new HashMap<String, Object>();
-		conceptObject.put("uuid", this.getOrder().getConcept().getUuid());
-		conceptObject.put("display", getOrder().getConcept().getDisplayString());
-		orderObject.put("concept", conceptObject);
+//		Map<String, Object> conceptObject = new HashMap<String, Object>();
+//		conceptObject.put("uuid", this.getOrder().getConcept().getUuid());
+//		conceptObject.put("display", getOrder().getConcept().getDisplayString());
+//		orderObject.put("concept", conceptObject);
 		
 		if (this.getOrder() != null) {
 			if (this.getOrder().getConcept().getShortNameInLocale(new Locale("en")) != null) {
