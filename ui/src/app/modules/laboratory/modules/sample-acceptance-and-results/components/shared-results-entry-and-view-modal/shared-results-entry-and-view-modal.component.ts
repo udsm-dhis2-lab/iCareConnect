@@ -477,7 +477,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                     },
                   };
                 });
-              } else {
+              } else if (allocationData?.finalResult?.value) {
                 approvalStatuses = [
                   {
                     status:
