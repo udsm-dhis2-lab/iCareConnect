@@ -153,8 +153,32 @@ public class SampleOrder implements Serializable {
 					}
 				}
 			}
+			concept.put("relatedMetadataAttribute", conceptAttributeMap);
 
-			concept.put("conceptAttribute", conceptAttributeMap);
+			if(this.getTestAllocations().size() > 0) {
+				System.out.println(this.getTestAllocations());
+				Map<String, Object> allocationConceptMap = new HashMap<>();
+				for (TestAllocation testAllocation : this.getTestAllocations()) {
+					allocationConceptMap.put("uuid", testAllocation.getUuid());
+					allocationConceptMap.put("display", testAllocation.getTestConcept().getDisplayString());
+					Map<String, Object> testAllocationMapping = new HashMap<>();
+					AdministrationService administrationService = Context.getService(AdministrationService.class);
+					String conceptSourceUuid = administrationService.getGlobalProperty(ICareConfig.LAB_TEST_METHOD_CONCEPT_SOURCE);
+					if (conceptSourceUuid == null) {
+						throw new Exception("The setting of property " + ICareConfig.LAB_TEST_METHOD_CONCEPT_SOURCE + " is not configured. Please configure ");
+					}
+					for (ConceptMap conceptMap : testAllocation.getTestConcept().getConceptMappings()) {
+						if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(conceptSourceUuid)) {
+							testAllocationMapping.put("code", conceptMap.getConceptReferenceTerm().getCode());
+							testAllocationMapping.put("source", conceptMap.getConceptReferenceTerm().getConceptSource().getName());
+							testAllocationMapping.put("relationship", conceptMap.getConceptMapType().getName());
+							concept.put("testAllocationMap", testAllocationMapping);
+
+						}
+					}
+				}
+			}
+
 		}
 		orderObject.put("concept", concept);
 		
