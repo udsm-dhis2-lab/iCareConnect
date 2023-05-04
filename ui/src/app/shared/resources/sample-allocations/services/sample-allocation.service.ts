@@ -54,7 +54,10 @@ export class SampleAllocationService {
             flatten(
               uniqBy(groupedAllocations[key], "allocationUuid")?.map(
                 (allocation) => {
-                  if (!allocation?.finalResult?.groups) {
+                  if (
+                    !allocation?.finalResult?.groups &&
+                    allocation?.finalResult?.value
+                  ) {
                     return allocation?.finalResult;
                   } else {
                     const results = allocation?.finalResult?.groups?.map(
@@ -72,12 +75,16 @@ export class SampleAllocationService {
                 }
               )
             )?.filter((result) => result) || [];
+
           const authorizationIsReady =
             (
               flatten(
                 uniqBy(groupedAllocations[key], "allocationUuid")?.map(
                   (allocation) => {
-                    if (!allocation?.finalResult?.groups) {
+                    if (
+                      !allocation?.finalResult?.groups &&
+                      allocation?.finalResult?.value
+                    ) {
                       return allocation?.finalResult;
                     } else {
                       const results = allocation?.finalResult?.groups?.map(
@@ -94,12 +101,7 @@ export class SampleAllocationService {
                     }
                   }
                 )
-              )?.filter(
-                (result) =>
-                  result?.authorizationIsReady &&
-                  result?.authorizationStatuses?.length >=
-                    countOfAuthorizationRequired
-              ) || []
+              )?.filter((result) => result?.authorizationIsReady) || []
             )?.length === withResults?.length && withResults?.length > 0;
           const allocationsKeyedByParametersUuid = keyBy(
             allSampleAllocations?.map((allocation) => {

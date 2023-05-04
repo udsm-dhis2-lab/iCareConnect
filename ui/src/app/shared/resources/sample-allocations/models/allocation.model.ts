@@ -203,9 +203,24 @@ export class SampleAllocation {
         }
       : {
           groups: Object.keys(finalResult)?.map((key) => {
+            const authorizationIsReady =
+              Number(this.allocation?.resultApprovalConfiguration) <=
+              (
+                this.allocation?.statuses?.filter(
+                  (status) =>
+                    status?.category === "RESULT_AUTHORIZATION" &&
+                    status?.status == "AUTHORIZED" &&
+                    status?.result?.uuid ===
+                      orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
+                        ?.uuid
+                ) || []
+              )?.length;
             return {
               key,
               results: finalResult[key],
+              resultApprovalConfiguration: Number(
+                this.allocation?.resultApprovalConfiguration
+              ),
               authorizationStatuses:
                 this.allocation?.statuses?.filter(
                   (status) =>
@@ -214,18 +229,7 @@ export class SampleAllocation {
                       orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
                         ?.uuid
                 ) || [],
-              authorizationIsReady:
-                Number(this.allocation?.resultApprovalConfiguration) <=
-                (
-                  this.allocation?.statuses?.filter(
-                    (status) =>
-                      status?.category === "RESULT_AUTHORIZATION" &&
-                      status?.status == "AUTHORIZED" &&
-                      status?.result?.uuid ===
-                        orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
-                          ?.uuid
-                  ) || []
-                )?.length,
+              authorizationIsReady: authorizationIsReady,
             };
           }),
           statuses:
