@@ -49,8 +49,8 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		initializeInMemoryDatabase();
 		executeDataSet("lab-data.xml");
 		AdministrationService adminService = Context.getService(AdministrationService.class);
-		adminService.setGlobalProperty(ICareConfig.LAB_TEST_ORDER_CONCEPT_ATTRIBUTE_TYPE, "8987bbb9-52b9-11zz-b60d-880027ae421d1");
-		adminService.setGlobalProperty(ICareConfig.LAB_TEST_METHOD_CONCEPT_SOURCE,"8987bbb9-52b9-11zz-b60d-880027ae421s");
+		adminService.setGlobalProperty(ICareConfig.LAB_RELATED_METADATA_ATTRIBUTE_TYPE, "8987bbb9-52b9-11zz-b60d-880027ae421d1");
+		adminService.setGlobalProperty(ICareConfig.LAB_UNIFIED_CODING_REFERENCE_CONCEPT_SOURCE,"8987bbb9-52b9-11zz-b60d-880027ae421s");
 		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS,"false");
 	}
 	
@@ -429,7 +429,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		String bodySummaryHtml = this.readFile("dto/laboratory/body-summary.html");
 		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_BODY_ATTACHMENT_CONFIGURATION_HTML, bodyAttachmentHtml);
 		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_BODY_SUMMARY_CONFIGURATION_HTML, bodySummaryHtml);
-		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS, "true");
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS, "false");
 		// creating sample status
 		String dto = this.readFile("dto/sample-status-create-dto.json");
 		Map<String, Object> sampleStatus = (new ObjectMapper()).readValue(dto, Map.class);
