@@ -52,7 +52,6 @@ export class SampleImportExportComponent implements OnInit {
     let rowOneHeaders = [];
     let rowTwoHeaders = [];
     var range = XLSX.utils.decode_range(sheet["!ref"]);
-    console.log(range);
     var C,
       count,
       R = range.s.r; /* start in the first row */
