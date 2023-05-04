@@ -463,16 +463,19 @@ public class ICareDao extends BaseDAO<Item> {
 	}
 	
 	public List<Concept> getConceptsBySearchParams(String q, String conceptClass, String searchTerm, Integer limit,
-	        Integer startIndex) {
+	        Integer startIndex, String searchTermOfConceptSetToExclude) {
 		DbSession session = getSession();
-		String searchConceptQueryStr = "SELECT DISTINCT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc LEFT JOIN c.names st";
+		String searchConceptQueryStr = "SELECT DISTINCT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc";
+
+
 		if (searchTerm != null) {
-			searchConceptQueryStr += " ON st.conceptNameType= 'INDEX_TERM'";
+			searchConceptQueryStr += " ON cn.conceptNameType= 'INDEX_TERM'";
 		}
 		String where = "WHERE";
 		if (q != null) {
 			where += " lower(cn.name) like lower(:q)";
 		}
+
 		if (conceptClass != null) {
 			if (!where.equals("WHERE")) {
 				where += " AND ";
@@ -483,8 +486,16 @@ public class ICareDao extends BaseDAO<Item> {
 			if (!where.equals("WHERE")) {
 				where += " AND ";
 			}
-			where += " lower(st.name) like lower(:searchTerm)";
+			where += " lower(cn.name) like lower(:searchTerm)";
 		}
+
+		if (searchTermOfConceptSetToExclude != null) {
+			if (!where.equals("WHERE")) {
+				where += " AND ";
+			}
+			where += " c NOT IN (SELECT DISTINCT cs.concept FROM ConceptSet cs WHERE cs.conceptSet IN (SELECT DISTINCT conc FROM Concept conc JOIN conc.names stn WHERE stn.conceptNameType= 'INDEX_TERM' AND lower(stn.name) like lower(:searchTermOfConceptSetToExclude)))";
+		}
+
 		if (!where.equals("WHERE")) {
 			searchConceptQueryStr += " " + where;
 		}
@@ -499,6 +510,10 @@ public class ICareDao extends BaseDAO<Item> {
 		}
 		if (conceptClass != null) {
 			sqlQuery.setParameter("conceptClass", "%" + conceptClass + "%");
+		}
+
+		if (searchTermOfConceptSetToExclude != null) {
+			sqlQuery.setParameter("searchTermOfConceptSetToExclude", searchTermOfConceptSetToExclude);
 		}
 		return sqlQuery.list();
 	}
