@@ -1,14 +1,10 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { FormGroup } from "@angular/forms";
 import { MatRadioChange } from "@angular/material/radio";
-import {
-  formulateHeadersFromExportTemplateReferences,
-  processImportedExcelFile,
-} from "../../resources/helpers/import-export.helper";
+import { formulateHeadersFromExportTemplateReferences } from "../../resources/helpers/import-export.helper";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { map } from "rxjs/operators";
-// import { read, utils, ExcelDataType } from "xlsx";
 import * as XLSX from "xlsx";
 import { keyBy } from "lodash";
 
@@ -19,6 +15,7 @@ import { keyBy } from "lodash";
 })
 export class SampleImportExportComponent implements OnInit {
   @Input() category: string;
+  @Input() labSamplesDepartments: any[];
   exceltoJson: any;
   formResource: FormGroup;
   file: any;
@@ -127,6 +124,7 @@ export class SampleImportExportComponent implements OnInit {
         }); // to get 2d array pass 2nd parameter as object {header: 1}
         this.exceltoJson[`sheet${i + 1}`] = data?.map((dataItem) => {
           let newDataItem = {};
+          // Validate the row items here
           Object.keys(dataItem)?.forEach((key) => {
             if (keyedExportColumnHeaders[key]?.systemKey) {
               newDataItem[keyedExportColumnHeaders[key]?.systemKey] =
