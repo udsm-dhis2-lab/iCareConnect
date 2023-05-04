@@ -593,7 +593,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 						return r2.getDateCreated().compareTo(r1.getDateCreated());
 					}
 				});
-
+				
 				Result allocationResults = testResult;
 				//					resList.get(resList.size() - 1);
 				//			for (Result allocationResults : testAllocation.getTestAllocationResults()) {

@@ -812,7 +812,7 @@ public class LaboratoryController {
 	@RequestMapping(value = "batchSample", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getBatchSampleByUuid(@RequestParam(value = "uuid", required = true) String uuid)
-			throws Exception {
+	        throws Exception {
 		
 		BatchSample batchSample = laboratoryService.getBatchSampleByUuid(uuid);
 		return batchSample.toMap();

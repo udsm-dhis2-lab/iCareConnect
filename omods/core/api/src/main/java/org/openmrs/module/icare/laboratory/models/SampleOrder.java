@@ -210,7 +210,6 @@ public class SampleOrder implements Serializable {
 		}
 		return sampleOrderObject;
 	}
-
 	
 	public List<TestAllocation> getTestAllocations() {
 		return testAllocations;
