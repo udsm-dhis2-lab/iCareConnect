@@ -247,7 +247,8 @@ public class StoreController {
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
 	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
 	        @RequestParam(value = "status", required = false) RequisitionStatus.RequisitionStatusCode status,
-	        @RequestParam(value = "orderByDirection", required = false) Requisition.OrderByDirection orderByDirection) throws Exception {
+	        @RequestParam(value = "orderByDirection", required = false) Requisition.OrderByDirection orderByDirection)
+	        throws Exception {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
@@ -594,7 +595,8 @@ public class StoreController {
 	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
 	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
-	        @RequestParam(required = false) String q, @RequestParam(required = false) String conceptClassName) throws Exception {
+	        @RequestParam(required = false) String q, @RequestParam(required = false) String conceptClassName)
+	        throws Exception {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);

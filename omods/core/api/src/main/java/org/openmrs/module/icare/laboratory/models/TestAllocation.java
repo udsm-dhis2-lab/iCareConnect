@@ -56,6 +56,9 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "testAllocation")
 	private List<TestAllocationAssociatedField> testAllocationAssociatedFields = new ArrayList<>(0);
+
+	@Column(name = "related_allocation_uuid")
+	private String relatedtestAllocationUuid;
 	
 	public Concept getTestConcept() {
 		return this.testConcept;
@@ -88,7 +91,15 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 	public List<TestAllocationStatus> getTestAllocationStatuses() {
 		return testAllocationStatuses;
 	}
-	
+
+	public String getRelatedtestAllocationUuid() {
+		return relatedtestAllocationUuid;
+	}
+
+	public void setRelatedtestAllocationUuid(String relatedtestAllocationUuid) {
+		this.relatedtestAllocationUuid = relatedtestAllocationUuid;
+	}
+
 	public void setTestAllocationStatuses(List<TestAllocationStatus> testAllocationStatuses) {
 		this.testAllocationStatuses = testAllocationStatuses;
 	}
@@ -150,6 +161,10 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 		testAllocation.setSampleOrder(sampleOrder);
 		if (testConcept != null) {
 			testAllocation.setTestConcept(testConcept);
+		}
+
+		if(map.get("relatedAllocation") != null){
+			testAllocation.setRelatedtestAllocationUuid(((Map)map.get("relatedAllocation")).get("uuid").toString());
 		}
 		
 		return testAllocation;
@@ -259,6 +274,12 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 				allocationAssociatedfieldsListMap.add(testAllocationAssociatedField.toMap());
 			}
 			testAllocationMap.put("testAllocationAssociatedFields",allocationAssociatedfieldsListMap);
+		}
+
+		if(this.getRelatedtestAllocationUuid() != null){
+			Map<String,Object> relatedAllocationMap = new HashMap<>();
+			relatedAllocationMap.put("uuid",this.getRelatedtestAllocationUuid());
+			testAllocationMap.put("relatedAllocation",relatedAllocationMap);
 		}
 
 		return testAllocationMap;
