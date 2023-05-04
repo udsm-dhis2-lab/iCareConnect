@@ -254,6 +254,13 @@ export class ConceptsService {
         "searchTerm=" +
         parameters?.searchTerm;
     }
+
+    if (parameters?.searchTermOfConceptSetToExclude) {
+      queryParams +=
+        (queryParams?.length > 0 ? "&" : "") +
+        "searchTermOfConceptSetToExclude=" +
+        parameters?.searchTermOfConceptSetToExclude;
+    }
     return this.httpClient.get(`icare/concept?${queryParams}`).pipe(
       map((response) => {
         return response?.results.map((result) => {

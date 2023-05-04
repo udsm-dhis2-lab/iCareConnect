@@ -16,6 +16,7 @@ export class ConceptSetMembersComponent implements OnInit {
   @Input() standardSearchTerm: string;
   @Input() testMethodUuid: string;
   @Input() setMembersListFromTestMethod: ConceptGetFull[];
+  @Input() searchTermOfConceptSetToExcludeFromTestOrders: string;
   selectedItems: ConceptGetFull[] = [];
   conceptsList$: Observable<ConceptGetFull[]>;
   @Output() selectedSetMembers: EventEmitter<ConceptGetFull[]> =
