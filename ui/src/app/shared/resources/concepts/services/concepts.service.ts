@@ -214,6 +214,17 @@ export class ConceptsService {
     );
   }
 
+  updateConceptAttribute(conceptUuid: string, data: any): Observable<any> {
+    return from(
+      this.api.concept.updateConceptAttribute(conceptUuid, data?.uuid, data)
+    ).pipe(
+      map((response) => response),
+      catchError((error) => {
+        return of(error);
+      })
+    );
+  }
+
   searchConcept(parameters: any): Observable<ConceptGet[]> {
     let queryParams = "";
     if (parameters?.q) {
@@ -469,14 +480,15 @@ export class ConceptsService {
     );
   }
 
-  getConceptByMappingSource(source: string, fields?: string){
-   return from(
+  getConceptByMappingSource(source: string, fields?: string) {
+    return from(
       this.api.concept.getAllConcepts({
         source: source,
         v: !fields
           ? "custom:(uuid,display,names,descriptions,setMembers:(uuid,display,datatype,attributes:(uuid,display,value,attributeType:(uuid,display)),answers:(uuid,display),setMembers:(uuid,display,attributes:(uuid,display,value,attributeType:(uuid,display)),datatype,answers:(uuid,display))))"
           : fields,
-      })).pipe(
+      })
+    ).pipe(
       map((data) => {
         return data;
       }),
