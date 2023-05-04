@@ -93,7 +93,6 @@ export class VisitsService {
   }
 
   getVisitDiagnosesByVisitUuid(parameters: any): Observable<any> {
-    console.log(parameters);
     return from(
       this.api.visit.getVisit(parameters?.uuid, parameters?.query)
     ).pipe(
