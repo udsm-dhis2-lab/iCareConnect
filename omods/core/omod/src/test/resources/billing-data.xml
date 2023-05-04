@@ -70,8 +70,21 @@
     <concept concept_id="5000" retired="false" datatype_id="2" class_id="1" is_set="false" creator="1"
              date_created="2016-01-01 00:00:57.0" version="" uuid="z8211c30-5e44-11e8-ie7c-50b6etwQqQee" />
 
+    <concept concept_id="1020" retired="false" datatype_id="2" class_id="1" is_set="true" creator="1"
+             date_created="2016-01-01 00:00:57.0" version="" uuid="90981c30-5e44-11e8-ie7c-50b6etwQqQee" />
+
+    <concept_name concept_name_id="1020" concept_id="1020" name="PARENT ONE" locale="en_GB" creator="1"
+                  date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="1119b329-52b9-11e8-b60d-080027ea4288" />
+
+    <concept_name concept_name_id="1021" concept_id="1020" name="PARENT_ONE" locale="en_GB" creator="1"
+                  date_created="2014-01-12 00:00:00.0" concept_name_type="INDEX_TERM" locale_preferred="1" voided="false"
+                  uuid="1119b329-52b9-11e8-b60d-080027ea428a" />
+
+    <concept_set concept_set_id="4" concept_id="1000" sort_weight="1" uuid="88911c30-1f43-11d8-ie7c-50b6etwQqQee" concept_set="1020" creator="1" date_created="2020-12-27 00:00:00" />
+
     <!-- reception dept set members -->
-    <concept_set concept_set_id="1" concept_id="1005" uuid="c0011c30-1f43-11d8-ie7c-50b6etwQqQee" concept_set="5000" creator="1" date_created="2020-12-27 00:00:00" ></concept_set>
+    <concept_set concept_set_id="1" concept_id="1005" sort_weight="1" uuid="c0011c30-1f43-11d8-ie7c-50b6etwQqQee" concept_set="5000" creator="1" date_created="2020-12-27 00:00:00" />
 
 <!--    <concept_set concept_set_id="2" concept_id="" uuid="q9911c30-6q44-12e8-ie7c-50b6etwQqQee" concept_set="5000" creator="1" date_created="2020-12-27 00:00:00" ></concept_set>-->
 
@@ -103,6 +116,7 @@
     <concept_name concept_name_id="1000" concept_id="1000" name="OPD Service" locale="en_GB" creator="1"
                   date_created="2017-05-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="a457ac00-5345-11e8-9c7c-40mcpekrcfee" />
+
     <concept_name concept_name_id="1001" concept_id="1001" name="Billable Item" locale="en_GB" creator="1"
                   date_created="2017-05-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="a457ac00-5345-11e8-9c7c-40b0mskrcfee" />

@@ -531,13 +531,21 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testSearchConcepts() throws Exception {
-		MockHttpServletRequest newGetRequest = newGetRequest("icare/concept", new Parameter("q", "opd"), new Parameter(
-		        "conceptClass", "Test"));
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/concept", new Parameter("q", "opd"),
+				new Parameter("conceptClass", "Test"),new Parameter("searchTermOfConceptSetToExclude", "PARENT_ONE"));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		List<Map<String, Object>> maps = (List) results.get("results");
+//		System.out.println(maps);
+		assertThat("Should return 0 item", maps.size(), is(0));
+
+
+		newGetRequest = newGetRequest("icare/concept", new Parameter("q", "PARENT_ONE"));
+		handle = handle(newGetRequest);
+		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		maps = (List) results.get("results");
 		assertThat("Should return 1 item", maps.size(), is(1));
-		
+
 		newGetRequest = newGetRequest("icare/concept", new Parameter("q", "count"));
 		handle = handle(newGetRequest);
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
@@ -548,7 +556,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		maps = (List) results.get("results");
-		assertThat("Should return 1 item", maps.size(), is(13));
+		assertThat("Should return 14 item", maps.size(), is(14));
 	}
 	
 	@Test
