@@ -53,6 +53,7 @@
             <p *ngFor="let diagnosis of params?.diagnoses">
               <b> {{ diagnosis?.display }}</b>
             </p>
+            <span *ngIf="params?.diagnoses.length === 0"> - </span>
           </div>
           Clinical Observation:
           <p *ngIf="params.obs" class="mt-2">
@@ -63,6 +64,7 @@
               >
             </b>
           </p>
+          <span *ngIf="!params.obs">-</span>
         </div>
       </div>
     </div>
