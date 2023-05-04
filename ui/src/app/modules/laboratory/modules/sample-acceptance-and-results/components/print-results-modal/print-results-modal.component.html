@@ -296,7 +296,16 @@
                       </span>
                     </td>
                     <td>
-                      <span *ngIf="params?.referringDoctorAttributes">
+                      <span
+                        *ngIf="
+                          params?.referringDoctorAttributes &&
+                          params?.referringDoctorAttributes?.length > 0 &&
+                          params?.visit?.attributesKeyedByAttributeType &&
+                          params?.visit?.attributesKeyedByAttributeType[
+                            params?.referringDoctorAttributes[1].value
+                          ]
+                        "
+                      >
                         {{
                           params?.visit?.attributesKeyedByAttributeType[
                             params?.referringDoctorAttributes[1].value

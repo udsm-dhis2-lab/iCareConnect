@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Store } from "@ngrx/store";
 import * as _ from "lodash";
 import { Observable } from "rxjs";
@@ -39,6 +39,7 @@ export class PrintResultsModalComponent implements OnInit {
   keyedRemarks: any;
   @Input() data: any;
   diagnoses$: Observable<any>;
+  @Output() cancel: EventEmitter<boolean> = new EventEmitter<boolean>();
   constructor(
     private patientService: PatientService,
     private visitService: VisitsService,
@@ -402,5 +403,10 @@ export class PrintResultsModalComponent implements OnInit {
 
   onGetRemarks(remarks: any): void {
     this.keyedRemarks = remarks;
+  }
+
+  onClose(event: Event): void {
+    event.stopPropagation();
+    this.cancel.emit(true);
   }
 }

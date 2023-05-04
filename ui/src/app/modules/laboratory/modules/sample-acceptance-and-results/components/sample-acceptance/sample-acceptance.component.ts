@@ -544,4 +544,10 @@ export class SampleAcceptanceComponent implements OnInit {
       panelClass: "custom-dialog-container",
     });
   }
+
+  onCancelFromResultsPage(shouldGoBack: boolean): void {
+    if (shouldGoBack) {
+      this.showPrintingPage = !this.showPrintingPage;
+    }
+  }
 }

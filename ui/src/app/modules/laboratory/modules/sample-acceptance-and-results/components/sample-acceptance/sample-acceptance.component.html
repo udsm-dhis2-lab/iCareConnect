@@ -217,6 +217,7 @@
               </button>
             </div>
             <app-print-results-page
+              (cancel)="onCancelFromResultsPage($event)"
               [data]="dataToPrint"
             ></app-print-results-page>
           </div>
@@ -250,7 +251,7 @@
                 mat-flat-button
                 color="primary"
                 (click)="togglePrintAndList($event)"
-                matTooltip="Back to lis"
+                matTooltip="Back to list"
               >
                 <mat-icon>arrow_back</mat-icon>
                 Back to List
@@ -258,6 +259,7 @@
             </div>
             <app-print-results-page
               [data]="dataToPrint"
+              (cancel)="onCancelFromResultsPage($event)"
             ></app-print-results-page>
           </div>
         </div>
