@@ -29,7 +29,47 @@
     mode="indeterminate"
     *ngIf="!params?.samples && startDate && endDate"
   ></mat-progress-bar>
-  <div class="w-100" style="overflow: auto">
+  <div
+    class="row sample-filters d-flex justify-content-left"
+    *ngIf="startDate && endDate"
+  >
+    <div class="col-md-12 col-sx-12 col-sm-12 d-flex justify-content-left">
+      <mat-form-field class="w-25">
+        <mat-label>Search</mat-label>
+        <mat-icon matPrefix>search</mat-icon
+        ><input matInput (keyup)="onSearchSamples($event)" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="w-50 ml-2">
+        <mat-label>Select Section</mat-label>
+        <mat-select (selectionChange)="onSelectDepartment($event)">
+          <mat-option (click)="setDepartment($event, '')">All</mat-option>
+          <mat-option *ngFor="let dept of labSamplesDepartments" [value]="dept">
+            {{ dept?.display }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <app-form
+        style="margin-top: -4px"
+        class="ml-1"
+        [fields]="[searchingSpecimenSourceField]"
+        (formUpdate)="onSearchBySpecimen($event)"
+      ></app-form>
+      <app-form
+        style="margin-top: -4px"
+        class="ml-1"
+        [fields]="[searchingTestField]"
+        (formUpdate)="onSearchByTest($event)"
+      ></app-form>
+      <app-form
+        style="margin-top: -4px"
+        class="ml-1"
+        [fields]="[searchingEquipmentsField]"
+        (formUpdate)="onSearchByEquipment($event)"
+      ></app-form>
+    </div>
+  </div>
+  <div class="w-100" style="overflow: auto" *ngIf="startDate && endDate">
     <table
       class="table table-bordered"
       *ngIf="params?.samples"
