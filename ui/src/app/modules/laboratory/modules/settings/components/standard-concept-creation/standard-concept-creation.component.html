@@ -2,7 +2,8 @@
   class="row"
   *ngIf="{
     selectedTestMethodDetails: selectedTestMethodDetails$ | async,
-    conceptSources: conceptSources$ | async
+    conceptSources: conceptSources$ | async,
+    relatedMetadataAttributeUuid: relatedMetadataAttributeUuid$ | async
   } as params"
 >
   <div
@@ -22,6 +23,23 @@
     <div class="row">
       <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
         <div *ngIf="searchTermForTestMethod">
+          <app-shared-error
+            *ngIf="errors && errors?.length > 0"
+            [errors]="errors"
+          ></app-shared-error>
+          <div
+            *ngIf="
+              params?.relatedMetadataAttributeUuid &&
+              params?.relatedMetadataAttributeUuid === 'none'
+            "
+            class="alert alert-warning"
+            role="alert"
+          >
+            Seems reference to related metadata is not well set. Please contact
+            IT to check
+            <em>icare.laboratory.concept.relatedMetadata.attributeUuid</em>
+            setting
+          </div>
           <app-form
             [fields]="[testMethodField]"
             (formUpdate)="onFormUpdateTestMethod($event)"
@@ -92,9 +110,18 @@
           (!isFormValid && !searchTermForTestMethod) ||
           (!isFormValid &&
             searchTermForTestMethod &&
-            selectedSetMembers?.length === 0)
+            selectedSetMembers?.length === 0) ||
+          (searchTermForTestMethod &&
+            params?.relatedMetadataAttributeUuid &&
+            params?.relatedMetadataAttributeUuid === 'none')
         "
-        (click)="onSave($event, selectedTestMethodDetails)"
+        (click)="
+          onSave(
+            $event,
+            params?.selectedTestMethodDetails,
+            params?.relatedMetadataAttributeUuid
+          )
+        "
         color="primary"
       >
         {{ !conceptUuid ? "Save" : "Update" }}
@@ -108,7 +135,9 @@
       [standardSearchTerm]="standardSearchTerm"
       [selectedConceptUuid]="conceptUuid"
       [conceptClass]="conceptClass"
-      (conceptToEdit)="onConceptEdit($event)"
+      (conceptToEdit)="
+        onConceptEdit($event, params?.relatedMetadataAttributeUuid)
+      "
     ></app-standard-concepts-list>
   </div>
 </div>
