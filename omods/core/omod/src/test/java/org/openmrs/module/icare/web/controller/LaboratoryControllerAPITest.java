@@ -898,6 +898,15 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		System.out.println(worksheetdefinitions);
 		
 		assertThat("Has 1 worksheet definition", worksheetdefinitions.size(), is(1));
+
+		//3. Getting worksheet by instrument
+		//When
+		newGetRequest = newGetRequest("lab/worksheetdefinitions",new Parameter("instrument","123111zz-0011-477v-8y8y-acc38ebc6252"));
+		handle = handle(newGetRequest);
+		worksheetdefinitions = (new ObjectMapper()).readValue(handle.getContentAsString(), List.class);
+		System.out.println(worksheetdefinitions);
+
+
 	}
 	
 	@Test
