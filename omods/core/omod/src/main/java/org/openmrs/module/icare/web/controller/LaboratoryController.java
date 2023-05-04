@@ -812,7 +812,7 @@ public class LaboratoryController {
 	@RequestMapping(value = "batchSample", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getBatchSampleByUuid(@RequestParam(value = "uuid", required = true) String uuid)
-			throws Exception {
+	        throws Exception {
 		
 		BatchSample batchSample = laboratoryService.getBatchSampleByUuid(uuid);
 		return batchSample.toMap();
@@ -1048,7 +1048,8 @@ public class LaboratoryController {
 															@RequestParam(value = "q", required = false) String q,
 															@RequestParam(defaultValue = "0") Integer startIndex,
 															@RequestParam(defaultValue = "100") Integer limit,
-															@RequestParam(value = "expirationDate", required = false) String expirationDate) throws ParseException{
+															@RequestParam(value = "expirationDate", required = false) String expirationDate,
+															@RequestParam(value="instrument", required = false) String instrumentUuid) throws ParseException{
 
 		Date start = null;
 		Date end = null;
@@ -1063,7 +1064,7 @@ public class LaboratoryController {
 			expirationDateFormatted = formatter.parse(expirationDate);
 		}
 
-		List<WorksheetDefinition> worksheetDefinitions = laboratoryService.getWorksheetDefinitions(start, end, q, startIndex, limit,expirationDateFormatted);
+		List<WorksheetDefinition> worksheetDefinitions = laboratoryService.getWorksheetDefinitions(start, end, q, startIndex, limit,expirationDateFormatted,instrumentUuid);
 
 		List<Map<String,Object>> worksheetDefinitionsObject = new ArrayList<>();
 		for(WorksheetDefinition worksheetDefinition : worksheetDefinitions){

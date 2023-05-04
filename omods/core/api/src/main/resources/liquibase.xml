@@ -5234,6 +5234,17 @@
 
     </changeSet>
 
+    <changeSet id="add_related_allocation_column_to_lb_test_allocation" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="related_allocation_uuid" tableName="lb_test_allocation"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_test_allocation" >
+            <column name="related_allocation_uuid" type="char(38)"/>
+        </addColumn>
+    </changeSet>
+
 
 
 </databaseChangeLog>
