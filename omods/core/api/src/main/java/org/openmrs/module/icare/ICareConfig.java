@@ -108,8 +108,8 @@ public class ICareConfig {
 	public static final String LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS = "mail.icare.laboratory.results.authorized.autorelease";
 	
 	public static final String ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE = "icare.person.attribute.email";
-
+	
 	public static final String LAB_RELATED_METADATA_ATTRIBUTE_TYPE = "icare.laboratory.concept.relatedMetadata.attributeUuid";
-
+	
 	public static final String LAB_UNIFIED_CODING_REFERENCE_CONCEPT_SOURCE = "icare.laboratory.concept.unifiedCodingReference.conceptSourceUuid";
 }

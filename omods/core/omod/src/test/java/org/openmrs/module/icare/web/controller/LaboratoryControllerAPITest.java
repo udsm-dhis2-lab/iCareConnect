@@ -49,9 +49,11 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		initializeInMemoryDatabase();
 		executeDataSet("lab-data.xml");
 		AdministrationService adminService = Context.getService(AdministrationService.class);
-		adminService.setGlobalProperty(ICareConfig.LAB_RELATED_METADATA_ATTRIBUTE_TYPE, "8987bbb9-52b9-11zz-b60d-880027ae421d1");
-		adminService.setGlobalProperty(ICareConfig.LAB_UNIFIED_CODING_REFERENCE_CONCEPT_SOURCE,"8987bbb9-52b9-11zz-b60d-880027ae421s");
-		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS,"false");
+		adminService.setGlobalProperty(ICareConfig.LAB_RELATED_METADATA_ATTRIBUTE_TYPE,
+		    "8987bbb9-52b9-11zz-b60d-880027ae421d1");
+		adminService.setGlobalProperty(ICareConfig.LAB_UNIFIED_CODING_REFERENCE_CONCEPT_SOURCE,
+		    "8987bbb9-52b9-11zz-b60d-880027ae421s");
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS, "false");
 	}
 	
 	@Test
