@@ -46,6 +46,7 @@ export class SharedSamplesListComponent implements OnInit {
   instrumentUuid: string;
   testUuid: string;
   specimenUuid: string;
+  dapartment: string;
   constructor(private sampleService: SamplesService) {}
 
   ngOnInit(): void {
@@ -121,6 +122,10 @@ export class SharedSamplesListComponent implements OnInit {
       hasStatus: this.hasStatus,
       pageSize: this.pageSize,
       page: this.page,
+      testUuid: this.testUuid,
+      specimenUuid: this.specimenUuid,
+      instrument: this.instrumentUuid,
+      dapartment: this.dapartment,
     });
   }
 
@@ -137,13 +142,17 @@ export class SharedSamplesListComponent implements OnInit {
   }
 
   onSelectDepartment(event: MatSelectChange): void {
+    this.dapartment = event?.value?.uuid;
     this.getSamples({
       category: this.category,
       hasStatus: this.hasStatus,
       pageSize: this.pageSize,
       page: 1,
       q: this.searchingText,
-      dapartment: event?.value?.uuid,
+      testUuid: this.testUuid,
+      specimenUuid: this.specimenUuid,
+      instrument: this.instrumentUuid,
+      dapartment: this.dapartment,
     });
   }
 
@@ -213,6 +222,7 @@ export class SharedSamplesListComponent implements OnInit {
       testUuid: this.testUuid,
       specimenUuid: this.specimenUuid,
       instrument: this.instrumentUuid,
+      dapartment: this.dapartment,
     });
   }
 
@@ -227,6 +237,7 @@ export class SharedSamplesListComponent implements OnInit {
       testUuid: this.testUuid,
       specimenUuid: this.specimenUuid,
       instrument: this.instrumentUuid,
+      dapartment: this.dapartment,
     });
   }
 
@@ -241,6 +252,7 @@ export class SharedSamplesListComponent implements OnInit {
       q: this.searchingText,
       testUuid: this.testUuid,
       specimenUuid: this.specimenUuid,
+      dapartment: this.dapartment,
     });
   }
 
