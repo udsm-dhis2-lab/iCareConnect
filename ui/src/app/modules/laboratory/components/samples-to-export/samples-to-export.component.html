@@ -1,0 +1,63 @@
+<div class="w-100" *ngIf="{ samples: samples$ | async } as params">
+  <div class="w-100 d-flex justify-content-end">
+    <mat-form-field appearance="fill" floatLabel="always">
+      <mat-label>Select date range</mat-label>
+      <mat-date-range-input [rangePicker]="visitDatePicker">
+        <input
+          matStartDate
+          placeholder="Start date"
+          autocomplete="off"
+          [(ngModel)]="startDate"
+          (dateInput)="onDateChange()"
+        />
+        <input
+          matEndDate
+          placeholder="End date"
+          autocomplete="off"
+          [(ngModel)]="endDate"
+          (dateInput)="onDateChange(true)"
+        />
+      </mat-date-range-input>
+      <mat-datepicker-toggle
+        matSuffix
+        [for]="visitDatePicker"
+      ></mat-datepicker-toggle>
+      <mat-date-range-picker #visitDatePicker></mat-date-range-picker>
+    </mat-form-field>
+  </div>
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="!params?.samples && startDate && endDate"
+  ></mat-progress-bar>
+  <div class="w-100" style="overflow: auto">
+    <table
+      class="table table-bordered"
+      *ngIf="params?.samples"
+      id="samples-to-export"
+    >
+      <thead>
+        <tr>
+          <th
+            [attr.colspan]="rowOneItem?.colspan"
+            class="text-center"
+            *ngFor="let rowOneItem of formulatedHeaders?.rowOneItems"
+          >
+            {{ rowOneItem?.name }}
+          </th>
+        </tr>
+        <tr>
+          <th *ngFor="let header of formulatedHeaders?.rowTwoItems">
+            {{ header?.exportKey }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let sample of params?.samples?.results">
+          <td *ngFor="let header of formulatedHeaders?.rowTwoItems">
+            {{ sample[header?.systemKey] }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

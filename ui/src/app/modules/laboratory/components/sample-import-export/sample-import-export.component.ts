@@ -1,10 +1,16 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { FormGroup } from "@angular/forms";
 import { MatRadioChange } from "@angular/material/radio";
-import { processImportedExcelFile } from "../../resources/helpers/import-export.helper";
+import {
+  formulateHeadersFromExportTemplateReferences,
+  processImportedExcelFile,
+} from "../../resources/helpers/import-export.helper";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { map } from "rxjs/operators";
+// import { read, utils, ExcelDataType } from "xlsx";
+import * as XLSX from "xlsx";
+import { keyBy } from "lodash";
 
 @Component({
   selector: "app-sample-import-export",
@@ -13,11 +19,14 @@ import { map } from "rxjs/operators";
 })
 export class SampleImportExportComponent implements OnInit {
   @Input() category: string;
+  exceltoJson: any;
   formResource: FormGroup;
   file: any;
   resourceType: any;
   actionCategory: string = "IMPORT";
   exportTemplateDataReferences$: Observable<any>;
+
+  formulatedHeaders: any = {};
   constructor(private systemSettingsService: SystemSettingsService) {}
 
   ngOnInit(): void {
@@ -37,10 +46,49 @@ export class SampleImportExportComponent implements OnInit {
       );
   }
 
-  fileSelection(event) {
+  fileSelection(event: any, exportTemplateDataReferences: any[]): void {
     // const element: HTMLElement = document.getElementById('fileSelector');
     this.file = event.target.files[0];
-    this.formResource.value.file = this.file;
+  }
+
+  get_header_row(sheet) {
+    let rowOneHeaders = [];
+    let rowTwoHeaders = [];
+    var range = XLSX.utils.decode_range(sheet["!ref"]);
+    console.log(range);
+    var C,
+      count,
+      R = range.s.r; /* start in the first row */
+    /* walk every column in the range */
+    for (C = range.s.c; C <= range.e.c; ++C) {
+      var cell =
+        sheet[
+          XLSX.utils.encode_cell({ c: C, r: R })
+        ]; /* find the cell in the first row */
+      // console.log("cell",cell)
+      var hdr = "UNKNOWN " + C; // <-- replace with your desired default
+      if (cell && cell.t) {
+        hdr = XLSX.utils.format_cell(cell);
+        rowOneHeaders.push(hdr);
+      }
+    }
+    for (count = 0; count <= range.e.c; ++count) {
+      var cellForRowTwo =
+        sheet[
+          XLSX.utils.encode_cell({ c: count, r: R + 1 })
+        ]; /* find the cell in the first row */
+      var hdr = "UNKNOWN " + count; // <-- replace with your desired default
+      if (cellForRowTwo && cellForRowTwo.t) {
+        hdr = XLSX.utils.format_cell(cellForRowTwo);
+        rowTwoHeaders.push(hdr);
+      }
+    }
+    return {
+      headers: {
+        rowOne: rowOneHeaders,
+        rowTwo: rowTwoHeaders,
+      },
+    };
   }
 
   getSelectionCategory(event: MatRadioChange): void {
@@ -50,18 +98,57 @@ export class SampleImportExportComponent implements OnInit {
     }, 10);
   }
 
-  onImport(event: Event): void {
+  onImport(event: Event, exportTemplateDataReferences: any[]): void {
     event.stopPropagation();
-    console.log(this.file);
-    const data = processImportedExcelFile(this.file);
+    this.formulatedHeaders = formulateHeadersFromExportTemplateReferences(
+      exportTemplateDataReferences
+    );
+
+    const keyedExportColumnHeaders = keyBy(
+      exportTemplateDataReferences,
+      "exportKey"
+    );
+    this.exceltoJson = {};
+
+    this.exceltoJson = {};
+    let headerJson = {};
+    const reader: FileReader = new FileReader();
+    reader.readAsBinaryString(this.file);
+    this.exceltoJson["filename"] = this.file.name;
+    reader.onload = (e: any) => {
+      /* create workbook */
+      const binarystr: string = e.target.result;
+      const wb: XLSX.WorkBook = XLSX.read(binarystr, { type: "binary" });
+      for (var i = 0; i < wb.SheetNames.length; ++i) {
+        const wsname: string = wb.SheetNames[i];
+        const ws: XLSX.WorkSheet = wb.Sheets[wsname];
+        const data = XLSX.utils.sheet_to_json(ws, {
+          range: 1,
+        }); // to get 2d array pass 2nd parameter as object {header: 1}
+        this.exceltoJson[`sheet${i + 1}`] = data?.map((dataItem) => {
+          let newDataItem = {};
+          Object.keys(dataItem)?.forEach((key) => {
+            if (keyedExportColumnHeaders[key]?.systemKey) {
+              newDataItem[keyedExportColumnHeaders[key]?.systemKey] =
+                dataItem[key];
+            }
+          });
+          return newDataItem;
+        });
+        const headers = this.get_header_row(ws);
+        headerJson[`header${i + 1}`] = headers;
+        //  console.log("json",headers)
+      }
+      this.exceltoJson["headers"] = headerJson;
+    };
   }
 
-  onExportDataToImportExportTemplate(event: Event): void {
-    event.stopPropagation();
+  onExportDataToImportExportTemplate(event: Event, id: string): void {
+    this.onDownloadTemplate(event, id);
   }
 
   onDownloadTemplate(event: Event, id: string): void {
-    const fileName = `NPHL_export_template${
+    const fileName = `NPHL_export_template_${
       new Date().getFullYear() +
       "-" +
       (new Date().getMonth() + 1) +
@@ -76,7 +163,9 @@ export class SampleImportExportComponent implements OnInit {
       ":" +
       new Date().getSeconds()
     }.xls`;
-    event.stopPropagation();
+    if (event) {
+      event.stopPropagation();
+    }
     const htmlTable = document.getElementById(id).outerHTML;
     if (htmlTable) {
       const uri = "data:application/vnd.ms-excel;base64,",
