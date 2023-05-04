@@ -100,6 +100,10 @@ export class SamplesToExportComponent implements OnInit {
       hasStatus: this.hasStatus,
       pageSize: this.pageSize,
       page: this.page,
+      testUuid: this.testUuid,
+      specimenUuid: this.specimenUuid,
+      instrument: this.instrumentUuid,
+      dapartment: this.dapartment,
     });
   }
 
