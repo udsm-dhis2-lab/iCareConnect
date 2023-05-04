@@ -120,9 +120,9 @@ public class SampleOrder implements Serializable {
 			for (ConceptAttribute conceptAttribute : this.getOrder().getConcept().getAttributes()) {
 
 				AdministrationService administrationService = Context.getService(AdministrationService.class);
-				String conceptAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.LAB_TEST_ORDER_CONCEPT_ATTRIBUTE_TYPE);
+				String conceptAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.LAB_RELATED_METADATA_ATTRIBUTE_TYPE);
 				if(conceptAttributeTypeUuid == null){
-					throw new Exception("The setting of property "+ICareConfig.LAB_TEST_ORDER_CONCEPT_ATTRIBUTE_TYPE+" is not configured. Please configure ");
+					throw new Exception("The setting of property "+ICareConfig.LAB_RELATED_METADATA_ATTRIBUTE_TYPE+" is not configured. Please configure ");
 				}
 
 				if (conceptAttribute.getAttributeType().getUuid().equals(conceptAttributeTypeUuid)) {
@@ -138,9 +138,9 @@ public class SampleOrder implements Serializable {
 					conceptAttributeMap.put("testMethod", testMethodConceptMap);
 
 					Map<String, Object> testMethodMapping = new HashMap<>();
-					String conceptSourceUuid = administrationService.getGlobalProperty(ICareConfig.LAB_TEST_METHOD_CONCEPT_SOURCE);
+					String conceptSourceUuid = administrationService.getGlobalProperty(ICareConfig.LAB_UNIFIED_CODING_REFERENCE_CONCEPT_SOURCE);
 					if(conceptSourceUuid == null){
-						throw new Exception("The setting of property "+ICareConfig.LAB_TEST_METHOD_CONCEPT_SOURCE+" is not configured. Please configure ");
+						throw new Exception("The setting of property "+ICareConfig.LAB_UNIFIED_CODING_REFERENCE_CONCEPT_SOURCE+" is not configured. Please configure ");
 					}
 					for (ConceptMap conceptMap : testMethodConcept.getConceptMappings()) {
 						if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(conceptSourceUuid)) {
@@ -163,9 +163,9 @@ public class SampleOrder implements Serializable {
 					allocationConceptMap.put("display", testAllocation.getTestConcept().getDisplayString());
 					Map<String, Object> testAllocationMapping = new HashMap<>();
 					AdministrationService administrationService = Context.getService(AdministrationService.class);
-					String conceptSourceUuid = administrationService.getGlobalProperty(ICareConfig.LAB_TEST_METHOD_CONCEPT_SOURCE);
+					String conceptSourceUuid = administrationService.getGlobalProperty(ICareConfig.LAB_UNIFIED_CODING_REFERENCE_CONCEPT_SOURCE);
 					if (conceptSourceUuid == null) {
-						throw new Exception("The setting of property " + ICareConfig.LAB_TEST_METHOD_CONCEPT_SOURCE + " is not configured. Please configure ");
+						throw new Exception("The setting of property " + ICareConfig.LAB_UNIFIED_CODING_REFERENCE_CONCEPT_SOURCE + " is not configured. Please configure ");
 					}
 					for (ConceptMap conceptMap : testAllocation.getTestConcept().getConceptMappings()) {
 						if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(conceptSourceUuid)) {
