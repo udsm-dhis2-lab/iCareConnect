@@ -25,6 +25,7 @@ export class MultipleItemsSelectionComponent implements OnInit {
   @Input() source: string;
   @Input() conceptClass: string;
   @Input() multipleSelectionCompHeight: string;
+  @Input() searchTermOfConceptSetToExcludeFromTestOrders: string;
   currentSelectedItems: any[] = [];
   @Output() getSelectedItems: EventEmitter<any[]> = new EventEmitter<any[]>();
   items$: Observable<any[]>;
@@ -37,6 +38,10 @@ export class MultipleItemsSelectionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log(
+      "searchTermOfConceptSetToExcludeFromTestOrders",
+      this.searchTermOfConceptSetToExcludeFromTestOrders
+    );
     this.currentSelectedItems =
       this.selectedItems?.filter((item) => !item?.retired) || [];
     if (
@@ -67,6 +72,8 @@ export class MultipleItemsSelectionComponent implements OnInit {
               limit: this.pageSize,
               startIndex: (this.page - 1) * this.pageSize,
               searchTerm: this.standardSearchTerm,
+              searchTermOfConceptSetToExclude:
+                this.searchTermOfConceptSetToExcludeFromTestOrders,
             });
     } else if (this.itemType === "conceptReferenceTerm") {
       this.items$ = this.conceptReferenceService

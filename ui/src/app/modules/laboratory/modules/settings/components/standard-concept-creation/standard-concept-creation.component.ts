@@ -33,6 +33,7 @@ export class StandardConceptCreationComponent implements OnInit {
   @Input() setMembersHeaderName: string;
   @Input() conceptDataTypes: ConceptdatatypeGet[];
   @Input() inheritProperties: boolean;
+  @Input() searchTermOfConceptSetToExcludeFromTestOrders: string;
   basicConceptFields: any[];
   dataTypeField: any;
   unitsField: any;
