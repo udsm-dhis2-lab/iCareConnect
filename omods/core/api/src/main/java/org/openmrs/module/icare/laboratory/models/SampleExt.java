@@ -10,10 +10,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Entity
 @Table(name = "lb_sample")
@@ -113,8 +110,20 @@ public class SampleExt extends Sample {
 
         HashMap<String, Object> conceptObject = new HashMap<String, Object>();
         conceptObject.put("uuid", this.getConcept().getUuid());
+        conceptObject.put("display", this.getConcept().getDisplayString());
+        if(this.getConcept().getShortNameInLocale(new Locale("en")) != null) {
+            conceptObject.put("shortName", this.getConcept().getShortNameInLocale(new Locale("en")).getName());
+        }
 
         sampleObject.put("concept", conceptObject);
+        sampleObject.put("department", conceptObject);
+
+        HashMap<String, Object> specimenSource = new HashMap<String, Object>();
+        if (this.getSpecimenSource() != null) {
+            specimenSource.put("uuid", this.getSpecimenSource().getUuid());
+            specimenSource.put("display", this.getSpecimenSource().getDisplayString());
+        }
+        sampleObject.put("specimenSource", specimenSource);
 
         List<Map<String, Object>> orders = new ArrayList<Map<String, Object>>();
 
