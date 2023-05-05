@@ -87,6 +87,23 @@ export class LocationService {
       );
   }
 
+  getLocationAttributesByLocationUuid(uuid): Observable<any> {
+    return this.httpClient
+      .get(
+        "location/" +
+          uuid +
+          "?v=custom:(uuid,attributes:(attributeType,uuid,value,voided))"
+      )
+      .pipe(
+        map((response) => {
+          return response?.attributes && response?.attributes?.length > 0
+            ? response?.attributes.filter((attribute) => !attribute?.voided)
+            : [];
+        }),
+        catchError((error) => of(error))
+      );
+  }
+
   getLocationByIds(uuids, params?: any): Observable<any> {
     let parameters = [];
     if (params && params?.v) {

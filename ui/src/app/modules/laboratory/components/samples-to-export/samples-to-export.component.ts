@@ -7,6 +7,7 @@ import { formulateHeadersFromExportTemplateReferences } from "../../resources/he
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { MatSelectChange } from "@angular/material/select";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { LocationService } from "src/app/core/services";
 
 @Component({
   selector: "app-samples-to-export",
@@ -39,7 +40,10 @@ export class SamplesToExportComponent implements OnInit {
   instrumentUuid: string;
   dapartment: string;
 
-  constructor(private sampleService: SamplesService) {}
+  constructor(
+    private sampleService: SamplesService,
+    private locationService: LocationService
+  ) {}
 
   ngOnInit(): void {
     // console.log(this.exportTemplateDataReferences);
@@ -261,6 +265,7 @@ export class SamplesToExportComponent implements OnInit {
                           attribute?.attributeType?.uuid ===
                           reference?.attributeTypeUuid
                       ) || [])[0];
+
                       formattedResult[reference?.systemKey] = !attribute
                         ? ""
                         : attribute?.value;
@@ -274,12 +279,48 @@ export class SamplesToExportComponent implements OnInit {
                           attribute?.attributeType?.uuid ===
                           reference?.attributeTypeUuid
                       ) || [])[0];
-                      formattedResult[reference?.systemKey] = !attribute
-                        ? ""
-                        : attribute?.value;
+
+                      if (
+                        reference?.attributeTypeUuid ===
+                          "47da17a9-a910-4382-8149-736de57dab18" &&
+                        attribute
+                      ) {
+                        this.locationService
+                          .getLocationAttributesByLocationUuid(attribute?.value)
+                          .subscribe((response) => {
+                            if (response) {
+                              const hfrCodeAttribute = (response?.filter(
+                                (locAttribute) =>
+                                  locAttribute?.attributeType?.uuid ==
+                                  "1c8bbe24-1976-4f6a-aa2d-ed542c9d0938"
+                              ) || [])[0];
+                              formattedResult[reference?.systemKey] =
+                                hfrCodeAttribute ? hfrCodeAttribute?.value : "";
+                            }
+                          });
+                      } else {
+                        formattedResult[reference?.systemKey] = !attribute
+                          ? ""
+                          : attribute?.value;
+                      }
                     } else if (reference?.category === "sample") {
                       if (reference?.type === "label") {
                         formattedResult[reference?.systemKey] = result?.label;
+                      }
+
+                      if (reference?.type === "testMethod") {
+                        result?.orders?.forEach((order) => {
+                          const relatedMetadataAttribute =
+                            order?.order?.concept?.relatedMetadataAttribute;
+                          if (relatedMetadataAttribute) {
+                            const testMethod =
+                              relatedMetadataAttribute?.testMethod;
+                            formattedResult[reference?.systemKey] = testMethod
+                              ?.testMethodMap?.code
+                              ? testMethod?.testMethodMap?.code
+                              : "";
+                          }
+                        });
                       }
                     }
                   }
