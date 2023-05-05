@@ -1,8 +1,10 @@
 package org.openmrs.module.icare.laboratory.models;
 
 import org.hibernate.annotations.DiscriminatorFormula;
-import org.openmrs.PatientIdentifier;
-import org.openmrs.PersonAttribute;
+import org.openmrs.*;
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.ICareConfig;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -64,6 +66,19 @@ public class SampleExt extends Sample {
 
         if (this.getLocation() != null) {
             locationObject.put("uuid", this.getLocation().getUuid());
+            locationObject.put("display", this.getLocation().getDisplayString());
+            List<Map<String, Object>> attributes = new ArrayList<>();
+            if (this.getLocation().getAttributes().size() > 0) {
+                for(LocationAttribute locationAttribute: this.getLocation().getAttributes()) {
+                    Map<String, Object> attribute = new HashMap<>();
+                    attribute.put("value", locationAttribute.getValue());
+                    Map<String, Object> attributeType =  new HashMap<>();
+                    attributeType.put("uuid", locationAttribute.getAttributeType().getUuid());
+                    attribute.put("attributeType", attributeType);
+                    attributes.add(attribute);
+                }
+            }
+            locationObject.put("attributes", attributes);
         }
 
         sampleObject.put("location", locationObject);
@@ -74,7 +89,18 @@ public class SampleExt extends Sample {
         visitObject.put("uuid", this.getVisit().getUuid());
         visitObject.put("startDateTime", this.getVisit().getStartDatetime());
         visitObject.put("stopDateTime", this.getVisit().getStopDatetime());
-
+        List<Map<String, Object>> visitAttributes = new ArrayList<>();
+        if ( this.getVisit().getAttributes().size() > 0) {
+            for(VisitAttribute visitAttribute: this.getVisit().getAttributes()) {
+                Map<String, Object> attribute = new HashMap<>();
+                attribute.put("value", visitAttribute.getValue());
+                Map<String, Object> attributeType =  new HashMap<>();
+                attributeType.put("uuid", visitAttribute.getAttributeType().getUuid());
+                attribute.put("attributeType", attributeType);
+                visitAttributes.add(attribute);
+            }
+        }
+        visitObject.put("attributes", visitAttributes);
         sampleObject.put("visit", visitObject);
 
         //
@@ -136,11 +162,14 @@ public class SampleExt extends Sample {
             patientIdentifiers.add(patientIdentifierObject);
         }
 
-        PersonAttribute phoneAttribute = this.getVisit().getPatient().getPerson().getAttribute(51);
 
-        if (phoneAttribute != null) {
-            patientObject.put("phone", phoneAttribute.getValue());
+        String phoneNumber = null;
+        String phoneAttributeTypeUuid = Context.getService(AdministrationService.class).getGlobalProperty(ICareConfig.PHONE_NUMBER_ATTRIBUTE);
+        if (phoneAttributeTypeUuid != null) {
+            phoneNumber = this.getVisit().getPatient().getPerson().getAttribute(Context.getPersonService().getPersonAttributeTypeByUuid(phoneAttributeTypeUuid)).getValue();
         }
+        patientObject.put("phone", phoneNumber);
+
         patientObject.put("identifiers", patientIdentifiers);
         patientObject.put("age", this.getVisit().getPatient().getAge());
         patientObject.put("familyName", this.getVisit().getPatient().getPersonName().getFamilyName());
@@ -148,6 +177,34 @@ public class SampleExt extends Sample {
         patientObject.put("givenName", this.getVisit().getPatient().getPersonName().getGivenName());
         patientObject.put("gender", this.getVisit().getPatient().getGender());
         patientObject.put("uuid", this.getVisit().getPatient().getUuid());
+
+
+        List<Map<String, Object>> attributes = new ArrayList<>();
+        if (this.getVisit().getPatient().getPerson().getAttributes().size() > 0) {
+            for (PersonAttribute personAttribute: this.getVisit().getPatient().getPerson().getAttributes()) {
+                Map<String, Object> attribute = new HashMap<>();
+                Map<String, Object> attributeType = new HashMap<>();
+                attributeType.put("uuid", personAttribute.getAttributeType().getUuid());
+                attribute.put("attributeType", attributeType);
+                attribute.put("value", personAttribute.getValue());
+            }
+        }
+        patientObject.put("attributes", attributes);
+
+        List<Map<String, Object>> addresses = new ArrayList<>();
+        if (this.getVisit().getPatient().getPerson().getAddresses().size() > 0) {
+            for(PersonAddress personAddress: this.getVisit().getPatient().getPerson().getAddresses()) {
+                Map<String, Object> address = new HashMap<>();
+                address.put("address1", personAddress.getAddress1().toString());
+                address.put("address2", personAddress.getAddress2().toString());
+                address.put("address3", personAddress.getAddress3().toString());
+                address.put("address4", personAddress.getAddress4().toString());
+                address.put("cityVillage", personAddress.getCityVillage());
+                address.put("country", personAddress.getCountry());
+                addresses.add(address);
+            }
+        }
+        patientObject.put("addresses", addresses);
 
         sampleObject.put("patient", patientObject);
 

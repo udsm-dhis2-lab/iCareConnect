@@ -272,7 +272,6 @@ public class SampleDAO extends BaseDAO<Sample> {
 		}
 		
 		if (instrumentUuid != null) {
-			System.out.println("HEREEEEEEEEEEEE");
 			query.setParameter("instrumentUuid", instrumentUuid);
 		}
 		
