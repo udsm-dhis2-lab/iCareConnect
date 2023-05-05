@@ -322,6 +322,11 @@ export class SamplesToExportComponent implements OnInit {
                           }
                         });
                       }
+
+                      if (reference?.type === "specimen") {
+                        const specimen = result?.specimenSource;
+                        // formattedResult[reference?.systemKey] =
+                      }
                     }
                   }
                 });
