@@ -57,36 +57,101 @@
             (change)="fileSelection($event)"
           />
         </div>
-        <div class="w-100" style="overflow: auto" *ngIf="exceltoJson?.filename">
-          <table class="table table-bordered" id="samples-imported">
-            <thead>
-              <tr>
-                <th rowspan="2" style="width: 40px">SN</th>
-                <th
-                  [attr.colspan]="rowOneItem?.colspan"
-                  class="text-center"
-                  *ngFor="let rowOneItem of formulatedHeaders?.rowOneItems"
-                >
-                  {{ rowOneItem?.name }}
-                </th>
-              </tr>
-              <tr>
-                <th *ngFor="let header of formulatedHeaders?.rowTwoItems">
-                  {{ header?.exportKey }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let sample of exceltoJson?.sheet1; let count = index">
-                <td>
-                  {{ count + 1 }}
-                </td>
-                <td *ngFor="let header of formulatedHeaders?.rowTwoItems">
-                  {{ sample[header?.systemKey] }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="w-100" *ngIf="exceltoJson?.filename">
+          <mat-tab-group>
+            <mat-tab label="Valid samples">
+              <ng-template matTabContent>
+                <div class="p-3 w-100" style="overflow: auto">
+                  <table class="table table-bordered" id="samples-imported">
+                    <thead>
+                      <tr>
+                        <th rowspan="2" style="width: 40px">SN</th>
+                        <th
+                          [attr.colspan]="rowOneItem?.colspan"
+                          class="text-center"
+                          *ngFor="
+                            let rowOneItem of formulatedHeaders?.rowOneItems
+                          "
+                        >
+                          {{ rowOneItem?.name }}
+                        </th>
+                      </tr>
+                      <tr>
+                        <th
+                          *ngFor="let header of formulatedHeaders?.rowTwoItems"
+                        >
+                          {{ header?.exportKey }}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        *ngFor="
+                          let sample of exceltoJson?.sheet1;
+                          let count = index
+                        "
+                      >
+                        <td>
+                          {{ count + 1 }}
+                        </td>
+                        <td
+                          *ngFor="let header of formulatedHeaders?.rowTwoItems"
+                        >
+                          {{ sample[header?.systemKey] }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </ng-template>
+            </mat-tab>
+            <mat-tab label="Samples with issues">
+              <ng-template matTabContent>
+                <div class="p-3 w-100" style="overflow: auto">
+                  <table class="table table-bordered" id="samples-with-issues">
+                    <thead>
+                      <tr>
+                        <th rowspan="2" style="width: 40px">SN</th>
+                        <th
+                          [attr.colspan]="rowOneItem?.colspan"
+                          class="text-center"
+                          *ngFor="
+                            let rowOneItem of formulatedHeaders?.rowOneItems
+                          "
+                        >
+                          {{ rowOneItem?.name }}
+                        </th>
+                      </tr>
+                      <tr>
+                        <th
+                          *ngFor="let header of formulatedHeaders?.rowTwoItems"
+                        >
+                          {{ header?.exportKey }}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        *ngFor="
+                          let sample of exceltoJson?.sheet1;
+                          let count = index
+                        "
+                      >
+                        <td>
+                          {{ count + 1 }}
+                        </td>
+                        <td
+                          *ngFor="let header of formulatedHeaders?.rowTwoItems"
+                        >
+                          {{ sample[header?.systemKey] }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </ng-template>
+            </mat-tab>
+          </mat-tab-group>
         </div>
         <div class="w-100 mt-2 d-flex justify-content-left">
           <button
@@ -96,6 +161,46 @@
             (click)="onImport($event, params?.exportTemplateDataReferences)"
           >
             Import
+          </button>
+
+          <button
+            class="ml-2"
+            mat-flat-button
+            color="primary"
+            [disabled]="
+              !exceltoJson ||
+              !exceltoJson?.sheet1 ||
+              !params?.exportTemplateDataReferences
+            "
+            (click)="
+              onConfirm(
+                $event,
+                exceltoJson?.sheet1,
+                params?.exportTemplateDataReferences
+              )
+            "
+          >
+            Confirm
+          </button>
+          <button
+            class="ml-2"
+            mat-stroked-button
+            [disabled]="
+              !exceltoJson ||
+              !exceltoJson?.sheet1 ||
+              !params?.exportTemplateDataReferences
+            "
+            (click)="
+              onDownloadSamplesWithIssues(
+                $event,
+                'samples-with-issues',
+                params?.exportTemplateDataReferences,
+                'Samples_with_issues_' + file?.name
+              )
+            "
+          >
+            <mat-icon>arrow_drop_down</mat-icon>
+            <span class="ml-2"> Samples with issues </span>
           </button>
         </div>
       </div>
