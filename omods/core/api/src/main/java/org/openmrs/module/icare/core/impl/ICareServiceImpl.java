@@ -671,7 +671,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		catch (Exception e) {
 			throw new RuntimeException("Error occurred while sending  email: " + e);
 		}
-		return "TESTING";
+		return "SENT EMAIL";
 	}
 	
 	public String getClientsFromExternalSystems(String identifier, String identifierReference, String basicAuthKey)
