@@ -487,14 +487,14 @@ public class ICareDao extends BaseDAO<Item> {
 			}
 			where += " lower(cn.name) like lower(:searchTerm)";
 		}
-
+		
 		if (searchTermOfConceptSetToExclude != null) {
 			if (!where.equals("WHERE")) {
 				where += " AND ";
 			}
 			where += " c NOT IN (SELECT DISTINCT cs.concept FROM ConceptSet cs WHERE cs.conceptSet IN (SELECT DISTINCT conc FROM Concept conc JOIN conc.names stn WHERE stn.conceptNameType= 'INDEX_TERM' AND lower(stn.name) like lower(:searchTermOfConceptSetToExclude)))";
 		}
-
+		
 		if (referenceTermCode != null && conceptSourceUuid != null) {
 			if (!where.equals("WHERE")) {
 				where += " AND ";
@@ -521,7 +521,7 @@ public class ICareDao extends BaseDAO<Item> {
 		if (searchTermOfConceptSetToExclude != null) {
 			sqlQuery.setParameter("searchTermOfConceptSetToExclude", searchTermOfConceptSetToExclude);
 		}
-
+		
 		if (referenceTermCode != null && conceptSourceUuid != null) {
 			sqlQuery.setParameter("referenceTermCode", referenceTermCode);
 			sqlQuery.setParameter("conceptSourceUuid", conceptSourceUuid);
@@ -569,6 +569,26 @@ public class ICareDao extends BaseDAO<Item> {
 		if (concept != null) {
 			sqlQuery.setParameter("concept", concept);
 		}
+		return sqlQuery.list();
+	}
+	
+	public List<Location> getLocations(String attributeType, String value, Integer limit, Integer startIndex) {
+		DbSession session = getSession();
+		new LocationAttribute();
+		String getLocationQuery = "SELECT DISTINCT location FROM Location location ";
+		
+		if (attributeType != null && value != null) {
+			getLocationQuery += " WHERE location IN (SELECT attribute.location FROM LocationAttribute attribute WHERE attribute.valueReference =:value AND attribute.attributeType IN (SELECT lat FROM LocationAttributeType lat WHERE lat.uuid =:attributeType))";
+		}
+		Query sqlQuery = session.createQuery(getLocationQuery);
+		
+		sqlQuery.setFirstResult(startIndex);
+		sqlQuery.setMaxResults(limit);
+		if (attributeType != null && value != null) {
+			sqlQuery.setParameter("attributeType", attributeType);
+			sqlQuery.setParameter("value", value);
+		}
+		
 		return sqlQuery.list();
 	}
 	

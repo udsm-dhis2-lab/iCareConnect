@@ -544,16 +544,15 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		maps = (List) results.get("results");
 		assertThat("Should return 1 item", maps.size(), is(1));
-
-		newGetRequest = newGetRequest("icare/concept", new Parameter("conceptSource", "8387bbb9-52b9-11zz-b60d-880027ae421s"),
-				new Parameter("referenceTermCode", "CODEONE"));
+		
+		newGetRequest = newGetRequest("icare/concept",
+		    new Parameter("conceptSource", "8387bbb9-52b9-11zz-b60d-880027ae421s"), new Parameter("referenceTermCode",
+		            "CODEONE"));
 		handle = handle(newGetRequest);
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		maps = (List) results.get("results");
 		assertThat("Should return 1 item", maps.size(), is(1));
-
-
-
+		
 		newGetRequest = newGetRequest("icare/concept", new Parameter("q", "count"));
 		handle = handle(newGetRequest);
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
@@ -593,6 +592,17 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		List<Map<String, Object>> maps = (List) results.get("results");
 		System.out.println(maps);
 		assertThat("Should return 0 concept set", maps.size(), is(0));
+	}
+	
+	@Test
+	public void testGetLocations() throws Exception {
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/location", new Parameter("attributeType",
+		        "15f83cd6-64e9-4e06-a5f9-364d3b14a43d"), new Parameter("value", "HFR_CODE"));
+		MockHttpServletResponse handle = handle(newGetRequest);
+		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		List<Map<String, Object>> maps = (List) results.get("results");
+		//		System.out.println(maps);
+		assertThat("Should return 0 Location", maps.size(), is(0));
 	}
 	
 	@Test
