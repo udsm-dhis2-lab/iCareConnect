@@ -376,9 +376,11 @@ public class ICareController {
 												@RequestParam(value = "searchTerm", required = false) String searchTerm,
 												@RequestParam(defaultValue = "50") Integer limit,
 												@RequestParam(defaultValue = "0") Integer startIndex,
-												@RequestParam(value="searchTermOfConceptSetToExclude", required = false) String searchTermOfConceptSetToExclude) {
+												@RequestParam(value="searchTermOfConceptSetToExclude", required = false) String searchTermOfConceptSetToExclude,
+												@RequestParam(value="conceptSource", required = false) String conceptSourceUuid,
+												@RequestParam(value="referenceTermCode", required = false) String referenceTermCode) {
 		List<Map<String, Object>> conceptsList = new ArrayList<>();
-		for (Concept conceptItem: iCareService.getConcepts(q, conceptClass, searchTerm, limit, startIndex, searchTermOfConceptSetToExclude)) {
+		for (Concept conceptItem: iCareService.getConcepts(q, conceptClass, searchTerm, limit, startIndex, searchTermOfConceptSetToExclude,conceptSourceUuid, referenceTermCode)) {
 			Map<String, Object> conceptMap = new HashMap<String, Object>();
 			conceptMap.put("uuid", conceptItem.getUuid().toString());
 			conceptMap.put("display", conceptItem.getDisplayString());
@@ -389,8 +391,14 @@ public class ICareController {
 			classDetails.put("name", conceptItem.getConceptClass().getName() );
 			conceptMap.put("class",  classDetails );
 //			Mappings
-			Map<String, Object> mappings = new HashMap<String, Object>();
-			mappings.put("name", conceptItem.getConceptMappings().getClass().getName() );
+			List<Map<String, Object>> mappings = new ArrayList<>();
+			for(ConceptMap mapping: conceptItem.getConceptMappings()) {
+				Map<String, Object> conceptMapping = new HashMap<>();
+				conceptMapping.put("uuid", mapping.getUuid());
+				conceptMapping.put("code", mapping.getConceptReferenceTerm().getCode());
+				conceptMapping.put("conceptSourceUuid", mapping.getConceptReferenceTerm().getConceptSource().getUuid());
+				mappings.add(conceptMapping);
+			}
 
 			conceptMap.put("mappings",  mappings );
 			conceptsList.add(conceptMap);

@@ -142,6 +142,15 @@
                   date_created="2017-05-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="b657ac00-5345-nso8-9c7c-4ybs34kksxfe" />
 
+    <concept_map_type concept_map_type_id="1" name="SAME-AS" creator="1" date_created="2023-02-27 00:00:00.0" retired="false" is_hidden="false" uuid="8127bbb9-52b9-11zz-b60d-880027ae4212" description="SAME AS DESCRIPTION" />
+
+    <concept_reference_source concept_source_id="1" name="UNIFIED CODING REFERENCE" description="THIS IS UNIFIED CODING REFERENCE" hl7_code="SCT" creator="1" date_created="2023-02-27 00:00:00.0" retired="false" uuid="8387bbb9-52b9-11zz-b60d-880027ae421s"/>
+
+    <concept_reference_term concept_reference_term_id="2"  concept_source_id="1" code="CODEONE" creator="1" date_created="2023-02-27 00:00:00.0"  retired="false"  uuid="8187bbb9-52b9-11zz-b60d-880027ae4211"/>
+
+    <concept_reference_map concept_map_id="1" concept_reference_term_id="2" concept_map_type_id="1" creator="1" date_created="2023-02-27 00:00:00.0" concept_id="1000" uuid="8087bbb9-52b9-11zz-b60d-880027ae4211"/>
+
+
     <!-- Patient-Persons -->
     <person person_id="1000" gender="M" birthdate="1980-07-31" birthdate_estimated="0" dead="0" creator="1"
             date_created="2016-08-19 15:58:32" voided="false" uuid="993c46d2-5007-45e8-9512-969300717761" deathdate_estimated="0" />
