@@ -245,6 +245,15 @@ export class SamplesToExportComponent implements OnInit {
                     ) {
                       formattedResult[reference?.systemKey] =
                         result?.patient?.identifiers[0]?.id;
+                    } else if (
+                      reference?.category === "patient" &&
+                      reference?.systemKey === "address"
+                    ) {
+                      formattedResult[reference?.systemKey] =
+                        result.patient?.addresses &&
+                        result.patient?.addresses?.length > 0
+                          ? result.patient?.addresses[0]?.address1
+                          : "";
                     } else if (reference?.category === "patient") {
                       // Get from attributes
                       const attribute = (result?.patient?.attributes?.filter(
@@ -255,6 +264,23 @@ export class SamplesToExportComponent implements OnInit {
                       formattedResult[reference?.systemKey] = !attribute
                         ? ""
                         : attribute?.value;
+                    } else if (
+                      reference?.category === "visit" &&
+                      reference?.attributeTypeUuid
+                    ) {
+                      // Get from attributes
+                      const attribute = (result?.visit?.attributes?.filter(
+                        (attribute: any) =>
+                          attribute?.attributeType?.uuid ===
+                          reference?.attributeTypeUuid
+                      ) || [])[0];
+                      formattedResult[reference?.systemKey] = !attribute
+                        ? ""
+                        : attribute?.value;
+                    } else if (reference?.category === "sample") {
+                      if (reference?.type === "label") {
+                        formattedResult[reference?.systemKey] = result?.label;
+                      }
                     }
                   }
                 });

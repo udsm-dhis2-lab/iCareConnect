@@ -431,7 +431,7 @@ export class StandardConceptCreationComponent implements OnInit {
           ? this.formData["precision"]?.value
           : null,
       mappings: uniqBy(mappings, "conceptReferenceTerm"),
-      attributes: attributesValuesData,
+      attributes: attributesValuesData?.filter((attr) => attr?.value) || [],
     };
 
     const keys: any[] = Object.keys(concept);
@@ -447,7 +447,7 @@ export class StandardConceptCreationComponent implements OnInit {
     this.conceptService
       .searchConcept({ q: conceptName, conceptClass: this.conceptClass })
       .subscribe((checkResponse) => {
-        if (checkResponse?.length > 0 && !this.conceptUuid) {
+        if (checkResponse?.length > 0 && !this.conceptBeingEdited?.uuid) {
           this.saving = false;
           this.alertType = "danger";
           this.savingMessage = "Item with name " + conceptName + " exists";
@@ -457,7 +457,10 @@ export class StandardConceptCreationComponent implements OnInit {
         } else {
           (!this.conceptUuid
             ? this.conceptService.createConcept(concept)
-            : this.conceptService.updateConcept(this.conceptUuid, concept)
+            : this.conceptService.updateConcept(
+                this.conceptBeingEdited?.uuid,
+                concept
+              )
           ).subscribe((response: any) => {
             if (response) {
               // Update attribute if exists
@@ -477,7 +480,7 @@ export class StandardConceptCreationComponent implements OnInit {
                 });
               // If it is test order create as a billable item
               if (
-                !this.conceptUuid &&
+                !this.conceptBeingEdited?.uuid &&
                 this.standardSearchTerm === "TEST_ORDERS"
               ) {
                 const billableItem = {
