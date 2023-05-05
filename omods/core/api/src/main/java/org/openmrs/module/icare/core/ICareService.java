@@ -120,6 +120,8 @@ public interface ICareService extends OpenmrsService {
 	
 	List<ConceptSet> getConceptsSetsByConcept(String concept);
 	
+	List<Location> getLocations(String attributeType, String value, Integer limit, Integer startIndex);
+	
 	List<PatientWrapper> getPatients(String search, String patientUUID, PatientWrapper.VisitStatus visitStatus,
 	        Integer startIndex, Integer limit, PatientWrapper.OrderByDirection orderByDirection);
 	

@@ -452,6 +452,25 @@ public class ICareController {
 		return results;
 	}
 	
+	@RequestMapping(value = "location", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getLocations(@RequestParam(value = "attributeType", required = false) String attributeType,
+										   @RequestParam(value = "value", required = false) String value,
+										   @RequestParam(defaultValue = "50") Integer limit,
+										   @RequestParam(defaultValue = "0") Integer startIndex) {
+		List<Map<String, Object>> locationList = new ArrayList<>();
+		for(Location location: iCareService.getLocations(attributeType, value, limit, startIndex)) {
+			Map<String, Object> locationData = new HashMap<>();
+			locationData.put("uuid", location.getUuid());
+			locationData.put("name", location.getName());
+			locationData.put("display", location.getDisplayString());
+			locationList.add(locationData);
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", locationList);
+		return results;
+	}
+	
 	@RequestMapping(value = "drug", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getDrugs(@RequestParam(value = "concept", required = false) String concept, @RequestParam(defaultValue = "50") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
@@ -485,9 +504,7 @@ public class ICareController {
 
 		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
 		for (PatientWrapper patient: patients){
-
 			responseSamplesObject.add((Map<String, Object>) patient.toMap());
-
 		}
 		Map<String, Object> results = new HashMap<>();
 		results.put("results",responseSamplesObject);
