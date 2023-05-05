@@ -7,6 +7,7 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 import { map } from "rxjs/operators";
 import * as XLSX from "xlsx";
 import { keyBy } from "lodash";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 
 @Component({
   selector: "app-sample-import-export",
@@ -19,6 +20,7 @@ export class SampleImportExportComponent implements OnInit {
   @Input() provider: any;
   @Input() currentUser: any;
   @Input() unifiedCodingReferenceConceptSourceUuid: string;
+  @Input() relatedMetadataAttributeUuid: string;
   exceltoJson: any;
   formResource: FormGroup;
   file: any;
@@ -27,7 +29,10 @@ export class SampleImportExportComponent implements OnInit {
   exportTemplateDataReferences$: Observable<any>;
 
   formulatedHeaders: any = {};
-  constructor(private systemSettingsService: SystemSettingsService) {}
+  constructor(
+    private systemSettingsService: SystemSettingsService,
+    private conceptService: ConceptsService
+  ) {}
 
   ngOnInit(): void {
     this.exportTemplateDataReferences$ = this.systemSettingsService
@@ -204,7 +209,6 @@ export class SampleImportExportComponent implements OnInit {
     exportTemplateDataReferences: any[]
   ): void {
     event.stopPropagation();
-    console.log(dataRows);
     const keyedExportTemplateDataReferences = keyBy(
       exportTemplateDataReferences,
       "systemKey"
@@ -331,15 +335,37 @@ export class SampleImportExportComponent implements OnInit {
           !reference?.attributeTypeUuid &&
           reference?.type == "specimen"
         ) {
-          specimenSource = data[key];
+          const referenceTermCode = data[key];
+          this.conceptService
+            .searchConcept({
+              conceptSource: this.unifiedCodingReferenceConceptSourceUuid,
+              referenceTermCode: referenceTermCode,
+            })
+            .subscribe((response: any) => {
+              if (response) {
+                specimenSource = response[0]?.uuid;
+              }
+            });
         }
 
         if (
           reference?.category === "sample" &&
           !reference?.attributeTypeUuid &&
-          reference?.type == "specimen"
+          reference?.type == "testMethod"
         ) {
-          specimenSource = data[key];
+          const referenceTermCode = data[key];
+          this.conceptService
+            .searchConcept({
+              conceptSource: this.unifiedCodingReferenceConceptSourceUuid,
+              referenceTermCode: referenceTermCode,
+            })
+            .subscribe((response: any) => {
+              if (response) {
+                // console.log("response", response);
+                // deduce test order
+                testOrder = response[0]?.uuid;
+              }
+            });
         }
 
         if (
@@ -355,7 +381,7 @@ export class SampleImportExportComponent implements OnInit {
       person["addresses"] = [address];
       patient["person"] = person;
       patient["identifiers"] = identifiers;
-      console.log(patient);
+      // console.log(patient);
       const visit = {
         patient: "",
         visitType: "54e8ffdc-dea0-4ef0-852f-c23e06d16066",

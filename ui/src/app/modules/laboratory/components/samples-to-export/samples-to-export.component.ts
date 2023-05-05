@@ -335,7 +335,6 @@ export class SamplesToExportComponent implements OnInit {
                             )
                             .subscribe((response: any) => {
                               if (response) {
-                                console.log(response);
                                 const mapping = (response?.mappings?.filter(
                                   (mapping) =>
                                     mapping?.conceptReferenceTerm?.conceptSource
