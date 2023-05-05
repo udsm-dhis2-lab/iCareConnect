@@ -15,7 +15,7 @@ public class WorksheetDefinitionDAO extends BaseDAO<WorksheetDefinition> {
 	
 	public List<WorksheetDefinition> getWorksheetDefinitions(Date startDate, Date endDate, String q, Integer startIndex,
 	        Integer limit, Date expirationDate, String instrumentUuid) {
-
+		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT wd FROM WorksheetDefinition wd INNER JOIN wd.worksheet w";
 		
@@ -44,14 +44,14 @@ public class WorksheetDefinitionDAO extends BaseDAO<WorksheetDefinition> {
 			}
 			queryStr += " cast(wd.expirationDateTime as date) >= :expirationDate";
 		}
-		if(instrumentUuid != null){
+		if (instrumentUuid != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
-
-			queryStr +=" w.instrument.uuid = :instrumentUuid AND wd IN ( SELECT ws.worksheetDefinition FROM WorksheetSample ws WHERE ws.sample IN(SELECT sample FROM Sample sample WHERE sample NOT IN( SELECT st.sample FROM SampleStatus st WHERE st.category ='HAS_RESULTS' )))";
+			
+			queryStr += " w.instrument.uuid = :instrumentUuid AND wd IN ( SELECT ws.worksheetDefinition FROM WorksheetSample ws WHERE ws.sample IN(SELECT sample FROM Sample sample WHERE sample NOT IN( SELECT st.sample FROM SampleStatus st WHERE st.category ='HAS_RESULTS' )))";
 		}
 		//Construct a query object
 		Query query = session.createQuery(queryStr);
@@ -71,9 +71,9 @@ public class WorksheetDefinitionDAO extends BaseDAO<WorksheetDefinition> {
 		if (expirationDate != null) {
 			query.setParameter("expirationDate", expirationDate);
 		}
-
-		if(instrumentUuid != null){
-			query.setParameter("instrumentUuid",instrumentUuid);
+		
+		if (instrumentUuid != null) {
+			query.setParameter("instrumentUuid", instrumentUuid);
 		}
 		
 		query.setFirstResult(startIndex);
