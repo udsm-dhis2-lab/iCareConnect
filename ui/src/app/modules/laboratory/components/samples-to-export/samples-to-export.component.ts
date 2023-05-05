@@ -215,7 +215,15 @@ export class SamplesToExportComponent implements OnInit {
                   ["asc"]
                 )?.forEach((reference: any) => {
                   if (reference?.systemKey) {
-                    if (reference?.category === "patient") {
+                    if (
+                      reference?.category === "patient" &&
+                      (reference?.systemKey === "givenName" ||
+                        reference?.systemKey === "familyName" ||
+                        reference?.systemKey === "middleName" ||
+                        reference?.systemKey === "age" ||
+                        reference?.systemKey === "dob" ||
+                        reference?.systemKey === "gender")
+                    ) {
                       formattedResult[reference?.systemKey] =
                         reference?.options?.length > 0
                           ? (reference?.options?.filter(
@@ -230,6 +238,12 @@ export class SamplesToExportComponent implements OnInit {
                               ) || [])[0]?.exportValue
                             : "N/A"
                           : result?.patient[reference?.systemKey];
+                    } else if (
+                      reference?.category === "patient" &&
+                      reference?.systemKey === "fileNo"
+                    ) {
+                      formattedResult[reference?.systemKey] =
+                        result?.patient?.identifiers[0]?.id;
                     }
                   }
                 });
