@@ -463,7 +463,7 @@ public class ICareDao extends BaseDAO<Item> {
 	}
 	
 	public List<Concept> getConceptsBySearchParams(String q, String conceptClass, String searchTerm, Integer limit,
-	        Integer startIndex, String searchTermOfConceptSetToExclude) {
+	        Integer startIndex, String searchTermOfConceptSetToExclude, String conceptSourceUuid, String referenceTermCode) {
 		DbSession session = getSession();
 		String searchConceptQueryStr = "SELECT DISTINCT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc";
 		
@@ -487,12 +487,19 @@ public class ICareDao extends BaseDAO<Item> {
 			}
 			where += " lower(cn.name) like lower(:searchTerm)";
 		}
-		
+
 		if (searchTermOfConceptSetToExclude != null) {
 			if (!where.equals("WHERE")) {
 				where += " AND ";
 			}
 			where += " c NOT IN (SELECT DISTINCT cs.concept FROM ConceptSet cs WHERE cs.conceptSet IN (SELECT DISTINCT conc FROM Concept conc JOIN conc.names stn WHERE stn.conceptNameType= 'INDEX_TERM' AND lower(stn.name) like lower(:searchTermOfConceptSetToExclude)))";
+		}
+
+		if (referenceTermCode != null && conceptSourceUuid != null) {
+			if (!where.equals("WHERE")) {
+				where += " AND ";
+			}
+			where += " c IN (SELECT DISTINCT cms.concept FROM ConceptMap cms WHERE cms.conceptReferenceTerm IN (SELECT DISTINCT crt FROM ConceptReferenceTerm crt WHERE crt.conceptSource IN (SELECT cs FROM ConceptSource cs WHERE cs.uuid =:conceptSourceUuid) AND crt.code =:referenceTermCode))";
 		}
 		
 		if (!where.equals("WHERE")) {
@@ -513,6 +520,11 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		if (searchTermOfConceptSetToExclude != null) {
 			sqlQuery.setParameter("searchTermOfConceptSetToExclude", searchTermOfConceptSetToExclude);
+		}
+
+		if (referenceTermCode != null && conceptSourceUuid != null) {
+			sqlQuery.setParameter("referenceTermCode", referenceTermCode);
+			sqlQuery.setParameter("conceptSourceUuid", conceptSourceUuid);
 		}
 		return sqlQuery.list();
 	}
