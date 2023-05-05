@@ -332,13 +332,11 @@ export class LabSample {
   }
 
   get department(): any {
-    return this.keyedDepartments[this.sample?.orders[0]?.order?.concept?.uuid];
+    return this.sample?.department;
   }
 
   get specimenSource(): any {
-    return this.keyedSpecimenSources[
-      this.sample?.orders[0]?.order?.concept?.uuid
-    ];
+    return this.sample?.specimenSource;
   }
 
   get integrationStatus(): any {

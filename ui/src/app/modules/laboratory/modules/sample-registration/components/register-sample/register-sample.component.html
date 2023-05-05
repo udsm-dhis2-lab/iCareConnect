@@ -11,7 +11,9 @@
     identifierTypes: identifierTypes$ | async,
     batchsets: batchsets$ | async,
     batches: batches$ | async,
-    barcodeSettings: barcodeSettings$ | async
+    barcodeSettings: barcodeSettings$ | async,
+    unifiedCodingReferenceConceptSourceUuid:
+      unifiedCodingReferenceConceptSourceUuid$ | async
   } as params"
 >
   <div class="row">
@@ -66,7 +68,8 @@
               !params?.referringDoctorAttributes ||
               !params?.referFromFacilityVisitAttribute ||
               !params?.labNumberCharactersCount ||
-              !params?.testsFromExternalSystemsConfigs
+              !params?.testsFromExternalSystemsConfigs ||
+              !params?.unifiedCodingReferenceConceptSourceUuid
             "
             mode="indeterminate"
           ></mat-progress-bar>
@@ -208,11 +211,20 @@
           </mat-radio-button>
         </mat-radio-group>
         <div class="row">
-          <div class="col-12 mt-2" *ngIf="importExportCategory">
+          <div
+            class="col-12 mt-2"
+            *ngIf="
+              importExportCategory &&
+              params?.unifiedCodingReferenceConceptSourceUuid
+            "
+          >
             <app-sample-import-export
               [category]="importExportCategory"
               [currentUser]="currentUser"
               [provider]="provider"
+              [unifiedCodingReferenceConceptSourceUuid]="
+                params?.unifiedCodingReferenceConceptSourceUuid
+              "
               [labSamplesDepartments]="labSections"
             ></app-sample-import-export>
           </div>
