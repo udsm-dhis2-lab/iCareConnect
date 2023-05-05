@@ -332,11 +332,23 @@ export class LabSample {
   }
 
   get department(): any {
-    return this.sample?.department;
+    return {
+      ...this.sample?.department,
+      name:
+        this.sample?.department?.display?.indexOf(":") > -1
+          ? this.sample?.department?.display?.split(":")[1]
+          : this.sample?.department?.display,
+    };
   }
 
   get specimenSource(): any {
-    return this.sample?.specimenSource;
+    return {
+      ...this.sample?.specimenSource,
+      name:
+        this.sample?.specimenSource?.display?.indexOf(":") > -1
+          ? this.sample?.specimenSource?.display?.split(":")[1]
+          : this.sample?.specimenSource?.display,
+    };
   }
 
   get integrationStatus(): any {

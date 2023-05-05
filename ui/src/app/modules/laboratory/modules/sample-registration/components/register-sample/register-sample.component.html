@@ -13,7 +13,8 @@
     batches: batches$ | async,
     barcodeSettings: barcodeSettings$ | async,
     unifiedCodingReferenceConceptSourceUuid:
-      unifiedCodingReferenceConceptSourceUuid$ | async
+      unifiedCodingReferenceConceptSourceUuid$ | async,
+    relatedMetadataAttributeUuid: relatedMetadataAttributeUuid$ | async
   } as params"
 >
   <div class="row">
@@ -215,7 +216,8 @@
             class="col-12 mt-2"
             *ngIf="
               importExportCategory &&
-              params?.unifiedCodingReferenceConceptSourceUuid
+              params?.unifiedCodingReferenceConceptSourceUuid &&
+              params?.relatedMetadataAttributeUuid
             "
           >
             <app-sample-import-export
@@ -224,6 +226,9 @@
               [provider]="provider"
               [unifiedCodingReferenceConceptSourceUuid]="
                 params?.unifiedCodingReferenceConceptSourceUuid
+              "
+              [relatedMetadataAttributeUuid]="
+                params?.relatedMetadataAttributeUuid
               "
               [labSamplesDepartments]="labSections"
             ></app-sample-import-export>

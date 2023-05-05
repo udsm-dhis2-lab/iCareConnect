@@ -97,6 +97,7 @@ export class RegisterSampleComponent implements OnInit {
   }
 
   unifiedCodingReferenceConceptSourceUuid$: Observable<string>;
+  relatedMetadataAttributeUuid$: Observable<string>;
 
   constructor(
     private samplesService: SamplesService,
@@ -126,6 +127,11 @@ export class RegisterSampleComponent implements OnInit {
     this.unifiedCodingReferenceConceptSourceUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
         `icare.laboratory.concept.unifiedCodingReference.conceptSourceUuid`
+      );
+
+    this.relatedMetadataAttributeUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `icare.laboratory.concept.relatedMetadata.attributeUuid`
       );
 
     this.agencyConceptConfigs$ = this.store.select(getConceptById, {
