@@ -293,6 +293,13 @@ export class SampleImportExportComponent implements OnInit {
         ) {
           clinicalInformation = data[key];
         }
+        if (
+          reference?.category === "visit" &&
+          !reference?.attributeTypeUuid &&
+          reference?.type == "icdCodedDiagnosis"
+        ) {
+          codedDiagnosis = data[key];
+        }
 
         if (
           reference?.category === "visit" &&
