@@ -177,7 +177,7 @@ public class SampleExt extends Sample {
         patientObject.put("familyName", this.getVisit().getPatient().getPersonName().getFamilyName());
         patientObject.put("middleName", this.getVisit().getPatient().getPersonName().getMiddleName());
         patientObject.put("givenName", this.getVisit().getPatient().getPersonName().getGivenName());
-        patientObject.put("getFamilyName2", this.getVisit().getPatient().getPersonName().getFamilyName2());
+        patientObject.put("familyName2", this.getVisit().getPatient().getPersonName().getFamilyName2());
         patientObject.put("gender", this.getVisit().getPatient().getGender());
         patientObject.put("uuid", this.getVisit().getPatient().getUuid());
 

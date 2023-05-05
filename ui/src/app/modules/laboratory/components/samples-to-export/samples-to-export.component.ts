@@ -220,6 +220,7 @@ export class SamplesToExportComponent implements OnInit {
                       (reference?.systemKey === "givenName" ||
                         reference?.systemKey === "familyName" ||
                         reference?.systemKey === "middleName" ||
+                        reference?.systemKey === "familyName2" ||
                         reference?.systemKey === "age" ||
                         reference?.systemKey === "dob" ||
                         reference?.systemKey === "gender")
@@ -244,6 +245,16 @@ export class SamplesToExportComponent implements OnInit {
                     ) {
                       formattedResult[reference?.systemKey] =
                         result?.patient?.identifiers[0]?.id;
+                    } else if (reference?.category === "patient") {
+                      // Get from attributes
+                      const attribute = (result?.patient?.attributes?.filter(
+                        (attribute: any) =>
+                          attribute?.attributeType?.uuid ===
+                          reference?.attributeTypeUuid
+                      ) || [])[0];
+                      formattedResult[reference?.systemKey] = !attribute
+                        ? ""
+                        : attribute?.value;
                     }
                   }
                 });
