@@ -96,6 +96,8 @@ export class RegisterSampleComponent implements OnInit {
     return `${maxDate.getFullYear()}-${maxMonth}-${maxDay}`;
   }
 
+  unifiedCodingReferenceConceptSourceUuid$: Observable<string>;
+
   constructor(
     private samplesService: SamplesService,
     private systemSettingsService: SystemSettingsService,
@@ -120,6 +122,10 @@ export class RegisterSampleComponent implements OnInit {
     this.referFromFacilityVisitAttribute$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "lis.attribute.referFromFacility"
+      );
+    this.unifiedCodingReferenceConceptSourceUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `icare.laboratory.concept.unifiedCodingReference.conceptSourceUuid`
       );
 
     this.agencyConceptConfigs$ = this.store.select(getConceptById, {

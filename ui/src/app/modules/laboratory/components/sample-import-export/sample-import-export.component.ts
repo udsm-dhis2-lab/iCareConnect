@@ -18,6 +18,7 @@ export class SampleImportExportComponent implements OnInit {
   @Input() labSamplesDepartments: any[];
   @Input() provider: any;
   @Input() currentUser: any;
+  @Input() unifiedCodingReferenceConceptSourceUuid: string;
   exceltoJson: any;
   formResource: FormGroup;
   file: any;

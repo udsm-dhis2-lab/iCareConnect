@@ -8,6 +8,7 @@ import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { MatSelectChange } from "@angular/material/select";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { LocationService } from "src/app/core/services";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 
 @Component({
   selector: "app-samples-to-export",
@@ -19,6 +20,7 @@ export class SamplesToExportComponent implements OnInit {
   @Input() labSamplesDepartments: any[];
   @Input() sampleTypes: any[];
   @Input() codedSampleRejectionReasons: any[];
+  @Input() unifiedCodingReferenceConceptSourceUuid: string;
   startDate: Date;
   endDate: Date;
   datesParameters: any;
@@ -42,7 +44,8 @@ export class SamplesToExportComponent implements OnInit {
 
   constructor(
     private sampleService: SamplesService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private conceptService: ConceptsService
   ) {}
 
   ngOnInit(): void {
@@ -324,8 +327,27 @@ export class SamplesToExportComponent implements OnInit {
                       }
 
                       if (reference?.type === "specimen") {
-                        const specimen = result?.specimenSource;
-                        // formattedResult[reference?.systemKey] =
+                        if (result?.specimenSource) {
+                          this.conceptService
+                            .getConceptDetailsByUuid(
+                              result?.specimenSource?.uuid,
+                              "custom:(uuid,display,mappings:(uuid,conceptReferenceTerm:(uuid,code,display,conceptSource:(uuid,display))))"
+                            )
+                            .subscribe((response: any) => {
+                              if (response) {
+                                console.log(response);
+                                const mapping = (response?.mappings?.filter(
+                                  (mapping) =>
+                                    mapping?.conceptReferenceTerm?.conceptSource
+                                      ?.uuid ===
+                                    this.unifiedCodingReferenceConceptSourceUuid
+                                ) || [])[0];
+                                formattedResult[reference?.systemKey] = mapping
+                                  ? mapping?.conceptReferenceTerm?.code
+                                  : "";
+                              }
+                            });
+                        }
                       }
                     }
                   }
