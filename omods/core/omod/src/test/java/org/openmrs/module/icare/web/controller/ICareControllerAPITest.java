@@ -539,10 +539,12 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		//		System.out.println(maps);
 		assertThat("Should return 0 item", maps.size(), is(0));
 		
-		newGetRequest = newGetRequest("icare/concept", new Parameter("q", "PARENT_ONE"));
+		newGetRequest = newGetRequest("icare/concept", new Parameter("q", "opd"),
+				new Parameter("searchTerm", "SERVICE"));
 		handle = handle(newGetRequest);
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		maps = (List) results.get("results");
+		System.out.println(maps);
 		assertThat("Should return 1 item", maps.size(), is(1));
 		
 		newGetRequest = newGetRequest("icare/concept",

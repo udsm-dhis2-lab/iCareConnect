@@ -117,6 +117,10 @@
                   date_created="2017-05-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="a457ac00-5345-11e8-9c7c-40mcpekrcfee" />
 
+    <concept_name concept_name_id="1012" concept_id="1000" name="SERVICE" locale="en_GB" creator="1"
+                  date_created="2017-05-12 00:00:00.0" concept_name_type="INDEX_TERM" locale_preferred="1" voided="false"
+                  uuid="9227ac00-5345-11e8-9c7c-40mcpek787ee" />
+
     <concept_name concept_name_id="1001" concept_id="1001" name="Billable Item" locale="en_GB" creator="1"
                   date_created="2017-05-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="a457ac00-5345-11e8-9c7c-40b0mskrcfee" />
