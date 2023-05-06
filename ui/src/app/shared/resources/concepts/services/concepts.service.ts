@@ -276,6 +276,20 @@ export class ConceptsService {
         parameters?.referenceTermCode;
     }
 
+    if (parameters?.attributeType) {
+      queryParams +=
+        (queryParams?.length > 0 ? "&" : "") +
+        "attributeType=" +
+        parameters?.attributeType;
+    }
+
+    if (parameters?.attributeValue) {
+      queryParams +=
+        (queryParams?.length > 0 ? "&" : "") +
+        "attributeValue=" +
+        parameters?.attributeValue;
+    }
+
     return this.httpClient.get(`icare/concept?${queryParams}`).pipe(
       map((response) => {
         return response?.results.map((result) => {
