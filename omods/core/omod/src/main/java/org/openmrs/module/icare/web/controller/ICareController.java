@@ -378,9 +378,12 @@ public class ICareController {
 												@RequestParam(defaultValue = "0") Integer startIndex,
 												@RequestParam(value="searchTermOfConceptSetToExclude", required = false) String searchTermOfConceptSetToExclude,
 												@RequestParam(value="conceptSource", required = false) String conceptSourceUuid,
-												@RequestParam(value="referenceTermCode", required = false) String referenceTermCode) {
+												@RequestParam(value="referenceTermCode", required = false) String referenceTermCode,
+												@RequestParam(value="attributeType", required = false) String attributeType,
+												@RequestParam(value="attributeValue", required = false) String attributeValue) {
 		List<Map<String, Object>> conceptsList = new ArrayList<>();
-		for (Concept conceptItem: iCareService.getConcepts(q, conceptClass, searchTerm, limit, startIndex, searchTermOfConceptSetToExclude,conceptSourceUuid, referenceTermCode)) {
+		for (Concept conceptItem: iCareService.getConcepts(q, conceptClass, searchTerm, limit, startIndex,
+				searchTermOfConceptSetToExclude,conceptSourceUuid, referenceTermCode,attributeType,attributeValue)) {
 			Map<String, Object> conceptMap = new HashMap<String, Object>();
 			conceptMap.put("uuid", conceptItem.getUuid().toString());
 			conceptMap.put("display", conceptItem.getDisplayString());
