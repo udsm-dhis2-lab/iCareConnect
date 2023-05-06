@@ -361,9 +361,16 @@ export class SampleImportExportComponent implements OnInit {
             })
             .subscribe((response: any) => {
               if (response) {
-                // console.log("response", response);
-                // deduce test order
-                testOrder = response[0]?.uuid;
+                this.conceptService
+                  .searchConcept({
+                    attributeType: this.relatedMetadataAttributeUuid,
+                    attributeValue: response[0]?.uuid,
+                  })
+                  .subscribe((restOrderResponse: any) => {
+                    if (restOrderResponse) {
+                      testOrder = restOrderResponse[0]?.uuid;
+                    }
+                  });
               }
             });
         }
