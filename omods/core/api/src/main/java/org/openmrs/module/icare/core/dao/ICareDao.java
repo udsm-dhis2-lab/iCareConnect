@@ -463,14 +463,13 @@ public class ICareDao extends BaseDAO<Item> {
 	}
 	
 	public List<Concept> getConceptsBySearchParams(String q, String conceptClass, String searchTerm, Integer limit,
-												   Integer startIndex, String searchTermOfConceptSetToExclude,
-												   String conceptSourceUuid, String referenceTermCode,
-												   String attributeType, String attributeValue) {
+	        Integer startIndex, String searchTermOfConceptSetToExclude, String conceptSourceUuid, String referenceTermCode,
+	        String attributeType, String attributeValue) {
 		DbSession session = getSession();
-		String searchConceptQueryStr = "SELECT DISTINCT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc";
+		String searchConceptQueryStr = "SELECT DISTINCT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc ";
 		
 		if (searchTerm != null) {
-			searchConceptQueryStr += " ON cn.conceptNameType= 'INDEX_TERM'";
+			searchConceptQueryStr += " LEFT JOIN c.names st ON st.conceptNameType= 'INDEX_TERM'";
 		}
 		String where = "WHERE";
 		if (q != null) {
@@ -487,7 +486,7 @@ public class ICareDao extends BaseDAO<Item> {
 			if (!where.equals("WHERE")) {
 				where += " AND ";
 			}
-			where += " lower(cn.name) like lower(:searchTerm)";
+			where += " lower(st.name) like lower(:searchTerm)";
 		}
 		
 		if (searchTermOfConceptSetToExclude != null) {
@@ -496,7 +495,7 @@ public class ICareDao extends BaseDAO<Item> {
 			}
 			where += " c NOT IN (SELECT DISTINCT cs.concept FROM ConceptSet cs WHERE cs.conceptSet IN (SELECT DISTINCT conc FROM Concept conc JOIN conc.names stn WHERE stn.conceptNameType= 'INDEX_TERM' AND lower(stn.name) like lower(:searchTermOfConceptSetToExclude)))";
 		}
-
+		
 		if (attributeType != null && attributeValue != null) {
 			if (!where.equals("WHERE")) {
 				where += " AND ";
@@ -514,8 +513,7 @@ public class ICareDao extends BaseDAO<Item> {
 		if (!where.equals("WHERE")) {
 			searchConceptQueryStr += " " + where;
 		}
-
-		System.out.println(searchConceptQueryStr);
+		
 		Query sqlQuery = session.createQuery(searchConceptQueryStr);
 		sqlQuery.setFirstResult(startIndex);
 		sqlQuery.setMaxResults(limit);
@@ -537,7 +535,7 @@ public class ICareDao extends BaseDAO<Item> {
 			sqlQuery.setParameter("referenceTermCode", referenceTermCode);
 			sqlQuery.setParameter("conceptSourceUuid", conceptSourceUuid);
 		}
-
+		
 		if (attributeType != null && attributeValue != null) {
 			sqlQuery.setParameter("attributeType", attributeType);
 			sqlQuery.setParameter("attributeValue", attributeValue);
