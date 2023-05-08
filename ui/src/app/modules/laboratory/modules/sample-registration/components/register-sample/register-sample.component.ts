@@ -98,6 +98,7 @@ export class RegisterSampleComponent implements OnInit {
 
   unifiedCodingReferenceConceptSourceUuid$: Observable<string>;
   relatedMetadataAttributeUuid$: Observable<string>;
+  hfrCodeAttributeUuid$: Observable<string>;
 
   constructor(
     private samplesService: SamplesService,
@@ -132,6 +133,11 @@ export class RegisterSampleComponent implements OnInit {
     this.relatedMetadataAttributeUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
         `icare.laboratory.concept.relatedMetadata.attributeUuid`
+      );
+
+    this.hfrCodeAttributeUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `icare.location.attributes.hfrCode.attributeUuid`
       );
 
     this.agencyConceptConfigs$ = this.store.select(getConceptById, {

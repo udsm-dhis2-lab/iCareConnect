@@ -8,6 +8,7 @@ import { map } from "rxjs/operators";
 import * as XLSX from "xlsx";
 import { keyBy } from "lodash";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
+import { LocationService } from "src/app/core/services";
 
 @Component({
   selector: "app-sample-import-export",
@@ -21,6 +22,7 @@ export class SampleImportExportComponent implements OnInit {
   @Input() currentUser: any;
   @Input() unifiedCodingReferenceConceptSourceUuid: string;
   @Input() relatedMetadataAttributeUuid: string;
+  @Input() hfrCodeAttributeUuid: string;
   exceltoJson: any;
   formResource: FormGroup;
   file: any;
@@ -31,7 +33,8 @@ export class SampleImportExportComponent implements OnInit {
   formulatedHeaders: any = {};
   constructor(
     private systemSettingsService: SystemSettingsService,
-    private conceptService: ConceptsService
+    private conceptService: ConceptsService,
+    private locationService: LocationService
   ) {}
 
   ngOnInit(): void {
@@ -203,18 +206,21 @@ export class SampleImportExportComponent implements OnInit {
     }
   }
 
-  onConfirm(
+  async onConfirm(
     event: Event,
     dataRows: any,
     exportTemplateDataReferences: any[]
-  ): void {
+  ) {
     event.stopPropagation();
     const keyedExportTemplateDataReferences = keyBy(
       exportTemplateDataReferences,
       "systemKey"
     );
 
-    const payload = dataRows?.map((data: any) => {
+    let payload = [];
+    for (let index in dataRows) {
+      const data = dataRows[index];
+      console.log(data);
       let patient = {};
       let person = {};
       let personNames = {};
@@ -242,7 +248,9 @@ export class SampleImportExportComponent implements OnInit {
       let deliveredBy = "";
       let transportCondition = "";
       let transportTemperature = "";
-      Object.keys(data).forEach((key) => {
+      const keys = Object.keys(data);
+      for (let keyIndex in keys) {
+        const key = keys[keyIndex];
         const reference = keyedExportTemplateDataReferences[key];
         if (
           reference?.category === "patient" &&
@@ -252,10 +260,11 @@ export class SampleImportExportComponent implements OnInit {
             personNames[key] = data[key];
           }
           if (reference?.type === "address") {
-            address[key] = data[key];
+            address[key + "1"] = data[key];
+            address["cityVillage"] = data[key];
           }
 
-          if (reference?.type === "identifier") {
+          if (reference?.type === "fileNo") {
             identifiers = [
               {
                 identifier: data[key],
@@ -267,7 +276,15 @@ export class SampleImportExportComponent implements OnInit {
           }
 
           if (!reference?.type) {
-            person[key] = data[key];
+            person[key] =
+              !reference?.options ||
+              (reference?.options && reference?.options?.length === 0)
+                ? data[key]
+                : (reference?.options?.filter(
+                    (option) =>
+                      option?.exportValue?.toLowerCase() ===
+                      data[key]?.toLowerCase()
+                  ) || [])[0]?.code;
           }
         }
 
@@ -282,13 +299,35 @@ export class SampleImportExportComponent implements OnInit {
         }
 
         if (reference?.category === "visit" && reference?.attributeTypeUuid) {
-          visitAttributes = [
-            ...visitAttributes,
-            {
-              attributeType: reference?.attributeTypeUuid,
-              value: data[key],
-            },
-          ];
+          if (reference?.valueAttributeTypeUuid === this.hfrCodeAttributeUuid) {
+            if (data[key]) {
+              await this.locationService
+                .getLocationByAttributeTypeAndValue({
+                  attributeType: this.hfrCodeAttributeUuid,
+                  attributeValue: data[key],
+                })
+                .toPromise()
+                .then((response: any) => {
+                  if (response && !response?.error) {
+                    visitAttributes = [
+                      ...visitAttributes,
+                      {
+                        attributeType: reference?.attributeTypeUuid,
+                        value: response?.uuid,
+                      },
+                    ];
+                  }
+                });
+            }
+          } else {
+            visitAttributes = [
+              ...visitAttributes,
+              {
+                attributeType: reference?.attributeTypeUuid,
+                value: data[key],
+              },
+            ];
+          }
         }
 
         if (
@@ -382,7 +421,7 @@ export class SampleImportExportComponent implements OnInit {
         ) {
           laboratoryCode = data[key];
         }
-      });
+      }
       person["names"] = [personNames];
       person["attributes"] = attributes;
       person["addresses"] = [address];
@@ -550,9 +589,20 @@ export class SampleImportExportComponent implements OnInit {
           status: "CLINICAL",
         },
       ];
-      return { patient, visit, encounter, diagnosis, sample, sampleStatuses };
-    });
-    console.log(payload);
+
+      // 1. Create patient
+      // 2. Create visit
+      // 3. Create encounter
+      // 4. Create diagnosis if any
+      // 5. Create sample
+      // 6. Create sample statuses
+
+      payload = [
+        ...payload,
+        { patient, visit, encounter, diagnosis, sample, sampleStatuses },
+      ];
+      console.log(payload);
+    }
   }
 
   onDownloadSamplesWithIssues(

@@ -14,7 +14,8 @@
     barcodeSettings: barcodeSettings$ | async,
     unifiedCodingReferenceConceptSourceUuid:
       unifiedCodingReferenceConceptSourceUuid$ | async,
-    relatedMetadataAttributeUuid: relatedMetadataAttributeUuid$ | async
+    relatedMetadataAttributeUuid: relatedMetadataAttributeUuid$ | async,
+    hfrCodeAttributeUuid: hfrCodeAttributeUuid$ | async
   } as params"
 >
   <div class="row">
@@ -217,7 +218,8 @@
             *ngIf="
               importExportCategory &&
               params?.unifiedCodingReferenceConceptSourceUuid &&
-              params?.relatedMetadataAttributeUuid
+              params?.relatedMetadataAttributeUuid &&
+              params?.hfrCodeAttributeUuid
             "
           >
             <app-sample-import-export
@@ -230,6 +232,7 @@
               [relatedMetadataAttributeUuid]="
                 params?.relatedMetadataAttributeUuid
               "
+              [hfrCodeAttributeUuid]="params?.hfrCodeAttributeUuid"
               [labSamplesDepartments]="labSections"
             ></app-sample-import-export>
           </div>

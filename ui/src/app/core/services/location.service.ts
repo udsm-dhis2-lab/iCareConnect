@@ -330,4 +330,23 @@ export class LocationService {
       catchError((error) => of(error))
     );
   }
+
+  getLocationByAttributeTypeAndValue(parameters: any): Observable<any> {
+    return this.httpClient
+      .get(
+        `icare/location?attributeType=${parameters?.attributeType}&value=${parameters?.attributeValue}`
+      )
+      .pipe(
+        map((response) => {
+          return response?.results && response?.results?.length > 0
+            ? response?.results[0]
+            : {
+                error: {
+                  message: "Code does not found",
+                },
+              };
+        }),
+        catchError((error) => of(error))
+      );
+  }
 }
