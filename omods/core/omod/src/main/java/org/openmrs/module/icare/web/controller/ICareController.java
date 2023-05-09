@@ -387,6 +387,7 @@ public class ICareController {
 			Map<String, Object> conceptMap = new HashMap<String, Object>();
 			conceptMap.put("uuid", conceptItem.getUuid().toString());
 			conceptMap.put("display", conceptItem.getDisplayString());
+			conceptMap.put("systemName", conceptItem.getDisplayString());
 
 //			Class details
 			Map<String, Object> classDetails = new HashMap<String, Object>();
@@ -447,6 +448,7 @@ public class ICareController {
 			Map<String, Object> conceptSet = new HashMap<String, Object>();
 			conceptSet.put("uuid", conceptSets.getConceptSet().getUuid());
 			conceptSet.put("display", conceptSets.getConceptSet().getDisplayString());
+			conceptSet.put("systemName", conceptSets.getConceptSet().getDisplayString());
 			conceptSet.put("retired", conceptSets.getConceptSet().getRetired().booleanValue());
 			conceptSetsList.add(conceptSet);
 		}
