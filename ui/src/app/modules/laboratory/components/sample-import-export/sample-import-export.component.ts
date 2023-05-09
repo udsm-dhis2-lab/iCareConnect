@@ -6,9 +6,14 @@ import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { map } from "rxjs/operators";
 import * as XLSX from "xlsx";
-import { keyBy } from "lodash";
+import { keyBy, flatten } from "lodash";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { LocationService } from "src/app/core/services";
+import { PatientService } from "src/app/shared/resources/patient/services/patients.service";
+import { VisitsService } from "src/app/shared/resources/visits/services";
+import { SamplesService } from "src/app/shared/services/samples.service";
+import { LabOrdersService } from "../../resources/services/lab-orders.service";
+import { DiagnosisService } from "src/app/shared/resources/diagnosis/services";
 
 @Component({
   selector: "app-sample-import-export",
@@ -31,10 +36,18 @@ export class SampleImportExportComponent implements OnInit {
   exportTemplateDataReferences$: Observable<any>;
 
   formulatedHeaders: any = {};
+  errors: any[] = [];
+  payloadOfSamplesWithIssues: any[] = [];
+  onTheProcessErrors: any = {};
   constructor(
     private systemSettingsService: SystemSettingsService,
     private conceptService: ConceptsService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private patientService: PatientService,
+    private visitService: VisitsService,
+    private sampleService: SamplesService,
+    private labOrdersService: LabOrdersService,
+    private diagnosisService: DiagnosisService
   ) {}
 
   ngOnInit(): void {
@@ -269,7 +282,7 @@ export class SampleImportExportComponent implements OnInit {
               {
                 identifier: data[key],
                 identifierType: reference?.identifierType,
-                location: "",
+                location: JSON.parse(localStorage.getItem("userLocations"))[0],
                 preferred: true,
               },
             ];
@@ -375,12 +388,13 @@ export class SampleImportExportComponent implements OnInit {
           reference?.type == "specimen"
         ) {
           const referenceTermCode = data[key];
-          this.conceptService
+          await this.conceptService
             .searchConcept({
               conceptSource: this.unifiedCodingReferenceConceptSourceUuid,
               referenceTermCode: referenceTermCode,
             })
-            .subscribe((response: any) => {
+            .toPromise()
+            .then((response: any) => {
               if (response) {
                 specimenSource = response[0]?.uuid;
               }
@@ -393,22 +407,37 @@ export class SampleImportExportComponent implements OnInit {
           reference?.type == "testMethod"
         ) {
           const referenceTermCode = data[key];
-          this.conceptService
+          await this.conceptService
             .searchConcept({
               conceptSource: this.unifiedCodingReferenceConceptSourceUuid,
               referenceTermCode: referenceTermCode,
             })
-            .subscribe((response: any) => {
+            .toPromise()
+            .then((response: any) => {
               if (response) {
                 this.conceptService
                   .searchConcept({
                     attributeType: this.relatedMetadataAttributeUuid,
                     attributeValue: response[0]?.uuid,
                   })
-                  .subscribe((restOrderResponse: any) => {
-                    if (restOrderResponse) {
-                      testOrder = restOrderResponse[0]?.uuid;
+                  .toPromise()
+                  .then((testOrderResponse: any) => {
+                    if (testOrderResponse) {
+                      testOrder = testOrderResponse[0]?.uuid;
                     }
+                  })
+                  .then((response) => {
+                    this.conceptService
+                      .getConceptSetsByConceptUuids([testOrder])
+                      .toPromise()
+                      .then((conceptSets: any[]) => {
+                        // console.log("concept sets", conceptSets);
+                        department = (conceptSets?.filter(
+                          (conceptSet: any) =>
+                            conceptSet?.display?.indexOf("LAB_DEPARTMENT:") > -1
+                        ) || [])[0]?.uuid;
+                        // console.log("department", department);
+                      });
                   });
               }
             });
@@ -466,7 +495,6 @@ export class SampleImportExportComponent implements OnInit {
             orderType: "52a447d3-a64a-11e3-9aeb-50e549534c5e",
             action: "NEW",
             orderer: this.provider?.uuid,
-            patient: "",
             careSetting: careSetting,
             urgency: "ROUTINE",
             instructions: "",
@@ -476,7 +504,7 @@ export class SampleImportExportComponent implements OnInit {
         obs: [
           {
             concept: "3a010ff3-6361-4141-9f4e-dd863016db5a",
-            value: clinicalInformation,
+            value: clinicalInformation ? clinicalInformation : "None",
           },
         ],
         encounterProviders: [
@@ -495,21 +523,25 @@ export class SampleImportExportComponent implements OnInit {
         },
         rank: 0,
         condition: null,
-        certainty: certainty,
+        certainty: certainty ? certainty : "PROVISIONAL",
         patient: "",
         encounter: "",
       };
       // Use location API to get the location (lab) using attribute type and code
-      // Fetch department using code
+      // Fetch department using code (Alternatively we can use test order)
       // Fetch specimen source using code
+      // TODO: The sample location should be the lab from where the sample come from
       const sample = {
         visit: { uuid: "" },
         label: sampleLabel,
-        concept: { uuid: "" },
-        specimenSource: { uuid: "" },
-        location: { uuid: "" },
+        concept: { uuid: department }, // Get the department from the test order (test order to department is one to one)
+        specimenSource: { uuid: specimenSource },
+        location: {
+          uuid: JSON.parse(localStorage.getItem("userLocations"))[0],
+        },
         orders: [{ uuid: "" }],
       };
+      console.log(sample);
       const sampleStatuses = [
         {
           sample: { uuid: "" },
@@ -596,12 +628,44 @@ export class SampleImportExportComponent implements OnInit {
       // 4. Create diagnosis if any
       // 5. Create sample
       // 6. Create sample statuses
+      await this.patientService
+        .createPatient(patient)
+        .toPromise()
+        .then((patientResponse: any) => {
+          if (patientResponse && !patientResponse?.error) {
+            this.onProceedWithVisit(null, {
+              patient,
+              visit,
+              encounter,
+              diagnosis,
+              sample,
+              sampleStatuses,
+            });
+          } else {
+            // give user message that the client exists so that she can omit or agree
+            this.errors = [...this.errors, patientResponse?.error];
+            this.payloadOfSamplesWithIssues = [
+              ...this.payloadOfSamplesWithIssues,
+              {
+                data,
+                patient,
+                visit,
+                encounter,
+                diagnosis,
+                sample,
+                sampleStatuses,
+                error: { ...patientResponse?.error },
+              },
+            ];
+
+            // console.log("sas", this.payloadOfSamplesWithIssues);
+          }
+        });
 
       payload = [
         ...payload,
         { patient, visit, encounter, diagnosis, sample, sampleStatuses },
       ];
-      console.log(payload);
     }
   }
 
@@ -613,5 +677,158 @@ export class SampleImportExportComponent implements OnInit {
   ): void {
     console.log(tableId);
     this.onDownloadTemplate(event, tableId, name);
+  }
+
+  async onProceedWithVisit(event: Event, sampleDetails: any) {
+    if (event) {
+      event.stopPropagation();
+    }
+    // 1. get patient identifier
+    // 2. Check if the sample exists
+    // 3 . Create visit
+    const sampleLabel = sampleDetails?.sample?.label;
+    await this.sampleService
+      .getLabSamplesByCollectionDates(
+        {},
+        null,
+        null,
+        true,
+        {
+          pageSize: 3,
+          page: 1,
+        },
+        {
+          departments: this.labSamplesDepartments,
+          specimenSources: [],
+          codedRejectionReasons: [],
+        },
+        null,
+        sampleLabel
+      )
+      .pipe(map((response) => response?.results))
+      .toPromise()
+      .then((sampleCheckResponse: any) => {
+        if (sampleCheckResponse && sampleCheckResponse?.length === 0) {
+          this.createVisit(sampleDetails).then((res) => console.log(res));
+        } else {
+          // TODO: handle errors
+          this.onTheProcessErrors[
+            sampleDetails?.patient?.identifiers[0]?.identifier
+          ] = {
+            error: {
+              error: `Sample with lab No ${sampleLabel} exists`,
+              message: `Sample with lab No ${sampleLabel} exists`,
+            },
+          };
+          console.log("on process errors", this.onTheProcessErrors);
+        }
+      });
+  }
+
+  async createVisit(sampleDetails: any) {
+    let visit = sampleDetails?.visit;
+    let visitResponse;
+    await this.patientService
+      .getPatients(sampleDetails?.patient?.identifiers[0]?.identifier)
+      .pipe((response: any) => response)
+      .toPromise()
+      .then((patientResponse: any) => {
+        if (patientResponse && patientResponse?.length > 0) {
+          visit["patient"] = patientResponse[0]?.patient?.uuid;
+          // console.log(visit);
+          return this.visitService
+            .createVisit(visit)
+            .subscribe((visitResponse: any) => {
+              if (visitResponse && !visitResponse?.error) {
+                // console.log(visitResponse);
+                // console.log(sampleDetails);
+                this.createEncountersAndOrders(sampleDetails, visitResponse);
+              } else {
+                // TODO: handle errors
+              }
+            });
+        } else {
+          // TODO: handle errors
+        }
+      });
+  }
+
+  async createEncountersAndOrders(sampleDetails: any, visitResponse: any) {
+    let encounterObject = sampleDetails?.encounter;
+    encounterObject["visit"] = visitResponse?.uuid;
+    encounterObject["patient"] = visitResponse?.patient?.uuid;
+    let orders = encounterObject?.orders;
+    orders = orders?.map((order: any) => {
+      return {
+        ...order,
+        patient: visitResponse?.patient?.uuid,
+      };
+    });
+    encounterObject["orders"] = orders;
+    return this.labOrdersService
+      .createLabOrdersViaEncounter(encounterObject)
+      .toPromise()
+      .then((encounterResponse: any) => {
+        if (encounterResponse) {
+          // console.log("encounterResponse", encounterResponse);
+          const diagnosisCode = sampleDetails?.diagnosis?.diagnosis?.coded;
+          if (diagnosisCode) {
+            this.createDiagnosis(
+              sampleDetails,
+              visitResponse,
+              encounterResponse
+            );
+          }
+
+          this.getVisitDetails(sampleDetails, visitResponse);
+        }
+      });
+  }
+
+  async createDiagnosis(sampleDetails, visitResponse, encounterResponse) {
+    let diagnosis = sampleDetails?.diagnosis;
+    await this.diagnosisService
+      .addDiagnosis(diagnosis)
+      .toPromise()
+      .then((diagnosisResponse) => {
+        if (diagnosisResponse) {
+          console.log("diagnosisResponse", diagnosisResponse);
+        }
+      });
+  }
+
+  async getVisitDetails(sampleDetails, visitResponse) {
+    await this.visitService
+      .getActiveVisitDetails(
+        visitResponse?.uuid,
+        "custom:(uuid,display,startDatetime,encounters:(uuid,orders))"
+      )
+      .then((visitData: any) => {
+        if (visitData) {
+          this.createSample(sampleDetails, visitData);
+        }
+      });
+  }
+
+  async createSample(sampleDetails, visitResponse) {
+    let sample = sampleDetails?.sample;
+    sample["visit"]["uuid"] = visitResponse?.uuid;
+    sample["orders"] = flatten(
+      visitResponse?.encounters?.map((encounter: any) => {
+        return encounter?.orders?.map((order: any) => {
+          return {
+            uuid: order?.uuid,
+          };
+        });
+      })
+    );
+    await this.sampleService
+      .createLabSample(sample)
+      .toPromise()
+      .then((sampleResponse: any) => {
+        if (sampleResponse) {
+          console.log(sampleResponse);
+        }
+      });
   }
 }
