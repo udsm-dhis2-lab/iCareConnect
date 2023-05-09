@@ -45,7 +45,15 @@ export class PatientService {
     return this.httpClient.get(`person/${personUuid}?v=full`).pipe(
       map((response) => {
         return response;
-      })
+      }),
+      catchError((e) => of(e))
+    );
+  }
+
+  createPatient(data: any): Observable<any> {
+    return this.httpClient.post(`patient`, data).pipe(
+      map((response) => response),
+      catchError((e) => of(e))
     );
   }
 }

@@ -121,6 +121,7 @@
                         >
                           {{ rowOneItem?.name }}
                         </th>
+                        <th rowspan="2"></th>
                       </tr>
                       <tr>
                         <th
@@ -131,21 +132,98 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr
+                      <ng-container
                         *ngFor="
-                          let sample of exceltoJson?.sheet1;
+                          let sample of payloadOfSamplesWithIssues;
                           let count = index
                         "
                       >
-                        <td>
-                          {{ count + 1 }}
-                        </td>
-                        <td
-                          *ngFor="let header of formulatedHeaders?.rowTwoItems"
-                        >
-                          {{ sample[header?.systemKey] }}
-                        </td>
-                      </tr>
+                        <tr>
+                          <td>
+                            {{ count + 1 }}
+                          </td>
+                          <td
+                            *ngFor="
+                              let header of formulatedHeaders?.rowTwoItems
+                            "
+                          >
+                            {{ sample?.data[header?.systemKey] }}
+                          </td>
+                          <td>
+                            <button
+                              [disabled]="
+                                !sample?.error?.error?.globalErrors ||
+                                sample?.error?.error?.globalErrors?.length == 0
+                              "
+                              color="primary"
+                              mat-flat-button
+                              (click)="onProceedWithVisit($event, sample)"
+                            >
+                              Proceed
+                            </button>
+                          </td>
+                        </tr>
+                        <tr *ngIf="sample?.error">
+                          <td colspan="100%">
+                            <p
+                              class="alert alert-warning"
+                              role="alert"
+                              *ngFor="
+                                let error of sample?.error?.error?.globalErrors
+                              "
+                            >
+                              {{ error?.message }}
+                            </p>
+                            <ng-container
+                              *ngIf="sample?.error?.error?.fieldErrors"
+                            >
+                              <ng-container
+                                *ngFor="
+                                  let header of formulatedHeaders?.rowTwoItems
+                                "
+                              >
+                                <p
+                                  *ngIf="
+                                    sample?.error?.error?.fieldErrors[
+                                      header?.systemKey
+                                    ]
+                                  "
+                                  class="alert alert-warning"
+                                  role="alert"
+                                >
+                                  {{
+                                    sample?.error?.error?.fieldErrors[
+                                      header?.systemKey
+                                    ][0]?.message
+                                  }}
+                                </p>
+                              </ng-container>
+                            </ng-container>
+                            <ng-container
+                              *ngFor="
+                                let header of formulatedHeaders?.rowTwoItems
+                              "
+                            >
+                              <p
+                                *ngIf="
+                                  sample?.data[header?.systemKey] &&
+                                  onTheProcessErrors[
+                                    sample?.data[header?.systemKey]
+                                  ]
+                                "
+                                class="alert alert-warning"
+                                role="alert"
+                              >
+                                {{
+                                  onTheProcessErrors[
+                                    sample?.data[header?.systemKey]
+                                  ]?.error?.message
+                                }}
+                              </p>
+                            </ng-container>
+                          </td>
+                        </tr>
+                      </ng-container>
                     </tbody>
                   </table>
                 </div>

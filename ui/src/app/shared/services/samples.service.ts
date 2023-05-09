@@ -47,7 +47,7 @@ export class SamplesService {
       parameters = [...parameters, "paging=false"];
     }
 
-    if (dates) {
+    if (dates && dates?.startDate && dates?.endDate) {
       parameters = [...parameters, "startDate=" + dates?.startDate];
       parameters = [...parameters, "endDate=" + dates?.endDate];
     }
