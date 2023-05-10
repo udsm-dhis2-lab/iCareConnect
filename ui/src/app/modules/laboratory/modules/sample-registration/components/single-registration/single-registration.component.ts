@@ -36,6 +36,7 @@ import { getLocationsByIds } from "src/app/store/selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { BarCodePrintModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-print-modal/bar-code-print-modal.component";
 import { webSocket } from "rxjs/webSocket";
+import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 
 @Component({
   selector: "app-single-registration",
@@ -131,6 +132,9 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   currentLabLocation: any;
   existingFields: any;
   connection: any;
+  referralFields: any[];
+  referralData: any;
+  showReferralDataFields: boolean = true;
 
   constructor(
     private samplesService: SamplesService,
@@ -150,30 +154,6 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
   }
   ngAfterViewInit(): void {
-    // this.openBarCodeDialog({
-    //   sampleLabelsUsedDetails:  [{
-    //       visit: {
-    //           uuid: "330a23f2-83f6-4795-861c-71c22bcf230a"
-    //       },
-    //       label: "NPHL/23/0000115",
-    //       concept: {
-    //           uuid: "e61969c1-eb08-4c26-b9ce-fd7b02a4064e"
-    //       },
-    //       location: {
-    //           uuid: "7fdfa2cb-bc95-405a-88c6-32b7673c0453"
-    //       },
-    //       orders: [
-    //           {
-    //               uuid: "36799ca6-bd8f-4dfb-8e47-3994c6775dde"
-    //           },
-    //           {
-    //               uuid: "ad49832a-05e6-46af-bae4-3781b0e55749"
-    //           }
-    //       ],
-    //       uuid: "051b1294-b272-41bf-ba60-dbd95d308bf6"
-    //     }],
-    //     isLis: true
-    // })
     this.connection = webSocket(this.barcodeSettings?.socketUrl);
 
     this.connection.subscribe({
@@ -203,7 +183,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
         const field = this.allRegistrationFields?.specimenDetailFields[key];
         return field;
       });
-
+    this.createReferralFields();
     // this.specimenDetailsFields = [
     //   new Dropdown({
     //     id: "specimen",
@@ -340,6 +320,49 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
 
   getTimestampFromDateAndTime(date: string, time: string): number {
     return new Date(`${date} ${time}`).getTime();
+  }
+
+  createReferralFields(): void {
+    this.referralFields = [
+      new Dropdown({
+        id: "isReferred",
+        key: "isReferred",
+        label: "Referred?",
+        required: true,
+        options: [
+          {
+            key: "YES",
+            label: "YES",
+            name: "YES",
+            value: "YES",
+          },
+          {
+            key: "NO",
+            label: "NO",
+            name: "NO",
+            value: "NO",
+          },
+        ],
+      }),
+      new Textbox({
+        id: "referralReason",
+        key: "referralReason",
+        label: "Referral reason",
+      }),
+    ];
+  }
+
+  onGetReferralData(formValue: FormValue): void {
+    const values = formValue.getValues();
+    if (values["isReferred"]?.value === "YES") {
+      this.referralData = {
+        status: "REFERRED SAMPLE",
+        category: "SAMPLE_REFERRAL",
+        remarks: values?.referralReason?.value
+          ? values?.referralReason?.value
+          : "Referred",
+      };
+    }
   }
 
   getSelectedReceivedOnTime(event: Event): void {
@@ -1558,6 +1581,29 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                             },
                                                                           ];
 
+                                                                        if (
+                                                                          this
+                                                                            .referralData
+                                                                        ) {
+                                                                          statuses =
+                                                                            [
+                                                                              ...statuses,
+                                                                              {
+                                                                                ...this
+                                                                                  .referralData,
+                                                                                sample:
+                                                                                  {
+                                                                                    uuid: sampleResponse?.uuid,
+                                                                                  },
+                                                                                user: {
+                                                                                  uuid: localStorage.getItem(
+                                                                                    "userUuid"
+                                                                                  ),
+                                                                                },
+                                                                              },
+                                                                            ];
+                                                                        }
+
                                                                         // console.log(
                                                                         //   "statuses",
                                                                         //   statuses
@@ -1802,6 +1848,9 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
         break;
       case "tests":
         this.tests = !this.tests;
+        break;
+      case "referralData":
+        this.showReferralDataFields = !this.showReferralDataFields;
         break;
       default:
         break;

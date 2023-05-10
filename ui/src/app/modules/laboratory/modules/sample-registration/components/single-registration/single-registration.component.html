@@ -398,7 +398,7 @@
         <div class="referring-doctor-field">
           <fieldset>
             <legend (click)="toggleFieldSet('referingDoctor')" class="d-flex">
-              <span> Refering Doctor </span>
+              <span> Referring Doctor </span>
               <span>
                 <mat-icon *ngIf="!referingDoctor">keyboard_arrow_down</mat-icon>
                 <mat-icon *ngIf="referingDoctor">keyboard_arrow_up</mat-icon>
@@ -413,6 +413,29 @@
             </ng-container>
           </fieldset>
         </div>
+      </div>
+      <ng-template matStepLabel>Is referred?</ng-template>
+      <div>
+        <fieldset>
+          <legend (click)="toggleFieldSet('referralData')" class="d-flex">
+            <span> Is referred? </span>
+            <span>
+              <mat-icon *ngIf="!showReferralDataFields"
+                >keyboard_arrow_down</mat-icon
+              >
+              <mat-icon *ngIf="showReferralDataFields"
+                >keyboard_arrow_up</mat-icon
+              >
+            </span>
+          </legend>
+          <div class="w-100" *ngIf="showReferralDataFields">
+            <app-form
+              [fields]="referralFields"
+              [isFormHorizontal]="true"
+              (formUpdate)="onGetReferralData($event)"
+            ></app-form>
+          </div>
+        </fieldset>
       </div>
       <ng-template matStepLabel>Tests</ng-template>
       <div
