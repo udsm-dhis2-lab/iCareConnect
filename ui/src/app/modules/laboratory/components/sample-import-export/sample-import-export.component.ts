@@ -39,6 +39,10 @@ export class SampleImportExportComponent implements OnInit {
   errors: any[] = [];
   payloadOfSamplesWithIssues: any[] = [];
   onTheProcessErrors: any = {};
+
+  showImportLogs: boolean = false;
+  importLogs: any[] = [];
+  importStarted: boolean = false;
   constructor(
     private systemSettingsService: SystemSettingsService,
     private conceptService: ConceptsService,
@@ -65,6 +69,11 @@ export class SampleImportExportComponent implements OnInit {
             : [];
         })
       );
+  }
+
+  onToggleSystemLogs(event: Event): void {
+    event.stopPropagation();
+    this.showImportLogs = !this.showImportLogs;
   }
 
   fileSelection(event: any, exportTemplateDataReferences: any[]): void {
@@ -225,6 +234,8 @@ export class SampleImportExportComponent implements OnInit {
     exportTemplateDataReferences: any[]
   ) {
     event.stopPropagation();
+    this.importStarted = true;
+    this.importLogs = [];
     const keyedExportTemplateDataReferences = keyBy(
       exportTemplateDataReferences,
       "systemKey"
@@ -314,6 +325,13 @@ export class SampleImportExportComponent implements OnInit {
         if (reference?.category === "visit" && reference?.attributeTypeUuid) {
           if (reference?.valueAttributeTypeUuid === this.hfrCodeAttributeUuid) {
             if (data[key]) {
+              this.importLogs = [
+                ...this.importLogs,
+                {
+                  type: "INFO",
+                  message: `Getting system identifier for the Health facility using the ${reference?.exportKey}: ${data[key]}`,
+                },
+              ];
               await this.locationService
                 .getLocationByAttributeTypeAndValue({
                   attributeType: this.hfrCodeAttributeUuid,
@@ -322,6 +340,13 @@ export class SampleImportExportComponent implements OnInit {
                 .toPromise()
                 .then((response: any) => {
                   if (response && !response?.error) {
+                    this.importLogs = [
+                      ...this.importLogs,
+                      {
+                        type: "SUCCESS",
+                        message: `Found  and assign system identifier ${response?.uuid} for the Health facility using the ${reference?.exportKey}: ${data[key]}`,
+                      },
+                    ];
                     visitAttributes = [
                       ...visitAttributes,
                       {
@@ -385,6 +410,14 @@ export class SampleImportExportComponent implements OnInit {
         if (
           reference?.category === "sample" &&
           !reference?.attributeTypeUuid &&
+          reference?.type == "priority"
+        ) {
+          priority = data[key];
+        }
+
+        if (
+          reference?.category === "sample" &&
+          !reference?.attributeTypeUuid &&
           reference?.type == "specimen"
         ) {
           const referenceTermCode = data[key];
@@ -426,19 +459,7 @@ export class SampleImportExportComponent implements OnInit {
                       testOrder = testOrderResponse[0]?.uuid;
                     }
                   })
-                  .then((response) => {
-                    this.conceptService
-                      .getConceptSetsByConceptUuids([testOrder])
-                      .toPromise()
-                      .then((conceptSets: any[]) => {
-                        // console.log("concept sets", conceptSets);
-                        department = (conceptSets?.filter(
-                          (conceptSet: any) =>
-                            conceptSet?.display?.indexOf("LAB_DEPARTMENT:") > -1
-                        ) || [])[0]?.uuid;
-                        // console.log("department", department);
-                      });
-                  });
+                  .then((response) => {});
               }
             });
         }
@@ -531,17 +552,28 @@ export class SampleImportExportComponent implements OnInit {
       // Fetch department using code (Alternatively we can use test order)
       // Fetch specimen source using code
       // TODO: The sample location should be the lab from where the sample come from
-      const sample = {
-        visit: { uuid: "" },
-        label: sampleLabel,
-        concept: { uuid: department }, // Get the department from the test order (test order to department is one to one)
-        specimenSource: { uuid: specimenSource },
-        location: {
-          uuid: JSON.parse(localStorage.getItem("userLocations"))[0],
-        },
-        orders: [{ uuid: "" }],
-      };
-      console.log(sample);
+      let sample;
+      await this.conceptService
+        .getConceptSetsByConceptUuids([testOrder])
+        .toPromise()
+        .then((conceptSets: any[]) => {
+          // console.log("concept sets", conceptSets);
+          department = (conceptSets?.filter(
+            (conceptSet: any) =>
+              conceptSet?.systemName?.indexOf("LAB_DEPARTMENT:") > -1
+          ) || [])[0]?.uuid;
+          console.log("department", department);
+          sample = {
+            visit: { uuid: "" },
+            label: sampleLabel,
+            concept: { uuid: department }, // Get the department from the test order (test order to department is one to one)
+            specimenSource: { uuid: specimenSource },
+            location: {
+              uuid: JSON.parse(localStorage.getItem("userLocations"))[0],
+            },
+            orders: [{ uuid: "" }],
+          };
+        });
       const sampleStatuses = [
         {
           sample: { uuid: "" },
@@ -620,6 +652,13 @@ export class SampleImportExportComponent implements OnInit {
           category: "SAMPLE_REGISTRATION_CATEGORY",
           status: "CLINICAL",
         },
+        {
+          sample: { uuid: "" },
+          user: { uuid: this.currentUser?.uuid },
+          remarks: "Sample referral", // TODO: You might need to include another important info here for the referral
+          category: "SAMPLE_REFERRAL",
+          status: "REFERRED SAMPLE",
+        },
       ];
 
       // 1. Create patient
@@ -628,6 +667,7 @@ export class SampleImportExportComponent implements OnInit {
       // 4. Create diagnosis if any
       // 5. Create sample
       // 6. Create sample statuses
+      console.log("sample", sample);
       await this.patientService
         .createPatient(patient)
         .toPromise()
@@ -657,6 +697,19 @@ export class SampleImportExportComponent implements OnInit {
                 error: { ...patientResponse?.error },
               },
             ];
+            this.errors?.forEach((error: any) => {
+              if (error?.error?.globalErrors?.length > 0) {
+                error?.error?.globalErrors?.forEach((globalError) => {
+                  this.importLogs = [
+                    ...this.importLogs,
+                    {
+                      type: "ERROR",
+                      message: `${globalError?.message}`,
+                    },
+                  ];
+                });
+              }
+            });
 
             // console.log("sas", this.payloadOfSamplesWithIssues);
           }
@@ -799,10 +852,10 @@ export class SampleImportExportComponent implements OnInit {
 
   async getVisitDetails(sampleDetails, visitResponse) {
     await this.visitService
-      .getActiveVisitDetails(
-        visitResponse?.uuid,
-        "custom:(uuid,display,startDatetime,encounters:(uuid,orders))"
-      )
+      .getVisitDetailsByVisitUuid(visitResponse?.uuid, {
+        v: "custom:(uuid,display,startDatetime,encounters:(uuid,orders))",
+      })
+      .toPromise()
       .then((visitData: any) => {
         if (visitData) {
           this.createSample(sampleDetails, visitData);
@@ -828,7 +881,30 @@ export class SampleImportExportComponent implements OnInit {
       .then((sampleResponse: any) => {
         if (sampleResponse) {
           console.log(sampleResponse);
+          this.createSampleStatuses(sampleDetails, sampleResponse);
         }
+      });
+  }
+
+  async createSampleStatuses(sampleDetails, sampleResponse) {
+    let sampleStatuses =
+      sampleDetails?.sampleStatuses
+        ?.map((status) => {
+          return status?.remarks && status?.status
+            ? {
+                ...status,
+                sample: {
+                  uuid: sampleResponse?.uuid,
+                },
+              }
+            : null;
+        })
+        ?.filter((sampleStatus) => sampleStatus) || [];
+    await this.sampleService
+      .setMultipleSampleStatuses(sampleStatuses)
+      .toPromise()
+      .then((response) => {
+        console.log(response);
       });
   }
 }

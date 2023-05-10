@@ -231,55 +231,105 @@
             </mat-tab>
           </mat-tab-group>
         </div>
-        <div class="w-100 mt-2 d-flex justify-content-left">
-          <button
-            mat-flat-button
-            color="primary"
-            [disabled]="!file || !params?.exportTemplateDataReferences"
-            (click)="onImport($event, params?.exportTemplateDataReferences)"
-          >
-            Import
-          </button>
+        <div class="w-100 d-flex justify-content-between">
+          <div class="w-75 mt-2 d-flex justify-content-left">
+            <button
+              mat-flat-button
+              color="primary"
+              [disabled]="
+                !file || !params?.exportTemplateDataReferences || importStarted
+              "
+              (click)="onImport($event, params?.exportTemplateDataReferences)"
+            >
+              Import
+            </button>
 
-          <button
-            class="ml-2"
-            mat-flat-button
-            color="primary"
-            [disabled]="
-              !exceltoJson ||
-              !exceltoJson?.sheet1 ||
-              !params?.exportTemplateDataReferences
-            "
-            (click)="
-              onConfirm(
-                $event,
-                exceltoJson?.sheet1,
-                params?.exportTemplateDataReferences
-              )
-            "
-          >
-            Confirm
-          </button>
-          <button
-            class="ml-2"
-            mat-stroked-button
-            [disabled]="
-              !exceltoJson ||
-              !exceltoJson?.sheet1 ||
-              !params?.exportTemplateDataReferences
-            "
-            (click)="
-              onDownloadSamplesWithIssues(
-                $event,
-                'samples-with-issues',
-                params?.exportTemplateDataReferences,
-                'Samples_with_issues_' + file?.name
-              )
-            "
-          >
-            <mat-icon>arrow_drop_down</mat-icon>
-            <span class="ml-2"> Samples with issues </span>
-          </button>
+            <button
+              class="ml-2"
+              mat-flat-button
+              color="primary"
+              [disabled]="
+                !exceltoJson ||
+                !exceltoJson?.sheet1 ||
+                !params?.exportTemplateDataReferences ||
+                importStarted
+              "
+              (click)="
+                onConfirm(
+                  $event,
+                  exceltoJson?.sheet1,
+                  params?.exportTemplateDataReferences
+                )
+              "
+            >
+              Confirm
+            </button>
+            <button
+              class="ml-2"
+              mat-stroked-button
+              [disabled]="
+                !exceltoJson ||
+                !exceltoJson?.sheet1 ||
+                !params?.exportTemplateDataReferences ||
+                !payloadOfSamplesWithIssues ||
+                importStarted
+              "
+              (click)="
+                onDownloadSamplesWithIssues(
+                  $event,
+                  'samples-with-issues',
+                  params?.exportTemplateDataReferences,
+                  'Samples_with_issues_' + file?.name
+                )
+              "
+            >
+              <mat-icon>arrow_drop_down</mat-icon>
+              <span class="ml-2"> Samples with issues </span>
+            </button>
+          </div>
+          <div class="w-25 d-flex justify-content-end">
+            <button
+              mat-icon-button
+              *ngIf="importStarted"
+              (click)="onToggleSystemLogs($event)"
+            >
+              <mat-icon *ngIf="!showImportLogs">keyboard_arrow_down</mat-icon>
+              <mat-icon *ngIf="showImportLogs">keyboard_arrow_up</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div
+          class="w-100 mt-3"
+          style="height: 400px; overflow: auto"
+          *ngIf="showImportLogs && importStarted"
+        >
+          <!-- {{ importLogs | json }} -->
+          <div class="w-100" *ngFor="let log of importLogs">
+            <div
+              *ngIf="log?.type === 'INFO'"
+              class="alert alert-info"
+              role="alert"
+              style="padding: 4px; margin-bottom: 0"
+            >
+              {{ log?.message }}
+            </div>
+            <div
+              style="padding: 4px; margin-bottom: 0"
+              *ngIf="log?.type === 'SUCCESS'"
+              class="alert alert-success"
+              role="alert"
+            >
+              {{ log?.message }}
+            </div>
+            <div
+              style="padding: 4px; margin-bottom: 0"
+              *ngIf="log?.type === 'ERROR'"
+              class="alert alert-danger"
+              role="alert"
+            >
+              {{ log?.message }}
+            </div>
+          </div>
         </div>
       </div>
       <div class="col-12" *ngIf="actionCategory === 'EXPORT'">
