@@ -486,6 +486,7 @@ export class ConceptsService {
                       ? result?.display?.split(":")[1]
                       : result?.display,
                   concept: uuid,
+                  testOrder: uuid,
                   setMembers: [
                     {
                       uuid,
