@@ -7,7 +7,8 @@
       userRoles: userRoles$ | async,
       LISConfigurations: LISConfigurations$ | async,
       currentUser: currentUser$ | async,
-      currentLocation: currentLocation$ | async
+      currentLocation: currentLocation$ | async,
+      labs: labs$ | async
     } as params"
   >
     <div
@@ -68,10 +69,20 @@
             class="w-100 pl-3 pt-1 pb-2"
             *ngIf="params?.LISConfigurations?.isLIS"
           >
-            <button mat-button>
+            <button mat-button [matMenuTriggerFor]="labs">
               <mat-icon color="primary">location_on</mat-icon
               >{{ params?.currentLocation?.display }}
             </button>
+            <mat-menu #labs="matMenu">
+              <button mat-menu-item (click)="setCurrentLab(null)">All</button>
+              <button
+                mat-menu-item
+                (click)="setCurrentLab(lab)"
+                *ngFor="let lab of params?.labs"
+              >
+                {{ lab?.name }}
+              </button>
+            </mat-menu>
             <p class="ml-4">
               {{ params?.currentUser?.person?.display }}
               <em>({{ params?.currentUser?.username }})</em>
@@ -100,7 +111,8 @@
             *ngIf="
               params?.privileges &&
               params?.privileges['Laboratory Orders'] &&
-              params?.LISConfigurations?.isLIS
+              params?.LISConfigurations?.isLIS &&
+              params?.currentLocation?.name !== 'All'
             "
             (click)="changeRoute($event, 'sample-registration', false)"
             routerLinkActive="active-route"

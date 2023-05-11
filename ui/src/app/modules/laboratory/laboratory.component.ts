@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { Store } from "@ngrx/store";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { map, take } from "rxjs/operators";
@@ -8,6 +8,7 @@ import {
   getAllUSerRoles,
   getCurrentUserInfo,
   getCurrentUserPrivileges,
+  getUserAssignedLocations,
 } from "src/app/store/selectors/current-user.selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import {
@@ -26,6 +27,7 @@ import { getAllSampleTypes, getCurrentLocation } from "src/app/store/selectors";
 import { LISConfigurationsModel } from "./resources/models/lis-configurations.model";
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 import { Title } from "@angular/platform-browser";
+import { LocationService } from "src/app/core/services";
 
 @Component({
   selector: "lab-root",
@@ -70,6 +72,7 @@ export class LaboratoryComponent implements OnInit {
 
   LISConfigurations$: Observable<LISConfigurationsModel>;
   currentLocation$: Observable<any>;
+  labs$: Observable<any[]>;
 
   constructor(
     private store: Store<AppState>,
@@ -80,6 +83,7 @@ export class LaboratoryComponent implements OnInit {
     this.store.dispatch(loadRolesDetails());
     this.store.dispatch(loadOrderTypes());
     // this.store.dispatch(loadLISConfigurations());
+    this.labs$ = this.store.select(getUserAssignedLocations);
 
     this.LISConfigurations$ = this.store.select(getLISConfigurations);
     router.events.pipe(take(1)).subscribe((currentRoute) => {
@@ -240,6 +244,24 @@ export class LaboratoryComponent implements OnInit {
     this.currentLocation$ = this.store.select(getCurrentLocation);
   }
 
+  setCurrentLab(location: any): void {
+    this.currentLocation$ = of(null);
+    if (location) {
+      localStorage.setItem("currentLocation", JSON.stringify(location));
+      setTimeout(() => {
+        this.currentLocation$ = this.store.select(getCurrentLocation);
+      }, 100);
+    } else {
+      localStorage.setItem("currentLocation", null);
+      setTimeout(() => {
+        this.currentLocation$ = of({ name: "All", display: "All" });
+      }, 100);
+
+      if (this.currentRoutePath === "sample-registration")
+        this.changeRoute(null, "sample-acceptance-and-results", true);
+    }
+  }
+
   toggleMenuItems(event: Event): void {
     event.stopPropagation();
     this.showMenuItems = !this.showMenuItems;
@@ -255,7 +277,9 @@ export class LaboratoryComponent implements OnInit {
     showDate: boolean,
     dateRange?: number
   ) {
-    event.stopPropagation();
+    if (event) {
+      event.stopPropagation();
+    }
     this.currentRoutePath = routePath;
     this.showDate = showDate;
     if (this.showDate) {
