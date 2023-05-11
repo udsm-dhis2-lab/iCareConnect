@@ -23,7 +23,7 @@ import { VisitsService } from "src/app/shared/resources/visits/services";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { BarCodeModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component";
 
-import { uniqBy, keyBy, omit } from "lodash";
+import { uniqBy, keyBy, omit, groupBy } from "lodash";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { SampleRegistrationFinalizationComponent } from "../sample-registration-finalization/sample-registration-finalization.component";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
@@ -735,12 +735,21 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
             .getConceptSetsByConceptUuids(orderConceptUuids)
             .subscribe((conceptSetsResponse: any) => {
               if (conceptSetsResponse && !conceptSetsResponse?.error) {
-                // console.log("conceptSetsResponse", conceptSetsResponse);
-                this.groupedTestOrdersByDepartments =
-                  formulateSamplesByDepartments(
-                    conceptSetsResponse,
-                    this.testOrders
-                  );
+                const groupedTestorders = groupBy(
+                  conceptSetsResponse,
+                  "testOrder"
+                );
+                this.groupedTestOrdersByDepartments = [];
+                Object.keys(groupedTestorders).forEach((key: string) => {
+                  let metadata = [];
+                  metadata = groupedTestorders[key];
+                  if (metadata.length > 0) {
+                    this.groupedTestOrdersByDepartments = [
+                      ...this.groupedTestOrdersByDepartments,
+                      metadata,
+                    ];
+                  }
+                });
                 zip(
                   this.registrationService.getPatientIdentifierTypes(),
                   this.locationService.getFacilityCode(),
@@ -984,28 +993,26 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
 
                                       // Create encounter with orders
                                       zip(
-                                        ...this.groupedTestOrdersByDepartments.map(
+                                        ...this.groupedTestOrdersByDepartments?.map(
                                           (groupedTestOrders) => {
-                                            const orders =
-                                              groupedTestOrders.map(
-                                                (testOrder) => {
-                                                  // TODO: Remove hard coded order type
-                                                  return {
-                                                    concept: testOrder?.value,
-                                                    orderType:
-                                                      "52a447d3-a64a-11e3-9aeb-50e549534c5e", // TODO: Find a way to soft code this
-                                                    action: "NEW",
-                                                    orderer:
-                                                      this.provider?.uuid,
-                                                    patient:
-                                                      patientResponse?.uuid,
-                                                    careSetting: "OUTPATIENT",
-                                                    urgency: "ROUTINE", // TODO: Change to reflect users input
-                                                    instructions: "",
-                                                    type: "testorder",
-                                                  };
-                                                }
-                                              );
+                                            const orders = uniqBy(
+                                              groupedTestOrders,
+                                              "testOrder"
+                                            ).map((testOrder) => {
+                                              // TODO: Remove hard coded order type
+                                              return {
+                                                concept: testOrder?.testOrder,
+                                                orderType:
+                                                  "52a447d3-a64a-11e3-9aeb-50e549534c5e", // TODO: Find a way to soft code this
+                                                action: "NEW",
+                                                orderer: this.provider?.uuid,
+                                                patient: patientResponse?.uuid,
+                                                careSetting: "OUTPATIENT",
+                                                urgency: "ROUTINE", // TODO: Change to reflect users input
+                                                instructions: "",
+                                                type: "testorder",
+                                              };
+                                            });
 
                                             let obs = [];
                                             if (this.formData["notes"]?.value) {
@@ -1071,7 +1078,6 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                             ordersResponse,
                                                             "uuid"
                                                           );
-
                                                         this.samplesService
                                                           .getIncreamentalSampleLabel()
                                                           .subscribe(
@@ -1084,11 +1090,15 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                   label:
                                                                     sampleLabel,
                                                                   concept: {
-                                                                    uuid: this
-                                                                      .groupedTestOrdersByDepartments[
+                                                                    uuid: (this.groupedTestOrdersByDepartments[
                                                                       index
-                                                                    ][0]
-                                                                      ?.departmentUuid,
+                                                                    ]?.filter(
+                                                                      (dpt) =>
+                                                                        dpt?.systemName?.indexOf(
+                                                                          "LAB_DEPARTMENT:"
+                                                                        ) > -1
+                                                                    ) || [])[0]
+                                                                      ?.uuid,
                                                                   },
                                                                   specimenSource:
                                                                     {
@@ -2040,105 +2050,4 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   formatDimeChars(char: string): string {
     return char.length == 1 ? "0" + char : char;
   }
-
-  //Check JSPM WebSocket status
-
-  // jsPrint(data: any = [{
-  //         visit: {
-  //             uuid: "330a23f2-83f6-4795-861c-71c22bcf230a"
-  //         },
-  //         label: "NPHL/23/0000115",
-  //         concept: {
-  //             uuid: "e61969c1-eb08-4c26-b9ce-fd7b02a4064e"
-  //         },
-  //         location: {
-  //             uuid: "7fdfa2cb-bc95-405a-88c6-32b7673c0453"
-  //         },
-  //         orders: [
-  //             {
-  //                 uuid: "36799ca6-bd8f-4dfb-8e47-3994c6775dde"
-  //             },
-  //             {
-  //                 uuid: "ad49832a-05e6-46af-bae4-3781b0e55749"
-  //             }
-  //         ],
-  //         uuid: "051b1294-b272-41bf-ba60-dbd95d308bf6"
-  //       }]) {
-  //   // WebSocket settings
-  //   JSPM.JSPrintManager.auto_reconnect = true;
-  //   JSPM.JSPrintManager.start();
-  //   JSPM.JSPrintManager.WS.onStatusChanged = () => {
-  //       if (this.jspmWSStatus()) {
-  //           // get client installed printers
-  //           JSPM.JSPrintManager.getPrinters().then((printers) => {
-  //             this.openBarCodeDialog({
-  //               sampleLabelsUsedDetails: data?.sampleLabelsUsedDetails ? data?.sampleLabelsUsedDetails : data,
-  //               printers: printers,
-  //               isLis: true,
-  //             });
-  //           })
-  //       }
-  //   };
-  // }
-
-  // jspmWSStatus() {
-  //   if (JSPM.JSPrintManager.websocket_status === JSPM.WSStatus.Open) {
-  //       return true;
-  //   } else if (JSPM.JSPrintManager.websocket_status === JSPM.WSStatus.Closed) {
-  //       this.errorMessage = 'JSPrintManager (JSPM) is not installed or not running! Download JSPM Client App from https://neodynamic.com/downloads/jspm';
-  //       return false;
-  //     } else if (JSPM.JSPrintManager.websocket_status === JSPM.WSStatus.Blocked) {
-  //     this.errorMessage = 'JSPM has blocked this website!';
-  //       return false;
-  //   }
-  // }
-
-  // // Do Zebra ZPL printing...
-  // doPrintZPL(data?: any) {
-  //       // Create a ClientPrintJob
-  //   const cpj = new JSPM.ClientPrintJob();
-  //   if(data?.selectedPrinter){
-  //     cpj.clientPrinter = new JSPM.InstalledPrinter(data?.selectedPrinter)
-  //   } else {
-  //     cpj.clientPrinter = new JSPM.DefaultPrinter();
-  //   }
-  //       // Set content to print...
-  //       //Create Zebra ZPL commands for sample label
-  // 	var cmds =  `
-  //     ^XA
-  //     ^FX Barcode: BC-NRIB for orientation,number for height, Y for show data,Y on top^FS
-  //     ^FT30,400^A@B,15,10^FD{{SampleID}}^FS
-  //     ^FT30,120^A@B,15,10^FD[FORM]^FS
-  //     ^FO40,45^BCB,80,N,N,N,N^FD{{SampleID}}^FS
-  //     ^FT150,400^A@B,20,10^FD{{PatientNames}}^FS
-  //     ^FT145,150^A@B,15,10^FD{{Date}}^FS
-  //     ^FT220,400^A@B,15,10^FD{{SampleID}}^FS
-  //     ^FT220,210^A@B,15,10^FD{{SampleID}}^FS
-  //     ^FT240,210^A@B,15,5^FD{{PatientNames}}^FS
-  //     ^FXMiddle label starts Here^FS
-  //     ^FT310,400^A@B,15,10^FD{{SampleID}}^FS
-  //     ^FT310,120^A@B,15,10^FD[FORM]^FS
-  //     ^FT360,400^A@B,15,10^FD{{Tests}}^FS
-  //     ^FT460,400^A@B,20,10^FD{{PatientNames}}^FS
-  //     ^FT460,140^A@B,15,10^FD{{Date}}^FS
-  //     ^FT510,400^A@B,15,10^FD{{SampleID}}^FS
-  //     ^FT510,210^A@B,15,10^FD{{SampleID}}^FS
-  //     ^FT530,210^A@B,15,5^FD{{PatientNames}}^FS
-  //     ^FXMiddle Label Ends Here^FS
-  //     ^FT610,40^A@N,15,10^FD{{Storage}}^FS
-  //     ^FT590,400^A@B,15,10^FD{{SampleID}}^FS
-  //     ^FO600,45^BCB,80,N,N,N,N^FD{{SampleID}}^FS
-  //     ^FT710,400^A@B,20,10^FD{{PatientNames}}^FS
-  //     ^FT740,400^A@B,15,10^FD{{Tests}}^FS
-  //     ^FT790,400^A@B,15,10^FD{{SampleID}}^FS
-  //     ^FT810,400^A@B,15,10^FD{{Storage}}^FS
-  //     ^FT790,210^A@B,15,10^FD{{SampleID}}^FS
-  //     ^FT810,210^A@B,15,5^FD{{PatientNames}}^FS
-  //     ^XZ
-  //   `;
-  // 	cpj.printerCommands = cmds;
-
-  //   // Send print job to printer!
-  //   cpj.sendToClient();
-  //   }
 }
