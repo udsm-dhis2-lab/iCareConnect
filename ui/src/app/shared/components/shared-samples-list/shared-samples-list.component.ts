@@ -109,7 +109,10 @@ export class SharedSamplesListComponent implements OnInit {
         params?.dapartment,
         params?.testUuid,
         params?.instrument,
-        params?.specimenUuid
+        params?.specimenUuid,
+        localStorage?.getItem("currentLocation").indexOf("{") > -1
+          ? JSON.parse(localStorage?.getItem("currentLocation"))?.uuid
+          : null
       );
     }, 50);
   }

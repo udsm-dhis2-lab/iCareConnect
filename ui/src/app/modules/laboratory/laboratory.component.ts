@@ -248,18 +248,19 @@ export class LaboratoryComponent implements OnInit {
     this.currentLocation$ = of(null);
     if (location) {
       localStorage.setItem("currentLocation", JSON.stringify(location));
-      setTimeout(() => {
-        this.currentLocation$ = this.store.select(getCurrentLocation);
-      }, 100);
     } else {
-      localStorage.setItem("currentLocation", null);
-      setTimeout(() => {
-        this.currentLocation$ = of({ name: "All", display: "All" });
-      }, 100);
+      localStorage.setItem(
+        "currentLocation",
+        JSON.stringify({ name: "All", display: "All" })
+      );
 
       if (this.currentRoutePath === "sample-registration")
         this.changeRoute(null, "sample-acceptance-and-results", true);
     }
+
+    setTimeout(() => {
+      this.currentLocation$ = this.store.select(getCurrentLocation);
+    }, 100);
   }
 
   toggleMenuItems(event: Event): void {
