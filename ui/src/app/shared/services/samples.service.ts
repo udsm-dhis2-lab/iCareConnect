@@ -37,7 +37,8 @@ export class SamplesService {
     department?: string,
     testUuid?: string,
     instrument?: string,
-    specimenUuid?: string
+    specimenUuid?: string,
+    locationUuid?: string
   ): Observable<any> {
     let parameters = [];
     if (pagerInfo) {
@@ -82,6 +83,10 @@ export class SamplesService {
 
     if (specimenUuid) {
       parameters = [...parameters, "specimen=" + specimenUuid];
+    }
+
+    if (locationUuid) {
+      parameters = [...parameters, "location=" + locationUuid];
     }
 
     if (excludeAllocations) {
