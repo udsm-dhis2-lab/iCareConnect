@@ -1,5 +1,9 @@
 import { Component, EventEmitter, Inject, OnInit, Output } from "@angular/core";
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import {
+  MatDialog,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable, of, zip } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
@@ -193,7 +197,7 @@ export class DispensingFormComponent implements OnInit {
               },
             ];
           } else {
-            this.prescribedMedication = this.drugOrder?.obs[response]?.value
+            this.prescribedMedication = this.drugOrder?.obs[response]?.value;
           }
         })
       );
@@ -321,7 +325,7 @@ export class DispensingFormComponent implements OnInit {
         })
       );
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
-    this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
+    this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
     this.currentVisit$ = this.store.pipe(select(getActiveVisit));
     this.provider$ = this.store.select(getProviderDetails);
 
@@ -338,13 +342,16 @@ export class DispensingFormComponent implements OnInit {
   }
 
   onChangeDrugQuantity(quantity) {
-    this.showPrice = false
+    this.showPrice = false;
     this.drugOrder = { ...(this.drugOrder || ({} as any)), quantity };
     const pricePayload = {
       visitUuid: this.data.visit.uuid,
-      drugUuid: this.prescribedMedication
-    }
-    if (this.drugOrder.quantity?.toString().length > 0 && this.drugOrder.quantity !== 0) {
+      drugUuid: this.prescribedMedication,
+    };
+    if (
+      this.drugOrder.quantity?.toString().length > 0 &&
+      this.drugOrder.quantity !== 0
+    ) {
       this.itemPricesService
         .getItemPrice(pricePayload)
         .pipe(

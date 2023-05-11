@@ -96,7 +96,7 @@ export class InpatientDashboardComponent implements OnInit {
 
     this.activeVisit$ = this.store.select(getActiveVisit);
 
-    this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.currentLocation$ = this.store.select(getCurrentLocation(false));
     this.patientBillingDetails$ = zip(
       this.visitService.getActiveVisit(patientId, false),
       this.billingService.getPatientBills(patientId),

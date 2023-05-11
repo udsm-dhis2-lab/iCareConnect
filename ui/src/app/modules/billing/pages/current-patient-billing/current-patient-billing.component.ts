@@ -98,7 +98,7 @@ export class CurrentPatientBillingComponent implements OnInit {
     this.currentUser$ = this.store.select(getCurrentUserDetails);
     this.facilityLogo$ = this.configService.getLogo();
     this.facilityDetails$ = this.store.select(getParentLocation);
-    this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
+    this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
     this.provider$ = this.store.select(getProviderDetails);
 
     this.billingService

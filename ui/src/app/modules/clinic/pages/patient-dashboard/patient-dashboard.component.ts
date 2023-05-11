@@ -133,7 +133,7 @@ export class PatientDashboardComponent implements OnInit {
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
     this.activeVisit$ = this.store.pipe(select(getActiveVisit));
     this.provider$ = this.store.select(getProviderDetails);
-    this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.currentLocation$ = this.store.select(getCurrentLocation(false));
     this.visitEndingControlStatusesConceptUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
         `iCare.visits.settings.controlVisitsEndingStatuses.ConceptUuid`

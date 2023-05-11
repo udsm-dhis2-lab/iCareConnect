@@ -107,7 +107,7 @@ export class NursingDataComponent implements OnInit {
     );
     this.provider$ = this.store.select(getProviderDetails);
     this.visit$ = this.store.select(getActiveVisit);
-    this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
+    this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
     this.patient$ = this.store.pipe(select(getCurrentPatient));
 
     this.observations$ = this.store.select(getGroupedObservationByConcept);

@@ -35,11 +35,9 @@ import { RequisitionFormComponent } from "../../modals/requisition-form/requisit
 })
 export class RequisitionPageComponent implements OnInit {
   currentStore$: Observable<any>;
-  constructor(
-    private store: Store<AppState>,
-  ){}
+  constructor(private store: Store<AppState>) {}
 
   ngOnInit() {
-    this.currentStore$ = this.store.pipe(select(getCurrentLocation));
+    this.currentStore$ = this.store.pipe(select(getCurrentLocation(false)));
   }
 }

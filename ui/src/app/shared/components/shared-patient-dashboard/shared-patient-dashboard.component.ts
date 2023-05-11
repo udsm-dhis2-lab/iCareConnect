@@ -240,7 +240,7 @@ export class SharedPatientDashboardComponent implements OnInit {
       getCustomOpenMRSFormsByIds(this.currentLocation?.forms)
     );
 
-    this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.currentLocation$ = this.store.select(getCurrentLocation(false));
     this.consultationOrderType$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.consultation.orderType"
@@ -542,7 +542,7 @@ export class SharedPatientDashboardComponent implements OnInit {
     });
   }
 
-  reload(){
+  reload() {
     this.ngOnInit();
   }
 }
