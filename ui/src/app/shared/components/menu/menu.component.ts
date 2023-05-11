@@ -118,7 +118,7 @@ export class MenuComponent implements OnInit {
 
     this.currentUser$ = this.store.select(getCurrentUserDetails);
     this.locationsForCurrentUser$ = this.store.select(getUserAssignedLocations);
-    this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
+    this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
     this.showPatientSearch$ = this.store.pipe(select(showSearchPatientOnMenu));
     this.userAssignedLocationsLoadedState$ = this.store.select(
       getUserAssignedLocationsLoadedState

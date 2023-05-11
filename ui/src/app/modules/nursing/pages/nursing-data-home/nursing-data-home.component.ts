@@ -67,6 +67,6 @@ export class NursingDataHomeComponent implements OnInit {
       getFormPrivilegesConfigsLoadingState
     );
     this.currentUser$ = this.store.select(getCurrentUserDetails);
-    this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.currentLocation$ = this.store.select(getCurrentLocation(false));
   }
 }

@@ -115,7 +115,7 @@ export class InpatientComponent implements OnInit {
     this.userPrivileges$ = this.store.select(getCurrentUserPrivileges);
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
     this.activeVisit$ = this.store.pipe(select(getActiveVisit));
-    this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.currentLocation$ = this.store.select(getCurrentLocation(false));
   }
 
   onAssignBed(location, patient, provider, visit, bedOrdersWithBillStatus) {

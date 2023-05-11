@@ -1,26 +1,33 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { DispensingFormComponent } from 'src/app/shared/dialogs/dispension-form/dispension-form.component';
-import { AppState } from 'src/app/store/reducers';
-import { getCurrentLocation, getIfThereIsAnyDiagnosisInTheCurrentActiveVisit, getParentLocation } from 'src/app/store/selectors';
-import { getCurrentUserDetails, getProviderDetails } from 'src/app/store/selectors/current-user.selectors';
-import { getVisitLoadingState } from 'src/app/store/selectors/visit.selectors';
-import { formatDateToString } from '../../helpers/format-date.helper';
-import { TableActionOption } from '../../models/table-action-options.model';
-import { TableColumn } from '../../models/table-column.model';
-import { TableConfig } from '../../models/table-config.model';
-import { TableSelectAction } from '../../models/table-select-action.model';
-import { DrugOrdersService } from '../../resources/order/services';
-import { OrdersService } from '../../resources/order/services/orders.service';
-import { Visit } from '../../resources/visits/models/visit.model';
-import { ConfigsService } from '../../services/configs.service';
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { select, Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { DispensingFormComponent } from "src/app/shared/dialogs/dispension-form/dispension-form.component";
+import { AppState } from "src/app/store/reducers";
+import {
+  getCurrentLocation,
+  getIfThereIsAnyDiagnosisInTheCurrentActiveVisit,
+  getParentLocation,
+} from "src/app/store/selectors";
+import {
+  getCurrentUserDetails,
+  getProviderDetails,
+} from "src/app/store/selectors/current-user.selectors";
+import { getVisitLoadingState } from "src/app/store/selectors/visit.selectors";
+import { formatDateToString } from "../../helpers/format-date.helper";
+import { TableActionOption } from "../../models/table-action-options.model";
+import { TableColumn } from "../../models/table-column.model";
+import { TableConfig } from "../../models/table-config.model";
+import { TableSelectAction } from "../../models/table-select-action.model";
+import { DrugOrdersService } from "../../resources/order/services";
+import { OrdersService } from "../../resources/order/services/orders.service";
+import { Visit } from "../../resources/visits/models/visit.model";
+import { ConfigsService } from "../../services/configs.service";
 
 @Component({
-  selector: 'app-patient-drug-order-list',
-  templateUrl: './patient-drug-order-list.component.html',
-  styleUrls: ['./patient-drug-order-list.component.scss'],
+  selector: "app-patient-drug-order-list",
+  templateUrl: "./patient-drug-order-list.component.html",
+  styleUrls: ["./patient-drug-order-list.component.scss"],
 })
 export class PatientDrugOrderListComponent implements OnInit {
   @Input() currentLocation: any;
@@ -54,34 +61,34 @@ export class PatientDrugOrderListComponent implements OnInit {
   ngOnInit() {
     this.drugOrders$ = this.ordersService.getOrdersByVisitAndOrderType({
       visit: this.visit?.uuid,
-      orderType: 'iCARESTS-PRES-1111-1111-525400e4297f',
+      orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
     });
     this.visitLoadingState$ = this.store.select(getVisitLoadingState);
-    this.tableConfig = new TableConfig({ noDataLabel: 'No prescription' });
+    this.tableConfig = new TableConfig({ noDataLabel: "No prescription" });
     this.drugOrderColumns = [
       {
-        id: 'orderNumber',
-        label: '#',
+        id: "orderNumber",
+        label: "#",
       },
       {
-        id: 'display',
-        label: 'Item',
+        id: "display",
+        label: "Item",
       },
       {
-        id: 'orderedBy',
-        label: 'Ordered by',
+        id: "orderedBy",
+        label: "Ordered by",
       },
       {
-        id: 'quantity',
-        label: 'Quantity',
+        id: "quantity",
+        label: "Quantity",
       },
       {
-        id: 'price',
-        label: 'Price',
+        id: "price",
+        label: "Price",
       },
       {
-        id: 'paymentStatus',
-        label: 'Status',
+        id: "paymentStatus",
+        label: "Status",
       },
     ];
     this.isThereDiagnosisProvided$ = this.store.select(
@@ -89,7 +96,7 @@ export class PatientDrugOrderListComponent implements OnInit {
     );
     this.facilityLogo$ = this.configService.getLogo();
     this.facilityDetails$ = this.store.select(getParentLocation);
-    this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
+    this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
     this.currentUser$ = this.store.select(getCurrentUserDetails);
   }
 
@@ -97,25 +104,25 @@ export class PatientDrugOrderListComponent implements OnInit {
     this.orderSelectAction.emit(data);
   }
 
-  onPrintPrescriptions(drugOrders, e: any){
-      let contents: string;
+  onPrintPrescriptions(drugOrders, e: any) {
+    let contents: string;
 
-      const frame1: any = document.createElement("iframe");
-      frame1.name = "frame1";
-      frame1.style.position = "absolute";
-      frame1.style.width = "100%";
-      frame1.style.top = "-1000000px";
-      document.body.appendChild(frame1);
+    const frame1: any = document.createElement("iframe");
+    frame1.name = "frame1";
+    frame1.style.position = "absolute";
+    frame1.style.width = "100%";
+    frame1.style.top = "-1000000px";
+    document.body.appendChild(frame1);
 
-      var frameDoc = frame1.contentWindow
-        ? frame1.contentWindow
-        : frame1.contentDocument.document
-          ? frame1.contentDocument.document
-          : frame1.contentDocument;
+    var frameDoc = frame1.contentWindow
+      ? frame1.contentWindow
+      : frame1.contentDocument.document
+      ? frame1.contentDocument.document
+      : frame1.contentDocument;
 
-      frameDoc.document.open();
+    frameDoc.document.open();
 
-      frameDoc.document.write(`
+    frameDoc.document.write(`
       <html>
         <head> 
           <style> 
@@ -189,28 +196,28 @@ export class PatientDrugOrderListComponent implements OnInit {
          <div id="printOut">
         `);
 
-      // Change image from base64 then replace some text with empty string to get an image
+    // Change image from base64 then replace some text with empty string to get an image
 
-      let image = "";
+    let image = "";
 
-      e.FacilityDetails.attributes.map((attribute) => {
-        let attributeTypeName =
-          attribute && attribute.attributeType
-            ? attribute?.attributeType?.name.toLowerCase()
-            : "";
-        if (attributeTypeName === "logo") {
-          image = attribute?.value;
-        }
-      });
+    e.FacilityDetails.attributes.map((attribute) => {
+      let attributeTypeName =
+        attribute && attribute.attributeType
+          ? attribute?.attributeType?.name.toLowerCase()
+          : "";
+      if (attributeTypeName === "logo") {
+        image = attribute?.value;
+      }
+    });
 
-      let patientMRN =
+    let patientMRN =
       e.CurrentPatient?.MRN ||
       e.CurrentPatient?.patient?.identifiers[0]?.identifier.replace(
         "MRN = ",
         ""
       );
 
-      frameDoc.document.write(`
+    frameDoc.document.write(`
     
       <center id="top">
         <div class="logo">
@@ -256,15 +263,16 @@ export class PatientDrugOrderListComponent implements OnInit {
         <tbody>`);
 
       drugOrders.forEach((order) => {
-
-          contents = `
+        contents = `
               <tr>
                 <td>${order?.drug?.display}</td> 
                 <td>${order?.instructions || "No instructions"}</td>  
-                <td>${formatDateToString(new Date(order?.dateActivated), "DD-MM-YYYY")}</td>
+                <td>${formatDateToString(
+                  new Date(order?.dateActivated),
+                  "DD-MM-YYYY"
+                )}</td>
               </tr>`;
-          frameDoc.document.write(contents);
-        ;
+        frameDoc.document.write(contents);
       });
 
       frameDoc.document.write(`
@@ -284,7 +292,7 @@ export class PatientDrugOrderListComponent implements OnInit {
             </div>
           </div>
           <div class=""printDate>
-            <p>Printed on: ${formatDateToString(new Date(), "DD-MM-YYYY") }</p>
+            <p>Printed on: ${formatDateToString(new Date(), "DD-MM-YYYY")}</p>
           </div>
         </div>
       </body>
@@ -297,13 +305,12 @@ export class PatientDrugOrderListComponent implements OnInit {
       window.frames["frame1"].print();
       document.body.removeChild(frame1);
     }, 500);
-  
   }
 
   onAddOrder(e: MouseEvent) {
     e.stopPropagation();
     const dialog = this.dialog.open(DispensingFormComponent, {
-      width: '80%',
+      width: "80%",
       disableClose: true,
       data: {
         drugOrder: null,

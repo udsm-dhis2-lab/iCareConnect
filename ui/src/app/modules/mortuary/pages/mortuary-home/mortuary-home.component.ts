@@ -1,31 +1,31 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
-import { Location } from 'src/app/core/models';
-import { VisitObject } from 'src/app/shared/resources/visits/models/visit-object.model';
+import { Component, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { select, Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { take } from "rxjs/operators";
+import { Location } from "src/app/core/models";
+import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import {
   go,
   loadLocationById,
   loadLocationsByTagName,
-} from 'src/app/store/actions';
-import { AppState } from 'src/app/store/reducers';
+} from "src/app/store/actions";
+import { AppState } from "src/app/store/reducers";
 import {
   getAllBedsUnderCurrentWard,
   getAllCabinetsUnderCurrentLocation,
   getBedsGroupedByTheCurrentLocationChildren,
   getCurrentLocation,
-} from 'src/app/store/selectors';
+} from "src/app/store/selectors";
 import {
   getAllAdmittedPatientVisits,
   getVisitLoadingState,
-} from 'src/app/store/selectors/visit.selectors';
+} from "src/app/store/selectors/visit.selectors";
 
 @Component({
-  selector: 'app-mortuary-home',
-  templateUrl: './mortuary-home.component.html',
-  styleUrls: ['./mortuary-home.component.scss'],
+  selector: "app-mortuary-home",
+  templateUrl: "./mortuary-home.component.html",
+  styleUrls: ["./mortuary-home.component.scss"],
 })
 export class MortuaryHomeComponent implements OnInit {
   currentLocation: Location;
@@ -37,7 +37,7 @@ export class MortuaryHomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.store
-      .select(getCurrentLocation)
+      .select(getCurrentLocation(false))
       .pipe(take(1))
       .subscribe((location) => {
         /**
@@ -45,14 +45,14 @@ export class MortuaryHomeComponent implements OnInit {
          */
         this.currentLocation = location;
         this.store.dispatch(
-          loadLocationsByTagName({ tagName: 'Mortuary+Location' })
+          loadLocationsByTagName({ tagName: "Mortuary+Location" })
         );
         this.store.dispatch(loadLocationById({ locationUuid: location?.uuid }));
         this.cabinetsUnderCurrentLocation$ = this.store.select(
           getAllCabinetsUnderCurrentLocation,
           {
             id: location?.uuid,
-            tagName: 'Mortuary Location',
+            tagName: "Mortuary Location",
           }
         );
       });
@@ -60,6 +60,6 @@ export class MortuaryHomeComponent implements OnInit {
   }
 
   onSelectPatient() {
-    this.store.dispatch(go({ path: ['/mortuary/dashboard'] }));
+    this.store.dispatch(go({ path: ["/mortuary/dashboard"] }));
   }
 }

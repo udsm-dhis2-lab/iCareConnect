@@ -241,26 +241,31 @@ export class LaboratoryComponent implements OnInit {
       navigationDetails && navigationDetails?.path[0]
         ? navigationDetails?.path[0]?.replace("/laboratory/", "")
         : "";
-    this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.currentLocation$ = this.store.select(getCurrentLocation(false));
   }
 
   setCurrentLab(location: any): void {
     this.currentLocation$ = of(null);
     if (location) {
       localStorage.setItem("currentLocation", JSON.stringify(location));
+
+      setTimeout(() => {
+        this.currentLocation$ = this.store.select(getCurrentLocation(true));
+      }, 100);
     } else {
       localStorage.setItem(
         "currentLocation",
         JSON.stringify({ name: "All", display: "All" })
       );
 
-      if (this.currentRoutePath === "sample-registration")
-        this.changeRoute(null, "sample-acceptance-and-results", true);
-    }
+      setTimeout(() => {
+        this.currentLocation$ = this.store.select(getCurrentLocation(true));
 
-    setTimeout(() => {
-      this.currentLocation$ = this.store.select(getCurrentLocation);
-    }, 100);
+        if (this.currentRoutePath === "sample-registration") {
+          this.changeRoute(null, "sample-acceptance-and-results", true);
+        }
+      }, 100);
+    }
   }
 
   toggleMenuItems(event: Event): void {

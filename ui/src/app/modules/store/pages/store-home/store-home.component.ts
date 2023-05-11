@@ -29,7 +29,7 @@ export class StoreHomeComponent implements OnInit {
   settingCurrentLocationStatus$: Observable<boolean>;
   currentStorePage: any;
   privileges$: Observable<any>;
-  showStoreMetrics: boolean =  false;
+  showStoreMetrics: boolean = false;
   constructor(private store: Store<AppState>) {
     this.store.dispatch(clearStockMetrics());
   }
@@ -40,7 +40,7 @@ export class StoreHomeComponent implements OnInit {
     );
     this.store.dispatch(loadLedgerTypes());
     this.store.dispatch(loadStockMetrics());
-    this.currentStore$ = this.store.pipe(select(getCurrentLocation));
+    this.currentStore$ = this.store.pipe(select(getCurrentLocation(false)));
     this.storePages = [
       {
         id: "stock",
@@ -75,13 +75,13 @@ export class StoreHomeComponent implements OnInit {
   }
 
   onChangeRoute(event: any, url?: string, page?: any): void {
-    const e = event?.e ? event?.e : event
+    const e = event?.e ? event?.e : event;
     e.stopPropagation();
     this.currentStorePage = page ? page : event?.currentStorePage;
     this.showStoreMetrics = false;
     this.store.dispatch(go({ path: [`/store/${url ? url : event?.url}`] }));
     setTimeout(() => {
       this.showStoreMetrics = true;
-    }, 200)
+    }, 200);
   }
 }

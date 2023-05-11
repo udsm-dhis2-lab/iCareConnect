@@ -441,7 +441,7 @@ export class RegistrationAddComponent implements OnInit {
     this.residenceDetailsLocation$ = this.locationService.getLocationById(
       this.residenceDetailsLocationUuid
     );
-    this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.currentLocation$ = this.store.select(getCurrentLocation(false));
     this.showPatientType$ =
       this.systemSettingsService.getSystemSettingsDetailsByKey(
         `icare.registration.settings.showPatientTypeField`

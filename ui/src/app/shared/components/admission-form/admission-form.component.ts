@@ -84,7 +84,7 @@ export class AdmissionFormComponent implements OnInit {
     this.form$ = this.store.select(getCustomOpenMRSFormById, {
       id: this.formUuid,
     });
-    this.currentLocation$ = this.store.select(getCurrentLocation);
+    this.currentLocation$ = this.store.select(getCurrentLocation(false));
     this.admissionStatus$ = this.store.select(
       getAdmissionStatusOfCurrentPatient
     );
@@ -93,7 +93,8 @@ export class AdmissionFormComponent implements OnInit {
     //   tagName: "Admission Location",
     // });
 
-    this.admissionLocations$ = this.locationService.getLocationsByTagName("Admission+Location");
+    this.admissionLocations$ =
+      this.locationService.getLocationsByTagName("Admission+Location");
     this.observationLocations$ = this.locationService.getLocationsByTagName(
       "Observation+Location"
     );

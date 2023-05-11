@@ -47,7 +47,7 @@ export class StockComponent implements OnInit {
   ngOnInit() {
     this.stockLoadedState$ = this.store.select(getStockLoadedState);
     this.ledgerTypes$ = this.store.pipe(select(getAllLedgerTypes));
-    this.currentStore$ = this.store.pipe(select(getCurrentLocation));
+    this.currentStore$ = this.store.pipe(select(getCurrentLocation(false)));
     this.currentStock$ = this.store.pipe(select(getCurrentStock));
     this.isCurrentLocationMainStore$ = this.store.pipe(
       select(getIfCurrentLocationIsMainStore)
