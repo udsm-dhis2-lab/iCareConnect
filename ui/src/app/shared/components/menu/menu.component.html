@@ -6,7 +6,8 @@
     lisConfigurations: lisConfigurations$ | async,
     currentLocation: currentLocation$ | async,
     userAssignedLocationsLoadedState: userAssignedLocationsLoadedState$ | async,
-    googleFormLink: googleFormLink$ | async
+    googleFormLink: googleFormLink$ | async,
+    securitySystemSettings: securitySystemSettings$ | async
   } as params"
 >
   <div
@@ -73,8 +74,9 @@
           <button
             class="mt-2 text-center"
             id="btn-logout"
+            [disabled]="!params?.securitySystemSettings"
             mat-menu-item
-            (click)="onChangePassword($event)"
+            (click)="onChangePassword($event, params?.securitySystemSettings)"
           >
             Change Password
           </button>
