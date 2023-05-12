@@ -3,15 +3,16 @@
   *ngIf="{
     LISConfigurations: LISConfigurations$ | async,
     labSections: labSections$ | async,
-    provider: provider$ | async
+    provider: provider$ | async,
+    currentUser: currentUser$ | async
   } as params"
 >
   <mat-progress-bar
     class="mt-2"
-    *ngIf="!params?.LISConfigurations"
+    *ngIf="!params?.LISConfigurations || !params?.currentUser"
   ></mat-progress-bar>
   <mat-tab-group
-    *ngIf="params?.LISConfigurations"
+    *ngIf="params?.LISConfigurations && params?.currentUser"
     [selectedIndex]="selectedTab.value"
     (selectedTabChange)="onChangeRoute($event)"
     (selectedIndexChange)="selectedTab.setValue($event)"
@@ -110,8 +111,10 @@
     </mat-tab>
     <mat-tab label="System Settings">
       <ng-template matTabContent>
-        <div class="p-3">
-          <app-lab-system-settings></app-lab-system-settings>
+        <div class="p-3" *ngIf="params?.currentUser">
+          <app-lab-system-settings
+            [currentUser]="params?.currentUser"
+          ></app-lab-system-settings>
         </div>
       </ng-template>
     </mat-tab>
