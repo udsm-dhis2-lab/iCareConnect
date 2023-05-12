@@ -73,8 +73,9 @@ export class SystemSettingsService {
         map((response) => {
           return response?.results && response?.results?.length > 0
             ? response?.results.map((result) => {
-                return result?.value.indexOf("{") > -1 ||
-                  result?.value.indexOf("[") > -1
+                return result?.value &&
+                  (result?.value.indexOf("{") > -1 ||
+                    result?.value.indexOf("[") > -1)
                   ? {
                       uuid: result?.uuid,
                       name: result?.property

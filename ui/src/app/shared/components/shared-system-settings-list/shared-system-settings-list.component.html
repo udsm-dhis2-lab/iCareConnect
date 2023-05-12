@@ -1,6 +1,6 @@
 <div
   class="system-settings-list-container"
-  *ngIf="systemSettings$ | async as systemSettings"
+  *ngIf="{ systemSettings: systemSettings$ | async } as params"
 >
   <div class="loading-overlay" *ngIf="saving">
     <div class="text-center">
@@ -12,7 +12,7 @@
   </div>
 
   <mat-progress-bar
-    *ngIf="!systemSettings && !saving && !error"
+    *ngIf="!params?.systemSettings && !saving && !error"
     mode="indeterminate"
   ></mat-progress-bar>
   <!-- {{ systemSettings | json }} -->
@@ -29,7 +29,7 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div *ngIf="systemSettings && !saving && !error">
+  <div *ngIf="params?.systemSettings && !saving && !error">
     <div class="card" style="overflow: auto">
       <table class="mt-2 table table-striped">
         <thead>
@@ -42,7 +42,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let systemSetting of systemSettings; let count = index">
+          <tr
+            *ngFor="
+              let systemSetting of params?.systemSettings;
+              let count = index
+            "
+          >
             <td>{{ count + 1 + (page - 1) * pageSize }}.</td>
             <td>
               {{ systemSetting?.property }}
