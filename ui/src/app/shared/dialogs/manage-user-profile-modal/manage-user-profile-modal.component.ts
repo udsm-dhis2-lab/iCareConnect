@@ -87,10 +87,11 @@ export class ManageUserProfileModalComponent implements OnInit {
         systemKey: this.systemKey,
       })
       .subscribe((response) => {
-        if (response && !response?.error) {
+        console.log(response);
+        if (response && !response?.error && response?.status !== "ERROR") {
           this.verified = true;
         } else {
-          this.errors = [...this.errors, response?.error];
+          this.errors = [...this.errors, { error: { ...response } }];
         }
       });
   }
