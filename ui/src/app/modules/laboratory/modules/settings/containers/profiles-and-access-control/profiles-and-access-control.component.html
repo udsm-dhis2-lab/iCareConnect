@@ -19,6 +19,7 @@
           <div
             class="privileges-and-roles-management-container"
             *ngIf="
+              currentUser?.userPrivileges['ALL'] ||
               currentUser?.userPrivileges[
                 'MAINTENANCE_USER_ROLES_MANAGEMENT'
               ] ||
