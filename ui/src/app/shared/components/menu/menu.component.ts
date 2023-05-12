@@ -62,6 +62,7 @@ export class MenuComponent implements OnInit {
   userLocationsUuids: string[];
   userAssignedLocationsLoadedState$: Observable<boolean>;
   googleFormLink$: Observable<string>;
+  securitySystemSettings$: Observable<any[]>;
   constructor(
     private router: Router,
     public dialog: MatDialog,
@@ -128,6 +129,9 @@ export class MenuComponent implements OnInit {
     //   console.log("the sess response");
     //   console.log(sessionResponse);
     // });
+
+    this.securitySystemSettings$ =
+      this.systemSettingsService.getSystemSettingsMatchingAKey("security.");
     setInterval(() => {
       this.pingSession();
     }, 100000);
@@ -155,10 +159,11 @@ export class MenuComponent implements OnInit {
       panelClass: "custom-dialog-container",
     });
   }
-  onChangePassword(event: Event): void {
+  onChangePassword(event: Event, securitySystemSettings: any[]): void {
     // event.stopPropagation();
     this.matDialogRef = this.dialog.open(ChangePasswordComponent, {
-      width: "25%",
+      minWidth: "25%",
+      data: securitySystemSettings,
       disableClose: true,
     });
   }

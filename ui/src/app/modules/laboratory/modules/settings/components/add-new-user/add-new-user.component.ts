@@ -554,11 +554,9 @@ export class AddNewUserComponent implements OnInit {
                 : ""
               : "") +
             checkLengthRegExp;
-      console.log("pattern", pattern);
       const strongPassword = new RegExp("^" + pattern + "$");
       const test = strongPassword.test(this.passwordInput.value);
       this.passwordFocusOut = true;
-      console.log("TEST", test);
       if (test) {
         this.passwordStrong = true;
         this.passwordStrengthMessage = "";
