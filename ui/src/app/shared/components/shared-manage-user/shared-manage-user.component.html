@@ -1,17 +1,21 @@
 <mat-card>
   <div class="d-flex justify-content-between mb-2">
     <div class="h4 font-weight-normal">
-      <button mat-flat-button style="height: 10px" (click)="onCancel($event)">
+      <button mat-icon-button color="primary" (click)="onCancel($event)">
         <mat-icon>keyboard_backspace</mat-icon>
+        {{ user && user?.uuid ? "Update User" : "Add User" }}
       </button>
-      {{ user && user?.uuid ? "Update User" : "Add User" }}
     </div>
   </div>
 
   <!-- loading section -->
   <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
   <!-- end of loading section -->
-  <div class="table-responsive p-3" *ngIf="!loading && userForm">
+  <div
+    class="table-responsive p-3 w-100"
+    style="max-height: 550px; overflow: auto"
+    *ngIf="!loading && userForm"
+  >
     <form [formGroup]="userForm">
       <ng-container>
         <div class="row">
@@ -62,6 +66,9 @@
               <mat-hint *ngIf="!passwordInput.value"
                 >Enter your password</mat-hint
               >
+              <mat-hint class="text-danger" *ngIf="!passwordStrong">{{
+                passwordStrengthMessage
+              }}</mat-hint>
               <mat-icon matSuffix (click)="hide = !hide">{{
                 hide ? "visibility_off" : "visibility"
               }}</mat-icon>
