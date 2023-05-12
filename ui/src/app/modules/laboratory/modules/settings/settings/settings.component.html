@@ -23,14 +23,22 @@
     >
       <ng-template matTabContent>
         <div class="p-3">
-          <app-parameters-dashboard></app-parameters-dashboard>
+          <app-parameters-dashboard
+            *ngIf="
+              params?.currentUser && params?.currentUser?.userPrivileges['ALL']
+            "
+          ></app-parameters-dashboard>
         </div>
       </ng-template>
     </mat-tab>
     <mat-tab label="Test methods" *ngIf="params?.LISConfigurations?.isLIS">
       <ng-template matTabContent>
         <div class="p-3">
-          <app-test-methods-dashboard></app-test-methods-dashboard>
+          <app-test-methods-dashboard
+            *ngIf="
+              params?.currentUser && params?.currentUser?.userPrivileges['ALL']
+            "
+          ></app-test-methods-dashboard>
         </div>
       </ng-template>
     </mat-tab>
@@ -40,7 +48,11 @@
     >
       <ng-template matTabContent>
         <div class="p-3">
-          <app-test-orders-management></app-test-orders-management>
+          <app-test-orders-management
+            *ngIf="
+              params?.currentUser && params?.currentUser?.userPrivileges['ALL']
+            "
+          ></app-test-orders-management>
         </div>
       </ng-template>
     </mat-tab>
@@ -50,7 +62,11 @@
     >
       <ng-template matTabContent>
         <div class="p-3">
-          <app-labs-and-sections-management></app-labs-and-sections-management>
+          <app-labs-and-sections-management
+            *ngIf="
+              params?.currentUser && params?.currentUser?.userPrivileges['ALL']
+            "
+          ></app-labs-and-sections-management>
         </div>
       </ng-template>
     </mat-tab>
@@ -66,6 +82,9 @@
       <ng-template matTabContent>
         <div class="p-3">
           <app-register-sample
+            *ngIf="
+              params?.currentUser && params?.currentUser?.userPrivileges['ALL']
+            "
             [provider]="params?.provider"
             [labSections]="params?.labSections"
             [LISConfigurations]="params?.LISConfigurations"
@@ -80,17 +99,34 @@
     >
       <ng-template matTabContent>
         <div class="p-3">
-          <app-worksheet-management></app-worksheet-management>
+          <app-worksheet-management
+            *ngIf="
+              params?.currentUser && params?.currentUser?.userPrivileges['ALL']
+            "
+          ></app-worksheet-management>
         </div>
       </ng-template>
     </mat-tab>
     <mat-tab
       label="Users, Profiles & Access Control"
-      *ngIf="params?.LISConfigurations?.isLIS"
+      *ngIf="
+        params?.LISConfigurations?.isLIS &&
+        params?.currentUser &&
+        (params?.currentUser?.userPrivileges['ALL'] ||
+          params?.currentUser?.userPrivileges['MAINTENANCE_USER_MANAGEMENT'] ||
+          params?.currentUser?.userPrivileges[
+            'MAINTENANCE_USER_ROLES_MANAGEMENT'
+          ] ||
+          params?.currentUser?.userPrivileges[
+            'MAINTENANCE_USER_PRIVILEGE_MANAGEMENT'
+          ])
+      "
     >
       <ng-template matTabContent>
         <div class="p-3">
-          <app-profiles-and-access-control></app-profiles-and-access-control>
+          <app-profiles-and-access-control
+            [currentUser]="params?.currentUser"
+          ></app-profiles-and-access-control>
         </div>
       </ng-template>
     </mat-tab>
@@ -104,6 +140,9 @@
       <ng-template matTabContent>
         <div class="p-3">
           <app-extended-parameters-settings
+            *ngIf="
+              params?.currentUser && params?.currentUser?.userPrivileges['ALL']
+            "
             [LISConfigurations]="params?.LISConfigurations"
           ></app-extended-parameters-settings>
         </div>
@@ -122,6 +161,9 @@
       <ng-template matTabContent>
         <div class="p-3">
           <ngx-standard-report
+            *ngIf="
+              params?.currentUser && params?.currentUser?.userPrivileges['ALL']
+            "
             [actionType]="'manage'"
             [additionalKey]="'lis'"
           ></ngx-standard-report>
@@ -131,14 +173,22 @@
     <mat-tab label="Other" *ngIf="params?.LISConfigurations?.isLIS">
       <ng-template matTabContent>
         <div class="p-3">
-          <app-other-lab-configurations></app-other-lab-configurations>
+          <app-other-lab-configurations
+            *ngIf="
+              params?.currentUser && params?.currentUser?.userPrivileges['ALL']
+            "
+          ></app-other-lab-configurations>
         </div>
       </ng-template>
     </mat-tab>
     <mat-tab label="System logs" *ngIf="params?.LISConfigurations?.isLIS">
       <ng-template matTabContent>
         <div class="p-3">
-          <app-system-logs></app-system-logs>
+          <app-system-logs
+            *ngIf="
+              params?.currentUser && params?.currentUser?.userPrivileges['ALL']
+            "
+          ></app-system-logs>
         </div>
       </ng-template>
     </mat-tab>
