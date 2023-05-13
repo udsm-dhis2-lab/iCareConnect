@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.*;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metadata.ClassMetadata;
@@ -482,17 +483,27 @@ public class HibernateAuditLogInterceptor extends EmptyInterceptor {
         auditLog.setModuleVersion(AuditLogConstants.MODULE_VERSION);
         if (action == AuditLog.Action.UPDATED || action == AuditLog.Action.DELETED) {
             Map<String, Object[]> propertyValuesMap = null;
+
+            Configuration configuration = new Configuration().configure();
+            SessionFactory sessionFactory = configuration.buildSessionFactory();
+            Session session = sessionFactory.getCurrentSession();
+            LobHelper lobHelper = session.getLobHelper();
+
             if (action == AuditLog.Action.UPDATED) {
                 propertyValuesMap = objectChangesMap.get().peek().get(object);
                 if (propertyValuesMap != null) {
-                    Blob blob = Hibernate.createBlob(AuditLogUtil.serializeToJson(propertyValuesMap).getBytes());
+//                    Blob blob = Hibernate.createBlob(AuditLogUtil.serializeToJson(propertyValuesMap).getBytes());
+//                    auditLog.setSerializedData(blob);
+                    Blob blob = lobHelper.createBlob(AuditLogUtil.serializeToJson(propertyValuesMap).getBytes());
                     auditLog.setSerializedData(blob);
                 }
             } else if (InterceptorUtil.storeLastStateOfDeletedItems()) {
                 //TODO if one edits and deletes an object in the same API call, the property
                 //value that gets serialized is the new one but actually was never saved
                 //Should we store the value in the DB or the one in the current session?
-                Blob blob = Hibernate.createBlob(InterceptorUtil.serializePersistentObject(object).getBytes());
+//                Blob blob = Hibernate.createBlob(InterceptorUtil.serializePersistentObject(object).getBytes());
+//                auditLog.setSerializedData(blob);
+                Blob blob = lobHelper.createBlob(AuditLogUtil.serializeToJson(propertyValuesMap).getBytes());
                 auditLog.setSerializedData(blob);
             }
         }

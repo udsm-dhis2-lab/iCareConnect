@@ -38,6 +38,7 @@ public class BaseAuditLogTest extends BaseModuleContextSensitiveTest {
         ExceptionBasedAuditStrategy strategy = (ExceptionBasedAuditStrategy) auditLogService.getAuditingStrategy();
         assertEquals(AuditStrategy.NONE_EXCEPT, strategy);
         Set<Class<?>> exceptions = strategy.getExceptions();
+        System.out.println("size: "+exceptions.getClass().getName());
         assertEquals(5, exceptions.size());
         assertTrue(OpenmrsUtil.collectionContains(exceptions, Concept.class));
         assertTrue(OpenmrsUtil.collectionContains(exceptions, ConceptNumeric.class));
