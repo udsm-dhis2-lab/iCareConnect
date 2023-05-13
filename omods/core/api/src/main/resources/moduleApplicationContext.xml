@@ -486,7 +486,7 @@
     </bean>
 
     <bean id="auditLogDAO" class="org.openmrs.module.icare.auditlog.api.db.hibernate.HibernateAuditLogDAO">
-        <property name="sessionFactory" ref="dbSessionFactory" />
+        <property name="sessionFactory" ref="sessionFactory" />
     </bean>
 
 </beans>
