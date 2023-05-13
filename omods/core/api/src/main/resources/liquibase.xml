@@ -5245,6 +5245,30 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="create_audit_log" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="audit_log" /></not>
+        </preConditions>
+        <comment>Adding audit_log table</comment>
+        <createTable tableName="audit_log">
+            <column name="audit_log_id" type="int" autoIncrement="true" >
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="type" type="varchar(512)"><constraints nullable="false" /></column>
+            <column name="identifier" type="varchar(255)"><constraints nullable="false" /></column>
+            <column name="action" type="enum('CREATE','UPDATE','DELETE')"><constraints nullable="false" /></column>
+            <column name="user_id" type="int" />
+            <column name="serialized_data" type="longblob" />
+            <column name="date_created" type="DATETIME"><constraints nullable="false" /></column>
+            <column name="parent_auditlog_id" type="int" />
+            <column name="uuid" type="varchar(38)"><constraints nullable="false" unique="true" /></column>
+        </createTable>
+        <addForeignKeyConstraint
+                constraintName="authenticated_user"
+                baseTableName="audit_log" baseColumnNames="user_id"
+                referencedTableName="users" referencedColumnNames="user_id" />
+    </changeSet>
+
 
 
 </databaseChangeLog>
