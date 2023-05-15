@@ -26,6 +26,7 @@ public abstract class ExceptionBasedAuditStrategy extends ConfigurableAuditStrat
 		if (helper == null) {
 			helper = Context.getRegisteredComponents(AuditLogHelper.class).get(0);
 		}
+		System.out.println("exceptions: " + helper.getExceptions());
 		return helper;
 	}
 	
