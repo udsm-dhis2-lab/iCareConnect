@@ -5255,8 +5255,7 @@
                 <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="type" type="varchar(512)"><constraints nullable="false" /></column>
-            <column name="identifier" type="varchar(255)"><constraints nullable="false" /></column>
-            <column name="action" type="enum('CREATE','UPDATE','DELETE')"><constraints nullable="false" /></column>
+            <column name="action" type="varchar(50)"><constraints nullable="false" /></column>
             <column name="user_id" type="int" />
             <column name="serialized_data" type="longblob" />
             <column name="date_created" type="DATETIME"><constraints nullable="false" /></column>

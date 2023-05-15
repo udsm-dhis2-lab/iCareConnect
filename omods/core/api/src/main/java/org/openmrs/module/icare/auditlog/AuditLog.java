@@ -3,6 +3,7 @@ package org.openmrs.module.icare.auditlog;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.User;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Blob;
 import java.util.Date;
@@ -10,39 +11,52 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Entity
+@Table(name = "audit_log")
 public class AuditLog implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
+	@Column(name = "uuid", length = 38, nullable = false, unique = true)
 	private String uuid = UUID.randomUUID().toString();
 	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "audit_log_id")
 	private Integer auditLogId;
 	
 	//the fully qualified java class name of the create/updated/deleted object
+	@Column(name = "type", length = 512, nullable = false)
 	private Class<?> type;
 	
 	//the unique database id of the created/updated/deleted object
-	private Serializable identifier;
+	//	@Column(name = "identifier", length = 255, nullable = false)
+	//	private Serializable identifier;
 	
 	//the performed operation that which could be a create, update or delete
+	@Column(name = "action", length = 50, nullable = false)
 	private Action action;
 	
+	@ManyToOne
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 	
+	@Column(name = "date_created", nullable = false)
 	private Date dateCreated;
 	
-	private String openmrsVersion;
-	
-	private String moduleVersion;
-	
+	@ManyToOne
+	@JoinColumn(name = "parent_auditlog_id")
 	private AuditLog parentAuditLog;
 	
+	@OneToMany(mappedBy = "parentAuditLog", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<AuditLog> childAuditLogs;
 	
 	/**
 	 * Used to store Json for field new and old values for updated items or last properties values
 	 * of deleted items
 	 */
+	@Lob
+	@Column(name = "serialized_data")
 	private Blob serializedData;
 	
 	public enum Action {
@@ -55,19 +69,10 @@ public class AuditLog implements Serializable {
 	public AuditLog() {
 	}
 	
-	/**
-	 * Convenience constructor
-	 * 
-	 * @param type the fully qualified classname of the Object type
-	 * @param identifier the id of the object
-	 * @param action the operation performed on the object
-	 * @param user the user that triggered the operation
-	 * @param dateCreated the date when the operation was done
-	 */
-	public AuditLog(Class<?> type, Serializable identifier, Action action, User user, Date dateCreated) {
+	public AuditLog(Class<?> type, Action action, User user, Date dateCreated) {
 		this();
 		this.type = type;
-		this.identifier = identifier;
+		//this.identifier = identifier;
 		this.action = action;
 		this.user = user;
 		this.dateCreated = dateCreated;
@@ -104,16 +109,16 @@ public class AuditLog implements Serializable {
 	/**
 	 * @return the identifier
 	 */
-	public Serializable getIdentifier() {
-		return identifier;
-	}
+	//	public Serializable getIdentifier() {
+	//		return identifier;
+	//	}
 	
 	/**
 	 * @param identifier the identifier to set
 	 */
-	public void setIdentifier(Serializable identifier) {
-		this.identifier = identifier;
-	}
+	//	public void setIdentifier(Serializable identifier) {
+	//		this.identifier = identifier;
+	//	}
 	
 	/**
 	 * @return the action
@@ -157,37 +162,6 @@ public class AuditLog implements Serializable {
 		this.dateCreated = dateCreated;
 	}
 	
-	/**
-	 * @return the openmrsVersion
-	 */
-	public String getOpenmrsVersion() {
-		return openmrsVersion;
-	}
-	
-	/**
-	 * @param openmrsVersion the openmrsVersion to set to
-	 */
-	public void setOpenmrsVersion(String openmrsVersion) {
-		this.openmrsVersion = openmrsVersion;
-	}
-	
-	/**
-	 * @return moduleVersion
-	 */
-	public String getModuleVersion() {
-		return moduleVersion;
-	}
-	
-	/**
-	 * @param moduleVersion the moduleVersion to set to
-	 */
-	public void setModuleVersion(String moduleVersion) {
-		this.moduleVersion = moduleVersion;
-	}
-	
-	/**
-	 * @return the uuid
-	 */
 	public String getUuid() {
 		return uuid;
 	}
@@ -294,7 +268,7 @@ public class AuditLog implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return action + " " + type + " " + identifier;
+		return action + " " + type + " " + uuid;
 	}
 	
 	public boolean hasChildLogs() {
