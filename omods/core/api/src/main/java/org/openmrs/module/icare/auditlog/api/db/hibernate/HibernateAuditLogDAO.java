@@ -38,14 +38,11 @@ public class HibernateAuditLogDAO implements AuditLogDAO, GlobalPropertyListener
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<AuditLog> getAuditLogs(Serializable id, List<Class<?>> types, List<AuditLog.Action> actions, Date startDate,
+	public List<AuditLog> getAuditLogs(Serializable id, List<Class<?>> types, List<String> actions, Date startDate,
 	        Date endDate, boolean excludeChildAuditLogs, Integer start, Integer length) {
 		
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AuditLog.class);
-		
-		System.out.println(sessionFactory.getCurrentSession());
-		System.out.println(criteria);
-		System.out.println("list" + criteria.list());
+
 		if (types != null) {
 			criteria.add(Restrictions.in("type", types));
 		}
@@ -89,8 +86,9 @@ public class HibernateAuditLogDAO implements AuditLogDAO, GlobalPropertyListener
 			if (auditLog.getParentAuditLog() != null && auditLog.getParentAuditLog().getAuditLogId() == null) {
 				save(auditLog.getParentAuditLog());
 			}
+			//System.out.println("action-name " + auditLog.getAction().name());
+			System.out.println("action " + auditLog.getAction());
 		}
-		
 		sessionFactory.getCurrentSession().saveOrUpdate(object);
 		return object;
 	}

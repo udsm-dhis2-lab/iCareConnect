@@ -54,7 +54,7 @@ public class AuditLogServiceImpl extends BaseOpenmrsService implements AuditLogS
 	@SuppressWarnings({ "rawtypes" })
 	@Override
 	@Transactional(readOnly = true)
-	public List<AuditLog> getAuditLogs(List<Class<?>> clazzes, List<AuditLog.Action> actions, Date startDate, Date endDate,
+	public List<AuditLog> getAuditLogs(List<Class<?>> clazzes, List<String> actions, Date startDate, Date endDate,
 	        boolean excludeChildAuditLogs, Integer start, Integer length) {
 		if (OpenmrsUtil.compareWithNullAsEarliest(startDate, new Date()) > 0) {
 			throw new APIException(Context.getMessageSourceService().getMessage(
@@ -103,8 +103,8 @@ public class AuditLogServiceImpl extends BaseOpenmrsService implements AuditLogS
 	
 	@Override
 	@Transactional(readOnly = true)
-	public List<AuditLog> getAuditLogs(Serializable id, Class<?> clazz, List<AuditLog.Action> actions, Date startDate,
-	        Date endDate, boolean excludeChildAuditLogs) {
+	public List<AuditLog> getAuditLogs(Serializable id, Class<?> clazz, List<String> actions, Date startDate, Date endDate,
+	        boolean excludeChildAuditLogs) {
 		
 		if (id == null || clazz == null) {
 			throw new APIException("class and uuid are required when fetching AuditLogs for an object");
@@ -125,7 +125,7 @@ public class AuditLogServiceImpl extends BaseOpenmrsService implements AuditLogS
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public List<AuditLog> getAuditLogs(Object object, List<AuditLog.Action> actions, Date startDate, Date endDate,
+	public List<AuditLog> getAuditLogs(Object object, List<String> actions, Date startDate, Date endDate,
 	        boolean excludeChildAuditLogs) {
 		System.out.println("b");
 		return getAuditLogs(dao.getId(object), object.getClass(), actions, startDate, endDate, excludeChildAuditLogs);

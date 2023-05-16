@@ -806,4 +806,13 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse returnResponse = handle(emailRequest);
 		System.out.println(returnResponse);
 	}
+
+	@Test
+	public void getAuditLogs() throws Exception {
+		MockHttpServletRequest auditlogs = newGetRequest("icare/auditlogs");
+		MockHttpServletResponse returnResponse = handle(auditlogs);
+		List<Map<String, Object>> stockInvoicesStatusListMap = (new ObjectMapper()).readValue(returnResponse.getContentAsString(), List.class);
+
+		System.out.println(returnResponse.getContentAsString());
+	}
 }

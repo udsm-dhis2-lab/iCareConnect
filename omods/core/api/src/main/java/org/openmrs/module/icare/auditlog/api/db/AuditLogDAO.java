@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface AuditLogDAO {
 	
-	public List<AuditLog> getAuditLogs(Serializable id, List<Class<?>> types, List<AuditLog.Action> actions, Date startDate,
+	public List<AuditLog> getAuditLogs(Serializable id, List<Class<?>> types, List<String> actions, Date startDate,
 	        Date endDate, boolean excludeChildAuditLogs, Integer start, Integer length);
 	
 	/**

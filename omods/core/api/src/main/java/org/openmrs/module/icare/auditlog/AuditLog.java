@@ -1,15 +1,11 @@
 package org.openmrs.module.icare.auditlog;
 
 import org.apache.commons.lang.StringUtils;
-import org.openmrs.User;
-
+import org.openmrs.*;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Blob;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "audit_log")
@@ -35,7 +31,7 @@ public class AuditLog implements Serializable {
 	
 	//the performed operation that which could be a create, update or delete
 	@Column(name = "action", length = 50, nullable = false)
-	private Action action;
+	private String action;
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
@@ -69,7 +65,7 @@ public class AuditLog implements Serializable {
 	public AuditLog() {
 	}
 	
-	public AuditLog(Class<?> type, Action action, User user, Date dateCreated) {
+	public AuditLog(Class<?> type, String action, User user, Date dateCreated) {
 		this();
 		this.type = type;
 		//this.identifier = identifier;
@@ -123,14 +119,14 @@ public class AuditLog implements Serializable {
 	/**
 	 * @return the action
 	 */
-	public Action getAction() {
+	public String getAction() {
 		return action;
 	}
 	
 	/**
 	 * @param action the action to set
 	 */
-	public void setAction(Action action) {
+	public void setAction(String action) {
 		this.action = action;
 	}
 	
@@ -273,5 +269,33 @@ public class AuditLog implements Serializable {
 	
 	public boolean hasChildLogs() {
 		return getChildAuditLogs().size() > 0;
+	}
+
+	public Map<String, Object> toMap() {
+		Map<String, Object> auditLogMap = new HashMap<>();
+		if(this.getUuid() != null) {
+			auditLogMap.put("uuid", this.uuid);
+		}
+		if(this.getDateCreated() != null) {
+			auditLogMap.put("date_created", this.getDateCreated());
+		}
+		if(this.getAction() != null) {
+			auditLogMap.put("action", this.getAction());
+		}
+
+		if(this.getType() != null){
+			auditLogMap.put("type",this.getType());
+		}
+
+		if(this.getUser() != null){
+			Map<String,Object> userObjectMap = new HashMap<>();
+			userObjectMap.put("id",this.getUser().getId());
+			userObjectMap.put("name", this.getUser().getPersonName().getFullName());
+			userObjectMap.put("username",this.getUser().getUsername());
+			auditLogMap.put("user",userObjectMap);
+		}
+
+		return auditLogMap;
+
 	}
 }

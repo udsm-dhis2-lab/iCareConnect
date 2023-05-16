@@ -1,6 +1,5 @@
 package org.openmrs.module.icare.auditlog.api;
 
-import org.openmrs.Concept;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.icare.auditlog.AuditLog;
@@ -23,8 +22,8 @@ public interface AuditLogService extends OpenmrsService {
 	@Authorized(AuditLogConstants.CHECK_FOR_AUDITED_ITEMS)
 	public boolean isAudited(Class<?> clazz);
 	
-	@Authorized(AuditLogConstants.PRIV_GET_AUDITLOGS)
-	public List<AuditLog> getAuditLogs(List<Class<?>> clazzes, List<AuditLog.Action> actions, Date startDate, Date endDate,
+	//@Authorized(AuditLogConstants.PRIV_GET_AUDITLOGS)
+	public List<AuditLog> getAuditLogs(List<Class<?>> clazzes, List<String> actions, Date startDate, Date endDate,
 	        boolean excludeChildAuditLogs, Integer start, Integer length);
 	
 	/**
@@ -66,9 +65,9 @@ public interface AuditLogService extends OpenmrsService {
 	 * @should include logs for subclasses when getting by type
 	 * @should exclude child logs for object if excludeChildAuditLogs is set to true
 	 */
-	@Authorized(AuditLogConstants.PRIV_GET_AUDITLOGS)
-	public List<AuditLog> getAuditLogs(Serializable id, Class<?> clazz, List<AuditLog.Action> actions, Date startDate,
-	        Date endDate, boolean excludeChildAuditLogs);
+	//@Authorized(AuditLogConstants.PRIV_GET_AUDITLOGS)
+	public List<AuditLog> getAuditLogs(Serializable id, Class<?> clazz, List<String> actions, Date startDate, Date endDate,
+	        boolean excludeChildAuditLogs);
 	
 	/**
 	 * Gets all audit logs for the object that match the other specified arguments
@@ -82,7 +81,7 @@ public interface AuditLogService extends OpenmrsService {
 	 * @return a list of audit logs
 	 * @should get all logs for the specified object
 	 */
-	@Authorized(AuditLogConstants.PRIV_GET_AUDITLOGS)
-	public List<AuditLog> getAuditLogs(Object object, List<AuditLog.Action> actions, Date startDate, Date endDate,
+	//@Authorized(AuditLogConstants.PRIV_GET_AUDITLOGS)
+	public List<AuditLog> getAuditLogs(Object object, List<String> actions, Date startDate, Date endDate,
 	        boolean excludeChildAuditLogs);
 }
