@@ -313,4 +313,6 @@
     <global_property property="mail.smtp_port" property_value="25" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c616" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
     <global_property property="mail.user" property_value="test" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c999" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
 
+    <audit_log audit_log_id="1" type="org.openmrs.module.icare.laboratory.models.Sample" action="CREATED" date_created="2023-04-18 09:51:57.0" user_id="400" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c631" />
+    <audit_log audit_log_id="2" type="org.openmrs.module.icare.laboratory.models.Sample" action="UPDATED" date_created="2023-04-18 09:51:57.0" user_id="300" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c630"/>
 </dataset>
