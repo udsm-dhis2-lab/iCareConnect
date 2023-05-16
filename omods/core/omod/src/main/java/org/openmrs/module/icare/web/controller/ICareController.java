@@ -20,6 +20,8 @@ import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.op.In;
+import org.openmrs.module.icare.auditlog.AuditLog;
+import org.openmrs.module.icare.auditlog.api.AuditLogService;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.BillingService;
@@ -32,6 +34,8 @@ import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.models.PimaCovidLabRequest;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
+import org.openmrs.module.icare.laboratory.models.Sample;
+import org.openmrs.module.icare.laboratory.models.SampleStatus;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +69,7 @@ public class ICareController {
 	
 	@Autowired
 	EncounterService encounterService;
+
 	
 	/** Logger for this class and subclasses */
 	protected final Log log = LogFactory.getLog(getClass());
@@ -76,6 +81,7 @@ public class ICareController {
         List<String> ids = iCareService.generatePatientIds();
         results.put("identifiers", ids);
         return results;
+
     }
 	
 	@RequestMapping(value = "codegen", method = RequestMethod.GET)
@@ -770,5 +776,22 @@ public class ICareController {
 		}
 		System.out.println(response);
 		return response;
+	}
+
+	@RequestMapping(value="auditlogs", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getAuditLogs(@RequestParam(required = false) List<Class<?>> clazzes, @RequestParam(required = false) List<String> actions, @RequestParam(required = false)  Date startDate, @RequestParam(required = false) Date endDate, @RequestParam(required = false)  boolean excludeChildAuditLogs, @RequestParam(required = false)  Integer start, @RequestParam(required = false)  Integer length){
+
+		List<Map<String,Object>> auditLogMapList = new ArrayList<>();
+
+		AuditLogService auditLogService = Context.getService(AuditLogService.class);
+
+		List<AuditLog> auditLogs = auditLogService.getAuditLogs(clazzes,actions,startDate,endDate,excludeChildAuditLogs,start,length);
+		for(AuditLog auditLog : auditLogs){
+			auditLogMapList.add(auditLog.toMap());
+		}
+
+		return auditLogMapList;
+
 	}
 }
