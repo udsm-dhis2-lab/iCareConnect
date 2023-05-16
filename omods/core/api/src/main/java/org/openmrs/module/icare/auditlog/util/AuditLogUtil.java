@@ -112,7 +112,7 @@ public class AuditLogUtil {
 	 * @return a map of changes
 	 */
 	public static Map<String, List> getChangesOfUpdatedItem(AuditLog auditLog) {
-		if (auditLog.getAction() != AuditLog.Action.UPDATED) {
+		if (auditLog.getAction() != "UPDATED") {
 			throw new APIException("Can't call this method for an AuditLog item with action " + auditLog.getAction());
 		}
 		
@@ -138,7 +138,7 @@ public class AuditLogUtil {
 	 * @return a map of property names and values
 	 */
 	public static Map<String, String> getLastStateOfDeletedItem(AuditLog auditLog) {
-		if (auditLog.getAction() != AuditLog.Action.DELETED) {
+		if (auditLog.getAction() != "DELETED") {
 			throw new APIException("Can't call this method for an AuditLog item with action " + auditLog.getAction());
 		}
 		

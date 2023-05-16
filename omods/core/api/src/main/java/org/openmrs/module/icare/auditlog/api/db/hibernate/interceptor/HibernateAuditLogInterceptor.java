@@ -108,7 +108,6 @@ public class HibernateAuditLogInterceptor extends EmptyInterceptor {
 			if (log.isDebugEnabled()) {
 				log.debug("Creating log entry for created object with id:" + id + " of type:" + entity.getClass().getName());
 			}
-			System.out.println("saved entity: " + entity);
 			inserts.get().peek().add(entity);
 		}
 		
@@ -363,11 +362,11 @@ public class HibernateAuditLogInterceptor extends EmptyInterceptor {
 				//check all collection items to find dirty ones so that we can mark the the owners as dirty too
 				//I.e if a ConceptName/Mapping/Description was edited, mark the the Concept as dirty too
 				for (Map.Entry<Object, List<Collection<?>>> entry : entityCollectionsMap.get().peek().entrySet()) {
-					System.out.println("entry: " + entry);
+					//System.out.println("entry: " + entry);
 					for (Collection<?> coll : entry.getValue()) {
-						System.out.println("coll: " + coll);
+						//System.out.println("coll: " + coll);
 						for (Object obj : coll) {
-							System.out.println("object: " + obj);
+							//System.out.println("object: " + obj);
 							boolean isInsert = OpenmrsUtil.collectionContains(inserts.get().peek(), obj);
 							boolean isUpdate = OpenmrsUtil.collectionContains(updates.get().peek(), obj);
 							
@@ -397,8 +396,7 @@ public class HibernateAuditLogInterceptor extends EmptyInterceptor {
 										ownerUuidChildLogsMap.get().peek().put(owner, new ArrayList<AuditLog>());
 									}
 									
-									AuditLog childLog = instantiateAuditLog(obj, isInsert ? AuditLog.Action.CREATED
-									        : AuditLog.Action.UPDATED);
+									AuditLog childLog = instantiateAuditLog(obj, isInsert ? "CREATED" : "UPDATED");
 									
 									childbjectUuidAuditLogMap.get().peek().put(obj, childLog);
 									ownerUuidChildLogsMap.get().peek().get(owner).add(childLog);
@@ -425,7 +423,7 @@ public class HibernateAuditLogInterceptor extends EmptyInterceptor {
 								if (ownerUuidChildLogsMap.get().peek().get(removedItemsOwner) == null)
 									ownerUuidChildLogsMap.get().peek().put(removedItemsOwner, new ArrayList<AuditLog>());
 								
-								AuditLog childLog = instantiateAuditLog(removed, AuditLog.Action.DELETED);
+								AuditLog childLog = instantiateAuditLog(removed, "DELETED");
 								
 								childbjectUuidAuditLogMap.get().peek().put(removed, childLog);
 								ownerUuidChildLogsMap.get().peek().get(removedItemsOwner).add(childLog);
@@ -437,21 +435,24 @@ public class HibernateAuditLogInterceptor extends EmptyInterceptor {
 				List<AuditLog> logs = new ArrayList<AuditLog>();
 				for (Object insert : inserts.get().peek()) {
 					System.out.println("insert");
-					logs.add(createAuditLogIfNecessary(insert, AuditLog.Action.CREATED));
+					logs.add(createAuditLogIfNecessary(insert, "CREATED"));
 				}
 				
 				for (Object delete : deletes.get().peek()) {
 					System.out.println("delete");
-					logs.add(createAuditLogIfNecessary(delete, AuditLog.Action.DELETED));
+					logs.add(createAuditLogIfNecessary(delete, "DELETED"));
 				}
 				
 				for (Object update : updates.get().peek()) {
 					System.out.println("update");
-					logs.add(createAuditLogIfNecessary(update, AuditLog.Action.UPDATED));
+					logs.add(createAuditLogIfNecessary(update, "UPDATED"));
 				}
 				
 				for (AuditLog al : logs) {
 					System.out.println("saved-action: " + al.getAction());
+					System.out.println("class: " + al.getSimpleTypeName());
+					System.out.println("username: " + al.getUser().getName());
+					System.out.println(al);
 					InterceptorUtil.saveAuditLog(al);
 				}
 			}
@@ -476,7 +477,7 @@ public class HibernateAuditLogInterceptor extends EmptyInterceptor {
 		}
 	}
 	
-	private AuditLog createAuditLogIfNecessary(Object object, AuditLog.Action action) {
+	private AuditLog createAuditLogIfNecessary(Object object, String action) {
 		System.out.println("tr9:");
 		//If this is a collection element, we already created a log for it
 		AuditLog auditLog = childbjectUuidAuditLogMap.get().peek().get(object);
@@ -492,16 +493,16 @@ public class HibernateAuditLogInterceptor extends EmptyInterceptor {
 		return auditLog;
 	}
 	
-	private AuditLog instantiateAuditLog(Object object, AuditLog.Action action) {
+	private AuditLog instantiateAuditLog(Object object, String action) {
 		//System.out.println("tr10:");
 		Serializable id = InterceptorUtil.getId(object);
 		String serializedId = AuditLogUtil.serializeObject(id);
 		AuditLog auditLog = new AuditLog(object.getClass(), action, Context.getAuthenticatedUser(), date.get().peek());
 		SessionFactory sessionFactory = InterceptorUtil.getSessionFactory();
-		if (action == AuditLog.Action.UPDATED || action == AuditLog.Action.DELETED) {
+		if (action == "UPDATED" || action == "DELETED") {
 			Map<String, Object[]> propertyValuesMap = null;
 			System.out.println("action-action: " + action);
-			if (action == AuditLog.Action.UPDATED) {
+			if (action == "UPDATED") {
 				propertyValuesMap = objectChangesMap.get().peek().get(object);
 				if (propertyValuesMap != null) {
 					
