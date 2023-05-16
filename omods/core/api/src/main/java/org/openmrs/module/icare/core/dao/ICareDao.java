@@ -24,7 +24,6 @@ import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
-
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.HashMap;
