@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { Observable, from } from "rxjs";
 import { map } from "rxjs/operators";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { Api, ServerlogGetFull } from "src/app/shared/resources/openmrs";
 
 @Component({
@@ -10,13 +11,12 @@ import { Api, ServerlogGetFull } from "src/app/shared/resources/openmrs";
 })
 export class ServerLogsComponent implements OnInit {
   serverLogs$: Observable<ServerlogGetFull[]>;
-  constructor(private api: Api) {}
+  constructor(
+    private api: Api,
+    private httpClientService: OpenmrsHttpClientService
+  ) {}
 
   ngOnInit(): void {
-    this.serverLogs$ = from(this.api.serverlog.getAllServerLogs()).pipe(
-      map((response: any) => {
-        return response?.serverLog;
-      })
-    );
+    this.serverLogs$ = this.httpClientService.get("icare/auditlogs");
   }
 }
