@@ -82,6 +82,7 @@ public class SampleOrder implements Serializable {
 			sampleOrder.setTechnician(user);
 		}
 		return sampleOrder;
+		
 	}
 	
 	public Map<String, Object> toMap(Boolean excludeAllocations) throws Exception {
