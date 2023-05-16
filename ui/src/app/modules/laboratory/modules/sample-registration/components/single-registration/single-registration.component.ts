@@ -940,7 +940,9 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                       {
                                         attributeType:
                                           key.split("attribute-")[1],
-                                        value: this.formData[key]?.value,
+                                        value: this.formData[key]?.value
+                                          ? this.formData[key]?.value
+                                          : "-",
                                       },
                                     ];
                                   });

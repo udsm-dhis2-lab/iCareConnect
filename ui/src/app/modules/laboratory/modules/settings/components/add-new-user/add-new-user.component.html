@@ -256,9 +256,9 @@
               <!-- <mat-hint *ngIf="!passwordInput.value"
                 >Enter your password</mat-hint
               > -->
-              <mat-hint class="text-danger" *ngIf="!passwordStrong">{{
+              <mat-error class="text-danger" *ngIf="!passwordStrong">{{
                 passwordStrengthMessage
-              }}</mat-hint>
+              }}</mat-error>
               <mat-icon matSuffix (click)="hide = !hide">{{
                 hide ? "visibility_off" : "visibility"
               }}</mat-icon>
