@@ -1,4 +1,5 @@
 import { AddNewUserComponent } from "./add-new-user/add-new-user.component";
+import { AuditLogsComponent } from "./audit-logs/audit-logs.component";
 import { CodedAnswersSelectionComponent } from "./coded-answers-selection/coded-answers-selection.component";
 import { CodedAnswersComponent } from "./coded-answers/coded-answers.component";
 import { CodesSelectionComponent } from "./codes-selection/codes-selection.component";
@@ -70,6 +71,7 @@ export const components: any[] = [
   ConceptReferenceTermsSelectionComponent,
   ServerLogsComponent,
   LoggedinusersComponent,
+  AuditLogsComponent,
 ];
 
 export const entrySettingComponents: any[] = [
