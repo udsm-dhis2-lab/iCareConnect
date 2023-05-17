@@ -4,6 +4,14 @@
     *ngIf="!params?.LISConfigurations"
   ></mat-progress-bar> -->
   <mat-tab-group>
+    <mat-tab label="Audit logs">
+      <ng-template matTabContent>
+        <div class="p-3">
+          <app-audit-logs></app-audit-logs>
+        </div>
+      </ng-template>
+    </mat-tab>
+
     <mat-tab label="Server logs">
       <ng-template matTabContent>
         <div class="p-3">

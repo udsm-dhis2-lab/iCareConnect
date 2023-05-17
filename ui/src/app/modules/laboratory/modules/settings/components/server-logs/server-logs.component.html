@@ -6,27 +6,19 @@
   <div class="w-100" style="overflow: auto">
     <!-- {{ params?.serverLogs | json }} -->
     <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>Action</th>
-          <th>Type</th>
-          <th>Date & Time</th>
-          <th>By whom?</th>
-        </tr>
-      </thead>
       <tbody>
         <ng-container *ngFor="let serverLog of params?.serverLogs">
           <tr
             [ngClass]="{
-              'alert alert-danger': serverLog?.action === 'ERROR',
-              'alert alert-warning': serverLog?.action === 'WARN',
-              'alert alert-info': serverLog?.action === 'INFO'
+              'alert alert-danger': serverLog[0] === 'ERROR',
+              'alert alert-warning': serverLog[0] === 'WARN',
+              'alert alert-info': serverLog[0] === 'INFO'
             }"
           >
-            <td>{{ serverLog?.action }}</td>
-            <td>{{ serverLog?.type }}</td>
-            <td>{{ serverLog?.date_created | date: "medium" }}</td>
-            <td>{{ serverLog?.user?.name }}</td>
+            <td>{{ serverLog[0] }}</td>
+            <td>{{ serverLog[1] }}</td>
+            <td>{{ serverLog[2] }}</td>
+            <td>{{ serverLog[3] }}</td>
           </tr>
         </ng-container>
       </tbody>
