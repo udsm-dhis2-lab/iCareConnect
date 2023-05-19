@@ -270,7 +270,7 @@ public class AuditLog implements Serializable {
 	public boolean hasChildLogs() {
 		return getChildAuditLogs().size() > 0;
 	}
-
+	
 	public Map<String, Object> toMap() {
 		Map<String, Object> auditLogMap = new HashMap<>();
 		if(this.getUuid() != null) {
