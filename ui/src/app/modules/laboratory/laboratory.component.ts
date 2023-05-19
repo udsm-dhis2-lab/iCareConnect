@@ -21,6 +21,7 @@ import {
   loadOrderTypes,
   go,
   clearVisitsDatesParameters,
+  setCurrentUserCurrentLocation,
 } from "src/app/store/actions";
 import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
 import { getAllSampleTypes, getCurrentLocation } from "src/app/store/selectors";
@@ -78,7 +79,8 @@ export class LaboratoryComponent implements OnInit {
     private store: Store<AppState>,
     private router: Router,
     private route: ActivatedRoute,
-    private titleService: Title
+    private titleService: Title,
+    private locationService: LocationService
   ) {
     this.store.dispatch(loadRolesDetails());
     this.store.dispatch(loadOrderTypes());
@@ -285,6 +287,25 @@ export class LaboratoryComponent implements OnInit {
   ) {
     if (event) {
       event.stopPropagation();
+    }
+    const currentLoc = localStorage.getItem("currentLocation");
+    if (currentLoc && currentLoc.indexOf("{") > -1) {
+    } else {
+      try {
+        const locationUuid = JSON.parse(localStorage.getItem("userLocations"));
+        this.locationService
+          .getLocationById(locationUuid)
+          .subscribe((response: any) => {
+            if (response) {
+              this.store.dispatch(
+                setCurrentUserCurrentLocation({ location: response })
+              );
+              this.store.dispatch(
+                loadLabConfigurations({ periodParameters: this.parameters })
+              );
+            }
+          });
+      } catch (e) {}
     }
     this.currentRoutePath = routePath;
     this.showDate = showDate;
