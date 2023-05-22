@@ -386,7 +386,8 @@ public class ICareController {
 												@RequestParam(value="conceptSource", required = false) String conceptSourceUuid,
 												@RequestParam(value="referenceTermCode", required = false) String referenceTermCode,
 												@RequestParam(value="attributeType", required = false) String attributeType,
-												@RequestParam(value="attributeValue", required = false) String attributeValue) {
+												@RequestParam(value="attributeValue", required = false) String attributeValue,
+												@RequestParam(value="detailed", required = false) Boolean detailed) {
 		List<Map<String, Object>> conceptsList = new ArrayList<>();
 		for (Concept conceptItem: iCareService.getConcepts(q, conceptClass, searchTerm, limit, startIndex,
 				searchTermOfConceptSetToExclude,conceptSourceUuid, referenceTermCode,attributeType,attributeValue)) {
@@ -409,8 +410,38 @@ public class ICareController {
 				conceptMapping.put("conceptSourceUuid", mapping.getConceptReferenceTerm().getConceptSource().getUuid());
 				mappings.add(conceptMapping);
 			}
-
 			conceptMap.put("mappings",  mappings );
+			// TODO: Change logic to use query parameters instead of detailed
+			if (detailed != null && detailed) {
+				// Set members
+				List<Map<String, Object>> setMembers = new ArrayList<>();
+				for(Concept setMember: conceptItem.getSetMembers()) {
+					Map<String, Object> member = new HashMap<>();
+					member.put("uuid", setMember.getUuid());
+					member.put("display", setMember.getFullySpecifiedName(null));
+					member.put("displayName", setMember.getDisplayString());
+					List<Map<String, Object>> answers = new ArrayList<>();
+					if (setMember.getDatatype().isCoded() == true) {
+						for(ConceptAnswer conceptAnswer: setMember.getAnswers()) {
+							Map<String, Object> answer = new HashMap<>();
+							answer.put("answerUuid", conceptAnswer.getUuid());
+							answer.put("uuid", conceptAnswer.getConcept().getUuid());
+							answer.put("display", conceptAnswer.getConcept().getDisplayString());
+							answers.add(answer);
+						}
+					}
+					member.put("answers", answers);
+					Map<String, Object> datatype = new HashMap<>();
+					datatype.put("coded", setMember.getDatatype().isCoded());
+					datatype.put("text", setMember.getDatatype().isText());
+					datatype.put("boolean", setMember.getDatatype().isBoolean());
+					datatype.put("date", setMember.getDatatype().isDate());
+					datatype.put("datetime", setMember.getDatatype().isDateTime());
+					member.put("dataType", datatype);
+					setMembers.add(member);
+				}
+				conceptMap.put("setMembers", setMembers);
+			}
 			conceptsList.add(conceptMap);
 		}
 		Map<String, Object> results = new HashMap<>();
