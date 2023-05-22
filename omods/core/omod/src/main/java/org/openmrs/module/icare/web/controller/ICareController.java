@@ -422,11 +422,14 @@ public class ICareController {
 					List<Map<String, Object>> answers = new ArrayList<>();
 					if (setMember.getDatatype().isCoded() == true) {
 						for(ConceptAnswer conceptAnswer: setMember.getAnswers()) {
-							Map<String, Object> answer = new HashMap<>();
-							answer.put("answerUuid", conceptAnswer.getUuid());
-							answer.put("uuid", conceptAnswer.getConcept().getUuid());
-							answer.put("display", conceptAnswer.getConcept().getDisplayString());
-							answers.add(answer);
+							if (!conceptAnswer.getAnswerConcept().isRetired()) {
+								Map<String, Object> answer = new HashMap<>();
+								answer.put("answerUuid", conceptAnswer.getUuid());
+								answer.put("uuid", conceptAnswer.getAnswerConcept().getUuid());
+								answer.put("display", conceptAnswer.getAnswerConcept().getDisplayString());
+								answer.put("retired", conceptAnswer.getAnswerConcept().isRetired());
+								answers.add(answer);
+							}
 						}
 					}
 					member.put("answers", answers);
