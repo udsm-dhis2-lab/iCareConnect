@@ -42,7 +42,7 @@ public class HibernateAuditLogDAO implements AuditLogDAO, GlobalPropertyListener
 	        Date endDate, boolean excludeChildAuditLogs, Integer start, Integer length) {
 		
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(AuditLog.class);
-
+		
 		if (types != null) {
 			criteria.add(Restrictions.in("type", types));
 		}
