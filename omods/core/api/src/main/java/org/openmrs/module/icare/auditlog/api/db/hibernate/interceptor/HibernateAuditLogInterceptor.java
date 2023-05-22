@@ -229,15 +229,24 @@ public class HibernateAuditLogInterceptor extends EmptyInterceptor {
 			PersistentCollection persistentColl = ((PersistentCollection) collection);
 			if (InterceptorUtil.isAudited(persistentColl.getOwner().getClass())) {
 				Object owningObject = persistentColl.getOwner();
-				Map previousStoredSnapshotMap = (Map) persistentColl.getStoredSnapshot();
-				Object previousCollOrMap;
-				if (Collection.class.isAssignableFrom(collection.getClass())) {
-					previousCollOrMap = previousStoredSnapshotMap.values();
-				} else {
-					previousCollOrMap = previousStoredSnapshotMap;
+				System.out.println("class: " + persistentColl.getOwner().getClass());
+				System.out.println("owner: " + persistentColl.getOwner());
+				System.out.println("snapshot: " + persistentColl.getStoredSnapshot().toString());
+				if (persistentColl.getStoredSnapshot().getClass().isArray()) {
+					List<Map> previousStoredSnapshotMap = (List<Map>) persistentColl.getStoredSnapshot();
+					for (Map previousStoredSnapshotMap2 : previousStoredSnapshotMap) {
+						Object previousCollOrMap;
+						if (Collection.class.isAssignableFrom(collection.getClass())) {
+							
+							previousCollOrMap = previousStoredSnapshotMap2.values();
+							
+						} else {
+							previousCollOrMap = previousStoredSnapshotMap;
+						}
+						
+						handleUpdatedCollection(collection, previousCollOrMap, owningObject, persistentColl.getRole());
+					}
 				}
-				
-				handleUpdatedCollection(collection, previousCollOrMap, owningObject, persistentColl.getRole());
 			}
 		}
 	}

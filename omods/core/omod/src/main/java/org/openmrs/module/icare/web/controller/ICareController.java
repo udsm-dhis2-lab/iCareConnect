@@ -69,7 +69,6 @@ public class ICareController {
 	
 	@Autowired
 	EncounterService encounterService;
-
 	
 	/** Logger for this class and subclasses */
 	protected final Log log = LogFactory.getLog(getClass());
@@ -808,7 +807,7 @@ public class ICareController {
 		System.out.println(response);
 		return response;
 	}
-
+	
 	@RequestMapping(value="auditlogs", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String,Object>> getAuditLogs(@RequestParam(required = false) List<Class<?>> clazzes, @RequestParam(required = false) List<String> actions, @RequestParam(required = false)  Date startDate, @RequestParam(required = false) Date endDate, @RequestParam(required = false)  boolean excludeChildAuditLogs, @RequestParam(required = false)  Integer start, @RequestParam(required = false)  Integer length){
