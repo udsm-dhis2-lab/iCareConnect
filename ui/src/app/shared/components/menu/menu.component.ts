@@ -90,9 +90,17 @@ export class MenuComponent implements OnInit {
       this.store.dispatch(
         addSessionStatus({ authenticated: sessionResponse?.authenticated })
       );
-      this.store.dispatch(
-        addLoadedUserDetails({ userDetails: sessionResponse?.user })
-      );
+
+      this.service
+        .getUserById(sessionResponse?.user?.uuid)
+        .subscribe((response: any) => {
+          if (response) {
+            this.store.dispatch(
+              addLoadedUserDetails({ userDetails: response })
+            );
+          }
+        });
+
       this.userLocationsUuids = JSON.parse(
         localStorage
           .getItem("userLocations")
