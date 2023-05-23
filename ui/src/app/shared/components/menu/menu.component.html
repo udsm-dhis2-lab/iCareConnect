@@ -7,7 +7,8 @@
     currentLocation: currentLocation$ | async,
     userAssignedLocationsLoadedState: userAssignedLocationsLoadedState$ | async,
     googleFormLink: googleFormLink$ | async,
-    securitySystemSettings: securitySystemSettings$ | async
+    securitySystemSettings: securitySystemSettings$ | async,
+    currentUser: currentUser$ | async
   } as params"
 >
   <div
@@ -80,7 +81,7 @@
           >
             Change Password
           </button>
-          <button
+          <!-- <button
             class="mt-2 text-center"
             id="btn-logout"
             mat-menu-item
@@ -93,7 +94,7 @@
             >
               Support
             </a>
-          </button>
+          </button> -->
           <button
             class="mt-2 text-center"
             id="btn-logout"
@@ -106,7 +107,8 @@
             *ngIf="params?.lisConfigurations?.isLIS"
             class="mt-2 text-center"
             mat-menu-item
-            (click)="onUpdateProfile()"
+            [disabled]="!params?.currentUser"
+            (click)="onUpdateProfile(params?.currentUser)"
           >
             <mat-icon>person</mat-icon>
             Update Profile

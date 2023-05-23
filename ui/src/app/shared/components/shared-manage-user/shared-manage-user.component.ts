@@ -109,7 +109,7 @@ export class SharedManageUserComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log("securitySystemSettings", this.securitySystemSettings);
+    // console.log("securitySystemSettings", this.securitySystemSettings);
     if (this.user && this.user?.uuid) {
       this.selectedModules = this.user?.userProperties?.preferredModules
         ? this.systemModules?.filter(
@@ -248,7 +248,7 @@ export class SharedManageUserComponent implements OnInit {
   generateForm(user: any): any {
     this.selectedRoles = user?.roles;
     return this.fb.group({
-      username: new FormControl(user?.username, Validators.required),
+      username: new FormControl(user?.username, [Validators.required]),
       password: [
         "",
         !user ? [Validators.required, Validators.minLength(8)] : [],
