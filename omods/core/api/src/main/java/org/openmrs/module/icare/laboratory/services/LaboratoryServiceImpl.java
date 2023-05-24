@@ -779,12 +779,15 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 									for (TestAllocation testAllocationRef : sampleOrder.getTestAllocations()) {
 										if (testAllocationRef.getTestConcept().getUuid().equals(concept.getUuid())) {
 											resultValue = getTestResultsValueFromTestAllocation(testAllocationRef);
-											Result result = testAllocationRef.getTestAllocationResults().get(
-											    testAllocationRef.getTestAllocationResults().size() - 1);
+											Result result = new Result();
+											if (testAllocationRef != null && testAllocationRef.getTestAllocationResults().size() > 0) {
+												result =testAllocationRef.getTestAllocationResults().get(
+														testAllocationRef.getTestAllocationResults().size() - 1);
+											}
 											for (TestAllocationStatus allocationStatus : testAllocationRef
 											        .getTestAllocationStatuses()) {
-												if (allocationStatus.getTestResult().getUuid().equals(result.getUuid())
-												        && allocationStatus.getCategory().toLowerCase()
+												if (result != null && allocationStatus != null && allocationStatus.getTestResult() != null && allocationStatus.getTestResult().getUuid().equals(result.getUuid())
+												        && allocationStatus.getCategory() != null && allocationStatus.getCategory().toLowerCase()
 												                .equals("result_remarks")) {
 													comment = allocationStatus.getRemarks();
 												}
@@ -806,12 +809,15 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 								for (TestAllocation testAllocationRef : sampleOrder.getTestAllocations()) {
 									if (testAllocationRef.getTestConcept().getUuid().equals(concept.getUuid())) {
 										resultValue = getTestResultsValueFromTestAllocation(testAllocationRef);
-										Result result = testAllocationRef.getTestAllocationResults().get(
-										    testAllocationRef.getTestAllocationResults().size() - 1);
+										Result result = new Result();
+										if (testAllocationRef != null && testAllocationRef.getTestAllocationResults() != null && testAllocationRef.getTestAllocationResults().size() > 0) {
+											result = testAllocationRef.getTestAllocationResults().get(
+													testAllocationRef.getTestAllocationResults().size() - 1);
+										}
 										for (TestAllocationStatus allocationStatus : testAllocationRef
 										        .getTestAllocationStatuses()) {
-											if (allocationStatus.getTestResult().getUuid().equals(result.getUuid())
-											        && allocationStatus.getCategory().toLowerCase().equals("result_remarks")) {
+											if (result != null && allocationStatus != null && allocationStatus.getTestResult() != null && allocationStatus.getTestResult().getUuid().equals(result.getUuid())
+											        && allocationStatus.getCategory() != null && allocationStatus.getCategory().toLowerCase().equals("result_remarks")) {
 												comment = allocationStatus.getRemarks();
 											}
 										}
@@ -845,20 +851,32 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	private String getTestResultsValueFromTestAllocation(TestAllocation testAllocation) throws Exception {
 		String resultValue = "Processing ....";
 		// TODO: Add support for all concept data types supported
-		if (testAllocation.getTestAllocationResults() != null && testAllocation.getTestAllocationResults().size() > 0) {
+		if (testAllocation != null && testAllocation.getTestAllocationResults() != null
+		        && testAllocation.getTestAllocationResults().size() > 0) {
 			if (testAllocation.getTestConcept().getDatatype().isText()) {
 				resultValue = testAllocation.getTestAllocationResults()
 				        .get(testAllocation.getTestAllocationResults().size() - 1).getValueText();
 			} else if (testAllocation.getTestConcept().getDatatype().isCoded()) {
-				
-				resultValue = testAllocation.getTestAllocationResults()
-				        .get(testAllocation.getTestAllocationResults().size() - 1).getValueCodedName().getName();
+				if (testAllocation.getTestAllocationResults().get(testAllocation.getTestAllocationResults().size() - 1) != null
+				        && testAllocation.getTestAllocationResults()
+				                .get(testAllocation.getTestAllocationResults().size() - 1).getValueCodedName() != null) {
+					resultValue = testAllocation.getTestAllocationResults()
+					        .get(testAllocation.getTestAllocationResults().size() - 1).getValueCodedName().getName();
+				}
 			} else if (testAllocation.getTestConcept().getDatatype().isNumeric()) {
-				resultValue = testAllocation.getTestAllocationResults()
-				        .get(testAllocation.getTestAllocationResults().size() - 1).getValueNumeric().toString();
+				if (testAllocation.getTestAllocationResults().get(testAllocation.getTestAllocationResults().size() - 1) != null
+				        && testAllocation.getTestAllocationResults()
+				                .get(testAllocation.getTestAllocationResults().size() - 1).getValueNumeric() != null) {
+					resultValue = testAllocation.getTestAllocationResults()
+					        .get(testAllocation.getTestAllocationResults().size() - 1).getValueNumeric().toString();
+				}
 			} else if (testAllocation.getTestConcept().getDatatype().isBoolean()) {
-				resultValue = testAllocation.getTestAllocationResults()
-				        .get(testAllocation.getTestAllocationResults().size() - 1).getValueBoolean().toString();
+				if (testAllocation.getTestAllocationResults().get(testAllocation.getTestAllocationResults().size() - 1) != null
+				        && testAllocation.getTestAllocationResults()
+				                .get(testAllocation.getTestAllocationResults().size() - 1).getValueBoolean() != null) {
+					resultValue = testAllocation.getTestAllocationResults()
+					        .get(testAllocation.getTestAllocationResults().size() - 1).getValueBoolean().toString();
+				}
 			} else {
 				resultValue = "NA";
 			}
