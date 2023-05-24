@@ -113,15 +113,45 @@
     mode="indeterminate"
     *ngIf="!params?.samples"
   ></mat-progress-bar>
-  <table class="table table-bordered mt-3">
+  <div
+    *ngIf="
+      LISConfigurations?.isLIS &&
+      params?.samples &&
+      params?.samples?.results?.length > 0
+    "
+    class="w-100 mt-3 d-flex justify-content-end"
+  >
+    <section>
+      <mat-checkbox
+        color="primary"
+        [checked]="itemsToShow['mrn']"
+        (change)="toggleItemToShow($event, 'mrn')"
+        >show MRN</mat-checkbox
+      ><mat-checkbox
+        color="primary"
+        class="ml-3"
+        [checked]="itemsToShow['names']"
+        (change)="toggleItemToShow($event, 'names')"
+        >Show names</mat-checkbox
+      >
+    </section>
+  </div>
+  <table class="table table-bordered mt-2">
     <thead class="table-header">
       <tr>
         <th rowspan="2">SN</th>
         <th rowspan="2">Department / Section</th>
         <th rowspan="2">Sample / Specimen</th>
         <th rowspan="2">Laboratory ID</th>
-        <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">MRN</th>
-        <th rowspan="2" *ngIf="!LISConfigurations?.isLIS">Patient Names</th>
+        <th rowspan="2" *ngIf="!LISConfigurations?.isLIS || itemsToShow['mrn']">
+          MRN
+        </th>
+        <th
+          rowspan="2"
+          *ngIf="!LISConfigurations?.isLIS || itemsToShow['names']"
+        >
+          Patient Names
+        </th>
         <th colspan="2" class="text-center">Test details</th>
         <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
         <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
@@ -193,13 +223,19 @@
               {{ sample?.label }}
             </td>
             <td
-              *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+              *ngIf="
+                orderCount == 0 &&
+                (!LISConfigurations?.isLIS || itemsToShow['mrn'])
+              "
               [attr.rowspan]="sample?.orders?.length"
             >
               {{ sample?.mrn }}
             </td>
             <td
-              *ngIf="orderCount == 0 && !LISConfigurations?.isLIS"
+              *ngIf="
+                orderCount == 0 &&
+                (!LISConfigurations?.isLIS || itemsToShow['names'])
+              "
               [attr.rowspan]="sample?.orders?.length"
             >
               {{ sample?.patient?.givenName }}

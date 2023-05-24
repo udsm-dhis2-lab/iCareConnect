@@ -67,7 +67,7 @@
                 </b>
               </h4>
             </div>
-            <div class="col-12">
+            <div class="col-12" *ngIf="params?.obs && params?.diagnoses">
               <div
                 class="h5 text-center report-name"
                 style="
@@ -307,6 +307,7 @@
                         "
                       >
                         {{
+                          params?.referringDoctorAttributes[1].value &&
                           params?.visit?.attributesKeyedByAttributeType[
                             params?.referringDoctorAttributes[1].value
                           ]
@@ -316,7 +317,8 @@
                             : " - "
                         }}
                         {{
-                          params?.visit?.attributes[
+                          params?.referringDoctorAttributes[2].value &&
+                          params?.visit?.attributesKeyedByAttributeType[
                             params?.referringDoctorAttributes[2].value
                           ]
                             ? "(" +
@@ -328,7 +330,8 @@
                         }}
 
                         {{
-                          params?.visit?.attributes[
+                          params?.referringDoctorAttributes[0].value &&
+                          params?.visit?.attributesKeyedByAttributeType[
                             params?.referringDoctorAttributes[0].value
                           ]
                             ? "(" +
@@ -353,13 +356,11 @@
                         *ngIf="params?.diagnoses && LISConfigurations?.isLIS"
                       >
                         <p *ngFor="let diagnosis of params?.diagnoses">
-                          <b>
-                            {{ diagnosis?.display }}
-                          </b>
+                          <b> Diagnosis: {{ diagnosis?.display }} </b>
                         </p>
                       </div>
-                      <span *ngIf="params.obs && LISConfigurations?.isLIS">
-                        History: {{ params.obs?.latest?.value }}
+                      <span *ngIf="obsData && LISConfigurations?.isLIS">
+                        {{ obsData?.latest?.display }}
                       </span>
                     </td>
                     <td *ngIf="!LISConfigurations?.isLIS">
