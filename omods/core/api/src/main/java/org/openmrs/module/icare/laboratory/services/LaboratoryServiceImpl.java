@@ -845,20 +845,23 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	private String getTestResultsValueFromTestAllocation(TestAllocation testAllocation) throws Exception {
 		String resultValue = "Processing ....";
 		// TODO: Add support for all concept data types supported
-		if (testAllocation.getTestConcept().getDatatype().isText()) {
-			resultValue = testAllocation.getTestAllocationResults()
-			        .get(testAllocation.getTestAllocationResults().size() - 1).getValueText();
-		} else if (testAllocation.getTestConcept().getDatatype().isCoded()) {
-			resultValue = testAllocation.getTestAllocationResults()
-			        .get(testAllocation.getTestAllocationResults().size() - 1).getValueCodedName().getName();
-		} else if (testAllocation.getTestConcept().getDatatype().isNumeric()) {
-			resultValue = testAllocation.getTestAllocationResults()
-			        .get(testAllocation.getTestAllocationResults().size() - 1).getValueNumeric().toString();
-		} else if (testAllocation.getTestConcept().getDatatype().isBoolean()) {
-			resultValue = testAllocation.getTestAllocationResults()
-			        .get(testAllocation.getTestAllocationResults().size() - 1).getValueBoolean().toString();
-		} else {
-			resultValue = "NA";
+		if (testAllocation.getTestAllocationResults() != null && testAllocation.getTestAllocationResults().size() > 0) {
+			if (testAllocation.getTestConcept().getDatatype().isText()) {
+				resultValue = testAllocation.getTestAllocationResults()
+				        .get(testAllocation.getTestAllocationResults().size() - 1).getValueText();
+			} else if (testAllocation.getTestConcept().getDatatype().isCoded()) {
+				
+				resultValue = testAllocation.getTestAllocationResults()
+				        .get(testAllocation.getTestAllocationResults().size() - 1).getValueCodedName().getName();
+			} else if (testAllocation.getTestConcept().getDatatype().isNumeric()) {
+				resultValue = testAllocation.getTestAllocationResults()
+				        .get(testAllocation.getTestAllocationResults().size() - 1).getValueNumeric().toString();
+			} else if (testAllocation.getTestConcept().getDatatype().isBoolean()) {
+				resultValue = testAllocation.getTestAllocationResults()
+				        .get(testAllocation.getTestAllocationResults().size() - 1).getValueBoolean().toString();
+			} else {
+				resultValue = "NA";
+			}
 		}
 		return resultValue;
 	}
