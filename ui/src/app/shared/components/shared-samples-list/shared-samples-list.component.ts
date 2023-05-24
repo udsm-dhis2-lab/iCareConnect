@@ -47,6 +47,8 @@ export class SharedSamplesListComponent implements OnInit {
   testUuid: string;
   specimenUuid: string;
   dapartment: string;
+
+  itemsToShow: any = {};
   constructor(private sampleService: SamplesService) {}
 
   ngOnInit(): void {
@@ -85,6 +87,14 @@ export class SharedSamplesListComponent implements OnInit {
       conceptClass: "LIS instrument",
       shouldHaveLiveSearchForDropDownFields: true,
     });
+  }
+
+  toggleItemToShow(event: MatCheckboxChange, item: string): void {
+    if (event?.checked) {
+      this.itemsToShow[item] = true;
+    } else {
+      this.itemsToShow[item] = false;
+    }
   }
 
   getSamples(params?: any): void {

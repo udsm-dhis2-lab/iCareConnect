@@ -40,6 +40,7 @@ export class PrintResultsModalComponent implements OnInit {
   @Input() data: any;
   diagnoses$: Observable<any>;
   @Output() cancel: EventEmitter<boolean> = new EventEmitter<boolean>();
+  obsData: any;
   constructor(
     private patientService: PatientService,
     private visitService: VisitsService,
@@ -52,6 +53,8 @@ export class PrintResultsModalComponent implements OnInit {
     const data = this.data;
     this.patientDetailsAndSamples = {
       ...data?.patientDetailsAndSamples,
+      patient:
+        data?.patientDetailsAndSamples?.departments[0]?.samples[0]?.patient,
       departments: data?.patientDetailsAndSamples?.departments?.map(
         (department: any) => {
           return {
@@ -161,15 +164,18 @@ export class PrintResultsModalComponent implements OnInit {
     this.LISConfigurations = data?.LISConfigurations;
     this.loadingPatientPhone = true;
     this.errorLoadingPhone = false;
-    this.phoneNumber$ = this.patientService
-      .getPatientPhone(data?.patientDetailsAndSamples?.patient?.uuid)
-      .pipe(
-        tap((response) => {
-          this.errorLoadingPhone = false;
-          this.loadingPatientPhone = false;
-          this.phoneNumber = response;
-        })
-      );
+    // this.phoneNumber$ = this.patientService
+    //   .getPatientPhone(
+    //     data?.patientDetailsAndSamples?.departments[0]?.samples[0]?.patient
+    //       ?.uuid
+    //   )
+    //   .pipe(
+    //     tap((response) => {
+    //       this.errorLoadingPhone = false;
+    //       this.loadingPatientPhone = false;
+    //       this.phoneNumber = response;
+    //     })
+    //   );
     this.labConfigs = data?.labConfigs;
     this.user = data?.user;
     this.facilityDetails$ = this.store.select(getParentLocation).pipe(
@@ -204,6 +210,9 @@ export class PrintResultsModalComponent implements OnInit {
       })
       .pipe(
         map((obs) => {
+          this.obsData = obs["3a010ff3-6361-4141-9f4e-dd863016db5a"]
+            ? obs["3a010ff3-6361-4141-9f4e-dd863016db5a"]
+            : this.obsData;
           return !obs?.error && obs["3a010ff3-6361-4141-9f4e-dd863016db5a"]
             ? obs["3a010ff3-6361-4141-9f4e-dd863016db5a"]
             : "";
@@ -240,24 +249,34 @@ export class PrintResultsModalComponent implements OnInit {
               attributesKeyedByAttributeType: _.keyBy(
                 response?.attributes.map((attribute) => {
                   return {
-                    ...attribute,
-                    attributeTypeUuid: attribute?.attributeType?.uuid,
+                    ...attribute?.visitAttributeDetails,
+                    attributeTypeUuid:
+                      attribute?.visitAttributeDetails?.attributeType?.uuid,
                   };
                 }),
                 "attributeTypeUuid"
               ),
             };
-            this.refferedFromFacility$ = this.locationService
-              .getLocationById(
-                response?.attributesKeyedByAttributeType[
-                  "47da17a9-a910-4382-8149-736de57dab18"
-                ]?.value
-              )
-              .pipe(
-                map((response) => {
-                  return response?.error ? {} : response;
-                })
-              );
+            if (
+              response?.attributesKeyedByAttributeType[
+                "47da17a9-a910-4382-8149-736de57dab18"
+              ] &&
+              response?.attributesKeyedByAttributeType[
+                "47da17a9-a910-4382-8149-736de57dab18"
+              ]?.value
+            ) {
+              this.refferedFromFacility$ = this.locationService
+                .getLocationById(
+                  response?.attributesKeyedByAttributeType[
+                    "47da17a9-a910-4382-8149-736de57dab18"
+                  ]?.value
+                )
+                .pipe(
+                  map((response) => {
+                    return response?.error ? {} : response;
+                  })
+                );
+            }
 
             return response;
           }
