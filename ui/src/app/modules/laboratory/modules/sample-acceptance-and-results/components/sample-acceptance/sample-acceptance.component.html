@@ -14,7 +14,9 @@
     acceptedSamples: acceptedSamples$ | async,
     samplesWithResults: samplesWithResults$ | async,
     patientsWithResults: patientsWithResults$ | async,
-    samplesLoadedState: samplesLoadedState$ | async
+    samplesLoadedState: samplesLoadedState$ | async,
+    testRelationshipConceptSourceUuid:
+      testRelationshipConceptSourceUuid$ | async
   } as sampleParams"
 >
   <div class="loading-overlay" *ngIf="saving">
@@ -217,7 +219,11 @@
               </button>
             </div>
             <app-print-results-page
+              *ngIf="sampleParams?.testRelationshipConceptSourceUuid"
               (cancel)="onCancelFromResultsPage($event)"
+              [testRelationshipConceptSourceUuid]="
+                sampleParams?.testRelationshipConceptSourceUuid
+              "
               [data]="dataToPrint"
             ></app-print-results-page>
           </div>
@@ -258,6 +264,10 @@
               </button>
             </div>
             <app-print-results-page
+              *ngIf="sampleParams?.testRelationshipConceptSourceUuid"
+              [testRelationshipConceptSourceUuid]="
+                sampleParams?.testRelationshipConceptSourceUuid
+              "
               [data]="dataToPrint"
               (cancel)="onCancelFromResultsPage($event)"
             ></app-print-results-page>

@@ -38,6 +38,7 @@ export class PrintResultsModalComponent implements OnInit {
   phoneNumber$: Observable<any>;
   keyedRemarks: any;
   @Input() data: any;
+  @Input() testRelationshipConceptSourceUuid: string;
   diagnoses$: Observable<any>;
   @Output() cancel: EventEmitter<boolean> = new EventEmitter<boolean>();
   obsData: any;
@@ -91,7 +92,7 @@ export class PrintResultsModalComponent implements OnInit {
                       allocation?.parameter?.mappings?.filter(
                         (mapping: any) =>
                           mapping?.conceptReference?.conceptSource?.uuid ===
-                          "5b5af7e2-cd3d-4dba-8b11-ce6ca8b3d6a5"
+                          this.testRelationshipConceptSourceUuid
                       ) || []
                     )?.length > 0
                 ) || []
@@ -99,7 +100,7 @@ export class PrintResultsModalComponent implements OnInit {
                 const relationshipMapping = (alloc?.parameter?.mappings?.filter(
                   (mapping: any) =>
                     mapping?.conceptReference?.conceptSource?.uuid ===
-                    "5b5af7e2-cd3d-4dba-8b11-ce6ca8b3d6a5"
+                    this.testRelationshipConceptSourceUuid
                 ) || [])[0];
                 const relatedParameteruuid = relationshipMapping
                   ? relationshipMapping?.conceptReference?.code

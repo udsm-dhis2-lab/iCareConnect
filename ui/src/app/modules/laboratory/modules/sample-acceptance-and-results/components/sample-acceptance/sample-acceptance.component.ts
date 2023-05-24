@@ -37,6 +37,7 @@ import { getProviderDetails } from "src/app/store/selectors/current-user.selecto
 import { PrintResultsModalComponent } from "../print-results-modal/print-results-modal.component";
 import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
 import { SharedResultsEntryAndViewModalComponent } from "../shared-results-entry-and-view-modal/shared-results-entry-and-view-modal.component";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "app-sample-acceptance",
@@ -82,10 +83,12 @@ export class SampleAcceptanceComponent implements OnInit {
   currentTabWithDataLoaded: number = 0;
   showPrintingPage: boolean = false;
   dataToPrint: any;
+  testRelationshipConceptSourceUuid$: Observable<string>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
-    private sampleService: SamplesService
+    private sampleService: SamplesService,
+    private systemSettingsService: SystemSettingsService
   ) {}
 
   ngOnInit(): void {
@@ -99,6 +102,10 @@ export class SampleAcceptanceComponent implements OnInit {
     this.settingLabSampleStatus$ = this.store.select(
       getSettingLabSampleStatusState
     );
+    this.testRelationshipConceptSourceUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `iCare.lis.testParameterRelationship.conceptSourceUuid`
+      );
   }
 
   onGetDataToPrint(data: any): void {
