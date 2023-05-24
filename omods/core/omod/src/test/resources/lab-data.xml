@@ -234,7 +234,7 @@
     <!-- AssociatedField  -->
     <lb_associated_field associated_field_id="1" name="assoc-field" description="assoc description" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c636" creator="1" voided="0" date_created="2022-12-10 15:51:57" />
 
-    <global_property property="icare.person.attribute.email" property_value="iCARE110-TEST-YUDA-1234-d30dcfc0c632" uuid="iCARE110-TEST-YUDA-9beb-d30dcfc0c632" description="Email attribute type" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-21 15:51:57.0" changed_by="1" />
+    <global_property property="icare.email.person.attributeTypeUuid" property_value="iCARE110-TEST-YUDA-1234-d30dcfc0c632" uuid="iCARE110-TEST-YUDA-9beb-d30dcfc0c632" description="Email attribute type" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-21 15:51:57.0" changed_by="1" />
 
     <person_attribute_type person_attribute_type_id="1" uuid="iCARE110-TEST-YUDA-1234-d30dcfc0c632" name="email" description="Person email" format="org.openmrs.String" searchable="true" creator="1" date_created="2023-04-21 15:51:57.0" changed_by="1" date_changed="2023-04-21 15:51:57.0" retired="false" />
 
@@ -245,7 +245,7 @@
     <global_property property="mail.icare.laboratory.results.body.testorder.html" property_value="Test" uuid="iCARE110-TEST-0292-9beb-d30dcfc0c632" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-21 15:51:57.0" changed_by="1" />
     <global_property property="mail.debug" property_value="false" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c111" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
     <global_property property="mail.default_content_type" property_value="text/plain" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c222" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
-    <global_property property="mail.from" property_value="info@openmrs.org" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c555" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.from" property_value="josephatjulius24@gmail.com" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c555" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
     <global_property property="mail.password" property_value="test" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c333" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
     <global_property property="mail.smtp.starttls.enable" property_value="false" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c666" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
     <global_property property="mail.smtp_auth" property_value="false" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c444" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />

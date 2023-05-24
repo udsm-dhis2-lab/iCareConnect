@@ -702,8 +702,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				        && administrationService
 				                .getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_ATTACHMENT_CONFIGURATION_HTML) != null
 				        && administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_SUMMARY_CONFIGURATION_HTML) != null
-				        && administrationService.getGlobalProperty(ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE) != null) {
+				        && (administrationService.getGlobalProperty(ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE) != null || administrationService.getGlobalProperty(ICareConfig.ICARE_VISIT_EMAIL_ATTRIBUTE_TYPE) != null)) {
 					String attchmentHtml = "";
+
+					List<String> emailsToSendResults = new ArrayList<>();
 					Properties emailProperties = new Properties();
 					String subject = administrationService.getGlobalProperty(
 					    ICareConfig.LAB_RESULTS_SUBJECT_CONFIGURATION_HTML).toString();
@@ -718,6 +720,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 					}
 					String clientEmailAttributeTypeUuid = administrationService.getGlobalProperty(
 					    ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE).toString();
+					String visitEmailAttributeTypeUuid = administrationService.getGlobalProperty(
+							ICareConfig.ICARE_VISIT_EMAIL_ATTRIBUTE_TYPE).toString();
 					attchmentHtml = attachmentHtml;
 					Date date = new Date();
 					bodySummaryHtml = bodySummaryHtml.replace("{sampleCollectionDate}", sample.getDateTime().toString());
@@ -734,11 +738,23 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 					emailProperties.setProperty("from", fromMail);
 					emailProperties.setProperty("subject", subject);
 					Visit visit = sample.getVisit();
+					Set<VisitAttribute> visitAttributes = visit.getAttributes();
 					Set<PersonAttribute> personAttributes = visit.getPatient().getPerson().getAttributes();
-					for (PersonAttribute personAttribute : personAttributes) {
-						if (personAttribute.getAttributeType().getUuid().toString().equals(clientEmailAttributeTypeUuid)) {
-							// TODO: Validate the email address
-							emailProperties.setProperty("to", personAttribute.getValue());
+					if (clientEmailAttributeTypeUuid != null) {
+						for (PersonAttribute personAttribute : personAttributes) {
+							if (personAttribute.getAttributeType().getUuid().toString().equals(clientEmailAttributeTypeUuid)) {
+								// TODO: Validate the email address
+								emailsToSendResults.add(personAttribute.getValue().toString());
+							}
+						}
+					}
+
+					if (visitEmailAttributeTypeUuid != null) {
+						for (VisitAttribute visitAttribute : visitAttributes) {
+							if (visitAttribute.getAttributeType().getUuid().toString().equals(visitEmailAttributeTypeUuid)) {
+								// TODO: Validate the email address
+								emailsToSendResults.add(visitAttribute.getValue().toString());
+							}
 						}
 					}
 					// Process results for each of the order with
@@ -816,7 +832,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 					emailProperties.setProperty("attachmentFile", attchmentHtml.toString());
 					emailProperties.setProperty("attachmentFileName", "NPHL_results.pdf");
 					ICareService iCareService = Context.getService(ICareService.class);
-					iCareService.processEmail(emailProperties);
+					for(String email: emailsToSendResults) {
+						emailProperties.setProperty("to", email);
+						iCareService.processEmail(emailProperties);
+					}
 				}
 			}
 		}
