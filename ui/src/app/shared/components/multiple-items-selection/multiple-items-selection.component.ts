@@ -38,10 +38,6 @@ export class MultipleItemsSelectionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log(
-      "searchTermOfConceptSetToExcludeFromTestOrders",
-      this.searchTermOfConceptSetToExcludeFromTestOrders
-    );
     this.currentSelectedItems =
       this.selectedItems?.filter((item) => !item?.retired) || [];
     if (
