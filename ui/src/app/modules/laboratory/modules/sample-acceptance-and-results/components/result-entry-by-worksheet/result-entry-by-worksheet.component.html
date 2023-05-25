@@ -4,7 +4,7 @@
     currentWorksheetDefinition: currentWorksheetDefinition$ | async
   } as params"
 >
-  <ng-container >
+  <ng-container>
     <div class="row" *ngIf="!forSamples">
       <div class="col-10">
         <app-form
@@ -25,7 +25,7 @@
         </div>
       </div>
     </div>
-  
+
     <mat-progress-bar
       mode="indeterminate"
       *ngIf="
@@ -72,7 +72,32 @@
           >
         </mat-radio-group>
       </div>
-      <div class="col-md-12" style="width: 100%; overflow: auto" *ngIf="!forSamples">
+      <div class="w-100 d-flex justify-content-end mb-2">
+        <mat-radio-group class="registration-category">
+          <mat-radio-button
+            (change)="getSelection($event)"
+            [value]="'FULLY_SPECIFIED'"
+            [checked]="preferredName === 'FULLY_SPECIFIED'"
+            color="primary"
+          >
+            Fully specified name
+          </mat-radio-button>
+          <mat-radio-button
+            (change)="getSelection($event)"
+            class="ml-2"
+            [value]="'SHORT'"
+            [checked]="preferredName === 'SHORT'"
+            color="primary"
+          >
+            Short name
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+      <div
+        class="col-md-12"
+        style="width: 100%; overflow: auto"
+        *ngIf="!forSamples && conceptNameType"
+      >
         <table class="table table-bordered table-striped">
           <thead>
             <tr class="text-center">
@@ -229,13 +254,14 @@
                       color="primary"
                       [checked]="
                         allSelectedItems[worksheetSample?.uuid] &&
-                        worksheetSample?.sample?.authorizationStatuses?.length ===
-                          0
+                        worksheetSample?.sample?.authorizationStatuses
+                          ?.length === 0
                           ? true
                           : false
                       "
                       [disabled]="
-                        worksheetSample?.sample?.authorizationStatuses?.length > 0
+                        worksheetSample?.sample?.authorizationStatuses?.length >
+                        0
                       "
                       (change)="onSelectItem($event, worksheetSample)"
                     ></mat-checkbox>
@@ -247,7 +273,11 @@
         </table>
       </div>
     </div>
-    <div class="col-md-12" style="width: 100%; overflow: auto" *ngIf="samples?.length && forSamples">
+    <div
+      class="col-md-12"
+      style="width: 100%; overflow: auto"
+      *ngIf="samples?.length && forSamples && conceptNameType"
+    >
       <table class="table table-bordered table-striped">
         <thead>
           <tr class="text-center">
@@ -255,40 +285,37 @@
             <th style="width: 10%">Age</th>
             <th style="width: 10%">Gender</th>
             <th style="width: 10%">Lab No</th>
-            <th [attr.colspan]="
-                          samples[0]
-                            ?.allocationsCount 
-                        ">
-              Parameters
-            </th>
+            <th [attr.colspan]="samples[0]?.allocationsCount">Parameters</th>
             <th *ngIf="showRemarks" style="width: 20%">Remarks</th>
             <th style="width: 30px" *ngIf="viewType === 'authorization'">
               <div class="d-flex justify-content-end">
                 <section class="mr-2" title="Tick all to authorize">
-                  <mat-checkbox color="primary" (change)="
-                                onSelectAllItems(
-                                  $event,
-                                  samples
-                                )
-                              "></mat-checkbox>
+                  <mat-checkbox
+                    color="primary"
+                    (change)="onSelectAllItems($event, samples)"
+                  ></mat-checkbox>
                 </section>
               </div>
             </th>
           </tr>
         </thead>
-        <ng-container *ngFor="
-                      let sample of samples | searchItem: searchingText;
-                      let count = index
-                    ">
-          <tr [ngStyle]="{
-                        'background-color': sample
-                          ? sample?.authorizationStatuses?.length > 0
-                            ? '#6fd67bcf'
-                            : sample?.hasResults
-                            ? '#ec864acf'
-                            : ''
-                          : 'transparent'
-                      }">
+        <ng-container
+          *ngFor="
+            let sample of samples | searchItem: searchingText;
+            let count = index
+          "
+        >
+          <tr
+            [ngStyle]="{
+              'background-color': sample
+                ? sample?.authorizationStatuses?.length > 0
+                  ? '#6fd67bcf'
+                  : sample?.hasResults
+                  ? '#ec864acf'
+                  : ''
+                : 'transparent'
+            }"
+          >
             <td class="text-center">
               {{ count + 1 }}
             </td>
@@ -297,49 +324,67 @@
             <td style="width: 50px">
               {{ sample?.display }}
             </td>
-            <td style="width: 30px" *ngFor="let allocation of sample?.allocations">
+            <td
+              style="width: 30px"
+              *ngFor="let allocation of sample?.allocations"
+            >
               <div class="w-100">
                 <ng-container>
-                  <app-test-parameter-entry *ngIf="
-                                allocation?.order?.concept?.setMembers?.length == 0 ||
-                                (allocation?.order?.concept?.setMembers?.length > 0 &&
-                                  allocation?.order?.concept?.uuid !==
-                                    allocation?.parameter?.uuid)
-                              " [parameterUuid]="allocation?.parameter?.uuid" [allocation]="allocation"
+                  <app-test-parameter-entry
+                    *ngIf="
+                      allocation?.order?.concept?.setMembers?.length == 0 ||
+                      (allocation?.order?.concept?.setMembers?.length > 0 &&
+                        allocation?.order?.concept?.uuid !==
+                          allocation?.parameter?.uuid)
+                    "
+                    [parameterUuid]="allocation?.parameter?.uuid"
+                    [allocation]="allocation"
                     [multipleResultsAttributeType]="
-                                multipleResultsAttributeType
-                              " [isLIS]="isLIS" [disabled]="false" [finalResult]="allocation?.finalResult"
-                    [conceptNameType]="conceptNameType" (data)="
-                                getFedResult(
-                                  $event,
-                                  sample,
-                                  allocation,
-                                  params?.currentWorksheetDefinition
-                                )
-                              "></app-test-parameter-entry>
+                      multipleResultsAttributeType
+                    "
+                    [isLIS]="isLIS"
+                    [disabled]="false"
+                    [finalResult]="allocation?.finalResult"
+                    [conceptNameType]="conceptNameType"
+                    (data)="
+                      getFedResult(
+                        $event,
+                        sample,
+                        allocation,
+                        params?.currentWorksheetDefinition
+                      )
+                    "
+                  ></app-test-parameter-entry>
                 </ng-container>
               </div>
             </td>
             <td *ngIf="showRemarks">
-              <app-shared-remarks-entry (remarks)="onGetRemarks($event, allocation)"></app-shared-remarks-entry>
+              <app-shared-remarks-entry
+                (remarks)="onGetRemarks($event, allocation)"
+              ></app-shared-remarks-entry>
             </td>
             <td *ngIf="viewType === 'authorization'">
               <div class="d-flex justify-content-end">
-                <button [disabled]="
-                              sample?.authorizationStatuses?.length > 0
-                            " mat-flat-button color="primary" (click)="onAuthorize($event, sample)">
+                <button
+                  [disabled]="sample?.authorizationStatuses?.length > 0"
+                  mat-flat-button
+                  color="primary"
+                  (click)="onAuthorize($event, sample)"
+                >
                   Authorize
                 </button>
                 <section class="ml-4 mr-2" title="Tick to authorize">
-                  <mat-checkbox color="primary" [checked]="
-                                allSelectedItems[sample?.uuid] &&
-                                sample?.authorizationStatuses?.length ===
-                                  0
-                                  ? true
-                                  : false
-                              " [disabled]="
-                                sample?.authorizationStatuses?.length > 0
-                              " (change)="onSelectItem($event, sample)"></mat-checkbox>
+                  <mat-checkbox
+                    color="primary"
+                    [checked]="
+                      allSelectedItems[sample?.uuid] &&
+                      sample?.authorizationStatuses?.length === 0
+                        ? true
+                        : false
+                    "
+                    [disabled]="sample?.authorizationStatuses?.length > 0"
+                    (change)="onSelectItem($event, sample)"
+                  ></mat-checkbox>
                 </section>
               </div>
             </td>
@@ -349,14 +394,22 @@
     </div>
   </ng-container>
 
-
   <div class="w-100 d-flex justify-content-end">
-    <button mat-flat-button color="primary" (click)="onSave($event)"
-      [disabled]="!isFormValid && !associatedFieldsHasResults">
+    <button
+      mat-flat-button
+      color="primary"
+      (click)="onSave($event)"
+      [disabled]="!isFormValid && !associatedFieldsHasResults"
+    >
       Save
     </button>
-    <button class="ml-2" mat-flat-button color="primary" (click)="onAuthorizeAll($event)"
-      [disabled]="selectedSamples?.length === 0">
+    <button
+      class="ml-2"
+      mat-flat-button
+      color="primary"
+      (click)="onAuthorizeAll($event)"
+      [disabled]="selectedSamples?.length === 0"
+    >
       Authorize all
     </button>
   </div>
