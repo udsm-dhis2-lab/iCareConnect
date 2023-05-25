@@ -114,7 +114,7 @@
                     </ng-container>
                     <ng-container *ngIf="LISConfigurations?.isLIS">
                       <td><b>Collection Date & Time</b></td>
-                      <td>
+                      <td style="font-size: 0.6rem">
                         {{
                           !LISConfigurations?.isLIS
                             ? (samplesGroupedByDepartment?.samples[0]
@@ -131,7 +131,7 @@
                     <td>
                       <b> Registered On </b>
                     </td>
-                    <td>
+                    <td style="font-size: 0.6rem">
                       {{
                         samplesGroupedByDepartment["samples"][0]?.dateCreated
                           | date: "medium"
@@ -151,7 +151,7 @@
                       </span>
                     </td>
                     <td><b>Laboratory Number</b></td>
-                    <td>
+                    <td style="font-size: 0.6rem">
                       <span
                         *ngFor="
                           let sample of samplesGroupedByDepartment['samples']
@@ -173,7 +173,7 @@
                       <td>
                         <b> Received date & time </b>
                       </td>
-                      <td>
+                      <td style="font-size: 0.6rem">
                         <span>
                           {{
                             samplesGroupedByDepartment?.samples[0]
@@ -355,13 +355,19 @@
                         class="w-100"
                         *ngIf="params?.diagnoses && LISConfigurations?.isLIS"
                       >
-                        <p *ngFor="let diagnosis of params?.diagnoses">
+                        <p
+                          style="font-size: 0.6rem; margin-bottom: -8px"
+                          *ngFor="let diagnosis of params?.diagnoses"
+                        >
                           <b> Diagnosis: {{ diagnosis?.display }} </b>
                         </p>
+                        <p
+                          style="font-size: 0.6rem"
+                          *ngIf="obsData && LISConfigurations?.isLIS"
+                        >
+                          {{ obsData?.latest?.display }}
+                        </p>
                       </div>
-                      <span *ngIf="obsData && LISConfigurations?.isLIS">
-                        {{ obsData?.latest?.display }}
-                      </span>
                     </td>
                     <td *ngIf="!LISConfigurations?.isLIS">
                       <b> Sample Accepted By </b>
@@ -1203,16 +1209,6 @@
                   </span>
                 </div> -->
                 <div
-                  style="text-align: left; padding: 6px 0; margin: 5vh 0 0 0"
-                  class="providers-details"
-                >
-                  <span>
-                    <b>Printed By :</b>{{ user?.person?.display }},
-                    <b>Printed At :</b>
-                    {{ currentDateTime }}
-                  </span>
-                </div>
-                <div
                   style="text-align: center; margin: 2vh 0 0 0"
                   class="providers-details"
                 >
@@ -1221,6 +1217,16 @@
                       >----------------------------- END OF LABORATORY REPORT
                       -----------------------------</b
                     >
+                  </span>
+                </div>
+                <div
+                  style="text-align: left; padding: 6px 0; margin: 5vh 0 0 0"
+                  class="providers-details"
+                >
+                  <span>
+                    <b>Printed By :</b>{{ user?.person?.display }},
+                    <b>Printed At :</b>
+                    {{ currentDateTime }}
                   </span>
                 </div>
               </div>
