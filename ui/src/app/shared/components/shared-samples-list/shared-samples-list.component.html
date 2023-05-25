@@ -1,7 +1,8 @@
 <div
   *ngIf="{
     samples: samples$ | async,
-    labEquipments: labEquipments$ | async
+    labEquipments: labEquipments$ | async,
+    currentUser: currentUser$ | async
   } as params"
 >
   <div class="filter-and-legend row d-flex justify-content-between">
@@ -123,12 +124,26 @@
   >
     <section>
       <mat-checkbox
+        *ngIf="
+          params?.currentUser &&
+          (params?.currentUser?.userPrivileges['ALL'] ||
+            params?.currentUser?.userPrivileges[
+              'SAMPLE TESTING AND RESULTS_SHOW_MRN'
+            ])
+        "
         color="primary"
         [checked]="itemsToShow['mrn']"
         (change)="toggleItemToShow($event, 'mrn')"
         >MRN</mat-checkbox
       >
       <mat-checkbox
+        *ngIf="
+          params?.currentUser &&
+          (params?.currentUser?.userPrivileges['ALL'] ||
+            params?.currentUser?.userPrivileges[
+              'SAMPLE TESTING AND RESULTS_SHOW_GENDER'
+            ])
+        "
         color="primary"
         class="ml-3"
         [checked]="itemsToShow['gender']"
@@ -136,6 +151,13 @@
         >Gender</mat-checkbox
       >
       <mat-checkbox
+        *ngIf="
+          params?.currentUser &&
+          (params?.currentUser?.userPrivileges['ALL'] ||
+            params?.currentUser?.userPrivileges[
+              'SAMPLE TESTING AND RESULTS_SHOW_NAMES'
+            ])
+        "
         color="primary"
         class="ml-3"
         [checked]="itemsToShow['names']"
