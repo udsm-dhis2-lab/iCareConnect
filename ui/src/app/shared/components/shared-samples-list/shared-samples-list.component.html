@@ -126,13 +126,21 @@
         color="primary"
         [checked]="itemsToShow['mrn']"
         (change)="toggleItemToShow($event, 'mrn')"
-        >show MRN</mat-checkbox
-      ><mat-checkbox
+        >MRN</mat-checkbox
+      >
+      <mat-checkbox
+        color="primary"
+        class="ml-3"
+        [checked]="itemsToShow['gender']"
+        (change)="toggleItemToShow($event, 'gender')"
+        >Gender</mat-checkbox
+      >
+      <mat-checkbox
         color="primary"
         class="ml-3"
         [checked]="itemsToShow['names']"
         (change)="toggleItemToShow($event, 'names')"
-        >Show names</mat-checkbox
+        >Names</mat-checkbox
       >
     </section>
   </div>
@@ -151,6 +159,12 @@
           *ngIf="!LISConfigurations?.isLIS || itemsToShow['names']"
         >
           Patient Names
+        </th>
+        <th
+          rowspan="2"
+          *ngIf="!LISConfigurations?.isLIS || itemsToShow['gender']"
+        >
+          Gender
         </th>
         <th colspan="2" class="text-center">Test details</th>
         <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
@@ -241,6 +255,15 @@
               {{ sample?.patient?.givenName }}
               {{ sample?.patient?.middleName }}
               {{ sample?.patient?.familyName }}
+            </td>
+            <td
+              *ngIf="
+                orderCount == 0 &&
+                (!LISConfigurations?.isLIS || itemsToShow['gender'])
+              "
+              [attr.rowspan]="sample?.orders?.length"
+            >
+              {{ sample?.patient?.gender }}
             </td>
             <td>
               {{ order?.order?.concept?.display }}
