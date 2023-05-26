@@ -286,6 +286,22 @@
                         {{ params?.refferedFromFacility?.display }}
                       </span>
                     </td>
+                    <td>
+                      <span>
+                        <b> Specimen type </b>
+                      </span>
+                    </td>
+                    <td>
+                      <span>
+                        <span
+                          *ngFor="
+                            let sample of samplesGroupedByDepartment?.samples
+                          "
+                        >
+                          {{ sample?.specimenSource?.name }} </span
+                        >,
+                      </span>
+                    </td>
                   </tr>
                   <tr *ngIf="LISConfigurations?.isLIS">
                     <td>
@@ -331,7 +347,10 @@
                           params?.referringDoctorAttributes[0].value &&
                           params?.visit?.attributesKeyedByAttributeType[
                             params?.referringDoctorAttributes[0].value
-                          ]
+                          ] &&
+                          params?.visit?.attributesKeyedByAttributeType[
+                            params?.referringDoctorAttributes[0].value
+                          ].value != "NONE"
                             ? "(" +
                               params?.visit?.attributesKeyedByAttributeType[
                                 params?.referringDoctorAttributes[0].value
@@ -435,7 +454,6 @@
                   <table class="table" style="width: 100%">
                     <thead>
                       <tr>
-                        <th colspan="1">Specimen</th>
                         <th colspan="4">Tests Details</th>
                       </tr>
                     </thead>
@@ -449,9 +467,6 @@
                           border-bottom: 1px solid gray;
                         "
                       >
-                        <td colspan="1">
-                          {{ sample?.specimen?.specimenName }}
-                        </td>
                         <td colspan="4">
                           <div class="my-2 mx-2">
                             <table
