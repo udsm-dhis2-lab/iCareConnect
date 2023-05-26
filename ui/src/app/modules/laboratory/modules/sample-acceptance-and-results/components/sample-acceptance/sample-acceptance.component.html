@@ -28,7 +28,16 @@
     </div>
   </div>
   <mat-tab-group (selectedTabChange)="onOpenNewTab($event)">
-    <mat-tab label="Sample Acceptance">
+    <mat-tab
+      label="Sample Acceptance"
+      *ngIf="
+        currentUser &&
+        (currentUser?.userPrivileges['ALL'] ||
+          currentUser?.userPrivileges[
+            'SAMPLE TESTING AND RESULTS_SAMPLE ACCEPTANCE_VIEW_LIST'
+          ])
+      "
+    >
       <ng-template matTabContent>
         <div class="p-2">
           <app-samples-to-accept
@@ -45,7 +54,16 @@
         </div>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Accepted Samples">
+    <mat-tab
+      label="Accepted Samples"
+      *ngIf="
+        currentUser &&
+        (currentUser?.userPrivileges['ALL'] ||
+          currentUser?.userPrivileges[
+            'SAMPLE TESTING AND RESULTS_ACCEPTED SAMPLES_VIEW_LIST'
+          ])
+      "
+    >
       <ng-template matTabContent>
         <div class="p-2">
           <app-accepted-samples
@@ -62,7 +80,16 @@
         </div>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Rejected at Registration">
+    <mat-tab
+      label="Rejected at Registration"
+      *ngIf="
+        currentUser &&
+        (currentUser?.userPrivileges['ALL'] ||
+          currentUser?.userPrivileges[
+            'SAMPLE TESTING AND RESULTS_REJECTED_SAMPLES_VIEW_LIST'
+          ])
+      "
+    >
       <ng-template matTabContent>
         <div class="p-2">
           <app-rejected-samples
@@ -79,7 +106,16 @@
         </div>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Rejected at Laboratory">
+    <mat-tab
+      label="Rejected at Laboratory"
+      *ngIf="
+        currentUser &&
+        (currentUser?.userPrivileges['ALL'] ||
+          currentUser?.userPrivileges[
+            'SAMPLE TESTING AND RESULTS_REJECTED_SAMPLES_VIEW_LIST'
+          ])
+      "
+    >
       <ng-template matTabContent>
         <div class="p-2">
           <app-samples-rejected-after-registration
@@ -97,7 +133,19 @@
       </ng-template>
     </mat-tab>
 
-    <mat-tab label="Worklist">
+    <mat-tab
+      label="Workload"
+      *ngIf="
+        currentUser &&
+        (currentUser?.userPrivileges['ALL'] ||
+          currentUser?.userPrivileges[
+            'SAMPLE TESTING AND RESULTS_WORKLIST_VIEW_LIST' ||
+              currentUser?.userPrivileges[
+                'SAMPLE TESTING AND RESULTS_WORKLOAD_VIEW_LIST'
+              ]
+          ])
+      "
+    >
       <ng-template matTabContent>
         <div class="p-2">
           <app-worklist
@@ -115,7 +163,16 @@
       </ng-template>
     </mat-tab>
 
-    <mat-tab label="Worksheets" *ngIf="LISConfigurations?.isLIS">
+    <mat-tab
+      label="Worksheets"
+      *ngIf="
+        currentUser &&
+        (currentUser?.userPrivileges['ALL'] ||
+          currentUser?.userPrivileges[
+            'SAMPLE TESTING AND RESULTS_ADD_WORKSHEET'
+          ])
+      "
+    >
       <ng-template matTabContent>
         <div class="p-3">
           <app-worksheets [datesParameters]="datesParameters"></app-worksheets>
@@ -124,6 +181,16 @@
     </mat-tab>
     <mat-tab
       label="Results Entry {{ !LISConfigurations?.isLIS ? '& Approval' : '' }}"
+      *ngIf="
+        currentUser &&
+        (currentUser?.userPrivileges['ALL'] ||
+          currentUser?.userPrivileges[
+            'SAMPLE TESTING AND RESULTS_RESULT_ENTRY_VIEW_LIST'
+          ] ||
+          currentUser?.userPrivileges[
+            'SAMPLE TESTING AND RESULTS_RESULT_ENTRY_ADD RESULT'
+          ])
+      "
     >
       <ng-template matTabContent>
         <div class="p-2">
@@ -146,11 +213,26 @@
     </mat-tab>
     <mat-tab
       label="Results Review & Authorization"
-      *ngIf="LISConfigurations?.isLIS"
+      *ngIf="
+        currentUser &&
+        (currentUser?.userPrivileges['ALL'] ||
+          currentUser?.userPrivileges[
+            'SAMPLE TESTING AND RESULTS_RESULTS REVIEW & AUTHORIZATION_VIEW_LIST'
+          ] ||
+          currentUser?.userPrivileges[
+            'SAMPLE TESTING AND RESULTS_RESULTS REVIEW & AUTHORIZATION_VIEW_RESULTS'
+          ] ||
+          currentUser?.userPrivileges[
+            'SAMPLE TESTING AND RESULTS_RESULTS REVIEW & AUTHORIZATION_AMEND_RESULTS'
+          ] ||
+          currentUser?.userPrivileges[
+            'SAMPLE TESTING AND RESULTS_RESULTS REVIEW & AUTHORIZATION_AUTHORIZE_RESULTS'
+          ])
+      "
     >
       <ng-template matTabContent>
         <div class="p-2">
-          <app-samples-for-results-entry
+          <app-samples-for-results-review
             [tabType]="'REVIEW_AND_AUTHORIZATION'"
             [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
             [labConfigs]="labConfigs"
@@ -164,11 +246,14 @@
             [labSamplesContainers]="labSamplesContainers"
             [userUuid]="userUuid"
             [viewType]="'authorization'"
-          ></app-samples-for-results-entry>
+          ></app-samples-for-results-review>
         </div>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Results" *ngIf="LISConfigurations?.isLIS">
+    <mat-tab
+      *ngIf="LISConfigurations?.isLIS === '1'"
+      label="Authorised Results"
+    >
       <ng-template matTabContent>
         <div class="p-2">
           <div *ngIf="!showPrintingPage">
@@ -231,7 +316,18 @@
       </ng-template>
     </mat-tab>
 
-    <mat-tab label="Completed Samples">
+    <mat-tab
+      label="{{
+        LISConfigurations?.isLIS ? 'Authorised Results' : 'Completed Samples'
+      }}"
+      *ngIf="
+        currentUser &&
+        (currentUser?.userPrivileges['ALL'] ||
+          currentUser?.userPrivileges[
+            'SAMPLE TESTING AND RESULTS_RESULTS_PRINT_RESULTS'
+          ])
+      "
+    >
       <ng-template matTabContent>
         <div class="p-2">
           <div *ngIf="!showPrintingPage">
@@ -275,7 +371,17 @@
         </div>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Sample Tracking" *ngIf="!LISConfigurations?.isLIS">
+    <mat-tab
+      label="Sample Tracking"
+      *ngIf="
+        !LISConfigurations?.isLIS &&
+        currentUser &&
+        (currentUser?.userPrivileges['ALL'] ||
+          currentUser?.userPrivileges[
+            'SAMPLE TESTING AND RESULTS_SAMPLE_TRACKING'
+          ])
+      "
+    >
       <ng-template matTabContent>
         <div class="p-2">
           <app-sample-tracking-list

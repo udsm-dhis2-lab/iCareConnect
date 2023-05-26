@@ -175,7 +175,7 @@
                             color="primary"
                             (click)="onAuthorize($event, order, shouldConfirm)"
                           >
-                            {{ !shouldConfirm ? "Authorize" : "Confirm" }}
+                            {{ !shouldConfirm ? "Authorise" : "Confirm" }}
                           </button>
                         </div>
                         <div class="mt-2">
@@ -192,7 +192,7 @@
                             *ngIf="order?.authorizationIsReady"
                           >
                             <b
-                              >Authorized
+                              >Authorised
                               <span *ngIf="!data?.LISConfigurations?.isLIS"
                                 >(Second Approval)</span
                               ></b
@@ -291,7 +291,10 @@
                             Save
                           </button>
                         </div>
-                        <div class="mt-4 d-flex justify-content-end">
+                        <div
+                          class="mt-4 d-flex justify-content-end"
+                          *ngIf="data?.actionType !== 'review'"
+                        >
                           <button
                             *ngIf="shouldConfirm"
                             class="mr-2"
@@ -320,7 +323,7 @@
                               )
                             "
                           >
-                            {{ !shouldConfirm ? "Authorize" : "Confirm" }}
+                            {{ !shouldConfirm ? "Authorise" : "Confirm" }}
                           </button>
                         </div>
                         <div class="mt-2">
@@ -337,7 +340,7 @@
                             *ngIf="order?.authorizationIsReady"
                           >
                             <b
-                              >Authorized
+                              >Authorised
                               <span *ngIf="!data?.LISConfigurations?.isLIS"
                                 >(Second Approval)</span
                               ></b
