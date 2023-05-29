@@ -68,6 +68,9 @@
           'authorization'
         )
       "
+      (selectedSampleDetails)="
+        onGetSelectedSampleDetails($event, params?.providerDetails)
+      "
       [category]="category"
       [hasStatus]="hasStatus"
       [showLegend]="true"

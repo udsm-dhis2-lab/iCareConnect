@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatRadioChange } from "@angular/material/radio";
 import { Store } from "@ngrx/store";
@@ -7,6 +7,9 @@ import { SamplesService } from "src/app/shared/services/samples.service";
 import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { SharedResultsEntryAndViewModalComponent } from "../shared-results-entry-and-view-modal/shared-results-entry-and-view-modal.component";
+import { groupBy } from "lodash";
+import { map } from "rxjs/operators";
+import { LabSample } from "src/app/modules/laboratory/resources/models";
 
 @Component({
   selector: "app-samples-for-results-review",
@@ -43,6 +46,7 @@ export class SamplesForResultsReviewComponent implements OnInit {
   samplesToViewMoreDetails: any = {};
   saving: boolean = false;
   selectedResultEntryCategory: string = "Normal";
+  @Output() dataToPrint: EventEmitter<any> = new EventEmitter<any>();
   constructor(
     private store: Store<AppState>,
     private sampleService: SamplesService,
@@ -101,6 +105,66 @@ export class SamplesForResultsReviewComponent implements OnInit {
             this.providerDetails$ = this.store.select(getProviderDetails);
           }, 50);
         }
+      });
+  }
+
+  onGetSelectedSampleDetails(sample: any, providerDetails: any): void {
+    this.sampleService
+      .getFormattedSampleByUuid(
+        sample?.uuid,
+        this.labSamplesDepartments,
+        this.sampleTypes,
+        this.codedSampleRejectionReasons
+      )
+      .pipe(
+        map((response) => {
+          const filteredCompletedSamples = [
+            {
+              ...response,
+              mrn: response?.mrn,
+              departmentName: response?.department?.name,
+            },
+          ];
+          const groupedByMRN = groupBy(filteredCompletedSamples, "mrn");
+          return Object.keys(groupedByMRN).map((key) => {
+            const samplesKeyedByDepartments = groupBy(
+              groupedByMRN[key],
+              "departmentName"
+            );
+            return {
+              mrn: key,
+              patient: groupedByMRN[key][0]?.sample?.patient,
+              departments: Object.keys(samplesKeyedByDepartments).map(
+                (depName) => {
+                  return {
+                    departmentName: depName,
+                    samples: samplesKeyedByDepartments[depName].map(
+                      (sampleObject) => {
+                        const sample = new LabSample(
+                          sampleObject,
+                          this.labSamplesDepartments,
+                          this.sampleTypes,
+                          this.codedSampleRejectionReasons
+                        ).toJSon();
+                        return sample;
+                      }
+                    ),
+                  };
+                }
+              ),
+            };
+          });
+        })
+      )
+      .subscribe((response) => {
+        const data = {
+          patientDetailsAndSamples: response[0],
+          labConfigs: this.labConfigs,
+          LISConfigurations: this.LISConfigurations,
+          user: providerDetails,
+          authorized: true,
+        };
+        this.dataToPrint.emit(data);
       });
   }
 }
