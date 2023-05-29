@@ -360,26 +360,32 @@
               <div class="d-flex justify-content-center">
                 <div
                   class="d-flex justify-content-end"
-                  *ngIf="tabType === 'result-entry'"
+                  *ngIf="
+                    tabType === 'result-entry' || tabType === 'authorization'
+                  "
                 >
                   <button
                     class="colored-button"
                     mat-flat-button
                     color="primary"
-                    (click)="
-                      onResultsEntryAndReview(
-                        $event,
-                        sample,
-                        params?.providerDetails,
-                        'entry'
-                      )
-                    "
+                    (click)="onResultsEntryAndReview($event, sample)"
                   >
-                    {{
-                      sample?.ordersWithResults?.length === 0
-                        ? "Results entry"
-                        : "Edit Results"
-                    }}
+                    <span *ngIf="tabType !== 'authorization'">
+                      {{
+                        sample?.ordersWithResults?.length === 0
+                          ? "Results entry"
+                          : "Edit Results"
+                      }}
+                    </span>
+                    <span *ngIf="tabType === 'authorization'"> Review </span>
+                  </button>
+                  <button
+                    class="ml-2"
+                    mat-flat-button
+                    color="primary"
+                    (click)="onPrint($event, sample)"
+                  >
+                    Print
                   </button>
                 </div>
                 <div
