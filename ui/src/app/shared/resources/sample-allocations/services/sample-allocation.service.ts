@@ -116,7 +116,18 @@ export class SampleAllocationService {
             groupedAllocations[key]?.filter(
               (allocation) => allocation?.parameter?.relatedTo
             ) || [];
-
+          const finalResults = flatten(
+            groupedAllocations[key]?.map(
+              (allocation) => allocation?.finalResult || []
+            )
+          );
+          const finalResultsFedBy =
+            finalResults[0]?.groups &&
+            finalResults[0]?.groups?.length > 0 &&
+            finalResults[0]?.groups[0]?.results &&
+            finalResults[0]?.groups[0]?.results?.length > 0
+              ? finalResults[0]?.groups[0]?.results[0]?.creator
+              : finalResults[0]?.result?.creator;
           return {
             ...{
               ...groupedAllocations[key][0]?.order,
@@ -160,11 +171,10 @@ export class SampleAllocationService {
               )
             ),
             authorizationIsReady,
-            finalResults: flatten(
-              groupedAllocations[key]?.map(
-                (allocation) => allocation?.finalResult || []
-              )
-            ),
+            finalResults: finalResults,
+            finalResultsFedBy: finalResultsFedBy?.uuid
+              ? finalResultsFedBy
+              : null,
             allocations: groupedAllocations[key]?.map((allocation) => {
               return new SampleAllocation(allocation).toJson();
             }),

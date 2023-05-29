@@ -233,13 +233,14 @@
       <ng-template matTabContent>
         <div class="p-2">
           <app-samples-for-results-review
-            [tabType]="'REVIEW_AND_AUTHORIZATION'"
+            [tabType]="'authorization'"
             [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
             [labConfigs]="labConfigs"
             [datesParameters]="datesParameters"
             [LISConfigurations]="LISConfigurations"
             [category]="'HAS_RESULTS'"
             [hasStatus]="'YES'"
+            [currentUser]="currentUser"
             [patients]="patients"
             [sampleTypes]="sampleTypes"
             [labSamplesDepartments]="labSamplesDepartments"

@@ -27,6 +27,7 @@ export class SamplesForResultsReviewComponent implements OnInit {
   @Input() category: string;
   @Input() hasStatus: string;
   @Input() viewType: string;
+  @Input() tabType: string;
 
   sampplesForResultsEntry$: Observable<any[]>;
   selectedDepartment: string;
@@ -82,7 +83,9 @@ export class SamplesForResultsReviewComponent implements OnInit {
         data: {
           sample: sample,
           currentUser: this.currentUser,
+          providerDetails,
           labConfigs: this.labConfigs,
+          userUuid: this.currentUser?.userUuid,
           LISConfigurations: this.LISConfigurations,
           actionType,
         },
