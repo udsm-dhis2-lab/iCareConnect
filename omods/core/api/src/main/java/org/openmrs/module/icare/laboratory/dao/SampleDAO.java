@@ -158,6 +158,14 @@ public class SampleDAO extends BaseDAO<Sample> {
 					queryStr += " AND ";
 				}
 				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS'  OR  lower(sst.category) LIKE 'reject%'))   AND sp IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'))";
+
+			} else if (sampleCategory.toLowerCase().equals("rejected")) {
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category LIKE 'reject%')";
 			} else {
 				
 				if (!queryStr.contains("WHERE")) {
@@ -234,6 +242,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		//			queryStr += ",ss.timestamp DESC";
 		//		}
 		Query query = session.createQuery(queryStr);
+		System.out.println(queryStr);
 		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
@@ -243,10 +252,13 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("locationUuid", locationUuid);
 		}
 		
-		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")
-		        && !sampleCategory.toLowerCase().equals("no results")) {
+		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted") && !sampleCategory.toLowerCase().equals("no results") && !sampleCategory.toLowerCase().equals("rejected")) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
+
+//		if (sampleCategory.toLowerCase().equals("rejected")) {
+//			query.setParameter("sampleCategory", sampleCategory);
+//		}
 		
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
@@ -508,6 +520,13 @@ public class SampleDAO extends BaseDAO<Sample> {
 					queryStr += " AND ";
 				}
 				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS'  OR  lower(sst.category) LIKE 'reject%' OR lower(sst.category) LIKE 'dispose%')) AND sp IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'))";
+			} else if (sampleCategory.toLowerCase().equals("rejected")) {
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category LIKE 'reject%')";
 			} else {
 				
 				if (!queryStr.contains("WHERE")) {
@@ -578,6 +597,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		//		}
 		//		System.out.println(queryStr);
 		Query query = session.createQuery(queryStr);
+		System.out.println(queryStr);
 		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
@@ -586,11 +606,11 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("locationUuid", locationUuid);
 		}
 		
-		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")
-		        && !sampleCategory.toLowerCase().equals("no results")) {
+		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted") && !sampleCategory.toLowerCase().equals("no results") && !sampleCategory.toLowerCase().equals("rejected")) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
-		
+
+
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
 		}
