@@ -27,9 +27,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let drugConcept of params?.drugConcepts; let count = index">
+        <tr
+          *ngFor="
+            let drugConcept of params?.drugConcepts?.results;
+            let count = index
+          "
+        >
           <td>
-            {{ count + 1 + (page - 1) * pageCount }}
+            {{ count + 1 + (page - 1) * pageSize }}
           </td>
           <td>
             {{ drugConcept?.display }}
@@ -56,22 +61,15 @@
     </table>
   </div>
 
-  <div class="d-flex justify-content-end mt-2">
-    <button
-      [disabled]="page === 1"
-      mat-stroked-button
-      (click)="onGetList($event, 'prev')"
+  <div class="w-100 mt-2">
+    <mat-paginator
+      [hidden]="!pageCounts"
+      [length]="params?.drugConcepts?.pager?.total"
+      [pageSize]=""
+      [pageSizeOptions]="pageCounts"
+      (page)="onGetList($event)"
     >
-      Prev
-    </button>
-    <button
-      [disabled]="params?.drugConcepts && params?.drugConcepts < pageCount"
-      mat-stroked-button
-      (click)="onGetList($event, 'next')"
-      class="ml-2"
-    >
-      Next
-    </button>
+    </mat-paginator>
   </div>
   <div class="d-flex justify-content-end mt-2">
     <button

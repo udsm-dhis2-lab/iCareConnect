@@ -146,6 +146,9 @@ export class SharedConceptCreateComponent implements OnInit {
         ? data?.mappings[0]?.conceptReferenceTerm?.conceptSource?.uuid
         : null;
 
+    console.log("conceptSourceUuid", conceptSourceUuid);
+    console.log(data?.mappings);
+
     this.currentMappings =
       data && data?.mappings?.length > 0
         ? data?.mappings?.filter(
@@ -269,6 +272,7 @@ export class SharedConceptCreateComponent implements OnInit {
       .subscribe((response) => {
         if (response) {
           this.createBasicConceptFields(response);
+          this.createCodesMappingSourceField(response);
           this.editingSet = true;
           this.readyToCollectCodes = false;
           this.selectedCodingItems =
