@@ -399,6 +399,7 @@ public class ICareController {
 			conceptMap.put("uuid", conceptItem.getUuid().toString());
 			conceptMap.put("display", conceptItem.getDisplayString());
 			conceptMap.put("systemName", conceptItem.getDisplayString());
+			conceptMap.put("retired", conceptItem.getRetired().booleanValue());
 
 //			Class details
 			Map<String, Object> classDetails = new HashMap<String, Object>();

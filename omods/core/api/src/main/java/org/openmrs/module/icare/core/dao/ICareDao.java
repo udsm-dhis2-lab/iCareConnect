@@ -464,8 +464,8 @@ public class ICareDao extends BaseDAO<Item> {
 	}
 	
 	public ListResult getConceptsBySearchParams(String q, String conceptClass, String searchTerm, Integer limit,
-												   Integer startIndex, String searchTermOfConceptSetToExclude, String conceptSourceUuid, String referenceTermCode,
-												   String attributeType, String attributeValue, Pager pager) {
+	        Integer startIndex, String searchTermOfConceptSetToExclude, String conceptSourceUuid, String referenceTermCode,
+	        String attributeType, String attributeValue, Pager pager) {
 		DbSession session = getSession();
 		String searchConceptQueryStr = "SELECT DISTINCT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc ";
 		
@@ -541,14 +541,14 @@ public class ICareDao extends BaseDAO<Item> {
 			sqlQuery.setParameter("attributeType", attributeType);
 			sqlQuery.setParameter("attributeValue", attributeValue);
 		}
-
+		
 		if (pager.isAllowed()) {
 			pager.setTotal(sqlQuery.list().size());
 			//pager.setPageCount(pager.getT);
 			sqlQuery.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
 			sqlQuery.setMaxResults(pager.getPageSize());
 		}
-
+		
 		ListResult listResults = new ListResult();
 		listResults.setPager(pager);
 		listResults.setResults(sqlQuery.list());
