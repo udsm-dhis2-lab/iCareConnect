@@ -565,10 +565,12 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
           }
         });
     } else {
-      if (!this.data?.LISConfigurations?.isLIS) {
-        this.shouldConfirm = true;
-      } else {
-      }
+      this.shouldConfirm = true;
+      // if (!this.data?.LISConfigurations?.isLIS) {
+      //   this.shouldConfirm = true;
+      // } else {
+      //   this.shouldConfirm = true;
+      // }
 
       // console.log(this.data?.LISConfigurations?.isLIS);
       // console.log(order);
