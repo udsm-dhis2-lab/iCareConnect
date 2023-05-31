@@ -438,7 +438,7 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		String bodySummaryHtml = this.readFile("dto/laboratory/body-summary.html");
 		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_BODY_ATTACHMENT_CONFIGURATION_HTML, bodyAttachmentHtml);
 		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_BODY_SUMMARY_CONFIGURATION_HTML, bodySummaryHtml);
-		adminService.setGlobalProperty(ICareConfig.ICARE_VISIT_EMAIL_ATTRIBUTE_TYPE,"36b071d8-d5ea-0000-8e56-5b066420aaa1");
+		adminService.setGlobalProperty(ICareConfig.ICARE_VISIT_EMAIL_ATTRIBUTE_TYPE, "36b071d8-d5ea-0000-8e56-5b066420aaa1");
 		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS, "true");
 		// creating sample status
 		String dto = this.readFile("dto/sample-status-create-dto.json");

@@ -627,6 +627,9 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			Multipart multipart = new MimeMultipart();
 			MimeBodyPart contentBodyPart = new MimeBodyPart();
 			String content = emailProperties.getProperty("content", "");
+			if (emailProperties.getProperty("attachmentFile") != null) {
+				content += emailProperties.getProperty("attachmentFile");
+			}
 			contentBodyPart.setContent(content, "text/html");
 			multipart.addBodyPart(contentBodyPart);
 			
@@ -638,33 +641,33 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 				multipart.addBodyPart(attachmentPart);
 			}
 			
-			if (emailProperties.getProperty("attachmentFile") != null) {
-				String htmlContent = emailProperties.getProperty("attachmentFile");
-				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-				Document document = new Document();
-				
-				PdfWriter writer = PdfWriter.getInstance(document, outputStream);
-				document.open();
-				HTMLWorker htmlWorker = new HTMLWorker(document);
-				htmlWorker.parse(new StringReader(htmlContent));
-				document.close();
-				
-				//File encryption implementation
-				//				PdfReader reader = new PdfReader(outputStream.toByteArray());
-				//				PdfStamper stamper = new PdfStamper(reader, outputStream);
-				//				stamper.setEncryption("a".getBytes("UTF-8"), "b".getBytes("UTF-8"), PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
-				//				stamper.close();
-				//				reader.close();
-				//
-				byte[] pdfContent = outputStream.toByteArray();
-				
-				MimeBodyPart attachmentPart = new MimeBodyPart();
-
-				DataSource dataSource = new ByteArrayDataSource(pdfContent, "application/pdf");
-				attachmentPart.setDataHandler(new DataHandler(dataSource));
-				attachmentPart.setFileName(emailProperties.getProperty("attachmentFileName"));
-				multipart.addBodyPart(attachmentPart);
-			}
+			//			if (emailProperties.getProperty("attachmentFile") != null) {
+			//				String htmlContent = emailProperties.getProperty("attachmentFile");
+			//				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			//				Document document = new Document();
+			//
+			//				PdfWriter writer = PdfWriter.getInstance(document, outputStream);
+			//				document.open();
+			//				HTMLWorker htmlWorker = new HTMLWorker(document);
+			//				htmlWorker.parse(new StringReader(htmlContent));
+			//				document.close();
+			//
+			//				//File encryption implementation
+			//				//				PdfReader reader = new PdfReader(outputStream.toByteArray());
+			//				//				PdfStamper stamper = new PdfStamper(reader, outputStream);
+			//				//				stamper.setEncryption("a".getBytes("UTF-8"), "b".getBytes("UTF-8"), PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
+			//				//				stamper.close();
+			//				//				reader.close();
+			//				//
+			//				byte[] pdfContent = outputStream.toByteArray();
+			//
+			//				MimeBodyPart attachmentPart = new MimeBodyPart();
+			//
+			//				DataSource dataSource = new ByteArrayDataSource(pdfContent, "application/pdf");
+			//				attachmentPart.setDataHandler(new DataHandler(dataSource));
+			//				attachmentPart.setFileName(emailProperties.getProperty("attachmentFileName"));
+			//				multipart.addBodyPart(attachmentPart);
+			//			}
 			
 			//			if (report.getRenderedOutput() != null && "true".equalsIgnoreCase(configuration.getProperty("addOutputAsAttachment"))) {
 			//			MimeBodyPart attachment = new MimeBodyPart();
