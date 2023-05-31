@@ -58,15 +58,22 @@
     </div>
     <app-shared-samples-list
       *ngIf="selectedResultEntryCategory === 'Normal'"
-      [tabType]="'result-entry'"
+      [tabType]="tabType"
       [LISConfigurations]="LISConfigurations"
       [labSamplesDepartments]="labSamplesDepartments"
       (resultEntrySample)="
-        onResultsEntryAndReview($event, params?.providerDetails, 'entry')
+        onResultsEntryAndReview(
+          $event,
+          params?.providerDetails,
+          'authorization'
+        )
+      "
+      (selectedSampleDetails)="
+        onGetSelectedSampleDetails($event, params?.providerDetails)
       "
       [category]="category"
       [hasStatus]="hasStatus"
-      [showLegend]="false"
+      [showLegend]="true"
       [datesParameters]="datesParameters"
       [excludeAllocations]="true"
       [sampleTypes]="sampleTypes"

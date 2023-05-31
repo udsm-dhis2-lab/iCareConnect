@@ -43,7 +43,7 @@ export class ExportService {
 
       setTimeout(() => {
         const link = document.createElement("a");
-        link.download = fileName + ".xls";
+        link.download = fileName + ".xlsx";
         link.href = uri + base64(format(str, ctx));
         link.click();
       }, 100);

@@ -72,12 +72,12 @@
       <!-- ===================================================== Commented Mat Stepper ============================================================================= -->
       <!-- <mat-stepper #stepper>
         <mat-step errorMessage="Some fields not fed.">
-          <ng-template matStepLabel>Sample Information</ng-template>
+          <ng-template matStepLabel>Specimen Information</ng-template>
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sx-12 col-sm-12">
               <div class="for-specimen-details">
                 <fieldset>
-                  <legend>Sample Information</legend> -->
+                  <legend>Specimen Information</legend> -->
       <!-- <app-sample-label
                     [label]="params?.labSampleLabel"
                     (sampleLabel)="onGetSampleLabel($event)"
@@ -230,7 +230,7 @@
         </mat-step>
       </mat-stepper> -->
       <!-- ===================================================== Commented Mat Stepper ============================================================================= -->
-      <ng-template matStepLabel>Sample Information</ng-template>
+      <ng-template matStepLabel>Specimen Information</ng-template>
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sx-12 col-sm-12">
           <div class="for-specimen-details">
@@ -239,7 +239,7 @@
                 (click)="toggleFieldSet('sampleInformation')"
                 class="d-flex"
               >
-                <span> Sample Information </span>
+                <span> Specimen Information </span>
                 <span>
                   <mat-icon *ngIf="!sampleInformation"
                     >keyboard_arrow_down</mat-icon
@@ -514,14 +514,14 @@
     </div>
     <div class="col-12 d-flex justify-content-end mt-2 mb-2">
       <button
-        mat-flat-button
+        mat-stroked-button
         [disabled]="
           errorMessage ||
           !broughtOnTimeValid ||
           !receivedOnTimeValid ||
           !collectedOnTimeValid
         "
-        color="primary"
+        class="btn btn-danger"
         (click)="onSave($event, true, params?.labLocations)"
       >
         Save to Reject

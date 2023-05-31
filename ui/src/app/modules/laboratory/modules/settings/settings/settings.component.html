@@ -28,6 +28,14 @@
               params?.currentUser && params?.currentUser?.userPrivileges['ALL']
             "
           ></app-parameters-dashboard>
+
+          <div
+            class="alert alert-warning"
+            role="alert"
+            *ngIf="!params?.currentUser?.userPrivileges['ALL']"
+          >
+            Seems you do not have access to view this page
+          </div>
         </div>
       </ng-template>
     </mat-tab>
@@ -39,6 +47,13 @@
               params?.currentUser && params?.currentUser?.userPrivileges['ALL']
             "
           ></app-test-methods-dashboard>
+          <div
+            class="alert alert-warning"
+            role="alert"
+            *ngIf="!params?.currentUser?.userPrivileges['ALL']"
+          >
+            Seems you do not have access to view this page
+          </div>
         </div>
       </ng-template>
     </mat-tab>
@@ -53,11 +68,18 @@
               params?.currentUser && params?.currentUser?.userPrivileges['ALL']
             "
           ></app-test-orders-management>
+          <div
+            class="alert alert-warning"
+            role="alert"
+            *ngIf="!params?.currentUser?.userPrivileges['ALL']"
+          >
+            Seems you do not have access to view this page
+          </div>
         </div>
       </ng-template>
     </mat-tab>
     <mat-tab
-      label="Labs & Sections Management"
+      label="Sections, Labs & Instruments Management"
       *ngIf="params?.LISConfigurations?.isLIS"
     >
       <ng-template matTabContent>
@@ -67,6 +89,13 @@
               params?.currentUser && params?.currentUser?.userPrivileges['ALL']
             "
           ></app-labs-and-sections-management>
+          <div
+            class="alert alert-warning"
+            role="alert"
+            *ngIf="!params?.currentUser?.userPrivileges['ALL']"
+          >
+            Seems you do not have access to view this page
+          </div>
         </div>
       </ng-template>
     </mat-tab>
@@ -90,6 +119,13 @@
             [LISConfigurations]="params?.LISConfigurations"
             [fromMaintenance]="true"
           ></app-register-sample>
+          <div
+            class="alert alert-warning"
+            role="alert"
+            *ngIf="!params?.currentUser?.userPrivileges['ALL']"
+          >
+            Seems you do not have access to view this page
+          </div>
         </div>
       </ng-template>
     </mat-tab>
@@ -104,6 +140,13 @@
               params?.currentUser && params?.currentUser?.userPrivileges['ALL']
             "
           ></app-worksheet-management>
+          <div
+            class="alert alert-warning"
+            role="alert"
+            *ngIf="!params?.currentUser?.userPrivileges['ALL']"
+          >
+            Seems you do not have access to view this page
+          </div>
         </div>
       </ng-template>
     </mat-tab>
@@ -125,8 +168,16 @@
       <ng-template matTabContent>
         <div class="p-3">
           <app-profiles-and-access-control
+            *ngIf="params?.currentUser?.userPrivileges['ALL']"
             [currentUser]="params?.currentUser"
           ></app-profiles-and-access-control>
+          <div
+            class="alert alert-warning"
+            role="alert"
+            *ngIf="!params?.currentUser?.userPrivileges['ALL']"
+          >
+            Seems you do not have access to view this page
+          </div>
         </div>
       </ng-template>
     </mat-tab>
@@ -145,6 +196,13 @@
             "
             [LISConfigurations]="params?.LISConfigurations"
           ></app-extended-parameters-settings>
+          <div
+            class="alert alert-warning"
+            role="alert"
+            *ngIf="!params?.currentUser?.userPrivileges['ALL']"
+          >
+            Seems you do not have access to view this page
+          </div>
         </div>
       </ng-template>
     </mat-tab>
@@ -167,6 +225,13 @@
             [actionType]="'manage'"
             [additionalKey]="'lis'"
           ></ngx-standard-report>
+          <div
+            class="alert alert-warning"
+            role="alert"
+            *ngIf="!params?.currentUser?.userPrivileges['ALL']"
+          >
+            Seems you do not have access to view this page
+          </div>
         </div>
       </ng-template>
     </mat-tab>
@@ -178,6 +243,13 @@
               params?.currentUser && params?.currentUser?.userPrivileges['ALL']
             "
           ></app-other-lab-configurations>
+          <div
+            class="alert alert-warning"
+            role="alert"
+            *ngIf="!params?.currentUser?.userPrivileges['ALL']"
+          >
+            Seems you do not have access to view this page
+          </div>
         </div>
       </ng-template>
     </mat-tab>
@@ -192,6 +264,13 @@
               params?.currentUser && params?.currentUser?.userPrivileges['ALL']
             "
           ></app-system-logs>
+          <div
+            class="alert alert-warning"
+            role="alert"
+            *ngIf="!params?.currentUser?.userPrivileges['ALL']"
+          >
+            Seems you do not have access to view this page
+          </div>
         </div>
       </ng-template>
     </mat-tab>

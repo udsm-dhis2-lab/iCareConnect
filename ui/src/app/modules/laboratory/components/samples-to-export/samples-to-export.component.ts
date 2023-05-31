@@ -67,7 +67,7 @@ export class SamplesToExportComponent implements OnInit {
     this.searchingSpecimenSourceField = new Dropdown({
       id: "specimen",
       key: "specimen",
-      label: "Search by Specimen source",
+      label: "Search by Specimen type",
       searchControlType: "concept",
       searchTerm: "SPECIMEN_SOURCE",
       conceptClass: "Specimen",

@@ -44,6 +44,7 @@ export class ResultEntryByWorksheetComponent implements OnInit {
   associatedFieldsResults: any = {};
   associatedFieldsHasResults: boolean = false;
   fedResultsKeyedByAllocation: any = {};
+
   constructor(
     private worksheetsService: WorkSheetsService,
     private sampleService: SamplesService,
@@ -55,6 +56,13 @@ export class ResultEntryByWorksheetComponent implements OnInit {
 
   ngOnInit(): void {
     this.createWorksheetDefnitionField();
+  }
+
+  getSelection(event: MatRadioChange): void {
+    this.conceptNameType = null;
+    setTimeout(() => {
+      this.conceptNameType = event.value;
+    }, 50);
   }
 
   createWorksheetDefnitionField(): void {

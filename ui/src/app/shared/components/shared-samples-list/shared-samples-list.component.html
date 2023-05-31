@@ -1,7 +1,8 @@
 <div
   *ngIf="{
     samples: samples$ | async,
-    labEquipments: labEquipments$ | async
+    labEquipments: labEquipments$ | async,
+    currentUser: currentUser$ | async
   } as params"
 >
   <div class="filter-and-legend row d-flex justify-content-between">
@@ -123,16 +124,45 @@
   >
     <section>
       <mat-checkbox
+        *ngIf="
+          params?.currentUser &&
+          (params?.currentUser?.userPrivileges['ALL'] ||
+            params?.currentUser?.userPrivileges[
+              'SAMPLE TESTING AND RESULTS_SHOW_MRN'
+            ])
+        "
         color="primary"
         [checked]="itemsToShow['mrn']"
         (change)="toggleItemToShow($event, 'mrn')"
-        >show MRN</mat-checkbox
-      ><mat-checkbox
+        >MRN</mat-checkbox
+      >
+      <mat-checkbox
+        *ngIf="
+          params?.currentUser &&
+          (params?.currentUser?.userPrivileges['ALL'] ||
+            params?.currentUser?.userPrivileges[
+              'SAMPLE TESTING AND RESULTS_SHOW_GENDER'
+            ])
+        "
+        color="primary"
+        class="ml-3"
+        [checked]="itemsToShow['gender']"
+        (change)="toggleItemToShow($event, 'gender')"
+        >Gender</mat-checkbox
+      >
+      <mat-checkbox
+        *ngIf="
+          params?.currentUser &&
+          (params?.currentUser?.userPrivileges['ALL'] ||
+            params?.currentUser?.userPrivileges[
+              'SAMPLE TESTING AND RESULTS_SHOW_NAMES'
+            ])
+        "
         color="primary"
         class="ml-3"
         [checked]="itemsToShow['names']"
         (change)="toggleItemToShow($event, 'names')"
-        >Show names</mat-checkbox
+        >Names</mat-checkbox
       >
     </section>
   </div>
@@ -151,6 +181,12 @@
           *ngIf="!LISConfigurations?.isLIS || itemsToShow['names']"
         >
           Patient Names
+        </th>
+        <th
+          rowspan="2"
+          *ngIf="!LISConfigurations?.isLIS || itemsToShow['gender']"
+        >
+          Gender
         </th>
         <th colspan="2" class="text-center">Test details</th>
         <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
@@ -242,6 +278,15 @@
               {{ sample?.patient?.middleName }}
               {{ sample?.patient?.familyName }}
             </td>
+            <td
+              *ngIf="
+                orderCount == 0 &&
+                (!LISConfigurations?.isLIS || itemsToShow['gender'])
+              "
+              [attr.rowspan]="sample?.orders?.length"
+            >
+              {{ sample?.patient?.gender }}
+            </td>
             <td>
               {{ order?.order?.concept?.display }}
             </td>
@@ -315,26 +360,32 @@
               <div class="d-flex justify-content-center">
                 <div
                   class="d-flex justify-content-end"
-                  *ngIf="tabType === 'result-entry'"
+                  *ngIf="
+                    tabType === 'result-entry' || tabType === 'authorization'
+                  "
                 >
                   <button
                     class="colored-button"
                     mat-flat-button
                     color="primary"
-                    (click)="
-                      onResultsEntryAndReview(
-                        $event,
-                        sample,
-                        params?.providerDetails,
-                        'entry'
-                      )
-                    "
+                    (click)="onResultsEntryAndReview($event, sample)"
                   >
-                    {{
-                      sample?.ordersWithResults?.length === 0
-                        ? "Results entry"
-                        : "Edit Results"
-                    }}
+                    <span *ngIf="tabType !== 'authorization'">
+                      {{
+                        sample?.ordersWithResults?.length === 0
+                          ? "Results entry"
+                          : "Edit Results"
+                      }}
+                    </span>
+                    <span *ngIf="tabType === 'authorization'"> Review </span>
+                  </button>
+                  <button
+                    class="ml-2"
+                    mat-flat-button
+                    color="primary"
+                    (click)="onPrint($event, sample)"
+                  >
+                    Print
                   </button>
                 </div>
                 <div
