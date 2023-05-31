@@ -454,7 +454,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		}
 		
 		if (result.getInstrument() != null) {
-			Concept instrument = Context.getConceptService().getConceptByUuid(result.getInstrument().getUuid());
+;			Concept instrument = Context.getConceptService().getConceptByUuid(result.getInstrument().getUuid());
 			result.setInstrument(instrument);
 		}
 		
