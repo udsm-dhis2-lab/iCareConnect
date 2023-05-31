@@ -134,7 +134,7 @@
         color="primary"
         [checked]="itemsToShow['mrn']"
         (change)="toggleItemToShow($event, 'mrn')"
-        >MRN</mat-checkbox
+        >Patient Identification</mat-checkbox
       >
       <mat-checkbox
         *ngIf="
@@ -172,9 +172,9 @@
         <th rowspan="2">SN</th>
         <th rowspan="2">Department / Section</th>
         <th rowspan="2">Sample / Specimen</th>
-        <th rowspan="2">Laboratory ID</th>
+        <th rowspan="2">Laboratory No.</th>
         <th rowspan="2" *ngIf="!LISConfigurations?.isLIS || itemsToShow['mrn']">
-          MRN
+          Patient Identification
         </th>
         <th
           rowspan="2"

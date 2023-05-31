@@ -98,16 +98,10 @@
                     let countAllocation = index
                   "
                 >
-                  <td
-                    *ngIf="countAllocation == 0"
-                    [attr.rowspan]="order?.testAllocations?.length"
-                  >
-                    {{ count + 1 }}
+                  <td>
+                    {{ countAllocation + 1 }}
                   </td>
-                  <td
-                    *ngIf="countAllocation == 0"
-                    [attr.rowspan]="order?.testAllocations?.length"
-                  >
+                  <td>
                     {{ allocation?.concept?.display }}
                   </td>
                   <!-- <td>
