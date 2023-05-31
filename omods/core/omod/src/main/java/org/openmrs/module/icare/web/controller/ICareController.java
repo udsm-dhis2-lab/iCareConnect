@@ -27,10 +27,7 @@ import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
-import org.openmrs.module.icare.core.ICareService;
-import org.openmrs.module.icare.core.Item;
-import org.openmrs.module.icare.core.Message;
-import org.openmrs.module.icare.core.Summary;
+import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.models.PimaCovidLabRequest;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
@@ -386,10 +383,18 @@ public class ICareController {
 												@RequestParam(value="referenceTermCode", required = false) String referenceTermCode,
 												@RequestParam(value="attributeType", required = false) String attributeType,
 												@RequestParam(value="attributeValue", required = false) String attributeValue,
-												@RequestParam(value="detailed", required = false) Boolean detailed) {
+												@RequestParam(value="detailed", required = false) Boolean detailed,
+												@RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+												@RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+												@RequestParam(defaultValue = "1", value = "page", required = false) Integer page) {
 		List<Map<String, Object>> conceptsList = new ArrayList<>();
-		for (Concept conceptItem: iCareService.getConcepts(q, conceptClass, searchTerm, limit, startIndex,
-				searchTermOfConceptSetToExclude,conceptSourceUuid, referenceTermCode,attributeType,attributeValue)) {
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+		ListResult listResult = iCareService.getConcepts(q, conceptClass, searchTerm, limit, startIndex,
+				searchTermOfConceptSetToExclude,conceptSourceUuid, referenceTermCode,attributeType,attributeValue, pager);
+		for (Concept conceptItem: (List<Concept>) listResult.getResults()) {
 			Map<String, Object> conceptMap = new HashMap<String, Object>();
 			conceptMap.put("uuid", conceptItem.getUuid().toString());
 			conceptMap.put("display", conceptItem.getDisplayString());
@@ -448,6 +453,7 @@ public class ICareController {
 		}
 		Map<String, Object> results = new HashMap<>();
 		results.put("results", conceptsList);
+		results.put("pager", listResult.getPager());
 		return results;
 	}
 	
