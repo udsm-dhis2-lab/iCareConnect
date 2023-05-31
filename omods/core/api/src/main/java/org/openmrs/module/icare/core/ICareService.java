@@ -113,9 +113,9 @@ public interface ICareService extends OpenmrsService {
 	
 	List<String> generatePatientIds();
 	
-	List<Concept> getConcepts(String q, String conceptClass, String searchTerm, Integer limit, Integer startIndex,
+	ListResult getConcepts(String q, String conceptClass, String searchTerm, Integer limit, Integer startIndex,
 	        String searchTermOfConceptSetToExclude, String conceptSourceUuid, String referenceTermCode,
-	        String attributeType, String attributeValue);
+	        String attributeType, String attributeValue, Pager pager);
 	
 	List<ConceptReferenceTerm> getConceptReferenceTerms(String q, String source, Integer limit, Integer startIndex);
 	
