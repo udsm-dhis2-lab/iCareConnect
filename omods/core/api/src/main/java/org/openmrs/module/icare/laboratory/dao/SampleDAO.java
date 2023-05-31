@@ -158,7 +158,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 					queryStr += " AND ";
 				}
 				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS'  OR  lower(sst.category) LIKE 'reject%'))   AND sp IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'))";
-
+				
 			} else if (sampleCategory.toLowerCase().equals("rejected")) {
 				if (!queryStr.contains("WHERE")) {
 					queryStr += " WHERE ";
@@ -252,13 +252,14 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("locationUuid", locationUuid);
 		}
 		
-		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted") && !sampleCategory.toLowerCase().equals("no results") && !sampleCategory.toLowerCase().equals("rejected")) {
+		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")
+		        && !sampleCategory.toLowerCase().equals("no results") && !sampleCategory.toLowerCase().equals("rejected")) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
-
-//		if (sampleCategory.toLowerCase().equals("rejected")) {
-//			query.setParameter("sampleCategory", sampleCategory);
-//		}
+		
+		//		if (sampleCategory.toLowerCase().equals("rejected")) {
+		//			query.setParameter("sampleCategory", sampleCategory);
+		//		}
 		
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
@@ -606,11 +607,11 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("locationUuid", locationUuid);
 		}
 		
-		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted") && !sampleCategory.toLowerCase().equals("no results") && !sampleCategory.toLowerCase().equals("rejected")) {
+		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")
+		        && !sampleCategory.toLowerCase().equals("no results") && !sampleCategory.toLowerCase().equals("rejected")) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
-
-
+		
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
 		}
