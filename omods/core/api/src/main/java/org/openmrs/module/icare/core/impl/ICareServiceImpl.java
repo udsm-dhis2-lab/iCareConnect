@@ -659,6 +659,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 				byte[] pdfContent = outputStream.toByteArray();
 				
 				MimeBodyPart attachmentPart = new MimeBodyPart();
+
 				DataSource dataSource = new ByteArrayDataSource(pdfContent, "application/pdf");
 				attachmentPart.setDataHandler(new DataHandler(dataSource));
 				attachmentPart.setFileName(emailProperties.getProperty("attachmentFileName"));

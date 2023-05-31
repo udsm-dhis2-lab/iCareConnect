@@ -51,7 +51,7 @@
 
     <visit patient_id="500" visit_id="500" uuid="d9c1d8ac-2b8e-427f-804d-b858c52e6f11" date_started="2020-10-14 13:56:44" visit_type_id="721" creator="400" date_created="2020-10-14 13:56:44" voided="false"/>
 
-
+    <visit_attribute_type visit_attribute_type_id="1" name="Refering Doctor Email" datatype="org.openmrs.customdatatype.datatype.FreeTextDatatype" retired="false" uuid="36b071d8-d5ea-0000-8e56-5b066420aaa1" />
     <!-- Encounters -->
 
     <encounter encounter_id="100" patient_id="500" uuid="444395c-dd07-488d-8fd7-a748c9570000" visit_id="500" encounter_datetime="2020-10-14 13:56:44" date_created="2020-10-14 13:56:44" voided="false"/>
