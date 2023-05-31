@@ -495,8 +495,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	@Override
 	public ListResult getConcepts(String q, String conceptClass, String searchTerm, Integer limit, Integer startIndex,
-								  String searchTermOfConceptSetToExclude, String conceptSourceUuid, String referenceTermCode,
-								  String attributeType, String attributeValue, Pager pager) {
+	        String searchTermOfConceptSetToExclude, String conceptSourceUuid, String referenceTermCode,
+	        String attributeType, String attributeValue, Pager pager) {
 		return dao.getConceptsBySearchParams(q, conceptClass, searchTerm, limit, startIndex,
 		    searchTermOfConceptSetToExclude, conceptSourceUuid, referenceTermCode, attributeType, attributeValue, pager);
 	}
