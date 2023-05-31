@@ -18,15 +18,19 @@ export class StandardConceptsListComponent implements OnInit {
   page: number = 1;
   pageSize: number = 10;
 
+  pageCounts: any[] = [10, 20, 25, 50, 100, 200];
+  searchingText: string;
+
   @Output() conceptToEdit: EventEmitter<ConceptGetFull> =
     new EventEmitter<ConceptGetFull>();
   constructor(private conceptService: ConceptsService) {}
 
   ngOnInit(): void {
     this.conceptsList$ = this.conceptService.searchConcept({
-      limit: this.pageSize,
+      q: this.searchingText,
+      pageSize: this.pageSize,
       conceptClass: this.conceptClass,
-      startIndex: (this.page - 1) * this.pageSize,
+      page: this.page,
       searchTerm: this.standardSearchTerm,
     });
   }
@@ -40,34 +44,39 @@ export class StandardConceptsListComponent implements OnInit {
     this.conceptService.deleteConcept(concept?.uuid).subscribe((response) => {
       if (response) {
         this.saving = false;
-        this.conceptsList$ = this.conceptService.getConceptsBySearchTerm(
-          this.standardSearchTerm
-        );
+        this.conceptsList$ = this.conceptService.searchConcept({
+          q: this.searchingText,
+          pageSize: this.pageSize,
+          conceptClass: this.conceptClass,
+          page: this.page,
+          searchTerm: this.standardSearchTerm,
+        });
       }
     });
   }
 
   searchConcept(event: KeyboardEvent): void {
     this.page = 1;
-    const searchingText = (event.target as HTMLInputElement).value;
-    if (searchingText) {
+    this.searchingText = (event.target as HTMLInputElement).value;
+    if (this.searchingText) {
       this.conceptsList$ = this.conceptService.searchConcept({
-        q: searchingText,
-        limit: this.pageSize,
+        q: this.searchingText,
+        pageSize: this.pageSize,
         conceptClass: this.conceptClass,
-        startIndex: (this.page - 1) * this.pageSize,
+        page: this.page,
         searchTerm: this.standardSearchTerm,
       });
     }
   }
 
-  getConceptList(event: Event, action: string): void {
-    event.stopPropagation();
-    this.page = action === "prev" ? this.page - 1 : this.page + 1;
+  getConceptList(event: any, action?: string): void {
+    this.page = event.pageIndex + 1;
+    this.pageSize = Number(event?.pageSize);
     this.conceptsList$ = this.conceptService.searchConcept({
-      limit: this.pageSize,
+      q: this.searchingText,
+      pageSize: this.pageSize,
       conceptClass: this.conceptClass,
-      startIndex: (this.page - 1) * this.pageSize,
+      page: this.page,
       searchTerm: this.standardSearchTerm,
     });
   }

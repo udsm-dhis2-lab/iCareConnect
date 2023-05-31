@@ -25,7 +25,7 @@
         />
       </mat-form-field>
     </div>
-    <div *ngIf="params?.conceptsList" style="height: 400px; overflow: auto">
+    <div *ngIf="params?.conceptsList" style="max-height: 700px; overflow: auto">
       <table class="w-100 table-striped">
         <thead>
           <tr>
@@ -35,17 +35,19 @@
           </tr>
         </thead>
         <tbody>
-          <ng-container *ngIf="saving">
-            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-          </ng-container>
           <ng-container
-            *ngIf="params?.conceptsList && params?.conceptsList?.length > 0"
+            *ngIf="
+              params?.conceptsList && params?.conceptsList?.results?.length > 0
+            "
           >
             <tr
               [ngClass]="{
                 'selected-concept': concept?.uuid === selectedConceptUuid
               }"
-              *ngFor="let concept of params?.conceptsList; let count = index"
+              *ngFor="
+                let concept of params?.conceptsList?.results;
+                let count = index
+              "
             >
               <td>
                 {{ count + 1 + (page - 1) * pageSize }}
@@ -71,7 +73,10 @@
             </tr>
           </ng-container>
           <ng-container
-            *ngIf="params?.conceptsList && params?.conceptsList?.length === 0"
+            *ngIf="
+              params?.conceptsList &&
+              params?.conceptsList?.results?.length === 0
+            "
           >
             <tr>
               <td colspan="100%">
@@ -83,24 +88,15 @@
       </table>
     </div>
 
-    <div class="w-100 d-flex justify-content-end">
-      <button
-        [disabled]="page <= 1"
-        mat-button
-        (click)="getConceptList($event, 'prev')"
+    <div class="w-100 mt-2">
+      <mat-paginator
+        [hidden]="!pageCounts"
+        [length]="params?.conceptsList?.pager?.total"
+        [pageSize]=""
+        [pageSizeOptions]="pageCounts"
+        (page)="getConceptList($event)"
       >
-        Prev
-      </button>
-      <button
-        [disabled]="
-          params?.conceptsList && params?.conceptsList?.length < pageSize
-        "
-        mat-button
-        (click)="getConceptList($event, 'next')"
-        class="ml-2"
-      >
-        Next
-      </button>
+      </mat-paginator>
     </div>
   </div>
 

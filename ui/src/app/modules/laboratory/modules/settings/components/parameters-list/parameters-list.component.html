@@ -15,7 +15,7 @@
       </mat-form-field>
     </div>
     <!-- {{ params?.parameters | json }} -->
-    <div style="max-height: 500px; overflow: auto">
+    <div style="max-height: 700px; overflow: auto">
       <table *ngIf="params?.parameters" class="w-100 table-striped">
         <thead>
           <tr>
@@ -25,12 +25,15 @@
           </tr>
         </thead>
         <tbody>
-          <ng-container *ngIf="params?.parameters?.length > 0">
+          <ng-container *ngIf="params?.parameters?.results?.length > 0">
             <tr
               [ngClass]="{
                 'selected-parameter': currentParameter?.uuid === parameter?.uuid
               }"
-              *ngFor="let parameter of params?.parameters; let count = index"
+              *ngFor="
+                let parameter of params?.parameters?.results;
+                let count = index
+              "
             >
               <td>
                 {{ count + 1 + (page - 1) * pageSize }}
@@ -55,7 +58,7 @@
               </td>
             </tr>
           </ng-container>
-          <ng-container *ngIf="params?.parameters?.length === 0">
+          <ng-container *ngIf="params?.parameters?.results?.length === 0">
             <tr>
               <td colspan="100%">
                 <div class="alert alert-warning" role="alert">No items</div>
@@ -65,22 +68,16 @@
         </tbody>
       </table>
     </div>
-    <div class="w-100 d-flex justify-content-end">
-      <button
-        [disabled]="page <= 1"
-        mat-button
-        (click)="getTestParameters($event, 'prev')"
+
+    <div class="w-100 mt-2">
+      <mat-paginator
+        [hidden]="!pageCounts"
+        [length]="params?.parameters?.pager?.total"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageCounts"
+        (page)="getTestParameters($event)"
       >
-        Prev
-      </button>
-      <button
-        [disabled]="params?.parameters && params?.parameters?.length < pageSize"
-        mat-button
-        (click)="getTestParameters($event, 'next')"
-        class="ml-2"
-      >
-        Next
-      </button>
+      </mat-paginator>
     </div>
   </div>
   <mat-progress-bar

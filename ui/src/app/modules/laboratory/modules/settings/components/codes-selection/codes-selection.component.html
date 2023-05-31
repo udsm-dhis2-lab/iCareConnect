@@ -5,14 +5,14 @@
     style="max-height: 120; overflow: auto"
   >
     <tbody>
-      <ng-container *ngFor="let item of codedOptions">
+      <ng-container *ngFor="let item of mappings">
         <tr
           [ngClass]="{
             'retired-reference-term': item?.retired
           }"
         >
           <td>
-            {{ item?.display }}
+            {{ item?.conceptReferenceTerm?.display }}
           </td>
           <td>
             <button
