@@ -184,11 +184,6 @@
                             (click)="onAuthorize($event, order, shouldConfirm)"
                           >
                             {{ !shouldConfirm ? "Authorise" : "Confirm" }}
-                            {{
-                              data?.LISConfigurations?.isLIS &&
-                                order?.finalResultsFedBy?.uuid ===
-                                  data?.currentUser?.uuid
-                            }}
                           </button>
                         </div>
                         <div
