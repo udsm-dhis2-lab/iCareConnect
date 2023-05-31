@@ -187,7 +187,7 @@ export class StandardConceptCreationComponent implements OnInit {
         id: "description",
         key: "description",
         value: descriptionsDetails ? descriptionsDetails?.description : null,
-        label: "Description",
+        label: "Description/Interpretation",
       }),
     ];
   }

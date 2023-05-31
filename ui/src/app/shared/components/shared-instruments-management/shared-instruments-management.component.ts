@@ -27,7 +27,6 @@ export class SharedInstrumentsManagementComponent implements OnInit {
   }
 
   onEditInstrument(concept: any): void {
-    console.log("instrument", concept);
     this.conceptComponentReady = false;
     this.conceptService
       .getConceptDetailsByUuid(

@@ -1,11 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatCheckboxChange } from "@angular/material/checkbox";
 import { MatSelectChange } from "@angular/material/select";
+import { Store } from "@ngrx/store";
 import { omit, keyBy } from "lodash";
 import { Observable, of } from "rxjs";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { SamplesService } from "src/app/shared/services/samples.service";
+import { AppState } from "src/app/store/reducers";
+import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
   selector: "app-shared-samples-list",
@@ -49,7 +52,11 @@ export class SharedSamplesListComponent implements OnInit {
   dapartment: string;
 
   itemsToShow: any = {};
-  constructor(private sampleService: SamplesService) {}
+  currentUser$: Observable<any>;
+  constructor(
+    private sampleService: SamplesService,
+    private store: Store<AppState>
+  ) {}
 
   ngOnInit(): void {
     this.getSamples({
@@ -71,7 +78,7 @@ export class SharedSamplesListComponent implements OnInit {
     this.searchingSpecimenSourceField = new Dropdown({
       id: "specimen",
       key: "specimen",
-      label: "Search by Specimen source",
+      label: "Search by Specimen type",
       searchControlType: "concept",
       searchTerm: "SPECIMEN_SOURCE",
       conceptClass: "Specimen",
@@ -87,6 +94,8 @@ export class SharedSamplesListComponent implements OnInit {
       conceptClass: "LIS instrument",
       shouldHaveLiveSearchForDropDownFields: true,
     });
+
+    this.currentUser$ = this.store.select(getCurrentUserDetails);
   }
 
   toggleItemToShow(event: MatCheckboxChange, item: string): void {

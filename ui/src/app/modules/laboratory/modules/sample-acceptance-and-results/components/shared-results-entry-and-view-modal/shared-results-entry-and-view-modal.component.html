@@ -141,7 +141,7 @@
                       <td rowspan="4" style="width: 100px">
                         <div class="mt-4">
                           <button
-                            *ngIf="data?.actionType !== 'review'"
+                            *ngIf="data?.actionType !== 'authorization'"
                             [disabled]="!isFormValid"
                             mat-flat-button
                             color="primary"
@@ -154,7 +154,10 @@
                             }}
                           </button>
                         </div>
-                        <div class="mt-4 d-flex justify-content-end">
+                        <div
+                          class="mt-4 d-flex justify-content-end"
+                          *ngIf="data?.actionType === 'authorization'"
+                        >
                           <button
                             *ngIf="shouldConfirm"
                             class="mr-2"
@@ -172,11 +175,34 @@
                               order?.finalResults?.length > 0
                             "
                             mat-flat-button
+                            [disabled]="
+                              data?.LISConfigurations?.isLIS &&
+                              order?.finalResultsFedBy?.uuid ===
+                                data?.currentUser?.uuid
+                            "
                             color="primary"
                             (click)="onAuthorize($event, order, shouldConfirm)"
                           >
-                            {{ !shouldConfirm ? "Authorize" : "Confirm" }}
+                            {{ !shouldConfirm ? "Authorise" : "Confirm" }}
+                            {{
+                              data?.LISConfigurations?.isLIS &&
+                                order?.finalResultsFedBy?.uuid ===
+                                  data?.currentUser?.uuid
+                            }}
                           </button>
+                        </div>
+                        <div
+                          *ngIf="
+                            data?.actionType === 'authorization' &&
+                            data?.LISConfigurations?.isLIS &&
+                            order?.finalResultsFedBy?.uuid ===
+                              data?.currentUser?.uuid &&
+                            !order?.authorizationIsReady
+                          "
+                          class="alert alert-warning"
+                          role="alert"
+                        >
+                          You can not authorise results processed by you
                         </div>
                         <div class="mt-2">
                           <p
@@ -192,7 +218,7 @@
                             *ngIf="order?.authorizationIsReady"
                           >
                             <b
-                              >Authorized
+                              >Authorised
                               <span *ngIf="!data?.LISConfigurations?.isLIS"
                                 >(Second Approval)</span
                               ></b
@@ -282,7 +308,7 @@
                       <td rowspan="3">
                         <div class="mt-4">
                           <button
-                            *ngIf="data?.actionType !== 'review'"
+                            *ngIf="data?.actionType !== 'authorization'"
                             [disabled]="relatedResults?.length == 0"
                             mat-flat-button
                             color="primary"
@@ -291,7 +317,10 @@
                             Save
                           </button>
                         </div>
-                        <div class="mt-4 d-flex justify-content-end">
+                        <div
+                          class="mt-4 d-flex justify-content-end"
+                          *ngIf="data?.actionType === 'authorization'"
+                        >
                           <button
                             *ngIf="shouldConfirm"
                             class="mr-2"
@@ -320,7 +349,7 @@
                               )
                             "
                           >
-                            {{ !shouldConfirm ? "Authorize" : "Confirm" }}
+                            {{ !shouldConfirm ? "Authorise" : "Confirm" }}
                           </button>
                         </div>
                         <div class="mt-2">
@@ -337,7 +366,7 @@
                             *ngIf="order?.authorizationIsReady"
                           >
                             <b
-                              >Authorized
+                              >Authorised
                               <span *ngIf="!data?.LISConfigurations?.isLIS"
                                 >(Second Approval)</span
                               ></b

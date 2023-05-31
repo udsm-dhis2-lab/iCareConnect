@@ -188,7 +188,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     //   new Dropdown({
     //     id: "specimen",
     //     key: "specimen",
-    //     label: "Specimen",
+    //     label: "Specimen type",
     //     searchTerm: "SPECIMEN_SOURCE",
     //     options: [],
     //     conceptClass: "Specimen",

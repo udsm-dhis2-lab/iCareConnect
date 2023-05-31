@@ -109,8 +109,9 @@
                   let codedAnswer of params?.codedAnswers;
                   let count = index
                 "
+                [ngClass]="{ retired: codedAnswer?.retired }"
               >
-                <td>{{ count + 1 }}</td>
+                <td>{{ count + 1 + (page - 1) * pageSize }}</td>
                 <td>
                   {{ codedAnswer?.display }}
                 </td>

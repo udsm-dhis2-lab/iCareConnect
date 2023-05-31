@@ -39,9 +39,20 @@ export const getAuthenticationState = createSelector(
 export const getCurrentUserDetails = createSelector(
   getCurrentUserState,
   (state: CurrentUserState) => {
+    const privileges = flatten(
+      state.currentUser?.roles?.map((role: any) => {
+        return role?.privileges?.map((privilege) => {
+          return {
+            ...privilege,
+            name: privilege?.display,
+          };
+        });
+      })
+    );
     return {
       ...state.currentUser,
-      userPrivileges: keyBy(state.currentUser?.privileges, "name"),
+      privileges,
+      userPrivileges: keyBy(privileges, "name"),
     };
   }
 );

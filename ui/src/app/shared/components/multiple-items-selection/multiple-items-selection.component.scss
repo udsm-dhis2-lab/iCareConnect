@@ -39,3 +39,9 @@ ul li:hover {
   height: 280px;
   overflow: auto;
 }
+
+.retired {
+  cursor: not-allowed !important;
+  color: red;
+  text-decoration: line-through !important;
+}

@@ -227,7 +227,7 @@ export class RegisterSampleComponent implements OnInit {
       specimen: new Dropdown({
         id: "specimen",
         key: "specimen",
-        label: "Specimen",
+        label: "Specimen type",
         searchTerm: "SPECIMEN_SOURCE",
         options: [],
         conceptClass: "Specimen",
