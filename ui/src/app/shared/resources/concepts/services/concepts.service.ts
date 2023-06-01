@@ -242,6 +242,19 @@ export class ConceptsService {
         parameters?.startIndex;
     }
 
+    if (parameters?.page) {
+      queryParams +=
+        (queryParams?.length > 0 ? "&" : "") + "page=" + parameters?.page;
+    }
+
+    if (parameters?.pageSize) {
+      queryParams +=
+        (queryParams?.length > 0 ? "&" : "") +
+        "pageSize=" +
+        parameters?.pageSize;
+      queryParams += (queryParams?.length > 0 ? "&" : "") + "paging=true";
+    }
+
     if (parameters?.conceptClass) {
       queryParams +=
         (queryParams?.length > 0 ? "&" : "") +
@@ -291,29 +304,32 @@ export class ConceptsService {
     }
 
     return this.httpClient.get(`icare/concept?${queryParams}`).pipe(
-      map((response) => {
-        return response?.results.map((result) => {
-          return {
-            ...result,
-            display:
-              result?.display?.indexOf(":") > -1
-                ? result?.display?.split(":")[1]
-                : result?.display,
-            name:
-              result?.display?.indexOf(":") > -1
-                ? result?.display?.split(":")[1]
-                : result?.display,
-            names: result?.names?.filter((name) => {
-              return {
-                ...name,
-                display:
-                  name?.display?.indexOf(":") > -1
-                    ? name?.display?.split(":")[1]
-                    : name?.display,
-              };
-            }),
-          };
-        });
+      map((response: any) => {
+        return {
+          ...response,
+          results: response?.results.map((result) => {
+            return {
+              ...result,
+              display:
+                result?.display?.indexOf(":") > -1
+                  ? result?.display?.split(":")[1]
+                  : result?.display,
+              name:
+                result?.display?.indexOf(":") > -1
+                  ? result?.display?.split(":")[1]
+                  : result?.display,
+              names: result?.names?.filter((name) => {
+                return {
+                  ...name,
+                  display:
+                    name?.display?.indexOf(":") > -1
+                      ? name?.display?.split(":")[1]
+                      : name?.display,
+                };
+              }),
+            };
+          }),
+        };
       }),
       catchError((error) => {
         return of(error);

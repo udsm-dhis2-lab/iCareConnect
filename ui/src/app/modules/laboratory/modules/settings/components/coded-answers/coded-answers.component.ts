@@ -24,6 +24,8 @@ export class CodedAnswersComponent implements OnInit {
   codedAnswers$: Observable<ConceptGetFull[]>;
   pageSize: number = 10;
   page: number = 1;
+  pageCounts: any[] = [10, 20, 25, 50, 100, 200];
+  searchingText: string;
   isFormValid: boolean = false;
   hasError: boolean = false;
   error: string;
@@ -44,21 +46,22 @@ export class CodedAnswersComponent implements OnInit {
   ngOnInit(): void {
     this.codedAnswers$ = this.conceptService.searchConcept({
       q: "LIS_CODED_ANSWERS",
-      limit: this.pageSize,
+      pageSize: this.pageSize,
       conceptClass: "Coded answer",
-      startIndex: (this.page - 1) * this.pageSize,
+      page: this.page,
       searchTerm: "LIS_CODED_ANSWERS",
     });
     this.conceptSources$ = this.conceptSourceService.getConceptSources();
   }
 
-  getList(event: Event, actionType: string): void {
-    this.page = actionType == "next" ? this.page + 1 : this.page - 1;
+  getList(event: any, actionType?: string): void {
+    this.page = event.pageIndex + 1;
+    this.pageSize = Number(event?.pageSize);
     this.codedAnswers$ = this.conceptService.searchConcept({
       q: "LIS_CODED_ANSWERS",
-      limit: this.pageSize,
+      pageSize: this.pageSize,
+      page: this.page,
       conceptClass: "Coded answer",
-      startIndex: (this.page - 1) * this.pageSize,
       searchTerm: "LIS_CODED_ANSWERS",
     });
   }
@@ -117,8 +120,8 @@ export class CodedAnswersComponent implements OnInit {
     };
     this.conceptService
       .searchConcept({ q: conceptName, conceptClass: "Coded answer" })
-      .subscribe((response) => {
-        if (response?.length > 0 && !this.conceptBeingEdited) {
+      .subscribe((response: any) => {
+        if (response?.results?.length > 0 && !this.conceptBeingEdited) {
           this.saving = false;
           this.alertMessage = "Answer with name " + conceptName + " exists";
           setTimeout(() => {
@@ -183,9 +186,9 @@ export class CodedAnswersComponent implements OnInit {
       if (response) {
         this.page = 1;
         this.codedAnswers$ = this.conceptService.searchConcept({
-          limit: this.pageSize,
+          pageSize: this.pageSize,
           conceptClass: "Coded answer",
-          startIndex: (this.page - 1) * this.pageSize,
+          page: this.page,
           searchTerm: "LIS_CODED_ANSWERS",
         });
       }
@@ -194,12 +197,12 @@ export class CodedAnswersComponent implements OnInit {
 
   searchConcept(event: KeyboardEvent): void {
     this.page = 1;
-    const searchingText = (event.target as HTMLInputElement).value;
+    this.searchingText = (event.target as HTMLInputElement).value;
     this.codedAnswers$ = this.conceptService.searchConcept({
-      q: searchingText,
+      q: this.searchingText,
       conceptClass: "Coded answer",
-      limit: this.pageSize,
-      startIndex: (this.page - 1) * this.pageSize,
+      pageSize: this.pageSize,
+      page: this.page,
       searchTerm: "LIS_CODED_ANSWERS",
     });
   }

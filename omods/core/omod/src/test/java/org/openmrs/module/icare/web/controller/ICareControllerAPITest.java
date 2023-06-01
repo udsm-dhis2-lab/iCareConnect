@@ -544,7 +544,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		maps = (List) results.get("results");
-		System.out.println(maps);
+		System.out.println(results);
 		assertThat("Should return 1 item", maps.size(), is(1));
 		
 		//TODO: This test case has to be reviewed

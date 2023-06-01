@@ -446,8 +446,11 @@ export class StandardConceptCreationComponent implements OnInit {
     // Check if concept exists
     this.conceptService
       .searchConcept({ q: conceptName, conceptClass: this.conceptClass })
-      .subscribe((checkResponse) => {
-        if (checkResponse?.length > 0 && !this.conceptBeingEdited?.uuid) {
+      .subscribe((checkResponse: any) => {
+        if (
+          checkResponse?.results?.length > 0 &&
+          !this.conceptBeingEdited?.uuid
+        ) {
           this.saving = false;
           this.alertType = "danger";
           this.savingMessage = "Item with name " + conceptName + " exists";

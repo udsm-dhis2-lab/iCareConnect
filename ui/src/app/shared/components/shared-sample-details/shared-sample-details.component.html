@@ -81,47 +81,43 @@
               "
             >
               <tr>
-                <td>
+                <!-- <td>
                   {{ count + 1 }}
-                </td>
-                <td>
+                </td> -->
+                <td colspan="3">
                   {{ order?.order?.concept?.display }}
                 </td>
                 <!-- <td>
                   {{ allocation?.concept?.display }}
                 </td> -->
               </tr>
-              <!-- <tr
-                *ngFor="
-                  let allocation of order?.testAllocations;
-                  let countAllocation = index
-                "
-              >
-                <td
-                  *ngIf="countAllocation == 0"
-                  [attr.rowspan]="order?.testAllocations?.length"
+              <ng-container *ngIf="order?.testAllocations">
+                <tr
+                  *ngFor="
+                    let allocation of order?.testAllocations;
+                    let countAllocation = index
+                  "
                 >
-                  {{ count + 1 }}
-                </td>
-                <td
-                  *ngIf="countAllocation == 0"
-                  [attr.rowspan]="order?.testAllocations?.length"
-                >
-                  {{ order?.order?.concept?.display }}
-                </td>
-                <td>
+                  <td>
+                    {{ countAllocation + 1 }}
+                  </td>
+                  <td>
+                    {{ allocation?.concept?.display }}
+                  </td>
+                  <!-- <td>
                   {{ allocation?.concept?.display }}
-                </td>
-                <td>
-                  <app-shared-parameter-results
-                    [order]="order"
-                    [hideParameterLabel]="true"
-                    [parameter]="allocation?.concept"
-                    [count]="0"
-                    [units]=""
-                  ></app-shared-parameter-results>
-                </td>
-              </tr> -->
+                </td> -->
+                  <td>
+                    <app-shared-parameter-results
+                      [order]="order"
+                      [hideParameterLabel]="true"
+                      [parameter]="allocation?.concept"
+                      [count]="0"
+                      [units]=""
+                    ></app-shared-parameter-results>
+                  </td>
+                </tr>
+              </ng-container>
             </ng-container>
           </tbody>
         </table>

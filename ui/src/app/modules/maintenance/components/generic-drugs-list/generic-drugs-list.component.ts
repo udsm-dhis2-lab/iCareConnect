@@ -14,7 +14,8 @@ import { DrugListModalComponent } from "../../modals/drug-list-modal/drug-list-m
 export class GenericDrugsListComponent implements OnInit {
   drugConcepts$: Observable<any[]>;
   page: number = 1;
-  pageCount = 10;
+  pageSize = 10;
+  pageCounts: any[] = [10, 20, 25, 50, 100, 200];
   searchingText: string;
   constructor(
     private conceptsService: ConceptsService,
@@ -32,8 +33,8 @@ export class GenericDrugsListComponent implements OnInit {
   getDrugsConcepts(): void {
     this.drugConcepts$ = this.conceptsService.searchConcept({
       searchTerm: "ICARE_GENERIC_DRUG",
-      startIndex: (this.page - 1) * this.pageCount + 1,
-      limit: this.pageCount,
+      page: this.page,
+      pageSize: this.pageSize,
       q: this.searchingText,
     });
   }
@@ -65,9 +66,9 @@ export class GenericDrugsListComponent implements OnInit {
       });
   }
 
-  onGetList(event: Event, actionType: string): void {
-    event.stopPropagation();
-    this.page = actionType == "next" ? this.page + 1 : this.page - 1;
+  onGetList(event: any, actionType?: string): void {
+    this.page = event.pageIndex + 1;
+    this.pageSize = Number(event?.pageSize);
     this.getDrugsConcepts();
   }
 

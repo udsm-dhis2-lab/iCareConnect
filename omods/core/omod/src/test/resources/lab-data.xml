@@ -61,6 +61,9 @@
     <encounter_type encounter_type_id="1" name="Registration"  creator="1"
                     retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfee"/>
 
+    <!-- concept class -->
+    <concept_class concept_class_id="15" name="LIS Instrument" creator="1"
+                   retired="false" date_created="2020-12-27 00:00:00" uuid="YUsir5eb-5345-11e8-9c7c-40b034cCOBAS" />
     <!-- Concepts -->
     <concept concept_id="500" retired="false" datatype_id="3" class_id="7" is_set="true" creator="1"
              date_created="2017-02-14 15:51:57.0" version="" uuid="a8102d6d-c528-477a-80bd-acc38ebc6252" />
@@ -135,8 +138,11 @@
     <concept_reference_source concept_source_id="1" name="SNOMED" description="THIS IS SNOMED" hl7_code="SCT" creator="1" date_created="2023-02-27 00:00:00.0" retired="false" uuid="8987bbb9-52b9-11zz-b60d-880027ae421s"/>
 
     <concept_reference_term concept_reference_term_id="2"  concept_source_id="1" code="123" creator="1" date_created="2023-02-27 00:00:00.0"  retired="false"  uuid="8987bbb9-52b9-11zz-b60d-880027ae4211"/>
+    <concept_reference_term concept_reference_term_id="201"  concept_source_id="1" code="COBAS" creator="1" date_created="2023-02-27 00:00:00.0"  retired="false"  uuid="COBASbb9-52b9-11zz-b60d-880027ae4211"/>
 
     <concept_reference_map concept_map_id="1" concept_reference_term_id="2" concept_map_type_id="1" creator="1" date_created="2023-02-27 00:00:00.0" concept_id="501" uuid="8987bbb9-52b9-11zz-b60d-880027ae4211"/>
+
+    <concept_reference_map concept_map_id="101" concept_reference_term_id="201" concept_map_type_id="1" creator="1" date_created="2023-02-27 00:00:00.0" concept_id="810" uuid="7897bbb9-5222-11zz-b60d-880027ae4211"/>
 
     <!--order -->
     <order_type order_type_id="211" name="Laboratory Order"  creator="400" java_class_name="org.openmrs.TestOrder"

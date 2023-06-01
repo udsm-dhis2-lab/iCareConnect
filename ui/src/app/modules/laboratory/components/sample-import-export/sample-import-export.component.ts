@@ -429,7 +429,7 @@ export class SampleImportExportComponent implements OnInit {
             .toPromise()
             .then((response: any) => {
               if (response) {
-                specimenSource = response[0]?.uuid;
+                specimenSource = response?.results[0]?.uuid;
               }
             });
         }
@@ -456,7 +456,7 @@ export class SampleImportExportComponent implements OnInit {
                   .toPromise()
                   .then((testOrderResponse: any) => {
                     if (testOrderResponse) {
-                      testOrder = testOrderResponse[0]?.uuid;
+                      testOrder = testOrderResponse?.results[0]?.uuid;
                     }
                   })
                   .then((response) => {});

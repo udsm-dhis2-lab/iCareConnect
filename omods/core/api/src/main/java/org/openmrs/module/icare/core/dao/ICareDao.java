@@ -20,6 +20,8 @@ import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
@@ -461,9 +463,9 @@ public class ICareDao extends BaseDAO<Item> {
 		return (long) query.list().get(0);
 	}
 	
-	public List<Concept> getConceptsBySearchParams(String q, String conceptClass, String searchTerm, Integer limit,
+	public ListResult getConceptsBySearchParams(String q, String conceptClass, String searchTerm, Integer limit,
 	        Integer startIndex, String searchTermOfConceptSetToExclude, String conceptSourceUuid, String referenceTermCode,
-	        String attributeType, String attributeValue) {
+	        String attributeType, String attributeValue, Pager pager) {
 		DbSession session = getSession();
 		String searchConceptQueryStr = "SELECT DISTINCT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc ";
 		
@@ -539,7 +541,18 @@ public class ICareDao extends BaseDAO<Item> {
 			sqlQuery.setParameter("attributeType", attributeType);
 			sqlQuery.setParameter("attributeValue", attributeValue);
 		}
-		return sqlQuery.list();
+		
+		if (pager.isAllowed()) {
+			pager.setTotal(sqlQuery.list().size());
+			//pager.setPageCount(pager.getT);
+			sqlQuery.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+			sqlQuery.setMaxResults(pager.getPageSize());
+		}
+		
+		ListResult listResults = new ListResult();
+		listResults.setPager(pager);
+		listResults.setResults(sqlQuery.list());
+		return listResults;
 	}
 	
 	public List<ConceptReferenceTerm> getConceptReferenceTermsBySearchParams(String q, String source, Integer limit,

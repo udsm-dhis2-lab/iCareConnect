@@ -557,6 +557,12 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	public void testCreateMultipleResults() throws Exception {
 		//Given
 		String dto = this.readFile("dto/lab-related-results-create.json");
+		
+		AdministrationService administrationService = Context.getService(AdministrationService.class);
+		
+		administrationService.setGlobalProperty(ICareConfig.LAB_INSTRUMENT_CLASS_UUID,
+		    "YUsir5eb-5345-11e8-9c7c-40b034cCOBAS");
+		
 		List<Map<String, Object>> results = (new ObjectMapper()).readValue(dto, List.class);
 		
 		MockHttpServletRequest newPostRequest = newPostRequest("lab/multipleresults", results);
