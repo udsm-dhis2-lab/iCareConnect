@@ -445,7 +445,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		}
 		
 		if (q != null) {
-			queryStr += " JOIN sp.visit v LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi ";
+			queryStr += " JOIN sp.visit v LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi LEFT JOIN v.attributes va ";
 			
 			if (testConceptUuid != null) {
 				queryStr += " WHERE orderConcept.uuid =:testConceptUuid ";
@@ -457,7 +457,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 				queryStr += " AND ";
 			}
 			
-			queryStr += "(lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q))";
+			queryStr += "(lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q OR lower(va.valueReference) LIKE lower(:q)))";
 		}
 		
 		if (startDate != null && endDate != null) {
