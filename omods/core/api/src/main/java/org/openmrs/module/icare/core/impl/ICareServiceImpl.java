@@ -26,10 +26,7 @@ import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
-import org.openmrs.module.icare.core.ICareService;
-import org.openmrs.module.icare.core.Item;
-import org.openmrs.module.icare.core.Message;
-import org.openmrs.module.icare.core.Summary;
+import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
@@ -497,11 +494,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public List<Concept> getConcepts(String q, String conceptClass, String searchTerm, Integer limit, Integer startIndex,
+	public ListResult getConcepts(String q, String conceptClass, String searchTerm, Integer limit, Integer startIndex,
 	        String searchTermOfConceptSetToExclude, String conceptSourceUuid, String referenceTermCode,
-	        String attributeType, String attributeValue) {
+	        String attributeType, String attributeValue, Pager pager) {
 		return dao.getConceptsBySearchParams(q, conceptClass, searchTerm, limit, startIndex,
-		    searchTermOfConceptSetToExclude, conceptSourceUuid, referenceTermCode, attributeType, attributeValue);
+		    searchTermOfConceptSetToExclude, conceptSourceUuid, referenceTermCode, attributeType, attributeValue, pager);
 	}
 	
 	@Override

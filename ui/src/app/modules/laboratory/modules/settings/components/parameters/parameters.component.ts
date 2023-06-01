@@ -372,9 +372,9 @@ export class ParametersComponent implements OnInit {
     // Check if concept exist
     this.conceptService
       .searchConcept({ q: conceptName, conceptClass: "Test" })
-      .subscribe((response) => {
+      .subscribe((response: any) => {
         if (response) {
-          if (response?.length > 0 && !uuid) {
+          if (response?.results?.length > 0 && !uuid) {
             this.saving = false;
             this.alertType = "danger";
             this.savingMessage =

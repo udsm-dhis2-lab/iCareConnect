@@ -103,10 +103,10 @@
             </tr>
           </thead>
           <tbody>
-            <ng-container *ngIf="params?.codedAnswers?.length > 0">
+            <ng-container *ngIf="params?.codedAnswers?.results?.length > 0">
               <tr
                 *ngFor="
-                  let codedAnswer of params?.codedAnswers;
+                  let codedAnswer of params?.codedAnswers?.results;
                   let count = index
                 "
                 [ngClass]="{ retired: codedAnswer?.retired }"
@@ -135,7 +135,7 @@
                 </td>
               </tr>
             </ng-container>
-            <ng-container *ngIf="params?.codedAnswers?.length === 0">
+            <ng-container *ngIf="params?.codedAnswers?.results?.length === 0">
               <tr>
                 <td colspan="100%">
                   <div class="alert alert-warning" role="alert">No items</div>
@@ -145,25 +145,15 @@
           </tbody>
         </table>
       </div>
-
-      <div class="w-100 d-flex justify-content-end">
-        <button
-          [disabled]="page <= 1"
-          mat-button
-          (click)="getList($event, 'prev')"
+      <div class="w-100 mt-2">
+        <mat-paginator
+          [hidden]="!pageCounts"
+          [length]="params?.codedAnswers?.pager?.total"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageCounts"
+          (page)="getList($event)"
         >
-          Prev
-        </button>
-        <button
-          [disabled]="
-            params?.codedAnswers && params?.codedAnswers?.length < pageSize
-          "
-          mat-button
-          (click)="getList($event, 'next')"
-          class="ml-2"
-        >
-          Next
-        </button>
+        </mat-paginator>
       </div>
       <mat-progress-bar
         *ngIf="!params?.codedAnswers"

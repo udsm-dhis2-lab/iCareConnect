@@ -78,7 +78,9 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "result")
 	private List<AssociatedFieldResult> associatedFieldResults = new ArrayList<>(0);
-	
+
+	@Transient
+	private String instrumentCode;
 	public Integer getId() {
 		return id;
 	}
@@ -271,6 +273,11 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 			instrument.setUuid(((Map) map.get("instrument")).get("uuid").toString());
 			result.setInstrument(instrument);
 		}
+
+		if (map.get("instrument") != null && ((Map) map.get("instrument")).get("code") != null) {
+			String instrumentCode = instrumentCode = ((Map) map.get("instrument")).get("code").toString();
+			result.setInstrumentCode(instrumentCode);
+		}
 		
 		if (map.get("resultStatus") != null) {
 			result.setResultStatus(map.get("resultStatus").toString());
@@ -311,6 +318,7 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		resultsObject.put("valueComplex", this.getValueComplex());
 		resultsObject.put("valueModifier", this.getValueModifier());
 		resultsObject.put("valueDateTime", this.getValueDatetime());
+
 		if (this.getAbnormal() != null) {
 			resultsObject.put("abnormal", this.getAbnormal());
 		} else {
@@ -337,9 +345,12 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		
 		Map<String, Object> instrument = new HashMap<String, Object>();
 		if (this.getInstrument() != null) {
+			List<String> instrumentsCodes = new ArrayList<>();
+			instrumentsCodes = getCodes();
 			instrument.put("uuid", this.getInstrument().getUuid());
 			instrument.put("display", this.getInstrument().getDisplayString());
 			instrument.put("name", this.getInstrument().getName().getName());
+			instrument.put("instrumentCodes", instrumentsCodes);
 		} else {
 			instrument = null;
 		}
@@ -426,7 +437,26 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	public void setInstrument(Concept instrument) {
 		this.instrument = instrument;
 	}
-	
+
+	public  String getInstrumentCode() {
+		return  this.instrumentCode;
+	}
+
+	public  void setInstrumentCode(String code) {
+		this.instrumentCode = code;
+	}
+
+	public List<String> getCodes() {
+		List<String> codes = new ArrayList<>();
+		Collection<ConceptMap> conceptMaps = this.instrument.getConceptMappings();
+		if (conceptMaps.size() > 0) {
+			for(ConceptMap conceptMap: conceptMaps){
+				ConceptReferenceTerm conceptReferenceTerm = conceptMap.getConceptReferenceTerm();
+				codes.add(conceptReferenceTerm.getCode().toString());
+			}
+		}
+		return  codes;
+	}
 	/*
 	For statuses passed via results object
 	* */

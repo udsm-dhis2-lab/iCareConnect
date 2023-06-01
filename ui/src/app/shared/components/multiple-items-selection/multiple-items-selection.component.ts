@@ -62,15 +62,17 @@ export class MultipleItemsSelectionComponent implements OnInit {
                 };
               })
             )
-          : this.conceptService.searchConcept({
-              q: this.standardSearchTerm,
-              conceptClass: this.conceptClass,
-              limit: this.pageSize,
-              startIndex: (this.page - 1) * this.pageSize,
-              searchTerm: this.standardSearchTerm,
-              searchTermOfConceptSetToExclude:
-                this.searchTermOfConceptSetToExcludeFromTestOrders,
-            });
+          : this.conceptService
+              .searchConcept({
+                q: this.standardSearchTerm,
+                conceptClass: this.conceptClass,
+                pageSize: this.pageSize,
+                page: this.page,
+                searchTerm: this.standardSearchTerm,
+                searchTermOfConceptSetToExclude:
+                  this.searchTermOfConceptSetToExcludeFromTestOrders,
+              })
+              .pipe(map((response: any) => response?.results));
     } else if (this.itemType === "conceptReferenceTerm") {
       this.items$ = this.conceptReferenceService
         .getConceptReferenceTermsByParameters({
@@ -146,13 +148,15 @@ export class MultipleItemsSelectionComponent implements OnInit {
         debounceTime(1000),
         distinctUntilChanged(),
         switchMap((term) =>
-          this.conceptService.searchConcept({
-            q: term,
-            conceptClass: this.conceptClass,
-            limit: this.pageSize,
-            startIndex: (this.page - 1) * this.pageSize,
-            searchTerm: this.standardSearchTerm,
-          })
+          this.conceptService
+            .searchConcept({
+              q: term,
+              conceptClass: this.conceptClass,
+              pageSize: this.pageSize,
+              page: this.page,
+              searchTerm: this.standardSearchTerm,
+            })
+            .pipe(map((response: any) => response?.results))
         )
       );
     } else if (itemType === "conceptReferenceTerm") {
