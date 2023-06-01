@@ -166,7 +166,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 				} else {
 					queryStr += " AND ";
 				}
-				queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category LIKE 'reject%')";
+				queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE lower(sst.category) LIKE 'reject%')";
 			} else {
 				
 				if (!queryStr.contains("WHERE")) {
@@ -522,13 +522,14 @@ public class SampleDAO extends BaseDAO<Sample> {
 					queryStr += " AND ";
 				}
 				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS'  OR  lower(sst.category) LIKE 'reject%' OR lower(sst.category) LIKE 'dispose%')) AND sp IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'))";
+
 			} else if (sampleCategory.toLowerCase().equals("rejected")) {
 				if (!queryStr.contains("WHERE")) {
 					queryStr += " WHERE ";
 				} else {
 					queryStr += " AND ";
 				}
-				queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category LIKE 'reject%')";
+				queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE lower(sst.category) LIKE 'reject%')";
 			} else {
 				
 				if (!queryStr.contains("WHERE")) {
