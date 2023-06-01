@@ -25,6 +25,7 @@ import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
+import org.openmrs.module.icare.laboratory.models.Sample;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -271,9 +272,9 @@ public class ICareDao extends BaseDAO<Item> {
 	}
 	
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
-	        String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
-	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid) {
+											String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
+											Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
+											String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid, String sampleCategory) {
 		//PatientIdentifier
 		Query query = null;
 		DbSession session = this.getSession();
@@ -352,6 +353,17 @@ public class ICareDao extends BaseDAO<Item> {
 			queryStr += " vat.uuid = :visitAttributeTypeUuid";
 			
 		}
+
+		if(sampleCategory != null){
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+
+			queryStr +=" v IN (SELECT sp.visit FROM Sample sp WHERE sp IN (SELECT sst.sample FROM SampleStatus sst WHERE sst.category =:sampleCategory))";
+
+		}
 		
 		if (orderBy == VisitWrapper.OrderBy.VISIT) {
 			queryStr += " ORDER BY v.startDatetime ";
@@ -401,6 +413,9 @@ public class ICareDao extends BaseDAO<Item> {
 		}
 		if (visitAttributeTypeUuid != null) {
 			query.setParameter("visitAttributeTypeUuid", visitAttributeTypeUuid);
+		}
+		if(sampleCategory != null){
+			query.setParameter("sampleCategory", sampleCategory);
 		}
 		
 		query.setFirstResult(startIndex);

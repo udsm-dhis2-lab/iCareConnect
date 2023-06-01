@@ -245,6 +245,10 @@
     <visit_attribute visit_attribute_id="107" visit_id="20" attribute_type_id="100" value_reference="e7jnec30-5344-11e8-ie7c-40b6etw3cfes" uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfe1" creator="1"
                      voided="0" date_created="2020-12-27 00:00:00" />
 
+    <lb_sample uuid="ec2c9ec1-e742-4f89-979a-01560a60734" sample_id="205" visit_id="10" label="LB/22/00070" specimen_source_id="1006" concept_id="600" creator="1" date_created="2022-11-21 00:00:00" voided="false" date_time="2022-11-21 00:00:00"/>
+
+    <!-- Sample Status    -->
+    <lb_sample_status sample_status_id="1" sample_id="205" status="RECEIVED" category="RECEIVED" timestamp="2020-12-27 00:00:00" user_id="300" />
 
 
     <!-- Encounters -->
