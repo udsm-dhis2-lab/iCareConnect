@@ -51,8 +51,10 @@
 
     <visit patient_id="500" visit_id="500" uuid="d9c1d8ac-2b8e-427f-804d-b858c52e6f11" date_started="2020-10-14 13:56:44" visit_type_id="721" creator="400" date_created="2020-10-14 13:56:44" voided="false"/>
 
-
+    <visit_attribute_type visit_attribute_type_id="1" name="Refering Doctor Email" datatype="org.openmrs.customdatatype.datatype.FreeTextDatatype" retired="false" uuid="36b071d8-d5ea-0000-8e56-5b066420aaa1" min_occurs="0" creator="1" date_created="2020-10-14 13:56:44"/>
+    <visit_attribute_type visit_attribute_type_id="2" name="Refering Doctor Names" datatype="org.openmrs.customdatatype.datatype.FreeTextDatatype" retired="false" uuid="36b071d8-d5ea-0000-8e56-5b066420aaa2" min_occurs="0" creator="1" date_created="2020-10-14 13:56:44"/>
     <!-- Encounters -->
+    <visit_attribute visit_attribute_id="1" visit_id="500" attribute_type_id="2" value_reference="Gilbert James" uuid="36b071d8-d5ea-0000-8e56-5b066420aaa3" creator="1" date_created="2020-10-14 13:56:44" voided="false"/>
 
     <encounter encounter_id="100" patient_id="500" uuid="444395c-dd07-488d-8fd7-a748c9570000" visit_id="500" encounter_datetime="2020-10-14 13:56:44" date_created="2020-10-14 13:56:44" voided="false"/>
 
@@ -188,6 +190,8 @@
     <lb_sample_status sample_status_id="2" sample_id="201" status="RECEIVED" category="RECEIVED" timestamp="2020-12-27 00:00:00" user_id="400" />
 
     <lb_sample_status sample_status_id="3" sample_id="202" status="RESULTS" category="HAS_RESULTS" timestamp="2020-12-27 00:00:00" user_id="400" />
+
+    <lb_sample_status sample_status_id="4" sample_id="202" status="REJECTED" category="REJECTECED" timestamp="2020-12-27 00:00:00" user_id="400" />
 
     <st_device_type device_type_id="201" uuid="245ff55-2200-11e3-1111-0sndiu87hsju" name="lab devices" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
     <!--<lb_device device_id="123" uuid="d365e560-zz77-11e3-1111-0sndiu87hsju" item_id="666" device_type="201" name="mrt test device" serial_no="6563"/>-->

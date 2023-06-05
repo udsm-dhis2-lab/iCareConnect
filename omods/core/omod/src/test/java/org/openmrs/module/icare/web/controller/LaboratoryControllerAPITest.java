@@ -325,13 +325,13 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testGettingSamples() throws Exception {
-		
+
 		MockHttpServletRequest newGetRequest = newGetRequest("lab/samples", new Parameter("page", "2"), new Parameter(
-		        "pageSize", "2"), new Parameter("hasStatus", "NO"), new Parameter("excludeAllocations", "true"));
-		
+				"pageSize", "2"), new Parameter("hasStatus", "NO"), new Parameter("excludeAllocations", "true"));
+
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		MockHttpServletResponse handleGet = handle(newGetRequest);
-		
+
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		Map<String, Object> sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		//		System.out.println(((List) sampleResults.get("results")));
@@ -342,84 +342,96 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Page is 2", (Integer) pagerObject.get("page") == 2, is(true));
 		assertThat("List count is 1", ((List) sampleResults.get("results")).size() == 1, is(true));
 		assertThat(
-		    "There is atleast 1 sample for the visit from lab-data.xml with visit id = d9c1d8ac-2b8e-427f-804d-b858c52e6f11",
-		    handleGet.getContentAsString().contains("d9c1d8ac-2b8e-427f-804d-b858c52e6f11"));
+			"There is atleast 1 sample for the visit from lab-data.xml with visit id = d9c1d8ac-2b8e-427f-804d-b858c52e6f11",
+			handleGet.getContentAsString().contains("d9c1d8ac-2b8e-427f-804d-b858c52e6f11"));
 		//
 		newGetRequest = newGetRequest("lab/samples", new Parameter("location", "58c57d25-8d39-41ab-8422-108a0c277d98"));
-		
+
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		handleGet = handle(newGetRequest);
-		
+
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		//System.out.println("aaaa "+sampleResults);
-		
+
 		pagerObject = (Map<String, Object>) sampleResults.get("pager");
 		assertThat("Page Count is 2", (Integer) pagerObject.get("pageCount") == 0, is(true));
 		assertThat("Total is 3", (Integer) pagerObject.get("total") == 0, is(true));
 		assertThat("Page Size is 2", (Integer) pagerObject.get("pageSize") == 50, is(true));
 		assertThat("Page is 2", (Integer) pagerObject.get("page") == 1, is(true));
 		assertThat("List by location count is 1", ((List) sampleResults.get("results")).size() == 0, is(true));
-		
+
 		//	Search test section
 		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
-		    new Parameter("q", "x"));
+			new Parameter("q", "x"));
 		handleGet = handle(newGetRequest);
 		Map<String, Object> response = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		assertThat("List by search q count is 1", ((List) response.get("results")).size() == 1, is(true));
-		
+
 		MockHttpServletRequest newGetRequest2 = newGetRequest("lab/samples", new Parameter("acceptedBy",
-		        "e4ef4d4d-5cf2-47ff-af6b-bb9abdabdd60"), new Parameter("hasStatus", "YES"), new Parameter(
-		        "excludeAllocations", "TRUE"));
+				"e4ef4d4d-5cf2-47ff-af6b-bb9abdabdd60"), new Parameter("hasStatus", "YES"), new Parameter(
+				"excludeAllocations", "TRUE"));
 		MockHttpServletResponse handle2 = handle(newGetRequest2);
 		Map<String, Object> samples = (new ObjectMapper()).readValue(handle2.getContentAsString(), Map.class);
 		assertThat("There is 2 sample", ((List<Map>) samples.get("results")).size(), is(2));
-		
+
 		MockHttpServletRequest instrumentRequest = newGetRequest("lab/samples", new Parameter("instrument",
-		        "123111zz-0011-477v-8y8y-acc38ebc6252"), new Parameter("excludeAllocations", "TRUE"));
+				"123111zz-0011-477v-8y8y-acc38ebc6252"), new Parameter("excludeAllocations", "TRUE"));
 		MockHttpServletResponse instrumentResponse = handle(instrumentRequest);
 		Map<String, Object> samplesByInstrument = (new ObjectMapper()).readValue(instrumentResponse.getContentAsString(),
-		    Map.class);
+			Map.class);
 		assertThat("There is 1 sample with instrument used", ((List<Map>) samplesByInstrument.get("results")).size(), is(1));
-		
+
 		MockHttpServletRequest newGetRequest3 = newGetRequest("lab/samples", new Parameter("excludeAllocations", "true"),
-		    new Parameter("sampleCategory", "NOT ACCEPTED"), new Parameter("hasStatus", "yes"));
-		
+			new Parameter("sampleCategory", "NOT ACCEPTED"), new Parameter("hasStatus", "yes"));
+
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		MockHttpServletResponse handleGet3 = handle(newGetRequest3);
-		
+
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		Map<String, Object> sampleResults3 = (new ObjectMapper()).readValue(handleGet3.getContentAsString(), Map.class);
-		
+
 		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
-		    new Parameter("hasStatus", "NO"), new Parameter("excludeAllocations", "true"), new Parameter("test",
-		            "a8102d6d-c528-477a-80bd-acc38ebc6252"), new Parameter("q", "LIS/23/0221"));
-		
+			new Parameter("hasStatus", "NO"), new Parameter("excludeAllocations", "true"), new Parameter("test",
+					"a8102d6d-c528-477a-80bd-acc38ebc6252"), new Parameter("q", "LIS/23/0221"));
+
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		handleGet = handle(newGetRequest);
-		
+
 		//System.out.println(Context.getVisitService().getVisitByUuid("d9c1d8ac-2b8e-427f-804d-b858c52e6f11").getLocation().getUuid());
 		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
-		
+
 		// SEARCH BY DEPARTMENT
 		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
-		    new Parameter("excludeAllocations", "true"), new Parameter("department", "123111zz-0011-477v-8y8y-acc38ebc6222"));
-		
+			new Parameter("excludeAllocations", "true"), new Parameter("department", "123111zz-0011-477v-8y8y-acc38ebc6222"));
+
 		handleGet = handle(newGetRequest);
 		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
-		
+
 		// SEARCH BY SPECIMEN SOURCE
 		newGetRequest = newGetRequest("lab/samples", new Parameter("page", "1"), new Parameter("pageSize", "2"),
-		    new Parameter("excludeAllocations", "true"), new Parameter("specimen", "323111zz-0011-477v-8y8y-acc38ebc6215"));
-		
+			new Parameter("excludeAllocations", "true"), new Parameter("specimen", "323111zz-0011-477v-8y8y-acc38ebc6215"));
+
 		handleGet = handle(newGetRequest);
 		Map<String, Object> sampleResultsFilteredBySpecimen = (new ObjectMapper()).readValue(handleGet.getContentAsString(),
-		    Map.class);
+			Map.class);
 		//		System.out.println(((List<Map>) samples.get("results")).size());
 		//		for(Map<String, Object> sample: ((List<Map>) samples.get("results"))) {
 		//			System.out.println(sample.get("label"));
 		//		}
 		assertThat("There is 2 sample", ((List<Map>) samples.get("results")).size(), is(2));
+
+
+		newGetRequest = newGetRequest("lab/samples",  new Parameter("q", "Gilbert"));
+		handleGet = handle(newGetRequest);
+		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		assertThat("There are 5 samples", ((List<Map<String,Object>>) sampleResults.get("results")).size(), is( 5));
+
+
+		newGetRequest = newGetRequest("lab/samples", new Parameter("sampleCategory", "rejected"));
+		handleGet = handle(newGetRequest);
+		Map<String, Object> samplesRejected = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		System.out.println("rejected samples: " + samplesRejected);
 	}
 	
 	@Test
@@ -431,7 +443,8 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		String bodySummaryHtml = this.readFile("dto/laboratory/body-summary.html");
 		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_BODY_ATTACHMENT_CONFIGURATION_HTML, bodyAttachmentHtml);
 		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_BODY_SUMMARY_CONFIGURATION_HTML, bodySummaryHtml);
-		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS, "false");
+		adminService.setGlobalProperty(ICareConfig.ICARE_VISIT_EMAIL_ATTRIBUTE_TYPE, "36b071d8-d5ea-0000-8e56-5b066420aaa1");
+		adminService.setGlobalProperty(ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS, "true");
 		// creating sample status
 		String dto = this.readFile("dto/sample-status-create-dto.json");
 		Map<String, Object> sampleStatus = (new ObjectMapper()).readValue(dto, Map.class);

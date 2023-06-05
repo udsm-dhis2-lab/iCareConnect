@@ -314,10 +314,11 @@ public class ICareController {
                                                @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus,
 											   @RequestParam(required = false) String attributeValueReference,
 											   @RequestParam(required = false) VisitWrapper.PaymentStatus paymentStatus,
-											   @RequestParam(required = false) String visitAttributeTypeUuid
+											   @RequestParam(required = false) String visitAttributeTypeUuid,
+											   @RequestParam(required = false) String sampleCategory
 											   ) {
 
-        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, encounterTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus, visitAttributeTypeUuid);
+        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, encounterTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus, visitAttributeTypeUuid, sampleCategory);
 
         List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
         for (Visit visit : visits) {
@@ -328,9 +329,9 @@ public class ICareController {
             responseSamplesObject.add(sampleObject);
 
         }
-        Map<String, Object> retults = new HashMap<>();
-        retults.put("results", responseSamplesObject);
-        return retults;
+        Map<String, Object> results = new HashMap<>();
+        results.put("results", responseSamplesObject);
+        return results;
     }
 	
 	@RequestMapping(value = "order", method = RequestMethod.GET)

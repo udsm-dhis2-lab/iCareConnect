@@ -5,6 +5,7 @@ package org.openmrs.module.icare.laboratory.dao;
 import org.hibernate.Query;
 import org.openmrs.User;
 import org.openmrs.Visit;
+import org.openmrs.VisitAttribute;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
@@ -91,7 +92,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		}
 		
 		if (q != null) {
-			queryStr += " JOIN sp.visit v LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi ";
+			queryStr += " JOIN sp.visit v LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi LEFT JOIN v.attributes va";
 			
 			if (testConceptUuid != null) {
 				queryStr += " WHERE concept.uuid =:testConceptUuid ";
@@ -102,8 +103,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 			} else {
 				queryStr += " AND ";
 			}
-			
-			queryStr += "(lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q))";
+
+			queryStr += "(lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q OR lower(va.valueReference) LIKE lower(:q)))";
 		}
 		
 		if (startDate != null && endDate != null) {
@@ -158,6 +159,14 @@ public class SampleDAO extends BaseDAO<Sample> {
 					queryStr += " AND ";
 				}
 				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS'  OR  lower(sst.category) LIKE 'reject%'))   AND sp IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'))";
+				
+			} else if (sampleCategory.toLowerCase().equals("rejected")) {
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE lower(sst.category) LIKE 'reject%')";
 			} else {
 				
 				if (!queryStr.contains("WHERE")) {
@@ -234,6 +243,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		//			queryStr += ",ss.timestamp DESC";
 		//		}
 		Query query = session.createQuery(queryStr);
+		System.out.println(queryStr);
 		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
@@ -244,9 +254,13 @@ public class SampleDAO extends BaseDAO<Sample> {
 		}
 		
 		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")
-		        && !sampleCategory.toLowerCase().equals("no results")) {
+		        && !sampleCategory.toLowerCase().equals("no results") && !sampleCategory.toLowerCase().equals("rejected")) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
+		
+		//		if (sampleCategory.toLowerCase().equals("rejected")) {
+		//			query.setParameter("sampleCategory", sampleCategory);
+		//		}
 		
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
@@ -431,7 +445,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		}
 		
 		if (q != null) {
-			queryStr += " JOIN sp.visit v LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi ";
+			queryStr += " JOIN sp.visit v LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi LEFT JOIN v.attributes va ";
 			
 			if (testConceptUuid != null) {
 				queryStr += " WHERE orderConcept.uuid =:testConceptUuid ";
@@ -443,7 +457,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 				queryStr += " AND ";
 			}
 			
-			queryStr += "(lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q))";
+			queryStr += "(lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q OR lower(va.valueReference) LIKE lower(:q)))";
 		}
 		
 		if (startDate != null && endDate != null) {
@@ -508,6 +522,14 @@ public class SampleDAO extends BaseDAO<Sample> {
 					queryStr += " AND ";
 				}
 				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS'  OR  lower(sst.category) LIKE 'reject%' OR lower(sst.category) LIKE 'dispose%')) AND sp IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'))";
+
+			} else if (sampleCategory.toLowerCase().equals("rejected")) {
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE lower(sst.category) LIKE 'reject%')";
 			} else {
 				
 				if (!queryStr.contains("WHERE")) {
@@ -578,6 +600,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		//		}
 		//		System.out.println(queryStr);
 		Query query = session.createQuery(queryStr);
+		System.out.println(queryStr);
 		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
@@ -587,7 +610,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		}
 		
 		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")
-		        && !sampleCategory.toLowerCase().equals("no results")) {
+		        && !sampleCategory.toLowerCase().equals("no results") && !sampleCategory.toLowerCase().equals("rejected")) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
 		

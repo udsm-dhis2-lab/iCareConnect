@@ -454,6 +454,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		}
 		
 		if (result.getInstrument() != null) {
+
 			Concept instrument = Context.getConceptService().getConceptByUuid(result.getInstrument().getUuid());
 			result.setInstrument(instrument);
 		}
@@ -799,7 +800,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 											        .getTestAllocationStatuses()) {
 												if (result != null && allocationStatus != null && allocationStatus.getTestResult() != null && allocationStatus.getTestResult().getUuid().equals(result.getUuid())
 												        && allocationStatus.getCategory() != null && allocationStatus.getCategory().toLowerCase()
-												                .equals("result_remarks")) {
+												                .equals("result_remarks") && allocationStatus.getRemarks() != null) {
 													comment = allocationStatus.getRemarks();
 												}
 											}
@@ -809,7 +810,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 									newRows = newRows
 									        + parameterRow.replace("{sn}", count.toString())
 									                .replace("{parameter}", concept.getDisplayString().toString())
-									                .replace("{result}", resultValue).replace("{comment}", comment);
+									                .replace("{result}", resultValue)
+													.replace("{comment}", comment);
 									newTableBodies = newTableBodies.replace(parameterRow, newRows);
 									count = count + 1;
 								}

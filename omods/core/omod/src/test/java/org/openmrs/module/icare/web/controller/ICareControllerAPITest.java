@@ -503,7 +503,12 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("Should return a visit", ((List) orderResult.get("results")).size() == 1);
-		
+
+
+		newGetRequest = newGetRequest("icare/visit", new Parameter("sampleCategory","RECEIVED"));
+		handle = handle(newGetRequest);
+		orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		assertThat("Should return a visit",((List) orderResult.get("results")).size() == 1);
 	}
 	
 	@Test

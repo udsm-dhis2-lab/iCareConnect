@@ -10,9 +10,6 @@
 package org.openmrs.module.icare.core.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.html.simpleparser.HTMLWorker;
-import com.itextpdf.text.pdf.PdfWriter;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
@@ -30,7 +27,6 @@ import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
-import org.openmrs.module.icare.report.ReportData;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.validator.ValidateUtil;
@@ -43,7 +39,6 @@ import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
-import javax.mail.util.ByteArrayDataSource;
 import javax.naming.ConfigurationException;
 import javax.mail.Transport;
 import javax.mail.internet.MimeBodyPart;
@@ -247,12 +242,12 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	@Override
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
-	        String locationUuid, OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus,
-	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid) {
+											String locationUuid, OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus,
+											Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
+											String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid, String sampleCategory) {
 		return this.dao.getVisitsByOrderType(search, orderTypeUuid, encounterTypeUuid, locationUuid, prescriptionStatus,
 		    fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus,
-		    visitAttributeTypeUuid);
+		    visitAttributeTypeUuid,sampleCategory);
 	}
 	
 	@Override
@@ -624,6 +619,9 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			Multipart multipart = new MimeMultipart();
 			MimeBodyPart contentBodyPart = new MimeBodyPart();
 			String content = emailProperties.getProperty("content", "");
+			if (emailProperties.getProperty("attachmentFile") != null) {
+				content += emailProperties.getProperty("attachmentFile");
+			}
 			contentBodyPart.setContent(content, "text/html");
 			multipart.addBodyPart(contentBodyPart);
 			
@@ -635,32 +633,33 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 				multipart.addBodyPart(attachmentPart);
 			}
 			
-			if (emailProperties.getProperty("attachmentFile") != null) {
-				String htmlContent = emailProperties.getProperty("attachmentFile");
-				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-				Document document = new Document();
-				
-				PdfWriter writer = PdfWriter.getInstance(document, outputStream);
-				document.open();
-				HTMLWorker htmlWorker = new HTMLWorker(document);
-				htmlWorker.parse(new StringReader(htmlContent));
-				document.close();
-				
-				//File encryption implementation
-				//				PdfReader reader = new PdfReader(outputStream.toByteArray());
-				//				PdfStamper stamper = new PdfStamper(reader, outputStream);
-				//				stamper.setEncryption("a".getBytes("UTF-8"), "b".getBytes("UTF-8"), PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
-				//				stamper.close();
-				//				reader.close();
-				//
-				byte[] pdfContent = outputStream.toByteArray();
-				
-				MimeBodyPart attachmentPart = new MimeBodyPart();
-				DataSource dataSource = new ByteArrayDataSource(pdfContent, "application/pdf");
-				attachmentPart.setDataHandler(new DataHandler(dataSource));
-				attachmentPart.setFileName(emailProperties.getProperty("attachmentFileName"));
-				multipart.addBodyPart(attachmentPart);
-			}
+			//			if (emailProperties.getProperty("attachmentFile") != null) {
+			//				String htmlContent = emailProperties.getProperty("attachmentFile");
+			//				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			//				Document document = new Document();
+			//
+			//				PdfWriter writer = PdfWriter.getInstance(document, outputStream);
+			//				document.open();
+			//				HTMLWorker htmlWorker = new HTMLWorker(document);
+			//				htmlWorker.parse(new StringReader(htmlContent));
+			//				document.close();
+			//
+			//				//File encryption implementation
+			//				//				PdfReader reader = new PdfReader(outputStream.toByteArray());
+			//				//				PdfStamper stamper = new PdfStamper(reader, outputStream);
+			//				//				stamper.setEncryption("a".getBytes("UTF-8"), "b".getBytes("UTF-8"), PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
+			//				//				stamper.close();
+			//				//				reader.close();
+			//				//
+			//				byte[] pdfContent = outputStream.toByteArray();
+			//
+			//				MimeBodyPart attachmentPart = new MimeBodyPart();
+			//
+			//				DataSource dataSource = new ByteArrayDataSource(pdfContent, "application/pdf");
+			//				attachmentPart.setDataHandler(new DataHandler(dataSource));
+			//				attachmentPart.setFileName(emailProperties.getProperty("attachmentFileName"));
+			//				multipart.addBodyPart(attachmentPart);
+			//			}
 			
 			//			if (report.getRenderedOutput() != null && "true".equalsIgnoreCase(configuration.getProperty("addOutputAsAttachment"))) {
 			//			MimeBodyPart attachment = new MimeBodyPart();
