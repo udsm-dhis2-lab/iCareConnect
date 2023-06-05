@@ -260,9 +260,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     }
     this.unitPrice = this.formValues?.unitPrice?.value;
     this.amount = undefined;
-    if (this.batchQuantity && this.unitPrice && this.unitPrice !== "") {
+    if (Number(this.formValues?.orderQuantity?.value) && this.unitPrice && this.unitPrice !== "") {
       setTimeout(() => {
-        this.amount = (parseFloat(this.unitPrice) * this.batchQuantity).toFixed(
+        this.amount = (parseFloat(this.unitPrice) * Number(this.formValues?.orderQuantity?.value)).toFixed(
           2
         );
       }, 100);
