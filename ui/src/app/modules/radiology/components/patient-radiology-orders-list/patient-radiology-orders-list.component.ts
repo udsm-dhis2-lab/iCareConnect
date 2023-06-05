@@ -1,8 +1,11 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, Input, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
+import jsPDF from "jspdf";
 import { zip } from "rxjs";
 import { map } from "rxjs/operators";
+import { SharedPdfPreviewComponent } from "src/app/shared/dialogs/shared-pdf-preview/shared-pdf-preview.component";
 import { addBillStatusToOrders } from "src/app/shared/helpers/add-bill-status-to-ordered-items.helper";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { VisitsService } from "src/app/shared/resources/visits/services";
@@ -29,11 +32,13 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
   obsKeyedByConcepts: any = {};
 
   saving: boolean = false;
+  base64FileData: any;
   constructor(
     private httpClient: HttpClient,
     private visitService: VisitsService,
     private ordersService: OrdersService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -60,16 +65,56 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
           });
         }
       });
-    this.orders = addBillStatusToOrders(this.orders, this.currentBills, this.activeVisit);
+    this.orders = addBillStatusToOrders(
+      this.orders,
+      this.currentBills,
+      this.activeVisit
+    );
+  }
+
+  previewPDFData(pdfData) {
+    const doc = new jsPDF();
+
+    // doc.loadDocument(pdfData);
+    doc.save("preview.pdf");
   }
 
   fileSelection(event, order): void {
     event.stopPropagation();
-    const fileInputElement: HTMLElement = document.getElementById(
-      "file-selector-" + order?.uuid
+    const fileInputElement = document.getElementById(
+      "file-selector-" + order?.concept?.uuid
     );
-    this.file = event.target.files[0];
-    this.values[order?.uuid] = this.file;
+    this.file = (fileInputElement as any).files[0];
+    if (this.file && this.file.type === "application/pdf") {
+      const reader = new FileReader();
+      const that = this;
+      reader.onload = function (e) {
+        const pdfData = new Uint8Array((e.target as any).result);
+
+        let binary = "";
+        const bytes = new Uint8Array(pdfData);
+        const len = bytes.byteLength;
+        for (let i = 0; i < len; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        const base64PDF = btoa(binary);
+        const doc = new jsPDF();
+        doc.addPage();
+        that.base64FileData = base64PDF;
+      };
+
+      reader.readAsArrayBuffer(this.file);
+      this.values[order?.uuid] = this.file;
+    }
+  }
+
+  previewUploadPDF(event: Event): void {
+    event.stopPropagation();
+    this.dialog.open(SharedPdfPreviewComponent, {
+      minWidth: "60%",
+      maxHeight: "700px",
+      data: this.base64FileData,
+    });
   }
 
   getRemarks(event, order): void {
