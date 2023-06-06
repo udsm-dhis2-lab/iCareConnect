@@ -199,6 +199,8 @@ export class PatientDrugOrderListComponent implements OnInit {
     // Change image from base64 then replace some text with empty string to get an image
 
     let image = "";
+    let header = "";
+    let subHeader = "";
 
     e.FacilityDetails.attributes.map((attribute) => {
       let attributeTypeName =
@@ -208,6 +210,8 @@ export class PatientDrugOrderListComponent implements OnInit {
       if (attributeTypeName === "logo") {
         image = attribute?.value;
       }
+      header = attributeTypeName === "header" ? attribute?.value : "";
+      subHeader = attributeTypeName === "sub header" ? attribute?.value : "";
     });
 
     let patientMRN =
@@ -226,8 +230,12 @@ export class PatientDrugOrderListComponent implements OnInit {
         
 
         <div class="info">
-          <h2>${e.FacilityDetails.display}</h2>
-          <h3>P.O Box ${e.FacilityDetails.postalCode} ${e.FacilityDetails.stateProvince}</h3>
+          <h2>${header.length > 0 ? header : e.FacilityDetails.display} <br/> ${
+      subHeader.length > 0 ? subHeader : ""
+    }</h2>
+          <h3>P.O Box ${e.FacilityDetails.postalCode} ${
+      e.FacilityDetails.stateProvince
+    }</h3>
           <h3>${e.FacilityDetails.country}</h3>
         </div>
         <!--End Info-->
@@ -283,7 +291,7 @@ export class PatientDrugOrderListComponent implements OnInit {
     frameDoc.document.write(`
           <div class="footer">
             <div class="doctorDetails">
-              <p class="name">Doctor: .................................</p>
+              <p class="name">Doctor: ${drugOrders[0]?.orderer?.display}</p>
               <p class="signature">Signature : ..............................</p>
             </div>
             <div class="userDetails">
