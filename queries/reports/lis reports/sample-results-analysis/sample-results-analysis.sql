@@ -88,8 +88,8 @@
         )AS "instrument",
 
         test_order_concept_name.name  AS test,
-
-        (SELECT GROUP_CONCAT(DISTINCT results_name.name)
+        -- (SELECT GROUP_CONCAT(DISTINCT CASE WHEN results_name.name IS NULL THEN CONCAT(testalloc_name.name,'-',ob.value_text) ELSE CONCAT(testalloc_name.name,'-',results_name.name) END))
+       (SELECT GROUP_CONCAT(DISTINCT CASE WHEN results_name.name IS NULL THEN CONCAT(testalloc_name.name,'-',ob.value_text) ELSE CONCAT('[',testalloc_name.name,'-',results_name.name,']') END)
 		-- 	FROM lb_sample_order so
 -- 			INNER JOIN lb_test_allocation testalloc ON so.order_id = testalloc.order_id
 -- 			INNER JOIN lb_test_result test_result ON test_result.test_allocation_id = testalloc.test_allocation_id
@@ -122,10 +122,12 @@
 
         -- Addressing instrument
         INNER JOIN lb_test_allocation testalloc ON testalloc.order_id = test_order_order.order_id
+        INNER JOIN concept_name testalloc_name ON testalloc_name.concept_id = testalloc.concept_id AND testalloc_name.concept_name_type = 'FULLY_SPECIFIED'
         INNER JOIN lb_test_result test_result ON test_result.test_allocation_id = testalloc.test_allocation_id
         -- LEFT JOIN concept_name instrument_name ON test_result.instrument_id = instrument_name.concept_id AND instrument_name.concept_name_type='FULLY_SPECIFIED'
 
         -- Addressing results
+        LEFT JOIN obs ob ON ob.order_id=test_order_order.order_id
         LEFT JOIN concept_name results_name ON results_name.concept_id = test_result.value_coded_concept_id AND results_name.concept_name_type='FULLY_SPECIFIED'
 
 		WHERE CAST(CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT') AS DATE) BETWEEN :startDate AND :endDate

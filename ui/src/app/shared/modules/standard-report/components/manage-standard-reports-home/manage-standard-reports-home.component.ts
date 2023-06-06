@@ -22,7 +22,7 @@ export class ManageStandardReportsHomeComponent implements OnInit {
     setTimeout(() => {
       this.report = {
         ...report,
-        value: report?.value ? JSON.parse(report?.value) : report,
+        value: report?.value ? report?.value : report,
       };
     }, 100);
   }
