@@ -26,4 +26,13 @@ export class ManageStandardReportsHomeComponent implements OnInit {
       };
     }, 100);
   }
+
+  onGetReloadList(reload: boolean): void {
+    if (reload) {
+      this.hideList = true;
+      setTimeout(() => {
+        this.hideList = false;
+      }, 30);
+    }
+  }
 }
