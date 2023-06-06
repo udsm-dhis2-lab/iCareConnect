@@ -46,16 +46,25 @@
             {{ order?.instructions }}
           </td>
           <td>
-            <div>
+            <div class="d-flex justify-content-left">
               <input
                 type="file"
                 style="border: none; background-color: transparent"
                 class="form-control"
                 name="file"
-                accept=".pdf,.png,.jpg,.jpeg,.doc,.xls,.xlsx,.docx"
+                accept=".pdf"
                 id="file-selector-{{ order?.concept?.uuid }}"
                 (change)="fileSelection($event, order)"
               />
+
+              <button
+                *ngIf="file"
+                class="ml-2"
+                mat-button
+                (click)="previewUploadPDF($event)"
+              >
+                Preview
+              </button>
             </div>
 
             <div

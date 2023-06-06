@@ -55,7 +55,6 @@ export class SamplesToAcceptComponent implements OnInit {
 
   onToggleViewSampleDetails(event: Event, sample: any): void {
     event.stopPropagation();
-    console.log(sample);
   }
 
   onGetSelectedSampleDetails(sampleDetails: any, providerDetails: any): void {

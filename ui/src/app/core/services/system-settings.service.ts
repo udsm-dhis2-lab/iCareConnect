@@ -87,7 +87,11 @@ export class SystemSettingsService {
                         ],
                       property: result?.property,
                       description: result?.description,
-                      value: result?.value,
+                      value:
+                        result?.value.indexOf("{") > -1 ||
+                        result?.value.indexOf("[") > -1
+                          ? JSON.parse(result?.value)
+                          : result?.value,
                       order: Number(
                         result?.property.split(".")[
                           result?.property.split(".").length - 1
@@ -113,7 +117,11 @@ export class SystemSettingsService {
                         ],
                       property: result?.property,
                       description: result?.description,
-                      value: result?.value,
+                      value:
+                        result?.value.indexOf("{") > -1 ||
+                        result?.value.indexOf("[") > -1
+                          ? JSON.parse(result?.value)
+                          : result?.value,
                       order: Number(
                         result?.property.split(".")[
                           result?.property.split(".").length - 1
