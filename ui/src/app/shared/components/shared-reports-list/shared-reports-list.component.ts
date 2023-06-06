@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ManageReportsModalComponent } from "../../dialogs/manage-reports-modal/manage-reports-modal.component";
+import { Observable } from "rxjs";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "app-shared-reports-list",
@@ -8,13 +10,26 @@ import { ManageReportsModalComponent } from "../../dialogs/manage-reports-modal/
   styleUrls: ["./shared-reports-list.component.scss"],
 })
 export class SharedReportsListComponent implements OnInit {
-  @Input() reports: any[];
+  reports$: Observable<any[]>;
   @Input() currentUser: any;
   searchingText: string;
   selectedReport: any;
-  constructor(private dialog: MatDialog) {}
+  deleting: boolean = false;
+  @Output() shouldReload: EventEmitter<boolean> = new EventEmitter<boolean>();
+  constructor(
+    private dialog: MatDialog,
+    private systemSettingsService: SystemSettingsService
+  ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loadStandardReport();
+  }
+
+  loadStandardReport(): void {
+    this.reports$ = this.systemSettingsService.getSystemSettingsMatchingAKey(
+      `iCare.reports.standardReports`
+    );
+  }
 
   onSearchReport(event: KeyboardEvent): void {
     this.searchingText = (event?.target as HTMLInputElement)?.value;
@@ -33,11 +48,29 @@ export class SharedReportsListComponent implements OnInit {
 
   onAddNew(event: Event): void {
     event.stopPropagation();
-    this.dialog.open(ManageReportsModalComponent, {
-      minWidth: "60%",
-      data: {
-        currentUser: this.currentUser,
-      },
-    });
+    this.dialog
+      .open(ManageReportsModalComponent, {
+        minWidth: "60%",
+        data: {
+          currentUser: this.currentUser,
+        },
+      })
+      .afterClosed()
+      .subscribe(() => {
+        this.loadStandardReport();
+      });
+  }
+
+  onDelete(event: Event, report: any): void {
+    event.stopPropagation();
+    this.deleting = true;
+    this.systemSettingsService
+      .deleteSystemSettingByUuid(report?.uuid)
+      .subscribe((response) => {
+        if (response) {
+          this.deleting = false;
+          this.loadStandardReport();
+        }
+      });
   }
 }
