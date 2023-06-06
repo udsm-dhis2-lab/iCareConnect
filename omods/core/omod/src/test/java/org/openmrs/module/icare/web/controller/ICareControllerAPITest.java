@@ -532,16 +532,16 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Should return 1 item", maps.size(), is(2));
 		
 	}
-
+	
 	@Test
 	public void testGettingStockableItems() throws Exception {
-
+		
 		MockHttpServletRequest newGetRequest = newGetRequest("icare/item", new Parameter("stockable", "true"));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		List<Map<String, Object>> maps = (List) results.get("results");
 		assertThat("Should return 1 item", maps.size(), is(4));
-
+		
 	}
 	
 	@Test
