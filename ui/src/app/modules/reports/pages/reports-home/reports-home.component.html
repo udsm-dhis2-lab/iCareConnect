@@ -8,7 +8,8 @@
     reportGroups: reportGroups$ | async,
     loadedAllRoles: loadedAllRoles$ | async,
     reportsParametersConfigurations: reportsParametersConfigurations$ | async,
-    standardReports: standardReports$ | async
+    standardReports: standardReports$ | async,
+    currentUser: currentUser$ | async
   } as params"
 >
   <mat-progress-bar
@@ -21,10 +22,30 @@
       !params?.reportGroups ||
       !params?.loadedAllRoles ||
       !params?.reportsParametersConfigurations ||
-      !params?.standardReports
+      !params?.standardReports ||
+      !params?.currentUser
     "
   ></mat-progress-bar>
-  <div class="w-100">
-    <app-shared-reports-list></app-shared-reports-list>
+  <div
+    class="w-100"
+    *ngIf="
+      params?.userPrivileges &&
+      params?.reportsAccessConfigurations &&
+      params?.reportsCategoriesConfigurations &&
+      params?.reportsExtraParams &&
+      params?.reportGroups &&
+      params?.loadedAllRoles &&
+      params?.reportsParametersConfigurations &&
+      params?.standardReports &&
+      params?.currentUser
+    "
+  >
+    <div class="w-100">
+      <app-shared-reports-list
+        [reports]="params?.standardReports"
+        [currentUser]="params?.currentUser"
+        (selectedReport)="onGetSelectedReport($event)"
+      ></app-shared-reports-list>
+    </div>
   </div>
 </div>

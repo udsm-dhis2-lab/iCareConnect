@@ -110,7 +110,7 @@ export class SampleResultsDashboardComponent implements OnInit {
                 .afterClosed()
             : this.dialog
                 .open(SharedSamplesVerificationIntegratedComponent, {
-                  width: "30%",
+                  minWidth: "30%",
                   data: {
                     ...this.selectedSample,
                     externalSystemsReferenceConceptUuid,
@@ -396,7 +396,7 @@ export class SampleResultsDashboardComponent implements OnInit {
     event.stopPropagation();
     this.dialog
       .open(SharedSamplesVerificationIntegratedComponent, {
-        width: "50%",
+        minWidth: "50%",
         data: {
           ...sample,
           externalSystemsReferenceConceptUuid,
