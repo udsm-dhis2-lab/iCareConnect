@@ -95,14 +95,15 @@ public interface ICareService extends OpenmrsService {
 	
 	ItemPrice getItemPriceByDrugId(Integer serviceConceptId, Integer paymentSchemeConceptId, Integer paymentTypeConceptId);
 	
-	List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type);
+	List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type, Boolean stockable);
 	
 	Prescription savePrescription(Prescription order);
 	
 	List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid, String locationUuid,
-                                     OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus, Integer limit,
-                                     Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-                                     String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid, String sampleCategory);
+	        OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus, Integer limit,
+	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
+	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
+	        String sampleCategory);
 	
 	List<Order> getOrdersByVisitAndOrderType(String visitUuid, String orderTypeUuid, Order.FulfillerStatus fulfillerStatus,
 	        Integer limit, Integer startIndex);

@@ -127,7 +127,7 @@ public class ICareDao extends BaseDAO<Item> {
 		return query.list();
 	}
 	
-	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type) {
+	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type, Boolean stockable) {
 		DbSession session = getSession();
 		String queryStr;
 		
@@ -166,6 +166,21 @@ public class ICareDao extends BaseDAO<Item> {
 			if (type == Item.Type.CONCEPT) {
 				queryStr += " AND ip.concept IS NOT NULL";
 			}
+
+
+
+		}
+
+		if (stockable != null) {
+
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+
+			queryStr += " ip.stockable = :stockable";
+
 		}
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
@@ -176,6 +191,11 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		if (department != null) {
 			query.setParameter("department", department);
+		}
+
+		if(stockable != null){
+			System.out.println(queryStr);
+			query.setParameter("stockable",stockable);
 		}
 		
 		return query.list();
@@ -272,9 +292,10 @@ public class ICareDao extends BaseDAO<Item> {
 	}
 	
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
-											String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
-											Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-											String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid, String sampleCategory) {
+	        String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
+	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
+	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
+	        String sampleCategory) {
 		//PatientIdentifier
 		Query query = null;
 		DbSession session = this.getSession();
@@ -353,16 +374,16 @@ public class ICareDao extends BaseDAO<Item> {
 			queryStr += " vat.uuid = :visitAttributeTypeUuid";
 			
 		}
-
-		if(sampleCategory != null){
+		
+		if (sampleCategory != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
-
-			queryStr +=" v IN (SELECT sp.visit FROM Sample sp WHERE sp IN (SELECT sst.sample FROM SampleStatus sst WHERE sst.category =:sampleCategory))";
-
+			
+			queryStr += " v IN (SELECT sp.visit FROM Sample sp WHERE sp IN (SELECT sst.sample FROM SampleStatus sst WHERE sst.category =:sampleCategory))";
+			
 		}
 		
 		if (orderBy == VisitWrapper.OrderBy.VISIT) {
@@ -414,7 +435,7 @@ public class ICareDao extends BaseDAO<Item> {
 		if (visitAttributeTypeUuid != null) {
 			query.setParameter("visitAttributeTypeUuid", visitAttributeTypeUuid);
 		}
-		if(sampleCategory != null){
+		if (sampleCategory != null) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
 		
