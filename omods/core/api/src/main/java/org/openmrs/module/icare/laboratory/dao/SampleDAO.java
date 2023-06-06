@@ -103,7 +103,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			} else {
 				queryStr += " AND ";
 			}
-
+			
 			queryStr += "(lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q OR lower(va.valueReference) LIKE lower(:q)))";
 		}
 		
@@ -522,7 +522,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 					queryStr += " AND ";
 				}
 				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS'  OR  lower(sst.category) LIKE 'reject%' OR lower(sst.category) LIKE 'dispose%')) AND sp IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'))";
-
+				
 			} else if (sampleCategory.toLowerCase().equals("rejected")) {
 				if (!queryStr.contains("WHERE")) {
 					queryStr += " WHERE ";

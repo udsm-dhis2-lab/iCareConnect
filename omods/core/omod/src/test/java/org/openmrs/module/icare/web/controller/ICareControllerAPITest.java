@@ -503,12 +503,11 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("Should return a visit", ((List) orderResult.get("results")).size() == 1);
-
-
-		newGetRequest = newGetRequest("icare/visit", new Parameter("sampleCategory","RECEIVED"));
+		
+		newGetRequest = newGetRequest("icare/visit", new Parameter("sampleCategory", "RECEIVED"));
 		handle = handle(newGetRequest);
 		orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		assertThat("Should return a visit",((List) orderResult.get("results")).size() == 1);
+		assertThat("Should return a visit", ((List) orderResult.get("results")).size() == 1);
 	}
 	
 	@Test
@@ -531,6 +530,17 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		List<Map<String, Object>> maps = (List) results.get("results");
 		assertThat("Should return 1 item", maps.size(), is(2));
+		
+	}
+	
+	@Test
+	public void testGettingStockableItems() throws Exception {
+		
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/item", new Parameter("stockable", "true"));
+		MockHttpServletResponse handle = handle(newGetRequest);
+		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		List<Map<String, Object>> maps = (List) results.get("results");
+		assertThat("Should return 1 item", maps.size(), is(4));
 		
 	}
 	
