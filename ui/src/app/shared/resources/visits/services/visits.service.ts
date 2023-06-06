@@ -138,7 +138,7 @@ export class VisitsService {
   }
 
   getLabVisits(
-    queryParam?: string,
+    queryParams?: any,
     startIndex?: number,
     limit?: number
   ): Observable<Visit[]> {
@@ -235,7 +235,8 @@ export class VisitsService {
     orderBy?: string,
     orderByDirection?: string,
     filterBy?: string,
-    encounterType?: string
+    encounterType?: string,
+    sampleCategory?: string
   ): Observable<any> {
     const locationUuids: any = isArray(location)
       ? location
@@ -262,6 +263,10 @@ export class VisitsService {
     }
     if (queryParam) {
       parametersString += `&q=${queryParam}`;
+    }
+
+    if (sampleCategory) {
+      parametersString += `&sampleCategory=${sampleCategory}`;
     }
     if (filterBy) {
       parametersString += filterBy;
@@ -954,5 +959,9 @@ export class VisitsService {
       }),
       catchError((error) => of(error))
     );
+  }
+
+  getSamplesByVisitUuid(visitUuid: string): Observable<any[]> {
+    return this.httpClient.get("lab/sample?visit=" + visitUuid);
   }
 }
