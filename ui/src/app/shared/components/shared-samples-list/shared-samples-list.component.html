@@ -1,4 +1,5 @@
 <div
+  class="p-2"
   *ngIf="{
     samples: samples$ | async,
     labEquipments: labEquipments$ | async,
@@ -114,413 +115,783 @@
     mode="indeterminate"
     *ngIf="!params?.samples"
   ></mat-progress-bar>
-  <div
-    *ngIf="
-      LISConfigurations?.isLIS &&
-      params?.samples &&
-      params?.samples?.results?.length > 0
-    "
-    class="w-100 mt-3 d-flex justify-content-end"
-  >
-    <section>
-      <mat-checkbox
-        *ngIf="
-          params?.currentUser &&
-          (params?.currentUser?.userPrivileges['ALL'] ||
-            params?.currentUser?.userPrivileges[
-              'SAMPLE TESTING AND RESULTS_SHOW_MRN'
-            ])
-        "
-        color="primary"
-        [checked]="itemsToShow['mrn']"
-        (change)="toggleItemToShow($event, 'mrn')"
-        >Patient Identification</mat-checkbox
-      >
-      <mat-checkbox
-        *ngIf="
-          params?.currentUser &&
-          (params?.currentUser?.userPrivileges['ALL'] ||
-            params?.currentUser?.userPrivileges[
-              'SAMPLE TESTING AND RESULTS_SHOW_GENDER'
-            ])
-        "
-        color="primary"
-        class="ml-3"
-        [checked]="itemsToShow['gender']"
-        (change)="toggleItemToShow($event, 'gender')"
-        >Gender</mat-checkbox
-      >
-      <mat-checkbox
-        *ngIf="
-          params?.currentUser &&
-          (params?.currentUser?.userPrivileges['ALL'] ||
-            params?.currentUser?.userPrivileges[
-              'SAMPLE TESTING AND RESULTS_SHOW_NAMES'
-            ])
-        "
-        color="primary"
-        class="ml-3"
-        [checked]="itemsToShow['names']"
-        (change)="toggleItemToShow($event, 'names')"
-        >Names</mat-checkbox
-      >
-    </section>
+  <div class="row">
+    <div class="col-md-6 col-sx-12 col-sm-12 d-flex justify-content-left">
+      <mat-radio-group>
+        <mat-radio-button
+          color="primary"
+          [checked]="listType === 'samples'"
+          (change)="toggleListType($event)"
+          value="samples"
+          >Samples</mat-radio-button
+        >
+        <mat-radio-button
+          color="primary"
+          [checked]="listType === 'patients'"
+          (change)="toggleListType($event)"
+          value="patients"
+          class="ml-2"
+          >Patients</mat-radio-button
+        >
+      </mat-radio-group>
+    </div>
+    <div
+      *ngIf="
+        LISConfigurations?.isLIS &&
+        params?.samples &&
+        params?.samples?.results?.length > 0
+      "
+      class="col-md-6 col-sx-12 col-sm-12 mt-3 d-flex justify-content-end"
+    >
+      <section>
+        <mat-checkbox
+          *ngIf="
+            params?.currentUser &&
+            (params?.currentUser?.userPrivileges['ALL'] ||
+              params?.currentUser?.userPrivileges[
+                'SAMPLE TESTING AND RESULTS_SHOW_MRN'
+              ])
+          "
+          color="primary"
+          [checked]="itemsToShow['mrn']"
+          (change)="toggleItemToShow($event, 'mrn')"
+          >Patient Identification</mat-checkbox
+        >
+        <mat-checkbox
+          *ngIf="
+            params?.currentUser &&
+            (params?.currentUser?.userPrivileges['ALL'] ||
+              params?.currentUser?.userPrivileges[
+                'SAMPLE TESTING AND RESULTS_SHOW_GENDER'
+              ])
+          "
+          color="primary"
+          class="ml-3"
+          [checked]="itemsToShow['gender']"
+          (change)="toggleItemToShow($event, 'gender')"
+          >Gender</mat-checkbox
+        >
+        <mat-checkbox
+          *ngIf="
+            params?.currentUser &&
+            (params?.currentUser?.userPrivileges['ALL'] ||
+              params?.currentUser?.userPrivileges[
+                'SAMPLE TESTING AND RESULTS_SHOW_NAMES'
+              ])
+          "
+          color="primary"
+          class="ml-3"
+          [checked]="itemsToShow['names']"
+          (change)="toggleItemToShow($event, 'names')"
+          >Names</mat-checkbox
+        >
+      </section>
+    </div>
   </div>
-  <table class="table table-bordered mt-2">
-    <thead class="table-header">
-      <tr>
-        <th rowspan="2">SN</th>
-        <th rowspan="2">Department / Section</th>
-        <th rowspan="2">Sample / Specimen</th>
-        <th rowspan="2">Laboratory No.</th>
-        <th rowspan="2" *ngIf="!LISConfigurations?.isLIS || itemsToShow['mrn']">
-          Patient Identification
-        </th>
-        <th
-          rowspan="2"
-          *ngIf="!LISConfigurations?.isLIS || itemsToShow['names']"
-        >
-          Patient Names
-        </th>
-        <th
-          rowspan="2"
-          *ngIf="!LISConfigurations?.isLIS || itemsToShow['gender']"
-        >
-          Gender
-        </th>
-        <th colspan="2" class="text-center">Test details</th>
-        <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
-        <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
-        <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
-          {{ !LISConfigurations?.isLIS ? "Collected By" : "Registered By" }}
-        </th>
-        <th rowspan="2">
-          {{ !LISConfigurations?.isLIS ? "Collected On" : "Registered On" }}
-        </th>
-        <th rowspan="2">Priority</th>
-        <th rowspan="2" *ngIf="tabType == 'sample-disposal'">Disposed?</th>
-        <th rowspan="2">
-          <div
-            class="d-flex justify-content-end"
-            *ngIf="tabType === 'samples-to-accept'"
+  <ng-container *ngIf="listType === 'samples'">
+    <table class="table table-bordered mt-2">
+      <thead class="table-header">
+        <tr>
+          <th rowspan="2">SN</th>
+          <th rowspan="2">Department / Section</th>
+          <th rowspan="2">Sample / Specimen</th>
+          <th rowspan="2">Laboratory No.</th>
+          <th
+            rowspan="2"
+            *ngIf="!LISConfigurations?.isLIS || itemsToShow['mrn']"
           >
-            <section class="ml-4" title="Tick to select all">
-              <mat-checkbox
-                color="primary"
-                (change)="onSelectAll($event, params?.samples?.results)"
-              ></mat-checkbox>
-            </section>
-          </div>
-        </th>
-      </tr>
-      <tr>
-        <th>Test Order</th>
-        <th>
-          {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container *ngIf="params?.samples?.results?.length > 0">
-        <ng-container
-          *ngFor="let sample of params?.samples?.results; let count = index"
-        >
-          <tr
-            [ngStyle]="{
-              'background-color': showLegend
-                ? sample?.authorized
-                  ? '#6fd67bcf'
-                  : sample?.atLestOneOrderWithRejectedResults
-                  ? '#d04747ab'
-                  : sample?.approved && !LISConfigurations?.isLIS
-                  ? '#f5f171f7'
-                  : sample?.approved && LISConfigurations?.isLIS
-                  ? '#0080009e'
-                  : sample?.hasResults
-                  ? '#ec864acf'
-                  : ''
-                : 'transparent'
-            }"
-            *ngFor="let order of sample?.orders; let orderCount = index"
-            [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
+            Patient Identification
+          </th>
+          <th
+            rowspan="2"
+            *ngIf="!LISConfigurations?.isLIS || itemsToShow['names']"
           >
-            <td *ngIf="orderCount == 0" [attr.rowspan]="sample?.orders?.length">
-              {{ count + 1 + (page - 1) * pageSize }}
-            </td>
-            <td *ngIf="orderCount == 0" [attr.rowspan]="sample?.orders?.length">
-              {{
-                sample?.department?.name ? sample?.department?.name : "Not set"
-              }}
-            </td>
-            <td *ngIf="orderCount == 0" [attr.rowspan]="sample?.orders?.length">
-              {{ sample?.specimenSource?.name }}
-            </td>
-            <td *ngIf="orderCount == 0" [attr.rowspan]="sample?.orders?.length">
-              {{ sample?.label }}
-            </td>
-            <td
-              *ngIf="
-                orderCount == 0 &&
-                (!LISConfigurations?.isLIS || itemsToShow['mrn'])
-              "
-              [attr.rowspan]="sample?.orders?.length"
+            Patient Names
+          </th>
+          <th
+            rowspan="2"
+            *ngIf="!LISConfigurations?.isLIS || itemsToShow['gender']"
+          >
+            Gender
+          </th>
+          <th colspan="2" class="text-center">Test details</th>
+          <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
+          <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
+          <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
+            {{ !LISConfigurations?.isLIS ? "Collected By" : "Registered By" }}
+          </th>
+          <th rowspan="2">
+            {{ !LISConfigurations?.isLIS ? "Collected On" : "Registered On" }}
+          </th>
+          <th rowspan="2">Priority</th>
+          <th rowspan="2" *ngIf="tabType == 'sample-disposal'">Disposed?</th>
+          <th rowspan="2">
+            <div
+              class="d-flex justify-content-end"
+              *ngIf="tabType === 'samples-to-accept'"
             >
-              {{ sample?.mrn }}
-            </td>
-            <td
-              *ngIf="
-                orderCount == 0 &&
-                (!LISConfigurations?.isLIS || itemsToShow['names'])
-              "
-              [attr.rowspan]="sample?.orders?.length"
-            >
-              {{ sample?.patient?.givenName }}
-              {{ sample?.patient?.middleName }}
-              {{ sample?.patient?.familyName }}
-            </td>
-            <td
-              *ngIf="
-                orderCount == 0 &&
-                (!LISConfigurations?.isLIS || itemsToShow['gender'])
-              "
-              [attr.rowspan]="sample?.orders?.length"
-            >
-              {{ sample?.patient?.gender }}
-            </td>
-            <td>
-              {{ order?.order?.concept?.display }}
-            </td>
-            <td>
-              {{
-                !LISConfigurations?.isLIS
-                  ? order?.order?.orderer?.name
-                  : order?.order?.orderNumber
-              }}
-            </td>
-            <td
-              *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-              [attr.rowspan]="sample?.orders?.length"
-            >
-              {{ sample?.receivedByStatus?.user?.name }}
-            </td>
-            <td
-              *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-              [attr.rowspan]="sample?.orders?.length"
-            >
-              {{
-                sample?.receivedOnStatus?.timestamp
-                  ? (sample?.receivedOnStatus?.remarks | date: "medium")
-                  : ""
-              }}
-            </td>
-            <td
-              *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
-              [attr.rowspan]="sample?.orders?.length"
-            >
-              {{ sample?.collectedBy?.display }}
-            </td>
-            <td *ngIf="orderCount == 0" [attr.rowspan]="sample?.orders?.length">
-              {{ sample?.dateCreated | date: "medium" }}
-            </td>
-            <td *ngIf="orderCount == 0" [attr.rowspan]="sample?.orders?.length">
-              {{
-                !LISConfigurations?.isLIS
-                  ? sample?.priorityHigh
-                    ? "Urgent"
-                    : "Routine"
-                  : sample?.priorityStatus?.status
-                  ? sample?.priorityStatus?.status
-                  : "Routine"
-              }}
-            </td>
-
-            <td
-              class="text-center"
-              *ngIf="orderCount == 0 && tabType == 'sample-disposal'"
-              [attr.rowspan]="sample?.orders?.length"
-            >
-              <span>
-                {{ sample?.disposedStatus ? "DISPOSED" : "NOT DISPOSED" }}
-              </span>
-            </td>
-            <td *ngIf="orderCount == 0" [attr.rowspan]="sample?.orders?.length">
-              <div
-                class="d-flex justify-content-end"
-                *ngIf="tabType == 'sample-disposal'"
-              >
-                <button
-                  mat-flat-button
-                  [disabled]="sample?.disposedStatus"
+              <section class="ml-4" title="Tick to select all">
+                <mat-checkbox
                   color="primary"
-                  (click)="onDispose($event, sample)"
-                >
-                  Dispose
-                </button>
-              </div>
-              <div class="d-flex justify-content-center">
+                  (change)="onSelectAll($event, params?.samples?.results)"
+                ></mat-checkbox>
+              </section>
+            </div>
+          </th>
+        </tr>
+        <tr>
+          <th>Test Order</th>
+          <th>
+            {{ !LISConfigurations?.isLIS ? "Collected By" : "ID" }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngIf="params?.samples?.results?.length > 0">
+          <ng-container
+            *ngFor="let sample of params?.samples?.results; let count = index"
+          >
+            <tr
+              [ngStyle]="{
+                'background-color': showLegend
+                  ? sample?.authorized
+                    ? '#6fd67bcf'
+                    : sample?.atLestOneOrderWithRejectedResults
+                    ? '#d04747ab'
+                    : sample?.approved && !LISConfigurations?.isLIS
+                    ? '#f5f171f7'
+                    : sample?.approved && LISConfigurations?.isLIS
+                    ? '#0080009e'
+                    : sample?.hasResults
+                    ? '#ec864acf'
+                    : ''
+                  : 'transparent'
+              }"
+              *ngFor="let order of sample?.orders; let orderCount = index"
+              [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
+            >
+              <td
+                *ngIf="orderCount == 0"
+                [attr.rowspan]="sample?.orders?.length"
+              >
+                {{ count + 1 + (page - 1) * pageSize }}
+              </td>
+              <td
+                *ngIf="orderCount == 0"
+                [attr.rowspan]="sample?.orders?.length"
+              >
+                {{
+                  sample?.department?.name
+                    ? sample?.department?.name
+                    : "Not set"
+                }}
+              </td>
+              <td
+                *ngIf="orderCount == 0"
+                [attr.rowspan]="sample?.orders?.length"
+              >
+                {{ sample?.specimenSource?.name }}
+              </td>
+              <td
+                *ngIf="orderCount == 0"
+                [attr.rowspan]="sample?.orders?.length"
+              >
+                {{ sample?.label }}
+              </td>
+              <td
+                *ngIf="
+                  orderCount == 0 &&
+                  (!LISConfigurations?.isLIS || itemsToShow['mrn'])
+                "
+                [attr.rowspan]="sample?.orders?.length"
+              >
+                {{ sample?.mrn }}
+              </td>
+              <td
+                *ngIf="
+                  orderCount == 0 &&
+                  (!LISConfigurations?.isLIS || itemsToShow['names'])
+                "
+                [attr.rowspan]="sample?.orders?.length"
+              >
+                {{ sample?.patient?.givenName }}
+                {{ sample?.patient?.middleName }}
+                {{ sample?.patient?.familyName }}
+              </td>
+              <td
+                *ngIf="
+                  orderCount == 0 &&
+                  (!LISConfigurations?.isLIS || itemsToShow['gender'])
+                "
+                [attr.rowspan]="sample?.orders?.length"
+              >
+                {{ sample?.patient?.gender }}
+              </td>
+              <td>
+                {{ order?.order?.concept?.display }}
+              </td>
+              <td>
+                {{
+                  !LISConfigurations?.isLIS
+                    ? order?.order?.orderer?.name
+                    : order?.order?.orderNumber
+                }}
+              </td>
+              <td
+                *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                [attr.rowspan]="sample?.orders?.length"
+              >
+                {{ sample?.receivedByStatus?.user?.name }}
+              </td>
+              <td
+                *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                [attr.rowspan]="sample?.orders?.length"
+              >
+                {{
+                  sample?.receivedOnStatus?.timestamp
+                    ? (sample?.receivedOnStatus?.remarks | date: "medium")
+                    : ""
+                }}
+              </td>
+              <td
+                *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
+                [attr.rowspan]="sample?.orders?.length"
+              >
+                {{ sample?.collectedBy?.display }}
+              </td>
+              <td
+                *ngIf="orderCount == 0"
+                [attr.rowspan]="sample?.orders?.length"
+              >
+                {{ sample?.dateCreated | date: "medium" }}
+              </td>
+              <td
+                *ngIf="orderCount == 0"
+                [attr.rowspan]="sample?.orders?.length"
+              >
+                {{
+                  !LISConfigurations?.isLIS
+                    ? sample?.priorityHigh
+                      ? "Urgent"
+                      : "Routine"
+                    : sample?.priorityStatus?.status
+                    ? sample?.priorityStatus?.status
+                    : "Routine"
+                }}
+              </td>
+
+              <td
+                class="text-center"
+                *ngIf="orderCount == 0 && tabType == 'sample-disposal'"
+                [attr.rowspan]="sample?.orders?.length"
+              >
+                <span>
+                  {{ sample?.disposedStatus ? "DISPOSED" : "NOT DISPOSED" }}
+                </span>
+              </td>
+              <td
+                *ngIf="orderCount == 0"
+                [attr.rowspan]="sample?.orders?.length"
+              >
                 <div
                   class="d-flex justify-content-end"
-                  *ngIf="
-                    tabType === 'result-entry' || tabType === 'authorization'
-                  "
+                  *ngIf="tabType == 'sample-disposal'"
                 >
                   <button
-                    class="colored-button"
                     mat-flat-button
+                    [disabled]="sample?.disposedStatus"
                     color="primary"
-                    (click)="onResultsEntryAndReview($event, sample)"
+                    (click)="onDispose($event, sample)"
                   >
-                    <span *ngIf="tabType !== 'authorization'">
-                      {{
-                        sample?.ordersWithResults?.length === 0
-                          ? "Results entry"
-                          : "Edit Results"
-                      }}
-                    </span>
-                    <span *ngIf="tabType === 'authorization'"> Review </span>
-                  </button>
-                  <button
-                    class="ml-2"
-                    mat-flat-button
-                    color="primary"
-                    (click)="onPrint($event, sample)"
-                  >
-                    Print
+                    Dispose
                   </button>
                 </div>
+                <div class="d-flex justify-content-center">
+                  <div
+                    class="d-flex justify-content-end"
+                    *ngIf="
+                      tabType === 'result-entry' || tabType === 'authorization'
+                    "
+                  >
+                    <button
+                      class="colored-button"
+                      mat-flat-button
+                      color="primary"
+                      (click)="onResultsEntryAndReview($event, sample)"
+                    >
+                      <span *ngIf="tabType !== 'authorization'">
+                        {{
+                          sample?.ordersWithResults?.length === 0
+                            ? "Results entry"
+                            : "Edit Results"
+                        }}
+                      </span>
+                      <span *ngIf="tabType === 'authorization'"> Review </span>
+                    </button>
+                    <button
+                      class="ml-2"
+                      mat-flat-button
+                      color="primary"
+                      (click)="onPrint($event, sample)"
+                    >
+                      Print
+                    </button>
+                  </div>
+                  <div
+                    *ngIf="tabType === 'completed-samples'"
+                    class="d-flex justify-content-end"
+                  >
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      (click)="onPrint($event, sample)"
+                    >
+                      Print
+                    </button>
+                  </div>
+                  <div
+                    *ngIf="tabType === 'samples-to-accept'"
+                    class="d-flex justify-content-end"
+                  >
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      (click)="onAccept($event, [sample], 'accept')"
+                    >
+                      Accept
+                    </button>
+
+                    <button
+                      mat-stroked-button
+                      (click)="onReject($event, [sample], 'reject')"
+                      class="ml-2 reject-button"
+                    >
+                      Reject
+                    </button>
+                    <section class="ml-4" title="Tick to accept or reject">
+                      <mat-checkbox
+                        color="primary"
+                        [checked]="keyedSelectedSamples[sample?.id]"
+                        (change)="onSelectItem($event, sample)"
+                      ></mat-checkbox>
+                    </section>
+                  </div>
+                </div>
                 <div
-                  *ngIf="tabType === 'completed-samples'"
                   class="d-flex justify-content-end"
+                  *ngIf="tabType === 'view-results'"
                 >
                   <button
                     mat-flat-button
+                    [disabled]="sample?.integrationStatus"
                     color="primary"
-                    (click)="onPrint($event, sample)"
+                    (click)="onGetSelectedSampleDetails($event, sample, 'send')"
                   >
-                    Print
+                    Send
                   </button>
                 </div>
+                <div class="w-100">
+                  <button
+                    *ngIf="LISConfigurations?.isLIS"
+                    mat-flat-button
+                    class="mt-2"
+                    color="primary"
+                    (click)="onToggleViewSampleDetails($event, sample)"
+                  >
+                    <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.uuid]"
+                      >remove_red_eye</mat-icon
+                    >
+                    {{
+                      !samplesToViewMoreDetails[sample?.uuid]
+                        ? "Details"
+                        : "Hide"
+                    }}
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr
+              *ngIf="samplesToViewMoreDetails[sample?.uuid]"
+              class="sample-details-row"
+            >
+              <td colspan="11">
+                <app-shared-sample-details
+                  [sample]="sample"
+                ></app-shared-sample-details>
+              </td>
+              <td>
                 <div
+                  class="d-flex justify-content-end"
                   *ngIf="tabType === 'samples-to-accept'"
-                  class="d-flex justify-content-end"
                 >
-                  <button
+                  <!-- <button
+                    *ngIf="LISConfigurations?.isLIS"
                     mat-flat-button
                     color="primary"
-                    (click)="onAccept($event, [sample], 'accept')"
+                    (click)="onAccept($event, sample, 'accept')"
                   >
                     Accept
                   </button>
-
+  
                   <button
+                    *ngIf="LISConfigurations?.isLIS"
                     mat-stroked-button
-                    (click)="onReject($event, [sample], 'reject')"
+                    (click)="onReject($event, sample, 'reject')"
                     class="ml-2 reject-button"
                   >
                     Reject
                   </button>
-                  <section class="ml-4" title="Tick to accept or reject">
+                  <section
+                    class="ml-4"
+                    *ngIf="LISConfigurations?.isLIS"
+                    title="Tick to accept or reject"
+                  >
                     <mat-checkbox
                       color="primary"
-                      [checked]="keyedSelectedSamples[sample?.id]"
                       (change)="onSelectItem($event, sample)"
                     ></mat-checkbox>
-                  </section>
+                  </section> -->
                 </div>
-              </div>
-              <div
-                class="d-flex justify-content-end"
-                *ngIf="tabType === 'view-results'"
-              >
-                <button
-                  mat-flat-button
-                  [disabled]="sample?.integrationStatus"
-                  color="primary"
-                  (click)="onGetSelectedSampleDetails($event, sample, 'send')"
-                >
-                  Send
-                </button>
-              </div>
-              <div class="w-100">
-                <button
-                  *ngIf="LISConfigurations?.isLIS"
-                  mat-flat-button
-                  class="mt-2"
-                  color="primary"
-                  (click)="onToggleViewSampleDetails($event, sample)"
-                >
-                  <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.uuid]"
-                    >remove_red_eye</mat-icon
-                  >
-                  {{
-                    !samplesToViewMoreDetails[sample?.uuid] ? "Details" : "Hide"
-                  }}
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr
-            *ngIf="samplesToViewMoreDetails[sample?.uuid]"
-            class="sample-details-row"
-          >
-            <td colspan="11">
-              <app-shared-sample-details
-                [sample]="sample"
-              ></app-shared-sample-details>
-            </td>
-            <td>
-              <div
-                class="d-flex justify-content-end"
-                *ngIf="tabType === 'samples-to-accept'"
-              >
-                <!-- <button
-                  *ngIf="LISConfigurations?.isLIS"
-                  mat-flat-button
-                  color="primary"
-                  (click)="onAccept($event, sample, 'accept')"
-                >
-                  Accept
-                </button>
-
-                <button
-                  *ngIf="LISConfigurations?.isLIS"
-                  mat-stroked-button
-                  (click)="onReject($event, sample, 'reject')"
-                  class="ml-2 reject-button"
-                >
-                  Reject
-                </button>
-                <section
-                  class="ml-4"
-                  *ngIf="LISConfigurations?.isLIS"
-                  title="Tick to accept or reject"
-                >
-                  <mat-checkbox
-                    color="primary"
-                    (change)="onSelectItem($event, sample)"
-                  ></mat-checkbox>
-                </section> -->
-              </div>
+              </td>
+            </tr>
+          </ng-container>
+        </ng-container>
+        <ng-container *ngIf="params?.samples?.results?.length === 0">
+          <tr>
+            <td colspan="100%">
+              <div class="alert alert-warning" role="alert">No samples</div>
             </td>
           </tr>
         </ng-container>
-      </ng-container>
-      <ng-container *ngIf="params?.samples?.results?.length === 0">
-        <tr>
-          <td colspan="100%">
-            <div class="alert alert-warning" role="alert">No samples</div>
-          </td>
-        </tr>
-      </ng-container>
-    </tbody>
-  </table>
+      </tbody>
+    </table>
 
-  <mat-paginator
-    [hidden]="!pageCounts"
-    [length]="params?.samples?.pager?.total"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="pageCounts"
-    (page)="onPageChange($event)"
-  >
-  </mat-paginator>
+    <mat-paginator
+      [hidden]="!pageCounts"
+      [length]="params?.samples?.pager?.total"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="pageCounts"
+      (page)="onPageChange($event)"
+    >
+    </mat-paginator>
+  </ng-container>
+  <ng-container *ngIf="listType === 'patients'">
+    <table class="table table-bordered mt-2">
+      <thead>
+        <tr>
+          <th style="width: 40px">SN</th>
+          <th>Location</th>
+          <th>Visit Date & Time</th>
+          <th>MRN</th>
+          <th>Names</th>
+          <th>Gender</th>
+          <th>Age</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngIf="params?.samples?.results?.length > 0">
+          <ng-container
+            *ngFor="let visit of params?.samples?.results; let count = index"
+          >
+            <tr>
+              <td>{{ count + 1 }}</td>
+              <td>
+                {{ visit?.location?.parentLocation?.display }} /
+                {{ visit?.location?.display }}
+              </td>
+              <td>
+                {{ visit?.startDatetime | date: "medium" }}
+              </td>
+              <td>
+                {{ visit?.patient?.identifiers[0]?.identifier }}
+              </td>
+              <td>
+                {{ visit?.patient?.person?.display }}
+              </td>
+              <td>
+                {{ visit?.patient?.person?.gender }}
+              </td>
+              <td>
+                {{ visit?.patient?.person?.age }}
+              </td>
+              <td>
+                <button
+                  mat-flat-button
+                  (click)="getSamplesListByVisit($event, visit)"
+                >
+                  View samples
+                </button>
+              </td>
+            </tr>
+            <ng-container *ngIf="currentVisit?.uuid === visit?.uuid">
+              <ng-container
+                *ngIf="{
+                  currentSamplesByVisits: currentSamplesByVisits$ | async
+                } as params"
+              >
+                <tr *ngIf="!params?.currentSamplesByVisits">
+                  <td colspan="100%">
+                    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                  </td>
+                </tr>
+                <tr *ngIf="params?.currentSamplesByVisits">
+                  <td colspan="100%">
+                    <table class="table table-bordered mt-2">
+                      <thead class="table-header">
+                        <tr>
+                          <th rowspan="2">SN</th>
+                          <th rowspan="2">Department / Section</th>
+                          <th rowspan="2">Sample / Specimen</th>
+                          <th rowspan="2">Laboratory No.</th>
+                          <th colspan="2" class="text-center">Test details</th>
+                          <th rowspan="2">Collected By</th>
+                          <th rowspan="2">Collected On</th>
+                          <th rowspan="2">Priority</th>
+                        </tr>
+                        <tr>
+                          <th>Test Order</th>
+                          <th>Ordered By</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <ng-container
+                          *ngIf="params?.currentSamplesByVisits?.length > 0"
+                        >
+                          <ng-container
+                            *ngFor="
+                              let sample of params?.currentSamplesByVisits;
+                              let count = index
+                            "
+                          >
+                            <tr
+                              *ngFor="
+                                let order of sample?.orders;
+                                let orderCount = index
+                              "
+                              [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
+                            >
+                              <td
+                                *ngIf="orderCount == 0"
+                                [attr.rowspan]="sample?.orders?.length"
+                              >
+                                {{ count + 1 + (page - 1) * pageSize }}
+                              </td>
+                              <td
+                                *ngIf="orderCount == 0"
+                                [attr.rowspan]="sample?.orders?.length"
+                              >
+                                {{
+                                  sample?.department?.display
+                                    ? sample?.department?.display
+                                    : "Not set"
+                                }}
+                              </td>
+                              <td
+                                *ngIf="orderCount == 0"
+                                [attr.rowspan]="sample?.orders?.length"
+                              >
+                                {{ sample?.specimenSource?.display }}
+                              </td>
+                              <td
+                                *ngIf="orderCount == 0"
+                                [attr.rowspan]="sample?.orders?.length"
+                              >
+                                {{ sample?.label }}
+                              </td>
+                              <td>
+                                {{ order?.order?.concept?.display }}
+                              </td>
+                              <td>
+                                {{ order?.order?.orderer?.name }}
+                              </td>
+                              <td
+                                *ngIf="orderCount == 0"
+                                [attr.rowspan]="sample?.orders?.length"
+                              >
+                                {{ sample?.creator?.display }}
+                              </td>
+                              <td
+                                *ngIf="orderCount == 0"
+                                [attr.rowspan]="sample?.orders?.length"
+                              >
+                                {{ sample?.dateCreated | date: "medium" }}
+                              </td>
+                              <td
+                                *ngIf="orderCount == 0"
+                                [attr.rowspan]="sample?.orders?.length"
+                              >
+                                {{
+                                  !LISConfigurations?.isLIS
+                                    ? sample?.priorityHigh
+                                      ? "Urgent"
+                                      : "Routine"
+                                    : sample?.priorityStatus?.status
+                                    ? sample?.priorityStatus?.status
+                                    : "Routine"
+                                }}
+                              </td>
+                              <td
+                                *ngIf="orderCount == 0"
+                                [attr.rowspan]="sample?.orders?.length"
+                              >
+                                <div class="d-flex justify-content-center">
+                                  <div
+                                    class="d-flex justify-content-end"
+                                    *ngIf="
+                                      tabType === 'result-entry' ||
+                                      tabType === 'authorization'
+                                    "
+                                  >
+                                    <button
+                                      class="colored-button"
+                                      mat-flat-button
+                                      color="primary"
+                                      (click)="
+                                        onResultsEntryAndReview($event, sample)
+                                      "
+                                    >
+                                      <span *ngIf="tabType !== 'authorization'">
+                                        {{
+                                          sample?.ordersWithResults?.length ===
+                                          0
+                                            ? "Results entry"
+                                            : "Edit Results"
+                                        }}
+                                      </span>
+                                      <span *ngIf="tabType === 'authorization'">
+                                        Review
+                                      </span>
+                                    </button>
+                                    <button
+                                      class="ml-2"
+                                      mat-flat-button
+                                      color="primary"
+                                      (click)="onPrint($event, sample)"
+                                    >
+                                      Print
+                                    </button>
+                                  </div>
+                                  <div
+                                    *ngIf="tabType === 'completed-samples'"
+                                    class="d-flex justify-content-end"
+                                  >
+                                    <button
+                                      mat-flat-button
+                                      color="primary"
+                                      (click)="onPrint($event, sample)"
+                                    >
+                                      Print
+                                    </button>
+                                  </div>
+                                  <div
+                                    *ngIf="tabType === 'samples-to-accept'"
+                                    class="d-flex justify-content-end"
+                                  >
+                                    <button
+                                      mat-flat-button
+                                      color="primary"
+                                      (click)="
+                                        onAccept($event, [sample], 'accept')
+                                      "
+                                    >
+                                      Accept
+                                    </button>
+
+                                    <button
+                                      mat-stroked-button
+                                      (click)="
+                                        onReject($event, [sample], 'reject')
+                                      "
+                                      class="ml-2 reject-button"
+                                    >
+                                      Reject
+                                    </button>
+                                    <!-- <section
+                                      class="ml-4"
+                                      title="Tick to accept or reject"
+                                    >
+                                      <mat-checkbox
+                                        color="primary"
+                                        [checked]="
+                                          keyedSelectedSamples[sample?.id]
+                                        "
+                                        (change)="onSelectItem($event, sample)"
+                                      ></mat-checkbox>
+                                    </section> -->
+                                  </div>
+                                </div>
+                                <div
+                                  class="d-flex justify-content-end"
+                                  *ngIf="tabType === 'view-results'"
+                                >
+                                  <button
+                                    mat-flat-button
+                                    [disabled]="sample?.integrationStatus"
+                                    color="primary"
+                                    (click)="
+                                      onGetSelectedSampleDetails(
+                                        $event,
+                                        sample,
+                                        'send'
+                                      )
+                                    "
+                                  >
+                                    Send
+                                  </button>
+                                </div>
+                                <div class="w-100">
+                                  <button
+                                    *ngIf="LISConfigurations?.isLIS"
+                                    mat-flat-button
+                                    class="mt-2"
+                                    color="primary"
+                                    (click)="
+                                      onToggleViewSampleDetails($event, sample)
+                                    "
+                                  >
+                                    <mat-icon
+                                      *ngIf="
+                                        !samplesToViewMoreDetails[sample?.uuid]
+                                      "
+                                      >remove_red_eye</mat-icon
+                                    >
+                                    {{
+                                      !samplesToViewMoreDetails[sample?.uuid]
+                                        ? "Details"
+                                        : "Hide"
+                                    }}
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          </ng-container>
+                        </ng-container>
+                        <ng-container
+                          *ngIf="params?.currentSamplesByVisits?.length === 0"
+                        >
+                          <tr>
+                            <td colspan="100%">
+                              <div class="alert alert-warning" role="alert">
+                                No samples
+                              </div>
+                            </td>
+                          </tr>
+                        </ng-container>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+        <ng-container *ngIf="params?.samples?.results?.length === 0">
+          <tr>
+            <td colspan="100%">No patients</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </ng-container>
 </div>

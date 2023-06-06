@@ -118,6 +118,7 @@ import { DateTimeFieldComponent } from "./date-time-field/date-time-field.compon
 import { PatientHistoryComponent } from "./patient-history/patient-history.component";
 import { PatientHistoryDataComponent } from "./patient-history-data/patient-history-data.component";
 import { SharedSamplesListComponent } from "./shared-samples-list/shared-samples-list.component";
+import { SharedReportsListComponent } from "./shared-reports-list/shared-reports-list.component";
 export const components: any[] = [
   PatientAddressComponent,
   PatientSearchComponent,
@@ -239,6 +240,7 @@ export const components: any[] = [
   PatientHistoryDataComponent,
   SharedConfirmationComponent,
   SharedSamplesListComponent,
+  SharedReportsListComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
