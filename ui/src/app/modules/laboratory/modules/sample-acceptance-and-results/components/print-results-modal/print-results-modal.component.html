@@ -66,7 +66,7 @@
                 </b>
               </h4>
             </div>
-            <div class="col-12" *ngIf="params?.obs && params?.diagnoses">
+            <div class="col-12">
               <div
                 class="h5 text-center report-name"
                 style="
@@ -324,7 +324,10 @@
                           params?.referringDoctorAttributes[1].value &&
                           params?.visit?.attributesKeyedByAttributeType[
                             params?.referringDoctorAttributes[1].value
-                          ]
+                          ] &&
+                          params?.visit?.attributesKeyedByAttributeType[
+                            params?.referringDoctorAttributes[1].value
+                          ].value != "NONE"
                             ? params?.visit?.attributesKeyedByAttributeType[
                                 params?.referringDoctorAttributes[1].value
                               ].value
@@ -334,7 +337,10 @@
                           params?.referringDoctorAttributes[2].value &&
                           params?.visit?.attributesKeyedByAttributeType[
                             params?.referringDoctorAttributes[2].value
-                          ]
+                          ] &&
+                          params?.visit?.attributesKeyedByAttributeType[
+                            params?.referringDoctorAttributes[2].value
+                          ].value != "NONE"
                             ? "(" +
                               params?.visit?.attributesKeyedByAttributeType[
                                 params?.referringDoctorAttributes[2].value
@@ -372,12 +378,14 @@
                         class="w-100"
                         *ngIf="params?.diagnoses && LISConfigurations?.isLIS"
                       >
-                        <p
-                          style="font-size: 0.6rem; margin-bottom: -8px"
-                          *ngFor="let diagnosis of params?.diagnoses"
-                        >
-                          <b> Diagnosis: {{ diagnosis?.display }} </b>
-                        </p>
+                        <ng-container *ngIf="params?.diagnoses?.length > 0">
+                          <p
+                            style="font-size: 0.6rem; margin-bottom: -8px"
+                            *ngFor="let diagnosis of params?.diagnoses"
+                          >
+                            <b> Diagnosis: {{ diagnosis?.display }} </b>
+                          </p>
+                        </ng-container>
                         <p
                           style="font-size: 0.6rem"
                           *ngIf="obsData && LISConfigurations?.isLIS"
