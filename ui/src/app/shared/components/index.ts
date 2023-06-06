@@ -119,6 +119,8 @@ import { PatientHistoryComponent } from "./patient-history/patient-history.compo
 import { PatientHistoryDataComponent } from "./patient-history-data/patient-history-data.component";
 import { SharedSamplesListComponent } from "./shared-samples-list/shared-samples-list.component";
 import { SharedReportsListComponent } from "./shared-reports-list/shared-reports-list.component";
+import { SharedCustomReportComponent } from "./shared-custom-report/shared-custom-report.component";
+import { SharedRenderReportDashboardComponent } from "./shared-render-report-dashboard/shared-render-report-dashboard.component";
 export const components: any[] = [
   PatientAddressComponent,
   PatientSearchComponent,
@@ -241,6 +243,8 @@ export const components: any[] = [
   SharedConfirmationComponent,
   SharedSamplesListComponent,
   SharedReportsListComponent,
+  SharedCustomReportComponent,
+  SharedRenderReportDashboardComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
