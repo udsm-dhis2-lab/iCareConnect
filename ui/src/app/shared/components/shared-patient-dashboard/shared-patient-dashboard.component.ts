@@ -148,7 +148,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   errors: any[] = [];
   patientInvoice$: Observable<any>;
   @Input() IPDRoundConceptUuid: string;
-  showRoundDetails: boolean = true;
+  showHistoryDetails: boolean = true;
   currentRound: any;
   latestRound$: Observable<any>;
   updateMedication: boolean = true;
@@ -318,7 +318,7 @@ export class SharedPatientDashboardComponent implements OnInit {
           return res;
         })
       );
-    this.showRoundDetails = this.activeVisit?.isAdmitted;
+    this.showHistoryDetails = this.activeVisit?.isAdmitted;
   }
 
   onToggleVitalsSummary(event: Event): void {
@@ -332,7 +332,7 @@ export class SharedPatientDashboardComponent implements OnInit {
       event.stopPropagation();
     }
     this.selectedForm = form;
-    this.showRoundDetails = false;
+    this.showHistoryDetails = false;
     setTimeout(() => {
       this.readyForClinicalNotes = true;
     }, 50);
@@ -350,7 +350,7 @@ export class SharedPatientDashboardComponent implements OnInit {
 
   onToggleVisibityIcons(event: Event): void {
     event.stopPropagation();
-    this.showRoundDetails = !this.showRoundDetails;
+    this.showHistoryDetails = !this.showHistoryDetails;
   }
 
   onGetLatestRound(round: any): void {

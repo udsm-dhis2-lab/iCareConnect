@@ -78,10 +78,10 @@
                 [ngClass]="{
                   'selected-form':
                     (selectedForm &&
-                      !showRoundDetails &&
+                      !showHistoryDetails &&
                       selectedForm?.uuid === form?.uuid) ||
                     (!selectedForm &&
-                      !showRoundDetails &&
+                      !showHistoryDetails &&
                       dashboardParams?.forms[0] &&
                       dashboardParams?.forms[0]?.uuid === form?.uuid)
                 }"
@@ -91,8 +91,8 @@
                 {{ form?.name }}
               </button>
               <!-- <button mat-button (click)="onToggleVisibityIcons($event)">
-                <mat-icon *ngIf="showRoundDetails">visibility_off</mat-icon>
-                <mat-icon *ngIf="!showRoundDetails">visibility</mat-icon>
+                <mat-icon *ngIf="showHistoryDetails">visibility_off</mat-icon>
+                <mat-icon *ngIf="!showHistoryDetails">visibility</mat-icon>
                 Visit Information
               </button> -->
             </ng-container>
@@ -199,6 +199,7 @@
             </button>
             <button
               mat-stroked-button
+              [ngClass]="{ 'selected-form': showHistoryDetails }"
               (click)="onToggleVisibityIcons($event)"
               class="mr-2 float-right"
             >
@@ -386,11 +387,11 @@
                     <div class="w-100">
                       <div class="w-100 mt-2">
                         <!-- <app-shared-visit-history-summary
-                          *ngIf="showRoundDetails"
+                          *ngIf="showHistoryDetails"
                           [location]="dashboardParams?.currentLocation"
                           [activeVisit]="activeVisit"
                         ></app-shared-visit-history-summary> -->
-                        <div class="w-100" *ngIf="showRoundDetails">
+                        <div class="w-100" *ngIf="showHistoryDetails">
                           <mat-accordion>
                             <mat-expansion-panel
                               class="mb-2 border p-0"
@@ -421,7 +422,7 @@
                       dashboardParams.currentPatient &&
                       dashboardParams?.forms &&
                       dashboardParams?.forms?.length > 0 &&
-                      !showRoundDetails
+                      !showHistoryDetails
                     "
                     [clinicalObservations]="
                       dashboardParams?.observationsGroupedByConcept
@@ -442,7 +443,7 @@
                   <app-patient-observations-chart
                     *ngIf="
                       isInpatient &&
-                      !showRoundDetails &&
+                      !showHistoryDetails &&
                       !dashboardParams.loadingForms &&
                       dashboardParams.currentPatient &&
                       dashboardParams?.forms &&
@@ -481,7 +482,7 @@
                   <app-ipd-forms
                     *ngIf="
                       isInpatient &&
-                      !showRoundDetails &&
+                      !showHistoryDetails &&
                       readyForClinicalNotes &&
                       !dashboardParams.loadingForms &&
                       dashboardParams.currentPatient &&
