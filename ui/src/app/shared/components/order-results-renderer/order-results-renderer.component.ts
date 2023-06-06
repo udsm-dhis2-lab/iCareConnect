@@ -44,9 +44,9 @@ export class OrderResultsRendererComponent implements OnInit {
   creatingLabOrderState$: Observable<boolean>;
 
   testSetMembersKeyedByConceptUuid: any = {};
-  showParameters: boolean = false;
+  showParameters: any = {};
   currentLabTest: any;
-  showOtherDetails: boolean = false;
+  showOtherDetails: any = {};
   formFields: any[];
   formValuesData: any;
   commonLabTestsFields: any[] = [];
@@ -96,15 +96,19 @@ export class OrderResultsRendererComponent implements OnInit {
     this.voidingLabOrderState$ = this.store.select(getLabOrderVoidingState);
   }
 
-  toggleParametes(event: Event): void {
+  toggleParametes(event: Event, labTest: any): void {
     event.stopPropagation();
-    this.showParameters = !this.showParameters;
+    this.showParameters[labTest?.uuid] = this.showParameters[labTest?.uuid]
+      ? null
+      : labTest;
   }
 
   setCurrentOrderedItemForOtherDetailsView(event: Event, labTest) {
     event.stopPropagation();
     this.currentLabTest = labTest;
-    this.showOtherDetails = !this.showOtherDetails;
+    this.showOtherDetails[labTest?.uuid] = this.showOtherDetails[labTest?.uuid]
+      ? null
+      : labTest;
   }
 
   onFormUpdate(formValues: FormValue): void {
