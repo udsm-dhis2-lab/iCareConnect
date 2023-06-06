@@ -1,4 +1,8 @@
-<div class="w-100">
+<div class="w-100" *ngIf="{ reports: reports$ | async } as params">
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="!params?.reports"
+  ></mat-progress-bar>
   <div class="w-100" *ngIf="!selectedReport">
     <div class="row">
       <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
@@ -20,6 +24,14 @@
         </mat-form-field>
       </div>
     </div>
+    <div class="loading-overlay" *ngIf="deleting">
+      <div class="text-center">
+        <div>Deleting ....</div>
+        <div class="mt-3 d-flex justify-content-center w-100">
+          <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+        </div>
+      </div>
+    </div>
     <div class="w-100">
       <table class="table table-striped">
         <thead>
@@ -33,25 +45,62 @@
         </thead>
         <tbody>
           <ng-container
-            *ngFor="
-              let report of reports | searchingItem: searchingText;
-              let count = index
+            *ngIf="(params?.reports | searchingItem: searchingText)?.length > 0"
+          >
+            <ng-container
+              *ngFor="
+                let report of params?.reports | searchingItem: searchingText;
+                let count = index
+              "
+            >
+              <tr style="cursor: pointer">
+                <td style="width: 20px" (click)="onViewReport($event, report)">
+                  {{ count + 1 }}
+                </td>
+                <td (click)="onViewReport($event, report)">
+                  {{ report?.department }}
+                </td>
+                <td (click)="onViewReport($event, report)">
+                  {{ report?.value?.name }}
+                </td>
+                <td (click)="onViewReport($event, report)">
+                  {{ report?.description }}
+                </td>
+                <td>
+                  <button
+                    mat-icon-button
+                    [matMenuTriggerFor]="menu"
+                    aria-label="Actions"
+                  >
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu">
+                    <button
+                      mat-menu-item
+                      (click)="onViewReport($event, report)"
+                    >
+                      <mat-icon>remove_red_eye</mat-icon>
+                      <span>View</span>
+                    </button>
+                    <button mat-menu-item (click)="onDelete($event, report)">
+                      <mat-icon>delete</mat-icon>
+                      <span>Delete</span>
+                    </button>
+                  </mat-menu>
+                </td>
+              </tr>
+            </ng-container>
+          </ng-container>
+
+          <ng-container
+            *ngIf="
+              (params?.reports | searchingItem: searchingText)?.length === 0
             "
           >
-            <tr style="cursor: pointer" (click)="onViewReport($event, report)">
-              <td style="width: 20px">
-                {{ count + 1 }}
+            <tr>
+              <td colspan="100%">
+                <div class="alert alert-warning" role="alert">No Report</div>
               </td>
-              <td>
-                {{ report?.department }}
-              </td>
-              <td>
-                {{ report?.value?.name }}
-              </td>
-              <td>
-                {{ report?.description }}
-              </td>
-              <td></td>
             </tr>
           </ng-container>
         </tbody>

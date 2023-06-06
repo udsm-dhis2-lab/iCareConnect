@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 import { AngularEditorConfig } from "@kolkov/angular-editor";
 import { Textbox } from "../../../form/models/text-box.model";
@@ -52,6 +52,7 @@ export class ManageStandardReportComponent implements OnInit {
   selectedQueries: any = [];
   isFormValid: boolean = false;
   useDefaultPeFilter: boolean = true;
+  @Output() reloadList: EventEmitter<boolean> = new EventEmitter<boolean>();
   constructor(
     private domSanitizer: DomSanitizer,
     private systemSettingsService: SystemSettingsService
@@ -127,7 +128,8 @@ export class ManageStandardReportComponent implements OnInit {
             ...response,
             value: JSON.parse(response?.value),
           };
-          this.createReportFields(this.report);
+          // this.createReportFields(this.report);
+          this.reloadList.emit(true);
         } else {
           this.errors = [...this.errors, response];
           this.saving = false;
