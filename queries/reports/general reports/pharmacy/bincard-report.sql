@@ -46,7 +46,7 @@ SELECT
 tr.date_created AS "Date",
 tr.batch_no AS "Ref. No",
 loc.name AS "Receipt from/ issued to",
-CASE WHEN tr.previous_quantity < tr.current_quantity THEN tr.current_quantity-tr.previous_quantity ELSE '' END AS "Quantity Recieved",
+CASE WHEN tr.previous_quantity < tr.current_quantity THEN tr.current_quantity-tr.previous_quantity ELSE '' END AS "Quantity Received",
 CASE WHEN tr.previous_quantity > tr.current_quantity THEN tr.previous_quantity-tr.current_quantity ELSE '' END AS "Quantity Issued",
 tr.expire_date AS "Expiry Date",
 '' AS "Losses/Adjusments",
