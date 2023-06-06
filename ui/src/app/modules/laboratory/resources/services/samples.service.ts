@@ -372,6 +372,30 @@ export class SamplesService {
     return this.httpClientService.post("lab/samplestatus", data);
   }
 
+  setSampleStatuses(
+    statusesDetails: any[],
+    sampleUuid: string
+  ): Observable<any> {
+    const data = statusesDetails?.map((statusDetails) => {
+      return {
+        sample: {
+          uuid: sampleUuid,
+        },
+        user: {
+          uuid: localStorage.getItem("userUuid"),
+        },
+        remarks: statusDetails.comments ? statusDetails.comments : "",
+        status: statusDetails?.status,
+        category: statusDetails?.category,
+      };
+    });
+    return zip(
+      ...data.map((sampleStatus) =>
+        this.httpClientService.post("lab/samplestatus", sampleStatus)
+      )
+    );
+  }
+
   saveSampleStatus(data: any): Observable<any> {
     return this.httpClientService.post("lab/samplestatus", data).pipe(
       map((response) => response),

@@ -105,6 +105,7 @@ export class CurrentPatientBillingComponent implements OnInit {
       .getAllPatientInvoices(this.patientId, false, "all")
       .subscribe({
         next: (bills) => {
+          // console.log("The bills are", bills);
           bills.forEach((bill) => {
             if (bill) {
               this.bill = bill;
