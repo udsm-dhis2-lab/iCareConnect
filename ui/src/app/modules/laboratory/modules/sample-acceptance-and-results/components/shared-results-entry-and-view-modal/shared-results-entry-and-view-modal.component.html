@@ -169,9 +169,15 @@
                           <button
                             *ngIf="
                               ((!data?.LISConfigurations?.isLIS &&
-                                !order?.authorizationIsReady) ||
+                                (
+                                  order?.authorizationStatuses
+                                  | filterAuthorizationStatuses: ''
+                                )?.length === 0) ||
                                 (data?.LISConfigurations?.isLIS &&
-                                  !order?.authorizationIsReady)) &&
+                                  !(
+                                    order?.authorizationStatuses
+                                    | filterAuthorizationStatuses: ''
+                                  )?.length === 0)) &&
                               order?.finalResults?.length > 0
                             "
                             mat-flat-button
@@ -192,7 +198,10 @@
                             data?.LISConfigurations?.isLIS &&
                             order?.finalResultsFedBy?.uuid ===
                               data?.currentUser?.uuid &&
-                            !order?.authorizationIsReady
+                            (
+                              order?.authorizationStatuses
+                              | filterAuthorizationStatuses: ''
+                            )?.length === 0
                           "
                           class="alert alert-warning"
                           role="alert"
@@ -203,14 +212,22 @@
                           <p
                             *ngIf="
                               order?.authorizationStatuses?.length > 0 &&
-                              !order?.authorizationIsReady
+                              (
+                                order?.authorizationStatuses
+                                | filterAuthorizationStatuses: ''
+                              )?.length === 0
                             "
                           >
                             Approved, but waiting another approval
                           </p>
                           <p
                             color="primary"
-                            *ngIf="order?.authorizationIsReady"
+                            *ngIf="
+                              (
+                                order?.authorizationStatuses
+                                | filterAuthorizationStatuses: ''
+                              )?.length > 0
+                            "
                           >
                             <b
                               >Authorised
