@@ -8,7 +8,7 @@
   >
     <table class="table">
       <tbody>
-        <tr>
+        <tr style="border-bottom: solid 1px #eee">
           <td
             class="w-50"
             *ngIf="!hideParameterLabel && whatToShow === 'parameter'"
@@ -17,7 +17,9 @@
           </td>
           <td class="w-50" *ngIf="whatToShow !== 'parameter'">
             <ng-container *ngIf="parameterResultsDetails">
-              <table *ngFor="let resultAllocation of parameterResultsDetails">
+              <table
+                *ngFor="let resultAllocation of [parameterResultsDetails[0]]"
+              >
                 <ng-container *ngIf="resultAllocation?.results?.length > 0">
                   <ng-container
                     *ngFor="let result of resultAllocation?.results"
