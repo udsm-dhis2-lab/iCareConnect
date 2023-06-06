@@ -59,10 +59,7 @@ export class ReportsHomeComponent implements OnInit {
     this.reportsExtraParams$ = this.reportParamsService.getReportExtraParams();
     this.reportGroups$ = this.reportParamsService.getReportGroups();
     this.loadedAllRoles$ = this.store.select(getRolesLoadedState);
-    this.standardReports$ =
-      this.systemSettingsService.getSystemSettingsMatchingAKey(
-        `iCare.reports.standardReports`
-      );
+
     this.currentUser$ = this.store.select(getCurrentUserDetails);
   }
 

@@ -429,11 +429,21 @@
                     </td>
                     <td>
                       {{
+                        samplesGroupedByDepartment?.samples[0] &&
+                        samplesGroupedByDepartment?.samples[0]?.orders[0] &&
                         samplesGroupedByDepartment?.samples[0]?.orders[0]
-                          ?.testAllocations[0]?.resultsCommentsStatuses[
-                          samplesGroupedByDepartment?.samples[0]?.orders[0]
-                            ?.testAllocations[0]?.results?.length - 1
-                        ]?.timestamp | date: "medium"
+                          ?.testAllocations[0] &&
+                        samplesGroupedByDepartment?.samples[0]?.orders[0]
+                          ?.testAllocations[0]?.resultsCommentsStatuses &&
+                        samplesGroupedByDepartment?.samples[0]?.orders[0]
+                          ?.testAllocations[0]?.resultsCommentsStatuses
+                          ?.length > 0
+                          ? (samplesGroupedByDepartment?.samples[0]?.orders[0]
+                              ?.testAllocations[0]?.resultsCommentsStatuses[
+                              samplesGroupedByDepartment?.samples[0]?.orders[0]
+                                ?.testAllocations[0]?.results?.length - 1
+                            ]?.timestamp | date: "medium")
+                          : "-"
                       }}
                     </td>
                   </tr>
@@ -445,11 +455,21 @@
                     </td>
                     <td>
                       {{
+                        samplesGroupedByDepartment?.samples[0] &&
+                        samplesGroupedByDepartment?.samples[0]?.orders[0] &&
                         samplesGroupedByDepartment?.samples[0]?.orders[0]
-                          ?.testAllocations[0]?.resultsCommentsStatuses[
-                          samplesGroupedByDepartment?.samples[0]?.orders[0]
-                            ?.testAllocations[0]?.results?.length - 1
-                        ]?.timestamp | date: "medium"
+                          ?.testAllocations[0] &&
+                        samplesGroupedByDepartment?.samples[0]?.orders[0]
+                          ?.testAllocations[0]?.resultsCommentsStatuses &&
+                        samplesGroupedByDepartment?.samples[0]?.orders[0]
+                          ?.testAllocations[0]?.resultsCommentsStatuses
+                          ?.length > 0
+                          ? (samplesGroupedByDepartment?.samples[0]?.orders[0]
+                              ?.testAllocations[0]?.resultsCommentsStatuses[
+                              samplesGroupedByDepartment?.samples[0]?.orders[0]
+                                ?.testAllocations[0]?.results?.length - 1
+                            ]?.timestamp | date: "medium")
+                          : "-"
                       }}
                     </td>
                   </tr>
