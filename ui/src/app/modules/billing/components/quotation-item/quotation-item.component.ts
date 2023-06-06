@@ -326,6 +326,9 @@ export class QuotationItemComponent implements OnInit {
 
     let image = "";
 
+    let header = "";
+    let subHeader = "";
+
     e.FacilityDetails.attributes.map((attribute) => {
       let attributeTypeName =
         attribute && attribute.attributeType
@@ -334,6 +337,8 @@ export class QuotationItemComponent implements OnInit {
       if (attributeTypeName === "logo") {
         image = attribute?.value;
       }
+      header = attributeTypeName === "header" ? attribute?.value : "";
+      subHeader = attributeTypeName === "sub header" ? attribute?.value : "";
     });
 
     let patientMRN =
@@ -352,8 +357,11 @@ export class QuotationItemComponent implements OnInit {
         
 
         <div class="info">
-          <h2>${e.FacilityDetails.display}</h2>
-          <h3>P.O Box ${e.FacilityDetails.postalCode} ${e.FacilityDetails.stateProvince}</h3>
+          <h2>${header.length > 0 ? header : e.FacilityDetails.display} <br/> ${
+      subHeader.length > 0 ? subHeader : ""
+    }</h2>          <h3>P.O Box ${e.FacilityDetails.postalCode} ${
+      e.FacilityDetails.stateProvince
+    }</h3>
           <h3>${e.FacilityDetails.country}</h3>
         </div>
         <!--End Info-->
@@ -432,7 +440,7 @@ export class QuotationItemComponent implements OnInit {
 
     //For bills
     if (e.Bill) {
-      console.log("The bills are:", e.Bill);
+      // console.log("The bills are:", e.Bill);
       if (e.Bill.length > 0) {
         let sum = sumBy(e.Bill, "amount");
         frameDoc.document.write(`
