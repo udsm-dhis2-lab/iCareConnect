@@ -127,7 +127,8 @@ public class ICareDao extends BaseDAO<Item> {
 		return query.list();
 	}
 	
-	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type, Boolean stockable) {
+	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type,
+	        Boolean stockable) {
 		DbSession session = getSession();
 		String queryStr;
 		
@@ -166,21 +167,19 @@ public class ICareDao extends BaseDAO<Item> {
 			if (type == Item.Type.CONCEPT) {
 				queryStr += " AND ip.concept IS NOT NULL";
 			}
-
-
-
+			
 		}
-
+		
 		if (stockable != null) {
-
+			
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
-
+			
 			queryStr += " ip.stockable = :stockable";
-
+			
 		}
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
@@ -192,10 +191,10 @@ public class ICareDao extends BaseDAO<Item> {
 		if (department != null) {
 			query.setParameter("department", department);
 		}
-
-		if(stockable != null){
+		
+		if (stockable != null) {
 			System.out.println(queryStr);
-			query.setParameter("stockable",stockable);
+			query.setParameter("stockable", stockable);
 		}
 		
 		return query.list();
