@@ -137,8 +137,10 @@ export class PaymentReceiptComponent implements OnInit {
 
     // Change image from base64 then replace some text with empty string to get an image
     let image = "";
+    let header = "";
+    let subHeader = "";
 
-    this.facilityDetailsJson.attributes.forEach((attribute) => {
+    e.FacilityDetails.attributes.map((attribute) => {
       let attributeTypeName =
         attribute && attribute.attributeType
           ? attribute?.attributeType?.name.toLowerCase()
@@ -146,11 +148,13 @@ export class PaymentReceiptComponent implements OnInit {
       if (attributeTypeName === "logo") {
         image = attribute?.value;
       }
+      header = attributeTypeName === "header" ? attribute?.value : "";
+      subHeader = attributeTypeName === "sub header" ? attribute?.value : "";
     });
 
     let patientMRN =
-      this.data?.currentPatient?.MRN ||
-      this.data?.currentPatient?.patient?.identifiers[0]?.identifier.replace(
+      e.CurrentPatient?.MRN ||
+      e.CurrentPatient?.patient?.identifiers[0]?.identifier.replace(
         "MRN = ",
         ""
       );
@@ -164,8 +168,12 @@ export class PaymentReceiptComponent implements OnInit {
         
 
         <div class="info">
-          <h2>${this.facilityDetailsJson?.display}</h2>
-          <h3>P.O Box ${this.facilityDetailsJson?.postalCode} ${this.facilityDetailsJson?.stateProvince}</h3>
+          <h2>${header.length > 0 ? header : e.FacilityDetails.display} <br/> ${
+      subHeader.length > 0 ? subHeader : ""
+    }</h2>
+          <h3>P.O Box ${this.facilityDetailsJson?.postalCode} ${
+      this.facilityDetailsJson?.stateProvince
+    }</h3>
           <h3>${this.facilityDetailsJson?.country}</h3>
         </div>
         <!--End Info-->
