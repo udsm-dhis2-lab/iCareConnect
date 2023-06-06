@@ -1351,7 +1351,6 @@ export class LabSamplesEffects {
       switchMap(([action, provider]: [any, any]) => {
         return this.sampleService.collectSample(action.sampleData).pipe(
           mergeMap((response) => {
-            // console.log(action?.details);
             const formattedSample = {
               ...action?.details,
               sampleIdentifier: response?.label,
@@ -1406,13 +1405,28 @@ export class LabSamplesEffects {
                     },
                     user: action?.priorityDetails?.user,
                     remarks: "high priority",
+                    category: "PRIORITY",
                     status: "Urgent",
                   }
                 : null;
-            if (status) {
+            const statuses = [
+              status,
+              {
+                sample: {
+                  uuid: response?.uuid,
+                },
+                user: {
+                  uuid: localStorage.getItem("userUuid"),
+                },
+                remarks: "Sample collection",
+                category: "COLLECTED",
+                status: "COLLECTED",
+              },
+            ]?.filter((status) => status);
+            if (statuses?.length > 0) {
               return [
+                setSampleStatuses({ statuses: statuses }),
                 updateLabSample({ sample: formattedSample }),
-                setSampleStatus({ status, details: formattedSample }),
                 markSampleCollected({ sample: formattedSample }),
                 removeCollectedSampleFromSamplesToCollect({
                   referenceId: formattedSample?.departmentSpecimentSource,

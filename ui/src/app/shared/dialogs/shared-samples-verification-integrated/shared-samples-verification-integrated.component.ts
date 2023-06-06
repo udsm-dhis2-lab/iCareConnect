@@ -22,7 +22,7 @@ export class SharedSamplesVerificationIntegratedComponent implements OnInit {
   systemsField: Field<string>;
   isFormValid: boolean = false;
   selectedSystem: string;
-  externalSystems: any = DHIS2BasedSystems;
+  DHIS2BasedSystems: any = DHIS2BasedSystems;
   searchCriteriaField: Field<string>;
   searchCriteria: string;
   clientDetails$: Observable<any>;
@@ -125,7 +125,7 @@ export class SharedSamplesVerificationIntegratedComponent implements OnInit {
     const values = formValue.getValues();
     this.isFormValid = formValue.isValid;
     this.selectedSystem = values?.system?.value;
-    const searchingCriteria = (this.externalSystems?.filter(
+    const searchingCriteria = (this.DHIS2BasedSystems?.filter(
       (system) => system?.id === this.selectedSystem
     ) || [])[0]?.searchingCriteria;
     this.searchCriteriaField = new Dropdown({

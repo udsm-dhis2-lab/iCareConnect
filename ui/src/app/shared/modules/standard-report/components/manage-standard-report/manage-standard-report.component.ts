@@ -89,10 +89,10 @@ export class ManageStandardReportComponent implements OnInit {
     event.stopPropagation();
     this.saving = true;
     const value = {
+      name: this.formData?.name?.value,
       id: this.report?.value
         ? this.report?.value?.id
         : this.formData?.name?.value?.replace(/\s/g, ""),
-      name: this.formData?.name?.value,
       description: this.formData?.description?.value,
       category: "standard",
       htmlCode: htmlContent,

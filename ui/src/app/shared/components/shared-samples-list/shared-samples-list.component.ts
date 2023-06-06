@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatCheckboxChange } from "@angular/material/checkbox";
+import { MatRadioChange } from "@angular/material/radio";
 import { MatSelectChange } from "@angular/material/select";
 import { Store } from "@ngrx/store";
 import { omit, keyBy } from "lodash";
@@ -9,6 +10,8 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
+import { VisitsService } from "../../resources/visits/services";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-shared-samples-list",
@@ -53,9 +56,14 @@ export class SharedSamplesListComponent implements OnInit {
 
   itemsToShow: any = {};
   currentUser$: Observable<any>;
+  listType: string = "samples";
+
+  currentSamplesByVisits$: Observable<any[]>;
+  currentVisit: any;
   constructor(
     private sampleService: SamplesService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private visitsService: VisitsService
   ) {}
 
   ngOnInit(): void {
@@ -98,12 +106,57 @@ export class SharedSamplesListComponent implements OnInit {
     this.currentUser$ = this.store.select(getCurrentUserDetails);
   }
 
+  toggleListType(event: MatRadioChange): void {
+    this.listType = event.value;
+    if (this.listType === "samples") {
+      this.getSamples();
+    } else {
+      this.getPatients();
+    }
+  }
+
   toggleItemToShow(event: MatCheckboxChange, item: string): void {
     if (event?.checked) {
       this.itemsToShow[item] = true;
     } else {
       this.itemsToShow[item] = false;
     }
+  }
+
+  getPatients(): void {
+    this.samples$ = this.visitsService
+      .getAllVisits(
+        null,
+        true,
+        false,
+        null,
+        0,
+        10,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        this.category
+      )
+      .pipe(
+        map((response) => {
+          return {
+            pager: null,
+            results: response?.map((visitData) => visitData?.visit),
+          };
+        })
+      );
+  }
+
+  getSamplesListByVisit(event: Event, visit: any): void {
+    event.stopPropagation();
+    this.currentVisit = visit;
+    this.currentSamplesByVisits$ = this.visitsService.getSamplesByVisitUuid(
+      visit?.uuid
+    );
   }
 
   getSamples(params?: any): void {
@@ -129,8 +182,10 @@ export class SharedSamplesListComponent implements OnInit {
         params?.testUuid,
         params?.instrument,
         params?.specimenUuid,
-        localStorage?.getItem("currentLocation").indexOf("{") > -1
-          ? JSON.parse(localStorage?.getItem("currentLocation"))?.uuid
+        this.LISConfigurations?.isLIS
+          ? localStorage?.getItem("currentLocation").indexOf("{") > -1
+            ? JSON.parse(localStorage?.getItem("currentLocation"))?.uuid
+            : null
           : null
       );
     }, 50);

@@ -39,7 +39,7 @@ export class DrugsListComponent implements OnInit {
         startIndex: this.startIndex,
         limit: this.limit,
         q: this.searchingText,
-        v: "custom:(uuid,display,strength,concept:(uuid,display))",
+        v: "custom:(uuid,display,description,strength,concept:(uuid,display))",
       });
     }
   }
@@ -58,7 +58,7 @@ export class DrugsListComponent implements OnInit {
   onEdit(event: Event, drug): void {
     this.dialog
       .open(ManageDrugModalComponent, {
-        width: "40%",
+        minWidth: "40%",
         data: {
           ...drug,
         },
@@ -75,7 +75,7 @@ export class DrugsListComponent implements OnInit {
     event.stopPropagation();
     this.dialog
       .open(ManageDrugModalComponent, {
-        width: "40%",
+        minWidth: "40%",
       })
       .afterClosed()
       .subscribe((shouldReloadData) => {
@@ -102,7 +102,7 @@ export class DrugsListComponent implements OnInit {
     this.drugs$.subscribe((response) => {
       if (response) {
         this.downloading = false;
-        let data = response?.results
+        let data = response?.results;
         this.exportDataService.exportAsExcelFile(data, fileName);
       }
     });
