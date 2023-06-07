@@ -61,7 +61,7 @@
                 *ngIf="file"
                 class="ml-2"
                 mat-button
-                (click)="previewUploadPDF($event)"
+                (click)="previewUploadPDF($event, base64FileData, 'embed')"
               >
                 Preview
               </button>
@@ -79,6 +79,20 @@
                 />
                 Download
               </a>
+              <button
+                *ngIf="obsKeyedByConcepts[order?.concept?.uuid]?.uri"
+                class="ml-2"
+                mat-button
+                (click)="
+                  previewUploadPDF(
+                    $event,
+                    obsKeyedByConcepts[order?.concept?.uuid]?.uri,
+                    'iframe'
+                  )
+                "
+              >
+                Preview
+              </button>
             </div>
           </td>
           <td>

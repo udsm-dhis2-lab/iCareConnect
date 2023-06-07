@@ -7,6 +7,7 @@ import { VisitsService } from "../../resources/visits/services";
 import { flatten, orderBy, uniqBy } from "lodash";
 import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
 import { MatDialog } from "@angular/material/dialog";
+import { SharedPdfPreviewComponent } from "../../dialogs/shared-pdf-preview/shared-pdf-preview.component";
 
 @Component({
   selector: "app-patient-radiology-summary",
@@ -192,6 +193,18 @@ export class PatientRadiologySummaryComponent implements OnInit {
             }
           });
       }
+    });
+  }
+
+  previewUploadPDF(event: Event, data, rendererType: string): void {
+    event.stopPropagation();
+    this.dialog.open(SharedPdfPreviewComponent, {
+      minWidth: "60%",
+      maxHeight: "700px",
+      data: {
+        data,
+        rendererType,
+      },
     });
   }
 }

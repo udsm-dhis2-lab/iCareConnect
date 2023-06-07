@@ -108,12 +108,15 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
     }
   }
 
-  previewUploadPDF(event: Event): void {
+  previewUploadPDF(event: Event, data, rendererType: string): void {
     event.stopPropagation();
     this.dialog.open(SharedPdfPreviewComponent, {
       minWidth: "60%",
       maxHeight: "700px",
-      data: this.base64FileData,
+      data: {
+        data,
+        rendererType,
+      },
     });
   }
 

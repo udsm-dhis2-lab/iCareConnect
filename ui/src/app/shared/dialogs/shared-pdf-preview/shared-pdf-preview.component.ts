@@ -16,7 +16,14 @@ export class SharedPdfPreviewComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     const previewImg = document.getElementById("previewedImage");
-    previewImg.setAttribute("src", "data:application/pdf;base64," + this.data);
+    if (this.data?.rendererType === "embed") {
+      previewImg.setAttribute(
+        "src",
+        "data:application/pdf;base64," + this.data?.data
+      );
+    } else {
+      previewImg.setAttribute("src", this.data?.data);
+    }
   }
 
   onCancel(event: Event): void {
