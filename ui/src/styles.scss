@@ -317,7 +317,8 @@ mat-dialog-container {
   padding-top: 7rem !important;
 }
 
-.retired {
+.retired,
+.voided-item {
   cursor: not-allowed !important;
   color: red;
   text-decoration: line-through !important;

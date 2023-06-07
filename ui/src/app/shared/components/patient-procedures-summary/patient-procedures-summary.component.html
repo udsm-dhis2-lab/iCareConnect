@@ -35,7 +35,8 @@
             [ngClass]="{
               'attended-procedure':
                 params?.observationsKeyedByConcepts[procedure?.concept?.uuid]
-                  ?.latest?.valueObject?.display === 'True'
+                  ?.latest?.valueObject?.display === 'True',
+              'voided-item': procedure?.dateStopped || procedure?.autoExpireDate
             }"
           >
             <td>
@@ -87,9 +88,11 @@
             </td>
             <td>
               <button
-              *ngIf="!params?.observationsKeyedByConcepts[
+                *ngIf="
+                  !params?.observationsKeyedByConcepts[
                     procedure?.concept?.uuid + '-' + procedure?.uuid
-                  ]"
+                  ]
+                "
                 mat-icon-button
                 [matMenuTriggerFor]="menu"
                 aria-label="Options"
