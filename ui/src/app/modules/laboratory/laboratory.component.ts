@@ -22,13 +22,19 @@ import {
   go,
   clearVisitsDatesParameters,
   setCurrentUserCurrentLocation,
+  loadSystemSettings,
 } from "src/app/store/actions";
 import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
-import { getAllSampleTypes, getCurrentLocation } from "src/app/store/selectors";
+import {
+  getAllSampleTypes,
+  getCurrentLocation,
+  getLoadedSystemSettingsState,
+} from "src/app/store/selectors";
 import { LISConfigurationsModel } from "./resources/models/lis-configurations.model";
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 import { Title } from "@angular/platform-browser";
 import { LocationService } from "src/app/core/services";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "lab-root",
@@ -74,13 +80,16 @@ export class LaboratoryComponent implements OnInit {
   LISConfigurations$: Observable<LISConfigurationsModel>;
   currentLocation$: Observable<any>;
   labs$: Observable<any[]>;
+  errors: any[] = [];
+  loadedSystemSettings$: Observable<boolean>;
 
   constructor(
     private store: Store<AppState>,
     private router: Router,
     private route: ActivatedRoute,
     private titleService: Title,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private systemSettingsService: SystemSettingsService
   ) {
     this.store.dispatch(loadRolesDetails());
     this.store.dispatch(loadOrderTypes());
@@ -169,6 +178,30 @@ export class LaboratoryComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.systemSettingsService
+      .getSystemSettingsByKey(`icare.general.selectedSystemSettings`)
+      .subscribe((response) => {
+        if (response && response !== "none" && !response?.error) {
+          this.store.dispatch(
+            loadSystemSettings({ settingsKeyReferences: response })
+          );
+          this.loadedSystemSettings$ = this.store.select(
+            getLoadedSystemSettingsState
+          );
+        } else {
+          this.errors = [
+            ...this.errors,
+            {
+              error: {
+                error:
+                  "There is missing configuration for icare.general.selectedSystemSettings, contact IT",
+                message:
+                  "There is missing configuration for icare.general.selectedSystemSettings, contact IT",
+              },
+            },
+          ];
+        }
+      });
     this.LISConfigurations$.subscribe((response) => {
       if (response && response?.isLIS) {
         this.titleService.setTitle("NPHL IS");

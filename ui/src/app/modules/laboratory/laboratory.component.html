@@ -8,7 +8,8 @@
       LISConfigurations: LISConfigurations$ | async,
       currentUser: currentUser$ | async,
       currentLocation: currentLocation$ | async,
-      labs: labs$ | async
+      labs: labs$ | async,
+      loadedSystemSettings: loadedSystemSettings$ | async
     } as params"
   >
     <div
@@ -18,7 +19,8 @@
         !params?.privileges ||
         !params?.userRoles ||
         (params?.userRoles && params?.userRoles.length == 0) ||
-        !params?.LISConfigurations
+        !params?.LISConfigurations ||
+        (errors.length == 0 && !params?.loadedSystemSettings)
       "
     >
       <div class="col-12 text-center mt-5 mb-2">
@@ -28,7 +30,9 @@
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       </div>
     </div>
-
+    <div *ngIf="errors.length > 0">
+      <app-shared-error [errors]="errors"></app-shared-error>
+    </div>
     <div
       class="row"
       *ngIf="
@@ -36,7 +40,8 @@
         params?.privileges &&
         params?.userRoles &&
         params?.userRoles.length > 0 &&
-        params?.LISConfigurations
+        params?.LISConfigurations &&
+        params?.loadedSystemSettings
       "
     >
       <div
