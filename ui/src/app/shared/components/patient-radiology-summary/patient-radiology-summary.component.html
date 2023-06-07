@@ -46,6 +46,15 @@
               >
                 Download Results
               </a>
+              <button
+                class="ml-2"
+                mat-button
+                (click)="
+                  previewUploadPDF($event, order?.value?.links?.uri, 'iframe')
+                "
+              >
+                Preview
+              </button>
             </td>
             <td *ngIf="!order?.value?.display && !order?.value?.length">
               No results
