@@ -89,7 +89,11 @@
                 <mat-icon>more_vert</mat-icon>
               </button>
               <mat-menu #menu="matMenu">
-                <button mat-menu-item (click)="onDeleteOrder($event, order)">
+                <button
+                  [disabled]="order?.value"
+                  mat-menu-item
+                  (click)="onDeleteOrder($event, order)"
+                >
                   <mat-icon>delete</mat-icon>
                   <span>Delete</span>
                 </button>

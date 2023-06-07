@@ -101,6 +101,15 @@
               </button>
               <mat-menu #menu="matMenu">
                 <button
+                  [disabled]="
+                    params?.observationsKeyedByConcepts &&
+                    params?.observationsKeyedByConcepts[
+                      procedure?.concept?.uuid + '-' + procedure?.uuid
+                    ] &&
+                    params?.observationsKeyedByConcepts[
+                      procedure?.concept?.uuid + '-' + procedure?.uuid
+                    ]?.latest?.valueObject?.display === 'True'
+                  "
                   mat-menu-item
                   (click)="onDeleteProcedure($event, procedure)"
                 >
