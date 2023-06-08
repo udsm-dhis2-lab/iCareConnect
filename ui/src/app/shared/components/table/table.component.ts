@@ -110,7 +110,7 @@ export class TableComponent implements OnInit {
     });
   }
 
-  onPrintPrescriptions(e: any, drugOrders: any){
+  onPrintPrescriptions(e: any, drugOrders: any) {
     e?.stopPropagation();
     this.printPrescriptions.emit(drugOrders);
   }
