@@ -715,8 +715,17 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		    "There is one received item",
 		    ((Map) ((List) stockInvoiceGet2.get("results")).get(0)).get("uuid").equals(
 		        "8800zx3570-8z37-11ff-2234-01102007811"));
+
+		//Getting stock invoice by invoiceNumber
+		newGetRequest4 = newGetRequest("store/stockinvoices", new Parameter("q","inv-101"), new Parameter("startDate","2023-01-24"),new Parameter("endDate","2023-01-26"));
+		handle4 = handle(newGetRequest4);
+		System.out.println(handle4.getContentAsString());
+		stockInvoiceGet2 = (new ObjectMapper()).readValue(handle4.getContentAsString(), Map.class);
+		assertThat("There is one stock invoice", ((List) stockInvoiceGet2.get("results")).size() == 1, is(true));
+
 		
 	}
+
 	
 	@Test
 	public void creatingAndgettingSuppliers() throws Exception {
