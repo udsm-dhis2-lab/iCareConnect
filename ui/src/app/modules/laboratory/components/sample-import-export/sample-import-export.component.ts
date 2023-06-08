@@ -222,7 +222,7 @@ export class SampleImportExportComponent implements OnInit {
 
       str += "{div}</body></html>";
       const link = document.createElement("a");
-      link.download = fileName + ".xlsx";
+      link.download = fileName + ".xls";
       link.href = uri + base64(format(str, ctx));
       link.click();
     }
