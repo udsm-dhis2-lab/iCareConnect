@@ -111,7 +111,7 @@ public interface StoreService extends OpenmrsService {
 	
 	public Supplier getSupplierByUuid(String supplierUuid);
 	
-	ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status);
+	ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status,String q,Date start, Date end);
 	
 	Supplier saveSupplier(Supplier supplier) throws Exception;
 	
