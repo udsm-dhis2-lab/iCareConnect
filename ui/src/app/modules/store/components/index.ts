@@ -1,4 +1,5 @@
 import { ExpiredItemsComponent } from "./expired-items/expired-items.component";
+import { InvoiceFiltersComponent } from "./invoice-filters/invoice-filters.component";
 import { IssueItemsComponent } from "./issue-items/issue-items.component";
 import { IssuingStockByStoreComponent } from "./issuing-stock-by-store/issuing-stock-by-store.component";
 import { LedgersListComponent } from "./ledgers-list/ledgers-list.component";
@@ -45,5 +46,6 @@ export const stockComponents: any[] = [
   StockMetricsComponent,
   ExpiredItemsComponent,
   NearlyStockedOutItemsComponent,
-  NearlyExpiredItemsComponent
+  NearlyExpiredItemsComponent,
+  InvoiceFiltersComponent,
 ];
