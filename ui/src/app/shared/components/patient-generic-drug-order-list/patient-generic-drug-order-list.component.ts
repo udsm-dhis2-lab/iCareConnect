@@ -4,7 +4,11 @@ import { select, Store } from "@ngrx/store";
 import { Observable, of } from "rxjs";
 import { DispensingFormComponent } from "src/app/shared/dialogs/dispension-form/dispension-form.component";
 import { AppState } from "src/app/store/reducers";
-import { getCurrentLocation, getIfThereIsAnyDiagnosisInTheCurrentActiveVisit, getParentLocation } from "src/app/store/selectors";
+import {
+  getCurrentLocation,
+  getIfThereIsAnyDiagnosisInTheCurrentActiveVisit,
+  getParentLocation,
+} from "src/app/store/selectors";
 import { getVisitLoadingState } from "src/app/store/selectors/visit.selectors";
 import { TableActionOption } from "../../models/table-action-options.model";
 import { TableColumn } from "../../models/table-column.model";
@@ -67,7 +71,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
     private dialog: MatDialog,
     private store: Store<AppState>,
     private systemSettingsService: SystemSettingsService,
-    private configService: ConfigsService,
+    private configService: ConfigsService
   ) {}
 
   ngOnInit() {
@@ -136,7 +140,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
           }
         })
       );
-    
+
     this.prescriptionArrangementFields$ = this.systemSettingsService
       .getSystemSettingsByKey("iCare.clinic.prescription.arrangement")
       .pipe(
@@ -212,7 +216,11 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
     );
   }
 
-  onVerify(order: any, specificDrugConceptUuid: any, prescriptionArrangementFields: any) {
+  onVerify(
+    order: any,
+    specificDrugConceptUuid: any,
+    prescriptionArrangementFields: any
+  ) {
     const dialog = this.dialog.open(DispensingFormComponent, {
       width: "100%",
       disableClose: true,
@@ -222,7 +230,11 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
         visit: this.visit,
         location: this.currentLocation,
         encounterUuid: this.encounterUuid,
-        drugInstructions: arrangeDrugDetails(order, specificDrugConceptUuid, prescriptionArrangementFields)?.description,
+        drugInstructions: arrangeDrugDetails(
+          order,
+          specificDrugConceptUuid,
+          prescriptionArrangementFields
+        )?.description,
         fromDispensing: true,
         showAddButton: false,
         useGenericPrescription: this.useGenericPrescription,
@@ -237,12 +249,24 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
     });
   }
 
-  onPrintPrescriptions(event: Event, drugOrders: any, specificDrugConceptUuid: any, prescriptionArrangementFields: any,  e: any){
+  onPrintPrescriptions(
+    event: Event,
+    drugOrders: any,
+    specificDrugConceptUuid: any,
+    prescriptionArrangementFields: any,
+    e: any
+  ) {
     event?.stopPropagation();
 
     //Reconstruct drug details first
-    const orders = drugOrders?.map((order) => arrangeDrugDetails(order, specificDrugConceptUuid, prescriptionArrangementFields));
-    
+    const orders = drugOrders?.map((order) =>
+      arrangeDrugDetails(
+        order,
+        specificDrugConceptUuid,
+        prescriptionArrangementFields
+      )
+    );
+
     let contents: string;
 
     const frame1: any = document.createElement("iframe");
@@ -255,8 +279,8 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
     var frameDoc = frame1.contentWindow
       ? frame1.contentWindow
       : frame1.contentDocument.document
-        ? frame1.contentDocument.document
-        : frame1.contentDocument;
+      ? frame1.contentDocument.document
+      : frame1.contentDocument;
 
     frameDoc.document.open();
 
@@ -338,6 +362,9 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
 
     let image = "";
 
+    let header = "";
+    let subHeader = "";
+
     e.FacilityDetails.attributes.map((attribute) => {
       let attributeTypeName =
         attribute && attribute.attributeType
@@ -346,6 +373,8 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
       if (attributeTypeName === "logo") {
         image = attribute?.value;
       }
+      header = attributeTypeName === "header" ? attribute?.value : "";
+      subHeader = attributeTypeName === "sub header" ? attribute?.value : "";
     });
 
     let patientMRN =
@@ -357,14 +386,21 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
 
     frameDoc.document.write(`
       <center id="top">
+         <div class="info">
+          <h2>${header.length > 0 ? header : e.FacilityDetails.display} </h2>
+          </div>
         <div class="logo">
           <img src="${image}" alt="Facility's Logo"> 
         </div>
         
 
         <div class="info">
-          <h2>${e.FacilityDetails.display}</h2>
-          <h3>P.O Box ${e.FacilityDetails.postalCode} ${e.FacilityDetails.stateProvince}</h3>
+          <h2>${
+            subHeader.length > 0 ? subHeader : e.FacilityDetails.description
+          } </h2>
+          <h3>P.O Box ${e.FacilityDetails.postalCode} ${
+      e.FacilityDetails.stateProvince
+    }</h3>
           <h3>${e.FacilityDetails.country}</h3>
         </div>
         <!--End Info-->
@@ -400,15 +436,16 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
         <tbody>`);
 
       orders.forEach((order) => {
-
         contents = `
               <tr>
                 <td>${order?.name}</td> 
                 <td>${order?.description}</td>  
-                <td>${formatDateToString(new Date(order?.dateActivated), "DD-MM-YYYY")}</td>
+                <td>${formatDateToString(
+                  new Date(order?.dateActivated),
+                  "DD-MM-YYYY"
+                )}</td>
               </tr>`;
         frameDoc.document.write(contents);
-        ;
       });
 
       frameDoc.document.write(`
@@ -440,6 +477,6 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
       window.frames["frame1"].focus();
       window.frames["frame1"].print();
       document.body.removeChild(frame1);
-    }, 500); 
+    }, 500);
   }
 }
