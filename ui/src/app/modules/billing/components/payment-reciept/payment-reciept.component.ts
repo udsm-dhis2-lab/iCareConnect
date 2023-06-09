@@ -140,7 +140,7 @@ export class PaymentReceiptComponent implements OnInit {
     let header = "";
     let subHeader = "";
 
-    e.FacilityDetails.attributes.map((attribute) => {
+    this.facilityDetailsJson?.attributes.map((attribute) => {
       let attributeTypeName =
         attribute && attribute.attributeType
           ? attribute?.attributeType?.name.toLowerCase()
@@ -163,7 +163,9 @@ export class PaymentReceiptComponent implements OnInit {
     
      <center id="top">
          <div class="info">
-          <h2>${header.length > 0 ? header : e.FacilityDetails.display} </h2>
+          <h2>${
+            header?.length > 0 ? header : this.facilityDetailsJson?.display
+          } </h2>
           </div>
         <div class="logo">
           <img src="${image}" alt="Facility's Logo"> 
@@ -172,7 +174,9 @@ export class PaymentReceiptComponent implements OnInit {
 
         <div class="info">
           <h2>${
-            subHeader.length > 0 ? subHeader : e.FacilityDetails.description
+            subHeader?.length > 0
+              ? subHeader
+              : this.facilityDetailsJson?.description
           } </h2>
           <h3>P.O Box ${this.facilityDetailsJson?.postalCode} ${
       this.facilityDetailsJson?.stateProvince
