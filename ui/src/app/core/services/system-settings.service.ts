@@ -28,8 +28,8 @@ export class SystemSettingsService {
     return this.httpClient.get(`systemsetting?q=${key}&v=full`).pipe(
       map((response) => {
         return response?.results && response?.results[0]
-          ? response?.results[0]?.value.indexOf("{") > -1 ||
-            response?.results[0]?.value.indexOf("[") > -1
+          ? response?.results[0]?.value.indexOf("{") === 0 ||
+            response?.results[0]?.value.indexOf("[") === 0
             ? JSON.parse(response?.results[0]?.value)
             : response?.results[0]?.value
           : "none";
@@ -41,8 +41,8 @@ export class SystemSettingsService {
     return from(this.api.systemsetting.getSystemSetting(uuid)).pipe(
       map((response) => {
         return response && response
-          ? response?.value.indexOf("{") > -1 ||
-            response?.value.indexOf("[") > -1
+          ? response?.value.indexOf("{") === 0 ||
+            response?.value.indexOf("[") === 0
             ? JSON.parse(response?.value)
             : response?.value
           : "none";
@@ -76,8 +76,8 @@ export class SystemSettingsService {
               ? response?.results.map((result) => {
                   try {
                     return result?.value &&
-                      (result?.value?.indexOf("{") > -1 ||
-                        result?.value?.indexOf("[") > -1)
+                      (result?.value?.indexOf("{") === 0 ||
+                        result?.value?.indexOf("[") === 0)
                       ? {
                           uuid: result?.uuid,
                           name: result?.property
@@ -92,8 +92,8 @@ export class SystemSettingsService {
                           property: result?.property,
                           description: result?.description,
                           value:
-                            (result?.value?.indexOf("{") > -1 ||
-                              result?.value?.indexOf("[") > -1) &&
+                            (result?.value?.indexOf("{") === 0 ||
+                              result?.value?.indexOf("[") === 0) &&
                             JSON.parse(result?.value)
                               ? JSON.parse(result?.value)
                               : result?.value,
@@ -123,8 +123,8 @@ export class SystemSettingsService {
                           property: result?.property,
                           description: result?.description,
                           value:
-                            (result?.value?.indexOf("{") > -1 ||
-                              result?.value?.indexOf("[") > -1) &&
+                            (result?.value?.indexOf("{") === 0 ||
+                              result?.value?.indexOf("[") === 0) &&
                             JSON.parse(result?.value)
                               ? JSON.parse(result?.value)
                               : result?.value,

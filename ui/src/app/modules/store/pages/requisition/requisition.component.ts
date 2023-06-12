@@ -8,9 +8,7 @@ import { RequisitionObject } from "src/app/shared/resources/store/models/requisi
 import { RequisitionService } from "src/app/shared/resources/store/services/requisition.service";
 import { omit } from "lodash";
 import { AppState } from "src/app/store/reducers";
-import {
-  getStoreLocations,
-} from "src/app/store/selectors";
+import { getStoreLocations } from "src/app/store/selectors";
 import { getAllStockableItems } from "src/app/store/selectors/pricing-item.selectors";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { dateToISOStringMidnight } from "src/app/shared/helpers/format-date.helper";
@@ -82,7 +80,7 @@ export class RequisitionComponent implements OnInit {
       );
 
     this.requisitionCodeFormat$ =
-      this.systemSettingsService.getSystemSettingsMatchingAKey(
+      this.systemSettingsService.getSystemSettingsDetailsByKey(
         `iCare.store.requisition.id.format`
       );
     this.getAllRequisitions();
@@ -101,13 +99,13 @@ export class RequisitionComponent implements OnInit {
         this.pageSize,
         this.selectedStatus,
         "DESC"
-        )
-        .pipe(
-          map((requisitions) => {
-            this.pager = requisitions?.pager;
-            this.requisitions = requisitions?.requisitions;
-            this.storedRequisitions = requisitions?.requisitions;
-            this.loadedRequisitions = true;
+      )
+      .pipe(
+        map((requisitions) => {
+          this.pager = requisitions?.pager;
+          this.requisitions = requisitions?.requisitions;
+          this.storedRequisitions = requisitions?.requisitions;
+          this.loadedRequisitions = true;
           return requisitions;
         })
       );
@@ -138,7 +136,7 @@ export class RequisitionComponent implements OnInit {
   onNewRequest(e: Event, params: any): void {
     e.stopPropagation();
     this.showRequisitionForm = !this.showRequisitionForm;
-    if(!this.showRequisitionForm) {
+    if (!this.showRequisitionForm) {
       this.getAllRequisitions();
     }
 
@@ -185,7 +183,7 @@ export class RequisitionComponent implements OnInit {
     // }
   }
 
-  onUpdateRequisition(e: any, requisition: any){
+  onUpdateRequisition(e: any, requisition: any) {
     this.showRequisitionForm = true;
     this.existingRequisition = requisition;
   }
@@ -240,9 +238,11 @@ export class RequisitionComponent implements OnInit {
             },
             quantity: this.selectedItems[key]?.quantity,
             batch: this.selectedItems[key]?.batch,
-            expiryDate: dateToISOStringMidnight(new Date(this.selectedItems[key]?.expiryDate))
-          }
-        ]
+            expiryDate: dateToISOStringMidnight(
+              new Date(this.selectedItems[key]?.expiryDate)
+            ),
+          },
+        ],
       };
     });
     this.dialog
@@ -259,8 +259,9 @@ export class RequisitionComponent implements OnInit {
       .subscribe((issue) => {
         if (issue?.confirmed) {
           zip(
-            ...issueItems?.map((issueItem) => this.requisitionService
-              .receiveIssueItem(issueItem))
+            ...issueItems?.map((issueItem) =>
+              this.requisitionService.receiveIssueItem(issueItem)
+            )
           ).subscribe((response) => {
             if (response) {
               this.selectedItems = {};
@@ -268,7 +269,7 @@ export class RequisitionComponent implements OnInit {
             }
           });
         }
-      })
+      });
   }
 
   onReceiveRequisition(e: any, requisition: any) {
@@ -328,7 +329,8 @@ export class RequisitionComponent implements OnInit {
         width: "40%",
         data: {
           modalTitle: "Confirm Issues Rejection",
-          modalMessage: "Are you sure you want to reject this all selected items?",
+          modalMessage:
+            "Are you sure you want to reject this all selected items?",
           showRemarksInput: true,
           confirmationButtonText: "Reject",
         },
@@ -336,25 +338,29 @@ export class RequisitionComponent implements OnInit {
       .afterClosed()
       .subscribe((rejection) => {
         if (rejection?.confirmed) {
-          const rejectionObjects = Object.keys(this.selectedItems)?.map((key) => {
-            return {
-              issueItem: {
-                uuid: this.selectedItems[key]?.uuid,
-              },
-              status: "REJECTED",
-              remarks: rejection?.remarks || "",
-            };
-          })
+          const rejectionObjects = Object.keys(this.selectedItems)?.map(
+            (key) => {
+              return {
+                issueItem: {
+                  uuid: this.selectedItems[key]?.uuid,
+                },
+                status: "REJECTED",
+                remarks: rejection?.remarks || "",
+              };
+            }
+          );
           zip(
             ...rejectionObjects?.map((rejectionObject) => {
-              return this.requisitionService.createIssueItemStatus(rejectionObject);
+              return this.requisitionService.createIssueItemStatus(
+                rejectionObject
+              );
             })
           ).subscribe((response) => {
-              // Add support to catch error
-              if (response) {
-                this.getAllRequisitions();
-              }
-            });
+            // Add support to catch error
+            if (response) {
+              this.getAllRequisitions();
+            }
+          });
         }
       });
   }
@@ -375,7 +381,7 @@ export class RequisitionComponent implements OnInit {
           },
           quantity: e?.item?.quantity,
           batch: e?.item?.batch,
-          expiryDate: dateToISOStringMidnight(new Date(e?.item?.expiryDate))
+          expiryDate: dateToISOStringMidnight(new Date(e?.item?.expiryDate)),
         },
       ],
     };

@@ -24,6 +24,9 @@ export class StockInvoicesListComponent implements OnInit {
   page: number = 1;
   pager: number;
   pageSizeOptions: number[] = [5, 10, 15, 25, 50];
+  q: string;
+  startDate: Date;
+  endDate: Date;
   constructor(
     private stockInvoicesService: StockInvoicesService,
     private dialog: MatDialog
@@ -33,10 +36,29 @@ export class StockInvoicesListComponent implements OnInit {
     this.getInvoices();
   }
 
+  onGetSearchingText(q: string): void {
+    this.q = q;
+    this.getInvoices();
+  }
+
+  onGetEndDate(endDate: Date): void {
+    this.endDate = endDate;
+    this.getInvoices();
+  }
+
+  onGetStartDate(startDate: Date): void {
+    this.startDate = startDate;
+    this.getInvoices();
+  }
+
   getInvoices() {
     this.loading = true;
     this.stockInvoices$ = this.stockInvoicesService
-      .getStockInvoices(this.page, this.pageSize, this.status)
+      .getStockInvoices(this.page, this.pageSize, this.status, null, {
+        q: this.q,
+        startDate: this.startDate,
+        endDate: this.endDate,
+      })
       .pipe(
         map((response) => {
           this.loading = false;
@@ -47,7 +69,12 @@ export class StockInvoicesListComponent implements OnInit {
           if (response?.error) {
             this.errors = [...this.errors, response.error];
           }
-        })
+        }),
+        tap((result) =>
+          result.results.sort((a, b) =>
+            a.receivingDate > b.receivingDate ? -1 : 1
+          )
+        )
       );
   }
 

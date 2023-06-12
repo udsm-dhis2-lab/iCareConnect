@@ -114,11 +114,11 @@
                         ></app-print-button>
                       </div>
                     </div>
-                    <div *ngIf="patientBillingDetails.bills.length > 0">
+                    <div *ngIf="patientBillingDetails.bills.length > 1">
                       <app-print-button
                         [iconName]="'print'"
-                        [toolTipText]="'Click to print invoice'"
-                        [showText]="'Print Invoice'"
+                        [toolTipText]="'Click to print all invoices'"
+                        [showText]="'Print All Invoices'"
                         [classesList]="['float-right', 'button', 'mr-5']"
                         [ElementToBePrinted]="{
                           Bill: patientBillingDetails.bills,
