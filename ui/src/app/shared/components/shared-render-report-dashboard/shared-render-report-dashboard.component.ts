@@ -48,7 +48,7 @@ export class SharedRenderReportDashboardComponent implements OnInit {
               ? (response?.attributes?.filter(
                   (attribute) =>
                     attribute?.attributeType?.uuid ===
-                    "e935ea8e-5959-458b-a10b-c06446849dc3"
+                    "09e78d52-d02f-44aa-b055-6bc01c41fa64"
                 ) || [])[0]?.value
               : null,
         };
