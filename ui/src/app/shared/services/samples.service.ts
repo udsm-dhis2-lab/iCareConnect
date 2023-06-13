@@ -261,7 +261,8 @@ export class SamplesService {
     searchText?: string,
     departments?: any[],
     specimenSources?: any[],
-    codedSampleRejectionReasons?: any[]
+    codedSampleRejectionReasons?: any[],
+    excludeAllocations?: boolean
   ): Observable<{ pager: any; results: any[] }> {
     let queryParams = [];
     if (paginationParameters && paginationParameters?.page) {
@@ -285,6 +286,12 @@ export class SamplesService {
     if (dates && dates?.endDate) {
       queryParams = [...queryParams, `endDate=${dates?.endDate}`];
     }
+
+    if (excludeAllocations) {
+      queryParams = [...queryParams, "excludeAllocations=true"];
+    } else {
+      queryParams = [...queryParams, "excludeAllocations=true"];
+    }
     return this.httpClient
       .get(BASE_URL + `lab/samples?${queryParams?.join("&")}`)
       .pipe(
@@ -307,7 +314,8 @@ export class SamplesService {
 
   getCollectedSamplesByPaginationDetails(
     paginationParameters: { page: number; pageSize: number },
-    dates?: { startDate: string; endDate: string }
+    dates?: { startDate: string; endDate: string },
+    excludeAllocations?: boolean
   ): Observable<{ pager: any; results: any[] }> {
     let queryParams = [];
     if (paginationParameters && paginationParameters?.page) {
@@ -327,6 +335,12 @@ export class SamplesService {
 
     if (dates && dates?.endDate) {
       queryParams = [...queryParams, `endDate=${dates?.endDate}`];
+    }
+
+    if (excludeAllocations) {
+      queryParams = [...queryParams, "excludeAllocations=true"];
+    } else {
+      queryParams = [...queryParams, "excludeAllocations=true"];
     }
     return this.httpClient
       .get(BASE_URL + `lab/samples?${queryParams?.join("&")}`)
