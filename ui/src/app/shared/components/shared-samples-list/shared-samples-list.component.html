@@ -449,6 +449,19 @@
                       Print
                     </button>
                   </div>
+
+                  <div
+                    *ngIf="tabType === 'sample-tracking' && LISConfigurations?.isLIS"
+                    class="d-flex justify-content-end"
+                  >
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      (click)="onPrintBarcode($event, sample)"
+                    >
+                      Print Barcode
+                    </button>
+                  </div>
                   <div
                     *ngIf="tabType === 'samples-to-accept'"
                     class="d-flex justify-content-end"
@@ -863,6 +876,7 @@
                                     }}
                                   </button>
                                 </div>
+                                
                               </td>
                             </tr>
                           </ng-container>
