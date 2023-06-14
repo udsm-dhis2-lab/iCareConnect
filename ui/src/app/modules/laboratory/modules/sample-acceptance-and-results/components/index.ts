@@ -19,7 +19,7 @@ import { SampleTrackingModalComponent } from "./sample-tracking-modal/sample-tra
 import { PrintResultsModalComponent } from "./print-results-modal/print-results-modal.component";
 import { ResultsToPrintComponent } from "./results-to-print/results-to-print.component";
 import { SampleStatusSummaryForHomeComponent } from "./sample-status-summary-for-home/sample-status-summary-for-home.component";
-import { BarCodeModalComponent } from "./bar-code-modal/bar-code-modal.component";
+import { BarCodeModalComponent } from "../../../../../shared/dialogs/bar-code-modal/bar-code-modal.component";
 import { UploadFileComponent } from "./upload-file/upload-file.component";
 import { SampleAcceptanceComponent } from "./sample-acceptance/sample-acceptance.component";
 import { RejectAnswerModalComponent } from "./reject-answer-modal/reject-answer-modal.component";
