@@ -248,7 +248,11 @@ export class RegisterSampleComponent implements OnInit {
         id: "agency",
         key: "agency",
         label: "Urgency/Priority",
-        shouldHaveLiveSearchForDropDownFields: false,
+        options: [],
+        conceptClass: "priority",
+        searchControlType: "concept",
+        searchTerm: "SAMPLE_PRIORITIES",
+        shouldHaveLiveSearchForDropDownFields: true,
       }),
       receivedBy: new Dropdown({
         id: "receivedBy",
