@@ -1516,9 +1516,9 @@ export class SampleInBatchRegistrationComponent
                                                                                           .broughtOnTime
                                                                                       ),
                                                                                 status:
-                                                                                  "BROUGHT_ON",
+                                                                                  "DELIVERED_ON",
                                                                                 category:
-                                                                                  "BROUGHT_ON",
+                                                                                  "DELIVERED_ON",
                                                                               };
                                                                             statuses =
                                                                               [
@@ -2344,9 +2344,9 @@ export class SampleInBatchRegistrationComponent
                                                                                                   .broughtOnTime
                                                                                               ),
                                                                                         status:
-                                                                                          "BROUGHT_ON",
+                                                                                          "DELIVERED_ON",
                                                                                         category:
-                                                                                          "BROUGHT_ON",
+                                                                                          "DELIVERED_ON",
                                                                                       };
                                                                                     statuses =
                                                                                       [

@@ -210,7 +210,7 @@ export class LabSamplesEffects {
                     (status) => status?.category === "ACCEPTANCE_REMARKS"
                   ) || [])[0],
                   broughtOnStatus: (sample?.statuses?.filter(
-                    (status) => status?.category === "BROUGHT_ON"
+                    (status) => status?.category === "DELIVERED_ON"
                   ) || [])[0],
                   registeredBy: {
                     display: sample?.creator?.display?.split(" (")[0],
@@ -699,7 +699,7 @@ export class LabSamplesEffects {
                     (status) => status?.category === "ACCEPTANCE_REMARKS"
                   ) || [])[0],
                   broughtOnStatus: (sample?.statuses?.filter(
-                    (status) => status?.category === "BROUGHT_ON"
+                    (status) => status?.category === "DELIVERED_ON"
                   ) || [])[0],
                   registeredBy: {
                     display: sample?.creator?.display?.split(" (")[0],

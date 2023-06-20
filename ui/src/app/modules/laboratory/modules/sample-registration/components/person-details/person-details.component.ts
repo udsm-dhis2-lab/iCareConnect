@@ -31,6 +31,7 @@ export class PersonDetailsComponent implements OnInit {
 
   @Input() personEmailAttributeTypeUuid: string;
   @Input() personPhoneAttributeTypeUuid: string;
+  @Input() labTestRequestProgramStageId: string;
 
   patientIdentifierTypes: any[];
   @Output() personDetails: EventEmitter<any> = new EventEmitter<any>();
@@ -404,6 +405,9 @@ export class PersonDetailsComponent implements OnInit {
             };
 
             this.setPersonDetails(personDetailsData);
+            const today = moment(new Date());
+            this.age = today.diff(clientRequest?.dob, "years");
+            this.month = Number(today.diff(clientRequest?.dob, "months")) % 12;
             this.setIdentifierFields(
               this.identifierTypes,
               personDetailsData,

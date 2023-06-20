@@ -82,6 +82,7 @@ export class RegisterSampleComponent implements OnInit {
   errors: any[] = [];
 
   importExportCategory: string = "CLINICAL";
+  labTestRequestProgramStageId$: Observable<string>;
 
   get maximumDate() {
     let maxDate = new Date();
@@ -138,6 +139,10 @@ export class RegisterSampleComponent implements OnInit {
     this.hfrCodeAttributeUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
         `icare.location.attributes.hfrCode.attributeUuid`
+      );
+    this.labTestRequestProgramStageId$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.externalSystems.integrated.pimaCovid.programStages.testRequestStage"
       );
 
     this.agencyConceptConfigs$ = this.store.select(getConceptById, {
