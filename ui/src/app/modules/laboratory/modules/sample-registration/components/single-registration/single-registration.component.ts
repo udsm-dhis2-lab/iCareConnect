@@ -21,7 +21,7 @@ import { DiagnosisService } from "src/app/shared/resources/diagnosis/services";
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { SamplesService } from "src/app/shared/services/samples.service";
-import { BarCodeModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-modal/bar-code-modal.component";
+import { BarCodeModalComponent } from "../../../../../../shared/dialogs/bar-code-modal/bar-code-modal.component";
 
 import { uniqBy, keyBy, omit, groupBy } from "lodash";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";

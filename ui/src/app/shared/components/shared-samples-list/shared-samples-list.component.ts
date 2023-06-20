@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatCheckboxChange } from "@angular/material/checkbox";
 import { MatRadioChange } from "@angular/material/radio";
 import { MatSelectChange } from "@angular/material/select";
+import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { omit, keyBy } from "lodash";
 import { Observable, of } from "rxjs";
@@ -12,13 +13,16 @@ import { AppState } from "src/app/store/reducers";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import { VisitsService } from "../../resources/visits/services";
 import { map } from "rxjs/operators";
+import { webSocket } from "rxjs/webSocket";
+import { BarCodeModalComponent } from "src/app/shared/dialogs/bar-code-modal/bar-code-modal.component";
+import { formatDateToYYMMDD } from "../../helpers/format-date.helper";
 
 @Component({
   selector: "app-shared-samples-list",
   templateUrl: "./shared-samples-list.component.html",
   styleUrls: ["./shared-samples-list.component.scss"],
 })
-export class SharedSamplesListComponent implements OnInit {
+export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   @Input() LISConfigurations: any;
   @Input() labSamplesDepartments: any;
   @Input() tabType: string;
@@ -30,6 +34,7 @@ export class SharedSamplesListComponent implements OnInit {
   @Input() hasStatus: string;
   @Input() acceptedBy: string;
   @Input() showLegend: boolean;
+  @Input() barcodeSettings: any;
   samplesToViewMoreDetails: any = {};
   selectedDepartment: string;
   searchingText: string;
@@ -53,6 +58,7 @@ export class SharedSamplesListComponent implements OnInit {
   testUuid: string;
   specimenUuid: string;
   dapartment: string;
+  connection: any;
 
   itemsToShow: any = {};
   currentUser$: Observable<any>;
@@ -62,9 +68,20 @@ export class SharedSamplesListComponent implements OnInit {
   currentVisit: any;
   constructor(
     private sampleService: SamplesService,
+    private dialog: MatDialog,
     private store: Store<AppState>,
     private visitsService: VisitsService
   ) {}
+
+  ngAfterViewInit(): void {
+    this.connection = webSocket(this.barcodeSettings?.socketUrl);
+
+    this.connection.subscribe({
+      next: (msg) => console.log("message received: ", msg), // Called whenever there is a message from the server.
+      error: (err) => console.log(err), // Called if at any point WebSocket API signals some kind of error.
+      complete: () => console.log("complete"), // Called when connection is closed (for whatever reason).
+    });
+  }
 
   ngOnInit(): void {
     this.getSamples({
@@ -336,5 +353,59 @@ export class SharedSamplesListComponent implements OnInit {
   onDispose(event: Event, sample: any): void {
     event.stopPropagation();
     this.selectedSampleDetails.emit(sample);
+  }
+
+  onPrintBarcode(event: Event, sample: any): void{
+
+    const data = {identifier:sample?.label, sample:sample, sampleLabelsUsedDetails: [sample], isLis:this.LISConfigurations?.isLIS,};
+
+    this.dialog
+      .open(BarCodeModalComponent, {
+        height: "200px",
+        width: "20%",
+        data,
+        disableClose: false,
+        panelClass: "custom-dialog-container",
+      })
+      .afterClosed()
+      .subscribe((results) => {
+        if (results) {
+          let tests = [];
+          results?.sampleData?.orders?.forEach((order) => {
+            tests = [
+              ...tests,
+              order?.order?.shortName?.split("TEST_ORDERS:")?.join(""),
+            ];
+          });
+          
+          const message = {
+            SampleID: results?.sampleData?.label,
+            Tests: tests?.join(","),
+            PatientNames: `${results?.sampleData?.patient?.givenName} ${
+              results?.sampleData?.patient?.middleName?.length
+                ? results?.sampleData?.patient?.middleName
+                : ""
+            } ${results?.sampleData?.patient?.familyName}`,
+            Date: formatDateToYYMMDD(
+              new Date(results?.sampleData?.created),
+              true
+            ),
+            Storage: "",
+            Department:
+              results?.sampleData?.department?.shortName
+                ?.split("LAB_DEPARTMENT:")
+                .join("") || "",
+            BarcodeData: results?.sampleData?.label
+              ?.split(this.barcodeSettings?.textToIgnore)
+              .join(""),
+          };
+          
+          this.connection.next({
+            Message: message,
+            Description: "Message of data to be printed",
+            Type: "print",
+          });
+        }
+      });
   }
 }
