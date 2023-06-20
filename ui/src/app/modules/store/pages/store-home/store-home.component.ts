@@ -15,7 +15,10 @@ import {
   getMetrics,
   getSettingCurrentLocationStatus,
 } from "src/app/store/selectors";
-import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.selectors";
+import {
+  getCurrentUserDetails,
+  getCurrentUserPrivileges,
+} from "src/app/store/selectors/current-user.selectors";
 
 @Component({
   selector: "app-store-home",
@@ -30,11 +33,13 @@ export class StoreHomeComponent implements OnInit {
   currentStorePage: any;
   privileges$: Observable<any>;
   showStoreMetrics: boolean = false;
+  currentUser$: Observable<any>;
   constructor(private store: Store<AppState>) {
     this.store.dispatch(clearStockMetrics());
   }
 
   ngOnInit(): void {
+    this.currentUser$ = this.store.select(getCurrentUserDetails);
     this.settingCurrentLocationStatus$ = this.store.select(
       getSettingCurrentLocationStatus
     );
@@ -46,21 +51,25 @@ export class StoreHomeComponent implements OnInit {
         id: "stock",
         name: "Stock",
         url: "stock",
+        privilege: "STORE_VIEW_STOCK",
       },
       {
         id: "requisition",
         name: "Requests",
         url: "requisition",
+        privilege: "STORE_MAKE_REQUISITION",
       },
-      // {
-      //   id: "received",
-      //   name: "Received",
-      //   url: "receipt",
-      // },
+      {
+        id: "consume",
+        name: "Consume",
+        url: "consume",
+        privilege: "STORE_CONSUME_ITEM",
+      },
       {
         id: "issuing",
         name: "Issuing",
         url: "issuing",
+        privilege: "STORE_ISSUE_ITEM",
       },
       {
         id: "settings",

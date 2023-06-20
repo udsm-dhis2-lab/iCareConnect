@@ -17,12 +17,15 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { RequisitionInput } from "src/app/shared/resources/store/models/requisition-input.model";
 import { keyBy } from "lodash";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { StockService } from "src/app/shared/resources/store/services/stock.service";
 import { RequisitionService } from "src/app/shared/resources/store/services/requisition.service";
 import { ConfigsService } from "src/app/shared/services/configs.service";
 import { inpatientComponents } from "src/app/modules/inpatient/components";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { map } from "rxjs/operators";
+import { event } from "cypress/types/jquery";
 
 @Component({
   selector: "app-new-requisition-form",
@@ -43,7 +46,6 @@ export class NewRequisitionFormComponent implements OnInit {
   @Output() closePopup: EventEmitter<any> = new EventEmitter();
 
   requisitionFields: Field<string>[];
-  quantityField: Field<string>[];
   requisitionFormValue: FormValue;
   currentLocationTagsUuids: any = {};
   stockStatusForSelectedStore$: Observable<any>;
@@ -56,14 +58,61 @@ export class NewRequisitionFormComponent implements OnInit {
   requisitionObject: any;
   addingRequisitions: boolean = false;
   requisition: any;
+  allowRequestTargetOutOfStock$: Observable<any>;
+  errors: any[] = [];
+  showQuantityField: boolean = true;
+  quantity: number;
+  saving: boolean = false;
   constructor(
     private stockService: StockService,
     private requisitionService: RequisitionService,
     private configService: ConfigsService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private systemSettingsService: SystemSettingsService
   ) {}
 
   ngOnInit() {
+    this.allowRequestTargetOutOfStock$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        `iCare.store.settings.controls.allowRequestTargetOutOfStock`
+      )
+      .pipe(
+        map((response) => {
+          if (response === "none") {
+            this.errors = response?.error
+              ? [...this.errors, response]
+              : [
+                  ...this.errors,
+                  {
+                    error: {
+                      error:
+                        "iCare.store.settings.controls.allowRequestTargetOutOfStock is missing, contact IT",
+                      message:
+                        "iCare.store.settings.controls.allowRequestTargetOutOfStock is missing, contact IT",
+                    },
+                  },
+                ];
+            return response;
+          } else if (response && (!response?.error || response !== "none")) {
+            return response;
+          } else if (response) {
+            this.errors = response?.error
+              ? [...this.errors, response]
+              : [
+                  ...this.errors,
+                  {
+                    error: {
+                      error:
+                        "iCare.store.settings.controls.allowRequestTargetOutOfStock is missing, contact IT",
+                      message:
+                        "iCare.store.settings.controls.allowRequestTargetOutOfStock is missing, contact IT",
+                    },
+                  },
+                ];
+            return response;
+          }
+        })
+      );
     this.requisition = this.existingRequisition;
     if (localStorage.getItem("availableRequisition") && !this.requisition) {
       const availableRequisition = JSON.parse(
@@ -91,6 +140,7 @@ export class NewRequisitionFormComponent implements OnInit {
     } else {
       this.initializeRequisitionForm();
     }
+    this.stockStatusForSelectedStore$ = of({ eligibleQuantity: 0 });
   }
 
   initializeRequisitionForm() {
@@ -170,20 +220,8 @@ export class NewRequisitionFormComponent implements OnInit {
         searchControlType: "billableItem",
       }),
     ];
-    this.quantityField = [
-      new Textbox({
-        id: "quantity",
-        key: "quantity",
-        label: "Quantity",
-        min: 1,
-        required: true,
-        type: "number",
-        value: this.existingRequisitionItem
-          ? this.existingRequisitionItem?.quantity
-          : "",
-      }),
-    ];
   }
+
   onRequest(e: Event) {
     e.stopPropagation();
     this.requisitionObject = {
@@ -192,7 +230,7 @@ export class NewRequisitionFormComponent implements OnInit {
       items: [
         {
           itemUuid: this.formData?.requisitionItem?.value,
-          quantity: parseInt(this.formData?.quantity.value, 10),
+          quantity: this.quantity,
         },
       ],
     };
@@ -206,13 +244,15 @@ export class NewRequisitionFormComponent implements OnInit {
       });
   }
 
-  onAdd(e) {
+  onAdd(e: Event): void {
+    e.stopPropagation();
+    this.saving = true;
     if (this.requisition) {
       const item = {
         item: {
           uuid: this.formData?.requisitionItem?.value,
         },
-        quantity: parseInt(this.formData?.quantity.value, 10),
+        quantity: this.quantity,
         requisition: {
           uuid: this.requisition?.uuid,
         },
@@ -225,17 +265,16 @@ export class NewRequisitionFormComponent implements OnInit {
       this.requisitionService
         .createRequisitionItem(item)
         .subscribe((response) => {
+          this.saving = false;
           if (!response?.error) {
             const storedRequisition = this.requisition;
             const reserveRequisitionFields = this.requisitionFields;
-            const reserveQuantityFields = this.quantityField;
             this.requisition = undefined;
-            this.quantityField = [];
             this.requisitionFields = [];
+
             setTimeout(() => {
               this.requisition = storedRequisition;
               this.requisitionFields = reserveRequisitionFields;
-              this.quantityField = reserveQuantityFields;
             }, 100);
           }
         });
@@ -257,7 +296,7 @@ export class NewRequisitionFormComponent implements OnInit {
             item: {
               uuid: this.formData?.requisitionItem?.value,
             },
-            quantity: parseInt(this.formData?.quantity.value, 10),
+            quantity: this.quantity,
             requisitionItemStatus: [
               {
                 status: "DRAFT",
@@ -278,11 +317,10 @@ export class NewRequisitionFormComponent implements OnInit {
             this.requisitionService
               .createRequisition(requisitionObject)
               .subscribe((response) => {
+                this.saving = false;
                 if (!response?.error) {
                   this.requisition = response;
                   const reserveRequisitionFields = this.requisitionFields;
-                  const reserveQuantityFields = this.quantityField;
-                  this.quantityField = [];
                   this.requisitionFields = [];
                   localStorage.setItem(
                     "availableRequisition",
@@ -290,7 +328,6 @@ export class NewRequisitionFormComponent implements OnInit {
                   );
                   setTimeout(() => {
                     this.requisitionFields = reserveRequisitionFields;
-                    this.quantityField = reserveQuantityFields;
                   }, 100);
                 }
               });
@@ -307,8 +344,8 @@ export class NewRequisitionFormComponent implements OnInit {
           ? this.formData?.requisitionItem?.value
           : this.existingRequisitionItem?.item?.uuid,
       },
-      quantity: this.formData?.quantity.value?.length
-        ? parseInt(this.formData?.quantity.value, 10)
+      quantity: this.quantity
+        ? this.quantity
         : this.existingRequisitionItem?.quantity,
     };
     this.requisitionService
@@ -328,18 +365,30 @@ export class NewRequisitionFormComponent implements OnInit {
     };
     this.storeUuid = this.formData?.targetStore?.value;
     this.itemUuid = this.formData?.requisitionItem?.value;
-    this.specifiedQuantity = Number(formValue.getValues()?.quantity?.value);
+    this.specifiedQuantity = this.quantity;
     if (this.itemUuid && this.storeUuid) {
+      this.showQuantityField = false;
       this.stockStatusForSelectedStore$ =
         this.stockService.getAvailableStockOfAnItem(
           this.itemUuid,
           this.storeUuid
         );
+      this.stockStatusForSelectedStore$.subscribe((response: any) => {
+        if (response) {
+          setTimeout(() => {
+            this.showQuantityField = true;
+          }, 50);
+        }
+      });
       this.stockStatusForCurrentStore$ =
         this.stockService.getAvailableStockOfAnItem(
           this.itemUuid,
           this.currentStore?.uuid
         );
     }
+  }
+
+  onGetQuantity(quantity: number): void {
+    this.quantity = quantity;
   }
 }
