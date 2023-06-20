@@ -562,7 +562,6 @@ export class SampleImportExportComponent implements OnInit {
             (conceptSet: any) =>
               conceptSet?.systemName?.indexOf("LAB_DEPARTMENT:") > -1
           ) || [])[0]?.uuid;
-          console.log("department", department);
           sample = {
             visit: { uuid: "" },
             label: sampleLabel,
@@ -593,8 +592,8 @@ export class SampleImportExportComponent implements OnInit {
           sample: { uuid: "" },
           user: { uuid: this.currentUser?.uuid },
           remarks: broughOn,
-          status: "BROUGHT_ON",
-          category: "BROUGHT_ON",
+          status: "DELIVERED_ON",
+          category: "DELIVERED_ON",
         },
         {
           sample: { uuid: "" },

@@ -61,6 +61,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   @Input() specimenSources: ConceptGetFull[];
   @Input() personEmailAttributeTypeUuid: string;
   @Input() personPhoneAttributeTypeUuid: string;
+  @Input() labTestRequestProgramStageId: string;
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -184,62 +185,6 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
         return field;
       });
     this.createReferralFields();
-    // this.specimenDetailsFields = [
-    //   new Dropdown({
-    //     id: "specimen",
-    //     key: "specimen",
-    //     label: "Specimen type",
-    //     searchTerm: "SPECIMEN_SOURCE",
-    //     options: [],
-    //     conceptClass: "Specimen",
-    //     searchControlType: "concept",
-    //     shouldHaveLiveSearchForDropDownFields: true,
-    //   }),
-    //   new Dropdown({
-    //     id: "condition",
-    //     key: "condition",
-    //     label: "Condition",
-    //     options: [],
-    //     conceptClass: "condition",
-    //     searchControlType: "concept",
-    //     searchTerm: "SAMPLE_CONDITIONS",
-    //     shouldHaveLiveSearchForDropDownFields: true,
-    //   }),
-    //   new Dropdown({
-    //     id: "agency",
-    //     key: "agency",
-    //     label: "Urgency/Priority",
-    //     options: [],
-    //     conceptClass: "priority",
-    //     searchControlType: "concept",
-    //     searchTerm: "SAMPLE_PRIORITIES",
-    //     shouldHaveLiveSearchForDropDownFields: true,
-    //   }),
-    //   // new Dropdown({
-    //   //   id: "receivinglab",
-    //   //   key: "receivinglab",
-    //   //   label: "Receiving Lab",
-    //   //   options: [],
-    //   //   searchControlType: "concept",
-    //   //   conceptClass: "Lab Department",
-    //   //   shouldHaveLiveSearchForDropDownFields: true,
-    //   // }),
-    //   // new DateField({
-    //   //   id: "receivedOn",
-    //   //   key: "receivedOn",
-    //   //   label: "Received On",
-    //   // }),
-    //   // new Dropdown({
-    //   //   id: "department",
-    //   //   key: "department",
-    //   //   label: "Department",
-    //   //   options: [],
-    //   //   searchControlType: "concept",
-    //   //   conceptClass: "Lab Department",
-    //   //   shouldHaveLiveSearchForDropDownFields: true,
-    //   // }),
-    // ];
-
     this.receivedOnField =
       this.allRegistrationFields?.specimenDetailFields?.receivedOn;
     this.receivedByField =
@@ -1298,9 +1243,9 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                                     .broughtOnTime
                                                                                 ),
                                                                               status:
-                                                                                "BROUGHT_ON",
+                                                                                "DELIVERED_ON",
                                                                               category:
-                                                                                "BROUGHT_ON",
+                                                                                "DELIVERED_ON",
                                                                             };
                                                                           statuses =
                                                                             [
