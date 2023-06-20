@@ -351,15 +351,18 @@ export class QuotationItemComponent implements OnInit {
     frameDoc.document.write(`
     
       <center id="top">
+         <div class="info">
+          <h2>${header.length > 0 ? header : e.FacilityDetails.display} </h2>
+          </div>
         <div class="logo">
           <img src="${image}" alt="Facility's Logo"> 
         </div>
         
 
         <div class="info">
-          <h2>${header.length > 0 ? header : e.FacilityDetails.display} <br/> ${
-      subHeader.length > 0 ? subHeader : ""
-    }</h2>          <h3>P.O Box ${e.FacilityDetails.postalCode} ${
+          <h2>${
+            subHeader.length > 0 ? subHeader : e.FacilityDetails.description
+          } </h2>    <h3>P.O Box ${e.FacilityDetails.postalCode} ${
       e.FacilityDetails.stateProvince
     }</h3>
           <h3>${e.FacilityDetails.country}</h3>
