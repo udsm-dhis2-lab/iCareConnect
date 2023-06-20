@@ -15,7 +15,8 @@
     unifiedCodingReferenceConceptSourceUuid:
       unifiedCodingReferenceConceptSourceUuid$ | async,
     relatedMetadataAttributeUuid: relatedMetadataAttributeUuid$ | async,
-    hfrCodeAttributeUuid: hfrCodeAttributeUuid$ | async
+    hfrCodeAttributeUuid: hfrCodeAttributeUuid$ | async,
+    labTestRequestProgramStageId: labTestRequestProgramStageId$ | async
   } as params"
 >
   <div class="row">
@@ -71,8 +72,10 @@
               !params?.referFromFacilityVisitAttribute ||
               !params?.labNumberCharactersCount ||
               !params?.testsFromExternalSystemsConfigs ||
-              !params?.unifiedCodingReferenceConceptSourceUuid
-            "barcodeSettings
+              !params?.unifiedCodingReferenceConceptSourceUuid ||
+              !params?.labTestRequestProgramStageId
+            "
+            barcodeSettings
             mode="indeterminate"
           ></mat-progress-bar>
           <div
@@ -84,7 +87,8 @@
               params?.labNumberCharactersCount &&
               params?.testsFromExternalSystemsConfigs &&
               params?.identifierTypes &&
-              params?.barcodeSettings
+              params?.barcodeSettings &&
+              params?.labTestRequestProgramStageId
             "
           >
             <app-single-registration
@@ -115,6 +119,9 @@
                     : params?.identifierTypes
               "
               [LISConfigurations]="LISConfigurations"
+              [labTestRequestProgramStageId]="
+                params?.labTestRequestProgramStageId
+              "
             ></app-single-registration>
           </div>
         </div>

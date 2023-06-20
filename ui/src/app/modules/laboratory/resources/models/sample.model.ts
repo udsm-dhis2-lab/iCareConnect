@@ -491,8 +491,8 @@ export class LabSample {
       (status) =>
         status?.category === "COLLECTED_ON" ||
         status?.status === "COLLECTED_ON" ||
-        status?.category === "BROUGHT_ON" ||
-        status?.status === "BROUGHT_ON"
+        status?.category === "DELIVERED_ON" ||
+        status?.status === "DELIVERED_ON"
     ) || [])[0];
   }
 
@@ -501,8 +501,8 @@ export class LabSample {
       (status) =>
         status?.category === "RECEIVED_BY" ||
         status?.status === "RECEIVED_BY" ||
-        status?.category === "BROUGHT_ON" ||
-        status?.status === "BROUGHT_ON"
+        status?.category === "DELIVERED_ON" ||
+        status?.status === "DELIVERED_ON"
     ) || [])[0];
   }
 
