@@ -315,10 +315,11 @@ public class ICareController {
 											   @RequestParam(required = false) String attributeValueReference,
 											   @RequestParam(required = false) VisitWrapper.PaymentStatus paymentStatus,
 											   @RequestParam(required = false) String visitAttributeTypeUuid,
-											   @RequestParam(required = false) String sampleCategory
+											   @RequestParam(required = false) String sampleCategory,
+											   @RequestParam(required = false) String exclude
 											   ) {
 
-        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, encounterTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus, visitAttributeTypeUuid, sampleCategory);
+        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, encounterTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus, visitAttributeTypeUuid, sampleCategory,exclude);
 
         List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
         for (Visit visit : visits) {

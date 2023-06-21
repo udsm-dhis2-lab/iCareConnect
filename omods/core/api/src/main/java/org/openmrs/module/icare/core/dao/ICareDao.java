@@ -25,12 +25,13 @@ import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
-import org.openmrs.module.icare.laboratory.models.Sample;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ICareDao extends BaseDAO<Item> {
 	
@@ -291,10 +292,10 @@ public class ICareDao extends BaseDAO<Item> {
 	}
 	
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
-	        String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
-	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
-	        String sampleCategory) {
+											String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
+											Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
+											String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
+											String sampleCategory, String exclude) {
 		//PatientIdentifier
 		Query query = null;
 		DbSession session = this.getSession();
@@ -382,6 +383,30 @@ public class ICareDao extends BaseDAO<Item> {
 			}
 			
 			queryStr += " v IN (SELECT sp.visit FROM Sample sp WHERE sp IN (SELECT sst.sample FROM SampleStatus sst WHERE sst.category =:sampleCategory))";
+
+			if(exclude != null){
+
+				queryStr = queryStr.substring(0,queryStr.length()-1);
+
+				queryStr += " AND sp NOT IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
+
+				//System.out.println(excludedValue);
+
+//				String [] statuses = exclude.split(",");
+//				queryStr = queryStr.substring(0,queryStr.length()-1);
+//				for(int i=0 ; i < statuses.length ; i++){
+//
+//					queryStr += " AND sp NOT IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category =:statuses )";
+//
+//					//query = session.createQuery(queryStr);
+//					//query.setParameter("statuses",statuses[i]);
+//
+//				}
+//				queryStr +=")";
+//				System.out.println(queryStr);
+
+			}
+
 			
 		}
 		
@@ -437,7 +462,21 @@ public class ICareDao extends BaseDAO<Item> {
 		if (sampleCategory != null) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
-		
+		if(exclude != null){
+
+			Pattern pattern = Pattern.compile("List:\\[(.*?)\\]");
+			Matcher matcher = pattern.matcher(exclude);
+			String excludedValue;
+			if(matcher.find()){
+				excludedValue = matcher.group(1);
+			}else{
+				excludedValue = exclude;
+			}
+
+			String[] valuesArray = excludedValue.split(",");
+			List<String> valueList = new ArrayList<>(Arrays.asList(valuesArray));
+			query.setParameterList("statuses",valueList);
+		}
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
 		return query.list();
