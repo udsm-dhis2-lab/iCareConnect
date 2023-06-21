@@ -249,6 +249,7 @@
 
     <!-- Sample Status    -->
     <lb_sample_status sample_status_id="1" sample_id="205" status="RECEIVED" category="RECEIVED" timestamp="2020-12-27 00:00:00" user_id="300" />
+    <lb_sample_status sample_status_id="2" sample_id="205" status="REJECTED" category="REJECTED" timestamp="2020-12-27 00:00:00" user_id="300" />
 
 
     <!-- Encounters -->
