@@ -278,9 +278,7 @@ export class VisitsService {
     }
 
     if (excludedSampleCategories && excludedSampleCategories?.length > 0) {
-      parametersString += `&exclude=List:[${excludedSampleCategories.join(
-        ","
-      )}]`;
+      parametersString += `&exclude=${excludedSampleCategories.join(",")}`;
     }
     //
     return (
@@ -968,7 +966,54 @@ export class VisitsService {
     );
   }
 
-  getSamplesByVisitUuid(visitUuid: string): Observable<any[]> {
-    return this.httpClient.get("lab/sample?visit=" + visitUuid);
+  getSamplesByVisitUuid(visitUuid: string, parameters: any): Observable<any[]> {
+    let queryParams = [];
+    Object.keys(parameters)?.map((key) => {
+      queryParams = [...queryParams, key + "=" + parameters[key]];
+    });
+    return this.httpClient
+      .get("lab/sample?visit=" + visitUuid + "&" + queryParams.join("&"))
+      ?.pipe(
+        map((response) => {
+          return (response?.results ? response?.results : response)?.map(
+            (sample) => {
+              return {
+                ...sample,
+                accepted:
+                  (
+                    sample?.statuses?.filter(
+                      (status) => status?.category?.toLowerCase() === "accepted"
+                    ) || []
+                  )?.length > 0,
+                rejected:
+                  (
+                    sample?.statuses?.filter(
+                      (status) => status?.category?.toLowerCase() === "rejected"
+                    ) || []
+                  )?.length > 0,
+                hasResults:
+                  (
+                    sample?.statuses?.filter(
+                      (status) =>
+                        status?.category?.toLowerCase() === "has_results"
+                    ) || []
+                  )?.length > 0,
+                authorized:
+                  (
+                    sample?.statuses?.filter(
+                      (status) => status?.status?.toLowerCase() === "authorized"
+                    ) || []
+                  )?.length > 0,
+                approved:
+                  (
+                    sample?.statuses?.filter(
+                      (status) => status?.status?.toLowerCase() === "approved"
+                    ) || []
+                  )?.length > 0,
+              };
+            }
+          );
+        })
+      );
   }
 }
