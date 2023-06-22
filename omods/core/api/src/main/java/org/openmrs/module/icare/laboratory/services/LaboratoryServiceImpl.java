@@ -20,10 +20,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
 public class LaboratoryServiceImpl extends BaseOpenmrsService implements LaboratoryService {
 	
 	SampleDAO sampleDAO;
@@ -190,10 +186,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
-	        String testCategory, String q, String hasStatus, String acceptedByUuid, String testConceptUuid,
-	        String departmentUuid, String specimenSourceUuid, String instrumentUuid) {
+										 String testCategory, String q, String hasStatus, String acceptedByUuid, String testConceptUuid,
+										 String departmentUuid, String specimenSourceUuid, String instrumentUuid, String visitUuid) {
 		return this.sampleDAO.getSamples(startDate, endDate, pager, location, sampleCategory, testCategory, q, hasStatus,
-		    acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid, instrumentUuid);
+		    acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid, instrumentUuid,visitUuid);
 	}
 	
 	@Override
@@ -1106,10 +1102,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager, String location,
-	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
-	        String testConceptUuid, String departmentUuid, String specimenSourceUuid, String instrumentUuid) {
+															  String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
+															  String testConceptUuid, String departmentUuid, String specimenSourceUuid, String instrumentUuid, String visitUuid) {
 		return sampleDAO.getSamplesWithoutAllocations(startDate, endDate, pager, location, sampleCategory, testCategory, q,
-		    hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid, instrumentUuid);
+		    hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid, instrumentUuid,visitUuid);
 	}
 	
 	@Override
