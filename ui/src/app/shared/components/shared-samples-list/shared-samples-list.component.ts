@@ -1,4 +1,11 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from "@angular/core";
 import { MatCheckboxChange } from "@angular/material/checkbox";
 import { MatRadioChange } from "@angular/material/radio";
 import { MatSelectChange } from "@angular/material/select";
@@ -126,7 +133,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   toggleListType(event: MatRadioChange): void {
     this.listType = event.value;
     if (this.listType === "samples") {
-      this.getSamples();
+      this.getSamples({ pageSize: this.pageSize, page: this.page });
     } else {
       this.getPatients();
     }
@@ -355,9 +362,13 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     this.selectedSampleDetails.emit(sample);
   }
 
-  onPrintBarcode(event: Event, sample: any): void{
-
-    const data = {identifier:sample?.label, sample:sample, sampleLabelsUsedDetails: [sample], isLis:this.LISConfigurations?.isLIS,};
+  onPrintBarcode(event: Event, sample: any): void {
+    const data = {
+      identifier: sample?.label,
+      sample: sample,
+      sampleLabelsUsedDetails: [sample],
+      isLis: this.LISConfigurations?.isLIS,
+    };
 
     this.dialog
       .open(BarCodeModalComponent, {
@@ -377,7 +388,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
               order?.order?.shortName?.split("TEST_ORDERS:")?.join(""),
             ];
           });
-          
+
           const message = {
             SampleID: results?.sampleData?.label,
             Tests: tests?.join(","),
@@ -399,7 +410,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
               ?.split(this.barcodeSettings?.textToIgnore)
               .join(""),
           };
-          
+
           this.connection.next({
             Message: message,
             Description: "Message of data to be printed",

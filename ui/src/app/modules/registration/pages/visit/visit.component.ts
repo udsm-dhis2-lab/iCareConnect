@@ -139,7 +139,6 @@ export class VisitComponent implements OnInit {
         })
       );
     this.patientVisist$.subscribe((data: any) => {
-      console.log("The patient visit data are:", data);
       this.visitDetails["InsuranceID"] =
         (this.patientDetails?.person?.attributes?.filter(
           (attribute) => attribute?.attributeType?.display === "ID"
