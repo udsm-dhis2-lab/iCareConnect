@@ -449,8 +449,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	public void testGettingVisits() throws Exception {
 		
 		//Given
-
-
+		
 		PatientService patientService = Context.getService(PatientService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
 		Visit newVisit = this.getVisit(patient);
@@ -511,16 +510,18 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("Should return a visit", ((List) orderResult.get("results")).size() == 1);
 	}
-
+	
 	@Test
-	public void testGettingVisitsBySample() throws Exception{
-
-		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("sampleCategory", "RECEIVED"), new Parameter("exclude", "List:[REJECTED,COMPLETED]"));
+	public void testGettingVisitsBySample() throws Exception {
+		
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/visit", new Parameter("sampleCategory", "RECEIVED"),
+		    new Parameter("exclude", "List:[REJECTED,COMPLETED]"));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		Map<String, Object> visit = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		assertThat("No visit is returned",((List)visit.get("results")).size(),is(0));
-
+		assertThat("No visit is returned", ((List) visit.get("results")).size(), is(0));
+		
 	}
+	
 	@Test
 	public void testGettingItemsByDepartment() throws Exception {
 		

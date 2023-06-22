@@ -133,12 +133,12 @@ public class Prescription extends Order {
 		this.durationUnits = durationUnits;
 	}
 	
-//	public String toString() {
-//		String prefix = Order.Action.DISCONTINUE == this.getAction() ? "DC " : "";
-//		return prefix + "Prescription(ID:" + this.getId() + "|" + this.getDose() + this.getDoseUnits() + " of "
-//		        + (this.getDrug() != null ? this.getDrug().getName() : "[no drug]") + " from " + this.getDateActivated()
-//		        + " to " + (this.isDiscontinuedRightNow() ? this.getDateStopped() : this.getAutoExpireDate()) + ")";
-//	}
+	//	public String toString() {
+	//		String prefix = Order.Action.DISCONTINUE == this.getAction() ? "DC " : "";
+	//		return prefix + "Prescription(ID:" + this.getId() + "|" + this.getDose() + this.getDoseUnits() + " of "
+	//		        + (this.getDrug() != null ? this.getDrug().getName() : "[no drug]") + " from " + this.getDateActivated()
+	//		        + " to " + (this.isDiscontinuedRightNow() ? this.getDateStopped() : this.getAutoExpireDate()) + ")";
+	//	}
 	
 	public void setDosing(PrescriptionDosingInstruction di) {
 		di.setDosingInstructions(this);
