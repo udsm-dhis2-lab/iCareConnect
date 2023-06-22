@@ -1,4 +1,11 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from "@angular/core";
 import { MatCheckboxChange } from "@angular/material/checkbox";
 import { MatRadioChange } from "@angular/material/radio";
 import { MatSelectChange } from "@angular/material/select";
@@ -35,6 +42,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   @Input() acceptedBy: string;
   @Input() showLegend: boolean;
   @Input() barcodeSettings: any;
+  @Input() excludedSampleCategories: string[];
   samplesToViewMoreDetails: any = {};
   selectedDepartment: string;
   searchingText: string;
@@ -62,10 +70,11 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
   itemsToShow: any = {};
   currentUser$: Observable<any>;
-  listType: string = "samples";
+  listType: string = "patients";
 
   currentSamplesByVisits$: Observable<any[]>;
   currentVisit: any;
+  sampleVisitParameters: any;
   constructor(
     private sampleService: SamplesService,
     private dialog: MatDialog,
@@ -75,21 +84,30 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.connection = webSocket(this.barcodeSettings?.socketUrl);
-
     this.connection.subscribe({
       next: (msg) => console.log("message received: ", msg), // Called whenever there is a message from the server.
       error: (err) => console.log(err), // Called if at any point WebSocket API signals some kind of error.
       complete: () => console.log("complete"), // Called when connection is closed (for whatever reason).
     });
+    if (this.listType === "samples") {
+      this.getSamples({
+        category: this.category,
+        hasStatus: this.hasStatus,
+        pageSize: this.pageSize,
+        page: this.page,
+      });
+    } else {
+      this.getPatients();
+    }
   }
 
   ngOnInit(): void {
-    this.getSamples({
-      category: this.category,
+    this.listType = !this.LISConfigurations?.isLIS ? "patients" : "samples";
+
+    this.sampleVisitParameters = {
       hasStatus: this.hasStatus,
-      pageSize: this.pageSize,
-      page: this.page,
-    });
+      sampleCategory: this.category,
+    };
     this.searchingTestField = new Dropdown({
       id: "test",
       key: "test",
@@ -126,7 +144,12 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   toggleListType(event: MatRadioChange): void {
     this.listType = event.value;
     if (this.listType === "samples") {
-      this.getSamples();
+      this.getSamples({
+        pageSize: this.pageSize,
+        page: this.page,
+        category: this.category,
+        hasStatus: this.hasStatus,
+      });
     } else {
       this.getPatients();
     }
@@ -156,7 +179,8 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
         null,
         null,
         null,
-        this.category
+        this.category,
+        this.excludedSampleCategories
       )
       .pipe(
         map((response) => {
@@ -168,44 +192,42 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       );
   }
 
-  getSamplesListByVisit(event: Event, visit: any): void {
+  getSamplesListByVisit(event: Event, visit: any, parameters: any): void {
     event.stopPropagation();
     this.currentVisit = visit;
     this.currentSamplesByVisits$ = this.visitsService.getSamplesByVisitUuid(
-      visit?.uuid
+      visit?.uuid,
+      parameters
     );
   }
 
   getSamples(params?: any): void {
-    this.samples$ = of(null);
-    setTimeout(() => {
-      this.samples$ = this.sampleService.getLabSamplesByCollectionDates(
-        this.datesParameters,
-        params?.category,
-        params?.hasStatus,
-        this.excludeAllocations,
-        {
-          pageSize: params?.pageSize,
-          page: params?.page,
-        },
-        {
-          departments: this.labSamplesDepartments,
-          specimenSources: this.sampleTypes,
-          codedRejectionReasons: this.codedSampleRejectionReasons,
-        },
-        this.acceptedBy,
-        params?.q,
-        params?.dapartment,
-        params?.testUuid,
-        params?.instrument,
-        params?.specimenUuid,
-        this.LISConfigurations?.isLIS
-          ? localStorage?.getItem("currentLocation").indexOf("{") > -1
-            ? JSON.parse(localStorage?.getItem("currentLocation"))?.uuid
-            : null
+    this.samples$ = this.sampleService.getLabSamplesByCollectionDates(
+      this.datesParameters,
+      params?.category,
+      params?.hasStatus,
+      this.excludeAllocations,
+      {
+        pageSize: params?.pageSize,
+        page: params?.page,
+      },
+      {
+        departments: this.labSamplesDepartments,
+        specimenSources: this.sampleTypes,
+        codedRejectionReasons: this.codedSampleRejectionReasons,
+      },
+      this.acceptedBy,
+      params?.q,
+      params?.dapartment,
+      params?.testUuid,
+      params?.instrument,
+      params?.specimenUuid,
+      this.LISConfigurations?.isLIS
+        ? localStorage?.getItem("currentLocation").indexOf("{") > -1
+          ? JSON.parse(localStorage?.getItem("currentLocation"))?.uuid
           : null
-      );
-    }, 50);
+        : null
+    );
   }
 
   onPageChange(event: any): void {
@@ -355,9 +377,13 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     this.selectedSampleDetails.emit(sample);
   }
 
-  onPrintBarcode(event: Event, sample: any): void{
-
-    const data = {identifier:sample?.label, sample:sample, sampleLabelsUsedDetails: [sample], isLis:this.LISConfigurations?.isLIS,};
+  onPrintBarcode(event: Event, sample: any): void {
+    const data = {
+      identifier: sample?.label,
+      sample: sample,
+      sampleLabelsUsedDetails: [sample],
+      isLis: this.LISConfigurations?.isLIS,
+    };
 
     this.dialog
       .open(BarCodeModalComponent, {
@@ -377,7 +403,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
               order?.order?.shortName?.split("TEST_ORDERS:")?.join(""),
             ];
           });
-          
+
           const message = {
             SampleID: results?.sampleData?.label,
             Tests: tests?.join(","),
@@ -399,7 +425,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
               ?.split(this.barcodeSettings?.textToIgnore)
               .join(""),
           };
-          
+
           this.connection.next({
             Message: message,
             Description: "Message of data to be printed",
