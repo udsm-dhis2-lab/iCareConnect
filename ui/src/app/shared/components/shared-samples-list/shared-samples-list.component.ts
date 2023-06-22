@@ -70,10 +70,11 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
   itemsToShow: any = {};
   currentUser$: Observable<any>;
-  listType: string = "samples";
+  listType: string = "patients";
 
   currentSamplesByVisits$: Observable<any[]>;
   currentVisit: any;
+  sampleVisitParameters: any;
   constructor(
     private sampleService: SamplesService,
     private dialog: MatDialog,
@@ -83,21 +84,30 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.connection = webSocket(this.barcodeSettings?.socketUrl);
-
     this.connection.subscribe({
       next: (msg) => console.log("message received: ", msg), // Called whenever there is a message from the server.
       error: (err) => console.log(err), // Called if at any point WebSocket API signals some kind of error.
       complete: () => console.log("complete"), // Called when connection is closed (for whatever reason).
     });
+    if (this.listType === "samples") {
+      this.getSamples({
+        category: this.category,
+        hasStatus: this.hasStatus,
+        pageSize: this.pageSize,
+        page: this.page,
+      });
+    } else {
+      this.getPatients();
+    }
   }
 
   ngOnInit(): void {
-    this.getSamples({
-      category: this.category,
+    this.listType = !this.LISConfigurations?.isLIS ? "patients" : "samples";
+
+    this.sampleVisitParameters = {
       hasStatus: this.hasStatus,
-      pageSize: this.pageSize,
-      page: this.page,
-    });
+      sampleCategory: this.category,
+    };
     this.searchingTestField = new Dropdown({
       id: "test",
       key: "test",
@@ -134,7 +144,12 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   toggleListType(event: MatRadioChange): void {
     this.listType = event.value;
     if (this.listType === "samples") {
-      this.getSamples({ pageSize: this.pageSize, page: this.page });
+      this.getSamples({
+        pageSize: this.pageSize,
+        page: this.page,
+        category: this.category,
+        hasStatus: this.hasStatus,
+      });
     } else {
       this.getPatients();
     }
@@ -177,44 +192,42 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       );
   }
 
-  getSamplesListByVisit(event: Event, visit: any): void {
+  getSamplesListByVisit(event: Event, visit: any, parameters: any): void {
     event.stopPropagation();
     this.currentVisit = visit;
     this.currentSamplesByVisits$ = this.visitsService.getSamplesByVisitUuid(
-      visit?.uuid
+      visit?.uuid,
+      parameters
     );
   }
 
   getSamples(params?: any): void {
-    this.samples$ = of(null);
-    setTimeout(() => {
-      this.samples$ = this.sampleService.getLabSamplesByCollectionDates(
-        this.datesParameters,
-        params?.category,
-        params?.hasStatus,
-        this.excludeAllocations,
-        {
-          pageSize: params?.pageSize,
-          page: params?.page,
-        },
-        {
-          departments: this.labSamplesDepartments,
-          specimenSources: this.sampleTypes,
-          codedRejectionReasons: this.codedSampleRejectionReasons,
-        },
-        this.acceptedBy,
-        params?.q,
-        params?.dapartment,
-        params?.testUuid,
-        params?.instrument,
-        params?.specimenUuid,
-        this.LISConfigurations?.isLIS
-          ? localStorage?.getItem("currentLocation").indexOf("{") > -1
-            ? JSON.parse(localStorage?.getItem("currentLocation"))?.uuid
-            : null
+    this.samples$ = this.sampleService.getLabSamplesByCollectionDates(
+      this.datesParameters,
+      params?.category,
+      params?.hasStatus,
+      this.excludeAllocations,
+      {
+        pageSize: params?.pageSize,
+        page: params?.page,
+      },
+      {
+        departments: this.labSamplesDepartments,
+        specimenSources: this.sampleTypes,
+        codedRejectionReasons: this.codedSampleRejectionReasons,
+      },
+      this.acceptedBy,
+      params?.q,
+      params?.dapartment,
+      params?.testUuid,
+      params?.instrument,
+      params?.specimenUuid,
+      this.LISConfigurations?.isLIS
+        ? localStorage?.getItem("currentLocation").indexOf("{") > -1
+          ? JSON.parse(localStorage?.getItem("currentLocation"))?.uuid
           : null
-      );
-    }, 50);
+        : null
+    );
   }
 
   onPageChange(event: any): void {
