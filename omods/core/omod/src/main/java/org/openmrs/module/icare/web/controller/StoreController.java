@@ -738,24 +738,24 @@ public class StoreController {
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
 	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
 	        @RequestParam(required = false, value = "status") StockInvoiceStatus.Type status,
-			@RequestParam(required = false) String q,@RequestParam(value = "startDate", required = false) String startDate,
-			@RequestParam(value = "endDate", required = false) String endDate) throws Exception {
+	        @RequestParam(required = false) String q, @RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate) throws Exception {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
-
+		
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-
+			
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
 		}
 		
-		ListResult<StockInvoice> stockInvoices = this.storeService.getStockInvoices(pager, status,q,start,end);
+		ListResult<StockInvoice> stockInvoices = this.storeService.getStockInvoices(pager, status, q, start, end);
 		return stockInvoices.toMap();
 	}
 	

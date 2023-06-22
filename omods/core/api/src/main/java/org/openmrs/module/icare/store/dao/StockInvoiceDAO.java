@@ -12,7 +12,8 @@ import java.util.Date;
 
 public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 	
-	public ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status, String q, Date startDate, Date endDate) {
+	public ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status, String q, Date startDate,
+	        Date endDate) {
 		DbSession session = this.getSession();
 		String queryStr = " SELECT stinv FROM StockInvoice stinv WHERE stinv.voided = false";
 		
@@ -33,32 +34,32 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 			}
 			queryStr += " stinv IN (SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'RECEIVED') ";
 		}
-
+		
 		if (startDate != null && endDate != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
-			}else {
+			} else {
 				queryStr += " AND";
 			}
 			queryStr += " (cast(stinv.receivingDate as date) BETWEEN :startDate AND :endDate)";
 		}
-
+		
 		if (q != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
-
+			
 			queryStr += "lower(stinv.invoiceNumber) like lower(:q) ";
 		}
 		
 		Query query = session.createQuery(queryStr);
-		if(startDate != null && endDate != null){
-			query.setParameter("startDate",startDate);
-			query.setParameter("endDate",endDate);
+		if (startDate != null && endDate != null) {
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
 		}
-
+		
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
 		}

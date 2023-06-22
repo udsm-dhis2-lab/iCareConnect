@@ -605,14 +605,15 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status,String q,Date startDate, Date endDate ) {
+	public ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status, String q, Date startDate,
+	        Date endDate) {
 		
-		ListResult<StockInvoice> stockInvoices = stockInvoiceDAO.getStockInvoices(pager, status,q,startDate,endDate);
+		ListResult<StockInvoice> stockInvoices = stockInvoiceDAO.getStockInvoices(pager, status, q, startDate, endDate);
 		for (StockInvoice stockInvoice : stockInvoices.getResults()) {
 			Double totalAmount = stockInvoiceDAO.getTotalStockItemsAmountByStockInvoice(stockInvoice);
 			stockInvoice.setTotalAmount(totalAmount);
 		}
-		return stockInvoiceDAO.getStockInvoices(pager, status,q,startDate,endDate);
+		return stockInvoiceDAO.getStockInvoices(pager, status, q, startDate, endDate);
 	}
 	
 	@Override

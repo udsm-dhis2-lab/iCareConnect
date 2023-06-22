@@ -3,9 +3,7 @@ package org.openmrs.module.icare.laboratory.dao;
 // Generated Oct 7, 2020 12:49:21 PM by Hibernate Tools 5.2.10.Final
 
 import org.hibernate.Query;
-import org.openmrs.User;
 import org.openmrs.Visit;
-import org.openmrs.VisitAttribute;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
@@ -74,8 +72,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
-	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
-	        String testConceptUuid, String departmentUuid, String specimenSourceUuid, String instrumentUuid) {
+										 String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
+										 String testConceptUuid, String departmentUuid, String specimenSourceUuid, String instrumentUuid, String visitUuid) {
 		
 		DbSession session = this.getSession();
 		
@@ -237,6 +235,16 @@ public class SampleDAO extends BaseDAO<Sample> {
 				
 			}
 		}
+
+		if(visitUuid != null){
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+				queryStr += "sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
+
+		}
 		
 		queryStr += " ORDER BY sp.dateCreated DESC";
 		//		if (sampleCategory != null) {
@@ -287,6 +295,9 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		if (instrumentUuid != null) {
 			query.setParameter("instrumentUuid", instrumentUuid);
+		}
+		if(visitUuid != null){
+			query.setParameter("visitUuid",visitUuid);
 		}
 		
 		if (pager.isAllowed()) {
@@ -426,9 +437,9 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager,
-	        String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
-	        String acceptedByUuid, String testConceptUuid, String departmentUuid, String specimenSourceUuid,
-	        String instrumentUuid) {
+															  String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
+															  String acceptedByUuid, String testConceptUuid, String departmentUuid, String specimenSourceUuid,
+															  String instrumentUuid, String visitUuid) {
 		
 		DbSession session = this.getSession();
 		
@@ -594,6 +605,17 @@ public class SampleDAO extends BaseDAO<Sample> {
 				}
 			}
 		}
+
+		if(visitUuid != null){
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
+
+		}
+
 		queryStr += " ORDER BY sp.dateCreated DESC";
 		//		if (sampleCategory != null) {
 		//			queryStr += ",ss.timestamp DESC";
@@ -639,6 +661,10 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		if (instrumentUuid != null) {
 			query.setParameter("instrumentUuid", instrumentUuid);
+		}
+
+		if(visitUuid != null){
+			query.setParameter("visitUuid",visitUuid);
 		}
 		
 		if (pager.isAllowed()) {
