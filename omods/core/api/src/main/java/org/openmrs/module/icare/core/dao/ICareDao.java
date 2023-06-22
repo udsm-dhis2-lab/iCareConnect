@@ -463,7 +463,6 @@ public class ICareDao extends BaseDAO<Item> {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
 		if(exclude != null){
-
 			Pattern pattern = Pattern.compile("List:\\[(.*?)\\]");
 			Matcher matcher = pattern.matcher(exclude);
 			String excludedValue;
