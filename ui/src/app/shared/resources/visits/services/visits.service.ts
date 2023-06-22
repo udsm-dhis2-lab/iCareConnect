@@ -972,7 +972,7 @@ export class VisitsService {
       queryParams = [...queryParams, key + "=" + parameters[key]];
     });
     return this.httpClient
-      .get("lab/sample?visit=" + visitUuid + "&" + queryParams.join("&"))
+      .get("lab/samples?visit=" + visitUuid + "&" + queryParams.join("&"))
       ?.pipe(
         map((response) => {
           return (response?.results ? response?.results : response)?.map(
