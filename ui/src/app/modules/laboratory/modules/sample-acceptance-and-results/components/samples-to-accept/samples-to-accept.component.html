@@ -29,6 +29,7 @@
         (samplesForAction)="onGetSelectedSamplesForAction($event)"
         [category]="LISConfigurations?.isLIS ? 'NOT ACCEPTED' : 'COLLECTED'"
         [hasStatus]="'YES'"
+        [excludedSampleCategories]="['ACCEPTED', 'HAS_RESULTS', 'REJECTED']"
         [datesParameters]="datesParameters"
         [excludeAllocations]="excludeAllocations"
         [sampleTypes]="sampleTypes"

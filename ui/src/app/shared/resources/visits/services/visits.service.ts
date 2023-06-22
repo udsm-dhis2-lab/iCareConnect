@@ -236,7 +236,8 @@ export class VisitsService {
     orderByDirection?: string,
     filterBy?: string,
     encounterType?: string,
-    sampleCategory?: string
+    sampleCategory?: string,
+    excludedSampleCategories?: string[]
   ): Observable<any> {
     const locationUuids: any = isArray(location)
       ? location
@@ -274,6 +275,12 @@ export class VisitsService {
 
     if (encounterType) {
       parametersString += `&encounterTypeUuid=${encounterType}`;
+    }
+
+    if (excludedSampleCategories && excludedSampleCategories?.length > 0) {
+      parametersString += `&exclude=List:[${excludedSampleCategories.join(
+        ","
+      )}]`;
     }
     //
     return (

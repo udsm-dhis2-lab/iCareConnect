@@ -42,6 +42,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   @Input() acceptedBy: string;
   @Input() showLegend: boolean;
   @Input() barcodeSettings: any;
+  @Input() excludedSampleCategories: string[];
   samplesToViewMoreDetails: any = {};
   selectedDepartment: string;
   searchingText: string;
@@ -163,7 +164,8 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
         null,
         null,
         null,
-        this.category
+        this.category,
+        this.excludedSampleCategories
       )
       .pipe(
         map((response) => {
