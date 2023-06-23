@@ -317,7 +317,7 @@ public class StockDAO extends BaseDAO<Stock> {
 
 		DbSession session = this.getSession();
 
-		String queryStr = "SELECT stc FROM Stock stc INNER JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN it.drug d WHERE stc.expiryDate <= current_date AND (d.retired = false OR c.retired = false) AND  stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) ";
+		String queryStr = "SELECT stc FROM Stock stc INNER JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN it.drug d WHERE stc.expiryDate <= current_date AND (d.retired = false OR c.retired = false) AND  stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) AND stc.quantity > 0 ";
 
 		Query query = session.createQuery(queryStr);
 		query.setParameter("locationUuid", locationUuid);

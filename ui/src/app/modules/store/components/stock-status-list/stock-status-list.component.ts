@@ -96,17 +96,17 @@ export class StockStatusListComponent implements OnInit {
         return response?.results;
       }));
     } else if(this.status === 'EXPIRED'){
-      this.stocksList$ = this.stockService.getExpiredItems(this.currentLocation?.uuid).pipe(map((response) => {
+      this.stocksList$ = this.stockService.getExpiredItems(this.currentLocation?.uuid,this.page,this.pageSize).pipe(map((response) => {
         this.pager = response?.pager
         return response?.results
       }));
     } else if (this.status === 'NEARLYSTOCKEDOUT') {
-      this.stocksList$ = this.stockService.getNearlyStockedOutItems(this.currentLocation?.uuid).pipe(map((response) => {
+      this.stocksList$ = this.stockService.getNearlyStockedOutItems(this.currentLocation?.uuid,this.page,this.pageSize).pipe(map((response) => {
         this.pager = response?.pager
         return response?.results
       }));
     } else if (this.status === 'NEARLYEXPIRED') {
-      this.stocksList$ = this.stockService.getNearlyExpiredItems(this.currentLocation?.uuid).pipe(map((response) => {
+      this.stocksList$ = this.stockService.getNearlyExpiredItems(this.currentLocation?.uuid,this.page,this.pageSize).pipe(map((response) => {
         this.pager = response?.pager
         return response?.results
       }));
@@ -161,9 +161,13 @@ export class StockStatusListComponent implements OnInit {
   }
 
   onPageChange(event) {
-    this.page =
-      event.pageIndex - this.page >= 0 ? this.page + 1 : this.page - 1;
+    // this.page =
+    //   event.pageIndex - this.page >= 0 ? this.page + 1 : this.page - 1;
+    this.page = this.page + (event?.pageIndex - event?.previousPageIndex);
     this.pageSize = Number(event?.pageSize);
+    console.log("page: ",this.page);
+    console.log("pagesize: ",this.pageSize);
+    console.log("pageIndex: ",event.pageIndex)
     this.getStock();
   }
 

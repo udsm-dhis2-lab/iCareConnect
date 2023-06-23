@@ -430,10 +430,11 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		handleGet = handle(newGetRequest);
 		Map<String, Object> samplesRejected = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		System.out.println("rejected samples: " + samplesRejected);
-
-		newGetRequest = newGetRequest("lab/samples", new Parameter("visit","d9c1d8ac-2b8e-427f-804d-b858c52e6f11"), new Parameter("excludeAllocations", "true"));
+		
+		newGetRequest = newGetRequest("lab/samples", new Parameter("visit", "d9c1d8ac-2b8e-427f-804d-b858c52e6f11"),
+		    new Parameter("excludeAllocations", "true"));
 		handleGet = handle(newGetRequest);
-		Map<String,Object> samplesVisit = (new ObjectMapper()).readValue(handleGet.getContentAsString(),Map.class);
+		Map<String, Object> samplesVisit = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		assertThat("There are 5 samples", ((List<Map<String, Object>>) sampleResults.get("results")).size(), is(5));
 	}
 	

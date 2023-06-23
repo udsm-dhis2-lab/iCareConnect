@@ -228,7 +228,7 @@ public class LaboratoryController {
 	        @RequestParam(value = "department", required = false) String departmentUuid,
 	        @RequestParam(value = "specimen", required = false) String specimenSourceUuid,
 	        @RequestParam(value = "instrument", required = false) String instrumentUuid,
-			@RequestParam(value="visit", required = false) String visitUuid) throws Exception {
+	        @RequestParam(value = "visit", required = false) String visitUuid) throws Exception {
 		
 		Date start = null;
 		Date end = null;
