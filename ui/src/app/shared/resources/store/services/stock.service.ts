@@ -30,18 +30,21 @@ export class StockService {
     params?: { q?: string; limit?: number; startIndex?: number },
     page?: number, pageSize?: number
   ): Observable<any | StockObject[]> {
-    const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
-    const pageSizeNumber =
-      locationUuid && pageSize && page
-        ? `&pageSize=${pageSize}`
-        : pageSize && page
-          ? `&pageSize=${pageSize}`
-          : pageSize
-            ? `pageSize=${pageSize}` : ``;
-    const location =
-      locationUuid ? `locationUuid=${locationUuid}` : '';
-    const q = params?.q && locationUuid ? `&q=${params?.q}` : params?.q ? `q=${params?.q}` : ''; 
-    const args = `?${location}${q}${pageNumber}${pageSizeNumber}` ;
+    let queryParams = [];
+
+      if(page) {
+        queryParams = [...queryParams, `page=${page}`]
+      }
+      if(pageSize) {
+        queryParams = [...queryParams, `pageSize=${pageSize}`]
+      }
+      if(locationUuid) {
+        queryParams = [...queryParams, `locationUuid=${locationUuid}`]
+      }
+      if(params?.q) {
+        queryParams = [...queryParams, `q=${params?.q}`]
+      }
+    const args = `?${queryParams.join("&")}` ;
 
     return this.httpClient
       .get(
@@ -58,8 +61,8 @@ export class StockService {
             return new Stock(groupedStockBatches[stockItemKey]).toJson();
           })
         }
-      }))
-    return this._getStocks("store/stock", locationUuid, params);
+      }));
+    // return this._getStocks("store/stock", locationUuid, params);
   }
 
   getAvailableStockOfAnItem(
@@ -103,17 +106,32 @@ export class StockService {
   }
 
   getStockOuts(locationUuid?: string, page?: number, pageSize?: number): Observable<any> {
-    const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
-    const pageSizeNumber =
-      locationUuid && pageSize && page
-        ? `&pageSize=${pageSize}`
-        : pageSize && page
-          ? `&pageSize=${pageSize}`
-          : pageSize
-            ? `pageSize=${pageSize}` : ``;
-    const location =
-      locationUuid ? `location=${locationUuid}` : '';
-    const args = `?${location}${pageNumber}${pageSizeNumber}` ;
+    // const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
+    // const pageSizeNumber =
+    //   locationUuid && pageSize && page
+    //     ? `&pageSize=${pageSize}`
+    //     : pageSize && page
+    //       ? `&pageSize=${pageSize}`
+    //       : pageSize
+    //         ? `pageSize=${pageSize}` : ``;
+    // const location =
+    //   locationUuid ? `location=${locationUuid}` : '';
+    // const args = `?${location}${pageNumber}${pageSizeNumber}` ;
+
+    let queryParams = [];
+
+      if(page) {
+        queryParams = [...queryParams, `page=${page}`]
+      }
+      if(pageSize) {
+        queryParams = [...queryParams, `pageSize=${pageSize}`]
+      }
+      if(locationUuid) {
+        queryParams = [...queryParams, `location=${locationUuid}`]
+      }
+      
+    const args = `?${queryParams.join("&")}` ;
+
 
     return this.httpClient
       .get(
@@ -135,17 +153,32 @@ export class StockService {
     return this._getStocks("store/stockout", locationUuid, null, true);
   }
   getExpiredItems(locationUuid?: string, page?: number, pageSize?: number): Observable<any> {
-    const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
-    const pageSizeNumber =
-      locationUuid && pageSize && page
-        ? `&pageSize=${pageSize}`
-        : pageSize && page 
-        ? `&pageSize=${pageSize}`
-        : pageSize 
-        ? `pageSize=${pageSize}` : ``;
-    const location =
-      locationUuid ? `location=${locationUuid}` : '';
-    const args = `?${location}${pageNumber}${pageSizeNumber}` ;
+    // const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
+    // const pageSizeNumber =
+    //   locationUuid && pageSize && page
+    //     ? `&pageSize=${pageSize}`
+    //     : pageSize && page 
+    //     ? `&pageSize=${pageSize}`
+    //     : pageSize 
+    //     ? `pageSize=${pageSize}` : ``;
+    // const location =
+    //   locationUuid ? `location=${locationUuid}` : '';
+    // const args = `?${location}${pageNumber}${pageSizeNumber}` ;
+
+    let queryParams = [];
+
+      if(page) {
+        queryParams = [...queryParams, `page=${page}`]
+      }
+      if(pageSize) {
+        queryParams = [...queryParams, `pageSize=${pageSize}`]
+      }
+      if(locationUuid) {
+        queryParams = [...queryParams, `location=${locationUuid}`]
+      }
+      
+    const args = `?${queryParams.join("&")}` ;
+
 
     return this.httpClient
       .get(
@@ -167,17 +200,32 @@ export class StockService {
   }
 
   getNearlyStockedOutItems(locationUuid?: string, page?: number, pageSize?: number): Observable<any> {
-    const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
-    const pageSizeNumber =
-      locationUuid && pageSize && page
-        ? `&pageSize=${pageSize}`
-        : pageSize && page 
-        ? `&pageSize=${pageSize}`
-        : pageSize 
-        ? `pageSize=${pageSize}` : ``;
-    const location =
-      locationUuid ? `location=${locationUuid}` : '';
-    const args = `?${location}${pageNumber}${pageSizeNumber}` ;
+    // const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
+    // const pageSizeNumber =
+    //   locationUuid && pageSize && page
+    //     ? `&pageSize=${pageSize}`
+    //     : pageSize && page 
+    //     ? `&pageSize=${pageSize}`
+    //     : pageSize 
+    //     ? `pageSize=${pageSize}` : ``;
+    // const location =
+    //   locationUuid ? `location=${locationUuid}` : '';
+    // const args = `?${location}${pageNumber}${pageSizeNumber}` ;
+
+    let queryParams = [];
+
+      if(page) {
+        queryParams = [...queryParams, `page=${page}`]
+      }
+      if(pageSize) {
+        queryParams = [...queryParams, `pageSize=${pageSize}`]
+      }
+      if(locationUuid) {
+        queryParams = [...queryParams, `location=${locationUuid}`]
+      }
+      
+    const args = `?${queryParams.join("&")}` ;
+
 
     return this.httpClient
       .get(
@@ -199,17 +247,32 @@ export class StockService {
   }
   
   getNearlyExpiredItems(locationUuid?: string, page?: number, pageSize?: number): Observable<any> {
-    const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
-    const pageSizeNumber =
-      locationUuid && pageSize && page
-        ? `&pageSize=${pageSize}`
-        : pageSize && page 
-        ? `&pageSize=${pageSize}`
-        : pageSize 
-        ? `pageSize=${pageSize}` : ``;
-    const location =
-      locationUuid ? `location=${locationUuid}` : '';
-    const args = `?${location}${pageNumber}${pageSizeNumber}` ;
+    // const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
+    // const pageSizeNumber =
+    //   locationUuid && pageSize && page
+    //     ? `&pageSize=${pageSize}`
+    //     : pageSize && page 
+    //     ? `&pageSize=${pageSize}`
+    //     : pageSize 
+    //     ? `pageSize=${pageSize}` : ``;
+    // const location =
+    //   locationUuid ? `location=${locationUuid}` : '';
+    // const args = `?${location}${pageNumber}${pageSizeNumber}` ;
+
+    let queryParams = [];
+
+      if(page) {
+        queryParams = [...queryParams, `page=${page}`]
+      }
+      if(pageSize) {
+        queryParams = [...queryParams, `pageSize=${pageSize}`]
+      }
+      if(locationUuid) {
+        queryParams = [...queryParams, `location=${locationUuid}`]
+      }
+      
+    const args = `?${queryParams.join("&")}` ;
+
 
     return this.httpClient
       .get(

@@ -82,7 +82,7 @@
               selectedStock: currentItemStock?.id === stock.id
             }"
           >
-            <td>{{ stockIndex + 1 }}</td>
+            <td>{{ stockIndex + 1 +(page -1) * pageSize}}</td>
             <td style="word-wrap: break-word">{{ stock?.name }}</td>
             <td>{{ stock?.quantity }}</td>
             <td>{{ stock?.quantity - stock?.eligibleQuantity }}</td>

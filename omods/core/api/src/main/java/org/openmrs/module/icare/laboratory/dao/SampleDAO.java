@@ -72,8 +72,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
-										 String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
-										 String testConceptUuid, String departmentUuid, String specimenSourceUuid, String instrumentUuid, String visitUuid) {
+	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
+	        String testConceptUuid, String departmentUuid, String specimenSourceUuid, String instrumentUuid, String visitUuid) {
 		
 		DbSession session = this.getSession();
 		
@@ -235,15 +235,15 @@ public class SampleDAO extends BaseDAO<Sample> {
 				
 			}
 		}
-
-		if(visitUuid != null){
-				if (!queryStr.contains("WHERE")) {
-					queryStr += " WHERE ";
-				} else {
-					queryStr += " AND ";
-				}
-				queryStr += "sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
-
+		
+		if (visitUuid != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
+			
 		}
 		
 		queryStr += " ORDER BY sp.dateCreated DESC";
@@ -296,8 +296,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (instrumentUuid != null) {
 			query.setParameter("instrumentUuid", instrumentUuid);
 		}
-		if(visitUuid != null){
-			query.setParameter("visitUuid",visitUuid);
+		if (visitUuid != null) {
+			query.setParameter("visitUuid", visitUuid);
 		}
 		
 		if (pager.isAllowed()) {
@@ -437,9 +437,9 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager,
-															  String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
-															  String acceptedByUuid, String testConceptUuid, String departmentUuid, String specimenSourceUuid,
-															  String instrumentUuid, String visitUuid) {
+	        String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
+	        String acceptedByUuid, String testConceptUuid, String departmentUuid, String specimenSourceUuid,
+	        String instrumentUuid, String visitUuid) {
 		
 		DbSession session = this.getSession();
 		
@@ -605,17 +605,17 @@ public class SampleDAO extends BaseDAO<Sample> {
 				}
 			}
 		}
-
-		if(visitUuid != null){
+		
+		if (visitUuid != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
 			queryStr += "sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
-
+			
 		}
-
+		
 		queryStr += " ORDER BY sp.dateCreated DESC";
 		//		if (sampleCategory != null) {
 		//			queryStr += ",ss.timestamp DESC";
@@ -662,9 +662,9 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (instrumentUuid != null) {
 			query.setParameter("instrumentUuid", instrumentUuid);
 		}
-
-		if(visitUuid != null){
-			query.setParameter("visitUuid",visitUuid);
+		
+		if (visitUuid != null) {
+			query.setParameter("visitUuid", visitUuid);
 		}
 		
 		if (pager.isAllowed()) {
