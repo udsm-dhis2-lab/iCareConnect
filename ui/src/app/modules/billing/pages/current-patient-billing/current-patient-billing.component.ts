@@ -575,18 +575,65 @@ export class CurrentPatientBillingComponent implements OnInit {
 
         e.Bill.forEach((bill) => {
           bill.items.forEach((record) => {
-            contents = `
-            <tr>
-              <td>${record.name}</td> 
-              <td>${record.quantity}</td> 
-              <td>${record.amount}</td>
-            </tr>`;
-            frameDoc.document.write(contents);
+            // payable items
+            if (record?.discounted == false) {
+              contents = `
+              <tr>
+                <td>${record.name}</td> 
+                <td>${record.quantity}</td> 
+                <td>${record.amount}</td>
+              </tr>`;
+              frameDoc.document.write(contents);
+            }
           });
           contents = `<tr>
           
           <td  style ="font-weight:bold;"> &nbsp;Total </td>
           <td colspan="2" style ="font-weight:bold; text-align:center">${bill.totalPaymentAmount}</td>
+          </tr>`;
+          frameDoc.document.write(contents);
+        });
+
+        frameDoc.document.write(`
+          </tbody>
+        </table>`);
+      }
+    }
+
+    // For exempted items
+    if (e.Bill) {
+      if (e.Bill.length > 0) {
+        frameDoc.document.write(`
+        <div>
+          <h5>Exempted Items</h5>
+        </div>
+        <table id="table">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Quantity</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+        <tbody>`);
+
+        e.Bill.forEach((bill) => {
+          bill.items.forEach((record) => {
+            //Check for exempted items unexempted items
+            if (record.discounted == true) {
+              contents = `
+              <tr>
+                <td>${record.name}</td> 
+                <td>${record.quantity}</td> 
+                <td>${record.amount}</td>
+              </tr>`;
+              frameDoc.document.write(contents);
+            }
+          });
+          contents = `<tr>
+          
+          <td  style ="font-weight:bold;"> &nbsp;Total </td>
+          <td colspan="2" style ="font-weight:bold; text-align:center">${bill.discount}</td>
           </tr>`;
           frameDoc.document.write(contents);
         });
