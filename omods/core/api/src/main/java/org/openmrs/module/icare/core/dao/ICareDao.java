@@ -588,6 +588,8 @@ public class ICareDao extends BaseDAO<Item> {
 			searchConceptQueryStr += " " + where;
 		}
 		
+		searchConceptQueryStr += " ORDER BY c.dateCreated DESC";
+		
 		Query sqlQuery = session.createQuery(searchConceptQueryStr);
 		sqlQuery.setFirstResult(startIndex);
 		sqlQuery.setMaxResults(limit);
@@ -617,7 +619,6 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		if (pager.isAllowed()) {
 			pager.setTotal(sqlQuery.list().size());
-			//pager.setPageCount(pager.getT);
 			sqlQuery.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
 			sqlQuery.setMaxResults(pager.getPageSize());
 		}
