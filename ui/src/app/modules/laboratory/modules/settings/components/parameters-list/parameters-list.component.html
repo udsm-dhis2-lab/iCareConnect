@@ -46,13 +46,36 @@
                   <mat-icon>more_vert</mat-icon>
                 </button>
                 <mat-menu #menu="matMenu">
-                  <button mat-menu-item (click)="onEdit($event, parameter)">
+                  <button
+                    [disabled]="parameter?.retired"
+                    mat-menu-item
+                    (click)="onEdit($event, parameter)"
+                  >
                     <mat-icon>edit</mat-icon>
                     <span>Edit</span>
                   </button>
-                  <button mat-menu-item (click)="onDelete($event, parameter)">
+                  <button
+                    [disabled]="parameter?.retired"
+                    mat-menu-item
+                    (click)="onDelete($event, parameter)"
+                  >
                     <mat-icon>delete</mat-icon>
+                    <span>Retire (Disable)</span>
+                  </button>
+                  <button
+                    mat-menu-item
+                    (click)="onPermanentDelete($event, parameter)"
+                  >
+                    <mat-icon>delete_forever</mat-icon>
                     <span>Delete</span>
+                  </button>
+                  <button
+                    [disabled]="!parameter?.retired"
+                    mat-menu-item
+                    (click)="onEnable($event, parameter)"
+                  >
+                    <mat-icon>done</mat-icon>
+                    <span>Enable</span>
                   </button>
                 </mat-menu>
               </td>

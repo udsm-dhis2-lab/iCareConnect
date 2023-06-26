@@ -9,6 +9,9 @@ import {
   ConceptCreate,
   ConceptGetFull,
 } from "src/app/shared/resources/openmrs";
+import { omit } from "lodash";
+import { MatDialog } from "@angular/material/dialog";
+import { SharedConfirmationDialogComponent } from "src/app/shared/components/shared-confirmation-dialog/shared-confirmation-dialog.component";
 
 @Component({
   selector: "app-coded-answers",
@@ -40,7 +43,8 @@ export class CodedAnswersComponent implements OnInit {
 
   constructor(
     private conceptService: ConceptsService,
-    private conceptSourceService: ConceptSourcesService
+    private conceptSourceService: ConceptSourcesService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -182,17 +186,89 @@ export class CodedAnswersComponent implements OnInit {
   }
 
   onDelete(event: Event, concept: any): void {
-    this.conceptService.deleteConcept(concept?.uuid).subscribe((response) => {
-      if (response) {
-        this.page = 1;
-        this.codedAnswers$ = this.conceptService.searchConcept({
-          pageSize: this.pageSize,
-          conceptClass: "Coded answer",
-          page: this.page,
-          searchTerm: "LIS_CODED_ANSWERS",
-        });
-      }
-    });
+    this.dialog
+      .open(SharedConfirmationDialogComponent, {
+        minWidth: "20%",
+        data: {
+          header: `Are you sure to delete concept <b>${concept?.display}</b>`,
+        },
+      })
+      .afterClosed()
+      .subscribe((shouldConfirm) => {
+        if (shouldConfirm) {
+          this.conceptService
+            .deleteConcept(concept?.uuid)
+            .subscribe((response) => {
+              if (response) {
+                this.page = 1;
+                this.codedAnswers$ = this.conceptService.searchConcept({
+                  pageSize: this.pageSize,
+                  conceptClass: "Coded answer",
+                  page: this.page,
+                  searchTerm: "LIS_CODED_ANSWERS",
+                });
+              }
+            });
+        }
+      });
+  }
+
+  onPermanentDelete(event: Event, concept: any): void {
+    this.dialog
+      .open(SharedConfirmationDialogComponent, {
+        minWidth: "20%",
+        data: {
+          header: `Are you sure to delete concept <b>${concept?.display}</b> permanently?`,
+        },
+      })
+      .afterClosed()
+      .subscribe((shouldConfirm) => {
+        if (shouldConfirm) {
+          this.conceptService
+            .deleteConcept(concept?.uuid, true)
+            .subscribe((response) => {
+              if (response) {
+                this.page = 1;
+                this.codedAnswers$ = this.conceptService.searchConcept({
+                  pageSize: this.pageSize,
+                  conceptClass: "Coded answer",
+                  page: this.page,
+                  searchTerm: "LIS_CODED_ANSWERS",
+                });
+              }
+            });
+        }
+      });
+  }
+
+  onEnable(event: Event, concept: any): void {
+    this.dialog
+      .open(SharedConfirmationDialogComponent, {
+        minWidth: "20%",
+        data: {
+          header: `Are you sure you want to enable concept <b>${concept?.display}</b>?`,
+        },
+      })
+      .afterClosed()
+      .subscribe((shouldConfirm) => {
+        if (shouldConfirm) {
+          this.conceptService
+            .unRetireConcept(concept?.uuid, {
+              retired: false,
+            })
+            .subscribe((response) => {
+              if (response) {
+                this.page = 1;
+                this.codedAnswers$ = this.conceptService.searchConcept({
+                  pageSize: this.pageSize,
+                  conceptClass: "Coded answer",
+                  page: this.page,
+                  searchTerm: "LIS_CODED_ANSWERS",
+                });
+              }
+            });
+        }
+      });
   }
 
   searchConcept(event: KeyboardEvent): void {
