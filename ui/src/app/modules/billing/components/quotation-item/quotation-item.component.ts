@@ -446,10 +446,11 @@ export class QuotationItemComponent implements OnInit {
     if (e.Bill) {
       // console.log("The bills are:", e.Bill);
       if (e.Bill.length > 0) {
-        let sum = sumBy(
-          e.Bill.filter((record) => record.billItem.discounted === false),
-          "amount"
-        );
+        // let sum = sumBy(
+        //   e.Bill.filter((record) => record.billItem.discounted === false),
+        //   "amount"
+        // );
+        let sum = sumBy(e.Bill, "payable");
 
         frameDoc.document.write(`
         <div>
@@ -467,12 +468,12 @@ export class QuotationItemComponent implements OnInit {
 
         // e.Bill.forEach((bill) => {
         e.Bill.forEach((record) => {
-          if (!record.discounted) {
+          if (!record.discounted || record.payable > 0) {
             contents = `
             <tr>
               <td>${record.name}</td> 
               <td>${record.quantity}</td> 
-              <td>${record.amount}</td>
+              <td>${record.payable}</td>
             </tr>`;
             frameDoc.document.write(contents);
           }
@@ -493,10 +494,11 @@ export class QuotationItemComponent implements OnInit {
     //For exempted items
     if (e.Bill) {
       if (e.Bill.length > 0) {
-        let exempted_sum = sumBy(
-          e.Bill.filter((record) => record.billItem.discounted === true),
-          "amount"
-        );
+        // let exempted_sum = sumBy(
+        //   e.Bill.filter((record) => record.billItem.discounted === true),
+        //   "amount"
+        // );
+        let exempted_sum = sumBy(e.Bill, "discount");
 
         frameDoc.document.write(`
         <div>
@@ -519,7 +521,7 @@ export class QuotationItemComponent implements OnInit {
             <tr>
               <td>${record.name}</td> 
               <td>${record.quantity}</td> 
-              <td>${record.amount}</td>
+              <td>${record.discount}</td>
             </tr>`;
             frameDoc.document.write(contents);
           }
