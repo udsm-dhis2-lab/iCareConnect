@@ -576,12 +576,12 @@ export class CurrentPatientBillingComponent implements OnInit {
         e.Bill.forEach((bill) => {
           bill.items.forEach((record) => {
             // payable items
-            if (record?.discounted == false) {
+            if (!record?.discounted || record.payable > 0) {
               contents = `
               <tr>
                 <td>${record.name}</td> 
                 <td>${record.quantity}</td> 
-                <td>${record.amount}</td>
+                <td>${record.payable}</td>
               </tr>`;
               frameDoc.document.write(contents);
             }
@@ -620,12 +620,12 @@ export class CurrentPatientBillingComponent implements OnInit {
         e.Bill.forEach((bill) => {
           bill.items.forEach((record) => {
             //Check for exempted items unexempted items
-            if (record.discounted == true) {
+            if (record.discounted) {
               contents = `
               <tr>
                 <td>${record.name}</td> 
                 <td>${record.quantity}</td> 
-                <td>${record.amount}</td>
+                <td>${record.discount}</td>
               </tr>`;
               frameDoc.document.write(contents);
             }
