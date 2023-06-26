@@ -196,7 +196,7 @@ export class QuotationItemComponent implements OnInit {
   onGetInvoice(e: MouseEvent) {}
 
   onChangePaymentType(e) {
-    console.log(e);
+    // console.log(e);
   }
 
   getControlNumber(e: any, gepgConceptUuid?: any) {
