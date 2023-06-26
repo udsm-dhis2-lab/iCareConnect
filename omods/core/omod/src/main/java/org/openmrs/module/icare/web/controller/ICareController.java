@@ -398,10 +398,24 @@ public class ICareController {
 				searchTermOfConceptSetToExclude,conceptSourceUuid, referenceTermCode,attributeType,attributeValue, pager);
 		for (Concept conceptItem: (List<Concept>) listResult.getResults()) {
 			Map<String, Object> conceptMap = new HashMap<String, Object>();
+			conceptMap.put("dateCreated", conceptItem.getDateCreated());
 			conceptMap.put("uuid", conceptItem.getUuid().toString());
 			conceptMap.put("display", conceptItem.getDisplayString());
 			conceptMap.put("systemName", conceptItem.getDisplayString());
 			conceptMap.put("retired", conceptItem.getRetired().booleanValue());
+			conceptMap.put("retiredOn", conceptItem.getDateRetired());
+			conceptMap.put("retiredReason", conceptItem.getRetireReason());
+//			Creator
+			Map<String, Object> creator = new HashMap<>();
+			creator.put("uuid", conceptItem.getCreator().getUuid());
+			creator.put("display", conceptItem.getCreator().getDisplayString());
+			conceptMap.put("createdBy", creator);
+//			Changed By
+			Map<String, Object> changedBy = new HashMap<>();
+			changedBy.put("uuid", conceptItem.getChangedBy().getUuid());
+			changedBy.put("display", conceptItem.getChangedBy().getDisplayString());
+			conceptMap.put("dateChanged", conceptItem.getDateChanged());
+			conceptMap.put("changedBy", changedBy);
 
 //			Class details
 			Map<String, Object> classDetails = new HashMap<String, Object>();
