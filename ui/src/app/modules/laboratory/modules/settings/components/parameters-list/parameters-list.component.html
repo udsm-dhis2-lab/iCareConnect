@@ -28,7 +28,9 @@
           <ng-container *ngIf="params?.parameters?.results?.length > 0">
             <tr
               [ngClass]="{
-                'selected-parameter': currentParameter?.uuid === parameter?.uuid
+                'selected-parameter':
+                  currentParameter?.uuid === parameter?.uuid,
+                retired: parameter?.retired
               }"
               *ngFor="
                 let parameter of params?.parameters?.results;
