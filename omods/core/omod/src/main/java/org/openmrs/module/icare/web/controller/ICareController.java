@@ -817,9 +817,10 @@ public class ICareController {
 		List<String> conceptUuidForAnswers = answers;
 		if (concept.getAnswers().size() > 0) {
 			for(ConceptAnswer conceptAnswer:concept.getAnswers()) {
-				Concept answerConcept = conceptAnswer.getAnswerConcept();
-				if (answers.contains(answerConcept.getUuid().toString())) {
-					conceptUuidForAnswers.remove(conceptUuidForAnswers.indexOf(answerConcept.getUuid()));
+				if (answers.contains(conceptAnswer.getAnswerConcept().getUuid().toString())) {
+					conceptUuidForAnswers.remove(conceptUuidForAnswers.indexOf(conceptAnswer.getAnswerConcept().getUuid()));
+				} else {
+					concept.removeAnswer(conceptAnswer);
 				}
 			}
 		}
