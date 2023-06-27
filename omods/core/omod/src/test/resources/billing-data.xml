@@ -62,7 +62,7 @@
     <concept concept_id="1005" retired="false" datatype_id="2" class_id="1" is_set="false" creator="1"
              date_created="2016-01-01 00:00:57.0" version="" uuid="e721ec30-mfy4-11e8-ie7c-40b69mdy79ee" />
 
-    <concept concept_id="1006" retired="false" datatype_id="2" class_id="1" is_set="false" creator="1"
+    <concept concept_id="1006" retired="true" datatype_id="2" class_id="1" is_set="false" creator="1"
              date_created="2016-01-01 00:00:57.0" version="" uuid="e721ec30-mfy4-11e8-ie7c-40b69mdy79et" />
 
     <!-- dept concepts -->

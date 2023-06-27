@@ -672,6 +672,16 @@ public class ICareDao extends BaseDAO<Item> {
 		return sqlQuery.list();
 	}
 	
+	public String unRetireConcept(String uuid) {
+		DbSession session = getSession();
+		String queryStr = "UPDATE Concept SET retired='false' WHERE uuid=:uuid";
+		
+		SQLQuery query = session.createSQLQuery(queryStr);
+		query.setParameter("uuid", uuid);
+		query.executeUpdate();
+		return uuid;
+	}
+	
 	public List<Location> getLocations(String attributeType, String value, Integer limit, Integer startIndex) {
 		DbSession session = getSession();
 		new LocationAttribute();
