@@ -13,7 +13,6 @@ import { StockComponent } from "./pages/stock/stock.component";
 import { StoreHomeComponent } from "./pages/store-home/store-home.component";
 import { StoreSettingsComponent } from "./pages/store-settings/store-settings.component";
 import { StoreTransactionComponent } from "./pages/store-transaction/store-transaction.component";
-import { ConsumeStockItemComponent } from "./pages/consume-stock-item/consume-stock-item.component";
 
 const routes: Routes = [
   {
@@ -32,10 +31,6 @@ const routes: Routes = [
       {
         path: "requisition",
         component: RequisitionPageComponent,
-      },
-      {
-        path: "consume",
-        component: ConsumeStockItemComponent,
       },
       {
         path: "issuing",

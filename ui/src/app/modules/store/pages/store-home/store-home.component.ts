@@ -60,12 +60,6 @@ export class StoreHomeComponent implements OnInit {
         privilege: "STORE_MAKE_REQUISITION",
       },
       {
-        id: "consume",
-        name: "Consume",
-        url: "consume",
-        privilege: "STORE_CONSUME_ITEM",
-      },
-      {
         id: "issuing",
         name: "Issuing",
         url: "issuing",

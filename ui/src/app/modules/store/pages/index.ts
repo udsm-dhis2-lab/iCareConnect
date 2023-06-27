@@ -1,5 +1,4 @@
 import { RequisitionByStoreComponent } from "../components/requisition-by-store/requisition-by-store.component";
-import { ConsumeStockItemComponent } from "./consume-stock-item/consume-stock-item.component";
 import { IssuingPageComponent } from "./issuing-page/issuing-page.component";
 import { IssuingComponent } from "./issuing/issuing.component";
 import { RequisitionPageComponent } from "./requisition-page/requisition-page.component";
@@ -21,5 +20,4 @@ export const storePages: any[] = [
   IssuingPageComponent,
   StoreSettingsComponent,
   RequisitionByStoreComponent,
-  ConsumeStockItemComponent,
 ];

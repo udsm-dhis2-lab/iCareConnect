@@ -7,6 +7,7 @@
   } as params"
   class="container-fluid"
 >
+
   <div
     *ngIf="!params?.settingCurrentLocationStatus || !params?.currentUser"
     class="pt-2 store-container row"
@@ -22,7 +23,7 @@
                 storePage?.id !== 'settings') ||
               (params?.currentStore?.isMainStore &&
                 storePage?.id !== 'requisition' &&
-                storePage?.id !== 'received')
+                storePage?.id !== 'received' )
             "
           >
             <mat-list-item
