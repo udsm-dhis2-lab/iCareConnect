@@ -106,7 +106,8 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
     this.sampleVisitParameters = {
       hasStatus: this.hasStatus,
-      sampleCategory: this.category,
+      sampleCategory:
+        this.category === "COLLECTED" ? "NOT ACCEPTED" : this.category,
     };
     this.searchingTestField = new Dropdown({
       id: "test",
