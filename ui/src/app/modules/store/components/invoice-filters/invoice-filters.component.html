@@ -6,12 +6,17 @@
       class="float-left"
       matInput
       (keyup)="onSearch($event)"
-      placeholder="Search"
+      placeholder="Search "
     />
   </mat-form-field>
   <mat-form-field class="ml-2 w-50 d-flex">
     <mat-label>Start date</mat-label>
-    <input matInput [(ngModel)]="startDate" [matDatepicker]="start_date" />
+    <input 
+      matInput 
+      [(ngModel)]="startDate" 
+      [matDatepicker]="start_date"
+      (dateChange)="onGetDate($event, 'startDate')" 
+      />
     <mat-datepicker-toggle matSuffix [for]="start_date"></mat-datepicker-toggle>
     <mat-datepicker #start_date></mat-datepicker>
   </mat-form-field>

@@ -20,11 +20,14 @@ export class InvoiceFiltersComponent implements OnInit {
   }
 
   onGetDate(event: any, dateType): void {
+    console.log("dataType: ",dateType)
     if (dateType === "endDate") {
       this.endDate = event?.value;
+      console.log("endDate: ",this.endDate);
       this.definedEndDate.emit(this.endDate);
     } else {
       this.startDate = event?.value;
+      console.log("startDate: ",this.startDate);
       this.definedStartDate.emit(this.startDate);
     }
   }
