@@ -152,11 +152,12 @@ export class ParametersComponent implements OnInit {
     });
   }
 
-  createUnitField(): void {
+  createUnitField(data?: any): void {
     this.unitsField = new Textbox({
       id: "units",
       key: "units",
       label: "Units",
+      value: data ? data?.units : null,
       type: "text",
     });
   }
@@ -467,7 +468,7 @@ export class ParametersComponent implements OnInit {
     this.conceptsAttributesTypes$ = this.conceptService.getConceptsAttributes();
     this.selectedConceptDetails$ = this.conceptService.getConceptDetailsByUuid(
       this.parameterUuid,
-      "custom:(uuid,display,datatype,set,retired,descriptions,name,names,setMembers:(uuid,display),conceptClass:(uuid,display),answers:(uuid,display),attributes:(uuid,display,value,attributeType:(uuid,display)),mappings:(uuid,conceptReferenceTerm:(uuid,display,retired,conceptSource:(uuid,display))))"
+      "custom:(uuid,display,datatype,set,units,hiNormal,lowNormal,displayPrecision,retired,descriptions,name,names,setMembers:(uuid,display),conceptClass:(uuid,display),answers:(uuid,display),attributes:(uuid,display,value,attributeType:(uuid,display)),mappings:(uuid,conceptReferenceTerm:(uuid,display,retired,conceptSource:(uuid,display))))"
     );
 
     this.selectedConceptDetails$.subscribe((response) => {
@@ -484,9 +485,10 @@ export class ParametersComponent implements OnInit {
         this.selectedCodingSource =
           response?.mappings[0]?.conceptReferenceTerm?.conceptSource;
         this.createBasicParametersFields(response);
-        this.createUnitField();
+        this.createUnitField(response);
         this.createCodesMappingSourceField(response?.mappings);
         this.createCodeField([]);
+        this.createPrecisionField(response);
         this.selectedAnswers = response?.answers;
         this.createLowAndHighNormalFields(response);
       }

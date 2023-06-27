@@ -67,6 +67,9 @@ public class ICareController {
 	@Autowired
 	EncounterService encounterService;
 	
+	@Autowired
+	ConceptService conceptService;
+	
 	/** Logger for this class and subclasses */
 	protected final Log log = LogFactory.getLog(getClass());
 	
@@ -398,10 +401,24 @@ public class ICareController {
 				searchTermOfConceptSetToExclude,conceptSourceUuid, referenceTermCode,attributeType,attributeValue, pager);
 		for (Concept conceptItem: (List<Concept>) listResult.getResults()) {
 			Map<String, Object> conceptMap = new HashMap<String, Object>();
+			conceptMap.put("dateCreated", conceptItem.getDateCreated());
 			conceptMap.put("uuid", conceptItem.getUuid().toString());
 			conceptMap.put("display", conceptItem.getDisplayString());
 			conceptMap.put("systemName", conceptItem.getDisplayString());
 			conceptMap.put("retired", conceptItem.getRetired().booleanValue());
+			conceptMap.put("retiredOn", conceptItem.getDateRetired());
+			conceptMap.put("retiredReason", conceptItem.getRetireReason());
+//			Creator
+			Map<String, Object> creator = new HashMap<>();
+			creator.put("uuid", conceptItem.getCreator().getUuid());
+			creator.put("display", conceptItem.getCreator().getDisplayString());
+			conceptMap.put("createdBy", creator);
+//			Changed By
+			Map<String, Object> changedBy = new HashMap<>();
+			changedBy.put("uuid", conceptItem.getChangedBy().getUuid());
+			changedBy.put("display", conceptItem.getChangedBy().getDisplayString());
+			conceptMap.put("dateChanged", conceptItem.getDateChanged());
+			conceptMap.put("changedBy", changedBy);
 
 //			Class details
 			Map<String, Object> classDetails = new HashMap<String, Object>();
@@ -752,6 +769,37 @@ public class ICareController {
 			throw new RuntimeException(e);
 		}
 		return verificationInfo;
+	}
+	
+	@RequestMapping(value = "concept/{uuid}/retire", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> retireConcept(@PathVariable("uuid") String uuid, @RequestBody Map<String, Object> retireObject) {
+		Map<String, Object> returnResponse = new HashMap<>();
+		Concept concept = conceptService.getConceptByUuid((String) uuid);
+		if (concept == null){
+			throw new APIException("The concept with " + uuid+ " does not exist");
+		}
+		Concept changedConcept = new Concept();
+		if (retireObject.get("retire") == null) {
+			throw new APIException("The retire keyword is missing");
+		}
+
+		if ( retireObject.get("reason") == null &&  retireObject.get("retire").toString() == "true") {
+			throw new APIException("The retire reason is missing");
+		}
+		if ( retireObject.get("retire").toString() == "true") {
+			changedConcept =conceptService.retireConcept(concept, retireObject.get("reason").toString());
+		} else {
+			Concept conceptToUnRetire = conceptService.getConceptByUuid(uuid);
+			conceptToUnRetire.setRetired(false);
+			conceptService.saveConcept(conceptToUnRetire);
+			changedConcept = conceptService.getConceptByUuid(uuid);
+		}
+
+		returnResponse.put("uuid", changedConcept.getUuid());
+		returnResponse.put("display", changedConcept.getDisplayString());
+		returnResponse.put("retired", changedConcept.getRetired().booleanValue());
+		return returnResponse;
 	}
 	
 	@RequestMapping(value = "voidorder", method = RequestMethod.POST)

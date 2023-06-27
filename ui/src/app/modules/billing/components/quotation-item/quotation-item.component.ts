@@ -12,6 +12,7 @@ import { BillConfirmationComponent } from "../bill-confirmation/bill-confirmatio
 import { PaymentReceiptComponent } from "../payment-reciept/payment-reciept.component";
 import { sum, sumBy } from "lodash";
 import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
+import { forEach } from "cypress/types/lodash";
 
 @Component({
   selector: "app-quotation-item",
@@ -195,7 +196,7 @@ export class QuotationItemComponent implements OnInit {
   onGetInvoice(e: MouseEvent) {}
 
   onChangePaymentType(e) {
-    console.log(e);
+    // console.log(e);
   }
 
   getControlNumber(e: any, gepgConceptUuid?: any) {
@@ -445,7 +446,12 @@ export class QuotationItemComponent implements OnInit {
     if (e.Bill) {
       // console.log("The bills are:", e.Bill);
       if (e.Bill.length > 0) {
-        let sum = sumBy(e.Bill, "amount");
+        // let sum = sumBy(
+        //   e.Bill.filter((record) => record.billItem.discounted === false),
+        //   "amount"
+        // );
+        let sum = sumBy(e.Bill, "payable");
+
         frameDoc.document.write(`
         <div>
           <h5>Unpaid Items (Un-attended items)</h5>
@@ -462,18 +468,68 @@ export class QuotationItemComponent implements OnInit {
 
         // e.Bill.forEach((bill) => {
         e.Bill.forEach((record) => {
-          contents = `
+          if (!record.discounted || record.payable > 0) {
+            contents = `
             <tr>
               <td>${record.name}</td> 
               <td>${record.quantity}</td> 
-              <td>${record.amount}</td>
+              <td>${record.payable}</td>
             </tr>`;
-          frameDoc.document.write(contents);
+            frameDoc.document.write(contents);
+          }
         });
         contents = `<tr>
 
           <td  style ="font-weight:bold;"> &nbsp;Total </td>
           <td colspan="2" style ="font-weight:bold; text-align:center">${sum}</td>
+          </tr>`;
+        frameDoc.document.write(contents);
+
+        frameDoc.document.write(`
+          </tbody>
+        </table>`);
+      }
+    }
+
+    //For exempted items
+    if (e.Bill) {
+      if (e.Bill.length > 0) {
+        // let exempted_sum = sumBy(
+        //   e.Bill.filter((record) => record.billItem.discounted === true),
+        //   "amount"
+        // );
+        let exempted_sum = sumBy(e.Bill, "discount");
+
+        frameDoc.document.write(`
+        <div>
+          <h5>Exempted Items</h5>
+        </div>
+        <table id="table">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Quantity</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+        <tbody>`);
+
+        // e.Bill.forEach((bill) => {
+        e.Bill.forEach((record) => {
+          if (record.discounted) {
+            contents = `
+            <tr>
+              <td>${record.name}</td> 
+              <td>${record.quantity}</td> 
+              <td>${record.discount}</td>
+            </tr>`;
+            frameDoc.document.write(contents);
+          }
+        });
+        contents = `<tr>
+
+          <td  style ="font-weight:bold;"> &nbsp;Total </td>
+          <td colspan="2" style ="font-weight:bold; text-align:center">${exempted_sum}</td>
           </tr>`;
         frameDoc.document.write(contents);
 

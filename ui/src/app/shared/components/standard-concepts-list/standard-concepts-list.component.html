@@ -31,6 +31,7 @@
           <tr>
             <th>SN</th>
             <th>Name</th>
+            <th>Date created</th>
             <th></th>
           </tr>
         </thead>
@@ -42,7 +43,8 @@
           >
             <tr
               [ngClass]="{
-                'selected-concept': concept?.uuid === selectedConceptUuid
+                'selected-concept': concept?.uuid === selectedConceptUuid,
+                retired: concept?.retired
               }"
               *ngFor="
                 let concept of params?.conceptsList?.results;
@@ -56,17 +58,44 @@
                 {{ concept?.display }}
               </td>
               <td>
+                {{ concept?.dateCreated | date }}
+              </td>
+              <td>
                 <button mat-icon-button [matMenuTriggerFor]="menu">
                   <mat-icon>more_vert</mat-icon>
                 </button>
                 <mat-menu #menu="matMenu">
-                  <button mat-menu-item (click)="onEdit($event, concept)">
+                  <button
+                    [disabled]="concept?.retired"
+                    mat-menu-item
+                    (click)="onEdit($event, concept)"
+                  >
                     <mat-icon>edit</mat-icon>
                     <span>Edit</span>
                   </button>
-                  <button mat-menu-item (click)="onDelete($event, concept)">
+                  <button
+                    [disabled]="concept?.retired"
+                    mat-menu-item
+                    (click)="onDelete($event, concept)"
+                  >
                     <mat-icon>delete</mat-icon>
+                    <span>Retire (Disable)</span>
+                  </button>
+
+                  <button
+                    mat-menu-item
+                    (click)="onPermanentDelete($event, concept)"
+                  >
+                    <mat-icon>delete_forever</mat-icon>
                     <span>Delete</span>
+                  </button>
+                  <button
+                    [disabled]="!concept?.retired"
+                    mat-menu-item
+                    (click)="onEnable($event, concept)"
+                  >
+                    <mat-icon>done</mat-icon>
+                    <span>Enable</span>
                   </button>
                 </mat-menu>
               </td>

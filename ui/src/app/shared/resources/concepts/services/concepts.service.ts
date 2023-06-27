@@ -484,6 +484,17 @@ export class ConceptsService {
     );
   }
 
+  unRetireConcept(id: string): Observable<ConceptGetFull> {
+    return this.httpClient
+      .post(`icare/concept/${id}/retire`, { retire: false })
+      .pipe(
+        map((response) => response),
+        catchError((error) => {
+          return of(error);
+        })
+      );
+  }
+
   getConceptSetsByConceptUuids(uuids: string[]): Observable<ConceptGetFull[]> {
     return zip(
       ...uuids.map((uuid) =>
