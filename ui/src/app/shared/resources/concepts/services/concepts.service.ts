@@ -208,10 +208,7 @@ export class ConceptsService {
     return zip(
       from(this.api.concept.updateConcept(uuid, omit(data, "answers"))),
       data?.answers?.length > 0
-        ? this.httpClient.post(
-            `icare/concept/${data?.uuid}/answers`,
-            data?.answers
-          )
+        ? this.httpClient.post(`icare/concept/${uuid}/answers`, data?.answers)
         : of(null)
     ).pipe(
       map((responses) => responses[0]),
