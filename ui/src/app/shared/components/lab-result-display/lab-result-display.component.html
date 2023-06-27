@@ -88,6 +88,32 @@
     }}
     )</span
   >
+
+  <span
+    class="ml-4 text-danger"
+    *ngIf="
+      observationsKeyedByConcept &&
+      observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest &&
+      observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest
+        ?.value >
+        observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest
+          ?.concept?.hiNormal
+    "
+    ><b><mat-icon>arrow_upward</mat-icon></b></span
+  >
+  <span
+    class="ml-4 text-danger"
+    *ngIf="
+      observationsKeyedByConcept &&
+      observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest &&
+      observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest
+        ?.value <
+        observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest
+          ?.concept?.lowNormal
+    "
+    ><b><mat-icon>arrow_downward</mat-icon></b></span
+  >
+
   <span
     *ngIf="observationsKeyedByConcept[concept?.uuid]?.latest?.value?.links?.uri"
   >
@@ -112,12 +138,12 @@
           concept?.uuid
         ]?.latest?.value?.links?.uri.split('openmrs').length == 2
       "
-      href="{{
+      [href]="
         '/openmrs' +
-          observationsKeyedByConcept[
-            concept?.uuid
-          ]?.latest?.value?.links?.uri.split('openmrs')[1]
-      }}"
+        observationsKeyedByConcept[
+          concept?.uuid
+        ]?.latest?.value?.links?.uri.split('openmrs')[1]
+      "
     >
       Download Results
     </a>
