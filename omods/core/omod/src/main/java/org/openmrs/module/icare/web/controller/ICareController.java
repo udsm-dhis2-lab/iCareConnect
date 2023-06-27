@@ -802,6 +802,44 @@ public class ICareController {
 		return returnResponse;
 	}
 	
+	@RequestMapping(value = "concept/{uuid}/answers", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> saveConceptAnswers(@PathVariable("uuid") String uuid, @RequestBody List<String> answers) {
+		Map<String, Object> returnResponse = new HashMap<>();
+		Concept concept = conceptService.getConceptByUuid((String) uuid);
+		if (answers.size() == 0){
+			throw new APIException("No answers to update ");
+		}
+
+		Concept changedConcept = new Concept();
+		// Identify if the provided answers exist
+		List<String> conceptUuidForAnswers = new ArrayList<>();
+		if (concept.getAnswers().size() > 0) {
+			for(ConceptAnswer conceptAnswer:concept.getAnswers()) {
+				Concept answerConcept = conceptAnswer.getAnswerConcept();
+				if (answers.indexOf(answerConcept.getUuid().toString()) == - 1) {
+					conceptUuidForAnswers.add(answerConcept.getUuid());
+				}
+			}
+		} else {
+			conceptUuidForAnswers = answers;
+		}
+
+		if (conceptUuidForAnswers.size() > 0 ) {
+			for(String conceptForAnswerUuid: conceptUuidForAnswers) {
+				ConceptAnswer conceptAnswer = new ConceptAnswer();
+				conceptAnswer.setAnswerConcept(conceptService.getConceptByUuid(conceptForAnswerUuid));
+				concept.addAnswer(conceptAnswer);
+			}
+
+			changedConcept = conceptService.saveConcept(concept);
+			returnResponse.put("uuid", changedConcept.getUuid());
+			returnResponse.put("display", changedConcept.getDisplayString());
+			returnResponse.put("answersCount", changedConcept.getAnswers().size());
+		}
+		return returnResponse;
+	}
+	
 	@RequestMapping(value = "voidorder", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> voidOrder(@RequestBody Map<String, Object> voidObj) {

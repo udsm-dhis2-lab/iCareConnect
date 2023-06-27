@@ -62,8 +62,11 @@
     <concept concept_id="1005" retired="false" datatype_id="2" class_id="1" is_set="false" creator="1"
              date_created="2016-01-01 00:00:57.0" version="" uuid="e721ec30-mfy4-11e8-ie7c-40b69mdy79ee" />
 
-    <concept concept_id="1006" retired="true" datatype_id="2" class_id="1" is_set="false" creator="1"
+    <concept concept_id="1006" retired="true" datatype_id="3" class_id="1" is_set="false" creator="1"
              date_created="2016-01-01 00:00:57.0" version="" uuid="e721ec30-mfy4-11e8-ie7c-40b69mdy79et" />
+
+    <concept concept_id="1022" retired="false" datatype_id="3" class_id="1" is_set="false" creator="1"
+             date_created="2016-01-01 00:00:57.0" version="" uuid="UUU1ec30-mfy4-11e8-ie7c-40b69mdy79et" />
 
     <!-- dept concepts -->
 
@@ -80,6 +83,10 @@
     <concept_name concept_name_id="1021" concept_id="1020" name="PARENT_ONE" locale="en_GB" creator="1"
                   date_created="2014-01-12 00:00:00.0" concept_name_type="INDEX_TERM" locale_preferred="1" voided="false"
                   uuid="1119b329-52b9-11e8-b60d-080027ea428a" />
+
+    <concept_name concept_name_id="1022" concept_id="1022" name="Answer one" locale="en_GB" creator="1"
+                  date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="YYY9b329-52b9-11e8-b60d-080027ea428a" />
 
     <concept_set concept_set_id="4" concept_id="1000" sort_weight="1" uuid="88911c30-1f43-11d8-ie7c-50b6etwQqQee" concept_set="1020" creator="1" date_created="2020-12-27 00:00:00" />
 

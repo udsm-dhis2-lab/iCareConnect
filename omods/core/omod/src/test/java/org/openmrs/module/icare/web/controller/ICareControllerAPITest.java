@@ -624,16 +624,29 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		System.out.println(maps);
 		assertThat("Should return 0 concept set", maps.size(), is(0));
 	}
-
+	
 	@Test
 	public void testRetireAndUnRetireConcept() throws Exception {
 		String dto = this.readFile("dto/concept_retire.json");
 		Map<String, Object> retireObject = (new ObjectMapper()).readValue(dto, Map.class);
-		MockHttpServletRequest newPostRequest = newPostRequest("icare/concept/e721ec30-mfy4-11e8-ie7c-40b69mdy79et/retire",retireObject);
+		MockHttpServletRequest newPostRequest = newPostRequest("icare/concept/e721ec30-mfy4-11e8-ie7c-40b69mdy79et/retire",
+		    retireObject);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		Map<String, Object> returnedResponse = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		System.out.println(returnedResponse);
 		assertThat("Should return retired status equal to false", returnedResponse.get("retired").toString(), is("false"));
+	}
+	
+	@Test
+	public void testSavingConceptAnswers() throws Exception {
+		String dto = this.readFile("dto/concept_answers.json");
+		List<String> answers = (new ObjectMapper()).readValue(dto, List.class);
+		MockHttpServletRequest newPostRequest = newPostRequest("icare/concept/e721ec30-mfy4-11e8-ie7c-40b69mdy79et/answers",
+		    answers);
+		MockHttpServletResponse handle = handle(newPostRequest);
+		Map<String, Object> returnedResponse = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		//		System.out.println(returnedResponse);
+		assertThat("Should return answers count as one", (Integer) returnedResponse.get("answersCount"), is(1));
 	}
 	
 	@Test
