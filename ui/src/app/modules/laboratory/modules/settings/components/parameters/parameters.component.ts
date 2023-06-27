@@ -379,20 +379,20 @@ export class ParametersComponent implements OnInit {
               this.savingMessage = null;
             }, 4000);
           } else {
-            this.concept = {
-              ...this.concept,
-              answers: uniq(
-                this.selectedAnswers.map((answer) => {
-                  return answer?.uuid;
-                })
-              ),
-            };
             (!uuid
               ? this.conceptService.createConcept(this.concept)
               : this.conceptService.updateConcept(uuid, this.concept)
             ).subscribe((response: any) => {
               if (response) {
                 // Repeat update with answers (if any) added: Current openmrs does not support to update concept answers by adding new on the existing ones
+                this.concept = {
+                  ...this.concept,
+                  answers: uniq(
+                    this.selectedAnswers.map((answer) => {
+                      return answer?.uuid;
+                    })
+                  ),
+                };
                 if (
                   uuid &&
                   (
