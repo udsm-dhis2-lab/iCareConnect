@@ -11,6 +11,7 @@ import { StockObject } from "src/app/shared/resources/store/models/stock.model";
 import { StockService } from "src/app/shared/resources/store/services/stock.service";
 import { SupplierService } from "src/app/shared/resources/store/services/supplier.service";
 import { AddNewStockReceivedComponent } from "../../modals/add-new-stock-received/add-new-stock-received.component";
+import { ConsumeStockItemModalComponent } from "../../modals/consume-stock-item-modal/consume-stock-item-modal.component";
 
 @Component({
   selector: "app-stock-status-list",
@@ -40,12 +41,34 @@ export class StockStatusListComponent implements OnInit {
   page: number = 1;
   pager: number;
   pageSizeOptions: number[] = [5, 10, 15, 25, 50];
+  consumeLedgerUuid$: Observable<string>;
   constructor(
     private stockService: StockService,
     private dialog: MatDialog,
+    private systemSettingsService: SystemSettingsService
   ) {}
 
   ngOnInit(): void {
+    this.consumeLedgerUuid$ = this.systemSettingsService.getSystemSettingsByKey(
+      `icare.store.settings.consumeLedger.ledgerTypeUuid`
+    );
+    this.consumeLedgerUuid$.subscribe((response: any) => {
+      if (response?.error) {
+        this.errors = [...this.errors, response];
+      } else if (response === "none") {
+        this.errors = [
+          ...this.errors,
+          {
+            error: {
+              error:
+                "icare.store.settings.consumeLedger.ledgerTypeUuid does not exist, contact IT",
+              message:
+                "icare.store.settings.consumeLedger.ledgerTypeUuid does not exist, contact IT",
+            },
+          },
+        ];
+      }
+    });
     this.getStock();
   }
 
@@ -79,37 +102,63 @@ export class StockStatusListComponent implements OnInit {
 
   getStock(): void {
     if (!this.isStockOutPage && !this.status) {
-      this.stocksList$ = this.stockService.getAvailableStocks(
-        this.currentLocation?.uuid,
-        { q: this.searchTerm },
-        this.page, 
-        this.pageSize
-      ).pipe(map((response) => {
-        this.pager = response?.pager
-        return response?.results;
-      }));;
+      this.stocksList$ = this.stockService
+        .getAvailableStocks(
+          this.currentLocation?.uuid,
+          { q: this.searchTerm },
+          this.page,
+          this.pageSize
+        )
+        .pipe(
+          map((response) => {
+            this.pager = response?.pager;
+            return response?.results;
+          })
+        );
     } else if (this.isStockOutPage) {
-      this.stocksList$ = this.stockService.getStockOuts(
-        this.currentLocation?.uuid, this.page, this.pageSize
-      ).pipe(map((response) => {
-        this.pager = response?.pager
-        return response?.results;
-      }));
-    } else if(this.status === 'EXPIRED'){
-      this.stocksList$ = this.stockService.getExpiredItems(this.currentLocation?.uuid,this.page,this.pageSize).pipe(map((response) => {
-        this.pager = response?.pager
-        return response?.results
-      }));
-    } else if (this.status === 'NEARLYSTOCKEDOUT') {
-      this.stocksList$ = this.stockService.getNearlyStockedOutItems(this.currentLocation?.uuid,this.page,this.pageSize).pipe(map((response) => {
-        this.pager = response?.pager
-        return response?.results
-      }));
-    } else if (this.status === 'NEARLYEXPIRED') {
-      this.stocksList$ = this.stockService.getNearlyExpiredItems(this.currentLocation?.uuid,this.page,this.pageSize).pipe(map((response) => {
-        this.pager = response?.pager
-        return response?.results
-      }));
+      this.stocksList$ = this.stockService
+        .getStockOuts(this.currentLocation?.uuid, this.page, this.pageSize)
+        .pipe(
+          map((response) => {
+            this.pager = response?.pager;
+            return response?.results;
+          })
+        );
+    } else if (this.status === "EXPIRED") {
+      this.stocksList$ = this.stockService
+        .getExpiredItems(this.currentLocation?.uuid, this.page, this.pageSize)
+        .pipe(
+          map((response) => {
+            this.pager = response?.pager;
+            return response?.results;
+          })
+        );
+    } else if (this.status === "NEARLYSTOCKEDOUT") {
+      this.stocksList$ = this.stockService
+        .getNearlyStockedOutItems(
+          this.currentLocation?.uuid,
+          this.page,
+          this.pageSize
+        )
+        .pipe(
+          map((response) => {
+            this.pager = response?.pager;
+            return response?.results;
+          })
+        );
+    } else if (this.status === "NEARLYEXPIRED") {
+      this.stocksList$ = this.stockService
+        .getNearlyExpiredItems(
+          this.currentLocation?.uuid,
+          this.page,
+          this.pageSize
+        )
+        .pipe(
+          map((response) => {
+            this.pager = response?.pager;
+            return response?.results;
+          })
+        );
     }
   }
 
@@ -165,10 +214,30 @@ export class StockStatusListComponent implements OnInit {
     //   event.pageIndex - this.page >= 0 ? this.page + 1 : this.page - 1;
     this.page = this.page + (event?.pageIndex - event?.previousPageIndex);
     this.pageSize = Number(event?.pageSize);
-    console.log("page: ",this.page);
-    console.log("pagesize: ",this.pageSize);
-    console.log("pageIndex: ",event.pageIndex)
     this.getStock();
   }
 
+  onOpenConsumeModal(
+    currentItemStock: any,
+    consumeLedgerUuid: string,
+    ledgerTypes: any[]
+  ): void {
+    this.dialog
+      .open(ConsumeStockItemModalComponent, {
+        maxWidth: "40%",
+        data: {
+          currentItemStock,
+          ledger: (ledgerTypes?.filter(
+            (ledger) =>
+              (ledger?.id ? ledger?.id : ledger?.uuid) === consumeLedgerUuid
+          ) || [])[0],
+        },
+      })
+      .afterClosed()
+      .subscribe((shouldReload: boolean) => {
+        if (shouldReload) {
+          this.getStock();
+        }
+      });
+  }
 }
