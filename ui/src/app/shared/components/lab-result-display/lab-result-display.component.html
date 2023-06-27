@@ -95,6 +95,8 @@
       observationsKeyedByConcept &&
       observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest &&
       observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest
+        ?.concept?.hiNormal &&
+      observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest
         ?.value >
         observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest
           ?.concept?.hiNormal
@@ -106,6 +108,8 @@
     *ngIf="
       observationsKeyedByConcept &&
       observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest &&
+      observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest
+        ?.concept?.lowNormal &&
       observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest
         ?.value <
         observationsKeyedByConcept[concept?.uuid + '-' + labTest?.uuid]?.latest
