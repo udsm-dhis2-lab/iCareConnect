@@ -99,6 +99,7 @@
             <tr>
               <th>SN</th>
               <th>Answer</th>
+              <th>Date created</th>
               <th></th>
             </tr>
           </thead>
@@ -114,6 +115,9 @@
                 <td>{{ count + 1 + (page - 1) * pageSize }}</td>
                 <td>
                   {{ codedAnswer?.display }}
+                </td>
+                <td>
+                  {{ codedAnswer?.dateCreated | date }}
                 </td>
                 <td>
                   <button mat-icon-button [matMenuTriggerFor]="menu">

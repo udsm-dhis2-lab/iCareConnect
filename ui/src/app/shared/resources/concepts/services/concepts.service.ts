@@ -484,9 +484,9 @@ export class ConceptsService {
     );
   }
 
-  unRetireConcept(id: string, data: any): Observable<ConceptGetFull> {
+  unRetireConcept(id: string): Observable<ConceptGetFull> {
     return this.httpClient
-      .post(`icare/concept/${id}/retire`, { retired: false })
+      .post(`icare/concept/${id}/retire`, { retire: false })
       .pipe(
         map((response) => response),
         catchError((error) => {

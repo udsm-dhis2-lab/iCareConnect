@@ -21,6 +21,7 @@
           <tr>
             <th>SN</th>
             <th>Parameter</th>
+            <th>Date created</th>
             <th></th>
           </tr>
         </thead>
@@ -42,6 +43,9 @@
               </td>
               <td>
                 {{ parameter?.display }}
+              </td>
+              <td>
+                {{ parameter?.dateCreated | date }}
               </td>
               <td>
                 <button mat-icon-button [matMenuTriggerFor]="menu">
