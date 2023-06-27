@@ -165,7 +165,8 @@ export class StandardConceptCreationComponent implements OnInit {
       (name) => name?.conceptNameType === "SHORT"
     ) || [])[0];
     // Add support to support multiple languages
-    const descriptionsDetails = data?.descriptions[0];
+    const descriptionsDetails =
+      data?.descriptions?.length > 0 ? data?.descriptions[0] : null;
     this.readyToCollectCodes = true;
     this.basicConceptFields = [
       new Textbox({

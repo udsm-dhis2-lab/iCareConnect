@@ -272,16 +272,6 @@ export class ParametersComponent implements OnInit {
       },
     ];
 
-    let answers = [];
-
-    if (this.selectedAnswers?.length > 0) {
-      answers = uniq(
-        this.selectedAnswers.map((answer) => {
-          return answer?.uuid;
-        })
-      );
-    }
-
     const conceptMapType = "35543629-7d8c-11e1-909d-c80aa9edcf4e";
 
     let mappings = this.selectedCodeItems.map((item) => {
@@ -339,7 +329,12 @@ export class ParametersComponent implements OnInit {
       // Softcode concept class
       set: false,
       setMembers: [],
-      answers: answers,
+      answers:
+        uniq(
+          this.selectedAnswers.map((answer) => {
+            return answer?.uuid;
+          })
+        ) || [],
       lowNormal: this.formData["lowNormal"]?.value
         ? this.formData["lowNormal"]?.value
         : null,
@@ -384,17 +379,30 @@ export class ParametersComponent implements OnInit {
               this.savingMessage = null;
             }, 4000);
           } else {
+            this.concept = {
+              ...this.concept,
+              answers: uniq(
+                this.selectedAnswers.map((answer) => {
+                  return answer?.uuid;
+                })
+              ),
+            };
             (!uuid
               ? this.conceptService.createConcept(this.concept)
               : this.conceptService.updateConcept(uuid, this.concept)
             ).subscribe((response: any) => {
               if (response) {
                 // Repeat update with answers (if any) added: Current openmrs does not support to update concept answers by adding new on the existing ones
-                if (uuid && answers?.length > 0) {
-                  this.concept = {
-                    ...this.concept,
-                    answers,
-                  };
+                if (
+                  uuid &&
+                  (
+                    uniq(
+                      this.selectedAnswers.map((answer) => {
+                        return answer?.uuid;
+                      })
+                    ) || []
+                  )?.length > 0
+                ) {
                   this.conceptService
                     .updateConcept(uuid, this.concept)
                     .subscribe((updateResponse) => {
