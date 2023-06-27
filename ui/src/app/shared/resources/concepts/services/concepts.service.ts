@@ -205,9 +205,16 @@ export class ConceptsService {
   }
 
   updateConcept(uuid: string, data: any): Observable<ConceptCreateFull> {
-    const dataToUpdate = omit(data, "answers");
-    return from(this.api.concept.updateConcept(uuid, dataToUpdate)).pipe(
-      map((response) => response),
+    return zip(
+      from(this.api.concept.updateConcept(uuid, omit(data, "answers"))),
+      data?.answers?.length > 0
+        ? this.httpClient.post(
+            `icare/concept/${data?.uuid}/answers`,
+            data?.answers
+          )
+        : of(null)
+    ).pipe(
+      map((responses) => responses[0]),
       catchError((error) => {
         return of(error);
       })
