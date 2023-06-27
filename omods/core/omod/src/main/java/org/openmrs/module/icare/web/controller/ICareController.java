@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.mail.Session;
 import javax.naming.ConfigurationException;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.*;
@@ -799,6 +800,42 @@ public class ICareController {
 		returnResponse.put("uuid", changedConcept.getUuid());
 		returnResponse.put("display", changedConcept.getDisplayString());
 		returnResponse.put("retired", changedConcept.getRetired().booleanValue());
+		return returnResponse;
+	}
+	
+	@RequestMapping(value = "concept/{uuid}/answers", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> saveConceptAnswers(@PathVariable("uuid") String uuid, @RequestBody List<String> answers) {
+		Map<String, Object> returnResponse = new HashMap<>();
+		Concept concept = conceptService.getConceptByUuid((String) uuid);
+		if (answers.size() == 0){
+			throw new APIException("No answers to update ");
+		}
+
+		Concept changedConcept = new Concept();
+		// Identify if the provided answers exist
+		List<String> conceptUuidForAnswers = answers;
+		if (concept.getAnswers().size() > 0) {
+			for(ConceptAnswer conceptAnswer:concept.getAnswers()) {
+				if (answers.contains(conceptAnswer.getAnswerConcept().getUuid().toString())) {
+					conceptUuidForAnswers.remove(conceptUuidForAnswers.indexOf(conceptAnswer.getAnswerConcept().getUuid()));
+				} else {
+					concept.removeAnswer(conceptAnswer);
+				}
+			}
+		}
+		if (conceptUuidForAnswers.size() > 0 ) {
+			for(String conceptForAnswerUuid: conceptUuidForAnswers) {
+				ConceptAnswer conceptAnswer = new ConceptAnswer();
+				conceptAnswer.setAnswerConcept(conceptService.getConceptByUuid(conceptForAnswerUuid));
+				concept.addAnswer(conceptAnswer);
+			}
+
+			changedConcept = conceptService.saveConcept(concept);
+			returnResponse.put("uuid", changedConcept.getUuid());
+			returnResponse.put("display", changedConcept.getDisplayString());
+			returnResponse.put("answersCount", changedConcept.getAnswers().size());
+		}
 		return returnResponse;
 	}
 	
