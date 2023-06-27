@@ -613,7 +613,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			Double totalAmount = stockInvoiceDAO.getTotalStockItemsAmountByStockInvoice(stockInvoice);
 			stockInvoice.setTotalAmount(totalAmount);
 		}
-		return stockInvoiceDAO.getStockInvoices(pager, status, q, startDate, endDate);
+		return stockInvoices;
 	}
 	
 	@Override
