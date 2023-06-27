@@ -161,6 +161,7 @@
 
     <concept_reference_map concept_map_id="1" concept_reference_term_id="2" concept_map_type_id="1" creator="1" date_created="2023-02-27 00:00:00.0" concept_id="1000" uuid="8087bbb9-52b9-11zz-b60d-880027ae4211"/>
 
+    <concept_answer concept_answer_id="1" concept_id="1006" answer_concept="500" creator="1" uuid="000c46d2-5007-45e8-9512-969300717761" />
 
     <!-- Patient-Persons -->
     <person person_id="1000" gender="M" birthdate="1980-07-31" birthdate_estimated="0" dead="0" creator="1"

@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.mail.Session;
 import javax.naming.ConfigurationException;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.*;
@@ -813,18 +814,15 @@ public class ICareController {
 
 		Concept changedConcept = new Concept();
 		// Identify if the provided answers exist
-		List<String> conceptUuidForAnswers = new ArrayList<>();
+		List<String> conceptUuidForAnswers = answers;
 		if (concept.getAnswers().size() > 0) {
 			for(ConceptAnswer conceptAnswer:concept.getAnswers()) {
 				Concept answerConcept = conceptAnswer.getAnswerConcept();
-				if (answers.indexOf(answerConcept.getUuid().toString()) == - 1) {
-					conceptUuidForAnswers.add(answerConcept.getUuid());
+				if (answers.contains(answerConcept.getUuid().toString())) {
+					conceptUuidForAnswers.remove(conceptUuidForAnswers.indexOf(answerConcept.getUuid()));
 				}
 			}
-		} else {
-			conceptUuidForAnswers = answers;
 		}
-
 		if (conceptUuidForAnswers.size() > 0 ) {
 			for(String conceptForAnswerUuid: conceptUuidForAnswers) {
 				ConceptAnswer conceptAnswer = new ConceptAnswer();
