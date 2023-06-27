@@ -253,9 +253,7 @@ export class CodedAnswersComponent implements OnInit {
       .subscribe((shouldConfirm) => {
         if (shouldConfirm) {
           this.conceptService
-            .unRetireConcept(concept?.uuid, {
-              retired: false,
-            })
+            .unRetireConcept(concept?.uuid)
             .subscribe((response) => {
               if (response) {
                 this.page = 1;

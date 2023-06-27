@@ -31,6 +31,7 @@
           <tr>
             <th>SN</th>
             <th>Name</th>
+            <th>Date created</th>
             <th></th>
           </tr>
         </thead>
@@ -55,6 +56,9 @@
               </td>
               <td>
                 {{ concept?.display }}
+              </td>
+              <td>
+                {{ concept?.dateCreated | date }}
               </td>
               <td>
                 <button mat-icon-button [matMenuTriggerFor]="menu">
