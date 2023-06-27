@@ -161,7 +161,7 @@ export class StandardConceptCreationComponent implements OnInit {
   }
 
   createBasicConceptFields(data?: any): void {
-    const shortNameDetails = (data?.names.filter(
+    const shortNameDetails = (data?.names?.filter(
       (name) => name?.conceptNameType === "SHORT"
     ) || [])[0];
     // Add support to support multiple languages

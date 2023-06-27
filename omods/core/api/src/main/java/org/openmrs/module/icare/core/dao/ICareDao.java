@@ -588,6 +588,8 @@ public class ICareDao extends BaseDAO<Item> {
 			searchConceptQueryStr += " " + where;
 		}
 		
+		searchConceptQueryStr += " ORDER BY c.dateCreated DESC";
+		
 		Query sqlQuery = session.createQuery(searchConceptQueryStr);
 		sqlQuery.setFirstResult(startIndex);
 		sqlQuery.setMaxResults(limit);
@@ -617,7 +619,6 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		if (pager.isAllowed()) {
 			pager.setTotal(sqlQuery.list().size());
-			//pager.setPageCount(pager.getT);
 			sqlQuery.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
 			sqlQuery.setMaxResults(pager.getPageSize());
 		}
@@ -669,6 +670,16 @@ public class ICareDao extends BaseDAO<Item> {
 			sqlQuery.setParameter("concept", concept);
 		}
 		return sqlQuery.list();
+	}
+	
+	public String unRetireConcept(String uuid) {
+		DbSession session = getSession();
+		String queryStr = "UPDATE Concept SET retired='false' WHERE uuid=:uuid";
+		
+		SQLQuery query = session.createSQLQuery(queryStr);
+		query.setParameter("uuid", uuid);
+		query.executeUpdate();
+		return uuid;
 	}
 	
 	public List<Location> getLocations(String attributeType, String value, Integer limit, Integer startIndex) {

@@ -509,6 +509,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
+	public String unRetireConcept(String uuid) {
+		return dao.unRetireConcept(uuid);
+	}
+	
+	@Override
 	public List<Location> getLocations(String attributeType, String value, Integer limit, Integer startIndex) {
 		return dao.getLocations(attributeType, value, limit, startIndex);
 	}
