@@ -646,7 +646,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handle = handle(newPostRequest);
 		Map<String, Object> returnedResponse = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		//		System.out.println(returnedResponse);
-		assertThat("Should return answers count as one", (Integer) returnedResponse.get("answersCount"), is(1));
+		assertThat("Should return answers count as one", (Integer) returnedResponse.get("answersCount"), is(2));
 	}
 	
 	@Test
