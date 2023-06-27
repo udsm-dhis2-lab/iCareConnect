@@ -184,10 +184,11 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handleGet1 = handle(newGetRequest1);
 		
 		Map<String, Object> stocks = (new ObjectMapper()).readValue(handleGet1.getContentAsString(), Map.class);
-		assertThat("Only 7 stock items", ((List) stocks.get("results")).size(), is(7));
+		assertThat("Only 6 stock items", ((List) stocks.get("results")).size(), is(6));
 		System.out.println(stocks);
+		System.out.println(handleGet1.getContentAsString());
 		assertThat("Only two stock items", ((Map) ((List) stocks.get("results")).get(3)).get("quantity").toString(),
-		    is("10.0"));
+		    is("100.0"));
 		//		assertThat("Only two stock items", stocks.get(3).get("quantity").toString(), is("10.0"));
 		
 	}
@@ -461,7 +462,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		Map<String, Object> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		
-		assertThat("stock listing has 6 entries:", ((List) stockList.get("results")).size(), is(7));
+		assertThat("stock listing has 6 entries:", ((List) stockList.get("results")).size(), is(5));
 		
 		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
@@ -479,7 +480,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		System.out.println(stockList);
 		
-		assertThat("stock listing has 6 entries:", ((List) stockList.get("results")).size(), is(6));
+		assertThat("stock listing has 6 entries:", ((List) stockList.get("results")).size(), is(5));
 		
 		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
@@ -668,7 +669,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> stockList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		
 		System.out.println((List) stockList.get("results"));
-		assertThat("stock listing has 4 entries:", ((List) stockList.get("results")).size(), is(5));
+		assertThat("stock listing has 4 entries:", ((List) stockList.get("results")).size(), is(4));
 	}
 	
 	@Test
@@ -929,7 +930,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handleGet2 = handle(newGetRequest2);
 		Map<String, Object> handleGetObject2 = new ObjectMapper().readValue(handleGet2.getContentAsString(), Map.class);
 		System.out.println("nearly exp " + handleGet2.getContentAsString());
-		assertThat("The list of nearly expired items", ((List) handleGetObject2.get("results")).size() == 1);
+		assertThat("The list of nearly expired items", ((List) handleGetObject2.get("results")).size() == 0);
 		
 	}
 	
