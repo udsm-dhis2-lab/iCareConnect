@@ -17,6 +17,7 @@ import { AppState } from "src/app/store/reducers";
 import {
   getCurrentLocation,
   getIfCurrentLocationIsMainStore,
+  getIfCurrentLocationIsPharmacy,
 } from "src/app/store/selectors";
 import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.selectors";
 import { getAllLedgerTypes } from "src/app/store/selectors/ledger-type.selectors";
@@ -39,6 +40,7 @@ export class StockComponent implements OnInit {
   ledgerTypes$: Observable<LedgerTypeObject[]>;
   currentStore$: Observable<any>;
   isCurrentLocationMainStore$: Observable<boolean>;
+  isCurrentLocationPharmacy$: Observable<boolean>;
   searchTerm: string = "";
   stockLoadedState$: Observable<boolean>;
   userPrivileges$: Observable<any>;
@@ -51,6 +53,9 @@ export class StockComponent implements OnInit {
     this.currentStock$ = this.store.pipe(select(getCurrentStock));
     this.isCurrentLocationMainStore$ = this.store.pipe(
       select(getIfCurrentLocationIsMainStore)
+    );
+    this.isCurrentLocationPharmacy$ = this.store.pipe(
+      select(getIfCurrentLocationIsPharmacy)
     );
     this.userPrivileges$ = this.store.select(getCurrentUserPrivileges);
   }
