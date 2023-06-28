@@ -23,6 +23,7 @@ export class StockStatusListComponent implements OnInit {
   @Input() ledgerTypes: any[];
   @Input() userPrivileges: any;
   @Input() isCurrentLocationMainStore: boolean;
+  @Input() isCurrentLocationPharmacy: boolean;
   @Input() isStockOutPage: boolean;
   @Input() status: string;
   stocksList$: Observable<StockObject[]>;
