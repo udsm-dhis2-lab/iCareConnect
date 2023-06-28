@@ -186,4 +186,18 @@ export class MultipleItemsSelectionComponent implements OnInit {
       );
     }
   }
+
+  selectAll(event: Event, items: any[]): void {
+    event.stopPropagation();
+    this.currentSelectedItems = uniqBy([...this.selectedItems, ...items]);
+    this.items = [];
+    this.getSelectedItems.emit(this.currentSelectedItems);
+  }
+
+  UnSelectAll(event: Event, items: any[]): void {
+    event.stopPropagation();
+    this.currentSelectedItems = [];
+    this.items = [...this.items, ...items];
+    this.getSelectedItems.emit(this.currentSelectedItems);
+  }
 }
