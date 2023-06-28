@@ -383,7 +383,9 @@
                             style="font-size: 0.6rem; margin-bottom: -8px"
                             *ngFor="let diagnosis of params?.diagnoses"
                           >
-                            <b> Diagnosis: {{ diagnosis?.display }} </b>
+                            <b *ngIf="diagnosis?.display">
+                              Diagnosis: {{ diagnosis?.display }}
+                            </b>
                           </p>
                         </ng-container>
                         <p
