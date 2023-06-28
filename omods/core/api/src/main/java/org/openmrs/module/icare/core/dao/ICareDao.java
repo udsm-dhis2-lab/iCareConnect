@@ -150,16 +150,18 @@ public class ICareDao extends BaseDAO<Item> {
 			if (department != null) {
 				queryStr = "SELECT ip FROM Item ip "
 				        + "LEFT JOIN ip.concept as c WITH c.retired = false "
-				        + "LEFT JOIN c.names cn "
+				        + "LEFT JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED' "
 				        + "LEFT JOIN ip.drug as d WITH d.retired = false "
 				        + "LEFT JOIN d.concept as c1 WITH c1.retired = false "
-				        + "LEFT JOIN c1.names cn1 "
+				        + "LEFT JOIN c1.names cn1 WITH cn1.conceptNameType = 'FULLY_SPECIFIED' "
 				        + "WHERE (lower(cn.name) like :search OR lower(cn1.name) like :search OR lower(d.name) like :search) "
 				        + "AND ip.concept IN ((SELECT cs.concept FROM ConceptSet cs WHERE cs.conceptSet = (SELECT c FROM Concept c WHERE c.uuid = :department)))";
 			} else {
 				queryStr = "SELECT ip FROM Item ip " + "LEFT JOIN ip.concept as c WITH c.retired = false "
-				        + "LEFT JOIN c.names cn " + "LEFT JOIN ip.drug as d WITH d.retired=false "
-				        + "LEFT JOIN d.concept as c1 WITH c1.retired = false " + "LEFT JOIN c1.names cn1 "
+				        + "LEFT JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED' "
+				        + "LEFT JOIN ip.drug as d WITH d.retired=false "
+				        + "LEFT JOIN d.concept as c1 WITH c1.retired = false "
+				        + "LEFT JOIN c1.names cn1 WITH cn1.conceptNameType = 'FULLY_SPECIFIED' "
 				        + "WHERE lower(cn.name) like :search OR lower(cn1.name) like :search OR lower(d.name) like :search";
 			}
 			if (type == Item.Type.DRUG) {
