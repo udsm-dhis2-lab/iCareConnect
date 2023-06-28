@@ -112,7 +112,7 @@
                     </ng-container>
                     <ng-container *ngIf="LISConfigurations?.isLIS">
                       <td><b>Collection Date & Time</b></td>
-                      <td style="font-size: 0.6rem">
+                      <td>
                         {{
                           !LISConfigurations?.isLIS
                             ? (samplesGroupedByDepartment?.samples[0]
@@ -129,7 +129,7 @@
                     <td>
                       <b> Registered On </b>
                     </td>
-                    <td style="font-size: 0.6rem">
+                    <td>
                       {{
                         samplesGroupedByDepartment["samples"][0]?.dateCreated
                           | date: "medium"
@@ -149,7 +149,7 @@
                       </span>
                     </td>
                     <td><b>Laboratory Number</b></td>
-                    <td style="font-size: 0.6rem">
+                    <td>
                       <span
                         *ngFor="
                           let sample of samplesGroupedByDepartment['samples']
@@ -171,7 +171,7 @@
                       <td>
                         <b> Received date & time </b>
                       </td>
-                      <td style="font-size: 0.6rem">
+                      <td>
                         <span>
                           {{
                             samplesGroupedByDepartment?.samples[0]
