@@ -249,7 +249,6 @@ export class StandardConceptCreationComponent implements OnInit {
       .subscribe((response) => {
         if (response) {
           this.conceptBeingEdited = response;
-          this.setMembersReadySet = false;
           this.createBasicConceptFields(response);
           this.attributesValues = response?.attributes;
           const relatedConceptUuid = (response?.attributes?.filter(
@@ -257,10 +256,11 @@ export class StandardConceptCreationComponent implements OnInit {
               attribute?.attributeType?.uuid === relatedMetadataAttributeUuid
           ) || [])[0]?.value;
           if (relatedConceptUuid) {
+            this.testMethodUuid = relatedConceptUuid;
             this.selectedTestMethodDetails$ =
               this.conceptService.getConceptDetailsByUuid(
                 relatedConceptUuid,
-                "custom:(uuid,display,datatype,set,retired,descriptions,name,conceptClass:(uuid,display))"
+                "custom:(uuid,display,datatype,set,retired,descriptions,name,setMembers:(uuid,display),conceptClass:(uuid,display))"
               );
 
             this.selectedTestMethodDetails$.subscribe((response: any) => {
@@ -281,6 +281,7 @@ export class StandardConceptCreationComponent implements OnInit {
               };
             }) || [];
           this.mappings = response?.mappings;
+          // this.setMembersReadySet = false;
           setTimeout(() => {
             this.editingSet = false;
             this.setMembersReadySet = true;

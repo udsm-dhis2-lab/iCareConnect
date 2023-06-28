@@ -830,12 +830,11 @@ public class ICareController {
 				conceptAnswer.setAnswerConcept(conceptService.getConceptByUuid(conceptForAnswerUuid));
 				concept.addAnswer(conceptAnswer);
 			}
-
-			changedConcept = conceptService.saveConcept(concept);
-			returnResponse.put("uuid", changedConcept.getUuid());
-			returnResponse.put("display", changedConcept.getDisplayString());
-			returnResponse.put("answersCount", changedConcept.getAnswers().size());
 		}
+		changedConcept = conceptService.saveConcept(concept);
+		returnResponse.put("uuid", changedConcept.getUuid());
+		returnResponse.put("display", changedConcept.getDisplayString());
+		returnResponse.put("answersCount", changedConcept.getAnswers().size());
 		return returnResponse;
 	}
 	
