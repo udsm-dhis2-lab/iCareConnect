@@ -840,31 +840,10 @@
                                     }"
                                   >
                                     <td colspan="100%">
-                                      <div
-                                        *ngIf="
-                                          sample?.authorizationInfo &&
-                                          sample?.authorizationInfo[0]
-                                        "
-                                      >
-                                        <b>Authorised By: </b
-                                        >{{
-                                          sample?.authorizationInfo[0]?.name
-                                        }}
-                                        <b class="ml-4">On: </b
-                                        >{{
-                                          sample?.authorizationInfo[0]
-                                            ?.timestamp | date: "medium"
-                                        }}
-                                      </div>
-                                      <div
-                                        *ngIf="
-                                          !sample?.authorizationInfo ||
-                                          (sample?.authorizationInfo &&
-                                            !sample?.authorizationInfo[0])
-                                        "
-                                      >
-                                        Un-Authorized
-                                      </div>
+                                      <app-authorization-and-result-entry-action-summary
+                                        [sample]="sample"
+                                        [order]="order"
+                                      ></app-authorization-and-result-entry-action-summary>
                                     </td>
                                   </tr>
                                 </ng-container>
@@ -1149,31 +1128,10 @@
                                     }"
                                   >
                                     <td colspan="100%">
-                                      <div
-                                        *ngIf="
-                                          sample?.authorizationInfo &&
-                                          sample?.authorizationInfo[0]
-                                        "
-                                      >
-                                        <b>Authorised By: </b
-                                        >{{
-                                          sample?.authorizationInfo[0]?.name
-                                        }}
-                                        <b class="ml-4">On: </b
-                                        >{{
-                                          sample?.authorizationInfo[0]
-                                            ?.timestamp | date: "medium"
-                                        }}
-                                      </div>
-                                      <div
-                                        *ngIf="
-                                          !sample?.authorizationInfo ||
-                                          (sample?.authorizationInfo &&
-                                            !sample?.authorizationInfo[0])
-                                        "
-                                      >
-                                        Un-Authorized
-                                      </div>
+                                      <app-authorization-and-result-entry-action-summary
+                                        [sample]="sample"
+                                        [order]="order"
+                                      ></app-authorization-and-result-entry-action-summary>
                                     </td>
                                   </tr>
                                 </ng-container>
