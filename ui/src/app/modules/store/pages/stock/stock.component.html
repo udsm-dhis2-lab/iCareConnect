@@ -5,6 +5,7 @@
     currentStore: currentStore$ | async,
     currentStock: currentStock$ | async,
     isCurrentLocationMainStore: isCurrentLocationMainStore$ | async,
+    isCurrentLocationPharmacy: isCurrentLocationPharmacy$ | async,
     userPrivileges: userPrivileges$ | async
   } as params"
 >
@@ -30,6 +31,7 @@
             <app-stock-status-list
               [currentLocation]="params?.currentStore"
               [isCurrentLocationMainStore]="params?.isCurrentLocationMainStore"
+              [isCurrentLocationPharmacy]="params?.isCurrentLocationPharmacy"
               [userPrivileges]="params?.userPrivileges"
               [ledgerTypes]="params?.ledgerTypes"
             ></app-stock-status-list>

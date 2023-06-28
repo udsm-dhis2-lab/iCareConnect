@@ -131,6 +131,7 @@
                     </button>
 
                     <button
+                     *ngIf="!isCurrentLocationMainStore && !isCurrentLocationPharmacy"
                       mat-menu-item
                       [disabled]="
                         currentItemStock?.id === stock.id ||

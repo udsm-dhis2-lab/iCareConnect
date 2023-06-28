@@ -223,6 +223,22 @@ export const getIfCurrentLocationIsMainStore = createSelector(
   }
 );
 
+export const getIfCurrentLocationIsPharmacy = createSelector(
+  getLocationsState,
+  getCurrentLocation(false),
+  (state: LocationsState, currentLocation) => {
+    return currentLocation &&
+      currentLocation?.tags &&
+      (
+        currentLocation?.tags?.filter(
+          (tag) => tag?.display?.toLowerCase() === "pharmacy location"
+        ) || []
+      )?.length > 0
+      ? true
+      : false;
+  }
+);
+
 export const getAllTreatmentLocations = createSelector(
   getLocations,
   (locations: Location[]) => {
