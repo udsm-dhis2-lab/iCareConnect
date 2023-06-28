@@ -65,7 +65,11 @@
             {{ setMembersHeaderName }}
           </div>
           <app-concept-set-members
-            *ngIf="setMembersReadySet"
+            *ngIf="
+              setMembersReadySet &&
+              ((testMethodUuid && params?.selectedTestMethodDetails) ||
+                !testMethodUuid)
+            "
             [setMembersSearchTerm]="setMembersSearchTerm"
             [selectedSetMembersItems]="selectedSetMembers"
             [standardSearchTerm]="standardSearchTerm"

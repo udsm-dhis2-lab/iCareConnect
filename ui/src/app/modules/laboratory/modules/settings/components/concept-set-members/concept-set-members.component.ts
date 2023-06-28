@@ -30,7 +30,11 @@ export class ConceptSetMembersComponent implements OnInit {
             this.testMethodUuid,
             "custom:(uuid,display,setMembers:(uuid,display))"
           )
-          .pipe(map((response) => response?.setMembers))
+          .pipe(
+            map((response) => {
+              return response?.setMembers;
+            })
+          )
       : of([]);
   }
 
