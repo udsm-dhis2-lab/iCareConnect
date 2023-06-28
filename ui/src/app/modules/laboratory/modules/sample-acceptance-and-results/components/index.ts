@@ -47,6 +47,7 @@ import { BarCodePrintModalComponent } from "./bar-code-print-modal/bar-code-prin
 import { SampleToPrintResultsComponent } from "./sample-to-print-results/sample-to-print-results.component";
 import { ResultEntryByBatchHomeComponent } from "./result-entry-by-batch-home/result-entry-by-batch-home.component";
 import { SamplesForResultsReviewComponent } from "./samples-for-results-review/samples-for-results-review.component";
+import { AuthorizationAndResultEntryActionSummaryComponent } from "./authorization-and-result-entry-action-summary/authorization-and-result-entry-action-summary.component";
 
 export const components: any[] = [
   PatientsByVisitsListComponent,
@@ -98,6 +99,7 @@ export const components: any[] = [
   SampleToPrintResultsComponent,
   ResultEntryByBatchHomeComponent,
   SamplesForResultsReviewComponent,
+  AuthorizationAndResultEntryActionSummaryComponent,
 ];
 
 export const sampleAcceptanceAndResultsModals: any[] = [

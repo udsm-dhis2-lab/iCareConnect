@@ -23,7 +23,7 @@
       <ul
         class="w-100 ul-listed-items"
         *ngIf="items"
-        style="height: 270px; overflow: auto"
+        style="height: 250px; overflow: auto"
       >
         <li
           (click)="getSelectedItem($event, item, items)"
@@ -34,6 +34,17 @@
           {{ item?.display }}
         </li>
       </ul>
+
+      <div class="w-100 text-center">
+        <button
+          mat-button
+          [disabled]="items.length === 0"
+          style="cursor: pointer"
+          (click)="selectAll($event, items)"
+        >
+          Select all
+        </button>
+      </div>
       <mat-progress-bar
         class="w-100"
         *ngIf="!items"
@@ -72,5 +83,15 @@
         {{ item?.display }}
       </li>
     </ul>
+    <div class="w-100 text-center">
+      <button
+        mat-button
+        [disabled]="currentSelectedItems.length === 0"
+        style="cursor: pointer"
+        (click)="UnSelectAll($event, currentSelectedItems)"
+      >
+        Remove all
+      </button>
+    </div>
   </div>
 </div>
