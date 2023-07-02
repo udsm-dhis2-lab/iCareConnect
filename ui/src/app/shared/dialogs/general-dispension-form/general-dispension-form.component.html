@@ -91,7 +91,7 @@
         (click)="saveOrder($event, conceptFields)"
         mat-flat-button
         [color]="savingError ? 'warn' : 'primary'"
-        [disabled]="savingOrder"
+        [disabled]="savingOrder || !isFormValid"
       >
         <mat-icon *ngIf="savingError" class="mr-2">error</mat-icon>
         <mat-spinner
