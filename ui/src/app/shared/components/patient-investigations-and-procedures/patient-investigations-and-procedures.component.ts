@@ -29,9 +29,9 @@ export class PatientInvestigationsAndProceduresComponent implements OnInit {
 
   ngOnInit(): void {
     this.shouldShowLabSection = !this.clinicConfigurations?.provisionalDiagnosis
-      ?.shouldAffectImmediateSections
+      ?.immedicateSectionsAffected
       ? (
-          this.clinicConfigurations?.provisionalDiagnosis?.immdicateSectionsAffected.filter(
+          this.clinicConfigurations?.provisionalDiagnosis?.immedicateSectionsAffected.filter(
             (section) => section?.laboratory
           ) || []
         ).length > 0
