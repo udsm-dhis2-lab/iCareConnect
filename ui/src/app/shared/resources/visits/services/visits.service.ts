@@ -698,7 +698,7 @@ export class VisitsService {
         this.api.visit.getAllVisits({
           includeInactive: includeInactive,
           patient: patient,
-          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs:(accessionNumber,comment,concept:(uuid,display,units,lowNormal,hiNormal),display,encounter,groupMembers,order,person,uuid,value,valueCodedName,valueModifier,voided),orders,diagnoses,encounterProviders,encounterDatetime,encounterType))`,
+          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs:(accessionNumber,obsDatetime,comment,concept:(uuid,display,units,lowNormal,hiNormal),display,encounter,groupMembers,order,person,uuid,value,valueCodedName,valueModifier,voided),orders,diagnoses,encounterProviders,encounterDatetime,encounterType))`,
         } as any)
       )
     ).pipe(
@@ -777,7 +777,7 @@ export class VisitsService {
         this.api.visit.getAllVisits({
           includeInactive: includeInactive,
           patient,
-          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs:(accessionNumber,comment,concept:(uuid,display,units,lowNormal,hiNormal,setMembers:(uuid,display,units,lowNormal,hiNormal)),display,encounter,groupMembers,order,person,uuid,value,valueCodedName,valueModifier,voided),orders,diagnoses,encounterProviders,encounterDatetime,encounterType,voided,voidReason))`,
+          v: `custom:(uuid,visitType,location:(uuid,display,tags,parentLocation:(uuid,display)),startDatetime,attributes,stopDatetime,patient:(uuid,display,identifiers,person,voided),encounters:(uuid,form,location,obs:(accessionNumber,obsDatetime,comment,concept:(uuid,display,units,lowNormal,hiNormal,setMembers:(uuid,display,units,lowNormal,hiNormal)),display,encounter,groupMembers,order,person,uuid,value,valueCodedName,valueModifier,voided),orders,diagnoses,encounterProviders,encounterDatetime,encounterType,voided,voidReason))`,
         } as any)
       ),
       shouldNotLoadNonVisitItems
