@@ -509,18 +509,18 @@
                               "
                             >
                               <tr>
-                                <th style="width: 15px">SN</th>
+                                <!-- <th style="width: 15px">SN</th>
                                 <th *ngIf="!LISConfigurations?.isLIS">
                                   Test #
-                                </th>
+                                </th> -->
                                 <th>Test Order</th>
-                                <th>
+                                <th class="w-50">
                                   <div class="row">
-                                    <div class="col-6">Parameter</div>
-                                    <div class="col-3">Parameter</div>
-                                    <div class="col-1">Units</div>
-                                    <div class="col-1">LL</div>
-                                    <div class="col-1">UL</div>
+                                    <div class="col-md-6">Parameter</div>
+                                    <div class="col-md-3">Results</div>
+                                    <div class="col-md-1">Units</div>
+                                    <div class="col-md-1">LL</div>
+                                    <div class="col-md-1">UL</div>
                                   </div>
                                 </th>
                                 <th>Remarks</th>
@@ -546,12 +546,12 @@
                                       'row-alternated': count % 2 !== 0
                                     }"
                                   >
-                                    <td rowspan="2">
+                                    <!-- <td rowspan="2">
                                       {{ count + 1 }}
                                     </td>
                                     <td *ngIf="!LISConfigurations?.isLIS">
                                       {{ order?.order?.orderNumber }}
-                                    </td>
+                                    </td> -->
                                     <td>
                                       {{ order?.order?.concept?.display }}
                                       <br />
