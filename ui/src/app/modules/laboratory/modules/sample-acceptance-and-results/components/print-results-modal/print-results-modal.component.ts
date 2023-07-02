@@ -386,7 +386,7 @@ export class PrintResultsModalComponent implements OnInit {
       }, 500);
     }, 500);
 
-    //window.print();
+    // window.print();
   }
 
   getParameterConceptName(parameter, allocations) {
