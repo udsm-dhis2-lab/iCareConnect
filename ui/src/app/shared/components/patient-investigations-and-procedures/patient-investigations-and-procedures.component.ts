@@ -19,7 +19,7 @@ export class PatientInvestigationsAndProceduresComponent implements OnInit {
   @Input() userPrivileges: any;
   @Input() fromConsultation: boolean;
   @Input() isInpatient: boolean;
-  @Input() tabToShow: boolean;
+  @Input() tabToShow: string;
   @Input() isTheatre: boolean;
   selectedTab = new FormControl(0);
 
@@ -28,6 +28,7 @@ export class PatientInvestigationsAndProceduresComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    this.tabToShow = this.tabToShow?.toLowerCase();
     this.shouldShowLabSection = !this.clinicConfigurations?.provisionalDiagnosis
       ?.immedicateSectionsAffected
       ? (
