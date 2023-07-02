@@ -514,11 +514,15 @@
                                   Test #
                                 </th>
                                 <th>Test Order</th>
-                                <th>Parameter</th>
-                                <th>Results</th>
-                                <!-- <td>SI Units</td> -->
-                                <th *ngIf="!LISConfigurations?.isLIS">LL</th>
-                                <th *ngIf="!LISConfigurations?.isLIS">UL</th>
+                                <th>
+                                  <div class="row">
+                                    <div class="col-6">Parameter</div>
+                                    <div class="col-3">Parameter</div>
+                                    <div class="col-1">Units</div>
+                                    <div class="col-1">LL</div>
+                                    <div class="col-1">UL</div>
+                                  </div>
+                                </th>
                                 <th>Remarks</th>
                                 <th *ngIf="!LISConfigurations?.isLIS">
                                   Order date & Time
@@ -570,112 +574,6 @@
                                             [allocation]="allocation"
                                             [count]="count"
                                             [whatToShow]="'parameter'"
-                                            [parameter]="allocation?.parameter"
-                                            [units]="
-                                              allocation?.parameter?.units
-                                            "
-                                            (remarksData)="onGetRemarks($event)"
-                                          ></app-shared-parameter-results>
-                                        </div>
-                                      </div>
-                                    </td>
-                                    <td>
-                                      <div
-                                        class="w-100"
-                                        *ngIf="
-                                          order?.order?.concept?.setMembers
-                                            ?.length == 0
-                                        "
-                                      >
-                                        <span
-                                          *ngIf="
-                                            order?.testAllocations[0]
-                                              ?.secondSignOff &&
-                                            order?.order?.concept?.lowNormal &&
-                                            order?.order?.concept?.setMembers
-                                              ?.length == 0 &&
-                                            order?.order?.concept?.lowNormal >
-                                              order?.testAllocations[0]
-                                                ?.results[
-                                                order?.testAllocations[0]
-                                                  ?.results?.length - 1
-                                              ]?.valueNumeric
-                                          "
-                                          ><img
-                                            src="assets/images/arrowdownred.png"
-                                            height="8px"
-                                        /></span>
-                                        <span
-                                          *ngIf="
-                                            order?.testAllocations[0]
-                                              ?.secondSignOff &&
-                                            order?.order?.concept?.setMembers
-                                              ?.length == 0 &&
-                                            order?.order?.concept?.hiNormal &&
-                                            order?.testAllocations[0]?.results[
-                                              order?.testAllocations[0]?.results
-                                                ?.length - 1
-                                            ]?.valueNumeric >
-                                              order?.concept?.hiNormal
-                                          "
-                                          ><img
-                                            src="assets/images/arrowupred.png"
-                                            height="8px"
-                                        /></span>
-
-                                        <span
-                                          *ngIf="
-                                            order?.order?.concept?.setMembers
-                                              ?.length == 0 &&
-                                            order?.testAllocations[0]
-                                              ?.results[0]?.value
-                                          "
-                                        >
-                                          {{
-                                            order?.order?.concept?.answers
-                                              ?.length == 0
-                                              ? order?.testAllocations[0]
-                                                  ?.results[
-                                                  order?.testAllocations[0]
-                                                    ?.results?.length - 1
-                                                ]?.value
-                                              : order?.order?.concept
-                                                  ?.keyedAnswers[
-                                                  order?.testAllocations[0]
-                                                    ?.results[
-                                                    order?.testAllocations[0]
-                                                      ?.results?.length - 1
-                                                  ]?.value
-                                                ]?.display
-                                          }}
-                                        </span>
-                                        <span
-                                          class="text-warning"
-                                          *ngIf="
-                                            !order?.testAllocations[0]
-                                              ?.results[0]?.value
-                                          "
-                                        >
-                                          Processing ..
-                                        </span>
-                                      </div>
-                                      <div
-                                        class="w-100"
-                                        *ngIf="
-                                          order?.testAllocations?.length > 0
-                                        "
-                                      >
-                                        <div
-                                          *ngFor="
-                                            let allocation of order?.testAllocations;
-                                            let count = index
-                                          "
-                                        >
-                                          <app-shared-parameter-results
-                                            [order]="order"
-                                            [allocation]="allocation"
-                                            [whatToShow]="'result'"
-                                            [count]="count"
                                             [parameter]="allocation?.parameter"
                                             [units]="
                                               allocation?.parameter?.units

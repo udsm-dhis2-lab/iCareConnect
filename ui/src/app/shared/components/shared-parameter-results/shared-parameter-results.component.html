@@ -9,13 +9,10 @@
     <table class="table">
       <tbody>
         <tr style="border-bottom: solid 1px #eee">
-          <td
-            class="w-50"
-            *ngIf="!hideParameterLabel && whatToShow === 'parameter'"
-          >
+          <td class="w-50">
             <b>{{ parameter?.display ? parameter?.display : "-" }}</b>
           </td>
-          <td class="w-50" *ngIf="whatToShow !== 'parameter'">
+          <td style="width: 25%">
             <ng-container *ngIf="parameterResultsDetails">
               <table
                 *ngFor="let resultAllocation of [parameterResultsDetails[0]]"
@@ -61,9 +58,19 @@
             >
               No data/Processing
             </div>
-            <span>
-              {{ units }}
+          </td>
+          <td style="width: 18.3%">
+            <span *ngIf="parameter?.units">
+              (
+              {{ parameter?.units }}
+              )
             </span>
+          </td>
+          <td style="width: 8.3%">
+            {{ parameter?.lowNormal }}
+          </td>
+          <td style="width: 8.3%">
+            {{ parameter?.hiNormal }}
           </td>
         </tr>
       </tbody>

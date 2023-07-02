@@ -4,6 +4,7 @@ package org.openmrs.module.icare.laboratory.models;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.openmrs.*;
+import org.openmrs.api.context.Context;
 
 import javax.persistence.*;
 import java.util.*;
@@ -62,6 +63,11 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 	
 	public Concept getTestConcept() {
 		return this.testConcept;
+	}
+
+	public ConceptNumeric getConceptNumeric() {
+		String uuid = this.getTestConcept().getUuid().toString();
+		return  Context.getConceptService().getConceptNumericByUuid(uuid);
 	}
 	
 	public void setTestConcept(Concept testConcept) {
@@ -192,6 +198,14 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 			datatype.put("display", this.getTestConcept().getDatatype().getName());
 			datatype.put("description", this.getTestConcept().getDatatype().getDescription());
 			testConceptMap.put("datatype", datatype);
+			if(this.getTestConcept().isNumeric()) {
+				ConceptNumeric conceptNumeric = this.getConceptNumeric();
+				testConceptMap.put("units", conceptNumeric.getUnits());
+				testConceptMap.put("lowNormal", conceptNumeric.getLowNormal());
+				testConceptMap.put("hiNormal", conceptNumeric.getHiNormal());
+				testConceptMap.put("allowDecimal", conceptNumeric.getAllowDecimal());
+			}
+
 			List<Map<String, Object>> mappings = new ArrayList<>();
 			if (testConcept.getConceptMappings().size() > 0) {
 				for(ConceptMap conceptMap: testConcept.getConceptMappings()) {
