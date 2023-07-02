@@ -601,7 +601,7 @@
                     </div>
                   </mat-expansion-panel>
                 </mat-accordion>
-                <ng-container *ngIf="tabsToShow?.length">
+                <ng-container *ngIf="tabsToShow?.length > 0">
                   <ng-container *ngFor="let tabToShow of tabsToShow">
                     <mat-accordion>
                       <mat-expansion-panel
@@ -629,7 +629,7 @@
                               activeVisit &&
                               dashboardParams?.formEntities['All orderables'] &&
                               ((currentFormDetails[tabToShow] &&
-                                currentFormDetails?.requiredFormsHasData) ||
+                                !currentFormDetails?.requiredFormsHasData) ||
                                 !currentFormDetails[tabToShow])
                             "
                             [observations]="

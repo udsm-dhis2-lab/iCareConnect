@@ -73,17 +73,17 @@ export class ClinicalNotesComponent implements OnInit {
       (key) => this.clinicalObservations[key]?.latest
     );
     const concepts = identifyConceptsFromFormattedForm(this.currentCustomForm);
-    this.currentFormHasRequiredData =
-      (
-        Object.keys(this.clinicalObservations).filter(
-          (key) =>
-            indexOf(
-              concepts?.map((concept) => concept?.uuid),
-              key,
-              0
-            ) > -1
-        ) || []
-      ).length > 0;
+    // this.currentFormHasRequiredData =
+    //   (
+    //     Object.keys(this.clinicalObservations).filter(
+    //       (key) =>
+    //         indexOf(
+    //           concepts?.map((concept) => concept?.uuid),
+    //           key,
+    //           0
+    //         ) > -1
+    //     ) || []
+    //   ).length > 0;
     const latestObsForCurrentForm =
       latestObservations?.filter(
         (obs) => keyBy(concepts, "uuid")[obs?.conceptUuid]
@@ -105,6 +105,11 @@ export class ClinicalNotesComponent implements OnInit {
       // TODO: Add support to use configured time for the 2 hrs constant
       this.useFilledObsData = duration.asHours() > 2 ? false : true;
     }
+
+    this.dependedFormHasData = this.evaluateFormDependency(
+      this.clinicConfigurations,
+      this.currentCustomForm
+    );
 
     // Identify form with dependants
     if (Object.keys(this.clinicConfigurations?.forms)?.length > 0) {
@@ -148,10 +153,6 @@ export class ClinicalNotesComponent implements OnInit {
       // console.log("formsWithDependants", formsWithDependants);
     }
 
-    this.dependedFormHasData = this.evaluateFormDependency(
-      this.clinicConfigurations,
-      this.currentCustomForm
-    );
     if (
       this.clinicConfigurations?.forms &&
       this.clinicConfigurations?.forms[this.currentCustomForm?.uuid] &&
