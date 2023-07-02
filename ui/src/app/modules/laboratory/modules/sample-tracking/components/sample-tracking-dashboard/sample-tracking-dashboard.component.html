@@ -29,11 +29,12 @@
         [labSamplesDepartments]="labSamplesDepartments"
         [hasStatus]="'YES'"
         [showLegend]="true"
+        [category]="'COLLECTED'"
         [datesParameters]="datesParameters"
         [excludeAllocations]="true"
         [sampleTypes]="sampleTypes"
         [codedSampleRejectionReasons]="codedSampleRejectionReasons"
-        [barcodeSettings] = "sampleParams?.barcodeSettings"
+        [barcodeSettings]="sampleParams?.barcodeSettings"
       ></app-shared-samples-list>
     </div>
     <!-- <div class="filtering-div">
