@@ -12,23 +12,36 @@ export class RelatedTestParametersEntryComponent implements OnInit {
   @Input() isLIS: boolean;
   @Input() disabled: boolean;
   @Input() conceptNameType: string;
+  @Input() order: any;
   relatedAllocation: any;
   finalResultsForParentTestParameter: any;
   @Output() data: EventEmitter<any> = new EventEmitter<any>();
   results: any = {};
+  allocationsWithoutRelationShip: any[];
   constructor() {}
 
   ngOnInit(): void {
-    console.log(
-      "parametersWithDefinedRelationship",
-      this.parametersWithDefinedRelationship
-    );
+    console.log("allSampleAllocations", this.allSampleAllocations);
+    console.log("order", this.order);
+    // console.log(
+    //   "parametersWithDefinedRelationship",
+    //   this.parametersWithDefinedRelationship
+    // );
     this.relatedAllocation =
       this.parametersWithDefinedRelationship[0]?.relatedAllocation;
     this.finalResultsForParentTestParameter =
       this.relatedAllocation?.finalResult?.groups[
         this.relatedAllocation?.finalResult?.groups?.length - 1
       ]?.results;
+    this.allocationsWithoutRelationShip =
+      this.order?.allocations?.filter(
+        (allocation) =>
+          (
+            this.order?.parametersWithDefinedRelationship?.filter(
+              (all) => all?.id === allocation?.id
+            ) || []
+          )?.length === 0
+      ) || [];
   }
 
   getFedResult(data: any, relatedResult: any, allocation: any): void {

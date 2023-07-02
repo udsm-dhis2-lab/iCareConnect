@@ -1,12 +1,12 @@
-<div class="w-100" style="height: 20vh; overflow: auto">
-  <table
-    class="table"
-    *ngIf="
-      finalResultsForParentTestParameter &&
-      finalResultsForParentTestParameter?.length > 0
-    "
-  >
-    <tbody>
+<div class="w-100 p-2">
+  <table>
+    <tbody
+      class="table"
+      *ngIf="
+        finalResultsForParentTestParameter &&
+        finalResultsForParentTestParameter?.length > 0
+      "
+    >
       <tr>
         <td *ngFor="let result of finalResultsForParentTestParameter">
           <div class="w-100 mb-2">
@@ -30,6 +30,30 @@
                 </td>
               </tr>
             </table>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+    <tbody>
+      <tr>
+        <td>
+          <!-- {{ allocation?.formattedAllocation?.finalResult | json }} -->
+          <div class="row">
+            <div
+              class="col-2"
+              *ngFor="let allocation of allocationsWithoutRelationShip"
+            >
+              <app-test-parameter-entry
+                [parameterUuid]="allocation?.parameter?.uuid"
+                [allocation]="allocation"
+                [isLIS]="isLIS"
+                [relatedResult]="result"
+                [disabled]="disabled"
+                [finalResult]="allocation?.formattedAllocation?.finalResult"
+                [conceptNameType]="conceptNameType"
+                (data)="getFedResult($event, result, allocation)"
+              ></app-test-parameter-entry>
+            </div>
           </div>
         </td>
       </tr>
