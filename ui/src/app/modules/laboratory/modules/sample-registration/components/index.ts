@@ -2,6 +2,7 @@ import { BatchRegistrationComponent } from "./batch-registration/batch-registrat
 import { BatchSamplesListComponent } from "./batch-samples-list/batch-samples-list.component";
 import { ClientsFromExternalSystemsComponent } from "./clients-from-external-systems/clients-from-external-systems.component";
 import { ClinicalDataComponent } from "./clinical-data/clinical-data.component";
+import { DynamicOpenmrsRegistrationFormComponent } from "./dynamic-openmrs-registration-form/dynamic-openmrs-registration-form.component";
 import { LbOptionSelectorComponent } from "./lb-option-selector/lb-option-selector.component";
 import { MultipleTestsSelectionComponent } from "./multiple-tests-selection/multiple-tests-selection.component";
 import { PersonDetailsComponent } from "./person-details/person-details.component";
@@ -28,6 +29,7 @@ export const sampleRegistrationComponents: any[] = [
   SamplesListComponent,
   SampleInBatchRegistrationComponent,
   BatchSamplesListComponent,
+  DynamicOpenmrsRegistrationFormComponent,
 ];
 
 export const regModals: any[] = [SampleRegistrationFinalizationComponent];
