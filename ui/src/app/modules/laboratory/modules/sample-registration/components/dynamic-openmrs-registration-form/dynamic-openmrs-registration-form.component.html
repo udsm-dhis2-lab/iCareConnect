@@ -1,1 +1,6 @@
-<p>dynamic-openmrs-registration-form works!</p>
+<div class="w-100" *ngFor="let formId of formUuids">
+  <app-render-openmrs-form
+    [formId]="formId"
+    (formDataUpdate)="onFormUpdate($event)"
+  ></app-render-openmrs-form>
+</div>
