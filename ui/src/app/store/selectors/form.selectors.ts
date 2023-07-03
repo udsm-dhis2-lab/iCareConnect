@@ -38,10 +38,12 @@ export const getFormsLoadingState = createSelector(
   (formState: FormState) => formState.loading
 );
 
-export const getCustomOpenMRSFormById = createSelector(
-  getFormsEntities,
-  (formEntities, props) => formEntities[props?.id] || null
-);
+export const getCustomOpenMRSFormById = (id: string) =>
+  createSelector(
+    getAllForms,
+    (allForms) =>
+      (allForms?.filter((form) => form?.uuid === id) || [])[0] || null
+  );
 
 export const getCustomOpenMRSFormsByIds = (formUUids: string[]) =>
   createSelector(getAllForms, (allForms) =>

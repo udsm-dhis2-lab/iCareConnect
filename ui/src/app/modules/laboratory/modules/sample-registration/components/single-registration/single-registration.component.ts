@@ -84,7 +84,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
 
   patientFieldSetClosed: boolean = false;
 
-  registrationCategory: string = "CLINICAL";
+  registrationCategory: string = "HEID";
+  // "CLINICAL";
 
   receivedOnField: any;
   receivedByField: any;
@@ -227,6 +228,10 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     //   }),
     //   shouldHaveLiveSearchForDropDownFields: false,
     // });getSelectedRCollectedOnTime
+  }
+
+  onCustomFormUpdate(data: any): void {
+    console.log("custom form data", data);
   }
 
   get maximumDate() {
