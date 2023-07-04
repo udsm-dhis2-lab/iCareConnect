@@ -26,6 +26,8 @@ export class SampleRegistrationHomeComponent implements OnInit {
   personEmailAttributeTypeUuid$: Observable<string>;
   personPhoneAttributeTypeUuid$: Observable<string>;
   currentUser$: Observable<any>;
+  sampleRegistrationCategoriesConceptUuid$: Observable<string>;
+  errors: any[] = [];
   constructor(
     private store: Store<AppState>,
     private conceptService: ConceptsService,
@@ -49,5 +51,25 @@ export class SampleRegistrationHomeComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         `icare.person.attribute.email`
       );
+
+    this.sampleRegistrationCategoriesConceptUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `lis.registration.sampleRegistrationCategories.concept.uuid`
+      );
+    this.sampleRegistrationCategoriesConceptUuid$.subscribe((response: any) => {
+      if (response && response === "none") {
+        this.errors = [
+          ...this.errors,
+          {
+            error: {
+              error:
+                "Key lis.registration.sampleRegistrationCategories.concept.uuid as not available",
+              message:
+                "Key lis.registration.sampleRegistrationCategories.concept.uuid as not available",
+            },
+          },
+        ];
+      }
+    });
   }
 }
