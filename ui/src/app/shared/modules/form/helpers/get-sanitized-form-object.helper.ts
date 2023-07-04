@@ -1,7 +1,6 @@
 import { ConceptGet } from "src/app/shared/resources/openmrs";
 import { FormFieldType } from "../constants/form-field-type.constant";
 import { Boolean } from "../models/boolean.model";
-import { CheckBox } from "../models/check-box.model";
 import { ComplexDefaultFileField } from "../models/complex-file.model";
 import { Dropdown } from "../models/dropdown.model";
 import { Field } from "../models/field.model";
@@ -9,6 +8,7 @@ import { ICAREForm } from "../models/form.model";
 import { TextArea } from "../models/text-area.model";
 import { Textbox } from "../models/text-box.model";
 import { getFormFieldOptions } from "./get-form-field-options.helper";
+import { groupBy } from "lodash";
 
 export function getSanitizedFormObject(
   concept: ConceptGet,
@@ -64,10 +64,16 @@ export function getSanitizedFormObject(
     units: units,
   };
 
+  const formField = getFormField(formObject, isDiagnosis);
+  const formFields = getFormFields(formObject, isDiagnosis);
   return {
     ...formObject,
-    formField: getFormField(formObject, isDiagnosis),
-    formFields: getFormFields(formObject, isDiagnosis),
+    formField,
+    formFields,
+    groupedFields:
+      formFields && formFields?.length > 0
+        ? groupBy(formFields, "fieldPart")
+        : null,
   };
 }
 
@@ -80,11 +86,12 @@ function getFormFields(formObject: ICAREForm, isDiagnosis): Field<string>[] {
     (member) => !member.setMembers || member.setMembers.length === 0
   );
 
-  return hasLowestMembers
+  const formFields = hasLowestMembers
     ? formObject.setMembers
         .map((member) => getFormField(member, isDiagnosis))
         .filter((formField) => formField)
     : undefined;
+  return formFields;
 }
 
 function getFormField(
