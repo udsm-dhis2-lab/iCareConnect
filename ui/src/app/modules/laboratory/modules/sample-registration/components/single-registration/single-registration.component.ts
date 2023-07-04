@@ -34,7 +34,6 @@ import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
-import { BarCodePrintModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-print-modal/bar-code-print-modal.component";
 import { webSocket } from "rxjs/webSocket";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 
@@ -85,6 +84,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   patientFieldSetClosed: boolean = false;
 
   registrationCategory: string = "CLINICAL";
+  // "CLINICAL";
 
   receivedOnField: any;
   receivedByField: any;
@@ -136,6 +136,11 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   referralFields: any[];
   referralData: any;
   showReferralDataFields: boolean = true;
+
+  renderGenericForms: boolean = false;
+  generalObsFormData: any = {};
+  generalObservationsData: any;
+  isGeneralObsFormValid: boolean = false;
 
   constructor(
     private samplesService: SamplesService,
@@ -213,20 +218,23 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
         ? currentLocation?.childLocations
         : [];
 
-    // this.labFormField = new Dropdown({
-    //   id: "lab",
-    //   key: "lab",
-    //   label: "Receiving Lab",
-    //   options: labsAvailable.map((location) => {
-    //     return {
-    //       key: location?.uuid,
-    //       value: location?.uuid,
-    //       label: location?.display,
-    //       name: location?.display,
-    //     };
-    //   }),
-    //   shouldHaveLiveSearchForDropDownFields: false,
-    // });getSelectedRCollectedOnTime
+    this.renderGenericForms = true;
+  }
+
+  onCustomFormUpdate(data: FormValue): void {
+    this.isGeneralObsFormValid = data.isValid;
+    this.generalObsFormData = {
+      ...this.generalObsFormData,
+      ...data.getValues(),
+    };
+    this.generalObservationsData = Object.keys(this.generalObsFormData).map(
+      (key) => {
+        return {
+          concept: key,
+          value: this.generalObsFormData[key]?.value,
+        };
+      }
+    );
   }
 
   get maximumDate() {
@@ -261,6 +269,10 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
 
   getSelection(event: MatRadioChange): void {
     this.registrationCategory = event?.value;
+    this.renderGenericForms = false;
+    setTimeout(() => {
+      this.renderGenericForms = true;
+    }, 20);
   }
 
   getTimestampFromDateAndTime(date: string, time: string): number {
@@ -973,6 +985,11 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                 },
                                               ];
                                             }
+
+                                            obs = [
+                                              ...obs,
+                                              ...this.generalObservationsData,
+                                            ];
                                             const encounterObject = {
                                               visit: visitResponse?.uuid,
                                               patient: patientResponse?.uuid,
