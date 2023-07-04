@@ -7,6 +7,7 @@
   <app-capture-form-data
     *ngIf="params?.customForm"
     [form]="params?.customForm"
+    [isLIS]="true"
     (formDataUpdate)="onFormUpdate($event)"
   ></app-capture-form-data>
 </div>

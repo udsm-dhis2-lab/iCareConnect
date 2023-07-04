@@ -11,6 +11,8 @@ export interface ICAREForm {
   formClass: string;
   formField?: Field<string>;
   formFields?: Field<string>[];
+  groupedFields?: any;
+  unGroupedFields?: any;
   concept?: any;
   isForm?: boolean;
   required?: boolean;

@@ -96,10 +96,27 @@ export class FormEffects {
                 ["asc"]
               );
 
+              const keyedGroups =
+                formattedFormFields && formattedFormFields?.length > 0
+                  ? _.groupBy(formattedFormFields, "fieldPart") || []
+                  : null;
               const formattedForm = {
                 id: formResponse?.uuid,
                 ...formResponse,
                 formFields: formattedFormFields,
+                groupedFields: keyedGroups
+                  ? Object.keys(keyedGroups)?.map((key) =>
+                      keyedGroups[key]?.map((fieldItem) =>
+                        fieldItem?.formField
+                          ? fieldItem?.formField
+                          : fieldItem?.formFiels
+                      )
+                    )
+                  : null,
+                unGroupedFields:
+                  formattedFormFields?.filter(
+                    (formField: any) => !formField?.formField
+                  ) || [],
                 isForm: true,
               };
               return upsertForms({ forms: [formattedForm] });
@@ -126,27 +143,42 @@ export class FormEffects {
 
                 _.map(formResponse?.formFields, (formField) => {
                   if (formField.fieldNumber) {
-                    formattedFormFields = [
-                      ...formattedFormFields,
-                      getSanitizedFormObject(
-                        formField?.field?.concept,
-                        formField,
-                        action.causesOfDeathConcepts
-                      ),
-                    ];
+                    formattedFormFields = _.orderBy(
+                      [
+                        ...formattedFormFields,
+                        getSanitizedFormObject(
+                          formField?.field?.concept,
+                          formField,
+                          action.causesOfDeathConcepts
+                        ),
+                      ],
+                      ["fieldNumber", "fieldPart"],
+                      ["asc", "asc"]
+                    );
                   }
                 });
+
+                const keyedGroups =
+                  formattedFormFields && formattedFormFields?.length > 0
+                    ? _.groupBy(formattedFormFields, "fieldPart") || []
+                    : null;
+                console.log(keyedGroups);
 
                 forms = [
                   ...forms,
                   {
                     id: formResponse?.uuid,
                     ...formResponse,
-                    formFields: _.orderBy(
-                      formattedFormFields,
-                      ["fieldNumber", "fieldPart"],
-                      ["asc", "asc"]
-                    ),
+                    formFields: formattedFormFields,
+                    groupedFields: keyedGroups
+                      ? Object.keys(keyedGroups)?.map((key) =>
+                          keyedGroups[key]?.map((fieldItem) =>
+                            fieldItem?.formField
+                              ? fieldItem?.formField
+                              : fieldItem
+                          )
+                        )
+                      : null,
                     isForm: true,
                   },
                 ];
