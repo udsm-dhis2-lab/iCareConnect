@@ -4,7 +4,6 @@ import { FormValue } from "../../modules/form/models/form-value.model";
 import { Patient } from "../../resources/patient/models/patient.model";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { VisitsService } from "../../resources/visits/services";
-import { PatientService } from "../../services/patient.service";
 
 @Component({
   selector: "app-capture-form-data",
@@ -19,13 +18,11 @@ export class CaptureFormDataComponent implements OnInit {
   @Input() patient: Patient;
   observations$: Observable<any>;
 
-  @Output() formDataUpdate = new EventEmitter<FormValue>();
+  @Output() formDataUpdate: EventEmitter<FormValue> =
+    new EventEmitter<FormValue>();
 
   legendControl: any = {};
-  constructor(
-    private patientService: PatientService,
-    private visitService: VisitsService
-  ) {}
+  constructor(private visitService: VisitsService) {}
 
   ngOnInit(): void {
     this.observations$ = this.visitService.getVisitObservationsByVisitUuid({
@@ -36,7 +33,7 @@ export class CaptureFormDataComponent implements OnInit {
     });
   }
 
-  onFormUpdate(data) {
+  onFormUpdate(data: FormValue) {
     this.formDataUpdate.emit(data);
   }
 

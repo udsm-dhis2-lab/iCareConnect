@@ -52,7 +52,7 @@ export class CaptureFormDataModalComponent implements OnInit {
   patient: any;
   formUuid: string;
   formLoadingState$: Observable<boolean>;
-  form$: Observable<OpenMRSForm>;
+  form$: Observable<any>;
   formData: any;
   currentEncounterUuid: string;
   currentLocation: any;
@@ -108,9 +108,7 @@ export class CaptureFormDataModalComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.deathRegistry.formUuid"
       );
-    this.form$ = this.store.select(getCustomOpenMRSFormById, {
-      id: this.formUuid,
-    });
+    this.form$ = this.store.select(getCustomOpenMRSFormById(this.formUuid));
     // this.deathRegistryFormUuid$.subscribe((responseFormUuid) => {
     //   if (responseFormUuid) {
     //     this.store
