@@ -74,7 +74,7 @@
         ></app-person-details>
       </fieldset>
     </div>
-    <div class="col-12" *ngIf="registrationCategory === 'HEID'">
+    <div class="col-12" *ngIf="renderGenericForms">
       <app-dynamic-openmrs-registration-dashboard
         [registrationCategory]="registrationCategory"
         (formDataUpdate)="onCustomFormUpdate($event)"
@@ -265,7 +265,7 @@
           </fieldset>
         </div>
       </div>
-      <ng-template matStepLabel>Is referred?</ng-template>
+      <!-- <ng-template matStepLabel>Is referred?</ng-template>
       <div>
         <fieldset>
           <legend (click)="toggleFieldSet('referralData')" class="d-flex">
@@ -287,7 +287,7 @@
             ></app-form>
           </div>
         </fieldset>
-      </div>
+      </div> -->
       <ng-template matStepLabel>Tests</ng-template>
       <div
         *ngIf="

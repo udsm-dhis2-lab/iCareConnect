@@ -83,7 +83,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
 
   patientFieldSetClosed: boolean = false;
 
-  registrationCategory: string = "HEID";
+  registrationCategory: string = "CLINICAL";
   // "CLINICAL";
 
   receivedOnField: any;
@@ -137,6 +137,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   referralData: any;
   showReferralDataFields: boolean = true;
 
+  renderGenericForms: boolean = false;
   generalObsFormData: any = {};
   generalObservationsData: any;
   isGeneralObsFormValid: boolean = false;
@@ -217,20 +218,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
         ? currentLocation?.childLocations
         : [];
 
-    // this.labFormField = new Dropdown({
-    //   id: "lab",
-    //   key: "lab",
-    //   label: "Receiving Lab",
-    //   options: labsAvailable.map((location) => {
-    //     return {
-    //       key: location?.uuid,
-    //       value: location?.uuid,
-    //       label: location?.display,
-    //       name: location?.display,
-    //     };
-    //   }),
-    //   shouldHaveLiveSearchForDropDownFields: false,
-    // });getSelectedRCollectedOnTime
+    this.renderGenericForms = true;
   }
 
   onCustomFormUpdate(data: FormValue): void {
@@ -281,6 +269,10 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
 
   getSelection(event: MatRadioChange): void {
     this.registrationCategory = event?.value;
+    this.renderGenericForms = false;
+    setTimeout(() => {
+      this.renderGenericForms = true;
+    }, 20);
   }
 
   getTimestampFromDateAndTime(date: string, time: string): number {
