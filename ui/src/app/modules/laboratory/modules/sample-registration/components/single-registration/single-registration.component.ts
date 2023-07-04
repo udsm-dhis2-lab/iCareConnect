@@ -61,6 +61,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   @Input() personEmailAttributeTypeUuid: string;
   @Input() personPhoneAttributeTypeUuid: string;
   @Input() labTestRequestProgramStageId: string;
+  @Input() sampleRegistrationCategories: any[];
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -83,7 +84,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
 
   patientFieldSetClosed: boolean = false;
 
-  registrationCategory: string = "CLINICAL";
+  registrationCategory: any;
   // "CLINICAL";
 
   receivedOnField: any;
@@ -140,7 +141,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   renderGenericForms: boolean = false;
   generalObsFormData: any = {};
   generalObservationsData: any;
-  isGeneralObsFormValid: boolean = false;
+  isGeneralObsFormValid: boolean = true;
 
   constructor(
     private samplesService: SamplesService,
@@ -170,6 +171,11 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    // console.log(
+    //   "sampleRegistrationCategories refKey",
+    //   this.sampleRegistrationCategories
+    // );
+    this.registrationCategory = this.sampleRegistrationCategories[0];
     const userLocationsIds = JSON.parse(
       this.currentUser?.userProperties?.locations
     );

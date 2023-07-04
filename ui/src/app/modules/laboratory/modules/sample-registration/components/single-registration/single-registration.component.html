@@ -10,15 +10,16 @@
     <div class="col-12">
       <mat-radio-group class="registration-category">
         <mat-radio-button
+          *ngFor="let regCategoryItem of sampleRegistrationCategories"
           (change)="getSelection($event)"
-          class="registration-category-btn"
-          [value]="'CLINICAL'"
-          [checked]="registrationCategory === 'CLINICAL'"
+          class="registration-category-btn ml-2"
+          [value]="regCategoryItem"
+          [checked]="registrationCategory?.refKey === regCategoryItem?.refKey"
           color="primary"
         >
-          Clinical
+          {{ regCategoryItem?.display }}
         </mat-radio-button>
-        <mat-radio-button
+        <!-- <mat-radio-button
           (change)="getSelection($event)"
           class="registration-category-btn ml-2"
           [value]="'NON_CLINICAL'"
@@ -35,16 +36,11 @@
           color="primary"
         >
           HEID
-        </mat-radio-button>
+        </mat-radio-button> -->
       </mat-radio-group>
     </div>
 
-    <div
-      class="col-12"
-      *ngIf="
-        registrationCategory === 'CLINICAL' || registrationCategory === 'HEID'
-      "
-    >
+    <div class="col-12" *ngIf="registrationCategory?.refKey !== 'non-clinical'">
       <fieldset>
         <legend
           (click)="togglePatientDetailsFieldSet($event)"
@@ -218,10 +214,16 @@
         </div>
       </div>
 
-      <ng-template *ngIf="registrationCategory === 'CLINICAL'" matStepLabel
+      <ng-template
+        *ngIf="registrationCategory?.refKey !== 'non-clinical'"
+        matStepLabel
         >Clinical Data</ng-template
       >
-      <div *ngIf="registrationCategory === 'CLINICAL' && !fromExternalSystem">
+      <div
+        *ngIf="
+          registrationCategory?.refKey !== 'non-clinical' && !fromExternalSystem
+        "
+      >
         <div class="clinical-data">
           <fieldset>
             <legend (click)="toggleFieldSet('clinicalData')" class="d-flex">
@@ -241,11 +243,17 @@
         </div>
       </div>
       <ng-template
-        *ngIf="registrationCategory === 'CLINICAL' && !fromExternalSystem"
+        *ngIf="
+          registrationCategory?.refKey !== 'non-clinical' && !fromExternalSystem
+        "
         matStepLabel
         >Referring Doctor</ng-template
       >
-      <div *ngIf="registrationCategory === 'CLINICAL' && !fromExternalSystem">
+      <div
+        *ngIf="
+          registrationCategory?.refKey !== 'non-clinical' && !fromExternalSystem
+        "
+      >
         <div class="referring-doctor-field">
           <fieldset>
             <legend (click)="toggleFieldSet('referingDoctor')" class="d-flex">
@@ -265,29 +273,6 @@
           </fieldset>
         </div>
       </div>
-      <!-- <ng-template matStepLabel>Is referred?</ng-template>
-      <div>
-        <fieldset>
-          <legend (click)="toggleFieldSet('referralData')" class="d-flex">
-            <span> Is referred? </span>
-            <span>
-              <mat-icon *ngIf="!showReferralDataFields"
-                >keyboard_arrow_down</mat-icon
-              >
-              <mat-icon *ngIf="showReferralDataFields"
-                >keyboard_arrow_up</mat-icon
-              >
-            </span>
-          </legend>
-          <div class="w-100" *ngIf="showReferralDataFields">
-            <app-form
-              [fields]="referralFields"
-              [isFormHorizontal]="true"
-              (formUpdate)="onGetReferralData($event)"
-            ></app-form>
-          </div>
-        </fieldset>
-      </div> -->
       <ng-template matStepLabel>Tests</ng-template>
       <div
         *ngIf="
@@ -351,10 +336,6 @@
         {{ errorMessage }}
       </div>
     </div>
-
-    <!-- <div class="col-12" *ngIf="savingData">
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    </div> -->
     <div class="loading-overlay" *ngIf="savingData">
       <div class="text-center">
         <div>Saving sample...</div>

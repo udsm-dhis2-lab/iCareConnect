@@ -9,7 +9,7 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
   styleUrls: ["./dynamic-openmrs-registration-dashboard.component.scss"],
 })
 export class DynamicOpenmrsRegistrationDashboardComponent implements OnInit {
-  @Input() registrationCategory: string;
+  @Input() registrationCategory: any;
   formUuids$: Observable<string[]>;
   errors: any[] = [];
   @Output() formDataUpdate: EventEmitter<any> = new EventEmitter<any>();
@@ -17,7 +17,7 @@ export class DynamicOpenmrsRegistrationDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.formUuids$ = this.systemSettingsService.getSystemSettingsByKey(
-      `icare.lis.sampleRegistrationFormsUuids.${this.registrationCategory?.toLowerCase()}`
+      `icare.lis.sampleRegistrationFormsUuids.${this.registrationCategory?.refKey}`
     );
     this.formUuids$.subscribe((response: any) => {
       if (response && (response?.error || response === "none")) {
@@ -27,11 +27,11 @@ export class DynamicOpenmrsRegistrationDashboardComponent implements OnInit {
             error: {
               error:
                 "Forms references for " +
-                this.registrationCategory +
+                this.registrationCategory?.refKey +
                 " are missing",
               message:
                 "Forms references for " +
-                this.registrationCategory +
+                this.registrationCategory?.refKey +
                 " are missing",
             },
           },

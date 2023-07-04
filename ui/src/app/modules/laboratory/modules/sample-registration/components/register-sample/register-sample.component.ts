@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatRadioChange } from "@angular/material/radio";
 import { Store } from "@ngrx/store";
-import { Observable, zip } from "rxjs";
-import { map, take, tap, withLatestFrom } from "rxjs/operators";
+import { Observable, of, zip } from "rxjs";
+import { catchError, map, take, tap, withLatestFrom } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { LabSampleModel } from "src/app/modules/laboratory/resources/models";
 import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
@@ -13,6 +13,7 @@ import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import {
@@ -38,6 +39,7 @@ export class RegisterSampleComponent implements OnInit {
   @Input() specimenSources: ConceptGetFull[];
   @Input() personEmailAttributeTypeUuid: string;
   @Input() personPhoneAttributeTypeUuid: string;
+  @Input() sampleRegistrationCategoriesConceptUuid: string;
   registrationCategory: string = "single";
   currentUser$: Observable<any>;
 
@@ -100,12 +102,14 @@ export class RegisterSampleComponent implements OnInit {
   unifiedCodingReferenceConceptSourceUuid$: Observable<string>;
   relatedMetadataAttributeUuid$: Observable<string>;
   hfrCodeAttributeUuid$: Observable<string>;
+  sampleRegistrationCategories$: Observable<any>;
 
   constructor(
     private samplesService: SamplesService,
     private systemSettingsService: SystemSettingsService,
     private store: Store<AppState>,
-    private registrationService: RegistrationService
+    private registrationService: RegistrationService,
+    private conceptService: ConceptsService
   ) {}
 
   ngOnInit(): void {
@@ -209,7 +213,22 @@ export class RegisterSampleComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "lis.settings.labNumber.charactersCount"
       );
-
+    this.sampleRegistrationCategories$ = this.conceptService
+      .getConceptDetailsByUuid(
+        this.sampleRegistrationCategoriesConceptUuid,
+        "custom:(uuid,display,setMembers:(uuid,display))"
+      )
+      .pipe(
+        map((response) =>
+          response?.setMembers?.map((setMember: any) => {
+            return {
+              ...setMember,
+              refKey: setMember?.display?.toLowerCase(),
+            };
+          })
+        ),
+        catchError((error) => of(error))
+      );
     this.initializeRegistrationFields();
   }
 

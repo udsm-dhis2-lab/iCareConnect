@@ -7,7 +7,9 @@
     labSections: labSections$ | async,
     specimenSources: specimenSources$ | async,
     personEmailAttributeTypeUuid: personEmailAttributeTypeUuid$ | async,
-    personPhoneAttributeTypeUuid: personPhoneAttributeTypeUuid$ | async
+    personPhoneAttributeTypeUuid: personPhoneAttributeTypeUuid$ | async,
+    sampleRegistrationCategoriesConceptUuid:
+      sampleRegistrationCategoriesConceptUuid$ | async
   } as params"
 >
   <div
@@ -18,7 +20,8 @@
       params?.specimenSources &&
       params?.personEmailAttributeTypeUuid &&
       params?.personPhoneAttributeTypeUuid &&
-      params?.currentUser
+      params?.currentUser &&
+      params?.sampleRegistrationCategoriesConceptUuid
     "
   >
     <app-register-sample
@@ -29,6 +32,9 @@
       [currentUser]="params?.currentUser"
       [personPhoneAttributeTypeUuid]="params?.personPhoneAttributeTypeUuid"
       [personEmailAttributeTypeUuid]="params?.personEmailAttributeTypeUuid"
+      [sampleRegistrationCategoriesConceptUuid]="
+        params?.sampleRegistrationCategoriesConceptUuid
+      "
     ></app-register-sample>
   </div>
 
@@ -40,7 +46,8 @@
       !params?.specimenSources ||
       !params?.personEmailAttributeTypeUuid ||
       !params?.personPhoneAttributeTypeUuid ||
-      !params?.currentUser
+      !params?.currentUser ||
+      !params?.sampleRegistrationCategoriesConceptUuid
     "
     mode="indeterminate"
   ></mat-progress-bar>

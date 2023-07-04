@@ -16,7 +16,8 @@
       unifiedCodingReferenceConceptSourceUuid$ | async,
     relatedMetadataAttributeUuid: relatedMetadataAttributeUuid$ | async,
     hfrCodeAttributeUuid: hfrCodeAttributeUuid$ | async,
-    labTestRequestProgramStageId: labTestRequestProgramStageId$ | async
+    labTestRequestProgramStageId: labTestRequestProgramStageId$ | async,
+    sampleRegistrationCategories: sampleRegistrationCategories$ | async
   } as params"
 >
   <div class="row">
@@ -73,7 +74,8 @@
               !params?.labNumberCharactersCount ||
               !params?.testsFromExternalSystemsConfigs ||
               !params?.unifiedCodingReferenceConceptSourceUuid ||
-              !params?.labTestRequestProgramStageId
+              !params?.labTestRequestProgramStageId ||
+              !params?.sampleRegistrationCategories
             "
             barcodeSettings
             mode="indeterminate"
@@ -88,7 +90,8 @@
               params?.testsFromExternalSystemsConfigs &&
               params?.identifierTypes &&
               params?.barcodeSettings &&
-              params?.labTestRequestProgramStageId
+              params?.labTestRequestProgramStageId &&
+              params?.sampleRegistrationCategories
             "
           >
             <app-single-registration
@@ -121,6 +124,9 @@
               [LISConfigurations]="LISConfigurations"
               [labTestRequestProgramStageId]="
                 params?.labTestRequestProgramStageId
+              "
+              [sampleRegistrationCategories]="
+                params?.sampleRegistrationCategories
               "
             ></app-single-registration>
           </div>
