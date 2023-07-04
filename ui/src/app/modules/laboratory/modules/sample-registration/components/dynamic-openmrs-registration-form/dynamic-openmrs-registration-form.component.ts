@@ -1,9 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { Observable } from "rxjs";
+import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { loadCustomOpenMRSForms } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
-import { getCustomOpenMRSFormById } from "src/app/store/selectors/form.selectors";
 
 @Component({
   selector: "app-dynamic-openmrs-registration-form",
@@ -12,7 +11,8 @@ import { getCustomOpenMRSFormById } from "src/app/store/selectors/form.selectors
 })
 export class DynamicOpenmrsRegistrationFormComponent implements OnInit {
   @Input() formUuids: string[];
-  @Output() formUpdate: EventEmitter<any> = new EventEmitter<any>();
+  @Output() formDataUpdate: EventEmitter<FormValue> =
+    new EventEmitter<FormValue>();
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
@@ -23,7 +23,7 @@ export class DynamicOpenmrsRegistrationFormComponent implements OnInit {
     );
   }
 
-  onFormUpdate(data: any): void {
-    this.formUpdate.emit(data);
+  onFormUpdate(data: FormValue): void {
+    this.formDataUpdate.emit(data);
   }
 }

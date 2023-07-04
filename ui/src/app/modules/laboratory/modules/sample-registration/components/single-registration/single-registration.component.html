@@ -384,7 +384,8 @@
           errorMessage ||
           !broughtOnTimeValid ||
           !receivedOnTimeValid ||
-          !collectedOnTimeValid
+          !collectedOnTimeValid ||
+          !isGeneralObsFormValid
         "
         class="ml-2"
         (click)="onSave($event, false, params?.labLocations)"

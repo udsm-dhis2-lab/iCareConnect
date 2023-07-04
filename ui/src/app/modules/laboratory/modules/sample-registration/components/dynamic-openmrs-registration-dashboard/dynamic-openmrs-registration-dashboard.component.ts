@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 
 @Component({
   selector: "app-dynamic-openmrs-registration-dashboard",
@@ -11,7 +12,7 @@ export class DynamicOpenmrsRegistrationDashboardComponent implements OnInit {
   @Input() registrationCategory: string;
   formUuids$: Observable<string[]>;
   errors: any[] = [];
-  @Output() formUpdate: EventEmitter<any> = new EventEmitter<any>();
+  @Output() formDataUpdate: EventEmitter<any> = new EventEmitter<any>();
   constructor(private systemSettingsService: SystemSettingsService) {}
 
   ngOnInit(): void {
@@ -39,7 +40,7 @@ export class DynamicOpenmrsRegistrationDashboardComponent implements OnInit {
     });
   }
 
-  onFormUpdate(data: any): void {
-    this.formUpdate.emit(data);
+  onFormUpdate(data: FormValue): void {
+    this.formDataUpdate.emit(data);
   }
 }

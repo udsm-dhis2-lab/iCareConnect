@@ -27,7 +27,6 @@ export function getSanitizedFormObject(
         ) || []
       )?.length > 0;
   }
-
   const {
     name,
     display,
@@ -39,6 +38,7 @@ export function getSanitizedFormObject(
     mappings,
     units,
   } = concept;
+
   const formObject = {
     id: uuid,
     uuid,
@@ -97,6 +97,7 @@ function getFormField(
         key: formObject.uuid,
         label: formObject.name,
         type: "number",
+        required: formObject?.required,
         id: formObject.id,
         conceptClass: formObject?.concept?.conceptClass,
         min: formObject?.concept?.lowCritical
@@ -121,6 +122,7 @@ function getFormField(
       return new Dropdown({
         key: formObject.uuid,
         label: formObject.name,
+        required: formObject?.required,
         searchControlType: "concept",
         conceptClass: formObject?.concept?.conceptClass?.display,
         id: formObject.id,
@@ -133,6 +135,7 @@ function getFormField(
       return new TextArea({
         key: formObject.uuid,
         label: formObject.name,
+        required: formObject?.required,
         conceptClass: formObject?.concept?.conceptClass?.display,
         id: formObject.id,
         options: formObject.options,
@@ -143,6 +146,7 @@ function getFormField(
       return new ComplexDefaultFileField({
         key: formObject.uuid,
         label: formObject.name,
+        required: formObject?.required,
         conceptClass: formObject?.concept?.conceptClass?.display,
         id: formObject.id,
         options: formObject.options,
@@ -153,6 +157,7 @@ function getFormField(
       return new Boolean({
         key: formObject.uuid,
         label: formObject.name,
+        required: formObject?.required,
         conceptClass: formObject?.concept?.conceptClass?.display,
         id: formObject.id,
         options: formObject.options,
