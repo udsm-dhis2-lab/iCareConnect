@@ -34,7 +34,6 @@ import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getLocationsByIds } from "src/app/store/selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
-import { BarCodePrintModalComponent } from "../../../sample-acceptance-and-results/components/bar-code-print-modal/bar-code-print-modal.component";
 import { webSocket } from "rxjs/webSocket";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 
@@ -138,6 +137,10 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   referralData: any;
   showReferralDataFields: boolean = true;
 
+  generalObsFormData: any = {};
+  generalObservationsData: any;
+  isGeneralObsFormValid: boolean = false;
+
   constructor(
     private samplesService: SamplesService,
     private labTestsService: LabTestsService,
@@ -230,8 +233,20 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     // });getSelectedRCollectedOnTime
   }
 
-  onCustomFormUpdate(data: any): void {
-    console.log("custom form data", data);
+  onCustomFormUpdate(data: FormValue): void {
+    this.isGeneralObsFormValid = data.isValid;
+    this.generalObsFormData = {
+      ...this.generalObsFormData,
+      ...data.getValues(),
+    };
+    this.generalObservationsData = Object.keys(this.generalObsFormData).map(
+      (key) => {
+        return {
+          concept: key,
+          value: this.generalObsFormData[key]?.value,
+        };
+      }
+    );
   }
 
   get maximumDate() {
@@ -978,6 +993,11 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                 },
                                               ];
                                             }
+
+                                            obs = [
+                                              ...obs,
+                                              ...this.generalObservationsData,
+                                            ];
                                             const encounterObject = {
                                               visit: visitResponse?.uuid,
                                               patient: patientResponse?.uuid,
