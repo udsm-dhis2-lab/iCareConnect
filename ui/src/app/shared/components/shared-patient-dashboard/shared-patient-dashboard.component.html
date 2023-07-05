@@ -434,7 +434,7 @@
                       selectedForm ? selectedForm : dashboardParams?.forms[0]
                     "
                     (currentFormDetails)="onGetCurrentFormDetails($event)"
-                    (saveObservations)="reload()"
+                    (saveObservations)="reload(dashboardParams?.currentPatient)"
                   >
                   </app-clinical-notes>
                   <app-patient-observations-chart

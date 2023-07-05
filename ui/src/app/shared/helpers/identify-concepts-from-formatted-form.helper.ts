@@ -14,7 +14,11 @@ function getConcepts(formFields: any[]): any[] {
     if (formField?.concept?.dataType?.display === "N/A") {
       getConcepts(formField?.formFields);
     } else {
-      concepts = [...concepts, formField?.concept];
+      concepts = [
+        ...concepts,
+        formField?.concept,
+        ...formField?.concept?.setMembers,
+      ];
     }
   });
   return concepts;

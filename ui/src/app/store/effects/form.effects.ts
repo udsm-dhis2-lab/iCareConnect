@@ -162,7 +162,6 @@ export class FormEffects {
                   formattedFormFields && formattedFormFields?.length > 0
                     ? _.groupBy(formattedFormFields, "fieldPart") || []
                     : null;
-                console.log(keyedGroups);
 
                 forms = [
                   ...forms,

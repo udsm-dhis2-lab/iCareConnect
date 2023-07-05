@@ -78,6 +78,7 @@ import { VisitConsultationStatusModalComponent } from "../../dialogs/visit-consu
 import { BillingService } from "src/app/modules/billing/services/billing.service";
 import { map as rxMap } from "rxjs/operators";
 import { keyBy } from "lodash";
+import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -533,7 +534,6 @@ export class SharedPatientDashboardComponent implements OnInit {
     visit,
     patient
   ): void {
-    console.log(patient);
     event.stopPropagation();
     this.dialog.open(VisitConsultationStatusModalComponent, {
       width: "25%",
@@ -548,7 +548,7 @@ export class SharedPatientDashboardComponent implements OnInit {
     });
   }
 
-  reload() {
-    this.ngOnInit();
+  reload(currentPatient: Patient) {
+    this.store.dispatch(loadActiveVisit({ patientId: currentPatient?.id }));
   }
 }
