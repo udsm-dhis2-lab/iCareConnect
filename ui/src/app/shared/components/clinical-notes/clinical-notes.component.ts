@@ -145,6 +145,7 @@ export class ClinicalNotesComponent implements OnInit {
                   ) > -1
               ) || []
             ).length > 0;
+          console.log("currentFormHasRequiredData", currentFormHasRequiredData);
           this.currentFormDetails.emit({
             requiredFormsHasData: currentFormHasRequiredData,
             configs: form,

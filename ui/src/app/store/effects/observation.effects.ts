@@ -119,8 +119,6 @@ export class ObservationEffects {
                 type: "SUCCESS",
               })
             );
-
-            console.log("observationResults", observationResults);
             return [
               data?.fileObs && data?.fileObs?.length > 0
                 ? saveObservationsForFiles({
