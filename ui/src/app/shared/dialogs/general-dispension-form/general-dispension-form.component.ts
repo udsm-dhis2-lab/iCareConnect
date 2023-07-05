@@ -108,6 +108,7 @@ export class GeneralDispensingFormComponent implements OnInit {
       this.specificDrugConceptUuid
     ) {
       const drugs = await this.drugOrderService.getAllDrugs("full");
+      // TODO: HIGH - Softcode location uuid
       this.drugConceptField = new Dropdown({
         id: "drug",
         key: "drug",

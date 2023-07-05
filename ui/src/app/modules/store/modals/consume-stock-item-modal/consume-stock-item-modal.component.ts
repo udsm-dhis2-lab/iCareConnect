@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
-import { zip } from "rxjs";
+import { of, zip } from "rxjs";
+import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
@@ -18,6 +19,8 @@ export class ConsumeStockItemModalComponent implements OnInit {
   quantity: number;
   remarks: string;
   saving: boolean = false;
+  searchItemField: any;
+  currentItemStock: any;
   constructor(
     private dialogRef: MatDialogRef<ConsumeStockItemModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -25,6 +28,34 @@ export class ConsumeStockItemModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.currentItemStock = this.data?.currentItemStock;
+    if (!this.currentItemStock) {
+      this.searchItemField = new Dropdown({
+        id: "stockItem",
+        key: "stockItem",
+        label: "Item",
+        required: true,
+        options: [],
+        locationUuid: "7f65d926-57d6-4402-ae10-a5b3bcbf7986",
+        searchControlType: "drugStock",
+        shouldHaveLiveSearchForDropDownFields: true,
+      });
+    }
+    this.createQuantityAndRemarksFields();
+  }
+
+  onGetSelectedItem(formValue: FormValue): void {
+    this.currentItemStock = formValue.getValues()?.stockItem?.value;
+    // console.log("currentItemStock", this.currentItemStock);
+    if (this.currentItemStock?.batches) {
+      this.formFields = null;
+      setTimeout(() => {
+        this.createQuantityAndRemarksFields();
+      }, 50);
+    }
+  }
+
+  createQuantityAndRemarksFields(): void {
     this.formFields = [
       new Textbox({
         id: "quantity",
@@ -33,7 +64,9 @@ export class ConsumeStockItemModalComponent implements OnInit {
         required: true,
         type: "number",
         min: 1,
-        max: this.data?.currentItemStock?.eligibleQuantity,
+        max: this.currentItemStock?.eligibleQuantity
+          ? this.currentItemStock?.eligibleQuantity
+          : this.currentItemStock?.quantity,
       }),
       new TextArea({
         id: "remarks",
@@ -61,9 +94,7 @@ export class ConsumeStockItemModalComponent implements OnInit {
     let quntityValidator = 0;
     // TODO: Use for loop and break when condition is met
     (
-      this.data?.currentItemStock?.batches?.filter(
-        (batch) => !batch?.isExpired
-      ) || []
+      this.currentItemStock?.batches?.filter((batch) => !batch?.isExpired) || []
     )?.forEach((eligibleBatch) => {
       if (quntityValidator < this.quantity) {
         quntityValidator += this.quantity;
@@ -75,13 +106,15 @@ export class ConsumeStockItemModalComponent implements OnInit {
         const ledgerInput: LedgerInput = {
           itemUuid: this.data?.currentItemStock?.id,
           ledgerTypeUuid: this.data?.ledger?.id,
-          locationUuid: this.data?.currentItemStock?.location?.uuid,
+          locationUuid: this.currentItemStock?.location?.uuid,
           quantity: this.quantity,
           buyingPrice: 0,
           batchNo: batch?.batchNo,
           expiryDate: batch?.expiryDate,
           remarks: this.remarks,
         };
+        // console.log(ledgerInput);
+        // return of(null);
         return this.stockService.saveStockLedger(ledgerInput);
       })
     ).subscribe((response: any) => {

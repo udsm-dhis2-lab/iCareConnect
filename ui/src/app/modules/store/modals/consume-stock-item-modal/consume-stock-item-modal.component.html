@@ -1,6 +1,7 @@
 <div class="p-4">
   <div class="h5 text-left">
-    Consume <b>{{ data?.currentItemStock?.name }}</b>
+    {{ data?.ledger?.name ? data?.ledger?.name : data?.ledger?.name }}
+    <b *ngIf="data?.currentItemStockz">{{ data?.currentItemStock?.name }}</b>
   </div>
   <div class="loading-overlay" *ngIf="saving">
     <div class="text-center">
@@ -10,8 +11,14 @@
       </div>
     </div>
   </div>
-  <div class="w-100 mt-2">
+  <div class="w-100 mt-4">
     <app-form
+      *ngIf="searchItemField"
+      [fields]="[searchItemField]"
+      (formUpdate)="onGetSelectedItem($event)"
+    ></app-form>
+    <app-form
+      *ngIf="formFields"
       [fields]="formFields"
       (formUpdate)="onFormUpdate($event)"
     ></app-form>

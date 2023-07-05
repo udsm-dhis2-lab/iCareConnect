@@ -23,7 +23,7 @@
           />
         </mat-form-field>
 
-        <div class="w-75 float-right" >
+        <div class="w-75 float-right">
           <div class="float-right" *ngIf="isCurrentLocationMainStore">
             <!-- <button
             [disabled]="!userPrivileges['STORE_ADD_NEW_STOCKABLE_ITEM']"
@@ -43,7 +43,10 @@
             </button>
           </div>
 
-          <div class="float-right" *ngIf="!isCurrentLocationMainStore && !isCurrentLocationPharmacy">
+          <div
+            class="float-right"
+            *ngIf="!isCurrentLocationMainStore && !isCurrentLocationPharmacy"
+          >
             <!-- <button
             [disabled]="!userPrivileges['STORE_ADD_NEW_STOCKABLE_ITEM']"
             class="button-round"
@@ -52,11 +55,19 @@
             (click)="onAddNewStockRecevied($event, ledgerTypes, currentLocation)"
           > Receive New Item </button> -->
             <button
-              [disabled]="!params?.stocksList || params?.stocksList.length === 0"
-              class="button-round ml-4"
+              [disabled]="
+                !params?.stocksList || params?.stocksList.length === 0
+              "
               color="primary"
-              mat-stroked-button
-              (click)="onShowReceivingForm($event)"
+              mat-flat-button
+              (click)="
+                onOpenConsumeModal(
+                  null,
+                  params?.consumeLedgerUuid,
+                  ledgerTypes,
+                  currentLocation
+                )
+              "
             >
               Consume
             </button>
@@ -150,7 +161,10 @@
                     </button>
 
                     <button
-                     *ngIf="!isCurrentLocationMainStore && !isCurrentLocationPharmacy"
+                      *ngIf="
+                        !isCurrentLocationMainStore &&
+                        !isCurrentLocationPharmacy
+                      "
                       mat-menu-item
                       [disabled]="
                         currentItemStock?.id === stock.id ||
@@ -161,7 +175,8 @@
                         onOpenConsumeModal(
                           stock,
                           params?.consumeLedgerUuid,
-                          ledgerTypes
+                          ledgerTypes,
+                          currentLocation
                         )
                       "
                       (click)="menuTrigger.closeMenu()"
