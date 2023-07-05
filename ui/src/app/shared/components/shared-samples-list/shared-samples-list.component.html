@@ -451,7 +451,9 @@
                   </div>
 
                   <div
-                    *ngIf="tabType === 'sample-tracking' && LISConfigurations?.isLIS"
+                    *ngIf="
+                      tabType === 'sample-tracking' && LISConfigurations?.isLIS
+                    "
                     class="d-flex justify-content-end"
                   >
                     <button
@@ -593,12 +595,13 @@
       <thead>
         <tr>
           <th style="width: 40px">SN</th>
-          <th>Location</th>
-          <th>Visit Date & Time</th>
           <th>MRN</th>
           <th>Names</th>
           <th>Gender</th>
           <th>Age</th>
+          <th>Visit Date & Time</th>
+          <th>Location</th>
+
           <th></th>
         </tr>
       </thead>
@@ -609,13 +612,6 @@
           >
             <tr>
               <td>{{ count + 1 }}</td>
-              <td>
-                {{ visit?.location?.parentLocation?.display }} /
-                {{ visit?.location?.display }}
-              </td>
-              <td>
-                {{ visit?.startDatetime | date: "medium" }}
-              </td>
               <td>
                 {{ visit?.patient?.identifiers[0]?.identifier }}
               </td>
@@ -629,9 +625,18 @@
                 {{ visit?.patient?.person?.age }}
               </td>
               <td>
+                {{ visit?.startDatetime | date: "medium" }}
+              </td>
+              <td>
+                {{ visit?.location?.parentLocation?.display }} /
+                {{ visit?.location?.display }}
+              </td>
+              <td>
                 <button
                   mat-flat-button
-                  (click)="getSamplesListByVisit($event, visit, sampleVisitParameters)"
+                  (click)="
+                    getSamplesListByVisit($event, visit, sampleVisitParameters)
+                  "
                 >
                   View samples
                 </button>
@@ -876,7 +881,6 @@
                                     }}
                                   </button>
                                 </div>
-                                
                               </td>
                             </tr>
                           </ng-container>
