@@ -66,7 +66,7 @@
       "
       [category]="'ACCEPTED'"
       [hasStatus]="hasStatus"
-      [showLegend]="false"
+      [showLegend]="LISConfigurations?.isLIS ? false : true"
       [datesParameters]="datesParameters"
       [excludedSampleCategories]="['HAS_RESULTS']"
       [excludeAllocations]="true"
