@@ -156,7 +156,10 @@
                         </div>
                         <div
                           class="mt-4 d-flex justify-content-end"
-                          *ngIf="data?.actionType === 'authorization'"
+                          *ngIf="
+                            data?.actionType === 'authorization' ||
+                            !data?.LISConfigurations?.isLIS
+                          "
                         >
                           <button
                             *ngIf="shouldConfirm"
