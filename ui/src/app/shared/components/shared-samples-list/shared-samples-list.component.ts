@@ -150,7 +150,10 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       this.getSamples({
         pageSize: this.pageSize,
         page: this.page,
-        category: this.category,
+        category:
+          this.category === "COLLECTED" && this.tabType !== "sample-tracking"
+            ? "NOT ACCEPTED"
+            : this.category,
         hasStatus: this.hasStatus,
       });
     } else {
@@ -205,9 +208,13 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   }
 
   getSamples(params?: any): void {
+    const category =
+      params.category === "COLLECTED" && this.tabType !== "sample-tracking"
+        ? "NOT ACCEPTED"
+        : params.category;
     this.samples$ = this.sampleService.getLabSamplesByCollectionDates(
       this.datesParameters,
-      params?.category,
+      category,
       params?.hasStatus,
       this.excludeAllocations,
       {
