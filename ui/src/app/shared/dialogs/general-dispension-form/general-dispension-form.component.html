@@ -16,20 +16,7 @@
         [fields]="[drugConceptField]"
         (formUpdate)="onFormUpdate($event, 'drug')"
       ></app-form>
-      <!-- <app-form
-        *ngIf="strengthFormField"
-        [fields]="[strengthFormField]"
-        (formUpdate)="onFormUpdate($event)"
-      ></app-form> -->
     </div>
-    <!-- <div *ngIf="conceptFields">
-      <app-concepts-form
-        [conceptFields]="conceptFields"
-        (formUpdate)="onFormUpdate($event)"
-      ></app-concepts-form>
-    </div> -->
-    <!-- <div *ngIf="conceptFields">
-    </div> -->
     <div class="row" *ngIf="conceptFields">
       <div class="col-4">
         <app-concepts-form
@@ -37,7 +24,8 @@
           [textfield]="true"
           (formUpdate)="onFormUpdate($event)"
         ></app-concepts-form>
-        <app-form *ngIf="!conceptFields"
+        <app-form
+          *ngIf="!conceptFields"
           [fields]="[drugDoseField]"
           (formUpdate)="onFormUpdate($event)"
         ></app-form>
@@ -65,7 +53,8 @@
           [textfield]="true"
           (formUpdate)="onFormUpdate($event)"
         ></app-concepts-form>
-        <app-form *ngIf="!conceptFields"
+        <app-form
+          *ngIf="!conceptFields"
           [fields]="[drugDurationField]"
           (formUpdate)="onFormUpdate($event)"
         ></app-form>
