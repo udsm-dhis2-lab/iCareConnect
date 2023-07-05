@@ -151,8 +151,19 @@ export class GeneralDispensingFormComponent implements OnInit {
 
   onFormUpdate(formValues: FormValue, fieldItem?: string): void {
     this.isFormValid = formValues.isValid;
+
     this.formValues = { ...this.formValues, ...formValues.getValues() };
 
+    const doseDataValueKey: any = (Object.keys(this.formValues)?.filter(
+      (key) => this.formValues[key]?.label === "Dose"
+    ) || [])[0];
+    this.isFormValid =
+      this.isFormValid &&
+      this.formValues[doseDataValueKey]?.value?.length > 0 &&
+      this.formValues?.dosingUnit?.value?.length > 0 &&
+      this.formValues?.frequency?.value?.length > 0
+        ? true
+        : false;
     if (formValues.getValues()?.drug?.value?.length > 0) {
       this.selectedDrug = formValues
         .getValues()
@@ -194,7 +205,7 @@ export class GeneralDispensingFormComponent implements OnInit {
 
   saveOrder(e: any, conceptFields: any) {
     if (!this.formValues?.drug?.value) {
-      this.errors = []
+      this.errors = [];
       setTimeout(() => {
         this.errors = [
           ...this.errors,
@@ -205,9 +216,8 @@ export class GeneralDispensingFormComponent implements OnInit {
             },
           },
         ];
-      })
-    }
-    else {
+      });
+    } else {
       this.savingOrder = true;
       let encounterObject = {
         patient: this.currentPatient?.id,

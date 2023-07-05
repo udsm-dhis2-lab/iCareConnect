@@ -242,9 +242,7 @@
                     ></app-drug-order>
 
                     <div>
-                      <span *ngIf="showPrice">
-                        Price: {{ drugPrice }}
-                      </span>
+                      <span *ngIf="showPrice"> Price: {{ drugPrice }} </span>
                       <button
                         class="float-right"
                         (click)="
@@ -255,7 +253,8 @@
                         [disabled]="
                           !params?.specificDrugConceptUuid ||
                           savingOrder ||
-                          countOfDispensingFormFieldsWithValues < 3
+                          countOfDispensingFormFieldsWithValues < 3 ||
+                          !drugOrder.quantity
                         "
                       >
                         <mat-icon *ngIf="savingError" class="mr-2"
