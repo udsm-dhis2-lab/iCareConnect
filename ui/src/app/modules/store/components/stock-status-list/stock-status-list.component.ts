@@ -221,13 +221,15 @@ export class StockStatusListComponent implements OnInit {
   onOpenConsumeModal(
     currentItemStock: any,
     consumeLedgerUuid: string,
-    ledgerTypes: any[]
+    ledgerTypes: any[],
+    currentLocation: any
   ): void {
     this.dialog
       .open(ConsumeStockItemModalComponent, {
-        maxWidth: "40%",
+        minWidth: "40%",
         data: {
           currentItemStock,
+          currentLocation,
           ledger: (ledgerTypes?.filter(
             (ledger) =>
               (ledger?.id ? ledger?.id : ledger?.uuid) === consumeLedgerUuid

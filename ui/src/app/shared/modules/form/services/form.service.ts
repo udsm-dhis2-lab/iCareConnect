@@ -258,21 +258,32 @@ export class FormService {
             .pipe(
               map((response) => {
                 let formattedResponse = [];
-              
+
                 if (stockApiPath === "stockout?location") {
-                  formattedResponse = (response?.results || [])?.map((responseItem) => {
-                    stockOutItemsReference[responseItem?.uuid] = responseItem;
+                  formattedResponse = (response?.results || [])?.map(
+                    (responseItem) => {
+                      stockOutItemsReference[responseItem?.uuid] = responseItem;
+                      return {
+                        ...responseItem,
+                        item: {
+                          drug: responseItem?.drug,
+                          uuid: responseItem?.uuid,
+                        },
+                        quantity: 0,
+                      };
+                    }
+                  );
+                } else {
+                  formattedResponse = (
+                    response?.results?.filter(
+                      (batch) => batch?.expiryDate > new Date().getTime()
+                    ) || []
+                  )?.map((batch) => {
                     return {
-                      ...responseItem,
-                      item: {
-                        drug: responseItem?.drug,
-                        uuid: responseItem?.uuid,
-                      },
-                      quantity: 0,
+                      ...batch,
+                      isExpired: false,
                     };
                   });
-                } else {
-                  formattedResponse = response?.results || [];
                 }
                 const groupedByItemUuid = groupBy(
                   formattedResponse?.map((batch) => {
@@ -283,31 +294,36 @@ export class FormService {
                   }),
                   "itemUuid"
                 );
-                return (Object.keys(groupedByItemUuid) || [])?.map((itemUuid) => {
-                  const totalQuantity = Number(
-                    sumBy(
-                      (groupedByItemUuid[itemUuid] || [])?.map((batchData) => {
-                        return batchData;
-                      }),
-                      "quantity"
-                    )
-                  );
-                  return {
-                    uuid: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
-                    id: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
-                    display:
-                      groupedByItemUuid[itemUuid][0]?.item?.drug?.display +
-                      " (" +
-                      totalQuantity.toLocaleString("en-US") +
-                      ") ",
-                    itemUuid,
-                    value: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
-                    batches: groupedByItemUuid[itemUuid],
-                    name: groupedByItemUuid[itemUuid][0]?.item?.drug?.display,
-                    quantity: totalQuantity,
-                    isStockOut: totalQuantity === 0 ? true : false,
-                  };
-                });
+                return (Object.keys(groupedByItemUuid) || [])?.map(
+                  (itemUuid) => {
+                    const totalQuantity = Number(
+                      sumBy(
+                        (groupedByItemUuid[itemUuid] || [])?.map(
+                          (batchData) => {
+                            return batchData;
+                          }
+                        ),
+                        "quantity"
+                      )
+                    );
+                    return {
+                      uuid: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                      id: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                      display:
+                        groupedByItemUuid[itemUuid][0]?.item?.drug?.display +
+                        " (" +
+                        totalQuantity.toLocaleString("en-US") +
+                        ") ",
+                      itemUuid,
+                      location: { uuid: field?.locationUuid },
+                      value: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                      batches: flatten(groupedByItemUuid[itemUuid]),
+                      name: groupedByItemUuid[itemUuid][0]?.item?.drug?.display,
+                      quantity: totalQuantity,
+                      isStockOut: totalQuantity === 0 ? true : false,
+                    };
+                  }
+                );
               })
             );
         })
@@ -319,20 +335,26 @@ export class FormService {
             ["asc"]["asc"]
           );
           const drugIitemsGroupedByItemUuid = groupBy(allDrugItems, "itemUuid");
-          const formattedDrugItems = (Object.keys(
-            drugIitemsGroupedByItemUuid
-          ) || [])?.map((itemUuid) => {
+          const formattedDrugItems = (
+            Object.keys(drugIitemsGroupedByItemUuid) || []
+          )?.map((itemUuid) => {
             const totalQuantity = Number(
               sumBy(
-                (drugIitemsGroupedByItemUuid[itemUuid] || []).map((batchData) => {
-                  return batchData;
-                }),
+                (drugIitemsGroupedByItemUuid[itemUuid] || []).map(
+                  (batchData) => {
+                    return batchData;
+                  }
+                ),
                 "quantity"
               )
             );
             return {
               ...drugIitemsGroupedByItemUuid[itemUuid][0],
-              batches: drugIitemsGroupedByItemUuid[itemUuid],
+              batches: flatten(
+                drugIitemsGroupedByItemUuid[itemUuid]?.map((batchDetails) => {
+                  return batchDetails?.batches;
+                })
+              ),
               display:
                 drugIitemsGroupedByItemUuid[itemUuid][0]?.name +
                 " (" +
