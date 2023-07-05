@@ -223,7 +223,7 @@ export class RegisterSampleComponent implements OnInit {
           response?.setMembers?.map((setMember: any) => {
             return {
               ...setMember,
-              refKey: setMember?.display?.toLowerCase(),
+              refKey: setMember?.display?.toLowerCase().split(" ").join(""),
             };
           })
         ),
