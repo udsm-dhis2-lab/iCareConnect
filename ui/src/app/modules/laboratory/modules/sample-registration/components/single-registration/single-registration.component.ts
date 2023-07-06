@@ -1560,7 +1560,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                               remarks:
                                                                                 "Sample registration form type reference",
                                                                               status:
-                                                                                this.registrationCategory?.toUpperCase(),
+                                                                                this.registrationCategory?.refKey?.toUpperCase(),
                                                                             },
                                                                           ];
 
