@@ -233,14 +233,13 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
       ...this.generalObsFormData,
       ...data.getValues(),
     };
-    this.generalObservationsData = Object.keys(this.generalObsFormData).map(
-      (key) => {
+    this.generalObservationsData =
+      Object.keys(this.generalObsFormData).map((key) => {
         return {
           concept: key,
           value: this.generalObsFormData[key]?.value,
         };
-      }
-    );
+      }) || [];
   }
 
   get maximumDate() {
@@ -584,10 +583,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
 
   onGetPersonDetails(personDetails: any): void {
     this.personDetailsData =
-      this.registrationCategory === "CLINICAL"
+      this.registrationCategory?.refKey !== "non-clinical"
         ? personDetails
-        : this.registrationCategory === "EQA"
-        ? EQA_PERSON_DATA
         : NON_CLINICAL_PERSON_DATA;
     if (this.fromExternalSystem && this.selectedSystem) {
       // console.log(
@@ -683,10 +680,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
         }
 
         this.personDetailsData =
-          this.registrationCategory === "CLINICAL"
+          this.registrationCategory?.refKey !== "non-clinical"
             ? this.personDetailsData
-            : this.registrationCategory === "EQA"
-            ? EQA_PERSON_DATA
             : NON_CLINICAL_PERSON_DATA;
         if (this.testOrders?.length === 0) {
           this.errorMessage = "No test has been selected";
@@ -779,7 +774,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                               ],
                             },
                             identifiers:
-                              this.registrationCategory === "CLINICAL"
+                              this.registrationCategory?.refKey !==
+                              "non-clinical"
                                 ? (patientIdentifierTypes || [])
                                     .map((personIdentifierType) => {
                                       if (
@@ -875,7 +871,10 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                   },
                                 ];
 
-                                if (this.registrationCategory === "CLINICAL") {
+                                if (
+                                  this.registrationCategory?.refKey !==
+                                  "non-clinical"
+                                ) {
                                   const personDataAttributeKeys =
                                     Object.keys(this.personDetailsData).filter(
                                       (key) => key.indexOf("attribute-") === 0
@@ -994,7 +993,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
 
                                             obs = [
                                               ...obs,
-                                              ...this.generalObservationsData,
+                                              ...(this
+                                                .generalObservationsData || []),
                                             ];
                                             const encounterObject = {
                                               visit: visitResponse?.uuid,
@@ -1004,7 +1004,11 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                               location:
                                                 this.currentLocation?.uuid,
                                               orders,
-                                              obs,
+                                              obs:
+                                                obs?.filter(
+                                                  (observation) =>
+                                                    observation?.value
+                                                ) || [],
                                               encounterProviders: [
                                                 {
                                                   provider: this.provider?.uuid,
@@ -1556,8 +1560,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                               remarks:
                                                                                 "Sample registration form type reference",
                                                                               status:
-                                                                                this
-                                                                                  .registrationCategory,
+                                                                                this.registrationCategory?.toUpperCase(),
                                                                             },
                                                                           ];
 
