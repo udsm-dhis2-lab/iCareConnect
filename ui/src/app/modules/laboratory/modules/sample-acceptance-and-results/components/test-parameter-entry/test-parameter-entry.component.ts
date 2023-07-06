@@ -5,6 +5,8 @@ import { ConceptGet } from "src/app/shared/resources/openmrs";
 import { SampleAllocationObject } from "src/app/shared/resources/sample-allocations/models/allocation.model";
 
 import { orderBy } from "lodash";
+import { map } from "rxjs/operators";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "app-test-parameter-entry",
@@ -24,13 +26,32 @@ export class TestParameterEntryComponent implements OnInit {
   testParameter$: Observable<ConceptGet>;
   @Output() data: EventEmitter<any> = new EventEmitter<any>();
   latestResult: any;
-  constructor(private conceptService: ConceptsService) {}
+  errors: any[] = [];
+  multipleResultsAttributeType$: Observable<string>;
+  constructor(
+    private conceptService: ConceptsService,
+    private systemSettingsService: SystemSettingsService
+  ) {}
 
   ngOnInit(): void {
     this.testParameter$ = this.conceptService.getConceptDetailsByUuid(
       this.parameterUuid,
       "custom:(uuid,display,datatype,names,answers:(uuid,display,names),attributes:(uuid,display,attributeType:(uuid,display)))"
     );
+    this.multipleResultsAttributeType$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        `iCare.laboratory.settings.testParameters.attributes.multipleResultsAttributeTypeUuid`
+      )
+      .pipe(
+        map((response) => {
+          if (response && !response?.error) {
+            return response;
+          } else {
+            this.errors = [...this.errors, response];
+            return response;
+          }
+        })
+      );
     if (this.finalResult && !this.finalResult?.groups) {
       this.latestResult = {
         ...this.finalResult,
