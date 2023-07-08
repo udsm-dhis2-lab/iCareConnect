@@ -65,23 +65,7 @@ export const getUserAssignedLocations = createSelector(
 export const getCurrentUserPrivileges = createSelector(
   getCurrentUserState,
   (state: CurrentUserState) => {
-    const matchedPrivileges = state.currentUser
-      ? flatten(
-          state.currentUser.roles.map((referenceUserRole) => {
-            const availableRoleWithPrivileges = state.roles.find(
-              (role) => role?.uuid === referenceUserRole?.uuid
-            );
-            return (
-              availableRoleWithPrivileges?.privileges.map((privilege) => {
-                return {
-                  ...privilege,
-                  role: referenceUserRole,
-                };
-              }) || []
-            );
-          })
-        )
-      : null;
+    const matchedPrivileges = state.currentUser?.privileges;
     return matchedPrivileges
       ? {
           ...(keyBy(matchedPrivileges, "uuid") || {}),
