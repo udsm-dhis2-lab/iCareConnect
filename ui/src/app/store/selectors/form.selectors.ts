@@ -3,7 +3,7 @@ import { FormConfig } from "src/app/shared/modules/form/models/form-config.model
 import { ICAREForm } from "src/app/shared/modules/form/models/form.model";
 import { AppState, getRootState } from "../reducers";
 import { formAdapter, FormState } from "../states/form.state";
-import { filter } from "lodash";
+import { filter, orderBy } from "lodash";
 
 const getFormState = createSelector(
   getRootState,
@@ -47,9 +47,13 @@ export const getCustomOpenMRSFormById = (id: string) =>
 
 export const getCustomOpenMRSFormsByIds = (formUUids: string[]) =>
   createSelector(getAllForms, (allForms) =>
-    filter(allForms, (form) => {
-      if (formUUids.indexOf(form.uuid) > -1) {
-        return form;
-      }
-    })
+    orderBy(
+      filter(allForms, (form) => {
+        if (formUUids.indexOf(form.uuid) > -1) {
+          return form;
+        }
+      }),
+      ["name"],
+      ["asc"]
+    )
   );
