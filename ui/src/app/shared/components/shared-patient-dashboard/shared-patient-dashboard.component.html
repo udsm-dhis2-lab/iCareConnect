@@ -597,7 +597,9 @@
                         !currentFormDetails?.requiredFormsHasData
                       "
                     >
-                      {{ currentFormDetails?.configs?.name }} has not data
+                      Please fill data on
+                      <b>{{ currentFormDetails?.configs?.name }}</b> form to
+                      proceed
                     </div>
                   </mat-expansion-panel>
                 </mat-accordion>
@@ -663,7 +665,9 @@
                               !currentFormDetails?.requiredFormsHasData
                             "
                           >
-                            {{ currentFormDetails?.configs?.name }} has not data
+                            Please fill data on
+                            <b>{{ currentFormDetails?.configs?.name }}</b> form
+                            to proceed
                           </div>
                           <mat-progress-bar
                             *ngIf="
@@ -778,7 +782,9 @@
                         !currentFormDetails?.requiredFormsHasData
                       "
                     >
-                      {{ currentFormDetails?.configs?.name }} has not data
+                      Please fill data on
+                      <b>{{ currentFormDetails?.configs?.name }}</b> form to
+                      proceed
                     </div>
                     <mat-progress-bar
                       *ngIf="!dashboardParams?.formEntities['Visit Diagnoses']"
