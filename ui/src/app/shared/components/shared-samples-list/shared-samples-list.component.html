@@ -136,17 +136,14 @@
       </mat-radio-group>
     </div>
     <div
-      *ngIf="
-        LISConfigurations?.isLIS &&
-        params?.samples &&
-        params?.samples?.results?.length > 0
-      "
+      *ngIf="params?.samples && params?.samples?.results?.length > 0"
       class="col-md-6 col-sx-12 col-sm-12 mt-3 d-flex justify-content-end"
     >
       <section>
         <mat-checkbox
           *ngIf="
             params?.currentUser &&
+            LISConfigurations?.isLIS &&
             (params?.currentUser?.userPrivileges['ALL'] ||
               params?.currentUser?.userPrivileges[
                 'SAMPLE TESTING AND RESULTS_SHOW_MRN'
@@ -160,7 +157,8 @@
         <mat-checkbox
           *ngIf="
             params?.currentUser &&
-            (params?.currentUser?.userPrivileges['ALL'] ||
+            LISConfigurations?.isLIS &&
+            (params?.currentUser?.userPrivileges['ALLs'] ||
               params?.currentUser?.userPrivileges[
                 'SAMPLE TESTING AND RESULTS_SHOW_GENDER'
               ])
@@ -202,12 +200,7 @@
           >
             Patient Identification
           </th>
-          <th
-            rowspan="2"
-            *ngIf="!LISConfigurations?.isLIS || itemsToShow['names']"
-          >
-            Patient Names
-          </th>
+          <th rowspan="2" *ngIf="itemsToShow['names']">Patient Names</th>
           <th
             rowspan="2"
             *ngIf="!LISConfigurations?.isLIS || itemsToShow['gender']"
@@ -308,10 +301,7 @@
                 {{ sample?.mrn }}
               </td>
               <td
-                *ngIf="
-                  orderCount == 0 &&
-                  (!LISConfigurations?.isLIS || itemsToShow['names'])
-                "
+                *ngIf="orderCount == 0 && itemsToShow['names']"
                 [attr.rowspan]="sample?.orders?.length"
               >
                 {{ sample?.patient?.givenName }}
@@ -596,7 +586,7 @@
         <tr>
           <th style="width: 40px">SN</th>
           <th>MRN</th>
-          <th>Names</th>
+          <th *ngIf="itemsToShow['names']">Names</th>
           <th>Gender</th>
           <th>Age</th>
           <th>Visit Date & Time</th>
@@ -615,7 +605,7 @@
               <td>
                 {{ visit?.patient?.identifiers[0]?.identifier }}
               </td>
-              <td>
+              <td *ngIf="itemsToShow['names']">
                 {{ visit?.patient?.person?.display }}
               </td>
               <td>

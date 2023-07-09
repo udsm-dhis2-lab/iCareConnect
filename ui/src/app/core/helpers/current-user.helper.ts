@@ -1,7 +1,6 @@
 import { UserGet } from "src/app/shared/resources/openmrs";
 
 export function formatCurrentUserDetails(userDetails): UserGet {
-  console.log("userDetails", userDetails);
   return {
     links: userDetails.links,
     uuid: userDetails.uuid,
