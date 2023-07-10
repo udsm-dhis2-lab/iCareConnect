@@ -46,14 +46,10 @@ export const getCustomOpenMRSFormById = (id: string) =>
   );
 
 export const getCustomOpenMRSFormsByIds = (formUUids: string[]) =>
-  createSelector(getAllForms, (allForms) =>
-    orderBy(
-      filter(allForms, (form) => {
-        if (formUUids.indexOf(form.uuid) > -1) {
-          return form;
-        }
-      }),
+  createSelector(getAllForms, (allForms) => {
+    return orderBy(
+      filter(allForms, (form) => formUUids.indexOf(form.uuid) > -1),
       ["name"],
       ["asc"]
-    )
-  );
+    );
+  });

@@ -59,13 +59,25 @@ export class ClinicalNotesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.clinicalForms = this.clinicalForm?.setMembers || [];
-    // this.selectedForm = this.forms[0];
+    // console.log(this.clinicConfigurations);
+    this.clinicConfigurations = {
+      ...this.clinicConfigurations,
+      forms: keyBy(
+        Object.keys(this.clinicConfigurations?.forms)
+          .filter(
+            (key) =>
+              (this.forms?.filter((form) => form?.uuid == key) || [])?.length >
+              0
+          )
+          .map((key) => this.clinicConfigurations?.forms[key]),
+        "id"
+      ),
+    };
+    this.selectedForm = !this.selectedForm
+      ? this.clinicalForm
+      : this.selectedForm;
     this.formData = {};
-    this.currentForm = this.clinicalForms[0];
-    this.currentCustomForm = this.selectedForm
-      ? this.selectedForm
-      : this.forms[0];
+    this.currentCustomForm = this.selectedForm;
     this.currentSelectedFormForEmitting.emit(this.currentCustomForm);
     this.currentCustomFormName = this.forms[0]?.name;
     this.savingObservations$ = this.store.select(getSavingObservationStatus);
@@ -201,7 +213,7 @@ export class ClinicalNotesComponent implements OnInit {
     return dependedFormHasData;
   }
 
-  onSetClinicalForm(e, form) {
+  onSetClinicalForm(e: Event, form: any): void {
     e.stopPropagation();
     this.currentCustomForm = form;
     this.currentCustomFormName = form?.name;
