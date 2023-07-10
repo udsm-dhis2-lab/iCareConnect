@@ -13,6 +13,7 @@ export class DynamicOpenmrsRegistrationFormComponent implements OnInit {
   @Input() formUuids: string[];
   @Output() formDataUpdate: EventEmitter<FormValue> =
     new EventEmitter<FormValue>();
+  @Output() formId: EventEmitter<string> = new EventEmitter<string>();
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
@@ -23,7 +24,8 @@ export class DynamicOpenmrsRegistrationFormComponent implements OnInit {
     );
   }
 
-  onFormUpdate(data: FormValue): void {
+  onFormUpdate(data: FormValue, formId: string): void {
     this.formDataUpdate.emit(data);
+    this.formId.emit(formId);
   }
 }

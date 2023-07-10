@@ -13,6 +13,7 @@ export class DynamicOpenmrsRegistrationDashboardComponent implements OnInit {
   formUuids$: Observable<string[]>;
   errors: any[] = [];
   @Output() formDataUpdate: EventEmitter<any> = new EventEmitter<any>();
+  @Output() formId: EventEmitter<string> = new EventEmitter<string>();
   constructor(private systemSettingsService: SystemSettingsService) {}
 
   ngOnInit(): void {
@@ -42,5 +43,9 @@ export class DynamicOpenmrsRegistrationDashboardComponent implements OnInit {
 
   onFormUpdate(data: FormValue): void {
     this.formDataUpdate.emit(data);
+  }
+
+  onGetFormId(formId: string): void {
+    this.formId.emit(formId);
   }
 }

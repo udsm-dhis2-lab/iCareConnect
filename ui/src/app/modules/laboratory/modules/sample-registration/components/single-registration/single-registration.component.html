@@ -74,6 +74,7 @@
       <app-dynamic-openmrs-registration-dashboard
         [registrationCategory]="registrationCategory"
         (formDataUpdate)="onCustomFormUpdate($event)"
+        (formId)="onGetFormId($event)"
       ></app-dynamic-openmrs-registration-dashboard>
     </div>
     <div class="col-12">
