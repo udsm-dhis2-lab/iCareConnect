@@ -26,7 +26,10 @@ export class GroupParametersByHeadersPipe implements PipeTransform {
     return Object.keys(groupedAllocations).map((key) => {
       return {
         headerUuid: key,
-        display: groupedAllocations[key][0]?.parameterHeader?.display,
+        display: groupedAllocations[key][0]?.parameterHeader?.display?.replace(
+          "PARAMETER_HEADER:",
+          ""
+        ),
         allocations: groupedAllocations[key],
       };
     });
