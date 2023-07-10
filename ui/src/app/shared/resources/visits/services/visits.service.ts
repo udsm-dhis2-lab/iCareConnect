@@ -41,6 +41,62 @@ export class VisitsService {
     );
   }
 
+  getVisitEncounterDetailsByVisitUuid(parameters): Observable<any> {
+    return from(
+      this.api.visit.getVisit(parameters?.uuid, parameters?.query)
+    ).pipe(
+      map((response) => {
+        return response.encounters.map((encounter: any) => {
+          let formattedObs = [];
+          const encounterProvider = encounter?.encounterProviders[0];
+          formattedObs = [
+            ...formattedObs,
+            ...encounter?.obs.map((observation) => {
+              return {
+                ...observation,
+                encounterProvider: {
+                  ...encounterProvider?.provider,
+                  name:
+                    encounterProvider?.provider &&
+                    encounterProvider?.provider?.display?.indexOf(":") > -1
+                      ? encounterProvider?.provider?.display?.split(":")[0]
+                      : encounterProvider?.provider?.display?.split("- ")[1],
+                },
+                encounterType: encounter.encounterType,
+                conceptUuid: observation?.concept?.uuid || observation?.uuid,
+              };
+            }),
+          ];
+
+          const groupedObsByConcept = groupBy(formattedObs, "conceptUuid");
+          const obs = Object.keys(groupedObsByConcept).map((key) => {
+            return {
+              uuid: key,
+              history: orderBy(
+                groupedObsByConcept[key],
+                ["obsDatetime"],
+                ["asc"]
+              ),
+              latest: orderBy(
+                groupedObsByConcept[key],
+                ["obsDatetime"],
+                ["desc"]
+              )[0],
+            };
+          });
+
+          return {
+            ...encounter,
+            keyedObs: keyBy(obs, "uuid"),
+          };
+        });
+      }),
+      catchError((error) => {
+        return of(error);
+      })
+    );
+  }
+
   getVisitObservationsByVisitUuid(parameters): Observable<any> {
     return from(
       this.api.visit.getVisit(parameters?.uuid, parameters?.query)

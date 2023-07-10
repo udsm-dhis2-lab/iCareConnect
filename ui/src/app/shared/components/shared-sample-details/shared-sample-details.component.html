@@ -1,7 +1,7 @@
 <div
   class="row"
   *ngIf="{
-    obs: obs$ | async,
+    encounterInformation: encounterInformation$ | async,
     sampleConditions: sampleConditions$ | async,
     sampleDetails: sampleDetails$ | async,
     externalSystems: externalSystems$ | async,
@@ -53,19 +53,66 @@
             <p *ngFor="let diagnosis of params?.diagnoses">
               <b> {{ diagnosis?.display }}</b>
             </p>
-            <span *ngIf="params?.diagnoses.length === 0"> - </span>
+            <span *ngIf="params?.diagnoses?.length === 0"> - </span>
           </div>
-          Clinical Observation:
-          <p *ngIf="params.obs" class="mt-2">
-            <b>
-              <span
-                >Clinical Information / History: <br />
-                {{ params.obs?.latest?.value }}</span
-              >
-            </b>
-          </p>
-          <span *ngIf="!params.obs">-</span>
         </div>
+      </div>
+      <div class="w-100">
+        <ng-container *ngFor="let encounter of params?.encounterInformation">
+          <div
+            class="w-100"
+            *ngFor="let formField of encounter?.form?.formFields"
+          >
+            <ng-container
+              *ngIf="formField?.field?.concept?.setMembers?.length === 0"
+            >
+              <p>
+                {{ formField?.field?.display }} :
+                <b>
+                  {{
+                    !encounter?.keyedObs[formField?.field?.concept?.uuid]
+                      ? "-"
+                      : encounter?.keyedObs[formField?.field?.concept?.uuid] &&
+                        encounter?.keyedObs[formField?.field?.concept?.uuid]
+                          ?.latest?.value?.display
+                      ? encounter?.keyedObs[formField?.field?.concept?.uuid]
+                          ?.latest?.value?.display
+                      : encounter?.keyedObs[formField?.field?.concept?.uuid]
+                          ?.latest?.value
+                  }}
+                </b>
+              </p>
+            </ng-container>
+
+            <ng-container
+              *ngIf="formField?.field?.concept?.setMembers?.length > 0"
+            >
+              {{ formField?.field?.display }} :
+              <div
+                class="w-100 ml-4 mr-4"
+                *ngFor="
+                  let fieldConcept of formField?.field?.concept?.setMembers
+                "
+              >
+                <p>
+                  {{ fieldConcept?.display }}:
+                  <b>
+                    {{
+                      !encounter?.keyedObs[fieldConcept?.uuid]
+                        ? "-"
+                        : encounter?.keyedObs[fieldConcept?.uuid] &&
+                          encounter?.keyedObs[fieldConcept?.uuid]?.latest?.value
+                            ?.display
+                        ? encounter?.keyedObs[fieldConcept?.uuid]?.latest?.value
+                            ?.display
+                        : encounter?.keyedObs[fieldConcept?.uuid]?.latest?.value
+                    }}
+                  </b>
+                </p>
+              </div>
+            </ng-container>
+          </div>
+        </ng-container>
       </div>
     </div>
     <div [ngClass]="{ 'col-md-6': !hasResults, 'col-md-4': hasResults }">
