@@ -4,6 +4,7 @@ package org.openmrs.module.icare.laboratory.models;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.openmrs.*;
+import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
 
 import javax.persistence.*;
@@ -60,6 +61,9 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 
 	@Column(name = "related_allocation_uuid")
 	private String relatedtestAllocationUuid;
+
+	@Transient
+	private List<ConceptSet> conceptSets;
 	
 	public Concept getTestConcept() {
 		return this.testConcept;
@@ -142,6 +146,14 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 		this.testAllocationAssociatedFields = testAllocationAssociatedFields;
 	}
 
+	public List<ConceptSet> getConceptSets() {
+		return conceptSets;
+	}
+
+	public void setConceptSets(List<ConceptSet> conceptSets) {
+		this.conceptSets = conceptSets;
+	}
+
 	public static TestAllocation fromMap(Map<String, Object> map) {
 		Concept containerConcept = new Concept();
 		containerConcept.setUuid(((Map<String, Object>) map.get("container")).get("uuid").toString());
@@ -206,6 +218,7 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 				testConceptMap.put("allowDecimal", conceptNumeric.getAllowDecimal());
 			}
 
+
 			List<Map<String, Object>> mappings = new ArrayList<>();
 			if (testConcept.getConceptMappings().size() > 0) {
 				for(ConceptMap conceptMap: testConcept.getConceptMappings()) {
@@ -232,7 +245,26 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 			//			testConceptMap.put("shortNames", this.getTestConcept().getShortNames());
 			testAllocationMap.put("concept", testConceptMap);
 			testAllocationMap.put("parameter", testConceptMap);
+
+			if(this.getConceptSets() != null){
+				List<Map<String,Object>> parametersHeadersListMap = new ArrayList<>();
+				Map<String,Object> parameterHeaderMap = new HashMap<>();
+				for(ConceptSet conceptSet : this.getConceptSets()){
+					for(ConceptName indexTermName : conceptSet.getConceptSet().getIndexTerms()){
+						if(indexTermName.getName().toLowerCase().equals("parameter_header")){
+							parameterHeaderMap.put("uuid",conceptSet.getConceptSet().getUuid());
+							parameterHeaderMap.put("display",conceptSet.getConceptSet().getDisplayString());
+
+						}
+					}
+
+				}
+				parametersHeadersListMap.add(parameterHeaderMap);
+				testConceptMap.put("parameterHeaders",parametersHeadersListMap);
+
+			}
 		}
+
 		
 		List<Map<String, Object>> testAllocationStatusMap = new ArrayList<Map<String, Object>>();
 		for (TestAllocationStatus status : this.getTestAllocationStatuses()) {
