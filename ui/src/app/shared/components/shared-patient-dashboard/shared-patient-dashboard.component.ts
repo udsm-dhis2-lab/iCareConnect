@@ -76,8 +76,8 @@ import { UserService } from "src/app/modules/maintenance/services/users.service"
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { VisitConsultationStatusModalComponent } from "../../dialogs/visit-consultation-status-modal/visit-consultation-status-modal.component";
 import { BillingService } from "src/app/modules/billing/services/billing.service";
-import { map as rxMap } from "rxjs/operators";
-import { keyBy } from "lodash";
+import { map, map as rxMap } from "rxjs/operators";
+import { keyBy, orderBy } from "lodash";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 
 @Component({
@@ -233,9 +233,13 @@ export class SharedPatientDashboardComponent implements OnInit {
       select(getFormEntitiesByNames(CONSULTATION_FORM_CONFIGS))
     );
 
-    this.forms$ = this.store.select(
-      getCustomOpenMRSFormsByIds(this.currentLocation?.forms)
-    );
+    this.forms$ = this.store
+      .select(getCustomOpenMRSFormsByIds(this.currentLocation?.forms))
+      .pipe(
+        map((forms) => {
+          return orderBy(forms, ["name"], ["asc"]);
+        })
+      );
 
     this.currentLocation$ = this.store.select(getCurrentLocation(false));
     this.consultationOrderType$ =
