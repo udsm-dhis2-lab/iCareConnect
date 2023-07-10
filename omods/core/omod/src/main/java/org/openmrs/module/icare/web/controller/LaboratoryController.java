@@ -1,11 +1,9 @@
 package org.openmrs.module.icare.web.controller;
 
-import org.openmrs.Concept;
-import org.openmrs.Location;
-import org.openmrs.User;
-import org.openmrs.Visit;
+import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
@@ -28,6 +26,9 @@ public class LaboratoryController {
 	
 	@Autowired
 	LaboratoryService laboratoryService;
+	
+	@Autowired
+	ICareService iCareService;
 	
 	@Autowired
 	VisitService visitService;
@@ -416,6 +417,8 @@ public class LaboratoryController {
 					 for (SampleOrder order: sample.getSampleOrders()) {
 						 if (order.getTestAllocations().size() > 0) {
 							 for (TestAllocation allocation: order.getTestAllocations()) {
+								 List<ConceptSet> conceptSets = iCareService.getConceptsSetsByConcept(allocation.getTestConcept().getUuid());
+								 allocation.setConceptSets(conceptSets);
 								 allocations.add(allocation.toMap());
 							 }
 						 }
