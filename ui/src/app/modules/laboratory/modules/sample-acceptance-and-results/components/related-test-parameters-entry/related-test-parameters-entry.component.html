@@ -38,10 +38,21 @@
       <tr>
         <td>
           <!-- {{ allocation?.formattedAllocation?.finalResult | json }} -->
-          <div class="row">
+          <div
+            class="row"
+            *ngIf="
+              (
+                allocationsWithoutRelationShip
+                | identifyParametersWithoutHeaders
+              )?.length > 0
+            "
+          >
             <div
               class="col-2"
-              *ngFor="let allocation of allocationsWithoutRelationShip"
+              *ngFor="
+                let allocation of allocationsWithoutRelationShip
+                  | identifyParametersWithoutHeaders
+              "
             >
               <app-test-parameter-entry
                 [parameterUuid]="allocation?.parameter?.uuid"
@@ -53,6 +64,43 @@
                 [conceptNameType]="conceptNameType"
                 (data)="getFedResult($event, result, allocation)"
               ></app-test-parameter-entry>
+            </div>
+          </div>
+
+          <div
+            class="row"
+            *ngIf="
+              (allocationsWithoutRelationShip | groupParametersByHeaders)
+                ?.length > 0
+            "
+          >
+            <div
+              class="col-2"
+              *ngFor="
+                let header of allocationsWithoutRelationShip
+                  | groupParametersByHeaders
+              "
+            >
+              <div>
+                <div class="h5 text-muted">
+                  {{ header?.display }}
+                </div>
+                <div
+                  class="w-100 mt-2"
+                  *ngFor="let allocation of header?.allocations"
+                >
+                  <app-test-parameter-entry
+                    [parameterUuid]="allocation?.parameter?.uuid"
+                    [allocation]="allocation"
+                    [isLIS]="isLIS"
+                    [relatedResult]="result"
+                    [disabled]="disabled"
+                    [finalResult]="allocation?.formattedAllocation?.finalResult"
+                    [conceptNameType]="conceptNameType"
+                    (data)="getFedResult($event, result, allocation)"
+                  ></app-test-parameter-entry>
+                </div>
+              </div>
             </div>
           </div>
         </td>

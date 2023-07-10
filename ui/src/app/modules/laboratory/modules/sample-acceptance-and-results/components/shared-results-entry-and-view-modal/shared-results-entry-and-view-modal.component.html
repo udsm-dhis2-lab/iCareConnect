@@ -73,69 +73,159 @@
                         {{ order?.concept?.display }}
                       </td>
                       <td>
-                        <div class="row p-2">
-                          <div
-                            [ngClass]="{
-                              'col-12':
-                                !allocationData?.isSetMember ||
-                                order?.allocations?.length < 2,
-                              'col-6':
-                                (allocationData?.parameter?.datatype?.name ==
-                                  'Numeric' ||
-                                  allocationData?.parameter?.datatype.name ==
-                                    'Coded') &&
-                                allocationData?.isSetMember &&
-                                order?.allocations?.length == 2,
-                              'col-2':
-                                allocationData?.parameter?.datatype.name !=
-                                  'Numeric' &&
-                                allocationData?.parameter?.datatype.name !=
-                                  'Coded' &&
-                                allocationData?.isSetMember
-                            }"
-                            (dblclick)="
-                              toggleSideNavigation($event, allocationData)
-                            "
-                            matTooltip="Double Click to view history"
-                            [matTooltipPosition]="'above'"
-                            class="entry-col"
-                            *ngFor="let allocationData of order?.allocations"
-                          >
+                        <div
+                          class="row p-2"
+                          *ngIf="
+                            (
+                              order?.allocations
+                              | identifyParametersWithoutHeaders
+                            )?.length > 0
+                          "
+                        >
+                          <ng-container>
                             <div
-                              class="w-100"
-                              *ngIf="
-                                order?.concept?.setMembers?.length == 0 ||
-                                (order?.concept?.setMembers?.length > 0 &&
-                                  order?.concept?.uuid !==
-                                    allocationData?.parameter?.uuid)
+                              [ngClass]="{
+                                'col-12':
+                                  !allocationData?.isSetMember ||
+                                  order?.allocations?.length < 2,
+                                'col-6':
+                                  (allocationData?.parameter?.datatype?.name ==
+                                    'Numeric' ||
+                                    allocationData?.parameter?.datatype.name ==
+                                      'Coded') &&
+                                  allocationData?.isSetMember &&
+                                  order?.allocations?.length == 2,
+                                'col-2':
+                                  allocationData?.parameter?.datatype.name !=
+                                    'Numeric' &&
+                                  allocationData?.parameter?.datatype.name !=
+                                    'Coded' &&
+                                  allocationData?.isSetMember
+                              }"
+                              (dblclick)="
+                                toggleSideNavigation($event, allocationData)
                               "
+                              matTooltip="Double Click to view history"
+                              [matTooltipPosition]="'above'"
+                              class="entry-col"
+                              *ngFor="let allocationData of order?.allocations"
                             >
-                              <app-test-parameter-entry
-                                *ngIf="preferredName"
-                                [parameterUuid]="
-                                  allocationData?.parameter?.uuid
+                              <div
+                                class="w-100"
+                                *ngIf="
+                                  order?.concept?.setMembers?.length == 0 ||
+                                  (order?.concept?.setMembers?.length > 0 &&
+                                    order?.concept?.uuid !==
+                                      allocationData?.parameter?.uuid)
                                 "
-                                [multipleResultsAttributeType]="
-                                  params?.multipleResultsAttributeType
-                                "
-                                [allocation]="allocationData"
-                                [disabled]="
-                                  data?.actionType === 'review' &&
-                                  !data?.LISConfigurations?.isLIS
-                                "
-                                [finalResult]="allocationData?.finalResult"
-                                [isLIS]="data?.LISConfigurations?.isLIS"
-                                [conceptNameType]="preferredName"
-                                (data)="
-                                  onGetFieldData(
-                                    $event,
-                                    allocationData?.parameter,
-                                    allocationData
-                                  )
-                                "
-                              ></app-test-parameter-entry>
+                              >
+                                <app-test-parameter-entry
+                                  *ngIf="preferredName"
+                                  [parameterUuid]="
+                                    allocationData?.parameter?.uuid
+                                  "
+                                  [multipleResultsAttributeType]="
+                                    params?.multipleResultsAttributeType
+                                  "
+                                  [allocation]="allocationData"
+                                  [disabled]="
+                                    data?.actionType === 'review' &&
+                                    !data?.LISConfigurations?.isLIS
+                                  "
+                                  [finalResult]="allocationData?.finalResult"
+                                  [isLIS]="data?.LISConfigurations?.isLIS"
+                                  [conceptNameType]="preferredName"
+                                  (data)="
+                                    onGetFieldData(
+                                      $event,
+                                      allocationData?.parameter,
+                                      allocationData
+                                    )
+                                  "
+                                ></app-test-parameter-entry>
+                              </div>
                             </div>
-                          </div>
+                          </ng-container>
+                        </div>
+                        <div
+                          class="row p-2"
+                          *ngIf="
+                            (order?.allocations | groupParametersByHeaders)
+                              ?.length > 0
+                          "
+                        >
+                          <ng-container
+                            *ngFor="
+                              let header of order?.allocations
+                                | groupParametersByHeaders
+                            "
+                          >
+                            <div class="col-12 h5 text-left text-muted">
+                              {{ header?.display }}
+                            </div>
+                            <div
+                              [ngClass]="{
+                                'col-12':
+                                  !allocationData?.isSetMember ||
+                                  header?.allocations?.length < 2,
+                                'col-6':
+                                  (allocationData?.parameter?.datatype?.name ==
+                                    'Numeric' ||
+                                    allocationData?.parameter?.datatype.name ==
+                                      'Coded') &&
+                                  allocationData?.isSetMember &&
+                                  header?.allocations?.length == 2,
+                                'col-2':
+                                  allocationData?.parameter?.datatype.name !=
+                                    'Numeric' &&
+                                  allocationData?.parameter?.datatype.name !=
+                                    'Coded' &&
+                                  allocationData?.isSetMember
+                              }"
+                              (dblclick)="
+                                toggleSideNavigation($event, allocationData)
+                              "
+                              matTooltip="Double Click to view history"
+                              [matTooltipPosition]="'above'"
+                              class="entry-col"
+                              *ngFor="let allocationData of header?.allocations"
+                            >
+                              <div
+                                class="w-100"
+                                *ngIf="
+                                  order?.concept?.setMembers?.length == 0 ||
+                                  (order?.concept?.setMembers?.length > 0 &&
+                                    order?.concept?.uuid !==
+                                      allocationData?.parameter?.uuid)
+                                "
+                              >
+                                <app-test-parameter-entry
+                                  *ngIf="preferredName"
+                                  [parameterUuid]="
+                                    allocationData?.parameter?.uuid
+                                  "
+                                  [multipleResultsAttributeType]="
+                                    params?.multipleResultsAttributeType
+                                  "
+                                  [allocation]="allocationData"
+                                  [disabled]="
+                                    data?.actionType === 'review' &&
+                                    !data?.LISConfigurations?.isLIS
+                                  "
+                                  [finalResult]="allocationData?.finalResult"
+                                  [isLIS]="data?.LISConfigurations?.isLIS"
+                                  [conceptNameType]="preferredName"
+                                  (data)="
+                                    onGetFieldData(
+                                      $event,
+                                      allocationData?.parameter,
+                                      allocationData
+                                    )
+                                  "
+                                ></app-test-parameter-entry>
+                              </div>
+                            </div>
+                          </ng-container>
                         </div>
                       </td>
                       <td rowspan="4" style="width: 100px">
