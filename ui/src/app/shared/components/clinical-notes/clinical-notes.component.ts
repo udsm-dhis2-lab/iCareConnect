@@ -70,7 +70,7 @@ export class ClinicalNotesComponent implements OnInit {
               0
           )
           .map((key) => this.clinicConfigurations?.forms[key]),
-        "id"
+        "uuid"
       ),
     };
     this.selectedForm = !this.selectedForm
@@ -168,8 +168,8 @@ export class ClinicalNotesComponent implements OnInit {
     if (
       this.clinicConfigurations?.forms &&
       this.clinicConfigurations?.forms[this.currentCustomForm?.uuid] &&
-      this.clinicConfigurations?.forms[this.currentCustomForm?.uuid]
-        ?.dependsOn &&
+      this.clinicConfigurations?.forms[this.currentCustomForm?.uuid]?.dependsOn
+        ?.length > 0 &&
       this.clinicConfigurations?.forms[
         this.currentCustomForm?.uuid
       ]?.dependsOn?.filter((depended) => depended?.type === "form")
