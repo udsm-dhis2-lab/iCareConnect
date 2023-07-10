@@ -142,6 +142,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   generalObsFormData: any = {};
   generalObservationsData: any;
   isGeneralObsFormValid: boolean = true;
+  formId: string;
 
   constructor(
     private samplesService: SamplesService,
@@ -240,6 +241,10 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
           value: this.generalObsFormData[key]?.value,
         };
       }) || [];
+  }
+
+  onGetFormId(id: string): void {
+    this.formId = id;
   }
 
   get maximumDate() {
@@ -1016,6 +1021,9 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                     ICARE_CONFIG.encounterRole,
                                                 },
                                               ],
+                                              form: this.formId
+                                                ? this.formId
+                                                : null,
                                             };
                                             return this.labOrdersService.createLabOrdersViaEncounter(
                                               encounterObject

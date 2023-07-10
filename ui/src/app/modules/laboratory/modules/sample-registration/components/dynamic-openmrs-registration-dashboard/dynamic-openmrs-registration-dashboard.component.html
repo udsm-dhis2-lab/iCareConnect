@@ -12,6 +12,7 @@
       *ngIf="params?.formUuids"
       [formUuids]="params?.formUuids"
       (formDataUpdate)="onFormUpdate($event)"
+      (formId)="onGetFormId($event)"
     ></app-dynamic-openmrs-registration-form>
   </div>
 </div>
