@@ -20,4 +20,8 @@ public interface Stockable {
 	Location getSourceLocation();
 	
 	Location getDestinationLocation();
+
+	default Date getDateCreated(){
+		return new Date();
+	};
 }
