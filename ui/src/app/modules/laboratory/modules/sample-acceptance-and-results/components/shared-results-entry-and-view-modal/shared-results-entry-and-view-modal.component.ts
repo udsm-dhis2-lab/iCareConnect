@@ -7,7 +7,7 @@ import { ConceptGet } from "src/app/shared/resources/openmrs";
 import { SampleAllocationObject } from "src/app/shared/resources/sample-allocations/models/allocation.model";
 import { SampleAllocationService } from "src/app/shared/resources/sample-allocations/services/sample-allocation.service";
 
-import { omit, groupBy, flatten, orderBy } from "lodash";
+import { omit, groupBy, flatten, orderBy, isEqual } from "lodash";
 import { HttpClient } from "@angular/common/http";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { VisitsService } from "src/app/shared/resources/visits/services";
@@ -693,8 +693,33 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     this.relatedResults = [];
     // console.log("results", results);
     Object.keys(results)?.forEach((key) => {
-      if (results[key]?.value && results[key]?.value?.length > 0) {
-        if (results[key]?.multipleResults) {
+      // console.log(results[key]);
+      // if (results[key]?.multipleResults) {
+      //   console.log(results[key]);
+      // }
+      if (
+        results[key]?.value &&
+        results[key]?.value?.length > 0 &&
+        results[key]?.value != results[key]?.previousValue
+      ) {
+        if (
+          results[key]?.multipleResults &&
+          !isEqual(
+            orderBy(results[key]?.value, ["value"], ["asc"])?.map(
+              (dataValue) => dataValue?.value
+            ) || [],
+            orderBy(
+              results[key]?.previousValue?.map((val) => {
+                return {
+                  val,
+                };
+              }),
+              ["val"],
+              ["asc"]
+            )?.map((dataValue) => dataValue?.val) || []
+          )
+        ) {
+          // console.log("kkdkd", results[key]);
           this.multipleResults = [
             ...(this.multipleResults?.filter(
               (result) =>
@@ -702,7 +727,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
             ) || []),
             results[key],
           ];
-        } else {
+        } else if (!results[key]?.multipleResults) {
           this.relatedResults = [
             ...this.relatedResults,
             {
@@ -751,8 +776,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
 
   onSaveRelatedResults(event: Event, order: any): void {
     event.stopPropagation();
-    // console.log("relatedResults", this.relatedResults);
-    console.log("multipleResults", this.multipleResults);
     if (this.multipleResults?.length > 0) {
       this.multipleResults.map((multipleResult) => {
         const allocation = multipleResult?.allocation;
