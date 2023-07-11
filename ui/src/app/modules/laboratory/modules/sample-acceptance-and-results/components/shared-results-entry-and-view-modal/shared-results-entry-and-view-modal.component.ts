@@ -44,6 +44,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   relatedResults: any[] = [];
   selectedParametersWithDefinedRelationship: any[];
   selectedInstruments: any = {};
+  multipleResults: any = [];
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -692,50 +693,58 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     this.relatedResults = [];
     // console.log("results", results);
     Object.keys(results)?.forEach((key) => {
-      if (
-        results[key]?.value &&
-        results[key]?.value != results[key]?.previousValue[0]
-      ) {
-        this.relatedResults = [
-          ...this.relatedResults,
-          {
-            concept: {
-              uuid: results[key]?.parameter?.uuid,
-            },
-            testAllocation: {
-              uuid: results[key]?.allocation?.uuid,
-            },
-            valueNumeric: results[key]?.parameter?.isNumeric
-              ? results[key]?.value
-              : null,
-            valueText: results[key]?.parameter?.isText
-              ? results[key]?.value
-              : null,
-
-            valueCoded: results[key]?.parameter?.isCoded
-              ? {
-                  uuid: results[key]?.value,
-                }
-              : null,
-            resultGroup: {
-              uuid: results[key]?.relatedResult?.uuid,
-            },
-            instrument:
-              order && this.selectedInstruments[order?.concept?.uuid]
+      if (results[key]?.value && results[key]?.value?.length > 0) {
+        if (results[key]?.multipleResults) {
+          this.multipleResults = [
+            ...(this.multipleResults?.filter(
+              (result) =>
+                result?.allocation?.id !== results[key]?.allocation?.id
+            ) || []),
+            results[key],
+          ];
+        } else {
+          this.relatedResults = [
+            ...this.relatedResults,
+            {
+              concept: {
+                uuid: results[key]?.parameter?.uuid,
+              },
+              testAllocation: {
+                uuid: results[key]?.allocation?.uuid,
+              },
+              valueNumeric: results[key]?.parameter?.isNumeric
+                ? results[key]?.value
+                : null,
+              valueText: results[key]?.parameter?.isText
+                ? results[key]?.value
+                : null,
+              valueCoded: results[key]?.parameter?.isCoded
                 ? {
-                    uuid: this.selectedInstruments[order?.concept?.uuid],
+                    uuid: results[key]?.value,
                   }
                 : null,
-            abnormal: false,
-            status: this.remarksData[results[key]?.parameter?.uuid]
-              ? {
-                  category: "RESULT_REMARKS",
-                  status: "REMARKS",
-                  remarks: this.remarksData[results[key]?.parameter?.uuid],
-                }
-              : null,
-          },
-        ];
+              resultGroup: results[key]?.relatedResult
+                ? {
+                    uuid: results[key]?.relatedResult?.uuid,
+                  }
+                : null,
+              instrument:
+                order && this.selectedInstruments[order?.concept?.uuid]
+                  ? {
+                      uuid: this.selectedInstruments[order?.concept?.uuid],
+                    }
+                  : null,
+              abnormal: false,
+              status: this.remarksData[results[key]?.parameter?.uuid]
+                ? {
+                    category: "RESULT_REMARKS",
+                    status: "REMARKS",
+                    remarks: this.remarksData[results[key]?.parameter?.uuid],
+                  }
+                : null,
+            },
+          ];
+        }
       }
     });
   }
@@ -743,16 +752,150 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   onSaveRelatedResults(event: Event, order: any): void {
     event.stopPropagation();
     // console.log("relatedResults", this.relatedResults);
-    this.sampleAllocationService
-      .saveResultsViaAllocations(this.relatedResults)
-      .subscribe((response) => {
-        if (response) {
-          this.saving = false;
-          setTimeout(() => {
-            this.getAllocations();
-          }, 100);
-        }
+    console.log("multipleResults", this.multipleResults);
+    if (this.multipleResults?.length > 0) {
+      this.multipleResults.map((multipleResult) => {
+        const allocation = multipleResult?.allocation;
+        const parentAllocation = {
+          concept: {
+            uuid: allocation?.order?.concept?.uuid,
+          },
+          order: {
+            uuid: allocation?.order?.uuid,
+          },
+          container: {
+            uuid: "eb21ff23-a627-4a62-8bd0-efdc1db2ebb5", // Remove this hardcoded uuid
+          },
+          sample: {
+            uuid: allocation?.sample?.uuid,
+          },
+          label: allocation?.order?.orderNumber,
+        };
+        this.sampleAllocationService
+          .createTestAllocation(parentAllocation)
+          .subscribe((response) => {
+            if (response && !response?.error) {
+              const results = [
+                {
+                  concept: {
+                    uuid: allocation?.order?.concept?.uuid,
+                  },
+                  testAllocation: {
+                    uuid: response?.uuid,
+                  },
+                  valueNumeric: null,
+                  valueText: null,
+
+                  valueCoded: null,
+                  abnormal: false,
+                },
+              ];
+              this.sampleAllocationService
+                .saveResultsViaAllocations(results)
+                .subscribe((resultsResponse) => {
+                  if (resultsResponse) {
+                    const results = flatten(
+                      multipleResult?.value?.map((dataValue) => {
+                        return {
+                          concept: {
+                            uuid: multipleResult?.allocation?.parameter?.uuid,
+                          },
+                          testAllocation: {
+                            uuid: multipleResult?.allocation?.uuid,
+                          },
+                          valueNumeric: null,
+                          valueText: null,
+
+                          valueCoded: {
+                            uuid: dataValue?.value,
+                          },
+                          resultGroup: {
+                            uuid: resultsResponse[0]?.uuid,
+                          },
+                          instrument:
+                            order &&
+                            this.selectedInstruments[
+                              multipleResult?.allocation?.parameter?.uuid
+                            ]
+                              ? {
+                                  uuid: this.selectedInstruments[
+                                    order?.concept?.uuid
+                                  ],
+                                }
+                              : null,
+                          abnormal: false,
+                          status: this.remarksData[
+                            multipleResult?.allocation?.parameter?.uuid
+                          ]
+                            ? {
+                                category: "RESULT_REMARKS",
+                                status: "REMARKS",
+                                remarks:
+                                  this.remarksData[
+                                    multipleResult?.allocation?.parameter?.uuid
+                                  ],
+                              }
+                            : null,
+                        };
+                      })
+                    );
+                    zip(
+                      this.sampleAllocationService.saveResultsViaAllocations(
+                        results
+                      ),
+                      this.sampleAllocationService.saveResultsViaAllocations(
+                        this.relatedResults
+                      )
+                    ).subscribe((response) => {
+                      if (response) {
+                        this.saving = false;
+                        setTimeout(() => {
+                          this.getAllocations();
+                        }, 100);
+                        if (
+                          (
+                            this.data?.sample?.statuses?.filter(
+                              (status) => status?.category === "HAS_RESULTS"
+                            ) || []
+                          )?.length === 0
+                        ) {
+                          const status = {
+                            sample: {
+                              uuid: this.data?.sample?.uuid,
+                            },
+                            user: {
+                              uuid: localStorage.getItem("userUuid"),
+                            },
+                            remarks: "",
+                            status: "HAS RESULTS",
+                            category: "HAS_RESULTS",
+                          };
+                          this.sampleService
+                            .saveSampleStatus(status)
+                            .subscribe((response) => {});
+                        }
+                        setTimeout(() => {
+                          this.getAllocations();
+                        }, 100);
+                      }
+                    });
+                  }
+                });
+            }
+          });
       });
+    } else {
+      this.sampleAllocationService
+        .saveResultsViaAllocations(this.relatedResults)
+        .subscribe((response) => {
+          if (response) {
+            this.saving = false;
+            setTimeout(() => {
+              this.getAllocations();
+            }, 100);
+          }
+        });
+    }
   }
 
   onGetSelectedInstrument(instrument: any, order: any): void {
