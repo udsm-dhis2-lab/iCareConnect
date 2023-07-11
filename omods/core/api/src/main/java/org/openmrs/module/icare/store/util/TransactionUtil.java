@@ -25,6 +25,10 @@ public class TransactionUtil {
 		if (stockable.getDestinationLocation() != null) {
 			transaction.setDestinationLocation(stockable.getDestinationLocation());
 		}
+		
+		if (stockable.getDateCreated() != null) {
+			transaction.setDateCreated(stockable.getDateCreated());
+		}
 		StoreService storeService = Context.getService(StoreService.class);
 		Stock stock = storeService.getStockByItemBatchLocation(stockable.getItem(), stockable.getBatchNo(),
 		    stockable.getExpiryDate(), stockable.getLocation());
@@ -263,6 +267,7 @@ public class TransactionUtil {
 	
 	public static void operateOnStock(String operation, Stockable stockable) throws StockOutException {
 		Date todaysDate = new Date();
+		
 		if (operation.equals("+")) {
 			TransactionUtil.addStock(stockable);
 		} else if (operation.equals("-") && stockable.getExpiryDate().compareTo(todaysDate) > 0) {
