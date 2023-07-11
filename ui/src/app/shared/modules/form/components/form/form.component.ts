@@ -31,6 +31,7 @@ export class FormComponent implements OnInit {
   @Input() shouldRenderAsCheckBoxesButton: boolean;
   @Input() shouldDisable: boolean;
   @Input() isReport: boolean;
+  @Input() colClass: string;
 
   @Output() formUpdate: EventEmitter<any> = new EventEmitter<any>();
   @Output() fileFormUpdate: EventEmitter<any> = new EventEmitter<any>();
