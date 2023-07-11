@@ -49,26 +49,32 @@
               "
             >
               <div>
-                <div class="h6 text-muted">
+                <div class="h6">
                   {{ header?.display }}
                 </div>
                 <div class="w-100 mt-1">
                   <div class="row">
-                    <div
-                      class="col-2"
+                    <ng-container
                       *ngFor="let allocation of header?.allocations"
                     >
-                      <app-test-parameter-entry
-                        [parameterUuid]="allocation?.parameter?.uuid"
-                        [allocation]="allocation"
-                        [isLIS]="isLIS"
-                        [relatedResult]="null"
-                        [disabled]="disabled"
-                        [finalResult]="allocation?.finalResult"
-                        [conceptNameType]="conceptNameType"
-                        (data)="getFedResult($event, null, allocation)"
-                      ></app-test-parameter-entry>
-                    </div>
+                      <div
+                        *ngIf="
+                          order?.concept?.uuid !== allocation?.parameter?.uuid
+                        "
+                        class="col-2"
+                      >
+                        <app-test-parameter-entry
+                          [parameterUuid]="allocation?.parameter?.uuid"
+                          [allocation]="allocation"
+                          [isLIS]="isLIS"
+                          [relatedResult]="null"
+                          [disabled]="disabled"
+                          [finalResult]="allocation?.finalResult"
+                          [conceptNameType]="conceptNameType"
+                          (data)="getFedResult($event, null, allocation)"
+                        ></app-test-parameter-entry>
+                      </div>
+                    </ng-container>
                   </div>
                 </div>
               </div>
@@ -87,28 +93,88 @@
     >
       <tr>
         <td>
-          <div class="row">
+          <div
+            class="w-100"
+            *ngIf="
+              (parametersWithDefinedRelationship | groupParametersByHeaders)
+                ?.length > 0
+            "
+          >
             <div
-              class="col-{{ 12 / finalResultsForParentTestParameter.length }}"
-              *ngFor="let result of finalResultsForParentTestParameter"
+              class="w-100"
+              *ngFor="
+                let header of parametersWithDefinedRelationship
+                  | groupParametersByHeaders
+              "
             >
-              <div class="w-100 mb-2">
-                {{ result?.valueCoded?.display }}
+              <div class="h6">
+                {{ header?.display }}
               </div>
-              <div class="w-100">
+
+              <div class="row">
                 <div
-                  *ngFor="let allocation of parametersWithDefinedRelationship"
+                  class="col-{{
+                    12 / finalResultsForParentTestParameter.length
+                  }}"
+                  *ngFor="let result of finalResultsForParentTestParameter"
                 >
-                  <app-test-parameter-entry
-                    [parameterUuid]="allocation?.parameter?.uuid"
-                    [allocation]="allocation"
-                    [isLIS]="isLIS"
-                    [relatedResult]="result"
-                    [disabled]="disabled"
-                    [finalResult]="allocation?.finalResult"
-                    [conceptNameType]="conceptNameType"
-                    (data)="getFedResult($event, result, allocation)"
-                  ></app-test-parameter-entry>
+                  <div class="w-100 mb-2">
+                    {{ result?.valueCoded?.display }}
+                  </div>
+                  <div class="w-100">
+                    <div *ngFor="let allocation of header?.allocations">
+                      <app-test-parameter-entry
+                        [parameterUuid]="allocation?.parameter?.uuid"
+                        [allocation]="allocation"
+                        [isLIS]="isLIS"
+                        [relatedResult]="result"
+                        [disabled]="disabled"
+                        [finalResult]="allocation?.finalResult"
+                        [conceptNameType]="conceptNameType"
+                        (data)="getFedResult($event, result, allocation)"
+                      ></app-test-parameter-entry>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="w-100"
+            *ngIf="
+              (
+                parametersWithDefinedRelationship
+                | identifyParametersWithoutHeaders
+              )?.length > 0
+            "
+          >
+            <div class="row">
+              <div
+                class="col-{{ 12 / finalResultsForParentTestParameter.length }}"
+                *ngFor="let result of finalResultsForParentTestParameter"
+              >
+                <div class="w-100 mb-2">
+                  {{ result?.valueCoded?.display }}
+                </div>
+                <div class="w-100">
+                  <div
+                    *ngFor="
+                      let allocation of parametersWithDefinedRelationship
+                        | identifyParametersWithoutHeaders
+                    "
+                  >
+                    <app-test-parameter-entry
+                      [parameterUuid]="allocation?.parameter?.uuid"
+                      [allocation]="allocation"
+                      [isLIS]="isLIS"
+                      [relatedResult]="result"
+                      [disabled]="disabled"
+                      [finalResult]="allocation?.finalResult"
+                      [conceptNameType]="conceptNameType"
+                      (data)="getFedResult($event, result, allocation)"
+                    ></app-test-parameter-entry>
+                  </div>
                 </div>
               </div>
             </div>

@@ -415,7 +415,10 @@
                         <div class="mt-4">
                           <button
                             *ngIf="data?.actionType !== 'authorization'"
-                            [disabled]="relatedResults?.length == 0"
+                            [disabled]="
+                              relatedResults?.length == 0 &&
+                              multipleResults?.length === 0
+                            "
                             mat-flat-button
                             color="primary"
                             (click)="onSaveRelatedResults($event, order)"
