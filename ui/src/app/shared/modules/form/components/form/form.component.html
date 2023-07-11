@@ -2,9 +2,9 @@
   <ng-container *ngFor="let field of fields">
     <div
       *ngIf="field"
-      class="{{ isFormHorizontal ? 'col' : 'col-12' }} {{
-        field?.hidden ? 'hidden-field' : ''
-      }}"
+      class="{{
+        isFormHorizontal ? (colClass ? colClass : 'col') : 'col-12'
+      }} {{ field?.hidden ? 'hidden-field' : '' }}"
     >
       <div class="row">
         <div
