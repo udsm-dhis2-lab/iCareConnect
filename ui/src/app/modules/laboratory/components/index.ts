@@ -6,6 +6,7 @@ import { SampleTemplateTableComponent } from "./sample-template-table/sample-tem
 import { SamplesToCollectComponent } from "./samples-to-collect/samples-to-collect.component";
 import { SamplesToExportComponent } from "./samples-to-export/samples-to-export.component";
 import { SharedAssociatedFieldResultsEntryComponent } from "./shared-associated-field-results-entry/shared-associated-field-results-entry.component";
+import { SharedPrintResultsDashboardComponent } from "./shared-print-results-dashboard/shared-print-results-dashboard.component";
 import { SharedSamplesSummaryDashboardComponent } from "./shared-samples-summary-dashboard/shared-samples-summary-dashboard.component";
 
 export const labSharedComponents: any[] = [
@@ -18,4 +19,5 @@ export const labSharedComponents: any[] = [
   SampleImportExportComponent,
   SamplesToExportComponent,
   SampleTemplateTableComponent,
+  SharedPrintResultsDashboardComponent,
 ];
