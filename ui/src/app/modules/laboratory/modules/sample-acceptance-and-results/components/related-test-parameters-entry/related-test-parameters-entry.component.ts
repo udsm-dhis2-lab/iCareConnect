@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { SampleAllocationObject } from "src/app/shared/resources/sample-allocations/models/allocation.model";
-
+import { orderBy } from "lodash";
 @Component({
   selector: "app-related-test-parameters-entry",
   templateUrl: "./related-test-parameters-entry.component.html",
@@ -21,8 +21,6 @@ export class RelatedTestParametersEntryComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    console.log("allSampleAllocations", this.allSampleAllocations);
-    console.log("order", this.order);
     // console.log(
     //   "parametersWithDefinedRelationship",
     //   this.parametersWithDefinedRelationship
@@ -30,9 +28,19 @@ export class RelatedTestParametersEntryComponent implements OnInit {
     this.relatedAllocation =
       this.parametersWithDefinedRelationship[0]?.relatedAllocation;
     this.finalResultsForParentTestParameter =
-      this.relatedAllocation?.finalResult?.groups[
-        this.relatedAllocation?.finalResult?.groups?.length - 1
-      ]?.results;
+      this.relatedAllocation?.finalResult &&
+      this.relatedAllocation?.finalResult?.groups
+        ? orderBy(
+            this.relatedAllocation?.finalResult?.groups?.map((group) => {
+              return {
+                dateCreated: group?.results[0]?.dateCreated,
+                ...group,
+              };
+            }),
+            ["dateCreated"],
+            ["asc"]
+          )[this.relatedAllocation?.finalResult?.groups?.length - 1]?.results
+        : [];
     this.allocationsWithoutRelationShip =
       this.order?.allocations?.filter(
         (allocation) =>
@@ -42,10 +50,18 @@ export class RelatedTestParametersEntryComponent implements OnInit {
             ) || []
           )?.length === 0
       ) || [];
+
+    // console.log(this.order);
+    // console.log(
+    //   "this.allocationsWithoutRelationShip",
+    //   this.allocationsWithoutRelationShip
+    // );
   }
 
   getFedResult(data: any, relatedResult: any, allocation: any): void {
-    this.results[data?.parameter?.uuid + ":" + relatedResult?.uuid] = {
+    this.results[
+      data?.parameter?.uuid + (relatedResult ? ":" + relatedResult?.uuid : "")
+    ] = {
       ...data,
       relatedResult,
       allocation,

@@ -14,7 +14,11 @@
     [errors]="errors"
   ></app-shared-error>
   <app-result-entry-form
-    *ngIf="params?.testParameter && errors?.length === 0"
+    *ngIf="
+      params?.multipleResultsAttributeType &&
+      params?.testParameter &&
+      errors?.length === 0
+    "
     [parameter]="params?.testParameter"
     [disabled]="disabled"
     [isLIS]="isLIS"

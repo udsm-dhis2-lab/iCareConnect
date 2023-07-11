@@ -202,36 +202,41 @@ export class SampleAllocation {
             ) || [],
         }
       : {
-          groups: Object.keys(finalResult)?.map((key) => {
-            const authorizationIsReady =
-              Number(this.allocation?.resultApprovalConfiguration) <=
-              (
-                this.allocation?.statuses?.filter(
-                  (status) =>
-                    status?.category === "RESULT_AUTHORIZATION" &&
-                    status?.status == "AUTHORIZED" &&
-                    status?.result?.uuid ===
-                      orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
-                        ?.uuid
-                ) || []
-              )?.length;
-            return {
-              key,
-              results: finalResult[key],
-              resultApprovalConfiguration: Number(
-                this.allocation?.resultApprovalConfiguration
-              ),
-              authorizationStatuses:
-                this.allocation?.statuses?.filter(
-                  (status) =>
-                    status?.category === "RESULT_AUTHORIZATION" &&
-                    status?.result?.uuid ===
-                      orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
-                        ?.uuid
-                ) || [],
-              authorizationIsReady: authorizationIsReady,
-            };
-          }),
+          groups: orderBy(
+            Object.keys(finalResult)?.map((key) => {
+              const authorizationIsReady =
+                Number(this.allocation?.resultApprovalConfiguration) <=
+                (
+                  this.allocation?.statuses?.filter(
+                    (status) =>
+                      status?.category === "RESULT_AUTHORIZATION" &&
+                      status?.status == "AUTHORIZED" &&
+                      status?.result?.uuid ===
+                        orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
+                          ?.uuid
+                  ) || []
+                )?.length;
+              return {
+                key,
+                dateCreated: finalResult[key][0]?.dateCreated,
+                results: finalResult[key],
+                resultApprovalConfiguration: Number(
+                  this.allocation?.resultApprovalConfiguration
+                ),
+                authorizationStatuses:
+                  this.allocation?.statuses?.filter(
+                    (status) =>
+                      status?.category === "RESULT_AUTHORIZATION" &&
+                      status?.result?.uuid ===
+                        orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
+                          ?.uuid
+                  ) || [],
+                authorizationIsReady: authorizationIsReady,
+              };
+            }),
+            ["dateCreated"],
+            ["asc"]
+          ),
           statuses:
             this.allocation?.statuses?.filter(
               (status) => status?.result?.uuid === finalResult?.uuid
