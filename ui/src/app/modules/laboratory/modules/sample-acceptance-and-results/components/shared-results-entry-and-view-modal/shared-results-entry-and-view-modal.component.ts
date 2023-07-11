@@ -775,6 +775,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   }
 
   onSaveRelatedResults(event: Event, order: any): void {
+    this.saving = true;
     event.stopPropagation();
     if (this.multipleResults?.length > 0) {
       this.multipleResults.map((multipleResult) => {
