@@ -1,40 +1,7 @@
 <div class="w-100 p-2">
+  <!-- {{ finalResultsForParentTestParameter | json }} -->
   <table>
-    <tbody
-      class="table"
-      *ngIf="
-        finalResultsForParentTestParameter &&
-        finalResultsForParentTestParameter?.length > 0
-      "
-    >
-      <tr>
-        <td *ngFor="let result of finalResultsForParentTestParameter">
-          <div class="w-100 mb-2">
-            {{ result?.valueCoded?.display }}
-          </div>
-          <div class="w-100">
-            <table class="table table-responsive">
-              <tr *ngFor="let allocation of parametersWithDefinedRelationship">
-                <td>
-                  <!-- {{ allocation?.formattedAllocation?.finalResult | json }} -->
-                  <app-test-parameter-entry
-                    [parameterUuid]="allocation?.parameter?.uuid"
-                    [allocation]="allocation"
-                    [isLIS]="isLIS"
-                    [relatedResult]="result"
-                    [disabled]="disabled"
-                    [finalResult]="allocation?.formattedAllocation?.finalResult"
-                    [conceptNameType]="conceptNameType"
-                    (data)="getFedResult($event, result, allocation)"
-                  ></app-test-parameter-entry>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-    <tbody>
+    <tbody *ngIf="allocationsWithoutRelationShip?.length > 0">
       <tr>
         <td>
           <!-- {{ allocation?.formattedAllocation?.finalResult | json }} -->
@@ -58,11 +25,11 @@
                 [parameterUuid]="allocation?.parameter?.uuid"
                 [allocation]="allocation"
                 [isLIS]="isLIS"
-                [relatedResult]="result"
+                [relatedResult]="null"
                 [disabled]="disabled"
-                [finalResult]="allocation?.formattedAllocation?.finalResult"
+                [finalResult]="allocation?.finalResult"
                 [conceptNameType]="conceptNameType"
-                (data)="getFedResult($event, result, allocation)"
+                (data)="getFedResult($event, null, allocation)"
               ></app-test-parameter-entry>
             </div>
           </div>
@@ -95,16 +62,53 @@
                         [parameterUuid]="allocation?.parameter?.uuid"
                         [allocation]="allocation"
                         [isLIS]="isLIS"
-                        [relatedResult]="result"
+                        [relatedResult]="null"
                         [disabled]="disabled"
-                        [finalResult]="
-                          allocation?.formattedAllocation?.finalResult
-                        "
+                        [finalResult]="allocation?.finalResult"
                         [conceptNameType]="conceptNameType"
-                        (data)="getFedResult($event, result, allocation)"
+                        (data)="getFedResult($event, null, allocation)"
                       ></app-test-parameter-entry>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+
+    <tbody
+      class="table"
+      *ngIf="
+        finalResultsForParentTestParameter &&
+        finalResultsForParentTestParameter?.length > 0
+      "
+    >
+      <tr>
+        <td>
+          <div class="row">
+            <div
+              class="col-{{ 12 / finalResultsForParentTestParameter.length }}"
+              *ngFor="let result of finalResultsForParentTestParameter"
+            >
+              <div class="w-100 mb-2">
+                {{ result?.valueCoded?.display }}
+              </div>
+              <div class="w-100">
+                <div
+                  *ngFor="let allocation of parametersWithDefinedRelationship"
+                >
+                  <app-test-parameter-entry
+                    [parameterUuid]="allocation?.parameter?.uuid"
+                    [allocation]="allocation"
+                    [isLIS]="isLIS"
+                    [relatedResult]="result"
+                    [disabled]="disabled"
+                    [finalResult]="allocation?.finalResult"
+                    [conceptNameType]="conceptNameType"
+                    (data)="getFedResult($event, result, allocation)"
+                  ></app-test-parameter-entry>
                 </div>
               </div>
             </div>
