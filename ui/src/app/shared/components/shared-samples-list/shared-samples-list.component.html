@@ -145,9 +145,9 @@
           [disabled]="
             params?.currentUser &&
             !params?.currentUser?.userPrivileges['ALL'] &&
-              !params?.currentUser?.userPrivileges[
-                'SAMPLE TESTING AND RESULTS_SHOW_MRN'
-              ]
+            !params?.currentUser?.userPrivileges[
+              'SAMPLE TESTING AND RESULTS_SHOW_MRN'
+            ]
           "
           color="primary"
           [checked]="itemsToShow['mrn']"
@@ -159,9 +159,9 @@
           [disabled]="
             params?.currentUser &&
             !params?.currentUser?.userPrivileges['ALL'] &&
-              !params?.currentUser?.userPrivileges[
-                'SAMPLE TESTING AND RESULTS_SHOW_GENDER'
-              ]
+            !params?.currentUser?.userPrivileges[
+              'SAMPLE TESTING AND RESULTS_SHOW_GENDER'
+            ]
           "
           color="primary"
           class="ml-3"
@@ -173,9 +173,9 @@
           [disabled]="
             params?.currentUser &&
             !params?.currentUser?.userPrivileges['ALL'] &&
-              !params?.currentUser?.userPrivileges[
-                'SAMPLE TESTING AND RESULTS_SHOW_NAMES'
-              ]
+            !params?.currentUser?.userPrivileges[
+              'SAMPLE TESTING AND RESULTS_SHOW_NAMES'
+            ]
           "
           color="primary"
           class="ml-3"
@@ -519,7 +519,7 @@
               *ngIf="samplesToViewMoreDetails[sample?.uuid]"
               class="sample-details-row"
             >
-              <td colspan="11">
+              <td colspan="100%">
                 <app-shared-sample-details
                   [sample]="sample"
                 ></app-shared-sample-details>

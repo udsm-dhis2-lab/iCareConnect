@@ -248,12 +248,13 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
       Object.keys(this.generalObsFormData).map((key) => {
         return {
           concept: key,
-          value: this.generalObsFormData[key]?.value,
+          value: (this.generalObsFormData[key]?.value).toString(),
           form: this.generalObsFormData[key]?.form,
         };
       }) || [],
       "form"
     );
+    console.log("generalObsFormData", this.generalObservationsData);
   }
 
   onGetFormId(id: string): void {
@@ -1052,10 +1053,39 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                     ]?.map((obs) =>
                                                       omit(obs, "form")
                                                     ) || []
-                                                  ).filter(
-                                                    (obs) =>
-                                                      obs?.value?.length > 0
-                                                  ),
+                                                  )
+                                                    .filter((obs) => obs?.value)
+                                                    .map((obsValue) => {
+                                                      return {
+                                                        ...obsValue,
+                                                        value:
+                                                          obsValue?.value?.indexOf(
+                                                            "GMT+"
+                                                          ) === -1
+                                                            ? obsValue?.value
+                                                            : formatDateToYYMMDD(
+                                                                new Date(
+                                                                  obsValue?.value
+                                                                )
+                                                              ) +
+                                                              " " +
+                                                              this.formatDimeChars(
+                                                                new Date(
+                                                                  obsValue?.value
+                                                                )
+                                                                  .getHours()
+                                                                  .toString()
+                                                              ) +
+                                                              ":" +
+                                                              this.formatDimeChars(
+                                                                new Date(
+                                                                  obsValue?.value
+                                                                )
+                                                                  .getMinutes()
+                                                                  .toString()
+                                                              ),
+                                                      };
+                                                    }),
                                                   encounterProviders: [
                                                     {
                                                       provider:
