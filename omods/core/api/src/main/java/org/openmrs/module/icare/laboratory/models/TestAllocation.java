@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.openmrs.*;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.core.ICareService;
 
 import javax.persistence.*;
 import java.util.*;
@@ -147,6 +148,8 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 	}
 
 	public List<ConceptSet> getConceptSets() {
+		ICareService iCareService = Context.getService(ICareService.class);
+		List<ConceptSet> conceptSets = iCareService.getConceptsSetsByConcept(this.getTestConcept().getUuid());
 		return conceptSets;
 	}
 
