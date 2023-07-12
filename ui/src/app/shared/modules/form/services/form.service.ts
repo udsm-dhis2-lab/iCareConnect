@@ -442,7 +442,68 @@ export class FormService {
       "?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))";
     return this.httpClient.get("form/" + uuid + fields).pipe(
       map((response) => {
-        return response;
+        const formResponse = {
+          ...response,
+          formFields: response?.formFields?.map((formField) => {
+            return {
+              ...formField,
+              setMembers: formField?.setMembers?.map((setMember) => {
+                return {
+                  ...setMember,
+                  options: setMember?.options?.map((option) => {
+                    return {
+                      ...option,
+                      label:
+                        option?.label?.indexOf(":") > -1
+                          ? option?.label?.split(":")[1]
+                          : option?.label,
+                      name:
+                        option?.name?.indexOf(":") > -1
+                          ? option?.name?.split(":")[1]
+                          : option?.name,
+                    };
+                  }),
+                  concept: {
+                    ...setMember?.concept,
+                    display:
+                      setMember?.concept?.display?.indexOf(":") > -1
+                        ? setMember?.concept?.display?.split(":")[1]
+                        : setMember?.concept?.display,
+                    answers: setMember?.concept?.answers?.map((answer) => {
+                      return {
+                        ...answer,
+                        display:
+                          answer?.display?.indexOf(":") > -1
+                            ? answer?.display?.split(":")[1]
+                            : answer?.display,
+                      };
+                    }),
+                  },
+                };
+              }),
+              field: {
+                ...formField?.field,
+                concept: {
+                  ...formField?.field?.concept,
+                  display:
+                    formField?.field?.concept?.display?.indexOf(":") > -1
+                      ? formField?.field?.concept?.display?.split(":")[1]
+                      : formField?.field?.concept?.display,
+                  answers: formField?.field?.concept?.answers?.map((answer) => {
+                    return {
+                      ...answer,
+                      display:
+                        answer?.display?.indexOf(":") > -1
+                          ? answer?.display?.split(":")[1]
+                          : answer?.display,
+                    };
+                  }),
+                },
+              },
+            };
+          }),
+        };
+        return formResponse;
       }),
       catchError((error) => {
         return of(error);
