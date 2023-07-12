@@ -417,8 +417,10 @@ public class LaboratoryController {
 					 for (SampleOrder order: sample.getSampleOrders()) {
 						 if (order.getTestAllocations().size() > 0) {
 							 for (TestAllocation allocation: order.getTestAllocations()) {
-								 List<ConceptSet> conceptSets = iCareService.getConceptsSetsByConcept(allocation.getTestConcept().getUuid());
-								 allocation.setConceptSets(conceptSets);
+
+								 //Getting concept sets for parameter headers
+//								 List<ConceptSet> conceptSets = iCareService.getConceptsSetsByConcept(allocation.getTestConcept().getUuid());
+//								 allocation.setConceptSets(conceptSets);
 								 allocations.add(allocation.toMap());
 							 }
 						 }
