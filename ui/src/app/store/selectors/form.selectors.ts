@@ -39,11 +39,10 @@ export const getFormsLoadingState = createSelector(
 );
 
 export const getCustomOpenMRSFormById = (id: string) =>
-  createSelector(
-    getAllForms,
-    (allForms) =>
-      (allForms?.filter((form) => form?.uuid === id) || [])[0] || null
-  );
+  createSelector(getAllForms, (allForms) => {
+    let form = (allForms?.filter((form) => form?.uuid === id) || [])[0] || null;
+    return form;
+  });
 
 export const getCustomOpenMRSFormsByIds = (formUUids: string[]) =>
   createSelector(getAllForms, (allForms) => {

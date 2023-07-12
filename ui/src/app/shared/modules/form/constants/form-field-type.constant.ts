@@ -4,4 +4,7 @@ export enum FormFieldType {
   TEXT = "Text",
   BOOLEAN = "Boolean",
   COMPLEX = "Complex",
+  DATE = "Date",
+  DATETIME = "Datetime",
+  TIME = "Time",
 }

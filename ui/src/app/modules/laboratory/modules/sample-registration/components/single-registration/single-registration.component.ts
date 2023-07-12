@@ -23,7 +23,7 @@ import { VisitsService } from "src/app/shared/resources/visits/services";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { BarCodeModalComponent } from "../../../../../../shared/dialogs/bar-code-modal/bar-code-modal.component";
 
-import { uniqBy, keyBy, omit, groupBy } from "lodash";
+import { uniqBy, keyBy, omit, groupBy, flatten } from "lodash";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { SampleRegistrationFinalizationComponent } from "../sample-registration-finalization/sample-registration-finalization.component";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
@@ -62,6 +62,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   @Input() personPhoneAttributeTypeUuid: string;
   @Input() labTestRequestProgramStageId: string;
   @Input() sampleRegistrationCategories: any[];
+  @Input() specimenSourceConceptUuid: string;
 
   departmentField: any = {};
   specimenDetailsFields: any;
@@ -234,13 +235,25 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
       ...this.generalObsFormData,
       ...data.getValues(),
     };
-    this.generalObservationsData =
+    this.selectedSpecimenUuid =
+      this.generalObsFormData[this.specimenSourceConceptUuid]?.value;
+    // console.log("this.selectedSpecimenUuid", this.selectedSpecimenUuid);
+    if (this.selectedSpecimenUuid) {
+      this.testsUnderSpecimen$ =
+        this.labTestsService.getSetMembersByConceptUuid(
+          this.selectedSpecimenUuid
+        );
+    }
+    this.generalObservationsData = groupBy(
       Object.keys(this.generalObsFormData).map((key) => {
         return {
           concept: key,
-          value: this.generalObsFormData[key]?.value,
+          value: (this.generalObsFormData[key]?.value).toString(),
+          form: this.generalObsFormData[key]?.form,
         };
-      }) || [];
+      }) || [],
+      "form"
+    );
   }
 
   onGetFormId(id: string): void {
@@ -519,17 +532,17 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     this.maxForCollectedOn = true;
 
     // this.getDateStringFromMoment_i();
-    if (
-      itemKey &&
-      itemKey === "specimenDetails" &&
-      this.selectedSpecimenUuid !== this.formData["specimen"]?.value
-    ) {
-      this.selectedSpecimenUuid = this.formData["specimen"]?.value;
-      this.testsUnderSpecimen$ =
-        this.labTestsService.getSetMembersByConceptUuid(
-          this.selectedSpecimenUuid
-        );
-    }
+    // if (
+    //   itemKey &&
+    //   itemKey === "specimenDetails" &&
+    //   this.selectedSpecimenUuid !== this.formData["specimen"]?.value
+    // ) {
+    //   this.selectedSpecimenUuid = this.formData["specimen"]?.value;
+    //   this.testsUnderSpecimen$ =
+    //     this.labTestsService.getSetMembersByConceptUuid(
+    //       this.selectedSpecimenUuid
+    //     );
+    // }
   }
 
   onFormUpdateForTest(testValues: any): void {
@@ -995,43 +1008,115 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                 },
                                               ];
                                             }
-
-                                            obs = [
-                                              ...obs,
-                                              ...(this
-                                                .generalObservationsData || []),
+                                            let encounterObjects = [
+                                              {
+                                                visit: visitResponse?.uuid,
+                                                patient: patientResponse?.uuid,
+                                                encounterType:
+                                                  "9b46d3fe-1c3e-4836-a760-f38d286b578b",
+                                                location:
+                                                  this.currentLocation?.uuid,
+                                                orders,
+                                                obs:
+                                                  obs?.filter(
+                                                    (observation) =>
+                                                      observation?.value
+                                                  ) || [],
+                                                encounterProviders: [
+                                                  {
+                                                    provider:
+                                                      this.provider?.uuid,
+                                                    encounterRole:
+                                                      ICARE_CONFIG.encounterRole,
+                                                  },
+                                                ],
+                                              },
                                             ];
-                                            const encounterObject = {
-                                              visit: visitResponse?.uuid,
-                                              patient: patientResponse?.uuid,
-                                              encounterType:
-                                                "9b46d3fe-1c3e-4836-a760-f38d286b578b",
-                                              location:
-                                                this.currentLocation?.uuid,
-                                              orders,
-                                              obs:
-                                                obs?.filter(
-                                                  (observation) =>
-                                                    observation?.value
-                                                ) || [],
-                                              encounterProviders: [
-                                                {
-                                                  provider: this.provider?.uuid,
-                                                  encounterRole:
-                                                    ICARE_CONFIG.encounterRole,
-                                                },
-                                              ],
-                                              form: this.formId
-                                                ? this.formId
-                                                : null,
-                                            };
-                                            return this.labOrdersService.createLabOrdersViaEncounter(
-                                              encounterObject
+                                            encounterObjects = [
+                                              ...encounterObjects,
+                                              ...Object.keys(
+                                                this.generalObservationsData
+                                              ).map((key) => {
+                                                return {
+                                                  visit: visitResponse?.uuid,
+                                                  patient:
+                                                    patientResponse?.uuid,
+                                                  encounterType:
+                                                    "9b46d3fe-1c3e-4836-a760-f38d286b578b",
+                                                  location:
+                                                    this.currentLocation?.uuid,
+                                                  orders: [],
+                                                  obs: (
+                                                    this.generalObservationsData[
+                                                      key
+                                                    ]?.map((obs) =>
+                                                      omit(obs, "form")
+                                                    ) || []
+                                                  )
+                                                    .filter((obs) => obs?.value)
+                                                    .map((obsValue) => {
+                                                      return {
+                                                        ...obsValue,
+                                                        value:
+                                                          obsValue?.value?.indexOf(
+                                                            "GMT+"
+                                                          ) === -1
+                                                            ? obsValue?.value
+                                                            : formatDateToYYMMDD(
+                                                                new Date(
+                                                                  obsValue?.value
+                                                                )
+                                                              ) +
+                                                              " " +
+                                                              this.formatDimeChars(
+                                                                new Date(
+                                                                  obsValue?.value
+                                                                )
+                                                                  .getHours()
+                                                                  .toString()
+                                                              ) +
+                                                              ":" +
+                                                              this.formatDimeChars(
+                                                                new Date(
+                                                                  obsValue?.value
+                                                                )
+                                                                  .getMinutes()
+                                                                  .toString()
+                                                              ),
+                                                      };
+                                                    }),
+                                                  encounterProviders: [
+                                                    {
+                                                      provider:
+                                                        this.provider?.uuid,
+                                                      encounterRole:
+                                                        ICARE_CONFIG.encounterRole,
+                                                    },
+                                                  ],
+                                                  form: key,
+                                                };
+                                              }),
+                                            ];
+                                            return zip(
+                                              ...encounterObjects.map(
+                                                (encounterObject) =>
+                                                  this.labOrdersService.createLabOrdersViaEncounter(
+                                                    encounterObject
+                                                  )
+                                              )
+                                            ).pipe(
+                                              map((responses) => {
+                                                return responses[0];
+                                              })
                                             );
                                           }
                                         )
                                       ).subscribe((responses: any[]) => {
                                         if (responses) {
+                                          console.log(
+                                            "responsesjsjsj",
+                                            flatten(responses)
+                                          );
                                           responses.forEach(
                                             (encounterResponse, index) => {
                                               if (!encounterResponse?.error) {

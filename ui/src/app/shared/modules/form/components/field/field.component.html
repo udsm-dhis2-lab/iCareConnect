@@ -1,7 +1,10 @@
 <div
   [formGroup]="form"
   *ngIf="
-    isCommonField && !isReport && !field?.shouldHaveLiveSearchForDropDownFields
+    isCommonField &&
+    !isReport &&
+    !field?.shouldHaveLiveSearchForDropDownFields &&
+    !isDateTime
   "
 >
   <mat-form-field
@@ -323,7 +326,6 @@
     </mat-checkbox>
   </section>
 </div>
-
 <div [formGroup]="form" *ngIf="isDateTime && !isReport">
   <mat-form-field
     [hidden]="field?.hidden"

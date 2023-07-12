@@ -68,3 +68,15 @@ ng-deep .disabled-form-selection-option,
 .in-stock-item {
   color: #28a745 !important;
 }
+
+::ng-deep
+  .ngx-mat-timepicker
+  form
+  .ngx-mat-timepicker-table
+  .ngx-mat-timepicker-tbody
+  tr
+  td
+  .mat-form-field {
+  max-width: 50px;
+  min-width: 50px;
+}
