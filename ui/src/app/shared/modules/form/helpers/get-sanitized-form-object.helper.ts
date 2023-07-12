@@ -9,6 +9,8 @@ import { TextArea } from "../models/text-area.model";
 import { Textbox } from "../models/text-box.model";
 import { getFormFieldOptions } from "./get-form-field-options.helper";
 import { groupBy } from "lodash";
+import { DateField } from "../models/date-field.model";
+import { DateTimeField } from "../models/date-time-field.model";
 
 export function getSanitizedFormObject(
   concept: ConceptGet,
@@ -139,13 +141,36 @@ function getFormField(
       });
     }
     case FormFieldType.TEXT: {
-      return new TextArea({
+      return new Textbox({
         key: formObject.uuid,
         label: formObject.name,
         required: formObject?.required,
         conceptClass: formObject?.concept?.conceptClass?.display,
         id: formObject.id,
         options: formObject.options,
+      });
+    }
+
+    case FormFieldType.DATE: {
+      return new DateField({
+        key: formObject.uuid,
+        label: formObject.name,
+        required: formObject?.required,
+        conceptClass: formObject?.concept?.conceptClass?.display,
+        id: formObject.id,
+        options: formObject.options,
+      });
+    }
+
+    case FormFieldType.DATETIME: {
+      return new DateTimeField({
+        key: formObject.uuid,
+        label: formObject.name,
+        required: formObject?.required,
+        conceptClass: formObject?.concept?.conceptClass?.display,
+        id: formObject.id,
+        options: [],
+        controlType: "date-time",
       });
     }
 
