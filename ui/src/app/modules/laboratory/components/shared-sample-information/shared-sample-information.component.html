@@ -1,0 +1,63 @@
+<table style="width: 100%">
+  <tbody style="width: 100%">
+    <tr style="width: 100%">
+      <td colspan="4" style="width: 1005; text-align: center; font-weight: 600">
+        {{
+          samplesData[0]?.authorizationInfo?.length == 0
+            ? "Provisional"
+            : "Final"
+        }}
+      </td>
+    </tr>
+    <tr style="width: 100%">
+      <td style="width: 25%; text-align: left">Patient File Number:</td>
+      <td style="width: 25%; text-align: left">{{ samplesData[0]?.mrn }}</td>
+      <td style="width: 25%; text-align: left">Collection Date&Time:</td>
+      <td style="width: 25%; text-align: left"></td>
+    </tr>
+    <tr style="width: 100%">
+      <td style="width: 25%; text-align: left">Patient Name:</td>
+      <td style="width: 25%; text-align: left"></td>
+      <td style="width: 25%; text-align: left">Registered on:</td>
+      <td style="width: 25%; text-align: left"></td>
+    </tr>
+    <tr style="width: 100%">
+      <td style="width: 25%; text-align: left">Age:</td>
+      <td style="width: 25%; text-align: left"></td>
+      <td style="width: 25%; font-weight: 600; text-align: left">
+        Laboratory Number:
+      </td>
+      <td style="width: 25%; text-align: left">
+        {{ samplesData[0]?.label }}
+      </td>
+    </tr>
+    <tr style="width: 100%">
+      <td style="width: 25%; text-align: left">Gender:</td>
+      <td style="width: 25%; text-align: left"></td>
+      <td style="width: 25%; text-align: left">Received Date&Time:</td>
+      <td style="width: 25%; text-align: left"></td>
+    </tr>
+    <tr style="width: 100%">
+      <td style="width: 25%; text-align: left">Facility:</td>
+      <td style="width: 25%; text-align: left"></td>
+      <td style="width: 25%; text-align: left">Accepted Date&Time:</td>
+      <td style="width: 25%; text-align: left">
+        {{ samplesData[0]?.acceptedStatus?.timestamp | date: "medium" }}
+      </td>
+    </tr>
+    <tr style="width: 100%">
+      <td style="width: 25%; text-align: left">Requested by:</td>
+      <td style="width: 25%; text-align: left"></td>
+      <td style="width: 25%; text-align: left">Specimen Type:</td>
+      <td style="width: 25%; text-align: left">
+        {{ samplesData[0]?.specimen?.name }}
+      </td>
+    </tr>
+    <tr style="width: 100%">
+      <td style="width: 25%; text-align: left">Clinical Data:</td>
+      <td style="width: 25%; text-align: left"></td>
+      <td style="width: 25%; text-align: left"></td>
+      <td style="width: 25%; text-align: left"></td>
+    </tr>
+  </tbody>
+</table>
