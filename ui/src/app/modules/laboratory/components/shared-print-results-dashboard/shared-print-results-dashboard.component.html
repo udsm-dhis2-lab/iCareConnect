@@ -1,1 +1,24 @@
-<p>shared-print-results-dashboard works!</p>
+<div class="w-100 p-2">
+  <div style="width: 100%; text-align: center" id="report" #report>
+    <app-shared-lab-report-header></app-shared-lab-report-header>
+    <div
+      style="margin-top: 24px; width: 100%"
+      *ngFor="let department of data?.patientDetailsAndSamples?.departments"
+    >
+      <app-shared-sample-information
+        [samplesData]="department?.samples"
+      ></app-shared-sample-information>
+
+      <div style="margin-top: 24px; width: 100%">
+        <app-shared-sample-orders
+          [samplesData]="department?.samples"
+        ></app-shared-sample-orders>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-end">
+    <button mat-flat-button color="primary" (click)="printPDF($event)">
+      Print
+    </button>
+  </div>
+</div>

@@ -254,7 +254,6 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
       }) || [],
       "form"
     );
-    console.log("generalObsFormData", this.generalObservationsData);
   }
 
   onGetFormId(id: string): void {
