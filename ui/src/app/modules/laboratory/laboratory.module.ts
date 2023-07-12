@@ -8,8 +8,6 @@ import { EffectsModule } from "@ngrx/effects";
 import { labEffects } from "./store/effects";
 import { labReducers } from "./store/reducers";
 import { LaboratoryComponent } from "./laboratory.component";
-import { GroupParametersByHeadersPipe } from "./pipes/group-parameters-by-headers.pipe";
-import { IdentifyParametersWithoutHeadersPipe } from "./pipes/identify-parameters-without-headers.pipe";
 
 @NgModule({
   declarations: [...labPages, LaboratoryComponent],
