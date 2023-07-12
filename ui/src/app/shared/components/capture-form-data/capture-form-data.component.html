@@ -8,6 +8,7 @@
         [fields]="fields"
         [isFormHorizontal]="true"
         [isReport]="isReport"
+        [formId]="form?.uuid"
         [fieldsData]="observations"
         (formUpdate)="onFormUpdate($event)"
       ></app-form>
@@ -45,6 +46,8 @@
                   [fields]="formField?.formFields"
                   [isFormHorizontal]="true"
                   [isReport]="isReport"
+                  [colClass]="'col-4'"
+                  [formId]="form?.uuid"
                   [fieldsData]="observations"
                   (formUpdate)="onFormUpdate($event)"
                 >
@@ -71,6 +74,7 @@
           [fields]="[formField?.formField]"
           [isFormHorizontal]="false"
           [isReport]="isReport"
+          [formId]="form?.uuid"
           [fieldsData]="observations"
           (formUpdate)="onFormUpdate($event)"
         >
@@ -112,6 +116,7 @@
               [fields]="member?.formFields"
               [isFormHorizontal]="true"
               [isReport]="isReport"
+              [formId]="form?.uuid"
               [fieldsData]="observations"
               (formUpdate)="onFormUpdate($event)"
             >
@@ -130,6 +135,7 @@
               [fields]="[member]"
               [isFormHorizontal]="true"
               [isReport]="isReport"
+              [formId]="form?.uuid"
               [fieldsData]="observations"
               (formUpdate)="onFormUpdate($event)"
             >
@@ -147,6 +153,7 @@
               [dataType]="member?.dataType"
               [isFormHorizontal]="true"
               [isReport]="isReport"
+              [formId]="form?.uuid"
               [fieldsData]="observations"
               (formUpdate)="onFormUpdate($event)"
             >
@@ -190,6 +197,7 @@
                   [fields]="[subMember?.formField]"
                   [isFormHorizontal]="true"
                   [isReport]="isReport"
+                  [formId]="form?.uuid"
                   [fieldsData]="observations"
                   (formUpdate)="onFormUpdate($event)"
                 >

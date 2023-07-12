@@ -31,9 +31,11 @@ export class FormComponent implements OnInit {
   @Input() shouldRenderAsCheckBoxesButton: boolean;
   @Input() shouldDisable: boolean;
   @Input() isReport: boolean;
+  @Input() colClass: string;
 
   @Output() formUpdate: EventEmitter<any> = new EventEmitter<any>();
   @Output() fileFormUpdate: EventEmitter<any> = new EventEmitter<any>();
+  @Input() formId: string;
 
   values: any;
 
@@ -46,12 +48,12 @@ export class FormComponent implements OnInit {
   constructor(private fieldControlService: FieldControlService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-  this.shouldDisable = this.isReport ? true : this.shouldDisable;
-  this.form = this.fieldControlService.toFormGroup(
-    this.fields,
-    this.fieldsData
-  );
-  this.values = this.form.getRawValue();
+    this.shouldDisable = this.isReport ? true : this.shouldDisable;
+    this.form = this.fieldControlService.toFormGroup(
+      this.fields,
+      this.fieldsData
+    );
+    this.values = this.form.getRawValue();
   }
 
   ngOnInit(): void {
@@ -67,14 +69,18 @@ export class FormComponent implements OnInit {
 
   onFieldUpdate(form: FormGroup): void {
     if (!this.showSaveButton && form) {
-      this.formUpdate.emit(new FormValue(this.form, this.fields));
+      this.formUpdate.emit(
+        new FormValue(this.form, this.fields, null, this.formId)
+      );
 
       this.values = form.getRawValue();
     }
   }
 
   onFileFieldUpdate(fileData: File): void {
-    this.formUpdate.emit(new FormValue(this.form, this.fields, fileData));
+    this.formUpdate.emit(
+      new FormValue(this.form, this.fields, fileData, this.formId)
+    );
     this.values = fileData;
   }
 

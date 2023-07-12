@@ -70,6 +70,8 @@ export class TestParameterEntryComponent implements OnInit {
           : null,
       };
     } else {
+      // console.log("relatedResult", this.relatedResult?.uuid);
+      // console.log("final res", this.finalResult?.groups);
       this.latestResult = {
         ...(!this.relatedResult
           ? this.finalResult?.groups[this.finalResult?.groups?.length - 1]

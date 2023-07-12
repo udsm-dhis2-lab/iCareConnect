@@ -103,6 +103,7 @@ export class RegisterSampleComponent implements OnInit {
   relatedMetadataAttributeUuid$: Observable<string>;
   hfrCodeAttributeUuid$: Observable<string>;
   sampleRegistrationCategories$: Observable<any>;
+  specimenSourceConceptUuid$: Observable<string>;
 
   constructor(
     private samplesService: SamplesService,
@@ -149,6 +150,26 @@ export class RegisterSampleComponent implements OnInit {
         "iCare.externalSystems.integrated.pimaCovid.programStages.testRequestStage"
       );
 
+    this.specimenSourceConceptUuid$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        `lis.sampleRegistration.specimenSource.concept.uuid`
+      )
+      .pipe(
+        map((response) => {
+          if (response && response == "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  error: `Key: lis.sampleRegistration.specimenSource.concept.uuid is not set, contact IT`,
+                  message: `Key: lis.sampleRegistration.specimenSource.concept.uuid is not set, contact IT`,
+                },
+              },
+            ];
+          }
+          return response;
+        })
+      );
     this.agencyConceptConfigs$ = this.store.select(getConceptById, {
       id: this.LISConfigurations?.agencyConceptUuid,
     });

@@ -17,7 +17,8 @@
     relatedMetadataAttributeUuid: relatedMetadataAttributeUuid$ | async,
     hfrCodeAttributeUuid: hfrCodeAttributeUuid$ | async,
     labTestRequestProgramStageId: labTestRequestProgramStageId$ | async,
-    sampleRegistrationCategories: sampleRegistrationCategories$ | async
+    sampleRegistrationCategories: sampleRegistrationCategories$ | async,
+    specimenSourceConceptUuid: specimenSourceConceptUuid$ | async
   } as params"
 >
   <div class="row">
@@ -91,7 +92,8 @@
               params?.identifierTypes &&
               params?.barcodeSettings &&
               params?.labTestRequestProgramStageId &&
-              params?.sampleRegistrationCategories
+              params?.sampleRegistrationCategories &&
+              params?.specimenSourceConceptUuid
             "
           >
             <app-single-registration
@@ -110,6 +112,7 @@
               [testsFromExternalSystemsConfigs]="
                 params?.testsFromExternalSystemsConfigs
               "
+              [specimenSourceConceptUuid]="params?.specimenSourceConceptUuid"
               [personPhoneAttributeTypeUuid]="personPhoneAttributeTypeUuid"
               [personEmailAttributeTypeUuid]="personEmailAttributeTypeUuid"
               [barcodeSettings]="params?.barcodeSettings"

@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { groupBy } from "lodash";
+import { groupBy, orderBy } from "lodash";
 
 @Pipe({
   name: "groupParametersByHeaders",
@@ -23,15 +23,19 @@ export class GroupParametersByHeadersPipe implements PipeTransform {
       allocationsForParametersWithHeaders,
       "headerUuid"
     );
-    return Object.keys(groupedAllocations).map((key) => {
-      return {
-        headerUuid: key,
-        display: groupedAllocations[key][0]?.parameterHeader?.display?.replace(
-          "PARAMETER_HEADER:",
-          ""
-        ),
-        allocations: groupedAllocations[key],
-      };
-    });
+    return orderBy(
+      Object.keys(groupedAllocations).map((key) => {
+        return {
+          headerUuid: key,
+          display: groupedAllocations[
+            key
+          ][0]?.parameterHeader?.display?.replace("PARAMETER_HEADER:", ""),
+          allocations: groupedAllocations[key],
+          sortOrder: groupedAllocations[key][0]?.parameterHeader?.sortOrder,
+        };
+      }),
+      ["sortOrder", "display"],
+      ["asc", "asc"]
+    );
   }
 }

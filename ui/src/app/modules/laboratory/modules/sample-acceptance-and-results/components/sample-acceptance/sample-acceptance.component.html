@@ -265,13 +265,26 @@
               </button>
             </div>
             <app-print-results-page
-              *ngIf="sampleParams?.testRelationshipConceptSourceUuid"
+              *ngIf="
+                sampleParams?.testRelationshipConceptSourceUuid &&
+                !LISConfigurations?.isLIS
+              "
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
               "
               [data]="dataToPrint"
               (cancel)="onCancelFromResultsPage($event)"
             ></app-print-results-page>
+            <app-shared-print-results-dashboard
+              *ngIf="
+                sampleParams?.testRelationshipConceptSourceUuid &&
+                LISConfigurations?.isLIS
+              "
+              [testRelationshipConceptSourceUuid]="
+                sampleParams?.testRelationshipConceptSourceUuid
+              "
+              [data]="dataToPrint"
+            ></app-shared-print-results-dashboard>
           </div>
         </div>
       </ng-template>
@@ -330,13 +343,26 @@
               </button>
             </div>
             <app-print-results-page
-              *ngIf="sampleParams?.testRelationshipConceptSourceUuid"
+              *ngIf="
+                sampleParams?.testRelationshipConceptSourceUuid &&
+                !LISConfigurations?.isLIS
+              "
               (cancel)="onCancelFromResultsPage($event)"
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
               "
               [data]="dataToPrint"
             ></app-print-results-page>
+            <app-shared-print-results-dashboard
+              *ngIf="
+                sampleParams?.testRelationshipConceptSourceUuid &&
+                LISConfigurations?.isLIS
+              "
+              [testRelationshipConceptSourceUuid]="
+                sampleParams?.testRelationshipConceptSourceUuid
+              "
+              [data]="dataToPrint"
+            ></app-shared-print-results-dashboard>
           </div>
         </div>
       </ng-template>
@@ -386,13 +412,26 @@
               </button>
             </div>
             <app-print-results-page
-              *ngIf="sampleParams?.testRelationshipConceptSourceUuid"
+              *ngIf="
+                sampleParams?.testRelationshipConceptSourceUuid &&
+                !LISConfigurations?.isLIS
+              "
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
               "
               [data]="dataToPrint"
               (cancel)="onCancelFromResultsPage($event)"
             ></app-print-results-page>
+            <app-shared-print-results-dashboard
+              *ngIf="
+                sampleParams?.testRelationshipConceptSourceUuid &&
+                LISConfigurations?.isLIS
+              "
+              [testRelationshipConceptSourceUuid]="
+                sampleParams?.testRelationshipConceptSourceUuid
+              "
+              [data]="dataToPrint"
+            ></app-shared-print-results-dashboard>
           </div>
         </div>
       </ng-template>
