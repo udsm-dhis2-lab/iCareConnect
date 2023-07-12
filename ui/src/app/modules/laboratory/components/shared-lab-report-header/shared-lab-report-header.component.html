@@ -15,39 +15,34 @@
   >
     <tbody style="width: 100%">
       <tr style="width: 100%">
-        <td style="width: 33.3%; text-align: center; border: 0">
-          <div style="color: #fff">
-            .........................................
-          </div>
-        </td>
-        <td style="width: 33.3%; text-align: center; border: 0">
+        <td style="text-align: center; border: 0" colspan="3">
           <div>
             <img [src]="params?.locationDetails?.logo" width="90" height="90" />
           </div>
         </td>
-        <td style="width: 33.3%; text-align: center; border: 0"></td>
       </tr>
       <tr>
-        <td style="width: 33.3%; border: 0"></td>
-        <td style="width: 33.3%; text-align: center; border: 0">
+        <td colspan="3" style="text-align: center; border: 0">
           {{ params?.locationDetails?.display }}
         </td>
-        <td style="width: 33.3%; border: 0"></td>
       </tr>
       <tr>
-        <td style="width: 33.3%; border: 0"></td>
-        <td style="width: 33.3%; text-align: center; border: 0">
+        <td colspan="3" style="text-align: center; border: 0">
           {{ params?.locationDetails?.description }}
         </td>
-        <td style="width: 33.3%; border: 0"></td>
       </tr>
       <tr>
+        <td colspan="3" style="text-align: center; border: 0">
+          {{ params?.locationDetails?.postalCode }}
+        </td>
+      </tr>
+      <!-- <tr>
         <td style="width: 33.3%; border: 0"></td>
         <td style="width: 33.3%; text-align: center; border: 0">
           {{ params?.locationDetails?.postalCode }}
         </td>
         <td style="width: 33.3%; border: 0"></td>
-      </tr>
+      </tr> -->
     </tbody>
   </table>
 </div>

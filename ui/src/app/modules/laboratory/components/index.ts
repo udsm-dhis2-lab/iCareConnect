@@ -9,6 +9,7 @@ import { SharedAssociatedFieldResultsEntryComponent } from "./shared-associated-
 import { SharedLabReportHeaderComponent } from "./shared-lab-report-header/shared-lab-report-header.component";
 import { SharedPrintResultsDashboardComponent } from "./shared-print-results-dashboard/shared-print-results-dashboard.component";
 import { SharedSampleInformationComponent } from "./shared-sample-information/shared-sample-information.component";
+import { SharedSampleOrderResultsComponent } from "./shared-sample-order-results/shared-sample-order-results.component";
 import { SharedSampleOrdersComponent } from "./shared-sample-orders/shared-sample-orders.component";
 import { SharedSamplesSummaryDashboardComponent } from "./shared-samples-summary-dashboard/shared-samples-summary-dashboard.component";
 
@@ -26,4 +27,5 @@ export const labSharedComponents: any[] = [
   SharedLabReportHeaderComponent,
   SharedSampleInformationComponent,
   SharedSampleOrdersComponent,
+  SharedSampleOrderResultsComponent,
 ];
