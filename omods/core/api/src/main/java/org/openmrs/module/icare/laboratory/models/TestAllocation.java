@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.openmrs.*;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.core.ICareService;
 
 import javax.persistence.*;
 import java.util.*;
@@ -147,6 +148,8 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 	}
 
 	public List<ConceptSet> getConceptSets() {
+		ICareService iCareService = Context.getService(ICareService.class);
+		List<ConceptSet> conceptSets = iCareService.getConceptsSetsByConcept(this.getTestConcept().getUuid());
 		return conceptSets;
 	}
 
@@ -243,8 +246,7 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 			testConceptMap.put("mappings", mappings);
 			//			testConceptMap.put("names", this.getTestConcept().getNames());
 			//			testConceptMap.put("shortNames", this.getTestConcept().getShortNames());
-			testAllocationMap.put("concept", testConceptMap);
-			testAllocationMap.put("parameter", testConceptMap);
+
 
 			if(this.getConceptSets() != null){
 				List<Map<String,Object>> parametersHeadersListMap = new ArrayList<>();
@@ -263,6 +265,8 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 				testConceptMap.put("parameterHeaders",parametersHeadersListMap);
 
 			}
+			testAllocationMap.put("concept", testConceptMap);
+			testAllocationMap.put("parameter", testConceptMap);
 		}
 
 		
