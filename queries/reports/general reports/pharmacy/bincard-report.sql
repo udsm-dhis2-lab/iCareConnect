@@ -42,9 +42,27 @@
 -- AND issue.date_created BETWEEN '2020-01-01' AND '2022-10-10'
 -- ORDER BY date ASC;
 
+--SELECT
+--tr.date_created AS "date",
+--tr.batch_no AS "ref_no",
+--CASE WHEN tr.previous_quantity < tr.current_quantity THEN sourceloc.name WHEN tr.previous_quantity > tr.current_quantity && loc.location_id = 2  THEN 'Patient' WHEN tr.previous_quantity > tr.current_quantity THEN destloc.name END  AS "from_to",
+--CASE WHEN tr.previous_quantity < tr.current_quantity THEN tr.current_quantity-tr.previous_quantity ELSE '' END AS "qty_received",
+--CASE WHEN tr.previous_quantity > tr.current_quantity THEN tr.previous_quantity-tr.current_quantity ELSE '' END AS "qty_issued",
+--tr.expire_date AS "expiry_date",
+--tr.current_quantity AS "balance",
+--'' AS "remarks",
+--user.username AS "initials"
+--FROM st_transaction tr
+--LEFT JOIN location loc ON loc.location_id=tr.location_id
+--LEFT JOIN users user ON user.user_id=tr.creator
+--LEFT JOIN item it ON it.item_id =tr.item_id
+--LEFT JOIN location destloc ON destloc.location_id=tr.destination_location_id
+--LEFT JOIN location sourceloc ON sourceloc.location_id = tr.source_location_id
+--WHERE it.uuid= :itemUuid and loc.uuid= :locationUuid and tr.date_created between :startDate and :endDate;
+
 SELECT
 tr.date_created AS "date",
-tr.batch_no AS "ref_no",
+si.invoice_number AS "ref_no",
 CASE WHEN tr.previous_quantity < tr.current_quantity THEN sourceloc.name WHEN tr.previous_quantity > tr.current_quantity && loc.location_id = 2  THEN 'Patient' WHEN tr.previous_quantity > tr.current_quantity THEN destloc.name END  AS "from_to",
 CASE WHEN tr.previous_quantity < tr.current_quantity THEN tr.current_quantity-tr.previous_quantity ELSE '' END AS "qty_received",
 CASE WHEN tr.previous_quantity > tr.current_quantity THEN tr.previous_quantity-tr.current_quantity ELSE '' END AS "qty_issued",
@@ -58,4 +76,6 @@ LEFT JOIN users user ON user.user_id=tr.creator
 LEFT JOIN item it ON it.item_id =tr.item_id
 LEFT JOIN location destloc ON destloc.location_id=tr.destination_location_id
 LEFT JOIN location sourceloc ON sourceloc.location_id = tr.source_location_id
-WHERE it.uuid= :itemUuid and loc.uuid= :locationUuid and tr.date_created between :startDate and :endDate;
+LEFT JOIN st_stock_invoice_item sii ON sii.batch_no = tr.batch_no AND sii.item_id = tr.item_id
+LEFT JOIN st_stock_invoice si ON si.stock_invoice_id = sii.stock_invoice_id
+WHERE it.uuid= '6afcc2e5-e8e5-4fb5-ac8f-f120e6234065' and loc.location_id=50  and tr.date_created between '2023-07-12' and '2023-12-12';
