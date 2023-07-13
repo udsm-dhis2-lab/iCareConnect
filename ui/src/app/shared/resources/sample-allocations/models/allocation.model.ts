@@ -56,6 +56,7 @@ export interface SampleAllocationObject {
   resultApprovalConfiguration?: any;
   testRelationshipConceptSourceUuid?: string;
   isSetMember?: boolean;
+  instrument?: any;
 }
 
 export class SampleAllocation {
@@ -154,6 +155,10 @@ export class SampleAllocation {
             this.allocation?.results?.map((result) => {
               return {
                 ...result,
+                creator: {
+                  ...result?.creator,
+                  display: result?.creator?.display?.split(" (")[0],
+                },
                 parameter: this.allocation?.parameter,
                 value: result?.valueBoolean
                   ? result?.valueBoolean
@@ -194,12 +199,21 @@ export class SampleAllocation {
             this.allocation?.statuses?.filter(
               (status) => status?.result?.uuid === finalResult?.uuid
             ) || [],
-          authorizationStatuses:
+          authorizationStatuses: (
             this.allocation?.statuses?.filter(
               (status) =>
                 status?.category === "RESULT_AUTHORIZATION" &&
                 status?.result?.uuid === finalResult?.uuid
-            ) || [],
+            ) || []
+          )?.map((authStatus) => {
+            return {
+              ...authStatus,
+              user: {
+                ...authStatus?.user,
+                display: authStatus?.user?.display?.split(" (")[0],
+              },
+            };
+          }),
         }
       : {
           groups: orderBy(
@@ -223,14 +237,23 @@ export class SampleAllocation {
                 resultApprovalConfiguration: Number(
                   this.allocation?.resultApprovalConfiguration
                 ),
-                authorizationStatuses:
+                authorizationStatuses: (
                   this.allocation?.statuses?.filter(
                     (status) =>
                       status?.category === "RESULT_AUTHORIZATION" &&
                       status?.result?.uuid ===
                         orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
                           ?.uuid
-                  ) || [],
+                  ) || []
+                )?.map((authStatus) => {
+                  return {
+                    ...authStatus,
+                    user: {
+                      ...authStatus?.user,
+                      display: authStatus?.user?.display?.split(" (")[0],
+                    },
+                  };
+                }),
                 authorizationIsReady: authorizationIsReady,
               };
             }),
@@ -241,12 +264,21 @@ export class SampleAllocation {
             this.allocation?.statuses?.filter(
               (status) => status?.result?.uuid === finalResult?.uuid
             ) || [],
-          authorizationStatuses:
+          authorizationStatuses: (
             this.allocation?.statuses?.filter(
               (status) =>
                 status?.category === "RESULT_AUTHORIZATION" &&
                 status?.result?.uuid === finalResult?.uuid
-            ) || [],
+            ) || []
+          )?.map((authStatus) => {
+            return {
+              ...authStatus,
+              user: {
+                ...authStatus?.user,
+                display: authStatus?.user?.display?.split(" (")[0],
+              },
+            };
+          }),
         };
     return finalResult
       ? {
@@ -257,12 +289,21 @@ export class SampleAllocation {
             this.allocation?.statuses?.filter(
               (status) => status?.result?.uuid === finalResult?.uuid
             ) || [],
-          authorizationStatuses:
+          authorizationStatuses: (
             this.allocation?.statuses?.filter(
               (status) =>
                 status?.category === "RESULT_AUTHORIZATION" &&
                 status?.result?.uuid === finalResult?.uuid
-            ) || [],
+            ) || []
+          )?.map((authStatus) => {
+            return {
+              ...authStatus,
+              user: {
+                ...authStatus?.user,
+                display: authStatus?.user?.display?.split(" (")[0],
+              },
+            };
+          }),
           authorizationIsReady:
             formattedFinalResultPart?.authorizationStatuses?.length > 0,
         }
@@ -295,6 +336,15 @@ export class SampleAllocation {
     return this.allocation?.isSetMember;
   }
 
+  get instrument(): any {
+    return !this.finalResult?.groups
+      ? this.finalResult?.instrument
+      : this.finalResult?.groups?.length > 0
+      ? this.finalResult?.groups[this.finalResult?.groups?.length - 1]
+          ?.results[0]?.instrument
+      : null;
+  }
+
   toJson(): SampleAllocationObject {
     return {
       id: this.id,
@@ -310,6 +360,7 @@ export class SampleAllocation {
       results: this.results,
       finalResult: this.finalResult,
       isSetMember: this.isSetMember,
+      instrument: this.instrument,
     };
   }
 }
