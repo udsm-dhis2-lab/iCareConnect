@@ -20,6 +20,8 @@ import { FormatLabelCharCountDisplayPipe } from "./format-label-char-count-displ
 import { FilterOrdersByOrderPipe } from "./filter-orders-by-order.pipe";
 import { GetAssociatedFieldsPipe } from "./get-associated-fields.pipe";
 import { SearchingItemPipe } from "./searching-item.pipe";
+import { GroupParametersByHeadersPipe } from "./group-parameters-by-headers.pipe";
+import { IdentifyParametersWithoutHeadersPipe } from "./identify-parameters-without-headers.pipe";
 
 export const sharedPipes: any[] = [
   FilterByPipe,
@@ -44,4 +46,6 @@ export const sharedPipes: any[] = [
   FilterOrdersByOrderPipe,
   GetAssociatedFieldsPipe,
   SearchingItemPipe,
+  GroupParametersByHeadersPipe,
+  IdentifyParametersWithoutHeadersPipe,
 ];

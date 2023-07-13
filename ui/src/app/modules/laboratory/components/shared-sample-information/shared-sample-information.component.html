@@ -1,7 +1,7 @@
 <table style="width: 100%">
   <tbody style="width: 100%">
     <tr style="width: 100%">
-      <td colspan="4" style="width: 1005; text-align: center; font-weight: 600">
+      <td colspan="4" style="width: 100%; text-align: center; font-weight: 600">
         {{
           samplesData[0]?.authorizationInfo?.length == 0
             ? "Provisional"
@@ -17,23 +17,30 @@
     </tr>
     <tr style="width: 100%">
       <td style="width: 25%; text-align: left">Patient Name:</td>
-      <td style="width: 25%; text-align: left"></td>
+      <td style="width: 25%; text-align: left">
+        {{ samplesData[0]?.patient?.givenName }}
+        {{ samplesData[0]?.patient?.familyName }}
+      </td>
       <td style="width: 25%; text-align: left">Registered on:</td>
-      <td style="width: 25%; text-align: left"></td>
+      <td style="width: 25%; text-align: left">
+        {{ samplesData[0]?.dateCreated | date: "medium" }}
+      </td>
     </tr>
     <tr style="width: 100%">
       <td style="width: 25%; text-align: left">Age:</td>
-      <td style="width: 25%; text-align: left"></td>
-      <td style="width: 25%; font-weight: 600; text-align: left">
-        Laboratory Number:
+      <td style="width: 25%; text-align: left">
+        {{ samplesData[0]?.patient?.age }}
       </td>
+      <td style="width: 25%; text-align: left">Laboratory Number:</td>
       <td style="width: 25%; text-align: left">
         {{ samplesData[0]?.label }}
       </td>
     </tr>
     <tr style="width: 100%">
       <td style="width: 25%; text-align: left">Gender:</td>
-      <td style="width: 25%; text-align: left"></td>
+      <td style="width: 25%; text-align: left">
+        {{ samplesData[0]?.patient?.gender }}
+      </td>
       <td style="width: 25%; text-align: left">Received Date&Time:</td>
       <td style="width: 25%; text-align: left"></td>
     </tr>
