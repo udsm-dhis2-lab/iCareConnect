@@ -11,6 +11,7 @@ import { SharedPrintResultsDashboardComponent } from "./shared-print-results-das
 import { SharedSampleInformationComponent } from "./shared-sample-information/shared-sample-information.component";
 import { SharedSampleOrderResultsComponent } from "./shared-sample-order-results/shared-sample-order-results.component";
 import { SharedSampleOrdersComponent } from "./shared-sample-orders/shared-sample-orders.component";
+import { SharedSampleResultEntryAndAuthorizationComponent } from "./shared-sample-result-entry-and-authorization/shared-sample-result-entry-and-authorization.component";
 import { SharedSamplesSummaryDashboardComponent } from "./shared-samples-summary-dashboard/shared-samples-summary-dashboard.component";
 
 export const labSharedComponents: any[] = [
@@ -28,4 +29,5 @@ export const labSharedComponents: any[] = [
   SharedSampleInformationComponent,
   SharedSampleOrdersComponent,
   SharedSampleOrderResultsComponent,
+  SharedSampleResultEntryAndAuthorizationComponent,
 ];

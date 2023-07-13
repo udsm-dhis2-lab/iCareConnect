@@ -838,9 +838,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                           },
                           instrument:
                             order &&
-                            this.selectedInstruments[
-                              multipleResult?.allocation?.parameter?.uuid
-                            ]
+                            this.selectedInstruments[order?.concept?.uuid]
                               ? {
                                   uuid: this.selectedInstruments[
                                     order?.concept?.uuid
