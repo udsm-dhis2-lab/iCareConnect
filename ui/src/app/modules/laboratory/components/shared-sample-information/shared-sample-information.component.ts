@@ -10,6 +10,6 @@ export class SharedSampleInformationComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    console.log("data", this.samplesData);
+    // console.log("data", this.samplesData);
   }
 }
