@@ -9,5 +9,7 @@ export class SharedSampleOrdersComponent implements OnInit {
   @Input() samplesData: any;
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // console.log(this.samplesData);
+  }
 }
