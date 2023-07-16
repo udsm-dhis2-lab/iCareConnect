@@ -33,7 +33,7 @@ export class IssuingComponent implements OnInit {
   selectedItems: any = {};
   errors: any[];
   page: number = 1;
-  pageSize: number = 50;
+  pageSize: number = 10;
   pageSizeOptions: number[] = [5, 10, 25, 50, 100];
   pager: any;
   statuses: string[] = ["", "PENDING", "CANCELLED", "REJECTED", "ISSUED"];
