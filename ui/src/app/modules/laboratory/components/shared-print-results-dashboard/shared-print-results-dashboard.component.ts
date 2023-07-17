@@ -138,6 +138,14 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
 
     const documentDefinition = {
       content: html,
+      styles: {
+        "html-p": {
+          fontSize: "9",
+        },
+        "html-td": {
+          fontSize: "9",
+        },
+      },
       footer: (page, pages) => {
         return {
           columns: [
@@ -164,6 +172,14 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
           ],
           margin: [10, 10, 10, 10],
         };
+      },
+    };
+    pdfMake.fonts = {
+      Roboto: {
+        normal: "Roboto-Regular.ttf",
+        bold: "Roboto-Medium.ttf",
+        italics: "Roboto-Italic.ttf",
+        bolditalics: "Roboto-MediumItalic.ttf",
       },
     };
     pdfMake.createPdf(documentDefinition).open();
