@@ -25,6 +25,7 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
   receptionDateAndTimeUuids$: Observable<any>;
   requestedByUuids$: Observable<any>;
   clinicalDataUuids$: Observable<any>;
+  testRelationshipConceptSourceUuid$: Observable<string>;
   errors: any[] = [];
   constructor(private systemSettingsService: SystemSettingsService) {}
 
@@ -118,6 +119,31 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
                     "Configuration lis.labreport.sampleInformation.clinicalData.concepts.uuids is missing, contact IT",
                   message:
                     "Configuration lis.labreport.sampleInformation.clinicalData.concepts.uuids is missing, contact IT",
+                },
+              },
+            ];
+            return response;
+          }
+        })
+      );
+
+    this.testRelationshipConceptSourceUuid$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        `iCare.lis.testParameterRelationship.conceptSourceUuid`
+      )
+      .pipe(
+        map((response) => {
+          if (response && !response?.error && response != "none") {
+            return response;
+          } else {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  error:
+                    "Configuration iCare.lis.testParameterRelationship.conceptSourceUuid is missing, contact IT",
+                  message:
+                    "Configuration iCare.lis.testParameterRelationship.conceptSourceUuid is missing, contact IT",
                 },
               },
             ];

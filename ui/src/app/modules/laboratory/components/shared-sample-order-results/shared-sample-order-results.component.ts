@@ -8,6 +8,7 @@ import { SampleAllocation } from "src/app/shared/resources/sample-allocations/mo
 })
 export class SharedSampleOrderResultsComponent implements OnInit {
   @Input() ordersWithResults: any;
+  @Input() testRelationshipConceptSourceUuid: string;
   constructor() {}
 
   ngOnInit(): void {
@@ -19,7 +20,11 @@ export class SharedSampleOrderResultsComponent implements OnInit {
             (testAllocation) => testAllocation?.results?.length > 0
           ) || []
         )?.map((testAllocation) => {
-          return new SampleAllocation(testAllocation).toJson();
+          return new SampleAllocation({
+            ...testAllocation,
+            testRelationshipConceptSourceUuid:
+              this.testRelationshipConceptSourceUuid,
+          }).toJson();
         }),
       };
     });
