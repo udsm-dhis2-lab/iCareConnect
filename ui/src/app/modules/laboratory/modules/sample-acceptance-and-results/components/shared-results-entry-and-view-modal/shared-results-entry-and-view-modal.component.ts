@@ -16,6 +16,7 @@ import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { MatRadioChange } from "@angular/material/radio";
 import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: "app-shared-results-entry-and-view-modal",
@@ -54,7 +55,8 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     private ordersService: OrdersService,
     private visitService: VisitsService,
     private store: Store<AppState>,
-    private sampleService: SamplesService
+    private sampleService: SamplesService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -330,7 +332,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                       .saveResultsViaAllocations(results)
                       .subscribe((response) => {
                         if (response) {
-                          this.saving = false;
                           if (
                             (
                               this.data?.sample?.statuses?.filter(
@@ -354,6 +355,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                               .subscribe((response) => {});
                           }
                           setTimeout(() => {
+                            this.saving = false;
                             this.getAllocations();
                           }, 100);
                         }
@@ -370,7 +372,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         .saveResultsViaAllocations(data)
         .subscribe((response) => {
           if (response) {
-            this.saving = false;
             let allocationAmendmentStatuses = [];
             if (alreadyApproved) {
               allocationAmendmentStatuses = response?.map((result) => {
@@ -415,11 +416,18 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               )?.length === 0
                 ? this.sampleService.saveSampleStatus(status)
                 : of(null)
-            ).subscribe((response) => {
-              setTimeout(() => {
-                this.getAllocations();
-              }, 100);
+            ).subscribe((response) => {});
+
+            this.snackBar.open(`Results saved successfully`, "OK", {
+              horizontalPosition: "center",
+              verticalPosition: "bottom",
+              duration: 3500,
+              panelClass: ["snack-color"],
             });
+            setTimeout(() => {
+              this.saving = false;
+              this.getAllocations();
+            }, 200);
           }
         });
     }
@@ -512,7 +520,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         .saveAllocationStatuses(this.allocationStatuses)
         .subscribe((response) => {
           if (response && !response?.error) {
-            this.saving = false;
             if (
               (
                 this.allocationStatuses?.filter(
@@ -558,10 +565,27 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                 .subscribe((response) => {});
             }
             setTimeout(() => {
+              this.saving = false;
+              this.snackBar.open(`Authorized successfully`, "OK", {
+                horizontalPosition: "center",
+                verticalPosition: "bottom",
+                duration: 3500,
+                panelClass: ["snack-color"],
+              });
               this.getAllocations();
             }, 100);
           } else {
             this.saving = false;
+            this.snackBar.open(
+              `There is an issue with authorization`,
+              "ERROR",
+              {
+                horizontalPosition: "center",
+                verticalPosition: "bottom",
+                duration: 3500,
+                panelClass: ["snack-color"],
+              }
+            );
             this.errors = [this.errors, response];
           }
         });
@@ -870,10 +894,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                       )
                     ).subscribe((response) => {
                       if (response) {
-                        this.saving = false;
-                        setTimeout(() => {
-                          this.getAllocations();
-                        }, 100);
                         if (
                           (
                             this.data?.sample?.statuses?.filter(
@@ -894,11 +914,38 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                           };
                           this.sampleService
                             .saveSampleStatus(status)
-                            .subscribe((response) => {});
+                            .subscribe((response) => {
+                              setTimeout(() => {
+                                this.snackBar.open(
+                                  `Results saved successfully`,
+                                  "OK",
+                                  {
+                                    horizontalPosition: "center",
+                                    verticalPosition: "bottom",
+                                    duration: 3500,
+                                    panelClass: ["snack-color"],
+                                  }
+                                );
+                                this.saving = false;
+                                this.getAllocations();
+                              }, 100);
+                            });
+                        } else {
+                          setTimeout(() => {
+                            this.snackBar.open(
+                              `Results saved successfully`,
+                              "OK",
+                              {
+                                horizontalPosition: "center",
+                                verticalPosition: "bottom",
+                                duration: 3500,
+                                panelClass: ["snack-color"],
+                              }
+                            );
+                            this.saving = false;
+                            this.getAllocations();
+                          }, 100);
                         }
-                        setTimeout(() => {
-                          this.getAllocations();
-                        }, 100);
                       }
                     });
                   }
@@ -911,8 +958,14 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         .saveResultsViaAllocations(this.relatedResults)
         .subscribe((response) => {
           if (response) {
-            this.saving = false;
             setTimeout(() => {
+              this.saving = false;
+              this.snackBar.open(`Results saved successfully`, "OK", {
+                horizontalPosition: "center",
+                verticalPosition: "bottom",
+                duration: 3500,
+                panelClass: ["snack-color"],
+              });
               this.getAllocations();
             }, 100);
           }
