@@ -1,6 +1,10 @@
 <ng-container *ngIf="{ visitDetails: visitDetails$ | async } as params">
   <!-- {{ params?.visitDetails?.obsKeyedByConcept | json }} -->
-  <table style="width: 100%" *ngIf="params?.visitDetails">
+  <table
+    style="width: 100%"
+    *ngIf="params?.visitDetails"
+    data-pdfmake="{'widths':[120,120,120,120]}"
+  >
     <tbody style="width: 100%">
       <tr style="width: 100%">
         <td
