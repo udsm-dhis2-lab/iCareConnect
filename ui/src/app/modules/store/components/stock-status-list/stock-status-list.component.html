@@ -2,7 +2,9 @@
   *ngIf="{
     stocksList: stocksList$ | async,
     currentItemStock: currentItemStock$ | async,
-    consumeLedgerUuid: consumeLedgerUuid$ | async
+    consumeLedgerUuid: consumeLedgerUuid$ | async,
+    facilityDetails: facilityDetails$ | async,
+    currentUser: currentUser$ | async
   } as params"
 >
   <app-shared-error
@@ -48,12 +50,12 @@
             *ngIf="!isCurrentLocationMainStore && !isCurrentLocationPharmacy"
           >
             <!-- <button
-            [disabled]="!userPrivileges['STORE_ADD_NEW_STOCKABLE_ITEM']"
-            class="button-round"
-            color="primary"
-            mat-stroked-button
-            (click)="onAddNewStockRecevied($event, ledgerTypes, currentLocation)"
-          > Receive New Item </button> -->
+                [disabled]="!userPrivileges['STORE_ADD_NEW_STOCKABLE_ITEM']"
+                class="button-round"
+                color="primary"
+                mat-stroked-button
+                (click)="onAddNewStockRecevied($event, ledgerTypes, currentLocation)"
+              > Receive New Item </button> -->
             <button
               [disabled]="
                 !params?.stocksList || params?.stocksList.length === 0
@@ -70,6 +72,25 @@
               "
             >
               Consume
+            </button>
+          </div>
+          <div class="float-right">
+            {{ currentUser | json }}
+            <button
+              [disabled]="params?.stocksList?.length === 0"
+              color="primary"
+              class="button-round ml-2"
+              mat-stroked-button
+              (click)="
+                onPrint(
+                  $event,
+                  params?.stocksList,
+                  params?.facilityDetails,
+                  params?.currentUser
+                )
+              "
+            >
+              Print Stock
             </button>
           </div>
         </div>
