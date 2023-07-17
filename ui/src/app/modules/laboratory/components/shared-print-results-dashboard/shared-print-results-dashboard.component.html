@@ -1,5 +1,39 @@
-<div class="w-100 p-2">
+<div
+  class="w-100 p-2"
+  *ngIf="{
+    collectionDateAndTimeUuids: collectionDateAndTimeUuids$ | async,
+    receptionDateAndTimeUuids: receptionDateAndTimeUuids$ | async,
+    requestedByUuids: requestedByUuids$ | async,
+    clinicalDataUuids: clinicalDataUuids$ | async
+  } as params"
+>
   <div
+    class="centered-container"
+    *ngIf="
+      !params?.collectionDateAndTimeUuids ||
+      !params?.receptionDateAndTimeUuids ||
+      !params?.requestedByUuids ||
+      !params?.clinicalDataUuids
+    "
+    style="margin: auto; width: 80px; padding: 10px"
+  >
+    <mat-spinner></mat-spinner>
+    <br />
+    <br />
+    Loading....
+  </div>
+  <app-shared-error
+    *ngIf="errors?.length > 0"
+    [errors]="errors"
+  ></app-shared-error>
+  <div
+    *ngIf="
+      params?.collectionDateAndTimeUuids &&
+      params?.receptionDateAndTimeUuids &&
+      params?.requestedByUuids &&
+      params?.clinicalDataUuids &&
+      errors?.length === 0
+    "
     style="
       width: 100%;
       text-align: center;
@@ -16,6 +50,10 @@
     >
       <app-shared-sample-information
         [samplesData]="department?.samples"
+        [collectionDateAndTimeUuids]="params?.collectionDateAndTimeUuids"
+        [receptionDateAndTimeUuids]="params?.receptionDateAndTimeUuids"
+        [requestedByUuids]="params?.requestedByUuids"
+        [clinicalDataUuids]="params?.clinicalDataUuids"
       ></app-shared-sample-information>
 
       <div style="margin-top: 8px; width: 100%">
