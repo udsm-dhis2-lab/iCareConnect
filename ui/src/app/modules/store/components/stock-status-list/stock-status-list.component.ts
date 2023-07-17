@@ -255,36 +255,18 @@ export class StockStatusListComponent implements OnInit {
       });
   }
 
-  // onPrint(e: Event, stock: any, status: string) {
-  //   let title: string;
-  //   if (!this.isStockOutPage && !this.status) {
-  //     title = "AVAILABLE STOCK";
-  //   } else if (this.isStockOutPage) {
-  //     title = "STOCKED OUT ITEMS";
-  //   } else if (this.status === "EXPIRED") {
-  //     title = "EXPIRED ITEMS";
-  //   } else if (this.status === "NEARLYSTOCKEDOUT") {
-  //     title = "NEARLY STOCKED OUT";
-  //   } else if (this.status === "NEARLYEXPIRED") {
-  //     title = "NEARLY EXPIRED";
-  //   }
-
-  //   console.log("The title is ", title);
-  //   console.log("The title is ", stock);
-  //   console.log("The title is ", this.currentLocation);
-  // }
   onPrint(e: Event, param: any, facilityDetails: any, currentUser: any) {
     let title: string;
     if (!this.isStockOutPage && !this.status) {
-      title = "AVAILABLE STOCK";
+      title = "Available Stock";
     } else if (this.isStockOutPage) {
-      title = "STOCKED OUT ITEMS";
+      title = "Stocked Out Items";
     } else if (this.status === "EXPIRED") {
-      title = "EXPIRED ITEMS";
+      title = "Expired Items";
     } else if (this.status === "NEARLYSTOCKEDOUT") {
-      title = "NEARLY STOCKED OUT";
+      title = "Neary Stocked Out Items";
     } else if (this.status === "NEARLYEXPIRED") {
-      title = "NEARLY EXPIRED";
+      title = "Neary Expired Items";
     }
 
     let contents: string;
