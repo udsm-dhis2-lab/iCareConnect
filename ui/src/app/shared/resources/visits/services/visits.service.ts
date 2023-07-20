@@ -87,6 +87,7 @@ export class VisitsService {
 
           return {
             ...encounter,
+            attributes: response?.attributes,
             keyedObs: keyBy(obs, "uuid"),
           };
         });

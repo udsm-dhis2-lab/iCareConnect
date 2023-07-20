@@ -7,7 +7,10 @@ import { SamplesToCollectComponent } from "./samples-to-collect/samples-to-colle
 import { SamplesToExportComponent } from "./samples-to-export/samples-to-export.component";
 import { SharedAssociatedFieldResultsEntryComponent } from "./shared-associated-field-results-entry/shared-associated-field-results-entry.component";
 import { SharedLabReportHeaderComponent } from "./shared-lab-report-header/shared-lab-report-header.component";
+import { SharedLocationDisplayComponent } from "./shared-location-display/shared-location-display.component";
 import { SharedPrintResultsDashboardComponent } from "./shared-print-results-dashboard/shared-print-results-dashboard.component";
+import { SharedRelatedResultParameterValueComponent } from "./shared-related-result-parameter-value/shared-related-result-parameter-value.component";
+import { SharedRelatedResultsComponent } from "./shared-related-results/shared-related-results.component";
 import { SharedSampleInformationComponent } from "./shared-sample-information/shared-sample-information.component";
 import { SharedSampleOrderResultsComponent } from "./shared-sample-order-results/shared-sample-order-results.component";
 import { SharedSampleOrdersComponent } from "./shared-sample-orders/shared-sample-orders.component";
@@ -30,4 +33,7 @@ export const labSharedComponents: any[] = [
   SharedSampleOrdersComponent,
   SharedSampleOrderResultsComponent,
   SharedSampleResultEntryAndAuthorizationComponent,
+  SharedLocationDisplayComponent,
+  SharedRelatedResultsComponent,
+  SharedRelatedResultParameterValueComponent,
 ];

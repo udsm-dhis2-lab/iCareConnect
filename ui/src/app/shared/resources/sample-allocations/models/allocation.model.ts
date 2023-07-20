@@ -33,6 +33,7 @@ export interface ResultObject {
   valueComplex: any;
   value?: any;
   status?: any;
+  groups?: any[];
 }
 
 export interface SampleAllocationObject {
@@ -57,6 +58,7 @@ export interface SampleAllocationObject {
   testRelationshipConceptSourceUuid?: string;
   isSetMember?: boolean;
   instrument?: any;
+  relatedTo?: any;
 }
 
 export class SampleAllocation {
@@ -345,6 +347,10 @@ export class SampleAllocation {
       : null;
   }
 
+  get testRelationshipConceptSourceUuid(): string {
+    return this.allocation?.testRelationshipConceptSourceUuid;
+  }
+
   toJson(): SampleAllocationObject {
     return {
       id: this.id,
@@ -361,6 +367,8 @@ export class SampleAllocation {
       finalResult: this.finalResult,
       isSetMember: this.isSetMember,
       instrument: this.instrument,
+      testRelationshipConceptSourceUuid: this.testRelationshipConceptSourceUuid,
+      relatedTo: this.parameter?.relatedTo,
     };
   }
 }
