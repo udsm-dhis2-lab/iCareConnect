@@ -290,6 +290,7 @@ export class StandardConceptCreationComponent implements OnInit {
           }, 200);
         }
       });
+      
   }
 
   onGetSelectedCodes(selectedCodes: any): void {
