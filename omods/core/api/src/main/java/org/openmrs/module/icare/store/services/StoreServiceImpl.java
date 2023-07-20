@@ -548,6 +548,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 					stockableItem.setLocation(Context.getLocationService().getLocationByUuid(locationUuid));
 					stockableItem.setSourceLocation(Context.getLocationService().getLocationByUuid(locationUuid));
 					stockableItem.setQuantity(quantityToDeduct);
+					stockableItem.setOrder(savedOrder);
 					TransactionUtil.deductStock(stockableItem);
 					totalQuantity -= quantityToDeduct;
 				}

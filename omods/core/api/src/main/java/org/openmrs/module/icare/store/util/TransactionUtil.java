@@ -92,6 +92,10 @@ public class TransactionUtil {
         transaction.setLocation(stockable.getLocation());
         transaction.setBatchNo(stockable.getBatchNo());
         transaction.setExpireDate(stockable.getExpiryDate());
+
+        if(stockable.getOrder() != null){
+            transaction.setOrder(stockable.getOrder());
+        }
         if(stockable.getSourceLocation() != null) {
             transaction.setSourceLocation(stockable.getSourceLocation());
         }
@@ -174,6 +178,9 @@ public class TransactionUtil {
                         if(stockable.getDestinationLocation() != null){
                             newTransaction.setDestinationLocation(stockable.getDestinationLocation());
                         }
+                        if(stockable.getOrder() != null){
+                            newTransaction.setOrder(stockable.getOrder());
+                        }
                         newTransaction.setBatchNo(stockList.get(i).getBatch());
                         newTransaction.setExpireDate(stockable.getExpiryDate());
                         newTransaction.setCurrentQuantity(0.0);
@@ -211,6 +218,10 @@ public class TransactionUtil {
                         }
                         if(stockable.getDestinationLocation() != null){
                             newTransaction.setDestinationLocation(stockable.getDestinationLocation());
+                        }
+
+                        if(stockable.getOrder() != null){
+                            newTransaction.setOrder(stockable.getOrder());
                         }
                         stockList.get(i).setQuantity(stockList.get(i).getQuantity() - stockNeed);
 

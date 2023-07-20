@@ -5268,6 +5268,13 @@
                 referencedTableName="users" referencedColumnNames="user_id" />
     </changeSet>
 
+    <changeSet id="update_st_transaction_add_order_column" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_transaction
+            ADD COLUMN order_id INT NULL AFTER transaction_id,
+            ADD FOREIGN KEY(order_id) REFERENCES orders(order_id);
+        </sql>
+    </changeSet>
 
 
 </databaseChangeLog>

@@ -21,7 +21,8 @@ export class ConceptSetMembersComponent implements OnInit {
   conceptsList$: Observable<ConceptGetFull[]>;
   @Output() selectedSetMembers: EventEmitter<ConceptGetFull[]> =
     new EventEmitter<ConceptGetFull[]>();
-  constructor(private conceptService: ConceptsService) {}
+  constructor(private conceptService: ConceptsService) {
+  }
 
   ngOnInit(): void {
     this.conceptsList$ = this.testMethodUuid
