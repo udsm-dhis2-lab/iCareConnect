@@ -1,6 +1,6 @@
 <table
   style="width: 100%; border: 0"
-  data-pdfmake="{'widths':[200,100,55,55,55]}"
+  data-pdfmake="{'widths':[200,157,38,37,37]}"
 >
   <tbody style="width: 100%">
     <ng-container *ngFor="let orderWithResults of ordersWithResults">
@@ -30,61 +30,124 @@
             </td>
           </tr>
           <ng-container *ngFor="let allocation of header?.allocations">
-            <tr
-              *ngIf="
-                allocation?.order?.concept?.uuid !== allocation?.parameter?.uuid
-              "
-            >
-              <td style="text-align: left">
-                {{ allocation?.parameter?.display }}
-              </td>
-              <td style="text-align: left">
-                <span *ngIf="!allocation?.finalResult?.groups">
-                  {{
-                    allocation?.finalResult?.valueCoded
-                      ? allocation?.finalResult?.valueCoded?.display
-                      : allocation?.finalResult?.valueDateTime
-                      ? allocation?.finalResult?.valueDateTime
-                      : allocation?.finalResult?.valueNumeric
-                      ? allocation?.finalResult?.valueNumeric
-                      : allocation?.finalResult?.valueText
-                      ? allocation?.finalResult?.valueText
-                      : ""
-                  }}
-                </span>
-                <span
-                  *ngIf="
-                    allocation?.finalResult?.groups &&
-                    allocation?.finalResult?.groups?.length > 0
-                  "
-                >
+            <ng-container *ngIf="!allocation?.relatedTo">
+              <tr
+                *ngIf="
+                  allocation?.order?.concept?.uuid !==
+                  allocation?.parameter?.uuid
+                "
+              >
+                <td style="text-align: left">
+                  {{ allocation?.parameter?.display }}
+                </td>
+                <td style="text-align: left">
+                  <span *ngIf="!allocation?.finalResult?.groups">
+                    {{
+                      allocation?.finalResult?.valueCoded
+                        ? allocation?.finalResult?.valueCoded?.display
+                        : allocation?.finalResult?.valueDateTime
+                        ? allocation?.finalResult?.valueDateTime
+                        : allocation?.finalResult?.valueNumeric
+                        ? allocation?.finalResult?.valueNumeric
+                        : allocation?.finalResult?.valueText
+                        ? allocation?.finalResult?.valueText
+                        : ""
+                    }}
+                  </span>
                   <span
-                    *ngFor="
-                      let result of allocation?.finalResult?.groups[
-                        allocation?.finalResult?.groups?.length - 1
-                      ]?.results
+                    *ngIf="
+                      allocation?.finalResult?.groups &&
+                      allocation?.finalResult?.groups?.length > 0
                     "
                   >
-                    {{
-                      result?.valueCoded
-                        ? result?.valueCoded?.display
-                        : result?.valueDateTime
-                        ? result?.valueDateTime
-                        : result?.valueNumeric
-                        ? result?.valueNumeric
-                        : result?.valueText
-                        ? result?.valueText
-                        : ""
-                    }},
+                    <table
+                      style="width: 100%"
+                      data-pdfmake="{'widths':[60,60,60]}"
+                    >
+                      <tr>
+                        <td
+                          style="border: 0"
+                          [ngStyle]="{
+                            width:
+                              100 /
+                                allocation?.finalResult?.groups[
+                                  allocation?.finalResult?.groups?.length - 1
+                                ]?.results?.length +
+                              '%'
+                          }"
+                          *ngFor="
+                            let result of allocation?.finalResult?.groups[
+                              allocation?.finalResult?.groups?.length - 1
+                            ]?.results
+                          "
+                        >
+                          {{
+                            result?.valueCoded
+                              ? result?.valueCoded?.display
+                              : result?.valueDateTime
+                              ? result?.valueDateTime
+                              : result?.valueNumeric
+                              ? result?.valueNumeric
+                              : result?.valueText
+                              ? result?.valueText
+                              : ""
+                          }}
+                        </td>
+                      </tr>
+                    </table>
                   </span>
-                </span>
-              </td>
-              <td style="text-align: left">
-                {{ allocation?.parameter?.units }}
-              </td>
-              <td style="text-align: left"></td>
-              <td style="text-align: left"></td>
-            </tr>
+                </td>
+                <td style="text-align: left">
+                  {{ allocation?.parameter?.units }}
+                </td>
+                <td style="text-align: left"></td>
+                <td style="text-align: left"></td>
+              </tr>
+            </ng-container>
+            <ng-container *ngIf="allocation?.relatedTo">
+              <tr
+                *ngIf="
+                  allocation?.order?.concept?.uuid !==
+                  allocation?.parameter?.uuid
+                "
+              >
+                <td style="text-align: left">
+                  <!-- {{ allocation | json }} -->
+                  {{ allocation?.parameter?.display }}
+                </td>
+                <td style="text-align: left">
+                  <span *ngIf="!allocation?.finalResult?.groups">
+                    {{
+                      allocation?.finalResult?.valueCoded
+                        ? allocation?.finalResult?.valueCoded?.display
+                        : allocation?.finalResult?.valueDateTime
+                        ? allocation?.finalResult?.valueDateTime
+                        : allocation?.finalResult?.valueNumeric
+                        ? allocation?.finalResult?.valueNumeric
+                        : allocation?.finalResult?.valueText
+                        ? allocation?.finalResult?.valueText
+                        : ""
+                    }}
+                  </span>
+                  <span
+                    *ngIf="
+                      allocation?.finalResult?.groups &&
+                      allocation?.finalResult?.groups?.length > 0
+                    "
+                  >
+                    <app-shared-related-results
+                      [allAllocations]="orderWithResults?.testAllocations"
+                      [allocation]="allocation"
+                    ></app-shared-related-results>
+                  </span>
+                </td>
+                <td style="text-align: left">
+                  {{ allocation?.parameter?.units }}
+                </td>
+                <td style="text-align: left"></td>
+                <td style="text-align: left"></td>
+              </tr>
+            </ng-container>
           </ng-container>
         </ng-container>
       </ng-container>

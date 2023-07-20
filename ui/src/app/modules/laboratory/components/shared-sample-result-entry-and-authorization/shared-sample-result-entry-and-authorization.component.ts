@@ -25,10 +25,10 @@ export class SharedSampleResultEntryAndAuthorizationComponent
           const formattedAllocation = new SampleAllocation(
             testAllocation
           ).toJson();
-          console.log(formattedAllocation);
+          // console.log(formattedAllocation);
           if (formattedAllocation?.instrument) {
             this.instrument = formattedAllocation?.instrument;
-            console.log(this.instrument);
+            // console.log(this.instrument);
           }
           return formattedAllocation;
         }),
