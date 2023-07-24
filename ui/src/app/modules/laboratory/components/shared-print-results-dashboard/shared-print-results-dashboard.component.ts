@@ -170,6 +170,10 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
         },
         "html-td": {
           fontSize: "9",
+          color: "#232323",
+        },
+        "html-th": {
+          fontSize: "9",
         },
       },
       footer: (page, pages) => {
@@ -183,12 +187,6 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
                 ":" +
                 this.formatDimeChars(new Date().getMinutes().toString())
               } `,
-            },
-            {
-              alignment: "center",
-              fontSize: 12,
-              marginTop: -24,
-              text: page === pages ? "....End of laboratory report...." : "",
             },
             {
               alignment: "right",

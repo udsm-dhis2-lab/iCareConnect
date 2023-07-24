@@ -25,9 +25,9 @@
             <td style="text-align: left; width: 10%">Ref. Ranges</td>
           </tr>
           <tr>
-            <td colspan="5" style="text-align: left; width: 50%">
+            <th colspan="5" style="text-align: left; background-color: #fff">
               {{ header?.display }}
-            </td>
+            </th>
           </tr>
           <ng-container *ngFor="let allocation of header?.allocations">
             <ng-container *ngIf="!allocation?.relatedTo">
