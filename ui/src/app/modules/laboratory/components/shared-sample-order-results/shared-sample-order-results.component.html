@@ -100,8 +100,28 @@
                 <td style="text-align: left">
                   {{ allocation?.parameter?.units }}
                 </td>
-                <td style="text-align: left"></td>
-                <td style="text-align: left"></td>
+                <td style="text-align: left; color: red">
+                  <span
+                    *ngIf="
+                      allocation?.finalResult?.valueNumeric &&
+                      allocation?.finalResult?.valueNumeric <
+                        allocation?.parameter?.lowNormal
+                    "
+                    >L</span
+                  >
+                  <span
+                    *ngIf="
+                      allocation?.finalResult?.valueNumeric &&
+                      allocation?.finalResult?.valueNumeric >
+                        allocation?.parameter?.highNormal
+                    "
+                    >H</span
+                  >
+                </td>
+                <td style="text-align: left">
+                  {{ allocation?.parameter?.lowNormal }} -
+                  {{ allocation?.parameter?.highNormal }}
+                </td>
               </tr>
             </ng-container>
             <ng-container *ngIf="allocation?.relatedTo">
@@ -144,8 +164,28 @@
                 <td style="text-align: left">
                   {{ allocation?.parameter?.units }}
                 </td>
-                <td style="text-align: left"></td>
-                <td style="text-align: left"></td>
+                <td style="text-align: left; color: red">
+                  <span
+                    *ngIf="
+                      allocation?.finalResult?.valueNumeric &&
+                      allocation?.finalResult?.valueNumeric <
+                        allocation?.parameter?.lowNormal
+                    "
+                    >L</span
+                  >
+                  <span
+                    *ngIf="
+                      allocation?.finalResult?.valueNumeric &&
+                      allocation?.finalResult?.valueNumeric >
+                        allocation?.parameter?.highNormal
+                    "
+                    >H</span
+                  >
+                </td>
+                <td style="text-align: left">
+                  {{ allocation?.parameter?.lowNormal }} -
+                  {{ allocation?.parameter?.highNormal }}
+                </td>
               </tr>
             </ng-container>
           </ng-container>
@@ -193,8 +233,28 @@
             <td style="text-align: left">
               {{ allocation?.parameter?.units }}
             </td>
-            <td style="text-align: left"></td>
-            <td style="text-align: left"></td>
+            <td style="text-align: left; color: red">
+              <span
+                *ngIf="
+                  allocation?.finalResult?.valueNumeric &&
+                  allocation?.finalResult?.valueNumeric <
+                    allocation?.parameter?.lowNormal
+                "
+                >L</span
+              >
+              <span
+                *ngIf="
+                  allocation?.finalResult?.valueNumeric &&
+                  allocation?.finalResult?.valueNumeric >
+                    allocation?.parameter?.highNormal
+                "
+                >H</span
+              >
+            </td>
+            <td style="text-align: left">
+              {{ allocation?.parameter?.lowNormal }} -
+              {{ allocation?.parameter?.highNormal }}
+            </td>
           </tr>
         </ng-container>
       </ng-container>
