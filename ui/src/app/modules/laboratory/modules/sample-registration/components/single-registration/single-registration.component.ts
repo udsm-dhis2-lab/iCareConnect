@@ -1300,341 +1300,6 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                             ];
                                                                         }
 
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "receivedOn"
-                                                                          ]
-                                                                            ?.value
-                                                                        ) {
-                                                                          const receivedOnStatus =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this.getTimestampFromDateAndTime(
-                                                                                  this
-                                                                                    .receivedOnDateLatestValue,
-                                                                                  this
-                                                                                    .receivedOnTime
-                                                                                ),
-                                                                              status:
-                                                                                "RECEIVED_ON",
-                                                                              category:
-                                                                                "RECEIVED_ON",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              receivedOnStatus,
-                                                                            ];
-                                                                        }
-
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "broughtOn"
-                                                                          ]
-                                                                            ?.value
-                                                                        ) {
-                                                                          const broughtOnStatus =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this.getTimestampFromDateAndTime(
-                                                                                  this
-                                                                                    .broughtOnDateLatestValue,
-                                                                                  this
-                                                                                    .broughtOnTime
-                                                                                ),
-                                                                              status:
-                                                                                "DELIVERED_ON",
-                                                                              category:
-                                                                                "DELIVERED_ON",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              broughtOnStatus,
-                                                                            ];
-                                                                        }
-
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "collectedOn"
-                                                                          ]
-                                                                            ?.value
-                                                                        ) {
-                                                                          const collectedOnStatus =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this.getTimestampFromDateAndTime(
-                                                                                  this
-                                                                                    .collectedOnDateLatestValue,
-                                                                                  this
-                                                                                    .collectedOnTime
-                                                                                ),
-                                                                              status:
-                                                                                "COLLECTED_ON",
-                                                                              category:
-                                                                                "COLLECTED_ON",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              collectedOnStatus,
-                                                                            ];
-                                                                        }
-
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "condition"
-                                                                          ]
-                                                                            ?.value
-                                                                        ) {
-                                                                          const receivedOnStatus =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this
-                                                                                  .formData[
-                                                                                  "condition"
-                                                                                ]
-                                                                                  ?.value,
-                                                                              category:
-                                                                                "CONDITION",
-                                                                              status:
-                                                                                this
-                                                                                  .formData[
-                                                                                  "condition"
-                                                                                ]
-                                                                                  ?.value,
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              receivedOnStatus,
-                                                                            ];
-                                                                        }
-
-                                                                        const receivedByStatus =
-                                                                          {
-                                                                            sample:
-                                                                              {
-                                                                                uuid: sampleResponse?.uuid,
-                                                                              },
-                                                                            user: {
-                                                                              uuid: this
-                                                                                .formData[
-                                                                                "receivedBy"
-                                                                              ]
-                                                                                ?.value
-                                                                                ? this
-                                                                                    .formData[
-                                                                                    "receivedBy"
-                                                                                  ]
-                                                                                    ?.value
-                                                                                : localStorage.getItem(
-                                                                                    "userUuid"
-                                                                                  ),
-                                                                            },
-                                                                            category:
-                                                                              "RECEIVED_BY",
-                                                                            remarks:
-                                                                              "RECEIVED_BY",
-                                                                            status:
-                                                                              "RECEIVED_BY",
-                                                                          };
-                                                                        statuses =
-                                                                          [
-                                                                            ...statuses,
-                                                                            receivedByStatus,
-                                                                          ];
-
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "collectedBy"
-                                                                          ]
-                                                                            ?.value
-                                                                        ) {
-                                                                          const collectedByStatus =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this
-                                                                                  .formData[
-                                                                                  "collectedBy"
-                                                                                ]
-                                                                                  ?.value ||
-                                                                                "NO COLLECTOR SPECIFIED",
-                                                                              status:
-                                                                                "COLLECTED_BY",
-                                                                              category:
-                                                                                "COLLECTED_BY",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              collectedByStatus,
-                                                                            ];
-                                                                        }
-
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "broughtBy"
-                                                                          ]
-                                                                            ?.value
-                                                                        ) {
-                                                                          const broughtdByStatus =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this
-                                                                                  .formData[
-                                                                                  "broughtBy"
-                                                                                ]
-                                                                                  ?.value ||
-                                                                                "NO PERSON SPECIFIED",
-                                                                              status:
-                                                                                "DELIVERED_BY",
-                                                                              category:
-                                                                                "DELIVERED_BY",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              broughtdByStatus,
-                                                                            ];
-                                                                        }
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "transportCondition"
-                                                                          ]
-                                                                            ?.value
-                                                                            .length >
-                                                                          0
-                                                                        ) {
-                                                                          const transportCondition =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this
-                                                                                  .formData[
-                                                                                  "transportCondition"
-                                                                                ]
-                                                                                  ?.value ||
-                                                                                "NO TRANSPORT CONDITION SPECIFIED",
-                                                                              category:
-                                                                                "TRANSPORT_CONDITION",
-                                                                              status:
-                                                                                "TRANSPORT_CONDITION",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              transportCondition,
-                                                                            ];
-                                                                        }
-                                                                        if (
-                                                                          this
-                                                                            .formData[
-                                                                            "transportationTemperature"
-                                                                          ]
-                                                                            ?.value
-                                                                            ?.length >
-                                                                          0
-                                                                        ) {
-                                                                          const transportationTemperature =
-                                                                            {
-                                                                              sample:
-                                                                                {
-                                                                                  uuid: sampleResponse?.uuid,
-                                                                                },
-                                                                              user: {
-                                                                                uuid: localStorage.getItem(
-                                                                                  "userUuid"
-                                                                                ),
-                                                                              },
-                                                                              remarks:
-                                                                                this
-                                                                                  .formData[
-                                                                                  "transportationTemperature"
-                                                                                ]
-                                                                                  ?.value ||
-                                                                                "NO TRANSPORTATION TEMPERATURE SPECIFIED",
-                                                                              category:
-                                                                                "TRANSPORT_TEMPERATURE",
-                                                                              status:
-                                                                                "TRANSPORT_TEMPERATURE",
-                                                                            };
-                                                                          statuses =
-                                                                            [
-                                                                              ...statuses,
-                                                                              transportationTemperature,
-                                                                            ];
-                                                                        }
-
                                                                         statuses =
                                                                           [
                                                                             ...statuses,
@@ -1680,11 +1345,6 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                             ];
                                                                         }
 
-                                                                        // console.log(
-                                                                        //   "statuses",
-                                                                        //   statuses
-                                                                        // );
-
                                                                         if (
                                                                           this
                                                                             .personDetailsData
@@ -1712,6 +1372,28 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                               },
                                                                             ];
                                                                         }
+
+                                                                        statuses =
+                                                                          [
+                                                                            ...statuses,
+                                                                            {
+                                                                              sample:
+                                                                                {
+                                                                                  uuid: sampleResponse?.uuid,
+                                                                                },
+                                                                              user: {
+                                                                                uuid: localStorage.getItem(
+                                                                                  "userUuid"
+                                                                                ),
+                                                                              },
+                                                                              remarks:
+                                                                                "Sample collection",
+                                                                              category:
+                                                                                "COLLECTED",
+                                                                              status:
+                                                                                "COLLECTED",
+                                                                            },
+                                                                          ];
 
                                                                         if (
                                                                           statuses?.length >
