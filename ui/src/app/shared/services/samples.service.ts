@@ -85,9 +85,9 @@ export class SamplesService {
       parameters = [...parameters, "specimen=" + specimenUuid];
     }
 
-    if (locationUuid) {
-      parameters = [...parameters, "location=" + locationUuid];
-    }
+    // if (locationUuid) {
+    //   parameters = [...parameters, "location=" + locationUuid];
+    // }
 
     if (excludeAllocations) {
       parameters = [...parameters, "excludeAllocations=true"];
