@@ -75,8 +75,18 @@
                       : encounter?.keyedObs[formField?.field?.concept?.uuid] &&
                         encounter?.keyedObs[formField?.field?.concept?.uuid]
                           ?.latest?.value?.display
-                      ? encounter?.keyedObs[formField?.field?.concept?.uuid]
-                          ?.latest?.value?.display
+                      ? formField?.field?.concept?.datatype?.display ===
+                          "Datetime" ||
+                        fieldConcept?.datatype?.display === "Date"
+                        ? (encounter?.keyedObs[formField?.field?.concept?.uuid]
+                            ?.latest?.value?.display | date: "medium")
+                        : encounter?.keyedObs[formField?.field?.concept?.uuid]
+                            ?.latest?.value?.display
+                      : formField?.field?.concept?.datatype?.display ===
+                          "Datetime" ||
+                        fieldConcept?.datatype?.display === "Date"
+                      ? (encounter?.keyedObs[formField?.field?.concept?.uuid]
+                          ?.latest?.value | date: "medium")
                       : encounter?.keyedObs[formField?.field?.concept?.uuid]
                           ?.latest?.value
                   }}
@@ -94,6 +104,7 @@
                   let fieldConcept of formField?.field?.concept?.setMembers
                 "
               >
+                <!-- {{ fieldConcept | json }} -->
                 <p>
                   {{ fieldConcept?.display }}:
                   <b>
@@ -103,8 +114,16 @@
                         : encounter?.keyedObs[fieldConcept?.uuid] &&
                           encounter?.keyedObs[fieldConcept?.uuid]?.latest?.value
                             ?.display
-                        ? encounter?.keyedObs[fieldConcept?.uuid]?.latest?.value
-                            ?.display
+                        ? fieldConcept?.datatype?.display === "Datetime" ||
+                          fieldConcept?.datatype?.display === "Date"
+                          ? (encounter?.keyedObs[fieldConcept?.uuid]?.latest
+                              ?.value?.display | date: "medium")
+                          : encounter?.keyedObs[fieldConcept?.uuid]?.latest
+                              ?.value?.display
+                        : fieldConcept?.datatype?.display === "Datetime" ||
+                          fieldConcept?.datatype?.display === "Date"
+                        ? (encounter?.keyedObs[fieldConcept?.uuid]?.latest
+                            ?.value | date: "medium")
                         : encounter?.keyedObs[fieldConcept?.uuid]?.latest?.value
                     }}
                   </b>
