@@ -36,7 +36,7 @@ export class ConsumeStockItemModalComponent implements OnInit {
         label: "Item",
         required: true,
         options: [],
-        locationUuid: "7f65d926-57d6-4402-ae10-a5b3bcbf7986",
+        locationUuid: this.data?.currentLocation?.uuid,
         searchControlType: "drugStock",
         shouldHaveLiveSearchForDropDownFields: true,
       });

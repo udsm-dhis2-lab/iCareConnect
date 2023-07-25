@@ -180,10 +180,7 @@ public class TransactionUtil {
 
 
                         if (stockList.get(i).getBatch().equals(stockable.getBatchNo())){
-                        System.out.println("stock item is enough");
 
-                        System.out.println("loop batch: " +stockList.get(i).getBatch());
-                        System.out.println("incoming batch: "+stockable.getBatchNo());
                         // deduction operations and transactions
                         Transaction newTransaction = new Transaction();
                         transactionList.add(newTransaction);
