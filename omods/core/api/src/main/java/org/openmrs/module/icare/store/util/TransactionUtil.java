@@ -105,17 +105,7 @@ public class TransactionUtil {
 
         StoreService storeService = Context.getService(StoreService.class);
 
-        System.out.println(stockable.getItem());
-        System.out.println(stockable.getBatchNo());
-        System.out.println(stockable.getExpiryDate());
-        System.out.println(stockable.getLocation());
-
-
         Stock stock = null;
-//        Stock stock = storeService.getStockByItemBatchLocation(stockable.getItem(), stockable.getBatchNo(),
-//                stockable.getExpiryDate(), stockable.getLocation());
-
-        System.out.println("testing");
         List<Transaction> transactionList = new ArrayList<>();
 
         List<Stock> stockList = storeService.getStockByItemLocation(stockable.getItem(), stockable.getLocation());
@@ -131,7 +121,6 @@ public class TransactionUtil {
         AdministrationService administrationService = Context.getAdministrationService();
         String allowNegativeStock = administrationService.getGlobalProperty(ICareConfig.ALLOW_NEGATIVE_STOCK);
 
-        System.out.println(stockListMap.toString());
 
         // check if stock to issue is more than total stock
         if (totalStock - stockable.getQuantity() < 0) {
@@ -157,15 +146,6 @@ public class TransactionUtil {
                     if (stockList.get(i).getQuantity() - stockNeed < 0 ) {
 
                         if(stockList.get(i).getBatch().equals(stockable.getBatchNo())){
-                          // System.out.println("batch: "+stockList.get(i).getBatch());
-
-
-
-                        System.out.println("stock item is not enough, deduct all");
-
-                        System.out.println("loop batch: " +stockList.get(i).getBatch());
-                        System.out.println("incoming batch: "+stockable.getBatchNo());
-
                         Transaction newTransaction = new Transaction();
 
                         // deduct to 0
@@ -235,12 +215,7 @@ public class TransactionUtil {
                     }
 
                 }
-                //else {
 
-                  //  transactionList.add(i, null);
-                    // do nothing on this batch stck has already been deducted
-
-                //}
 
             }
 
@@ -248,32 +223,6 @@ public class TransactionUtil {
         }
 
 
-//        if (stock == null) {
-//            transaction.setPreviousQuantity(0.0);
-//            stock = new Stock();
-//            stock.setQuantity(0.0);
-//            stock.setBatch(stockable.getBatchNo());
-//            stock.setExpiryDate(stockable.getExpiryDate());
-//            stock.setItem(stockable.getItem());
-//            stock.setLocation(stockable.getLocation());
-//        } else {
-//            transaction.setPreviousQuantity(stock.getQuantity());
-//        }
-//
-//        Double newQuantity = stock.getQuantity() - stockable.getQuantity();
-//
-//        System.out.println("the quantity : ");
-//        System.out.println(newQuantity);
-
-//        AdministrationService administrationService = Context.getAdministrationService();
-//        String allowNegativeStock = administrationService.getGlobalProperty(ICareConfig.ALLOW_NEGATIVE_STOCK);
-//        if (newQuantity < 0 && (allowNegativeStock == null || allowNegativeStock.equals("false"))) {
-//            throw new StockOutException("Negative Stock is not allowed");
-//        }
-//        transaction.setCurrentQuantity(newQuantity);
-//        stock.setQuantity(newQuantity);
-//        storeService.saveStock(stock);
-//        storeService.saveTransaction(transaction);
     }
 	
 	public static void operateOnStock(String operation, Stockable stockable) throws StockOutException {
