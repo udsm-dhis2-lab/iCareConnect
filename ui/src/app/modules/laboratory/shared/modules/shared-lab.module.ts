@@ -6,6 +6,7 @@ import { SharedModule } from "src/app/shared/shared.module";
 import { sharedModals } from "../../modals";
 import { FilterFieldsPipe } from "../../pipes/filter-fields.pipe";
 import { FilterAuthorizationStatusesPipe } from "../../pipes/filter-authorization-statuses.pipe";
+import { FilterAllocationsByNamePipe } from "../../pipes/filter-allocations-by-name.pipe";
 @NgModule({
   imports: [CommonModule, ...materialModules, SharedModule],
   exports: [
@@ -14,6 +15,7 @@ import { FilterAuthorizationStatusesPipe } from "../../pipes/filter-authorizatio
     ...sharedModals,
     FilterFieldsPipe,
     FilterAuthorizationStatusesPipe,
+    FilterAllocationsByNamePipe,
   ],
   entryComponents: [...sharedModals],
   declarations: [
@@ -21,6 +23,7 @@ import { FilterAuthorizationStatusesPipe } from "../../pipes/filter-authorizatio
     ...sharedModals,
     FilterFieldsPipe,
     FilterAuthorizationStatusesPipe,
+    FilterAllocationsByNamePipe,
   ],
   providers: [],
 })

@@ -506,7 +506,11 @@
                         class="text-muted test-order-description"
                       >
                         <em>
-                          Ordered By:
+                          {{
+                            data?.LISConfigurations?.isLIS
+                              ? "Registered By "
+                              : "Ordered By:"
+                          }}
                           <b>
                             {{ order?.orderer?.name }}
                           </b>
