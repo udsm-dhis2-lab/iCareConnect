@@ -38,6 +38,7 @@ import { PrintResultsModalComponent } from "../print-results-modal/print-results
 import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
 import { SharedResultsEntryAndViewModalComponent } from "../shared-results-entry-and-view-modal/shared-results-entry-and-view-modal.component";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { flatten } from "lodash";
 
 @Component({
   selector: "app-sample-acceptance",
@@ -110,7 +111,32 @@ export class SampleAcceptanceComponent implements OnInit {
 
   onGetDataToPrint(data: any): void {
     this.dataToPrint = data;
-    this.showPrintingPage = true;
+    const statuses = flatten(
+      data?.patientDetailsAndSamples?.departments?.map((department) => {
+        return department?.samples;
+      })
+    )?.map((sample) => {
+      return {
+        sample: {
+          uuid: sample?.uuid,
+        },
+        user: {
+          uuid: this.userUuid,
+        },
+        remarks: "Printed Results",
+        category: "PRINT",
+        status: "PRINTED",
+      };
+    });
+    this.saving = true;
+    this.sampleService
+      .setMultipleSamplesStatuses(statuses)
+      .subscribe((response) => {
+        if (response) {
+          this.showPrintingPage = true;
+          this.saving = false;
+        }
+      });
   }
 
   togglePrintAndList(event: Event): void {

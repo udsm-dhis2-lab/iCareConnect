@@ -25,7 +25,7 @@ export class SharedSampleInformationComponent implements OnInit {
       .getVisitEncounterDetailsByVisitUuid({
         uuid: this.samplesData[0]?.visit?.uuid,
         query: {
-          v: "custom:(uuid,visitType,attributes:(uuid,display,value,attributeType:(uuid,display)),startDatetime,encounters:(uuid,encounterDatetime,encounterType,form:(uuid,display,formFields:(uuid,fieldNumber,fieldPart,field:(uuid,display,concept:(uuid,display,setMembers:(uuid,display))))),location,obs,orders,diagnoses,encounterProviders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
+          v: "custom:(uuid,visitType,attributes:(uuid,display,value,attributeType:(uuid,display)),startDatetime,encounters:(uuid,encounterDatetime,encounterType,form:(uuid,display,formFields:(uuid,fieldNumber,fieldPart,field:(uuid,display,concept:(uuid,display,datatype,units,setMembers:(uuid,display,datatype,units))))),location,obs,orders,diagnoses,encounterProviders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
         },
       })
       .pipe(
