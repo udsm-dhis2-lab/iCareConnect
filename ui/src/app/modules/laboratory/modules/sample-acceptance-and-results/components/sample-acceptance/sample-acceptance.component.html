@@ -195,6 +195,7 @@
       <ng-template matTabContent>
         <div class="p-2">
           <app-samples-for-results-entry
+            *ngIf="!showPrintingPage"
             [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
             [labConfigs]="labConfigs"
             [datesParameters]="datesParameters"
@@ -207,7 +208,44 @@
             [labSamplesContainers]="labSamplesContainers"
             [userUuid]="userUuid"
             [viewType]="'entry'"
+            (dataToPrint)="onGetDataToPrint($event)"
           ></app-samples-for-results-entry>
+
+          <div class="w-100" *ngIf="showPrintingPage">
+            <div class="d-flex justify-content-left mb-2">
+              <button
+                class="ml-3"
+                mat-flat-button
+                color="primary"
+                (click)="togglePrintAndList($event)"
+                matTooltip="Back to list"
+              >
+                <mat-icon>arrow_back</mat-icon>
+                Back to List
+              </button>
+            </div>
+            <app-print-results-page
+              *ngIf="
+                sampleParams?.testRelationshipConceptSourceUuid &&
+                !LISConfigurations?.isLIS
+              "
+              [testRelationshipConceptSourceUuid]="
+                sampleParams?.testRelationshipConceptSourceUuid
+              "
+              [data]="dataToPrint"
+              (cancel)="onCancelFromResultsPage($event)"
+            ></app-print-results-page>
+            <app-shared-print-results-dashboard
+              *ngIf="
+                sampleParams?.testRelationshipConceptSourceUuid &&
+                LISConfigurations?.isLIS
+              "
+              [testRelationshipConceptSourceUuid]="
+                sampleParams?.testRelationshipConceptSourceUuid
+              "
+              [data]="dataToPrint"
+            ></app-shared-print-results-dashboard>
+          </div>
         </div>
       </ng-template>
     </mat-tab>
