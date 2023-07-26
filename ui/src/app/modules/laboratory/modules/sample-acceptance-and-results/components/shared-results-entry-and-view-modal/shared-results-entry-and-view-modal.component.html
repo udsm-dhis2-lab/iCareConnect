@@ -296,7 +296,7 @@
                               | filterAuthorizationStatuses: ''
                             )?.length === 0
                           "
-                          class="alert alert-warning"
+                          class="alert alert-warning mt-2"
                           role="alert"
                         >
                           You can not authorise results processed by you
@@ -366,7 +366,11 @@
                         class="text-muted test-order-description"
                       >
                         <em>
-                          Ordered By:
+                          {{
+                            data?.LISConfigurations?.isLIS
+                              ? "Registered By "
+                              : "Ordered By:"
+                          }}
                           <b>
                             {{ order?.orderer?.name }}
                           </b>
@@ -447,6 +451,11 @@
                               order?.finalResults?.length > 0
                             "
                             mat-flat-button
+                            [disabled]="
+                              data?.LISConfigurations?.isLIS &&
+                              order?.finalResultsFedBy?.uuid ===
+                                data?.currentUser?.uuid
+                            "
                             color="primary"
                             (click)="
                               onAuthorize(
