@@ -396,6 +396,17 @@ export class SamplesService {
     );
   }
 
+  setMultipleSamplesStatuses(statuses: any[]): Observable<any> {
+    return zip(
+      ...statuses.map((sampleStatus) =>
+        this.httpClientService.post("lab/samplestatus", sampleStatus)
+      )
+    ).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
+
   saveSampleStatus(data: any): Observable<any> {
     return this.httpClientService.post("lab/samplestatus", data).pipe(
       map((response) => response),

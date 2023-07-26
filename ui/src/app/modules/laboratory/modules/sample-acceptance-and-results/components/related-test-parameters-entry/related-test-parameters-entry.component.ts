@@ -18,6 +18,7 @@ export class RelatedTestParametersEntryComponent implements OnInit {
   @Output() data: EventEmitter<any> = new EventEmitter<any>();
   results: any = {};
   allocationsWithoutRelationShip: any[];
+  searchingText: string;
   constructor() {}
 
   ngOnInit(): void {

@@ -64,6 +64,9 @@
       (resultEntrySample)="
         onResultsEntryAndReview($event, params?.providerDetails, 'entry')
       "
+      (selectedSampleDetails)="
+        onGetSelectedSampleDetails($event, params?.providerDetails)
+      "
       [category]="'ACCEPTED'"
       [hasStatus]="hasStatus"
       [showLegend]="LISConfigurations?.isLIS ? false : true"
