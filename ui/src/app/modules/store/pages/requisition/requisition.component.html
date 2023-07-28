@@ -19,15 +19,13 @@
     <div class="d-flex justify-content-between">
       <div class="w-50">
         <div class="d-flex">
-          <mat-form-field class="w-75">
-            <input
-              autocomplete="off"
-              type="text"
-              matInput
-              placeholder="Search"
-              (keyup)="onSearchRequisition($event)"
-            />
-          </mat-form-field>
+          <div class="">
+            <app-invoice-filters
+              (searchingText)="onGetSearchingText($event)"
+              (definedEndDate)="onGetEndDate($event)"
+              (definedStartDate)="onGetStartDate($event)"
+            ></app-invoice-filters>
+          </div>
           <mat-form-field class="w-25 ml-2" appearance="fill">
             <mat-label>Filter </mat-label>
             <mat-select (selectionChange)="onSelectStatus($event)">

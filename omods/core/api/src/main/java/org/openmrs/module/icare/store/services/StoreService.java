@@ -39,10 +39,12 @@ public interface StoreService extends OpenmrsService {
 	public List<RequisitionStatus> getRequisitionStatuses();
 	
 	public ListResult<Requisition> getRequestsByRequestingLocation(String requestingLocationUuid, Pager pager,
-	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection);
+	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection, String q,
+	        Date start, Date end);
 	
 	public ListResult<Requisition> getRequestsForRequestedLocation(String requestedLocationUuid, Pager pager,
-	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection);
+	        RequisitionStatus.RequisitionStatusCode status, Requisition.OrderByDirection orderByDirection, String q,
+	        Date start, Date end);
 	
 	public Requisition getRequestByUuid(String requisitionUuid);
 	
