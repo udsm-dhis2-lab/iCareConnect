@@ -247,17 +247,27 @@ public class StoreController {
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
 	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
 	        @RequestParam(value = "status", required = false) RequisitionStatus.RequisitionStatusCode status,
-	        @RequestParam(value = "orderByDirection", required = false) Requisition.OrderByDirection orderByDirection)
-	        throws Exception {
+	        @RequestParam(value = "orderByDirection", required = false) Requisition.OrderByDirection orderByDirection,
+	        @RequestParam(required = false) String q, @RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate) throws Exception {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 		
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+		
 		if (requestedLocationUuid != null && requestingLocationUuid == null) {
 			ListResult<Requisition> requisitions = this.storeService.getRequestsForRequestedLocation(requestedLocationUuid,
-			    pager, status, orderByDirection);
+			    pager, status, orderByDirection, q, start, end);
 			
 			//			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
 			//
@@ -271,7 +281,7 @@ public class StoreController {
 		
 		if (requestingLocationUuid != null && requestedLocationUuid == null) {
 			ListResult<Requisition> requisitions = this.storeService.getRequestsByRequestingLocation(requestingLocationUuid,
-			    pager, status, orderByDirection);
+			    pager, status, orderByDirection, q, start, end);
 			
 			//			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
 			//

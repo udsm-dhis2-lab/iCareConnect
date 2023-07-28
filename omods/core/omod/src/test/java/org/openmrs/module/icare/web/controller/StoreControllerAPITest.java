@@ -210,7 +210,6 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> requestObject = ((List<Map<String, Object>>) requests.get("results"));
 		
-		System.out.println("=>=" + requestObject);
 		assertThat("Listing of requests has one request:", requestObject.size(), is(1));
 		
 		assertThat("The requested location id store A", ((Map) requestObject.get(0).get("requestedLocation")).get("display")
@@ -226,16 +225,20 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		    new Parameter("requestingLocationUuid", "44939999-d333-fff2-9bff-61d11117c22e"));
 		
 		MockHttpServletResponse handleGet2 = handle(newGetRequest2);
-		System.out.println("=> " + handleGet2.getContentAsString());
 		Map<String, Object> requests2 = (new ObjectMapper()).readValue(handleGet2.getContentAsString(), Map.class);
 		
 		List<Map<String, Object>> requestObject2 = ((List<Map<String, Object>>) requests2.get("results"));
-		System.out.println("==>|-> " + requestObject2);
 		
 		assertThat("The requesting location id store B", ((List) requestObject2.get(0).get("requisitionStatuses")).size(),
 		    is(1));
 		
-		System.out.println(requestObject2);
+		newGetRequest = newGetRequest("store/requests", new Parameter("requestingLocationUuid",
+		        "44939999-d333-fff2-9bff-61d11117c22e"), new Parameter("q", "RQ124"), new Parameter("startDate",
+		        "2022-12-30"), new Parameter("endDate", "2023-11-30"));
+		handleGet = handle(newGetRequest);
+		requests = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		List<Map<String, Object>> requestObject3 = ((List<Map<String, Object>>) requests.get("results"));
+		assertThat("Listing of requests has one request:", requestObject3.size(), is(1));
 		
 	}
 	
