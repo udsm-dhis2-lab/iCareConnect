@@ -25,7 +25,6 @@ export class InvoiceFiltersComponent implements OnInit {
       this.definedEndDate.emit(this.endDate);
     } else {
       this.startDate = event?.value;
-      console.log("startDate: ",this.startDate);
       this.definedStartDate.emit(this.startDate);
     }
   }

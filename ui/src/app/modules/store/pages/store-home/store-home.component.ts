@@ -14,6 +14,7 @@ import {
   getCurrentLocation,
   getMetrics,
   getSettingCurrentLocationStatus,
+  getIfCurrentLocationIsPharmacy,
 } from "src/app/store/selectors";
 import {
   getCurrentUserDetails,
@@ -30,6 +31,7 @@ export class StoreHomeComponent implements OnInit {
   currentStore$: Observable<any>;
   stockMetrics$: Observable<any>;
   settingCurrentLocationStatus$: Observable<boolean>;
+  isCurrentLocationPharmacy$: Observable<boolean>;
   currentStorePage: any;
   privileges$: Observable<any>;
   showStoreMetrics: boolean = false;
@@ -46,6 +48,9 @@ export class StoreHomeComponent implements OnInit {
     this.store.dispatch(loadLedgerTypes());
     this.store.dispatch(loadStockMetrics());
     this.currentStore$ = this.store.pipe(select(getCurrentLocation(false)));
+    this.isCurrentLocationPharmacy$ = this.store.pipe(
+      select(getIfCurrentLocationIsPharmacy)
+    );
     this.storePages = [
       {
         id: "stock",

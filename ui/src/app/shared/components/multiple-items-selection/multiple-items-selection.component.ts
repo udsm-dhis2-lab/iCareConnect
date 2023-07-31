@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output } from "@angular/core";
 import { uniqBy, orderBy } from "lodash";
 import { Observable, of } from "rxjs";
 import {
@@ -16,7 +16,7 @@ import { ConceptsService } from "../../resources/concepts/services/concepts.serv
   templateUrl: "./multiple-items-selection.component.html",
   styleUrls: ["./multiple-items-selection.component.scss"],
 })
-export class MultipleItemsSelectionComponent implements OnInit {
+export class MultipleItemsSelectionComponent implements OnInit, OnChanges {
   @Input() items: any[];
   @Input() selectedItems: any[];
   @Input() itemType: string;
@@ -100,6 +100,11 @@ export class MultipleItemsSelectionComponent implements OnInit {
       );
     }
   }
+
+ngOnChanges(): void {
+  this.currentSelectedItems =
+  this.selectedItems || [];
+}
 
   getSelectedItem(event: Event, item: any, items: any[]): void {
     event.stopPropagation();

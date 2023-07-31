@@ -63,7 +63,6 @@ public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
 		}
-		System.out.println(query.getQueryString());
 		
 		if (pager.isAllowed()) {
 			pager.setTotal(query.list().size());
