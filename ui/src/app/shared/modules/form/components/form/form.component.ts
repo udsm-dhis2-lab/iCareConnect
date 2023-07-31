@@ -83,6 +83,11 @@ export class FormComponent implements OnInit {
       );
 
       this.values = form.getRawValue();
+
+      this.validationIssues = validateFormFields(
+        this.formValidationRules,
+        this.values
+      );
     }
   }
 
