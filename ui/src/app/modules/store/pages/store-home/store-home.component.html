@@ -3,7 +3,8 @@
     settingCurrentLocationStatus: settingCurrentLocationStatus$ | async,
     currentStore: currentStore$ | async,
     privileges: privileges$ | async,
-    currentUser: currentUser$ | async
+    currentUser: currentUser$ | async,
+    isCurrentLocationPharmacy: isCurrentLocationPharmacy$ | async
   } as params"
   class="container-fluid"
 >
@@ -19,11 +20,11 @@
         <ng-container *ngFor="let storePage of storePages">
           <ng-container
             *ngIf="
-              (!params?.currentStore?.isMainStore &&
+             ( (!params?.currentStore?.isMainStore && params?.isCurrentLocationPharmacy &&
                 storePage?.id !== 'settings') ||
               (params?.currentStore?.isMainStore &&
                 storePage?.id !== 'requisition' &&
-                storePage?.id !== 'received' )
+                storePage?.id !== 'received' ) )|| (!params?.currentStore?.isMainStore && !params?.isCurrentLocationPharmacy && storePage?.id !== 'issuing' && storePage?.id !== 'settings') 
             "
           >
             <mat-list-item

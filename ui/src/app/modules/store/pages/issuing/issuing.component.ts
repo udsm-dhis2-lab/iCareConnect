@@ -40,6 +40,9 @@ export class IssuingComponent implements OnInit {
   selectedStatus: string;
   viewIssueItems: string;
   loadingIssues: boolean;
+  q: string;
+  startDate: Date;
+  endDate: Date;
 
   constructor(
     private store: Store<AppState>,
@@ -58,6 +61,21 @@ export class IssuingComponent implements OnInit {
     this.getAllIssuing();
     // this.loadingIssuingList$ = this.store.pipe(select(getIssuingLoadingState));
     this.stores$ = this.store.pipe(select(getStoreLocations));
+  }
+
+  onGetSearchingText(q: string): void {
+    this.q = q;
+    this.getAllIssuing();
+  }
+
+  onGetEndDate(endDate: Date): void {
+    this.endDate = endDate;
+    this.getAllIssuing();
+  }
+
+  onGetStartDate(startDate: Date): void {
+    this.startDate = startDate;
+    this.getAllIssuing();
   }
 
   onIssue(e: any, issue?: any, currentStore?: LocationGet): void {
@@ -124,7 +142,12 @@ export class IssuingComponent implements OnInit {
         this.page,
         this.pageSize,
         this.selectedStatus,
-        "DESC"
+        "DESC",
+        {
+         q: this.q,
+         startDate: this.startDate,
+         endDate: this.endDate,
+       }
       )
       ?.pipe(
         map((response) => {

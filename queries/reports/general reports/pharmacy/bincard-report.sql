@@ -88,5 +88,5 @@ LEFT JOIN person_name pn ON pn.person_id = ec.patient_id
 LEFT JOIN st_stock_invoice_item sii ON sii.batch_no = tr.batch_no AND sii.item_id = tr.item_id
 LEFT JOIN st_stock_invoice si ON si.stock_invoice_id = sii.stock_invoice_id
 LEFT JOIN st_supplier sup ON sup.supplier_id = si.supplier_id
-WHERE it.uuid= :itemUuid AND loc.uuid=:locationUuid  AND tr.date_created between :startDate AND :endDate
+WHERE it.uuid= :itemUuid AND loc.uuid=:locationUuid  AND CAST(CONVERT_TZ(tr.date_created,'Etc/GMT+3','GMT') AS DATE) between :startDate AND :endDate
 ORDER BY tr.date_created ASC;

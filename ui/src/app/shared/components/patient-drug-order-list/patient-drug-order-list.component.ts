@@ -131,7 +131,7 @@ export class PatientDrugOrderListComponent implements OnInit {
               body {
                 padding: 30px;
                 margin: 0 auto;
-                width: 100mm;
+                width: 150mm;
               }
 
               #top .logo img{
@@ -268,6 +268,7 @@ export class PatientDrugOrderListComponent implements OnInit {
           <tr>
             <th>Drug</th>
             <th>Instructions</th>
+            <th>Quantity</th>
             <th>Prescription Date</th>
           </tr>
         </thead>
@@ -278,6 +279,7 @@ export class PatientDrugOrderListComponent implements OnInit {
               <tr>
                 <td>${order?.drug?.display}</td> 
                 <td>${order?.instructions || "No instructions"}</td>  
+                <td>${order?.quantity}</td>
                 <td>${formatDateToString(
                   new Date(order?.dateActivated),
                   "DD-MM-YYYY"

@@ -32,7 +32,7 @@ export class StockService {
   ): Observable<any | StockObject[]> {
     let queryParams = [];
 
-      if(page) {
+      if(page && !params?.q) {
         queryParams = [...queryParams, `page=${page}`]
       }
       if(pageSize) {
@@ -43,6 +43,9 @@ export class StockService {
       }
       if(params?.q) {
         queryParams = [...queryParams, `q=${params?.q}`]
+      }
+      if(params?.q) {
+        queryParams = [...queryParams, `page=1`]
       }
     const args = `?${queryParams.join("&")}` ;
 

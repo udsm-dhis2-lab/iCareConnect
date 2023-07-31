@@ -43,7 +43,7 @@ export class StockStatusListComponent implements OnInit {
   suppliers$: Observable<any>;
   unitsOfMeasurementSettings$: Observable<any>;
   unitsOfMeasurement$: Observable<any>;
-  pageSize: number = 10;
+  pageSize: number = 15;
   page: number = 1;
   pager: number;
   pageSizeOptions: number[] = [5, 10, 15, 25, 50];
@@ -235,6 +235,7 @@ export class StockStatusListComponent implements OnInit {
     ledgerTypes: any[],
     currentLocation: any
   ): void {
+    console.log("===>",this.currentLocation)
     this.dialog
       .open(ConsumeStockItemModalComponent, {
         minWidth: "40%",

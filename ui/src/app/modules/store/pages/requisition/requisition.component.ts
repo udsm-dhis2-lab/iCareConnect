@@ -53,6 +53,10 @@ export class RequisitionComponent implements OnInit {
   viewRequisitionItems: string;
   selectedItems: any = {};
   existingRequisition: any;
+  q: string;
+  startDate: Date;
+  endDate: Date;
+
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -89,6 +93,21 @@ export class RequisitionComponent implements OnInit {
     this.stockableItems$ = this.store.pipe(select(getAllStockableItems));
   }
 
+  onGetSearchingText(q: string): void {
+    this.q = q;
+    this.getAllRequisitions();
+  }
+
+  onGetEndDate(endDate: Date): void {
+    this.endDate = endDate;
+    this.getAllRequisitions();
+  }
+
+  onGetStartDate(startDate: Date): void {
+    this.startDate = startDate;
+    this.getAllRequisitions();
+  }
+
   getAllRequisitions(event?: any): void {
     this.loadedRequisitions = false;
     this.searchTerm = event ? event?.target?.value : "";
@@ -98,7 +117,12 @@ export class RequisitionComponent implements OnInit {
         this.page,
         this.pageSize,
         this.selectedStatus,
-        "DESC"
+        "DESC",
+         {
+          q: this.q,
+          startDate: this.startDate,
+          endDate: this.endDate,
+        }
       )
       .pipe(
         map((requisitions) => {

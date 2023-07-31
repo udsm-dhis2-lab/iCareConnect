@@ -174,6 +174,8 @@ export class SampleAllocationService {
             finalResults: finalResults,
             finalResultsFedBy: finalResultsFedBy?.uuid
               ? finalResultsFedBy
+              : finalResults && finalResults?.length > 0
+              ? finalResults[0]?.creator
               : null,
             allocations: groupedAllocations[key]?.map((allocation) => {
               return new SampleAllocation(allocation).toJson();
