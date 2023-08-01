@@ -26,6 +26,8 @@ export class SamplesService {
     category?: string,
     hasStatus?: string,
     excludeAllocations?: boolean,
+    tabType?:string,
+    excludedSampleCategories?: string[],
     pagerInfo?: any,
     otherParams?: {
       departments: any[];
@@ -63,6 +65,11 @@ export class SamplesService {
 
     if (acceptedBy) {
       parameters = [...parameters, "acceptedBy=" + acceptedBy];
+    }
+
+    if(excludedSampleCategories && tabType === 'result-entry'){
+      excludedSampleCategories = ['RESULT_AUTHORIZATION'];
+      parameters = [...parameters,"excludeStatus=" +excludedSampleCategories]
     }
 
     if (q) {

@@ -217,6 +217,8 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       category,
       params?.hasStatus,
       this.excludeAllocations,
+      this.tabType?this.tabType : null,
+      this.excludedSampleCategories?this.excludedSampleCategories: null,
       {
         pageSize: params?.pageSize,
         page: params?.page,
