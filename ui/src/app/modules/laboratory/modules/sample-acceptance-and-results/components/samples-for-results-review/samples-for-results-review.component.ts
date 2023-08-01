@@ -36,6 +36,7 @@ export class SamplesForResultsReviewComponent implements OnInit {
   selectedDepartment: string;
   searchingText: string;
   excludeAllocations: boolean = true;
+  excludedSampleCategories : string[] = ['RESULT_AUTHORIZATION'];
 
   page: number = 1;
   pageCount: number = 100;
@@ -68,6 +69,8 @@ export class SamplesForResultsReviewComponent implements OnInit {
         "ACCEPTED",
         "YES",
         this.excludeAllocations,
+        this.tabType,
+        this.excludedSampleCategories,
         null,
         {
           departments: this.labSamplesDepartments,

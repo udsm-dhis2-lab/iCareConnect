@@ -228,7 +228,8 @@ public class LaboratoryController {
 	        @RequestParam(value = "department", required = false) String departmentUuid,
 	        @RequestParam(value = "specimen", required = false) String specimenSourceUuid,
 	        @RequestParam(value = "instrument", required = false) String instrumentUuid,
-	        @RequestParam(value = "visit", required = false) String visitUuid) throws Exception {
+	        @RequestParam(value = "visit", required = false) String visitUuid,
+	        @RequestParam(value = "excludeStatus", required = false) String excludeStatus) throws Exception {
 		
 		Date start = null;
 		Date end = null;
@@ -247,13 +248,13 @@ public class LaboratoryController {
 		if (!excludeAllocations) {
 			ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
 			    testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid,
-			    instrumentUuid, visitUuid);
+			    instrumentUuid, visitUuid, excludeStatus);
 			return sampleResults.toMap();
 		}
 		if (excludeAllocations) {
 			ListResult<SampleExt> sampleResults = laboratoryService.getSamplesWithoutAllocations(start, end, pager,
 			    locationUuid, sampleCategory, testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid,
-			    specimenSourceUuid, instrumentUuid, visitUuid);
+			    specimenSourceUuid, instrumentUuid, visitUuid, excludeStatus);
 			return sampleResults.toMap();
 		}
 		

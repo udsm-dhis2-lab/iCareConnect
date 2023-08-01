@@ -487,6 +487,11 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Should return a sample", ((List) sampleResults.get("results")).size() == 1);
 		assertThat("Should return a sample", ((List) sampleResults2.get("results")).size() == 1);
 		
+		newGetRequest = newGetRequest("lab/samples", new Parameter("excludeStatus", "RECEIVED"));
+		handleGet = handle(newGetRequest);
+		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		System.out.println("aa: " + handleGet.getContentAsString());
+		
 	}
 	
 	@Test

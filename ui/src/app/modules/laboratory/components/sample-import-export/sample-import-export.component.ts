@@ -745,6 +745,8 @@ export class SampleImportExportComponent implements OnInit {
         null,
         null,
         true,
+        null,
+        null,
         {
           pageSize: 3,
           page: 1,

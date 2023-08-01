@@ -10,9 +10,9 @@ import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.laboratory.models.*;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Home object for domain model class LbSample.
@@ -72,8 +72,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
-	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
-	        String testConceptUuid, String departmentUuid, String specimenSourceUuid, String instrumentUuid, String visitUuid) {
+										 String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
+										 String testConceptUuid, String departmentUuid, String specimenSourceUuid, String instrumentUuid, String visitUuid, String excludeStatus) {
 		
 		DbSession session = this.getSession();
 		
@@ -245,6 +245,18 @@ public class SampleDAO extends BaseDAO<Sample> {
 			queryStr += "sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
 			
 		}
+
+		if(excludeStatus != null){
+
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+
+			queryStr += "sp NOT IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
+
+		}
 		
 		queryStr += " ORDER BY sp.dateCreated DESC";
 		//		if (sampleCategory != null) {
@@ -298,6 +310,21 @@ public class SampleDAO extends BaseDAO<Sample> {
 		}
 		if (visitUuid != null) {
 			query.setParameter("visitUuid", visitUuid);
+		}
+
+		if(excludeStatus != null){
+			Pattern pattern = Pattern.compile("List:\\[(.*?)\\]");
+			Matcher matcher = pattern.matcher(excludeStatus);
+			String excludedValue;
+			if(matcher.find()){
+				excludedValue = matcher.group(1);
+			}else{
+				excludedValue = excludeStatus;
+			}
+
+			String[] valuesArray = excludedValue.split(",");
+			List<String> valueList = new ArrayList<>(Arrays.asList(valuesArray));
+			query.setParameterList("statuses",valueList);
 		}
 		
 		if (pager.isAllowed()) {
@@ -437,9 +464,9 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager,
-	        String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
-	        String acceptedByUuid, String testConceptUuid, String departmentUuid, String specimenSourceUuid,
-	        String instrumentUuid, String visitUuid) {
+															  String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
+															  String acceptedByUuid, String testConceptUuid, String departmentUuid, String specimenSourceUuid,
+															  String instrumentUuid, String visitUuid, String excludeStatus) {
 		
 		DbSession session = this.getSession();
 		
@@ -615,6 +642,18 @@ public class SampleDAO extends BaseDAO<Sample> {
 			queryStr += "sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
 			
 		}
+
+		if(excludeStatus != null){
+
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+
+			queryStr += "sp NOT IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
+
+		}
 		
 		queryStr += " ORDER BY sp.dateCreated DESC";
 		//		if (sampleCategory != null) {
@@ -665,6 +704,21 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		if (visitUuid != null) {
 			query.setParameter("visitUuid", visitUuid);
+		}
+
+		if(excludeStatus != null){
+			Pattern pattern = Pattern.compile("List:\\[(.*?)\\]");
+			Matcher matcher = pattern.matcher(excludeStatus);
+			String excludedValue;
+			if(matcher.find()){
+				excludedValue = matcher.group(1);
+			}else{
+				excludedValue = excludeStatus;
+			}
+
+			String[] valuesArray = excludedValue.split(",");
+			List<String> valueList = new ArrayList<>(Arrays.asList(valuesArray));
+			query.setParameterList("statuses",valueList);
 		}
 		
 		if (pager.isAllowed()) {

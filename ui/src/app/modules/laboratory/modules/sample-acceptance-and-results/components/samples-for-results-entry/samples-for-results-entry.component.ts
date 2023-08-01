@@ -45,6 +45,8 @@ export class SamplesForResultsEntryComponent implements OnInit {
   samplesToViewMoreDetails: any = {};
   saving: boolean = false;
   selectedResultEntryCategory: string = "Normal";
+  excludedSampleCategories : string[] = ['HAS_RESULTS'];
+  tabType : string = "result-entry";
 
   dataForPrinting: any;
   @Output() dataToPrint: EventEmitter<any> = new EventEmitter<any>();
@@ -69,6 +71,8 @@ export class SamplesForResultsEntryComponent implements OnInit {
         "ACCEPTED",
         "YES",
         this.excludeAllocations,
+        this.tabType,
+        this.excludedSampleCategories,
         null,
         {
           departments: this.labSamplesDepartments,
