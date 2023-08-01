@@ -391,4 +391,10 @@ export class NewRequisitionFormComponent implements OnInit {
   onGetQuantity(quantity: number): void {
     this.quantity = quantity;
   }
+
+  onRestartProcess(restart?: boolean): void {
+    if (restart) {
+      this.requisition = undefined;
+    }
+  }
 }
