@@ -194,6 +194,8 @@ export class SamplesToExportComponent implements OnInit {
           params?.category,
           params?.hasStatus,
           this.excludeAllocations,
+          null,
+          null,
           {
             pageSize: params?.pageSize,
             page: params?.page,

@@ -187,9 +187,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String location, String sampleCategory,
 	        String testCategory, String q, String hasStatus, String acceptedByUuid, String testConceptUuid,
-	        String departmentUuid, String specimenSourceUuid, String instrumentUuid, String visitUuid) {
+	        String departmentUuid, String specimenSourceUuid, String instrumentUuid, String visitUuid, String excludeStatus) {
 		return this.sampleDAO.getSamples(startDate, endDate, pager, location, sampleCategory, testCategory, q, hasStatus,
-		    acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid, instrumentUuid, visitUuid);
+		    acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid, instrumentUuid, visitUuid, excludeStatus);
 	}
 	
 	@Override
@@ -1103,9 +1103,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager, String location,
 	        String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
-	        String testConceptUuid, String departmentUuid, String specimenSourceUuid, String instrumentUuid, String visitUuid) {
+	        String testConceptUuid, String departmentUuid, String specimenSourceUuid, String instrumentUuid,
+	        String visitUuid, String excludeStatus) {
 		return sampleDAO.getSamplesWithoutAllocations(startDate, endDate, pager, location, sampleCategory, testCategory, q,
-		    hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid, instrumentUuid, visitUuid);
+		    hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid, instrumentUuid, visitUuid,
+		    excludeStatus);
 	}
 	
 	@Override
