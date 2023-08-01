@@ -388,7 +388,7 @@ public class ICareDao extends BaseDAO<Item> {
 
 			if(exclude != null){
 
-				queryStr = queryStr.substring(0,queryStr.length()-1);
+//				queryStr = queryStr.substring(0,queryStr.length()-1);
 
 				queryStr += " AND sp NOT IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
 
