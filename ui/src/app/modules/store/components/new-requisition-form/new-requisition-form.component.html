@@ -43,6 +43,8 @@
             <div class="container-fluid">
               <app-requisition-items
                 [requisition]="requisition"
+                [isNew]="true"
+                (restartProcess)="onRestartProcess($event)"
               ></app-requisition-items>
             </div>
           </div>

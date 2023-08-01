@@ -10,6 +10,18 @@
         mode="indeterminate"
         *ngIf="!params?.specificRequisition"
       ></mat-progress-bar>
+      <!-- Actions needed -->
+      <div class="w-100 d-flex justify-content-end" *ngIf="isNew">
+        <a
+          class="anchor-button ml-4"
+          style="cursor: pointer"
+          color="primary"
+          matTooltip="Send this requisition"
+          (click)="onSendRequisition($event, params?.specificRequisition)"
+        >
+          <mat-icon>send</mat-icon>
+        </a>
+      </div>
       <table
         class="table table-hover table-striped"
         *ngIf="
