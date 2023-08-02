@@ -213,7 +213,7 @@
                       [drugOrder]="data?.drugOrder"
                       [patient]="data?.patient"
                       [locations]="params?.dispensingLocations"
-                      [fromDispensing]="data.fromDispensing"
+                      [fromDispensing]="data?.fromDispensing"
                       [showAddButton]="false"
                       [hideActionButtons]="true"
                       [encounterUuid]="data?.encounterUuid"
@@ -246,7 +246,11 @@
                       <button
                         class="float-right"
                         (click)="
-                          onUpdateOrder($event, params?.specificDrugConceptUuid)
+                          onUpdateOrder(
+                            $event,
+                            params?.specificDrugConceptUuid,
+                            params?.currentVisit?.isEnsured
+                          )
                         "
                         mat-flat-button
                         [color]="savingError ? 'warn' : 'primary'"
@@ -254,7 +258,7 @@
                           !params?.specificDrugConceptUuid ||
                           savingOrder ||
                           countOfDispensingFormFieldsWithValues < 3 ||
-                          !drugOrder.quantity
+                          !drugOrder?.quantity
                         "
                       >
                         <mat-icon *ngIf="savingError" class="mr-2"

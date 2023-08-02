@@ -557,10 +557,10 @@ export class VisitComponent implements OnInit {
           modalTitle:
             key === "close" ? `Close This Visit` : "Delete this Visit",
           modalMessage: `Are you sure you want to ${
-            key === "close" ? "close" : "delete"
+            key === "close" ? "Close" : "delete"
           } this visit?`,
           showRemarksInput: false,
-          confirmationButtonText: key === "close" ? "Close" : "Delete",
+          confirmationButtonText: key === "close" ? "Yes" : "Delete",
           remarksFieldLabel: "Reason",
         },
       })

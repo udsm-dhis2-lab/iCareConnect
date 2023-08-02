@@ -29,6 +29,7 @@ import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.store.models.OrderStatus;
+import org.openmrs.module.icare.store.services.StoreService;
 import org.openmrs.validator.ValidateUtil;
 
 import javax.activation.DataHandler;
@@ -212,7 +213,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public Prescription savePrescription(Prescription prescription) {
+	public Prescription savePrescription(Prescription prescription, String status, String remarks) {
 		if (prescription.getUuid() != null) {
 			Prescription existingPrescription = (Prescription) Context.getOrderService().getOrderByUuid(
 			    prescription.getUuid());
@@ -226,10 +227,18 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 					}
 				}
 				existingPrescription.updatePrescription(prescription);
+				existingPrescription.setQuantity(prescription.getQuantity());
 				
-				dao.updatePrescription(prescription);
-				prescription = existingPrescription;
+				//				dao.updatePrescription(prescription);
+				prescription = (Prescription) Context.getOrderService().saveOrder(existingPrescription, null);
+				//				prescription = existingPrescription;
 			}
+		}
+		
+		if (prescription.getPreviousOrder() != null) {
+			Prescription previousOrder = (Prescription) Context.getOrderService().getOrderByUuid(
+			    prescription.getPreviousOrder().getUuid());
+			prescription.updatePrescription(previousOrder);
 		}
 		AdministrationService administrationService = Context.getAdministrationService();
 		administrationService.setGlobalProperty("validation.disable", "true");
@@ -237,6 +246,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		ValidateUtil.setDisableValidation(true);
 		System.out.println("Validation:" + ValidateUtil.getDisableValidation());
 		prescription = (Prescription) Context.getOrderService().saveOrder(prescription, null);
+		// Set respective status
+		if (status != null) {
+			OrderStatus orderStatus = Context.getService(StoreService.class).setDrugOrderStatus(prescription.getUuid(),
+			    status, remarks);
+		}
 		administrationService.setGlobalProperty("validation.disable", "false");
 		return prescription;
 	}
