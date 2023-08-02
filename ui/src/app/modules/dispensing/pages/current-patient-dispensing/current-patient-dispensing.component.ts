@@ -30,6 +30,7 @@ import {
   getVisitLoadingState,
 } from "src/app/store/selectors/visit.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
   selector: "app-current-patient-dispensing",
@@ -53,6 +54,7 @@ export class CurrentPatientDispensingComponent implements OnInit {
   genericPrescriptionOrderType$: Observable<any>;
   useGenericPrescription$: Observable<any>;
   errors: any[] = [];
+  provider$: Observable<any>;
   constructor(
     private route: ActivatedRoute,
     private systemSettingsService: SystemSettingsService,
@@ -70,6 +72,7 @@ export class CurrentPatientDispensingComponent implements OnInit {
     this.currentVisitLoadedState$ = this.store.select(getVisitLoadedState);
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
     this.currentPatient$ = this.store.select(getCurrentPatient);
+    this.provider$ = this.store.select(getProviderDetails);
     this.generalMetadataConfigurations$ = this.systemSettingsService
       .getSystemSettingsByKey("iCare.GeneralMetadata.Configurations")
       .pipe(
@@ -204,9 +207,13 @@ export class CurrentPatientDispensingComponent implements OnInit {
               "uuid"
             ],
           };
-          this.response$ = this.drugOrderService.dispenseOrderedDrugOrder(
-            drugOrderDispenseDetails
-          );
+
+          const drugOrder = (data as DrugOrder).toJson();
+          console.log("DRUG Order", drugOrder);
+          // this.response$ = this.drugOrderService.dispenseOrderedDrugOrder(
+          //   drugOrderDispenseDetails,
+          //   drugOrder
+          // );
 
           // this.store.dispatch(
           //   loadActiveVisit({

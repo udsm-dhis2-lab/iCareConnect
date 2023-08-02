@@ -137,15 +137,22 @@ export class DrugOrdersService {
     );
   }
 
-  dispenseOrderedDrugOrder(dispenseDetails): Observable<any> {
-    return this.openmrsService
-      .post(`store/drugOrder/${dispenseDetails?.uuid}/dispense`, {
-        location: dispenseDetails?.location,
-      })
-      .pipe(
-        map((response) => response),
-        catchError((error) => of(error))
-      );
+  dispenseOrderedDrugOrder(
+    dispenseDetails: any,
+    drugOrder?: DrugOrderObject
+  ): Observable<any> {
+    return zip(
+      this.openmrsService.post(
+        `store/drugOrder/${dispenseDetails?.uuid}/dispense`,
+        {
+          location: dispenseDetails?.location,
+        }
+      ),
+      this.openmrsService.post(`order`, drugOrder)
+    ).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
   }
 
   saveDrugOrder(
@@ -155,6 +162,8 @@ export class DrugOrdersService {
     location?: string,
     provider?: string
   ): Observable<any> {
+    console.log(order);
+    // return of(null);
     return this.openmrsService.post("icare/prescription", order);
     return this.getDrugOrderEncounter(
       {
