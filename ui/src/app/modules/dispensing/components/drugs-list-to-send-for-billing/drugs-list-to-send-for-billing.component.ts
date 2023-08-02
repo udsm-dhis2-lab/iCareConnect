@@ -111,6 +111,7 @@ export class DrugsListToSendForBillingComponent implements OnInit {
           uuid: order?.drug?.concept?.uuid,
         },
         action: order?.action || "REVISE",
+        instructions: order?.instructions,
         urgency: "ROUTINE",
         location: localStorage.getItem("currentLocation")
           ? JSON.parse(localStorage.getItem("currentLocation"))["uuid"]
