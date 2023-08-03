@@ -121,6 +121,7 @@ import { SharedSamplesListComponent } from "./shared-samples-list/shared-samples
 import { SharedReportsListComponent } from "./shared-reports-list/shared-reports-list.component";
 import { SharedCustomReportComponent } from "./shared-custom-report/shared-custom-report.component";
 import { SharedRenderReportDashboardComponent } from "./shared-render-report-dashboard/shared-render-report-dashboard.component";
+import { SharedDrugDosageInterpretationComponent } from "./shared-drug-dosage-interpretation/shared-drug-dosage-interpretation.component";
 export const components: any[] = [
   PatientAddressComponent,
   PatientSearchComponent,
@@ -245,6 +246,7 @@ export const components: any[] = [
   SharedReportsListComponent,
   SharedCustomReportComponent,
   SharedRenderReportDashboardComponent,
+  SharedDrugDosageInterpretationComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
