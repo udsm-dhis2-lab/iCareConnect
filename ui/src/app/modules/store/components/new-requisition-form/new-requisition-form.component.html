@@ -43,6 +43,8 @@
             <div class="container-fluid">
               <app-requisition-items
                 [requisition]="requisition"
+                [isNew]="true"
+                (restartProcess)="onRestartProcess($event)"
               ></app-requisition-items>
             </div>
           </div>
@@ -146,6 +148,24 @@
               </button>
             </td>
           </tr>
+          <ng-container
+            *ngIf="
+              showQuantityField &&
+              params?.stockStatusForSelectedStore &&
+              params?.stockStatusForCurrentStore &&
+              params?.allowRequestTargetOutOfStock !== 'true' &&
+              params?.stockStatusForSelectedStore?.eligibleQuantity === 0
+            "
+          >
+            <tr>
+              <td colspan="100%">
+                <div class="alert alert-warning" role="alert">
+                  Request from Out of stock store is not allowed. Contact IT if
+                  there is need to change
+                </div>
+              </td>
+            </tr>
+          </ng-container>
         </tbody>
       </table>
     </div>

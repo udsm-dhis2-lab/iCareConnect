@@ -17,6 +17,7 @@ export class CaptureFormDataComponent implements OnInit {
   @Input() visit: Visit;
   @Input() patient: Patient;
   @Input() isLIS: boolean;
+  @Input() formValidationRules: any[];
   observations$: Observable<any>;
 
   @Output() formDataUpdate: EventEmitter<FormValue> =

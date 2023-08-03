@@ -21,7 +21,7 @@ export class ConceptsFormComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    console.log("conceptFields::", this.conceptFields);
+    // console.log("conceptFields::", this.conceptFields);
     if (this.conceptFields?.length > 0) {
       this.conceptFields = orderBy(this.conceptFields, ["order"], ["asc"]);
       this.conceptFieldsMap = this.conceptFields?.map((conceptField) => {

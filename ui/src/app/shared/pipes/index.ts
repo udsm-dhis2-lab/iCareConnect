@@ -22,6 +22,7 @@ import { GetAssociatedFieldsPipe } from "./get-associated-fields.pipe";
 import { SearchingItemPipe } from "./searching-item.pipe";
 import { GroupParametersByHeadersPipe } from "./group-parameters-by-headers.pipe";
 import { IdentifyParametersWithoutHeadersPipe } from "./identify-parameters-without-headers.pipe";
+import { FilterDrugOrdersPipe } from "./filter-drug-orders.pipe";
 
 export const sharedPipes: any[] = [
   FilterByPipe,
@@ -48,4 +49,5 @@ export const sharedPipes: any[] = [
   SearchingItemPipe,
   GroupParametersByHeadersPipe,
   IdentifyParametersWithoutHeadersPipe,
+  FilterDrugOrdersPipe,
 ];

@@ -164,6 +164,10 @@ public class Prescription extends Order {
 		Map<String,Object> drugMap = new HashMap<>();
 		drugMap.put("uuid",this.getDrug().getUuid());
 		drugMap.put("display",this.getDrug().getDisplayName());
+		Map<String, Object> drugConceptMap = new HashMap<>();
+		drugConceptMap.put("uuid", this.getDrug().getConcept().getUuid());
+		drugConceptMap.put("display", this.getDrug().getConcept().getDisplayString());
+		drugMap.put("concept", drugConceptMap);
 		result.put("drug", drugMap);
 
 		Map<String,Object> orderTypeMap = new HashMap<>();
@@ -190,6 +194,12 @@ public class Prescription extends Order {
 			orderStatusesMap.add(orderStatusMap);
 		}
 		result.put("statuses", orderStatusesMap);
+		Map<String, Object> previousOrder = new HashMap<>();
+		if (this.getPreviousOrder() != null) {
+			previousOrder.put("uuid", this.getPreviousOrder().getUuid());
+			previousOrder.put("instructions", this.getPreviousOrder().getInstructions());
+		}
+		result.put("previousOrder", previousOrder);
 		return result;
 	}
 	
@@ -267,7 +277,6 @@ public class Prescription extends Order {
 		encounter.setPatient(patient);
 		encounter.setUuid((String) orderObject.get("encounter"));
 		order.setEncounter(encounter);
-		
 		return order;
 	}
 	

@@ -266,6 +266,11 @@ public class ICareController {
 	public Map<String, Object> onPostDrugOrderCreation(@RequestBody Map<String, Object> orderObject) throws Exception {
 		Prescription prescription = Prescription.fromMap(orderObject);
 		
+		String previousOrderUuid = null;
+		if (orderObject.get("previousOrder") != null) {
+			previousOrderUuid = orderObject.get("previousOrder").toString();
+		}
+		
 		ConceptService conceptService = Context.getConceptService();
 		OrderService orderService = Context.getOrderService();
 		PatientService patientService = Context.getPatientService();
@@ -300,7 +305,18 @@ public class ICareController {
 			throw new ConfigurationException("Prescription Order Type is not configured.");
 		}
 		prescription.setOrderType(orderType);
-		prescription = iCareService.savePrescription(prescription);
+		String orderStatus = null;
+		if (orderObject.get("status") != null) {
+			orderStatus = orderObject.get("status").toString();
+		}
+		String orderRemarks = null;
+		if (orderObject.get("remarks") != null) {
+			orderRemarks = orderObject.get("remarks").toString();
+		}
+		if (previousOrderUuid != null) {
+			prescription.setPreviousOrder(orderService.getOrderByUuid(previousOrderUuid));
+		}
+		prescription = iCareService.savePrescription(prescription, orderStatus, orderRemarks);
 		return prescription.toMap();
 	}
 	

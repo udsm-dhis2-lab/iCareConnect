@@ -109,6 +109,8 @@ public interface StoreService extends OpenmrsService {
 	
 	OrderStatus dispenseDrug(String drugOrderUuid, String location, String location1);
 	
+	OrderStatus setDrugOrderStatus(String orderUuid, String status, String remarks);
+	
 	StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception;
 	
 	public Supplier getSupplierByUuid(String supplierUuid);

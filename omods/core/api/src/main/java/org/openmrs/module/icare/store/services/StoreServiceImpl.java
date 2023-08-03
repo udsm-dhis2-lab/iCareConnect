@@ -603,6 +603,40 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		}
 	}
 	
+	@Override
+	public OrderStatus setDrugOrderStatus(String drugUuid, String status, String remarks) {
+		OrderService orderService = Context.getOrderService();
+		List<OrderStatus> orderStatuses = this.stockDAO.getOrderStatusByOrderUuid(drugUuid);
+		for (OrderStatus orderStatus : orderStatuses) {
+			if (orderStatus.getStatus().toString().equals(status)) {
+				throw new OrderEntryException("Order is already set the status: " + status);
+			}
+		}
+		Order savedOrder = orderService.getOrderByUuid(drugUuid);
+		
+		OrderStatus orderStatus = new OrderStatus();
+		
+		orderStatus.setOrder(savedOrder);
+		
+		if (status.equals(OrderStatus.OrderStatusCode.EMPTY.toString())) {
+			orderStatus.setStatus(OrderStatus.OrderStatusCode.EMPTY);
+		}
+		if (status.equals(OrderStatus.OrderStatusCode.CANCELLED.toString())) {
+			orderStatus.setStatus(OrderStatus.OrderStatusCode.CANCELLED);
+		}
+		if (status.equals(OrderStatus.OrderStatusCode.ISSUED.toString())) {
+			orderStatus.setStatus(OrderStatus.OrderStatusCode.ISSUED);
+		}
+		if (status.equals(OrderStatus.OrderStatusCode.REJECTED.toString())) {
+			orderStatus.setStatus(OrderStatus.OrderStatusCode.REJECTED);
+		}
+		if (status.equals(OrderStatus.OrderStatusCode.DISPENSED.toString())) {
+			orderStatus.setStatus(OrderStatus.OrderStatusCode.DISPENSED);
+		}
+		orderStatus.setRemarks(remarks);
+		return this.stockDAO.saveOrderStatus(orderStatus);
+	}
+	
 	public Supplier getSupplierByUuid(String supplierUuid) {
 		return supplierDAO.findByUuid(supplierUuid);
 	}

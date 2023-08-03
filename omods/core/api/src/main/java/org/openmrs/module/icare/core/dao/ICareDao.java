@@ -284,11 +284,10 @@ public class ICareDao extends BaseDAO<Item> {
 	
 	public Prescription updatePrescription(Prescription prescription) {
 		DbSession session = getSession();
-		
-		String queryStr = "UPDATE prescription SET quantity=10 WHERE uuid=:uuid";
-		
+		String queryStr = "UPDATE prescription SET quantity=" + prescription.getQuantity().toString()
+		        + " WHERE orderId=:orderId";
 		SQLQuery query = session.createSQLQuery(queryStr);
-		query.setParameter("uuid", prescription.getUuid());
+		query.setParameter("orderId", prescription.getOrderId());
 		query.executeUpdate();
 		return prescription;
 	}
