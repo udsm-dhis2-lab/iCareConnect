@@ -85,7 +85,8 @@
         *ngIf="
           params?.useGenericPrescription === 'true' &&
           params?.currentVisitLoadedState &&
-          params?.provider
+          params?.provider &&
+          !params?.patientVisit?.isEnsured
         "
       >
         <app-drugs-list-to-send-for-billing
