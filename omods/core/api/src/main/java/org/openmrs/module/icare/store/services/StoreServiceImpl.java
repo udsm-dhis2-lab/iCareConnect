@@ -948,7 +948,15 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	public ReorderLevel updateReorderLevel(ReorderLevel reorderLevel) {
 		return stockDAO.updateReorderLevel(reorderLevel);
 	}
-	
+
+	@Override
+	public Boolean isPendingRequisition(String itemUuid, String locationUuid) {
+
+		Boolean isPendingRequisition = stockDAO.isPendingRequisition(itemUuid, locationUuid);
+
+		return isPendingRequisition;
+	}
+
 	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		
