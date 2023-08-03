@@ -21,7 +21,8 @@
     drugOrderConceptDetails: drugOrderConceptDetails$ | async,
     strengthConceptUuid: strengthConceptUuid$ | async,
     useSpecificDrugPrescription: useSpecificDrugPrescription$ | async,
-    specificDrugConceptUuid: specificDrugConceptUuid$ | async
+    specificDrugConceptUuid: specificDrugConceptUuid$ | async,
+    previousVisit: previousVisit$ | async
   } as params"
 >
   <div class="loading-overlay" *ngIf="savingOrder">
@@ -120,7 +121,8 @@
                 params?.genericPrescriptionConceptUuids &&
                 params?.strengthConceptUuid &&
                 params?.useSpecificDrugPrescription &&
-                params?.specificDrugConceptUuid
+                params?.specificDrugConceptUuid &&
+                params?.previousVisit
               "
             >
               <app-general-dispension-form
@@ -167,6 +169,7 @@
                 "
                 [conceptFields$]="conceptFields$"
                 [strengthConceptUuid]="params?.strengthConceptUuid"
+                [previousVisit]="params?.previousVisit"
                 (updateConsultationOrder)="onUpdateConsultationOrder()"
                 (orderSaved)="onOrderSaved($event, params?.currentVisit)"
               ></app-general-dispension-form>

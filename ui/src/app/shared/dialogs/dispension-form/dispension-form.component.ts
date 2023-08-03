@@ -84,6 +84,7 @@ export class DispensingFormComponent implements OnInit {
   prescribedMedication: any;
   drugPrice: number;
   showPrice: boolean;
+  previousVisit$: Observable<any>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -145,6 +146,11 @@ export class DispensingFormComponent implements OnInit {
 
   ngOnInit() {
     this.getVisitByUuid(this.data?.visit?.uuid);
+    this.previousVisit$ = this.visitService
+      .getLastPatientVisit(this.data?.patientUuid, false)
+      .pipe(
+        map((response) => (response?.length > 0 ? response[0]?.visit : {}))
+      );
     this.drugOrder = this.data?.drugOrder;
     this.dispensingLocations$ = this.locationService
       .getLocationsByTagName("Dispensing+Unit")

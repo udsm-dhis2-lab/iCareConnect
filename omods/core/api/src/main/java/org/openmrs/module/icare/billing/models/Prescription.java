@@ -5,6 +5,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.openmrs.*;
 import org.openmrs.api.ProviderService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.core.PrescriptionDosingInstruction;
 import org.openmrs.module.icare.core.utils.StaticHelper;
@@ -194,10 +195,53 @@ public class Prescription extends Order {
 			orderStatusesMap.add(orderStatusMap);
 		}
 		result.put("statuses", orderStatusesMap);
+
+		if (this.getDose() != null) {
+			result.put("dose", this.getDose().floatValue());
+		}
+
+		if (this.getDuration() != null) {
+			result.put("duration", this.getDuration().floatValue());
+		}
+
+		Map<String, Object> durationUnits = new HashMap<>();
+		if (this.getDurationUnits() != null) {
+			durationUnits.put("uuid", this.getDurationUnits().getUuid());
+			durationUnits.put("display", this.getDurationUnits().getDisplayString());
+			if (this.getDurationUnits().getConceptMappings().size() > 0) {
+				// Get mapping source for referencing the equivalency
+				String conceptSourceUuid = Context.getAdministrationService().getGlobalProperty(ICareConfig.DRUG_DURATION_UNITS_EQUIVALENCE_CONCEPT_SOURCE);
+				for (ConceptMap conceptMap: this.getDurationUnits().getConceptMappings()) {
+					if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().toString().equals(conceptSourceUuid)) {
+						durationUnits.put("secondsPerUnitEquivalence", conceptMap.getConceptReferenceTerm().getCode());
+					}
+				}
+			}
+		}
+		result.put("durationUnits", durationUnits);
+
+		Map<String, Object> frequency = new HashMap<>();
+		if (this.getFrequency() != null) {
+			frequency.put("uuid", this.getFrequency().getUuid());
+			frequency.put("display", this.getFrequency().getName().toString());
+			if (this.getFrequency().getConcept().getConceptMappings().size() > 0) {
+				// Get mapping source for referencing the equivalency
+				String conceptSourceUuid = Context.getAdministrationService().getGlobalProperty(ICareConfig.DRUG_FREQUENCY_EQUIVALENCE_CONCEPT_SOURCE);
+				for (ConceptMap conceptMap: this.getFrequency().getConcept().getConceptMappings()) {
+					if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().toString().equals(conceptSourceUuid)) {
+						frequency.put("daysPerUnitEquivalence", conceptMap.getConceptReferenceTerm().getCode());
+					}
+				}
+			}
+		}
+		result.put("frequency", frequency);
+
 		Map<String, Object> previousOrder = new HashMap<>();
 		if (this.getPreviousOrder() != null) {
 			previousOrder.put("uuid", this.getPreviousOrder().getUuid());
-			previousOrder.put("instructions", this.getPreviousOrder().getInstructions());
+			if (this.getPreviousOrder().getInstructions() != null) {
+				previousOrder.put("instructions", this.getPreviousOrder().getInstructions().toString());
+			}
 		}
 		result.put("previousOrder", previousOrder);
 		return result;
