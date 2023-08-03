@@ -15,6 +15,7 @@ import { find } from "lodash";
 import { FieldData, FieldsData } from "../../models/fields-data.model";
 import { FormValue } from "../../models/form-value.model";
 import { FieldComponent } from "../field/field.component";
+import { validateFormFields } from "../../helpers/validate-form-fields.helper";
 
 @Component({
   selector: "app-form",
@@ -36,6 +37,7 @@ export class FormComponent implements OnInit {
   @Output() formUpdate: EventEmitter<any> = new EventEmitter<any>();
   @Output() fileFormUpdate: EventEmitter<any> = new EventEmitter<any>();
   @Input() formId: string;
+  @Input() formValidationRules: any[];
 
   values: any;
 
@@ -44,6 +46,7 @@ export class FormComponent implements OnInit {
 
   @ViewChild(FieldComponent, { static: false })
   fieldComponent: FieldComponent;
+  validationIssues: any = {};
 
   constructor(private fieldControlService: FieldControlService) {}
 
@@ -54,6 +57,12 @@ export class FormComponent implements OnInit {
       this.fieldsData
     );
     this.values = this.form.getRawValue();
+    // console.log("values", this.values);
+    // console.log("formValidationRules", this.formValidationRules);
+    this.validationIssues = validateFormFields(
+      this.formValidationRules,
+      this.values
+    );
   }
 
   ngOnInit(): void {
@@ -74,6 +83,11 @@ export class FormComponent implements OnInit {
       );
 
       this.values = form.getRawValue();
+
+      this.validationIssues = validateFormFields(
+        this.formValidationRules,
+        this.values
+      );
     }
   }
 

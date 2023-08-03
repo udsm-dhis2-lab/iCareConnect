@@ -55,7 +55,7 @@
     *ngIf="!params?.visitLoadingState && actionOptions && params?.drugOrders"
     [columns]="drugOrderColumns"
     [data$]="visit?.dispensingDrugOrderTableList$"
-    [drugOrders]="params?.drugOrders"
+    [drugOrders]="params?.drugOrders | filterDrugOrders: 'EMPTY':[]"
     [loading]="loading"
     [visit]="visit"
     [currentPatient]="currentPatient"
@@ -65,15 +65,13 @@
     [tableConfig]="tableConfig"
     [actionOptions]="actionOptions"
     (selectAction)="onSelectAction($event)"
-    (printPrescriptions)="onPrintPrescriptions
-    (
-      $event,
-      {
+    (printPrescriptions)="
+      onPrintPrescriptions($event, {
         CurrentPatient: currentPatient,
         FacilityDetails: params?.facilityDetails,
         Logo: params?.logo,
         CurrentUser: params?.currentUser
-      }
-    )"
+      })
+    "
   ></app-table>
 </div>

@@ -10,6 +10,7 @@
         [isReport]="isReport"
         [formId]="form?.uuid"
         [fieldsData]="observations"
+        [formValidationRules]="formValidationRules"
         (formUpdate)="onFormUpdate($event)"
       ></app-form>
       <ng-container *ngIf="fields[0]?.setMembers?.length > 0">
@@ -48,6 +49,7 @@
                   [isReport]="isReport"
                   [colClass]="'col-4'"
                   [formId]="form?.uuid"
+                  [formValidationRules]="formValidationRules"
                   [fieldsData]="observations"
                   (formUpdate)="onFormUpdate($event)"
                 >

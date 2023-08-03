@@ -421,7 +421,11 @@ export class DispensingFormComponent implements OnInit {
       );
   }
 
-  onUpdateOrder(e: Event, specificDrugConceptUuid?: string) {
+  onUpdateOrder(
+    e: Event,
+    specificDrugConceptUuid?: string,
+    isEnsured?: boolean
+  ) {
     this.dialog
       .open(SharedConfirmationDialogComponent, {
         width: "20%",
@@ -443,7 +447,7 @@ export class DispensingFormComponent implements OnInit {
             .getDrug(order?.obs[specificDrugConceptUuid]?.value)
             .subscribe((response) => {
               if (response) {
-                const formattedOrder = {
+                let formattedOrder = {
                   ...order,
                   orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
                   drug: {
@@ -471,6 +475,14 @@ export class DispensingFormComponent implements OnInit {
                     ? order?.patientUuid
                     : this.data?.patientUuid,
                 };
+
+                if (isEnsured) {
+                  formattedOrder = {
+                    ...formattedOrder,
+                    status: "EMPTY",
+                    remarks: "Control status",
+                  };
+                }
                 // console.log("this.data?.drugOrder", this.data?.drugOrder);
                 this.drugOrderService
                   .saveDrugOrder(
