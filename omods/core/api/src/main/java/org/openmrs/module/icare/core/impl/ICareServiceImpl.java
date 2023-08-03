@@ -236,9 +236,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		
 		if (prescription.getPreviousOrder() != null) {
+			Double quantity = prescription.getQuantity();
 			Prescription previousOrder = (Prescription) Context.getOrderService().getOrderByUuid(
 			    prescription.getPreviousOrder().getUuid());
 			prescription.updatePrescription(previousOrder);
+			prescription.setQuantity(quantity);
 		}
 		AdministrationService administrationService = Context.getAdministrationService();
 		administrationService.setGlobalProperty("validation.disable", "true");
