@@ -23,7 +23,7 @@
     </div>
   </div>
   <table class="table table-bordered">
-    <thead>
+    <thead *ngIf="(params?.drugOrders | filterDrugOrders: 'NON')?.length > 0">
       <tr>
         <th>Drug</th>
         <th>Instructions</th>
@@ -127,7 +127,10 @@
       </ng-container>
     </tbody>
   </table>
-  <div class="w-100 mb-2 d-flex justify-content-end">
+  <div
+    class="w-100 mb-2 d-flex justify-content-end"
+    *ngIf="(params?.drugOrders | filterDrugOrders: 'NON')?.length > 0"
+  >
     <button
       [disabled]="
         (params?.drugOrders | filterDrugOrders: 'NON')?.length == 0 ||
