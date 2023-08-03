@@ -3,7 +3,8 @@
   *ngIf="{
     drugOrders: drugOrders$ | async,
     prices: prices$ | async,
-    totalPrice: totalPrice$ | async
+    totalPrice: totalPrice$ | async,
+    pricesForSelectedDrugOrders: pricesForSelectedDrugOrders$ | async
   } as params"
 >
   <div class="p-3">
@@ -21,7 +22,7 @@
       </div>
     </div>
   </div>
-  <table class="table">
+  <table class="table table-bordered">
     <thead>
       <tr>
         <th>Drug</th>
@@ -30,10 +31,23 @@
         <th>Prescribed On</th>
         <th>Quantity</th>
         <th style="text-align: center; width: 150px">Price</th>
+        <th style="text-align: center; width: 100px">
+          <section>
+            <mat-checkbox
+              color="primary"
+              [disabled]="!params?.drugOrders"
+              [checked]="allSelected"
+              (change)="selectAllOrders($event, params?.drugOrders)"
+              >All</mat-checkbox
+            >
+          </section>
+        </th>
       </tr>
     </thead>
     <tbody>
-      <ng-container *ngIf="params?.drugOrders?.length > 0">
+      <ng-container
+        *ngIf="(params?.drugOrders | filterDrugOrders: 'NON')?.length > 0"
+      >
         <ng-container
           *ngFor="
             let drugOrder of params?.drugOrders | filterDrugOrders: 'NON';
@@ -71,14 +85,32 @@
               />
             </td>
             <td style="text-align: center; width: 150px">
-              {{ params?.prices ? params?.prices[drugOrder?.uuid] : "-" }}
+              {{
+                params?.prices
+                  ? (params?.prices[drugOrder?.uuid] | currency: "TZS":"":".0")
+                  : "-"
+              }}
+            </td>
+            <td style="text-align: center">
+              <section>
+                <mat-checkbox
+                  color="primary"
+                  [checked]="selectedDrugOrders[drugOrder?.uuid]"
+                  (change)="
+                    selectDrugOrder($event, drugOrder, params?.drugOrders)
+                  "
+                ></mat-checkbox>
+              </section>
             </td>
           </tr>
         </ng-container>
         <tr *ngIf="(params?.drugOrders | filterDrugOrders: 'NON')?.length > 0">
-          <th colspan="6" style="text-align: right">TOTAL PRICE</th>
+          <th colspan="5" style="text-align: right">TOTAL PRICE</th>
           <th style="text-align: center; width: 150px">
-            {{ params?.totalPrice }}
+            {{ params?.totalPrice | currency: "TZS":"":".0" }}
+          </th>
+          <th style="text-align: center; background-color: green; color: #fff">
+            {{ params?.pricesForSelectedDrugOrders | currency: "TZS":"":".0" }}
           </th>
         </tr>
       </ng-container>
@@ -97,7 +129,10 @@
   </table>
   <div class="w-100 mb-2 d-flex justify-content-end">
     <button
-      [disabled]="(params?.drugOrders | filterDrugOrders: 'NON')?.length == 0"
+      [disabled]="
+        (params?.drugOrders | filterDrugOrders: 'NON')?.length == 0 ||
+        !isSendValid
+      "
       class="mr-4"
       mat-flat-button
       color="primary"

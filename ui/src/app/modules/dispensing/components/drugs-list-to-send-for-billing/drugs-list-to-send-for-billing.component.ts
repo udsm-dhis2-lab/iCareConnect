@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Observable, of, zip } from "rxjs";
 import { filter, map, tap } from "rxjs/operators";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
@@ -7,7 +7,8 @@ import { ItemPriceService } from "src/app/shared/services/item-price.service";
 import { sum } from "lodash";
 import { DrugOrdersService } from "src/app/shared/resources/order/services";
 import { DrugOrder } from "src/app/shared/resources/order/models";
-import { keyBy } from "lodash";
+import { keyBy, omit } from "lodash";
+import { MatCheckboxChange } from "@angular/material/checkbox";
 
 @Component({
   selector: "app-drugs-list-to-send-for-billing",
@@ -24,12 +25,16 @@ export class DrugsListToSendForBillingComponent implements OnInit {
   @Input() currentPatient: any;
   @Input() generalMetadataConfigurations: any;
   @Input() provider: any;
+  @Output() reload: EventEmitter<boolean> = new EventEmitter<boolean>();
   drugOrders$: Observable<any[]>;
   drugQuantities: any = {};
   prices: any = {};
   prices$: Observable<any>;
+  pricesForSelectedDrugOrders$: Observable<any>;
   totalPrice$: Observable<number>;
   saving: boolean = false;
+  selectedDrugOrders: any = {};
+  allSelected: boolean = false;
   constructor(
     private ordersService: OrdersService,
     private itemPricesService: ItemPriceService,
@@ -86,6 +91,22 @@ export class DrugsListToSendForBillingComponent implements OnInit {
     this.getPrice(visitUuid, drugOrderUuid, quantity, drugUuid);
   }
 
+  validOrders(drugOrders): any[] {
+    const previousOrders =
+      (
+        drugOrders?.filter((drugOrder) => drugOrder?.previousOrder?.uuid) || []
+      )?.map((order) => order?.previousOrder) || [];
+    const keyedPreviousOrder = keyBy(previousOrders, "uuid");
+
+    return (
+      drugOrders?.filter(
+        (drugOrder) =>
+          drugOrder?.statuses?.length === 0 &&
+          !keyedPreviousOrder[drugOrder?.uuid]
+      ) || []
+    );
+  }
+
   sendToCashier(event: Event, drugOrders: any[]): void {
     event.stopPropagation();
     this.saving = true;
@@ -101,7 +122,11 @@ export class DrugsListToSendForBillingComponent implements OnInit {
           drugOrder?.statuses?.length === 0 &&
           !keyedPreviousOrder[drugOrder?.uuid]
       ) || [];
-    const formattedOrders = drugOrders?.map((order) => {
+    const formattedOrders = (
+      drugOrders?.filter(
+        (drugOrder) => this.selectedDrugOrders[drugOrder?.uuid]
+      ) || []
+    )?.map((order) => {
       return {
         orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
         drug: {
@@ -140,8 +165,47 @@ export class DrugsListToSendForBillingComponent implements OnInit {
       if (response) {
         this.saving = false;
         this.getOrders();
+        setTimeout(() => {
+          this.reload.emit(true);
+          this.allSelected = false;
+        }, 200);
       }
     });
+  }
+
+  selectAllOrders(event: MatCheckboxChange, orders: any[]): void {
+    // console.log(event);
+    if (event.checked) {
+      const drugOrders = this.validOrders(orders);
+      this.selectedDrugOrders = keyBy(drugOrders, "uuid");
+      this.allSelected = true;
+    } else {
+      this.selectedDrugOrders = {};
+      this.allSelected = false;
+    }
+
+    this.formulatePriceForSelectedOrders();
+  }
+
+  selectDrugOrder(event: MatCheckboxChange, order: any, orders: any[]): void {
+    if (event.checked) {
+      this.selectedDrugOrders[order?.uuid] = order?.uuid;
+      if (
+        Object.keys(this.selectedDrugOrders).length ===
+        this.validOrders(orders)?.length
+      ) {
+        this.allSelected = true;
+      }
+    } else {
+      this.selectedDrugOrders = omit(this.selectedDrugOrders, order?.uuid);
+      this.allSelected = false;
+    }
+
+    this.formulatePriceForSelectedOrders();
+  }
+
+  get isSendValid(): boolean {
+    return Object.keys(this.selectedDrugOrders)?.length > 0;
   }
 
   getPrice(
@@ -163,8 +227,21 @@ export class DrugsListToSendForBillingComponent implements OnInit {
           this.totalPrice$ = of(
             sum(Object.keys(this.prices).map((key) => this.prices[key]))
           );
+          this.formulatePriceForSelectedOrders();
         })
       )
       .subscribe();
+  }
+
+  formulatePriceForSelectedOrders(): void {
+    this.pricesForSelectedDrugOrders$ = of(
+      sum(
+        (
+          Object.keys(this.prices)?.filter(
+            (key) => this.selectedDrugOrders[key]
+          ) || []
+        ).map((key) => this.prices[key])
+      )
+    );
   }
 }

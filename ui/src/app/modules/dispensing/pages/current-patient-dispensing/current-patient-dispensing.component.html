@@ -99,10 +99,14 @@
           [generalMetadataConfigurations]="
             params?.generalMetadataConfigurations
           "
+          (reload)="shouldReloadDrugListForDispensing($event)"
         ></app-drugs-list-to-send-for-billing>
       </div>
 
-      <div class="border" *ngIf="params?.currentVisitLoadedState">
+      <div
+        class="border"
+        *ngIf="params?.currentVisitLoadedState && readyToShow"
+      >
         <app-patient-drug-order-list
           *ngIf="params?.patientVisit"
           [visit]="params?.patientVisit"
