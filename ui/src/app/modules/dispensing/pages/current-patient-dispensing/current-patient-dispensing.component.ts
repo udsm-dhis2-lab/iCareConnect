@@ -55,6 +55,7 @@ export class CurrentPatientDispensingComponent implements OnInit {
   useGenericPrescription$: Observable<any>;
   errors: any[] = [];
   provider$: Observable<any>;
+  readyToShow: boolean = false;
   constructor(
     private route: ActivatedRoute,
     private systemSettingsService: SystemSettingsService,
@@ -65,6 +66,7 @@ export class CurrentPatientDispensingComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.readyToShow = true;
     this.patientId = this.route?.snapshot?.params?.id;
     this.store.dispatch(removeCurrentPatient());
     this.store.dispatch(loadCurrentPatient({ uuid: this.patientId }));
@@ -227,6 +229,15 @@ export class CurrentPatientDispensingComponent implements OnInit {
         default:
           break;
       }
+    }
+  }
+
+  shouldReloadDrugListForDispensing(reload: boolean): void {
+    if (reload) {
+      this.readyToShow = false;
+      setTimeout(() => {
+        this.readyToShow = true;
+      }, 200);
     }
   }
 }
