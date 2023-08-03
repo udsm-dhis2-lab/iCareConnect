@@ -97,6 +97,11 @@
             ?.dateActivated | date: "medium"
         }}
       </b>
+      <app-shared-drug-dosage-interpretation
+        [prescription]="
+          params?.keyedPreviousVisitDrugOrders[selectedDrug?.uuid]
+        "
+      ></app-shared-drug-dosage-interpretation>
     </div>
     <div class="d-flex justify-content-end">
       <button
