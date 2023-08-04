@@ -156,6 +156,6 @@ public interface StoreService extends OpenmrsService {
 	ListResult<Item> getExpiredItemsByLocation(String locationUuid, Pager pager);
 	
 	ReorderLevel updateReorderLevel(ReorderLevel reorderLevel);
-
+	
 	Boolean isPendingRequisition(String itemUuid, String locationUuid);
 }

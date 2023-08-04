@@ -8,10 +8,15 @@ import { getSanitizedFormObject } from "../helpers/get-sanitized-form-object.hel
 import { FormConfig } from "../models/form-config.model";
 import { ICAREForm } from "../models/form.model";
 import { orderBy, uniqBy, omit, keyBy, groupBy, sumBy, flatten } from "lodash";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Injectable({ providedIn: "root" })
 export class FormService {
-  constructor(private api: Api, private httpClient: OpenmrsHttpClientService) {}
+  constructor(
+    private api: Api,
+    private httpClient: OpenmrsHttpClientService,
+    private systemSettingsService: SystemSettingsService
+  ) {}
 
   getForms(formConfigs: FormConfig[]): Observable<ICAREForm[]> {
     return zip(
@@ -439,10 +444,15 @@ export class FormService {
      * TODO:Dynamicall construct the fields
      */
     const fields =
-      "?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))";
-    return this.httpClient.get("form/" + uuid + fields).pipe(
-      map((response) => {
-        return response;
+      "?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,mappings:(uuid,conceptReferenceTerm:(uuid,display,conceptSource:(uuid))),hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,mappings:(uuid,conceptReferenceTerm:(uuid,display,conceptSource:(uuid))),hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,mappings:(uuid,conceptReferenceTerm:(uuid,display,conceptSource:(uuid))),conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))";
+    return zip(
+      this.httpClient.get("form/" + uuid + fields),
+      this.systemSettingsService.getSystemSettingsByKey(
+        `icare.forms.formFieldsConcepts.dataTypeExtensionReference.conceptSourceUuid`
+      )
+    ).pipe(
+      map((responses) => {
+        return { ...responses[0], conceptSourceUuid: responses[1] };
       }),
       catchError((error) => {
         return of(error);

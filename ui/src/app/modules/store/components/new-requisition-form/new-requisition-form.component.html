@@ -2,6 +2,7 @@
   *ngIf="{
     stockStatusForSelectedStore: stockStatusForSelectedStore$ | async,
     stockStatusForCurrentStore: stockStatusForCurrentStore$ | async,
+    itemRequisitionStatus: itemRequisitionStatus$ | async,
     allowRequestTargetOutOfStock: allowRequestTargetOutOfStock$ | async
   } as params"
 >
@@ -147,6 +148,15 @@
                 Update
               </button>
             </td>
+          </tr>
+          <tr *ngIf="params.itemRequisitionStatus && params.itemRequisitionStatus != false">
+            
+            <td colspan="100%">
+              <div class="alert alert-warning" role="alert">
+                The selected drug has drafted/pending request, please verify.
+              </div>
+            </td>
+            
           </tr>
           <ng-container
             *ngIf="
