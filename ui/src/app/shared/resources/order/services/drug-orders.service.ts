@@ -141,6 +141,8 @@ export class DrugOrdersService {
     return this.openmrsService
       .post(`store/drugOrder/${dispenseDetails?.uuid}/dispense`, {
         location: dispenseDetails?.location,
+        drugUuid: dispenseDetails?.drug?.uuid,
+        quantity: Number(dispenseDetails?.quantity),
       })
       .pipe(
         map((response) => response),

@@ -227,11 +227,9 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 					}
 				}
 				existingPrescription.updatePrescription(prescription);
-				existingPrescription.setQuantity(prescription.getQuantity());
 				
-				//				dao.updatePrescription(prescription);
-				prescription = (Prescription) Context.getOrderService().saveOrder(existingPrescription, null);
-				//				prescription = existingPrescription;
+				dao.updatePrescription(prescription);
+				prescription = existingPrescription;
 			}
 		}
 		

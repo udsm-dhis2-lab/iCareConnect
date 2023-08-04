@@ -381,7 +381,6 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	//@Ignore(value = "Changed to Advice")
 	public void testDrugOrderRevision() throws Exception {
-		
 		//Given
 		AdministrationService administrationService = Context.getAdministrationService();
 		administrationService.setGlobalProperty(ICareConfig.ALLOW_NEGATIVE_STOCK, "true");
@@ -414,15 +413,20 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		BillingService billingService = Context.getService(BillingService.class);
 		InvoiceItem invoiceItem = billingService.getInvoiceItemByOrder(Context.getOrderService().getOrderByUuid(
 		    (String) orderResult.get("uuid")));
-		System.out.println("Here:" + invoiceItem);
+		//		System.out.println("Here:" + invoiceItem);
 		assertThat("Should return a visit", orderResult != null);
 		
 		Map<String, Object> dispensing = new HashMap<String, Object>();
+		System.out.println(orderResult);
 		dispensing.put("location", "8d6c993e-c2cc-11de-8d13-0010c6dffd0f");
-		newGetRequest = newPostRequest("store/prescription/" + orderResult.get("uuid") + "/dispense", dispensing);
+		dispensing.put("drugUuid", "05ec820a-d297-44e3-be6e-698531d9dd3f");
+		dispensing.put("quantity", 2);
+		newGetRequest = newPostRequest("store/drugOrder/" + orderResult.get("uuid") + "/dispense", dispensing);
 		handle = handle(newGetRequest);
 		
 		orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		//		System.out.println("DISPENSED");
+		//		System.out.println(orderResult);
 		assertThat("Should return a visit", orderResult != null);
 		assertThat("Should return a visit", orderResult.get("status").equals("DISPENSED"));
 		

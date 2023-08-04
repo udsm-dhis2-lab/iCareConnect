@@ -107,7 +107,7 @@ public interface StoreService extends OpenmrsService {
 	
 	List<OrderStatus> getOrderStatus(String visitUuid);
 	
-	OrderStatus dispenseDrug(String drugOrderUuid, String location, String location1);
+	OrderStatus dispenseDrug(String drugOrderUuid, String drugUuid, Integer quantity, String location, String remarks);
 	
 	OrderStatus setDrugOrderStatus(String orderUuid, String status, String remarks);
 	
