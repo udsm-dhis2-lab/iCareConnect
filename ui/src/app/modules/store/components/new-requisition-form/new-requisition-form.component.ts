@@ -63,6 +63,7 @@ export class NewRequisitionFormComponent implements OnInit {
   showQuantityField: boolean = true;
   quantity: number;
   saving: boolean = false;
+  itemRequisitionStatus$: any;
   constructor(
     private stockService: StockService,
     private requisitionService: RequisitionService,
@@ -385,6 +386,11 @@ export class NewRequisitionFormComponent implements OnInit {
           this.itemUuid,
           this.currentStore?.uuid
         );
+      
+      this.itemRequisitionStatus$ = this.stockService.getRequisitionStatusOfAnItem(
+        this.itemUuid,
+        this.currentStore?.uuid
+      );
     }
   }
 

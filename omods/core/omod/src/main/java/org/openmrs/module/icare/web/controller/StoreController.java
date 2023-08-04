@@ -500,17 +500,17 @@ public class StoreController {
 		
 		return null;
 	}
-
-
+	
 	@RequestMapping(value = "pendingrequisition", method = RequestMethod.GET)
 	@ResponseBody
-	public Boolean isPendingRequisition(@RequestParam(required = false, value = "item") String itemUuid, @RequestParam(required = false, value = "location") String locationUuid){
-
-		Boolean IsPendingRequisition = this.storeService.isPendingRequisition(itemUuid,locationUuid);
-
+	public Boolean isPendingRequisition(@RequestParam(required = false, value = "item") String itemUuid,
+	        @RequestParam(required = false, value = "location") String locationUuid) {
+		
+		Boolean IsPendingRequisition = this.storeService.isPendingRequisition(itemUuid, locationUuid);
+		
 		return IsPendingRequisition;
 	}
-
+	
 	@RequestMapping(value = "stock", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> listAllStockStatus(@RequestParam(required = false) String locationUuid,
