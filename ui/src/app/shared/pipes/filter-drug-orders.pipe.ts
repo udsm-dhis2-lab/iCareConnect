@@ -57,7 +57,8 @@ export class FilterDrugOrdersPipe implements PipeTransform {
           drugOrder?.statuses?.filter(
             (drugStatus) => statusesToExcludeCheck[drugStatus?.status]
           ) || []
-        )?.length === 0 && drugOrder?.previousOrder?.uuid
+        )?.length === 0 &&
+        (drugOrder?.previousOrder?.uuid || status === "EMPTY")
     );
   }
 }

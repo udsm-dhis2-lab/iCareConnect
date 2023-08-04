@@ -509,98 +509,52 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public OrderStatus dispenseDrug(String drugUuid, String locationUuid, String remarks) {
+	public OrderStatus dispenseDrug(String drugOrderUuid, String drugUuid, Integer quantity, String locationUuid,
+	        String remarks) {
 		OrderService orderService = Context.getOrderService();
-		List<OrderStatus> orderStatuses = this.stockDAO.getOrderStatusByOrderUuid(drugUuid);
+		List<OrderStatus> orderStatuses = this.stockDAO.getOrderStatusByOrderUuid(drugOrderUuid);
 		for (OrderStatus orderStatus : orderStatuses) {
 			if (orderStatus.getStatus() == OrderStatus.OrderStatusCode.DISPENSED) {
 				throw new OrderEntryException("Order is already dispensed");
 			}
 		}
-		Order savedOrder = orderService.getOrderByUuid(drugUuid);
+		Order savedOrder = orderService.getOrderByUuid(drugOrderUuid);
+		ICareService iCareService = Context.getService(ICareService.class);
+		Item item = iCareService.getItemByDrugUuid(drugUuid);
 		
-		if (savedOrder instanceof Prescription) {
-			Prescription prescription = (Prescription) savedOrder;
-			ICareService iCareService = Context.getService(ICareService.class);
-			Item item = iCareService.getItemByDrugUuid(prescription.getDrug().getUuid());
-			
-			List<Stock> stockList = this.getStockByItemAndLocation(item.getUuid(), locationUuid);
-			AdministrationService administrationService = Context.getAdministrationService();
-			String stockEnabled = administrationService.getGlobalProperty(ICareConfig.STOCK_ENABLE);
-			
-			if (!(stockEnabled != null && stockEnabled.equals("false"))) {
-				if (stockList.size() == 0) {
-					throw new StockOutException(item.getDisplayString() + " is stocked out.");
+		List<Stock> stockList = this.getStockByItemAndLocation(item.getUuid(), locationUuid);
+		AdministrationService administrationService = Context.getAdministrationService();
+		String stockEnabled = administrationService.getGlobalProperty(ICareConfig.STOCK_ENABLE);
+		if (!(stockEnabled != null && stockEnabled.equals("false"))) {
+			Double totalQuantity = new Double(quantity);
+			for (Stock stock : stockList) {
+				if (totalQuantity == 0.0) {
+					break;
 				}
-				Double totalQuantity = prescription.getQuantity();
-				for (Stock stock : stockList) {
-					if (totalQuantity == 0.0) {
-						break;
-					}
-					Double quantityToDeduct;
-					if (totalQuantity > stock.getQuantity()) {
-						quantityToDeduct = stock.getQuantity();
-					} else {
-						quantityToDeduct = totalQuantity;
-					}
-					StockableItem stockableItem = new StockableItem();
-					stockableItem.setBatch(stock.getBatch());
-					stockableItem.setExpiryDate(stock.getExpiryDate());
-					stockableItem.setItem(item);
-					stockableItem.setLocation(Context.getLocationService().getLocationByUuid(locationUuid));
-					stockableItem.setSourceLocation(Context.getLocationService().getLocationByUuid(locationUuid));
-					stockableItem.setQuantity(quantityToDeduct);
-					stockableItem.setOrder(savedOrder);
-					TransactionUtil.deductStock(stockableItem);
-					totalQuantity -= quantityToDeduct;
+				Double quantityToDeduct;
+				if (totalQuantity > stock.getQuantity()) {
+					quantityToDeduct = stock.getQuantity();
+				} else {
+					quantityToDeduct = totalQuantity;
 				}
+				StockableItem stockableItem = new StockableItem();
+				stockableItem.setBatch(stock.getBatch());
+				stockableItem.setExpiryDate(stock.getExpiryDate());
+				stockableItem.setItem(item);
+				stockableItem.setLocation(Context.getLocationService().getLocationByUuid(locationUuid));
+				stockableItem.setSourceLocation(Context.getLocationService().getLocationByUuid(locationUuid));
+				stockableItem.setQuantity(quantityToDeduct);
+				stockableItem.setOrder(savedOrder);
+				TransactionUtil.deductStock(stockableItem);
+				totalQuantity -= quantityToDeduct;
 			}
-			OrderStatus orderStatus = new OrderStatus();
-			orderStatus.setOrder(prescription);
-			orderStatus.setStatus(OrderStatus.OrderStatusCode.DISPENSED);
-			orderStatus.setRemarks(remarks);
-			return this.stockDAO.saveOrderStatus(orderStatus);
-		} else {
-			DrugOrder drugOrder = (DrugOrder) savedOrder;
-			ICareService iCareService = Context.getService(ICareService.class);
-			Item item = iCareService.getItemByDrugUuid(drugOrder.getDrug().getUuid());
-			
-			List<Stock> stockList = this.getStockByItemAndLocation(item.getUuid(), locationUuid);
-			AdministrationService administrationService = Context.getAdministrationService();
-			String stockEnabled = administrationService.getGlobalProperty(ICareConfig.STOCK_ENABLE);
-			
-			if (!(stockEnabled != null && stockEnabled.equals("false"))) {
-				if (stockList.size() == 0) {
-					throw new StockOutException(item.getDisplayString() + " is stocked out.");
-				}
-				Double totalQuantity = drugOrder.getQuantity();
-				for (Stock stock : stockList) {
-					if (totalQuantity == 0.0) {
-						break;
-					}
-					Double quantityToDeduct;
-					if (totalQuantity > stock.getQuantity()) {
-						quantityToDeduct = stock.getQuantity();
-					} else {
-						quantityToDeduct = totalQuantity;
-					}
-					StockableItem stockableItem = new StockableItem();
-					stockableItem.setBatch(stock.getBatch());
-					stockableItem.setExpiryDate(stock.getExpiryDate());
-					stockableItem.setItem(item);
-					stockableItem.setLocation(Context.getLocationService().getLocationByUuid(locationUuid));
-					stockableItem.setSourceLocation(Context.getLocationService().getLocationByUuid(locationUuid));
-					stockableItem.setQuantity(quantityToDeduct);
-					TransactionUtil.deductStock(stockableItem);
-					totalQuantity -= quantityToDeduct;
-				}
-			}
-			OrderStatus orderStatus = new OrderStatus();
-			orderStatus.setOrder(drugOrder);
-			orderStatus.setStatus(OrderStatus.OrderStatusCode.DISPENSED);
-			orderStatus.setRemarks(remarks);
-			return this.stockDAO.saveOrderStatus(orderStatus);
 		}
+		
+		OrderStatus orderStatus = new OrderStatus();
+		orderStatus.setOrder(savedOrder);
+		orderStatus.setStatus(OrderStatus.OrderStatusCode.DISPENSED);
+		orderStatus.setRemarks(remarks);
+		return this.stockDAO.saveOrderStatus(orderStatus);
 	}
 	
 	@Override

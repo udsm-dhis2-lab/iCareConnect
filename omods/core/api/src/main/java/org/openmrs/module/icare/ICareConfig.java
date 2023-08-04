@@ -116,4 +116,8 @@ public class ICareConfig {
 	public static final String LAB_UNIFIED_CODING_REFERENCE_CONCEPT_SOURCE = "icare.laboratory.concept.unifiedCodingReference.conceptSourceUuid";
 	
 	public static final String LAB_INSTRUMENT_CLASS_UUID = "lis.icare.laboratory.instrument.conceptClassUuid";
+	
+	public static final String DRUG_FREQUENCY_EQUIVALENCE_CONCEPT_SOURCE = "icare.drugs.configuration.drugFrequencyEquivalence.conceptSourceUuid";
+	
+	public static final String DRUG_DURATION_UNITS_EQUIVALENCE_CONCEPT_SOURCE = "icare.drugs.configuration.drugDurationEquivalence.conceptSourceUuid";
 }

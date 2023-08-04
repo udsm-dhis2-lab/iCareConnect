@@ -208,14 +208,12 @@ export class CurrentPatientDispensingComponent implements OnInit {
             location: JSON.parse(localStorage.getItem("currentLocation"))[
               "uuid"
             ],
+            drug: data?.drug,
+            quantity: data?.quantity?.toFixed(1),
           };
-
-          const drugOrder = (data as DrugOrder).toJson();
-          console.log("DRUG Order", drugOrder);
-          // this.response$ = this.drugOrderService.dispenseOrderedDrugOrder(
-          //   drugOrderDispenseDetails,
-          //   drugOrder
-          // );
+          this.response$ = this.drugOrderService.dispenseOrderedDrugOrder(
+            drugOrderDispenseDetails
+          );
 
           // this.store.dispatch(
           //   loadActiveVisit({
