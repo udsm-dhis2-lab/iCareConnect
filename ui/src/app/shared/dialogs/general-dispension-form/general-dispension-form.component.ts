@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { Store } from "@ngrx/store";
 import { uniqBy, keyBy } from "lodash";
 import { Observable } from "rxjs";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -7,8 +6,6 @@ import {
   DrugOrder,
   DrugOrderObject,
 } from "src/app/shared/resources/order/models/drug-order.model";
-import { DrugOrdersService } from "src/app/shared/resources/order/services";
-import { AppState } from "src/app/store/reducers";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
 import { Textbox } from "../../modules/form/models/text-box.model";
 import { ICARE_CONFIG } from "../../resources/config";
@@ -83,31 +80,32 @@ export class GeneralDispensingFormComponent implements OnInit {
   keyedPreviousVisitDrugOrders$: Observable<any>;
 
   constructor(
-    private drugOrderService: DrugOrdersService,
     private ordersService: OrdersService,
     private observationService: ObservationService,
-    private store: Store<AppState>,
     private drugService: DrugsService
   ) {}
 
   async ngOnInit() {
-    console.log(this.previousVisit);
     this.keyedPreviousVisitDrugOrders$ = this.ordersService
       .getOrdersByVisitAndOrderType({
         visit: this.previousVisit?.uuid,
         orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
       })
-      .pipe(map((response) => keyBy(response, "orderUuid")));
+      .pipe(
+        map((response) =>
+          keyBy(
+            response?.filter((drugOrder) => drugOrder?.statuses?.length > 0) ||
+              [],
+            "drugUuid"
+          )
+        )
+      );
     this.dosingUnitsSettingsEvent.emit(this.dosingUnitsSettings);
     this.durationUnitsSettingsEvent.emit(this.durationUnitsSettings);
     this.drugRoutesSettingsEvent.emit(this.drugRoutesSettings);
     this.generalPrescriptionFrequencyConceptEvent.emit(
       this.generalPrescriptionFrequencyConcept
     );
-
-    // this.genericPrescriptionConceptUuidsEvent.emit(
-    //   this.genericPrescriptionConceptUuids
-    // );
     this.genericPrescriptionConceptUuidsEvent.emit([
       this.generalPrescriptionDoseConcept,
       this.generalPrescriptionDurationConcept,
@@ -142,22 +140,6 @@ export class GeneralDispensingFormComponent implements OnInit {
         shouldHaveLiveSearchForDropDownFields: true,
       });
     }
-
-    // this.drugDoseField = new Textbox({
-    //   id: "dose",
-    //   key: "dose",
-    //   label: "Dose",
-    //   required: true,
-    //   type: "number",
-    // });
-
-    // this.drugDurationField = new Textbox({
-    //   id: "duration",
-    //   key: "duration",
-    //   label: "Duration",
-    //   required: true,
-    //   type: "number",
-    // });
   }
 
   onFormUpdate(
