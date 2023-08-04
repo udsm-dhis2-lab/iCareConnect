@@ -15,6 +15,7 @@ import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.module.icare.store.models.ReorderLevel;
+import org.openmrs.module.icare.store.models.RequisitionItem;
 import org.openmrs.module.icare.store.models.Stock;
 
 import java.time.LocalDate;
@@ -486,5 +487,30 @@ public class StockDAO extends BaseDAO<Stock> {
 			return null;
 		}
 		
+	}
+
+
+	public Boolean isPendingRequisition(String itemUuid, String locationUuid) {
+		DbSession session = this.getSession();
+		String queryStr = "SELECT rq FROM Requisition rq INNER JOIN rq.requisitionItems ri INNER JOIN rq.requestingLocation loc INNER JOIN rq.requisitionStatuses rs WHERE ri.id.item.uuid =:itemUuid AND loc.uuid =:locationUuid AND rs.status != 4";
+
+		Query query = session.createQuery(queryStr);
+
+		if(itemUuid != null){
+			query.setParameter("itemUuid",itemUuid);
+		}
+
+		if(locationUuid != null){
+			query.setParameter("locationUuid",locationUuid);
+		}
+
+		Boolean isPendingRequisition = false;
+
+		if(query.list().size() > 1){
+			isPendingRequisition = true;
+		}
+
+		return isPendingRequisition;
+
 	}
 }
