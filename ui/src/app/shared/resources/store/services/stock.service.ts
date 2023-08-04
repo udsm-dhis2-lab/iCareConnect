@@ -108,6 +108,20 @@ export class StockService {
       );
   }
 
+  getRequisitionStatusOfAnItem(
+    itemUuid: string,
+    locationUuid: string
+  ): Observable<any> {
+    return this.httpClient
+      .get(`store/pendingrequisition?item=${itemUuid}&location=${locationUuid}`)
+      .pipe(
+        map((response) => {
+          return response
+        }),
+        catchError((e) => of(e))
+      );
+  }
+
   getStockOuts(locationUuid?: string, page?: number, pageSize?: number): Observable<any> {
     // const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
     // const pageSizeNumber =
