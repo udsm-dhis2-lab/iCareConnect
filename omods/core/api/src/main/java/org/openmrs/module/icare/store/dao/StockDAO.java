@@ -13,10 +13,7 @@ import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
-import org.openmrs.module.icare.store.models.OrderStatus;
-import org.openmrs.module.icare.store.models.ReorderLevel;
-import org.openmrs.module.icare.store.models.RequisitionItem;
-import org.openmrs.module.icare.store.models.Stock;
+import org.openmrs.module.icare.store.models.*;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -488,29 +485,28 @@ public class StockDAO extends BaseDAO<Stock> {
 		}
 		
 	}
-
-
+	
 	public Boolean isPendingRequisition(String itemUuid, String locationUuid) {
 		DbSession session = this.getSession();
-		String queryStr = "SELECT rq FROM Requisition rq INNER JOIN rq.requisitionItems ri INNER JOIN rq.requestingLocation loc INNER JOIN rq.requisitionStatuses rs WHERE ri.id.item.uuid =:itemUuid AND loc.uuid =:locationUuid AND rs.status != 4";
-
+		String queryStr = "SELECT rq FROM Requisition rq INNER JOIN rq.requisitionItems ri INNER JOIN rq.requestingLocation loc WHERE ri.id.item.uuid =:itemUuid AND loc.uuid =:locationUuid AND rq NOT IN( SELECT rs.requisition FROM RequisitionStatus rs WHERE (rs.status = 4 OR rs.status= 1 OR rs.status = 2))";
+		
 		Query query = session.createQuery(queryStr);
-
-		if(itemUuid != null){
-			query.setParameter("itemUuid",itemUuid);
+		
+		if (itemUuid != null) {
+			query.setParameter("itemUuid", itemUuid);
 		}
-
-		if(locationUuid != null){
-			query.setParameter("locationUuid",locationUuid);
+		
+		if (locationUuid != null) {
+			query.setParameter("locationUuid", locationUuid);
 		}
-
+		
 		Boolean isPendingRequisition = false;
-
-		if(query.list().size() > 1){
+		
+		if (query.list().size() > 0) {
 			isPendingRequisition = true;
 		}
-
+		
 		return isPendingRequisition;
-
+		
 	}
 }
