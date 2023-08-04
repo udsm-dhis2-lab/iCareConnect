@@ -93,7 +93,7 @@ public class TransactionUtil {
         transaction.setBatchNo(stockable.getBatchNo());
         transaction.setExpireDate(stockable.getExpiryDate());
 
-        if(stockable.getOrder().getId() != null){
+        if(stockable != null && stockable.getOrder() != null && stockable.getOrder().getId() != null){
             transaction.setOrder(stockable.getOrder());
         }
         if(stockable.getSourceLocation() != null) {

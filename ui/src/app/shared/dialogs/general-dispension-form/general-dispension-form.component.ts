@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { uniqBy } from "lodash";
+import { uniqBy, keyBy } from "lodash";
 import { Observable } from "rxjs";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import {
@@ -15,6 +15,7 @@ import { ICARE_CONFIG } from "../../resources/config";
 import { DrugsService } from "../../resources/drugs/services/drugs.service";
 import { ObservationService } from "../../resources/observation/services/observation.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-general-dispension-form",
@@ -43,6 +44,7 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Input() strengthConceptUuid: any;
   @Input() useSpecificDrugPrescription: any;
   @Input() specificDrugConceptUuid: any;
+  @Input() previousVisit: any;
 
   drugOrder: DrugOrderObject;
 
@@ -78,6 +80,7 @@ export class GeneralDispensingFormComponent implements OnInit {
   conceptFieldsMap: any[];
   errors: any[] = [];
   selectedDrug: any;
+  keyedPreviousVisitDrugOrders$: Observable<any>;
 
   constructor(
     private drugOrderService: DrugOrdersService,
@@ -88,6 +91,13 @@ export class GeneralDispensingFormComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
+    console.log(this.previousVisit);
+    this.keyedPreviousVisitDrugOrders$ = this.ordersService
+      .getOrdersByVisitAndOrderType({
+        visit: this.previousVisit?.uuid,
+        orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
+      })
+      .pipe(map((response) => keyBy(response, "orderUuid")));
     this.dosingUnitsSettingsEvent.emit(this.dosingUnitsSettings);
     this.durationUnitsSettingsEvent.emit(this.durationUnitsSettings);
     this.drugRoutesSettingsEvent.emit(this.drugRoutesSettings);
@@ -150,8 +160,15 @@ export class GeneralDispensingFormComponent implements OnInit {
     // });
   }
 
-  onFormUpdate(formValues: FormValue, fieldItem?: string): void {
+  onFormUpdate(
+    formValues: FormValue,
+    fieldItem?: string,
+    keyedPreviousVisitDrugOrders?: any
+  ): void {
     this.isFormValid = formValues.isValid;
+
+    console.log("keyedPreviousVisitDrugOrders", keyedPreviousVisitDrugOrders);
+    console.log(formValues.getValues()?.drug?.value);
 
     this.formValues = { ...this.formValues, ...formValues.getValues() };
 
@@ -165,12 +182,11 @@ export class GeneralDispensingFormComponent implements OnInit {
       this.formValues?.frequency?.value?.length > 0
         ? true
         : false;
-    if (formValues.getValues()?.drug?.value?.length > 0) {
-      this.selectedDrug = formValues
-        .getValues()
-        ?.drug?.options?.filter(
-          (option) => option?.name === formValues.getValues()?.drug?.value
-        )[0];
+    if (
+      formValues.getValues()?.drug?.value?.length > 0 ||
+      (formValues.getValues()?.drug?.value as any)?.display
+    ) {
+      this.selectedDrug = formValues.getValues()?.drug?.value;
     }
     if (fieldItem == "drug" && !this.specificDrugConceptUuid) {
       this.drugService

@@ -15,7 +15,8 @@ import { DateTimeField } from "../models/date-time-field.model";
 export function getSanitizedFormObject(
   concept: ConceptGet,
   fieldsInfo?,
-  conceptsForDiagnosis?: string[]
+  conceptsForDiagnosis?: string[],
+  conceptSourceUuid?: string
 ): ICAREForm {
   if (!concept) {
     return null;
@@ -45,7 +46,18 @@ export function getSanitizedFormObject(
     id: uuid,
     uuid,
     name: name?.name ? name?.name : display,
-    dataType: answers?.length > 0 || isDiagnosis ? "Coded" : datatype?.display,
+    dataType:
+      (
+        mappings?.filter(
+          (mapping: any) =>
+            mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
+            conceptSourceUuid
+        ) || []
+      )?.length > 0
+        ? "Textarea"
+        : answers?.length > 0 || isDiagnosis
+        ? "Coded"
+        : datatype?.display,
     formClass: conceptClass?.display,
     concept: concept,
     fieldNumber: fieldsInfo?.fieldNumber,
@@ -60,14 +72,19 @@ export function getSanitizedFormObject(
     captureData: setMembers?.length == 0 ? true : false,
     options: getFormFieldOptions(answers),
     setMembers: (setMembers || []).map((setMember) =>
-      getSanitizedFormObject(setMember, fieldsInfo, conceptsForDiagnosis)
+      getSanitizedFormObject(
+        setMember,
+        fieldsInfo,
+        conceptsForDiagnosis,
+        conceptSourceUuid
+      )
     ),
     mappings: mappings,
     units: units,
   };
 
-  const formField = getFormField(formObject, isDiagnosis);
-  const formFields = getFormFields(formObject, isDiagnosis);
+  const formField = getFormField(formObject, isDiagnosis, conceptSourceUuid);
+  const formFields = getFormFields(formObject, isDiagnosis, conceptSourceUuid);
   return {
     ...formObject,
     formField,
@@ -79,7 +96,11 @@ export function getSanitizedFormObject(
   };
 }
 
-function getFormFields(formObject: ICAREForm, isDiagnosis): Field<string>[] {
+function getFormFields(
+  formObject: ICAREForm,
+  isDiagnosis,
+  conceptSourceUuid: string
+): Field<string>[] {
   if (!formObject) {
     return undefined;
   }
@@ -90,7 +111,7 @@ function getFormFields(formObject: ICAREForm, isDiagnosis): Field<string>[] {
 
   const formFields = hasLowestMembers
     ? formObject.setMembers
-        .map((member) => getFormField(member, isDiagnosis))
+        .map((member) => getFormField(member, isDiagnosis, conceptSourceUuid))
         .filter((formField) => formField)
     : undefined;
   return formFields;
@@ -98,7 +119,8 @@ function getFormFields(formObject: ICAREForm, isDiagnosis): Field<string>[] {
 
 function getFormField(
   formObject: ICAREForm,
-  isDiagnosis: boolean
+  isDiagnosis: boolean,
+  conceptSourceUuid: string
 ): Field<string> {
   switch (formObject.dataType) {
     case FormFieldType.NUMERIC:
@@ -148,6 +170,18 @@ function getFormField(
         conceptClass: formObject?.concept?.conceptClass?.display,
         id: formObject.id,
         options: formObject.options,
+      });
+    }
+
+    case FormFieldType.TEXTAREA: {
+      return new TextArea({
+        key: formObject.uuid,
+        label: formObject.name,
+        required: formObject?.required,
+        conceptClass: formObject?.concept?.conceptClass?.display,
+        id: formObject.id,
+        options: formObject.options,
+        rows: 0,
       });
     }
 

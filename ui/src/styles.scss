@@ -253,14 +253,23 @@ mat-dialog-container {
 .back-to-client-list {
   padding: 10px 15px;
 }
+
 .snack-color {
   background: #2a8fd1;
   color: black;
   font-weight: bolder;
 }
+
 .snack-color-error {
   background: #ff0033;
   color: black;
+  font-weight: bolder;
+}
+
+.snack-color-sucess,
+.snack-color-ok {
+  background: green;
+  color: #fff;
   font-weight: bolder;
 }
 
