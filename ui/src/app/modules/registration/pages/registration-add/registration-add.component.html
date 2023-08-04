@@ -808,6 +808,7 @@
                   placeholder="Enter Text"
                   [(ngModel)]="patient['kinFname']"
                   name="kinFname"
+                  (keyup)="validateNamesInputs(patient['lname'], 'lname')"
                   [disabled]="addingPatient && !patientAdded"
                 />
               </mat-form-field>
@@ -842,6 +843,7 @@
                   placeholder="Enter Text"
                   [(ngModel)]="patient['kinLName']"
                   name="kinLName"
+                  (keyup)="validateNamesInputs(patient['lname'], 'lname')"
                   [disabled]="addingPatient && !patientAdded"
                 />
               </mat-form-field>
