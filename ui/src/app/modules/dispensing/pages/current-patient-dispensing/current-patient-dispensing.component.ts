@@ -208,6 +208,8 @@ export class CurrentPatientDispensingComponent implements OnInit {
             location: JSON.parse(localStorage.getItem("currentLocation"))[
               "uuid"
             ],
+            drug: data?.drug,
+            quantity: data?.quantity?.toFixed(1),
           };
           this.response$ = this.drugOrderService.dispenseOrderedDrugOrder(
             drugOrderDispenseDetails

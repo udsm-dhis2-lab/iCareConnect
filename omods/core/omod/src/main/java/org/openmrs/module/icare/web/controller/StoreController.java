@@ -564,8 +564,9 @@ public class StoreController {
 	@ResponseBody
 	public Map<String, Object> dispenseDrug(@PathVariable("drugOrderUuid") String drugOrderUuid,
 	        @RequestBody Map<String, Object> orderObject) {
-		OrderStatus orderStatus = storeService.dispenseDrug(drugOrderUuid, (String) orderObject.get("location"),
-		    (String) orderObject.get("location"));
+		OrderStatus orderStatus = storeService
+		        .dispenseDrug(drugOrderUuid, (String) orderObject.get("drugUuid"), (Integer) orderObject.get("quantity"),
+		            (String) orderObject.get("location"), (String) orderObject.get("remarks"));
 		return orderStatus.toMap();
 	}
 	
