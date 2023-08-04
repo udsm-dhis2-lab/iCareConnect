@@ -103,7 +103,9 @@ export class CaptureDataComponent implements OnInit {
       obs.filter((observation) => observation?.value != "") || [];
 
     this.saveObservations.emit(this.encounterData);
-    this.exitAfterSave.emit(saveAndExit);
+    if (saveAndExit) {
+      this.exitAfterSave.emit(saveAndExit);
+    }
   }
 
   onClear(event: Event, form: any): void {
