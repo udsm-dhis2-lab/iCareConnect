@@ -949,4 +949,14 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> updatedReorderLevel = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		System.out.println(handle.getContentAsString());
 	}
+
+	@Test
+	public void getReceivedItem() throws Exception{
+
+		MockHttpServletRequest newGetRequest = newGetRequest("store/receiveditem", new Parameter("location",
+				"44939999-d333-fff2-9bff-61d11117c22e"), new Parameter("item","8o00d43570-8y37-11f3-1234-08002007777"));
+		MockHttpServletResponse handleGet = handle(newGetRequest);
+		Boolean handleGetObject = new ObjectMapper().readValue(handleGet.getContentAsString(), Boolean.class);
+		assertThat("The item is in pending requisition", (handleGet.getContentAsString()),is("true"));
+	}
 }
