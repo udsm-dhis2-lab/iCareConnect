@@ -147,10 +147,8 @@ export class GeneralDispensingFormComponent implements OnInit {
     fieldItem?: string,
     keyedPreviousVisitDrugOrders?: any
   ): void {
+    this.selectedDrug = null;
     this.isFormValid = formValues.isValid;
-
-    console.log("keyedPreviousVisitDrugOrders", keyedPreviousVisitDrugOrders);
-    console.log(formValues.getValues()?.drug?.value);
 
     this.formValues = { ...this.formValues, ...formValues.getValues() };
 
