@@ -19,20 +19,26 @@ export class SharedDrugDosageInterpretationComponent implements OnInit {
       this.prescription?.durationUnits?.secondsPerUnitEquivalence
     );
 
-    const expectedDaysForDose = Number(
-      this.prescription?.quantity /
-        (this.prescription?.dose *
-          Number(this.prescription?.frequency?.daysPerUnitEquivalence))
-    );
-    this.expectedStopDate = new Date(
-      dateOrderActivated.setMilliseconds(
-        dateOrderActivated.getMilliseconds() +
-          expectedDaysForDose * 24 * 60 * 60000
-      )
-    );
+    if (
+      this.prescription?.frequency &&
+      this.prescription?.frequency?.daysPerUnitEquivalence &&
+      Number(this.prescription?.frequency?.daysPerUnitEquivalence) > 0
+    ) {
+      const expectedDaysForDose = Number(
+        this.prescription?.quantity /
+          (this.prescription?.dose *
+            Number(this.prescription?.frequency?.daysPerUnitEquivalence))
+      );
+      this.expectedStopDate = new Date(
+        dateOrderActivated.setMilliseconds(
+          dateOrderActivated.getMilliseconds() +
+            expectedDaysForDose * 24 * 60 * 60000
+        )
+      );
 
-    this.showWarningMessage =
-      new Date().getTime() < this.expectedStopDate.getTime();
-    // this.expectedStopDate = dateOrderActivated + new Date(totalDosageTimeInSeconds)
+      this.showWarningMessage =
+        new Date().getTime() < this.expectedStopDate.getTime();
+      // this.expectedStopDate = dateOrderActivated + new Date(totalDosageTimeInSeconds)
+    }
   }
 }
