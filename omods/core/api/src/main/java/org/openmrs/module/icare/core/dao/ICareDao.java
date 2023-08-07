@@ -487,8 +487,7 @@ public class ICareDao extends BaseDAO<Item> {
 	        Order.FulfillerStatus fulfillerStatus, Integer limit, Integer startIndex) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT distinct o FROM Visit v" + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o"
-		        + " INNER JOIN o.orderType ot" + " WHERE ot.uuid=:orderTypeUuid " + " AND v.stopDatetime IS NULL "
-		        + " AND v.uuid=:visitUuid ";
+		        + " INNER JOIN o.orderType ot" + " WHERE ot.uuid=:orderTypeUuid " + " AND v.uuid=:visitUuid ";
 		if (fulfillerStatus != null) {
 			queryStr += " AND o.fulfillerStatus=:fulfillerStatus";
 		} else {

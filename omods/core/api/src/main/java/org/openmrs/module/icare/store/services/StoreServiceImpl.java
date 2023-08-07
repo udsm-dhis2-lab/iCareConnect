@@ -944,7 +944,15 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		
 		return isPendingRequisition;
 	}
-	
+
+	@Override
+	public Requisition deleteRequisition(String requisitionUuid) {
+
+		Requisition requisition = stockDAO.deleteRequisition(requisitionUuid);
+
+		return requisition;
+	}
+
 	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		

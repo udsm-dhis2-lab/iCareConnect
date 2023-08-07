@@ -207,6 +207,13 @@ public class StoreController {
 		
 		return requisition.toMapWithItems();
 	}
+
+	@RequestMapping(value = "request/{requisitionUuid}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public Map<String,Object> deleteRequisition(@PathVariable("requisitionUuid") String requisitionUuid){
+		Requisition requisition = storeService.deleteRequisition(requisitionUuid);
+		return requisition.toMap();
+	}
 	
 	@RequestMapping(value = "requestitem", method = RequestMethod.POST)
 	@ResponseBody
@@ -229,6 +236,10 @@ public class StoreController {
 		
 		return updatedRequisitionItem.toMap();
 	}
+
+	@RequestMapping(value = "requestitem/{requestItemUuid}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public Map<String, Object> deleteRequisitionItem()
 	
 	@RequestMapping(value = "requeststatus", method = RequestMethod.POST)
 	@ResponseBody

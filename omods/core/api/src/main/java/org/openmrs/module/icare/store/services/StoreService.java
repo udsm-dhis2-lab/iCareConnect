@@ -158,4 +158,6 @@ public interface StoreService extends OpenmrsService {
 	ReorderLevel updateReorderLevel(ReorderLevel reorderLevel);
 	
 	Boolean isPendingRequisition(String itemUuid, String locationUuid);
+
+	Requisition deleteRequisition(String requisitionUuid);
 }

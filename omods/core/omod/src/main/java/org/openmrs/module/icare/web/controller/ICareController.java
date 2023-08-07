@@ -361,7 +361,7 @@ public class ICareController {
                                                 @RequestParam(defaultValue = "0") Integer startIndex,
                                                 @RequestParam String orderTypeUuid,
                                                 @RequestParam String visitUuid,
-                                                @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus) {
+                                                @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus, @RequestParam(required = false) boolean includeInactiv) {
 
         List<Order> orders = iCareService.getOrdersByVisitAndOrderType(visitUuid, orderTypeUuid, fulfillerStatus, limit, startIndex);
 
