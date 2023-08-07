@@ -509,4 +509,30 @@ public class StockDAO extends BaseDAO<Stock> {
 		return isPendingRequisition;
 		
 	}
+
+	public Requisition deleteRequisition(String requisitionUuid) {
+
+		DbSession session = this.getSession();
+		String selectQueryStr = "SELECT rq FROM Requisition rq WHERE rq.uuid = :requisitionUuid";
+
+		Query selectQuery = session.createQuery(selectQueryStr);
+		selectQuery.setParameter("requisitionUuid", requisitionUuid);
+
+		Requisition deletedRequisition = (Requisition) selectQuery.uniqueResult(); // Fetch the object before deletion
+
+		if (deletedRequisition != null) {
+			String deleteQueryStr = "DELETE FROM Requisition rq WHERE rq.uuid = :requisitionUuid";
+
+			Query deleteQuery = session.createQuery(deleteQueryStr);
+			deleteQuery.setParameter("requisitionUuid", requisitionUuid);
+
+			int deletedCount = deleteQuery.executeUpdate(); // Perform the deletion
+
+			// Now 'deletedRequisition' contains the deleted object
+		}
+
+		session.getTransaction().commit(); // Commit the transaction
+
+		return deletedRequisition;
+	}
 }
