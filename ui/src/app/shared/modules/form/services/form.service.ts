@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { from, Observable, of, zip } from "rxjs";
-import { catchError, map } from "rxjs/operators";
+import { catchError, map, mergeMap } from "rxjs/operators";
 import { Api, FormGet } from "src/app/shared/resources/openmrs";
 import { OpenmrsHttpClientService } from "../../openmrs-http-client/services/openmrs-http-client.service";
 import { getFormQueryFields } from "../helpers/get-form-query-field.helper";
@@ -18,19 +18,37 @@ export class FormService {
     private systemSettingsService: SystemSettingsService
   ) {}
 
-  getForms(formConfigs: FormConfig[]): Observable<ICAREForm[]> {
-    return zip(
-      ...(formConfigs || []).map((formConfig) =>
-        from(this.getForm(formConfig.name, formConfig.formLevel))
+  getForms(formConfigs: FormConfig[]): Observable<any[]> {
+    return this.systemSettingsService
+      .getSystemSettingsByKey(
+        `icare.forms.formFieldsConcepts.dataTypeExtensionReference.conceptSourceUuid`
       )
-    ).pipe(
-      map((forms) => {
-        return (forms || []).filter((form) => form);
-      })
-    );
+      .pipe(
+        mergeMap((conceptSourceUuid) => {
+          return zip(
+            ...(formConfigs || []).map((formConfig) => {
+              return from(
+                this.getForm(
+                  formConfig.name,
+                  formConfig.formLevel,
+                  conceptSourceUuid
+                )
+              );
+            })
+          ).pipe(
+            map((forms) => {
+              return (forms || []).filter((form) => form);
+            })
+          );
+        })
+      );
   }
 
-  async getForm(formName: string, queryLevel: number): Promise<any> {
+  async getForm(
+    formName: string,
+    queryLevel: number,
+    conceptSourceUuid?: string
+  ): Promise<any> {
     const formConceptResult = await this.api.concept.getAllConcepts({
       name: formName,
       v: `custom:${getFormQueryFields(queryLevel)}`,
@@ -38,7 +56,7 @@ export class FormService {
 
     const formConcept: any = (formConceptResult?.results || [])[0];
 
-    return getSanitizedFormObject(formConcept);
+    return getSanitizedFormObject(formConcept, null, null, conceptSourceUuid);
   }
 
   searchItem(

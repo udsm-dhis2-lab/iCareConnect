@@ -600,9 +600,8 @@ export class RegistrationAddComponent implements OnInit {
                   return attribute.attributeType.display === "kinPhone";
                 }
               )[0]?.value;
-            this.residenceField.value = this.residenceField.searchTerm = this
-              ?.patientInformation?.patient?.person?.preferredAddress
-              ?.cityVillage
+            this.residenceField.value = this?.patientInformation?.patient
+              ?.person?.preferredAddress?.cityVillage
               ? this?.patientInformation?.patient?.person?.preferredAddress
                   ?.cityVillage
               : this?.patientInformation?.patient?.person?.preferredAddress
@@ -1175,7 +1174,7 @@ export class RegistrationAddComponent implements OnInit {
   }
 
   validateNamesInputs(value, key) {
-    var regex = /^[a-zA-Z ]{2,30}$/;
+    var regex = /^[a-zA-Z' ]{2,30}$/;
     this.validatedTexts[key] = regex.test(value) ? "valid" : "invalid";
   }
 

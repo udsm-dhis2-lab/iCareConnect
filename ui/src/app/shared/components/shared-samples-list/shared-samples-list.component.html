@@ -622,14 +622,20 @@
                 {{ visit?.location?.display }}
               </td>
               <td>
-                <button
-                  mat-flat-button
-                  (click)="
-                    getSamplesListByVisit($event, visit, sampleVisitParameters)
-                  "
-                >
-                  View samples
-                </button>
+                <div class="w-100 d-flex justify-content-end">
+                  <button
+                    mat-stroked-button
+                    (click)="
+                      getSamplesListByVisit(
+                        $event,
+                        visit,
+                        sampleVisitParameters
+                      )
+                    "
+                  >
+                    View samples
+                  </button>
+                </div>
               </td>
             </tr>
             <ng-container *ngIf="currentVisit?.uuid === visit?.uuid">
@@ -656,6 +662,22 @@
                           <th rowspan="2">Collected By</th>
                           <th rowspan="2">Collected On</th>
                           <th rowspan="2">Priority</th>
+                          <th rowspan="2" class="text-right">
+                            <section *ngIf="tabType === 'samples-to-accept'">
+                              <mat-checkbox
+                                [disabled]="!params?.currentSamplesByVisits"
+                                color="primary"
+                                [checked]="allCurrentPatientSamplesSelected"
+                                (change)="
+                                  toggleCurrentPatientSamples(
+                                    $event,
+                                    params?.currentSamplesByVisits
+                                  )
+                                "
+                                >All</mat-checkbox
+                              >
+                            </section>
+                          </th>
                         </tr>
                         <tr>
                           <th>Test Order</th>
@@ -743,7 +765,7 @@
                                 *ngIf="orderCount == 0"
                                 [attr.rowspan]="sample?.orders?.length"
                               >
-                                <div class="d-flex justify-content-center">
+                                <div class="d-flex justify-content-end">
                                   <div
                                     class="d-flex justify-content-end"
                                     *ngIf="
@@ -815,18 +837,26 @@
                                     >
                                       Reject
                                     </button>
-                                    <!-- <section
+                                    <section
                                       class="ml-4"
                                       title="Tick to accept or reject"
                                     >
                                       <mat-checkbox
                                         color="primary"
                                         [checked]="
-                                          keyedSelectedSamples[sample?.id]
+                                          currentPatientSelectedSamples[
+                                            sample?.uuid
+                                          ]
                                         "
-                                        (change)="onSelectItem($event, sample)"
+                                        (change)="
+                                          toggleCurrentPatientSample(
+                                            $event,
+                                            sample,
+                                            params?.currentSamplesByVisits
+                                          )
+                                        "
                                       ></mat-checkbox>
-                                    </section> -->
+                                    </section>
                                   </div>
                                 </div>
                                 <div
@@ -888,6 +918,28 @@
                         </ng-container>
                       </tbody>
                     </table>
+                    <div
+                      class="w-100 d-flex justify-content-end mt-2"
+                      *ngIf="tabType === 'samples-to-accept'"
+                    >
+                      <button
+                        [disabled]="currentPatientSelectedSamplesCount === 0"
+                        mat-stroked-button
+                        class="btn btn-danger"
+                        (click)="onRejectAllCurrentPatientSamples($event)"
+                      >
+                        Reject selected
+                      </button>
+                      <button
+                        [disabled]="currentPatientSelectedSamplesCount === 0"
+                        mat-flat-button
+                        color="primary"
+                        class="ml-2"
+                        (click)="onAcceptAllCurrentPatientSamples($event)"
+                      >
+                        Accept selected
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </ng-container>

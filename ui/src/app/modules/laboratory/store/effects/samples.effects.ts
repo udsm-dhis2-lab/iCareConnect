@@ -278,13 +278,10 @@ export class SamplesEffects {
                       ...formattedOrders,
                       {
                         ...order,
-                        paid:
-                          action.paidItems[order?.concept?.display]
-                            ? true
-                            : false,
+                        paid: action.paidItems[order?.uuid] ? true : false,
                         isEnsured: action.visit.isEnsured,
                         isEmergency: action.visit.isEmergency,
-                        isAdmitted: action.visit.isAdmitted
+                        isAdmitted: action.visit.isAdmitted,
                       },
                     ];
                   });
