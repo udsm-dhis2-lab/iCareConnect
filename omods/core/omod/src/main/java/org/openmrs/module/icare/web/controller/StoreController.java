@@ -224,6 +224,15 @@ public class StoreController {
 		
 		return savedRequisitionItem.toMap();
 	}
+
+	@RequestMapping(value = "requestitem/{requestItemUuid}", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getRequisition(@PathVariable(value = "requestItemUuid") String requestItemUuid){
+
+		RequisitionItem requisitionItem = storeService.getRequisitionItem(requestItemUuid);
+
+		return  requisitionItem.toMap();
+	}
 	
 	@RequestMapping(value = "requestitem/{requestItemUuid}", method = RequestMethod.POST)
 	@ResponseBody
@@ -239,7 +248,21 @@ public class StoreController {
 
 	@RequestMapping(value = "requestitem/{requestItemUuid}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public Map<String, Object> deleteRequisitionItem()
+	public Map<String, Object> deleteRequisitionItem(@PathVariable(value = "requestItemUuid") String requestItemUuid){
+
+		RequisitionItem requisitionItem = storeService.deleteRequisitionItem(requestItemUuid);
+
+		return requisitionItem.toMap();
+	}
+
+	@RequestMapping(value = "requestitemstatus/{requestItemStatusUuid}",method = RequestMethod.DELETE)
+	@ResponseBody
+	public Map<String, Object> deleteRequisitionItemStatus(@PathVariable(value = "requestItemStatusUuid") String requestItemStatusUuid){
+
+		RequisitionItemStatus requisitionItemStatus = storeService.deleteRequisitionItemStatus(requestItemStatusUuid);
+
+		return requisitionItemStatus.toMap();
+	}
 	
 	@RequestMapping(value = "requeststatus", method = RequestMethod.POST)
 	@ResponseBody
@@ -249,7 +272,14 @@ public class StoreController {
 		
 		return storeService.saveRequestStatus(requisitionStatus).toMap();
 	}
-	
+
+	@RequestMapping(value = "requeststatus/{requestStatusUuid}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public Map<String,Object> deleteRequisitionStatus(@PathVariable(value = "requestStatusUuid") String requestStatusUuid){
+		RequisitionStatus requisitionStatus = storeService.deleteRequisitionStatus(requestStatusUuid);
+		return  requisitionStatus.toMap();
+	}
+
 	@RequestMapping(value = "requests", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getRequisitionsByLocation(@RequestParam(required = false) String requestingLocationUuid,
@@ -797,7 +827,16 @@ public class StoreController {
 		
 		StockInvoice stockInvoice = storeService.getStockInvoice(stockInvoiceUuid);
 		return stockInvoice.toMapWithItems();
-		
+	}
+
+	@RequestMapping(value = "stockinvoice/{stockInvoiceUuid}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public Map<String, Object> deleteStockInvoice(@PathVariable String stockInvoiceUuid){
+
+		StockInvoice stockInvoice = storeService.deleteStockInvoice(stockInvoiceUuid);
+
+		return stockInvoice.toMap();
+
 	}
 	
 	@RequestMapping(value = "suppliers",method = RequestMethod.POST)
@@ -887,4 +926,5 @@ public class StoreController {
 		StockInvoiceItem stockInvoiceItem = storeService.getStockInvoiceItemByUuid(stockInvoiceItemUuid);
 		return stockInvoiceItem.toMap();
 	}
+
 }
