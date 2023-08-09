@@ -1,16 +1,11 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { select, Store } from "@ngrx/store";
 import jsPDF from "jspdf";
-import { zip } from "rxjs";
-import { map } from "rxjs/operators";
 import { SharedPdfPreviewComponent } from "src/app/shared/dialogs/shared-pdf-preview/shared-pdf-preview.component";
 import { addBillStatusToOrders } from "src/app/shared/helpers/add-bill-status-to-ordered-items.helper";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { VisitsService } from "src/app/shared/resources/visits/services";
-import { AppState } from "src/app/store/reducers";
-import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 
 @Component({
   selector: "app-patient-radiology-orders-list",
@@ -33,11 +28,11 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
 
   saving: boolean = false;
   base64FileData: any;
+  formattedOrders: any[];
   constructor(
     private httpClient: HttpClient,
     private visitService: VisitsService,
     private ordersService: OrdersService,
-    private store: Store<AppState>,
     private dialog: MatDialog
   ) {}
 
@@ -65,7 +60,8 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
           });
         }
       });
-    this.orders = addBillStatusToOrders(
+
+    this.formattedOrders = addBillStatusToOrders(
       this.orders,
       this.currentBills,
       this.activeVisit
