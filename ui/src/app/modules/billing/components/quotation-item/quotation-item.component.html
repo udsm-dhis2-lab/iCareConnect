@@ -11,6 +11,10 @@
             >Total Amount:
             {{ bill.totalPaymentAmount | currency: "TZS":"":".0" }}</span
           >
+
+          <span style="color: #2a8fd1" *ngIf="bill?.billDetails?.created">
+            (On: {{ bill?.billDetails?.created | date }})
+          </span>
           <span class="ml-4" *ngIf="bill?.discount > 0"
             >Discount {{ bill?.discount | currency: "TZS":"":".0" }}</span
           >

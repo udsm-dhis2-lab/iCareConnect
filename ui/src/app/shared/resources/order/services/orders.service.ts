@@ -78,7 +78,7 @@ export class OrdersService {
           return response?.results.map((orderDetails) => {
             return {
               ...orderDetails,
-              orderUuid: orderDetails?.drug?.uuid,
+              drugUuid: orderDetails?.drug?.uuid,
               paid: getDrugOrderPaymentStatus(orderDetails, visit),
             };
           });

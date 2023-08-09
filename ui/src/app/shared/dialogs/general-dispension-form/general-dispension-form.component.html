@@ -83,24 +83,17 @@
       </div>
     </div>
     <div
-      class="alert alert-warning text-center"
-      role="alert"
       *ngIf="
+        selectedDrug &&
         params?.keyedPreviousVisitDrugOrders &&
         params?.keyedPreviousVisitDrugOrders[selectedDrug?.uuid]
       "
     >
-      <b>
-        This drug is still under use.
-        {{
-          params?.keyedPreviousVisitDrugOrders[selectedDrug?.uuid]
-            ?.dateActivated | date: "medium"
-        }}
-      </b>
       <app-shared-drug-dosage-interpretation
         [prescription]="
           params?.keyedPreviousVisitDrugOrders[selectedDrug?.uuid]
         "
+        [showWarningOnly]="true"
       ></app-shared-drug-dosage-interpretation>
     </div>
     <div class="d-flex justify-content-end">

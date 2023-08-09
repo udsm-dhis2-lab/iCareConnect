@@ -41,22 +41,23 @@ export function getSanitizedFormObject(
     mappings,
     units,
   } = concept;
-
+  // console.log("mappings", mappings);
+  // console.log(conceptSourceUuid);
   const formObject = {
     id: uuid,
     uuid,
     name: name?.name ? name?.name : display,
     dataType:
-      (
-        mappings?.filter(
-          (mapping: any) =>
-            mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
-            conceptSourceUuid
-        ) || []
-      )?.length > 0
-        ? "Textarea"
-        : answers?.length > 0 || isDiagnosis
+      answers?.length > 0 || isDiagnosis
         ? "Coded"
+        : (
+            mappings?.filter(
+              (mapping: any) =>
+                mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
+                conceptSourceUuid
+            ) || []
+          )?.length > 0
+        ? "Textarea"
         : datatype?.display,
     formClass: conceptClass?.display,
     concept: concept,
