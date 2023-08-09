@@ -509,30 +509,217 @@ public class StockDAO extends BaseDAO<Stock> {
 		return isPendingRequisition;
 		
 	}
-
+	
 	public Requisition deleteRequisition(String requisitionUuid) {
-
+		
 		DbSession session = this.getSession();
 		String selectQueryStr = "SELECT rq FROM Requisition rq WHERE rq.uuid = :requisitionUuid";
-
+		
 		Query selectQuery = session.createQuery(selectQueryStr);
 		selectQuery.setParameter("requisitionUuid", requisitionUuid);
-
+		
 		Requisition deletedRequisition = (Requisition) selectQuery.uniqueResult(); // Fetch the object before deletion
-
+		
 		if (deletedRequisition != null) {
 			String deleteQueryStr = "DELETE FROM Requisition rq WHERE rq.uuid = :requisitionUuid";
-
+			
 			Query deleteQuery = session.createQuery(deleteQueryStr);
 			deleteQuery.setParameter("requisitionUuid", requisitionUuid);
+			
+			int deletedCount = deleteQuery.executeUpdate(); // Perform the deletion
+			
+			// Now 'deletedRequisition' contains the deleted object
+		}
+		
+		session.getTransaction().commit(); // Commit the transaction
+		
+		return deletedRequisition;
+	}
+
+	public RequisitionItem deleteRequisitionItem(String requestItemUuid) {
+
+		DbSession session = this.getSession();
+		String selectQueryStr = "SELECT rq FROM RequisitionItem rq WHERE rq.uuid = :requestItemUuid";
+
+		Query selectQuery = session.createQuery(selectQueryStr);
+		selectQuery.setParameter("requestItemUuid", requestItemUuid);
+
+		RequisitionItem deletedRequisitionItem = (RequisitionItem) selectQuery.uniqueResult(); // Fetch the object before deletion
+
+		if (deletedRequisitionItem != null) {
+			String deleteQueryStr = "DELETE FROM RequisitionItem rq WHERE rq.uuid = :requestItemUuid";
+
+			Query deleteQuery = session.createQuery(deleteQueryStr);
+			deleteQuery.setParameter("requestItemUuid", requestItemUuid);
 
 			int deletedCount = deleteQuery.executeUpdate(); // Perform the deletion
 
-			// Now 'deletedRequisition' contains the deleted object
 		}
 
 		session.getTransaction().commit(); // Commit the transaction
 
-		return deletedRequisition;
+		return deletedRequisitionItem;
+
+	}
+
+	public RequisitionStatus deleteRequisitionStatus(String requestStatusUuid) {
+
+		DbSession session = this.getSession();
+		String selectQueryStr = "SELECT rq FROM RequisitionStatus rq WHERE rq.uuid = :requestStatusUuid";
+
+		Query selectQuery = session.createQuery(selectQueryStr);
+		selectQuery.setParameter("requestStatusUuid", requestStatusUuid);
+
+		RequisitionStatus deletedRequisitionStatus = (RequisitionStatus) selectQuery.uniqueResult(); // Fetch the object before deletion
+
+		if (deletedRequisitionStatus != null) {
+			String deleteQueryStr = "DELETE FROM RequisitionStatus rq WHERE rq.uuid = :requestStatusUuid";
+
+			Query deleteQuery = session.createQuery(deleteQueryStr);
+			deleteQuery.setParameter("requestStatusUuid", requestStatusUuid);
+
+			int deletedCount = deleteQuery.executeUpdate(); // Perform the deletion
+
+		}
+
+		session.getTransaction().commit(); // Commit the transaction
+
+		return deletedRequisitionStatus;
+	}
+
+	public RequisitionItemStatus deleteRequisitionItemStatus(String requestItemStatusUuid) {
+		DbSession session = this.getSession();
+		String selectQueryStr = "SELECT rq FROM RequisitionItemStatus rq WHERE rq.uuid = :requestItemStatusUuid";
+
+		Query selectQuery = session.createQuery(selectQueryStr);
+		selectQuery.setParameter("requestItemStatusUuid", requestItemStatusUuid);
+
+		RequisitionItemStatus deletedRequisitionItemStatus = (RequisitionItemStatus) selectQuery.uniqueResult(); // Fetch the object before deletion
+
+		if (deletedRequisitionItemStatus != null) {
+			String deleteQueryStr = "DELETE FROM RequisitionItemStatus rq WHERE rq.uuid = :requestItemStatusUuid";
+
+			Query deleteQuery = session.createQuery(deleteQueryStr);
+			deleteQuery.setParameter("requestItemStatusUuid", requestItemStatusUuid);
+
+			int deletedCount = deleteQuery.executeUpdate(); // Perform the deletion
+
+		}
+
+		session.getTransaction().commit(); // Commit the transaction
+
+		return deletedRequisitionItemStatus;
+
+	}
+
+	public RequisitionItem getRequisitionItemByUuid(String requestItemUuid) {
+
+		DbSession session = this.getSession();
+		String queryStr = "SELECT ri FROM RequisitionItem ri WHERE ri.uuid = :requestItemUuid";
+
+		Query query = session.createQuery(queryStr);
+		query.setParameter("requestItemUuid", requestItemUuid);
+
+		return (RequisitionItem) query.uniqueResult();
+	}
+
+	public StockInvoice deleteStockInvoice(String stockInvoiceUuid) {
+
+		DbSession session = this.getSession();
+		String selectQueryStr = "SELECT sti FROM StockInvoice sti WHERE sti.uuid = :stockInvoiceUuid";
+
+		Query selectQuery = session.createQuery(selectQueryStr);
+		selectQuery.setParameter("stockInvoiceUuid", stockInvoiceUuid);
+
+		StockInvoice deletedStockInvoice = (StockInvoice) selectQuery.uniqueResult(); // Fetch the object before deletion
+
+		if (deletedStockInvoice != null) {
+			String deleteQueryStr = "DELETE FROM StockInvoice sti WHERE sti.uuid = :stockInvoiceUuid";
+
+			Query deleteQuery = session.createQuery(deleteQueryStr);
+			deleteQuery.setParameter("stockInvoiceUuid", stockInvoiceUuid);
+
+			int deletedCount = deleteQuery.executeUpdate(); // Perform the deletion
+
+		}
+
+		session.getTransaction().commit(); // Commit the transaction
+
+		return deletedStockInvoice;
+
+	}
+
+	public StockInvoiceStatus deleteStockInvoiceStatus(String stockInvoiceStatusUuid) {
+		DbSession session = this.getSession();
+		String selectQueryStr = "SELECT stis FROM StockInvoiceStatus stis WHERE sti.uuid = :stockInvoiceStatusUuid";
+
+		Query selectQuery = session.createQuery(selectQueryStr);
+		selectQuery.setParameter("stockInvoiceStatusUuid", stockInvoiceStatusUuid);
+
+		StockInvoiceStatus deletedStockInvoiceStatus = (StockInvoiceStatus) selectQuery.uniqueResult(); // Fetch the object before deletion
+
+		if (deletedStockInvoiceStatus != null) {
+			String deleteQueryStr = "DELETE FROM StockInvoiceStatus stis WHERE stis.uuid = :stockInvoiceStatusUuid";
+
+			Query deleteQuery = session.createQuery(deleteQueryStr);
+			deleteQuery.setParameter("stockInvoiceStatusUuid", stockInvoiceStatusUuid);
+
+			int deletedCount = deleteQuery.executeUpdate(); // Perform the deletion
+
+		}
+
+		session.getTransaction().commit(); // Commit the transaction
+
+		return deletedStockInvoiceStatus;
+	}
+
+	public StockInvoiceItem deleteStockInvoiceItem(String stockInvoiceItemUuid) {
+
+		DbSession session = this.getSession();
+		String selectQueryStr = "SELECT stii FROM StockInvoiceItem stii WHERE stii.uuid = :stockInvoiceItemUuid";
+
+		Query selectQuery = session.createQuery(selectQueryStr);
+		selectQuery.setParameter("stockInvoiceItemUuid", stockInvoiceItemUuid);
+
+		StockInvoiceItem deletedStockInvoiceItem = (StockInvoiceItem) selectQuery.uniqueResult(); // Fetch the object before deletion
+
+		if (deletedStockInvoiceItem != null) {
+			String deleteQueryStr = "DELETE FROM StockInvoiceItem stii WHERE stii.uuid = :stockInvoiceItemUuid";
+
+			Query deleteQuery = session.createQuery(deleteQueryStr);
+			deleteQuery.setParameter("stockInvoiceItemUuid", stockInvoiceItemUuid);
+
+			int deletedCount = deleteQuery.executeUpdate(); // Perform the deletion
+
+		}
+
+		session.getTransaction().commit(); // Commit the transaction
+
+		return deletedStockInvoiceItem;
+	}
+
+	public StockInvoiceItemStatus deleteStockInvoiceItemStatus(String stockInvoiceItemStatusUuid) {
+
+		DbSession session = this.getSession();
+		String selectQueryStr = "SELECT stiis FROM StockInvoiceItemStatus stiis WHERE stiis.uuid = :stockInvoiceItemStatusUuid";
+
+		Query selectQuery = session.createQuery(selectQueryStr);
+		selectQuery.setParameter("stockInvoiceItemStatusUuid", stockInvoiceItemStatusUuid);
+
+		StockInvoiceItemStatus deletedStockInvoiceItemStatus = (StockInvoiceItemStatus) selectQuery.uniqueResult(); // Fetch the object before deletion
+
+		if (deletedStockInvoiceItemStatus != null) {
+			String deleteQueryStr = "DELETE FROM StockInvoiceItemStatus stiis WHERE stiis.uuid = :stockInvoiceItemStatusUuid";
+
+			Query deleteQuery = session.createQuery(deleteQueryStr);
+			deleteQuery.setParameter("stockInvoiceItemStatusUuid", stockInvoiceItemStatusUuid);
+
+			int deletedCount = deleteQuery.executeUpdate(); // Perform the deletion
+
+		}
+
+		session.getTransaction().commit(); // Commit the transaction
+
+		return deletedStockInvoiceItemStatus;
 	}
 }
