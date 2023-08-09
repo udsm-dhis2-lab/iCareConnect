@@ -75,6 +75,9 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   currentSamplesByVisits$: Observable<any[]>;
   currentVisit: any;
   sampleVisitParameters: any;
+  allCurrentPatientSamplesSelected: boolean = false;
+  currentPatientSelectedSamples: any = {};
+  currentPatientSelectedSamplesCount: number = 0;
   constructor(
     private sampleService: SamplesService,
     private dialog: MatDialog,
@@ -142,6 +145,68 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     });
 
     this.currentUser$ = this.store.select(getCurrentUserDetails);
+  }
+
+  toggleCurrentPatientSamples(event: MatCheckboxChange, samples: any[]): void {
+    if (event.checked) {
+      this.allCurrentPatientSamplesSelected = true;
+      this.currentPatientSelectedSamples = keyBy(samples, "uuid");
+    } else {
+      this.allCurrentPatientSamplesSelected = false;
+      this.currentPatientSelectedSamples = {};
+    }
+    this.currentPatientSelectedSamplesCount = Object.keys(
+      this.currentPatientSelectedSamples
+    )?.length;
+  }
+
+  toggleCurrentPatientSample(
+    event: MatCheckboxChange,
+    sample: any,
+    allSamples: any[]
+  ): void {
+    if (event.checked) {
+      this.currentPatientSelectedSamples[sample?.uuid] = sample;
+      this.allCurrentPatientSamplesSelected =
+        allSamples?.length ===
+        Object.keys(this.currentPatientSelectedSamples)?.length;
+    } else {
+      this.currentPatientSelectedSamples = omit(
+        this.currentPatientSelectedSamples,
+        sample?.id
+      );
+      this.allCurrentPatientSamplesSelected = false;
+    }
+    this.currentPatientSelectedSamplesCount = Object.keys(
+      this.currentPatientSelectedSamples
+    )?.length;
+  }
+
+  onRejectAllCurrentPatientSamples(event: Event): void {
+    event.stopPropagation();
+    this.selectedSampleDetails.emit({
+      data: Object.keys(this.currentPatientSelectedSamples).map(
+        (key) => this.currentPatientSelectedSamples[key]
+      ),
+      actionType: "reject",
+    });
+    this.allCurrentPatientSamplesSelected = false;
+    this.currentPatientSelectedSamples = {};
+    this.currentPatientSelectedSamplesCount = 0;
+  }
+
+  onAcceptAllCurrentPatientSamples(event: Event): void {
+    event.stopPropagation();
+
+    this.selectedSampleDetails.emit({
+      data: Object.keys(this.currentPatientSelectedSamples).map(
+        (key) => this.currentPatientSelectedSamples[key]
+      ),
+      actionType: "accept",
+    });
+    this.allCurrentPatientSamplesSelected = false;
+    this.currentPatientSelectedSamples = {};
+    this.currentPatientSelectedSamplesCount = 0;
   }
 
   toggleListType(event: MatRadioChange): void {
@@ -217,8 +282,8 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       category,
       params?.hasStatus,
       this.excludeAllocations,
-      this.tabType?this.tabType : null,
-      this.excludedSampleCategories?this.excludedSampleCategories: null,
+      this.tabType ? this.tabType : null,
+      this.excludedSampleCategories ? this.excludedSampleCategories : null,
       {
         pageSize: params?.pageSize,
         page: params?.page,
