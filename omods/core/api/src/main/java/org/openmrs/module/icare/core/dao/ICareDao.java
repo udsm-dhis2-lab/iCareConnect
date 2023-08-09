@@ -389,7 +389,15 @@ public class ICareDao extends BaseDAO<Item> {
 
 //				queryStr = queryStr.substring(0,queryStr.length()-1);
 
-				queryStr += " AND sp NOT IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+
+				queryStr += " v IN (SELECT sp.visit FROM Sample sp WHERE sp NOT IN (SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
+
+				//queryStr += " AND sp NOT IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
 
 				//System.out.println(excludedValue);
 
@@ -426,7 +434,7 @@ public class ICareDao extends BaseDAO<Item> {
 		} else if (orderByDirection == VisitWrapper.OrderByDirection.DESC) {
 			queryStr += " DESC ";
 		}
-		
+		System.out.println(queryStr);
 		query = session.createQuery(queryStr);
 		if (orderTypeUuid != null) {
 			query.setParameter("orderTypeUuid", orderTypeUuid);
