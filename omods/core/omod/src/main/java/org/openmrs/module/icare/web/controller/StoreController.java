@@ -207,10 +207,10 @@ public class StoreController {
 		
 		return requisition.toMapWithItems();
 	}
-
+	
 	@RequestMapping(value = "request/{requisitionUuid}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public Map<String,Object> deleteRequisition(@PathVariable("requisitionUuid") String requisitionUuid){
+	public Map<String, Object> deleteRequisition(@PathVariable("requisitionUuid") String requisitionUuid) {
 		Requisition requisition = storeService.deleteRequisition(requisitionUuid);
 		return requisition.toMap();
 	}
@@ -224,14 +224,14 @@ public class StoreController {
 		
 		return savedRequisitionItem.toMap();
 	}
-
+	
 	@RequestMapping(value = "requestitem/{requestItemUuid}", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getRequisition(@PathVariable(value = "requestItemUuid") String requestItemUuid){
-
+	public Map<String, Object> getRequisition(@PathVariable(value = "requestItemUuid") String requestItemUuid) {
+		
 		RequisitionItem requisitionItem = storeService.getRequisitionItem(requestItemUuid);
-
-		return  requisitionItem.toMap();
+		
+		return requisitionItem.toMap();
 	}
 	
 	@RequestMapping(value = "requestitem/{requestItemUuid}", method = RequestMethod.POST)
@@ -245,22 +245,23 @@ public class StoreController {
 		
 		return updatedRequisitionItem.toMap();
 	}
-
+	
 	@RequestMapping(value = "requestitem/{requestItemUuid}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public Map<String, Object> deleteRequisitionItem(@PathVariable(value = "requestItemUuid") String requestItemUuid){
-
+	public Map<String, Object> deleteRequisitionItem(@PathVariable(value = "requestItemUuid") String requestItemUuid) {
+		
 		RequisitionItem requisitionItem = storeService.deleteRequisitionItem(requestItemUuid);
-
+		
 		return requisitionItem.toMap();
 	}
-
-	@RequestMapping(value = "requestitemstatus/{requestItemStatusUuid}",method = RequestMethod.DELETE)
+	
+	@RequestMapping(value = "requestitemstatus/{requestItemStatusUuid}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public Map<String, Object> deleteRequisitionItemStatus(@PathVariable(value = "requestItemStatusUuid") String requestItemStatusUuid){
-
+	public Map<String, Object> deleteRequisitionItemStatus(
+	        @PathVariable(value = "requestItemStatusUuid") String requestItemStatusUuid) {
+		
 		RequisitionItemStatus requisitionItemStatus = storeService.deleteRequisitionItemStatus(requestItemStatusUuid);
-
+		
 		return requisitionItemStatus.toMap();
 	}
 	
@@ -272,14 +273,14 @@ public class StoreController {
 		
 		return storeService.saveRequestStatus(requisitionStatus).toMap();
 	}
-
+	
 	@RequestMapping(value = "requeststatus/{requestStatusUuid}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public Map<String,Object> deleteRequisitionStatus(@PathVariable(value = "requestStatusUuid") String requestStatusUuid){
+	public Map<String, Object> deleteRequisitionStatus(@PathVariable(value = "requestStatusUuid") String requestStatusUuid) {
 		RequisitionStatus requisitionStatus = storeService.deleteRequisitionStatus(requestStatusUuid);
-		return  requisitionStatus.toMap();
+		return requisitionStatus.toMap();
 	}
-
+	
 	@RequestMapping(value = "requests", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getRequisitionsByLocation(@RequestParam(required = false) String requestingLocationUuid,
@@ -828,15 +829,15 @@ public class StoreController {
 		StockInvoice stockInvoice = storeService.getStockInvoice(stockInvoiceUuid);
 		return stockInvoice.toMapWithItems();
 	}
-
+	
 	@RequestMapping(value = "stockinvoice/{stockInvoiceUuid}", method = RequestMethod.DELETE)
 	@ResponseBody
-	public Map<String, Object> deleteStockInvoice(@PathVariable String stockInvoiceUuid){
-
+	public Map<String, Object> deleteStockInvoice(@PathVariable String stockInvoiceUuid) {
+		
 		StockInvoice stockInvoice = storeService.deleteStockInvoice(stockInvoiceUuid);
-
+		
 		return stockInvoice.toMap();
-
+		
 	}
 	
 	@RequestMapping(value = "suppliers",method = RequestMethod.POST)
@@ -926,5 +927,5 @@ public class StoreController {
 		StockInvoiceItem stockInvoiceItem = storeService.getStockInvoiceItemByUuid(stockInvoiceItemUuid);
 		return stockInvoiceItem.toMap();
 	}
-
+	
 }
