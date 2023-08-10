@@ -946,6 +946,111 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
+	public Requisition deleteRequisition(String requisitionUuid) {
+		
+		Requisition requisitionToDelete = this.getRequestByUuid(requisitionUuid);
+		
+		if (requisitionToDelete != null) {
+			if (requisitionToDelete.getRequisitionItems().size() > 0) {
+				
+				for (RequisitionItem requisitionItem : requisitionToDelete.getRequisitionItems()) {
+					this.deleteRequisitionItem(requisitionItem.getUuid());
+				}
+			}
+			
+			if (requisitionToDelete.getRequisitionStatuses().size() > 0) {
+				for (RequisitionStatus requisitionStatus : this.getRequisitionStatuses()) {
+					this.deleteRequisitionStatus(requisitionStatus.getUuid());
+				}
+			}
+		}
+		
+		Requisition requisition = stockDAO.deleteRequisition(requisitionUuid);
+		
+		return requisition;
+	}
+	
+	@Override
+	public RequisitionItem deleteRequisitionItem(String requestItemUuid) {
+		
+		RequisitionItem requisitionItemToDelete = this.getRequisitionItem(requestItemUuid);
+		
+		if (requisitionItemToDelete != null) {
+			if (requisitionItemToDelete.getRequisitionItemStatuses().size() > 1) {
+				for (RequisitionItemStatus requisitionItemStatus : requisitionItemToDelete.getRequisitionItemStatuses()) {
+					this.deleteRequisitionItemStatus(requisitionItemStatus.getUuid());
+				}
+			}
+		}
+		
+		RequisitionItem requisitionItem = stockDAO.deleteRequisitionItem(requestItemUuid);
+		
+		return requisitionItem;
+	}
+	
+	@Override
+	public RequisitionStatus deleteRequisitionStatus(String requestStatusUuid) {
+		
+		RequisitionStatus requisitionStatus = stockDAO.deleteRequisitionStatus(requestStatusUuid);
+		return requisitionStatus;
+	}
+	
+	@Override
+	public RequisitionItemStatus deleteRequisitionItemStatus(String requestItemStatusUuid) {
+		
+		RequisitionItemStatus requisitionItemStatus = stockDAO.deleteRequisitionItemStatus(requestItemStatusUuid);
+		return requisitionItemStatus;
+	}
+	
+	@Override
+	public RequisitionItem getRequisitionItem(String requestItemUuid) {
+		RequisitionItem requisitionItem = stockDAO.getRequisitionItemByUuid(requestItemUuid);
+		return requisitionItem;
+	}
+	
+	@Override
+	public StockInvoice deleteStockInvoice(String stockInvoiceUuid) {
+		StockInvoice stockInvoiceToDelete = this.getStockInvoicebyUuid(stockInvoiceUuid);
+		if (stockInvoiceToDelete != null) {
+			if (stockInvoiceToDelete.getStockInvoiceItems().size() > 0) {
+				for (StockInvoiceItem stockInvoiceItem : stockInvoiceToDelete.getStockInvoiceItems()) {
+					this.deleteStockInvoiceItem(stockInvoiceItem.getUuid());
+				}
+			}
+			
+			if (stockInvoiceToDelete.getStockInvoiceStatuses().size() > 0) {
+				for (StockInvoiceStatus stockInvoiceStatus : stockInvoiceToDelete.getStockInvoiceStatuses()) {
+					this.deleteStockInvoiceStatus(stockInvoiceStatus.getUuid());
+				}
+			}
+		}
+		return stockDAO.deleteStockInvoice(stockInvoiceUuid);
+	}
+	
+	@Override
+	public StockInvoiceStatus deleteStockInvoiceStatus(String stockInvoiceStatusUuid) {
+		return stockDAO.deleteStockInvoiceStatus(stockInvoiceStatusUuid);
+	}
+	
+	@Override
+	public StockInvoiceItem deleteStockInvoiceItem(String stockInvoiceItemUuid) {
+		StockInvoiceItem stockInvoiceItem = this.getStockInvoiceItemByUuid(stockInvoiceItemUuid);
+		if (stockInvoiceItem != null) {
+			if (stockInvoiceItem.getStockInvoiceItemStatuses().size() > 0) {
+				for (StockInvoiceItemStatus stockInvoiceItemStatus : stockInvoiceItem.getStockInvoiceItemStatuses()) {
+					this.deleteStockInvoiceItemStatus(stockInvoiceItemStatus.getUuid());
+				}
+			}
+		}
+		return stockDAO.deleteStockInvoiceItem(stockInvoiceItemUuid);
+	}
+	
+	@Override
+	public StockInvoiceItemStatus deleteStockInvoiceItemStatus(String stockInvoiceItemStatusUuid) {
+		return stockDAO.deleteStockInvoiceItemStatus(stockInvoiceItemStatusUuid);
+	}
+	
+	@Override
 	public StockInvoice saveStockInvoice(StockInvoice stockInvoice) throws Exception {
 		
 		Supplier supplier = this.getSupplierByUuid(stockInvoice.getSupplier().getUuid());
