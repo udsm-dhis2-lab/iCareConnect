@@ -67,7 +67,8 @@
       [required]="field?.required"
       matInput
       autocomplete="off"
-      (keyup)="onFieldUpdate()"
+      (keyup)="onFieldUpdate($event)"
+      (keydown)="onListenKeyEvent($event)"
     />
     <!-- end of textbox -->
 

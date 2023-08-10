@@ -35,6 +35,7 @@ export class FormComponent implements OnInit {
   @Input() colClass: string;
 
   @Output() formUpdate: EventEmitter<any> = new EventEmitter<any>();
+  @Output() enterKeyPressedFields: EventEmitter<any> = new EventEmitter<any>();
   @Output() fileFormUpdate: EventEmitter<any> = new EventEmitter<any>();
   @Input() formId: string;
   @Input() formValidationRules: any[];
@@ -43,6 +44,7 @@ export class FormComponent implements OnInit {
 
   form: FormGroup;
   payload = "";
+  fieldsResponsedToEnterKey: any = {};
 
   @ViewChild(FieldComponent, { static: false })
   fieldComponent: FieldComponent;
@@ -89,6 +91,11 @@ export class FormComponent implements OnInit {
         this.values
       );
     }
+  }
+
+  onGetFieldsResponsedToEnterKey(fieldKey: string): void {
+    this.fieldsResponsedToEnterKey[fieldKey] = fieldKey;
+    this.enterKeyPressedFields.emit(this.fieldsResponsedToEnterKey);
   }
 
   onFileFieldUpdate(fileData: File): void {
