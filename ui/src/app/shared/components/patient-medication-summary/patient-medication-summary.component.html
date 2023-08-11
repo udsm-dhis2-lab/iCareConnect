@@ -3,7 +3,8 @@
     generalPrescriptionOrderType: generalPrescriptionOrderType$ | async,
     useGeneralPrescription: useGeneralPrescription$ | async,
     currentVisit: currentVisit$ | async,
-    filteredDrugOrders: filteredDrugOrders$ | async
+    filteredDrugOrders: filteredDrugOrders$ | async,
+    drugOrders: drugOrders$ | async
   } as drugParams"
 >
   <mat-progress-bar
@@ -246,46 +247,48 @@
                   <th>Instructions</th>
                   <th>Prescribed By</th>
                   <th>Prescribed On</th>
+                  <th>Dispensed?</th>
                 </tr>
               </thead>
               <tbody>
-                <ng-container
-                  *ngIf="drugParams?.currentVisit?.drugOrders?.length > 0"
-                >
-                  <tr
+                <ng-container *ngIf="drugParams?.drugOrders?.length > 0"
+                  ><ng-container
                     *ngFor="
-                      let drugOrder of drugParams?.currentVisit?.drugOrders;
+                      let drugOrder of drugParams?.drugOrders;
                       let count = index
                     "
                   >
-                    <td>
-                      {{ count + 1 }}
-                    </td>
-                    <td>
-                      {{
-                        drugOrder?.drug
-                          ? drugOrder?.drug?.display
-                          : drugOrder?.drugOrder?.display
-                      }}
-                    </td>
-                    <td>
-                      {{
-                        drugOrder?.drugOrder?.instructions
-                          ? drugOrder?.drugOrder?.instructions
-                          : "No instructions written"
-                      }}
-                    </td>
-                    <td>
-                      {{ drugOrder?.orderer?.display }}
-                    </td>
-                    <td>
-                      {{ drugOrder?.dateActivated | date: "medium" }}
-                    </td>
-                  </tr>
+                    <tr *ngIf="drugOrder?.statuses?.length > 0">
+                      <td>
+                        {{ count + 1 }}
+                      </td>
+                      <td>
+                        {{
+                          drugOrder?.drug
+                            ? drugOrder?.drug?.display
+                            : drugOrder?.drugOrder?.display
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          drugOrder?.drugOrder?.instructions
+                            ? drugOrder?.drugOrder?.instructions
+                            : "No instructions written"
+                        }}
+                      </td>
+                      <td>
+                        {{ drugOrder?.orderer?.display }}
+                      </td>
+                      <td>
+                        {{ drugOrder?.dateActivated | date: "medium" }}
+                      </td>
+                      <td>
+                        {{ drugOrder?.dispensed ? "Yes" : "No" }}
+                      </td>
+                    </tr>
+                  </ng-container>
                 </ng-container>
-                <ng-container
-                  *ngIf="drugParams?.currentVisit?.drugOrders?.length === 0"
-                >
+                <ng-container *ngIf="drugParams?.drugOrders?.length === 0">
                   <tr>
                     <td colspan="100%">
                       No previous visit drugs prescribed for this patient

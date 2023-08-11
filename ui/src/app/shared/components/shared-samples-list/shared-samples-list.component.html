@@ -600,7 +600,12 @@
           <ng-container
             *ngFor="let visit of params?.samples?.results; let count = index"
           >
-            <tr>
+            <tr
+              [ngClass]="{
+                'selected-visit':
+                  currentVisit && currentVisit?.uuid === visit?.uuid
+              }"
+            >
               <td>{{ count + 1 }}</td>
               <td>
                 {{ visit?.patient?.identifiers[0]?.identifier }}
@@ -650,7 +655,7 @@
                   </td>
                 </tr>
                 <tr *ngIf="params?.currentSamplesByVisits">
-                  <td colspan="100%">
+                  <td colspan="100%" style="padding: 0 !important">
                     <table class="table table-bordered mt-2">
                       <thead class="table-header">
                         <tr>
@@ -695,6 +700,23 @@
                             "
                           >
                             <tr
+                              [ngStyle]="{
+                                'background-color': showLegend
+                                  ? sample?.authorized
+                                    ? '#6fd67bcf'
+                                    : sample?.atLestOneOrderWithRejectedResults
+                                    ? '#d04747ab'
+                                    : sample?.approved &&
+                                      !LISConfigurations?.isLIS
+                                    ? '#f5f171f7'
+                                    : sample?.approved &&
+                                      LISConfigurations?.isLIS
+                                    ? '#0080009e'
+                                    : sample?.hasResults
+                                    ? '#ec864acf'
+                                    : ''
+                                  : 'transparent'
+                              }"
                               *ngFor="
                                 let order of sample?.orders;
                                 let orderCount = index

@@ -69,6 +69,8 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
   provider$: Observable<ProviderGet>;
   dispensingLocations$: Observable<any>;
   errors: any[] = [];
+
+  @Output() enterKeyPressedFields: EventEmitter<any> = new EventEmitter<any>();
   constructor(
     private drugOrderService: DrugOrdersService,
     private store: Store<AppState>
@@ -187,5 +189,9 @@ export class DrugOrderComponent implements OnInit, AfterViewInit {
   onCancel(e) {
     e.stopPropagation();
     this.cancelForm.emit();
+  }
+
+  onGetEnterKeyResponsedFields(keys: Event): void {
+    this.enterKeyPressedFields.emit(keys);
   }
 }

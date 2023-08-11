@@ -347,6 +347,16 @@ export class DispensingFormComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  onGetEnterKeyResponsedFields(
+    keys: any,
+    specificDrugConceptUuid?: string,
+    isEnsured?: boolean
+  ): void {
+    if (keys["quantity"]) {
+      this.onUpdateOrder(null, specificDrugConceptUuid, isEnsured);
+    }
+  }
+
   onChangeDrugQuantity(quantity) {
     this.showPrice = false;
     this.drugOrder = { ...(this.drugOrder || ({} as any)), quantity };
@@ -432,6 +442,9 @@ export class DispensingFormComponent implements OnInit {
     specificDrugConceptUuid?: string,
     isEnsured?: boolean
   ) {
+    if (e) {
+      e.stopPropagation();
+    }
     this.dialog
       .open(SharedConfirmationDialogComponent, {
         width: "20%",
@@ -442,7 +455,6 @@ export class DispensingFormComponent implements OnInit {
       .afterClosed()
       .subscribe((shouldConfirm) => {
         if (shouldConfirm) {
-          e.stopPropagation();
           this.savingOrder = true;
           this.savingOrderSuccess = false;
           this.savingError = null;

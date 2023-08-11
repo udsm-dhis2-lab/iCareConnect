@@ -242,10 +242,18 @@
                       (cancelForm)="onCancel()"
                       (formUpdate)="onFormUpdate($event)"
                       (getDrugsByConceptUuid)="getDrugsByConceptUuid($event)"
+                      (enterKeyPressedFields)="
+                        onGetEnterKeyResponsedFields(
+                          $event,
+                          params?.specificDrugConceptUuid,
+                          params?.currentVisit?.isEnsured
+                        )
+                      "
                     ></app-drug-order>
 
                     <div>
                       <span *ngIf="showPrice"> Price: {{ drugPrice }} </span>
+
                       <button
                         class="float-right"
                         (click)="
@@ -256,6 +264,7 @@
                           )
                         "
                         mat-flat-button
+                        type="submit"
                         [color]="savingError ? 'warn' : 'primary'"
                         [disabled]="
                           !params?.specificDrugConceptUuid ||
