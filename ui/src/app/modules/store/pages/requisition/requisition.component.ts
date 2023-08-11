@@ -232,16 +232,27 @@ export class RequisitionComponent implements OnInit {
 
   onDeleteRequisition(e: any, requisition: any) {
     e?.stopPropagation();
-    const requisitionObject = {
-      ...requisition,
-      voided: true,
-    };
-    this.requisitionService
-      .updateRequisition(requisition?.uuid, requisitionObject)
-      .subscribe((response) => {
-        localStorage.removeItem("availableRequisition");
-        this.getAllRequisitions();
-      });
+    this.dialog
+        .open(SharedConfirmationComponent, {
+          width: "25%",
+          data: {
+            modalTitle: "Are you sure to delete this Requisition",
+            modalMessage:
+              "This action is irreversible. Please, click confirm to delete and click cancel to cancel deletion.",
+          },
+        })
+        .afterClosed()
+        .subscribe((data) => {
+          if (data?.confirmed) {
+      
+        this.requisitionService
+          .deleteRequisition(requisition?.uuid)
+          .subscribe((response) => {
+            localStorage.removeItem("availableRequisition");
+            this.getAllRequisitions();
+          });
+        }
+      });    
   }
 
   receiveAllSelected(e: Event, requisition) {

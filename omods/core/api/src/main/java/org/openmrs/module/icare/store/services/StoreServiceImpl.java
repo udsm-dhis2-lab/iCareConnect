@@ -959,7 +959,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			}
 			
 			if (requisitionToDelete.getRequisitionStatuses().size() > 0) {
-				for (RequisitionStatus requisitionStatus : this.getRequisitionStatuses()) {
+				for (RequisitionStatus requisitionStatus : requisitionToDelete.getRequisitionStatuses()) {
 					this.deleteRequisitionStatus(requisitionStatus.getUuid());
 				}
 			}
