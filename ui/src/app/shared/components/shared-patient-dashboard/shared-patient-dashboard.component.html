@@ -853,11 +853,12 @@
   </div>
   <mat-progress-bar
     *ngIf="
-      dashboardParams?.loadingPaymentStatus ||
-      !dashboardParams?.encounterTypes ||
-      dashboardParams?.billLoadingState ||
-      !dashboardParams?.currentPatient ||
-      dashboardParams?.loadingForms
+      dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType &&
+      (dashboardParams?.loadingPaymentStatus ||
+        !dashboardParams?.encounterTypes ||
+        dashboardParams?.billLoadingState ||
+        !dashboardParams?.currentPatient ||
+        dashboardParams?.loadingForms)
     "
     mode="indeterminate"
   >
