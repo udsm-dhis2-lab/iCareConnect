@@ -531,7 +531,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			// Now 'deletedRequisition' contains the deleted object
 		}
 		
-		session.getTransaction().commit(); // Commit the transaction
+		//session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedRequisition;
 	}
@@ -556,7 +556,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			
 		}
 		
-		session.getTransaction().commit(); // Commit the transaction
+		//session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedRequisitionItem;
 		
@@ -582,7 +582,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			
 		}
 		
-		session.getTransaction().commit(); // Commit the transaction
+		//session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedRequisitionStatus;
 	}
@@ -606,7 +606,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			
 		}
 		
-		session.getTransaction().commit(); // Commit the transaction
+		//session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedRequisitionItemStatus;
 		
@@ -643,7 +643,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			
 		}
 		
-		session.getTransaction().commit(); // Commit the transaction
+		//session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedStockInvoice;
 		
@@ -651,7 +651,7 @@ public class StockDAO extends BaseDAO<Stock> {
 	
 	public StockInvoiceStatus deleteStockInvoiceStatus(String stockInvoiceStatusUuid) {
 		DbSession session = this.getSession();
-		String selectQueryStr = "SELECT stis FROM StockInvoiceStatus stis WHERE sti.uuid = :stockInvoiceStatusUuid";
+		String selectQueryStr = "SELECT stis FROM StockInvoiceStatus stis WHERE stis.uuid = :stockInvoiceStatusUuid";
 		
 		Query selectQuery = session.createQuery(selectQueryStr);
 		selectQuery.setParameter("stockInvoiceStatusUuid", stockInvoiceStatusUuid);
@@ -668,7 +668,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			
 		}
 		
-		session.getTransaction().commit(); // Commit the transaction
+		////session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedStockInvoiceStatus;
 	}
@@ -693,7 +693,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			
 		}
 		
-		session.getTransaction().commit(); // Commit the transaction
+		//session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedStockInvoiceItem;
 	}
@@ -718,7 +718,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			
 		}
 		
-		session.getTransaction().commit(); // Commit the transaction
+		//session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedStockInvoiceItemStatus;
 	}

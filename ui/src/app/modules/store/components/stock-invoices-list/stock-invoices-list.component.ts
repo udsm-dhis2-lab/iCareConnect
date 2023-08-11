@@ -151,14 +151,14 @@ export class StockInvoicesListComponent implements OnInit {
       .afterClosed()
       .subscribe((data) => {
         if (data?.confirmed) {
-          const stockInvoiceObject = {
-            ...stockInvoice,
-            receivingDate: new Date(stockInvoice?.receivingDate).toISOString(),
-            voided: true,
-          };
+          // const stockInvoiceObject = {
+          //   ...stockInvoice,
+          //   receivingDate: new Date(stockInvoice?.receivingDate).toISOString(),
+          //   voided: true,
+          // };
 
           this.stockInvoicesService
-            .updateStockInvoice(stockInvoice?.uuid, stockInvoiceObject)
+            .deleteStockInvoice(stockInvoice?.uuid)
             .pipe(
               tap((response) => {
                 this.getInvoices();
