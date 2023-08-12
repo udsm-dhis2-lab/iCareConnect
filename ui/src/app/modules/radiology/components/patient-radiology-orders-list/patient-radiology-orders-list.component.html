@@ -16,6 +16,7 @@
           <th>Order</th>
           <th>Orderer</th>
           <th>Instructions</th>
+          <th>Status</th>
           <th>Upload</th>
           <th>Remarks</th>
           <td>Action</td>
@@ -23,11 +24,12 @@
       </thead>
       <tbody>
         <tr
-          *ngFor="let order of orders; let count = index"
+          *ngFor="let order of formattedOrders; let count = index"
           [ngClass]="{
             'attended-radiology-order':
               obsKeyedByConcepts[order?.concept?.uuid]?.uri,
-            'no-mouse-event': !order?.paid
+            'no-mouse-event': !order?.canBeAttended,
+            'order-not-to-attend': !order?.canBeAttended
           }"
         >
           <td>
@@ -44,6 +46,17 @@
           </td>
           <td>
             {{ order?.instructions }}
+          </td>
+          <td>
+            {{
+              order?.paid
+                ? "Paid"
+                : !order?.paid && order?.isAdmitted
+                ? "Not paid but Admitted"
+                : !order?.paid && order?.isEmergency
+                ? "Not paid but has emergency"
+                : "Not paid"
+            }}
           </td>
           <td>
             <div class="d-flex justify-content-left">

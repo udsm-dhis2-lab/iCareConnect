@@ -13,6 +13,7 @@ import {
 } from "../models/requisition.model";
 import { orderBy } from "lodash";
 
+
 @Injectable({
   providedIn: "root",
 })
@@ -110,6 +111,17 @@ export class RequisitionService {
     );
   }
 
+  deleteRequisition(uuid: string): Observable<any>{
+    return this.httpClient
+    .delete(`store/request/${uuid}`)
+    .pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => error)
+    );
+  }
+
   createRequest(
     requisitionInput: RequisitionInput
   ): Observable<RequisitionObject | any> {
@@ -147,6 +159,17 @@ export class RequisitionService {
         }),
         catchError((error) => error)
       );
+  }
+
+  deleteRequisitionItem(uuid: string): Observable<any>{
+    return this.httpClient
+    .delete(`store/requestitem/${uuid}`)
+    .pipe(
+      map((response) =>{
+        return response;
+      }),
+      catchError((error) => error)
+    );
   }
 
   receiveIssueItem(requisitionObject: any): Observable<any> {

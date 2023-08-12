@@ -24,6 +24,7 @@
             [isCheckBoxButton]="shouldRenderAsCheckBoxesButton"
             [shouldDisable]="shouldDisable"
             (fieldUpdate)="onFieldUpdate($event)"
+            (enterKeyPressedFields)="onGetFieldsResponsedToEnterKey($event)"
             (fileFieldUpdate)="onFileFieldUpdate($event)"
           ></app-field>
           <p

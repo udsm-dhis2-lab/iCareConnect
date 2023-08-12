@@ -46,6 +46,7 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
   ngOnInit(): void {
     if (this.diagnosisFormDetails) {
       this.diagnosisForm = formatDiagnosisFormObject(this.diagnosisFormDetails);
+      // console.log("TEST", this.diagnosisForm);
       this.diagnosisField = (this.diagnosisForm?.formFields.filter(
         (field) => field?.key === "diagnosis"
       ) || [])[0];

@@ -120,6 +120,30 @@ export class RequisitionItemsComponent implements OnInit {
     }
   }
 
+  onDeleteRequsitionItem(requisitionItemUuid : string) {
+    
+      this.dialog
+        .open(SharedConfirmationComponent, {
+          width: "25%",
+          data: {
+            modalTitle: "Are you sure to delete this Item",
+            modalMessage:
+              "This action is irreversible. Please, click confirm to delete and click cancel to cancel deletion.",
+          },
+        })
+        .afterClosed()
+        .subscribe((data) => {
+          if (data?.confirmed) {
+            this.requisitionService
+              .deleteRequisitionItem(requisitionItemUuid)
+              .subscribe((response: any) => {
+                this.getSpecificRequsition();
+              });
+          }
+        });
+    
+  }
+
   onRejectItem(e: Event, item: any) {
     e.stopPropagation();
     this.rejectItem.emit({ event: e, item: item });

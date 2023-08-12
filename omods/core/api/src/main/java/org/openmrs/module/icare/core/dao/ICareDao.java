@@ -389,7 +389,15 @@ public class ICareDao extends BaseDAO<Item> {
 
 //				queryStr = queryStr.substring(0,queryStr.length()-1);
 
-				queryStr += " AND sp NOT IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+
+				queryStr += " v IN (SELECT sp.visit FROM Sample sp WHERE sp NOT IN (SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
+
+				//queryStr += " AND sp NOT IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
 
 				//System.out.println(excludedValue);
 
@@ -426,7 +434,7 @@ public class ICareDao extends BaseDAO<Item> {
 		} else if (orderByDirection == VisitWrapper.OrderByDirection.DESC) {
 			queryStr += " DESC ";
 		}
-		
+		System.out.println(queryStr);
 		query = session.createQuery(queryStr);
 		if (orderTypeUuid != null) {
 			query.setParameter("orderTypeUuid", orderTypeUuid);
@@ -487,8 +495,7 @@ public class ICareDao extends BaseDAO<Item> {
 	        Order.FulfillerStatus fulfillerStatus, Integer limit, Integer startIndex) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT distinct o FROM Visit v" + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o"
-		        + " INNER JOIN o.orderType ot" + " WHERE ot.uuid=:orderTypeUuid " + " AND v.stopDatetime IS NULL "
-		        + " AND v.uuid=:visitUuid ";
+		        + " INNER JOIN o.orderType ot" + " WHERE ot.uuid=:orderTypeUuid " + " AND v.uuid=:visitUuid ";
 		if (fulfillerStatus != null) {
 			queryStr += " AND o.fulfillerStatus=:fulfillerStatus";
 		} else {
