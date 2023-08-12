@@ -46,6 +46,7 @@ export class FieldComponent implements AfterViewInit {
 
   @Output() fieldUpdate: EventEmitter<FormGroup> =
     new EventEmitter<FormGroup>();
+  @Output() enterKeyPressedFields: EventEmitter<any> = new EventEmitter<any>();
 
   @Output() fileFieldUpdate: EventEmitter<any> = new EventEmitter<any>();
 
@@ -143,8 +144,15 @@ export class FieldComponent implements AfterViewInit {
     return this.field?.id;
   }
 
-  onFieldUpdate(): void {
+  onFieldUpdate(event?: KeyboardEvent): void {
     this.fieldUpdate.emit(this.form);
+  }
+
+  onListenKeyEvent(event?: KeyboardEvent): void {
+    if (event && event.code === "Enter") {
+      this.enterKeyPressedFields.emit(this.field?.key);
+    } else {
+    }
   }
 
   fileChangeEvent(event, field): void {

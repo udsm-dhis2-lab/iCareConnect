@@ -84,6 +84,18 @@ export class StockInvoicesService {
       );
   }
 
+  deleteStockInvoice(invoiceUuid: string): Observable<any> {
+    return this.httpClient
+    .delete(`store/stockinvoice/${invoiceUuid}`)
+    .pipe(
+      map((stockInvoicesResponse: any) => {
+        return stockInvoicesResponse;
+      }),
+      catchError((error: any) => error)
+    );
+
+  }
+
   getStockInvoice(uuid: string): Observable<any> {
     return this.httpClient.get(`store/stockinvoice/${uuid}`).pipe(
       map((stockInvoiceResponse: any) => {

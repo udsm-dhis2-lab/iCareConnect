@@ -79,6 +79,7 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
     _.each(this.payments, (payment) => {
       _.each(payment?.items, (item) => {
         this.paidItems[item?.name] = item;
+        this.paidItems[item?.paymentItem?.order?.uuid] = item;
       });
     });
 
