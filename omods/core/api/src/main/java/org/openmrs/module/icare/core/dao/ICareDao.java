@@ -293,10 +293,10 @@ public class ICareDao extends BaseDAO<Item> {
 	}
 	
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
-											String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
-											Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-											String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
-											String sampleCategory, String exclude) {
+                                            String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
+                                            Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
+                                            String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
+                                            String sampleCategory, String exclude, Boolean includeInactive) {
 		//PatientIdentifier
 		Query query = null;
 		DbSession session = this.getSession();
@@ -308,7 +308,7 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		if (orderTypeUuid != null && encounterTypeUuid == null) {
 			queryStr = queryStr + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o" + " INNER JOIN o.orderType ot"
-			        + " WHERE ot.uuid=:orderTypeUuid " + " AND v.stopDatetime IS NULL ";
+			        + " WHERE ot.uuid=:orderTypeUuid " + "  ";
 			
 			if (fulfillerStatus != null) {
 				queryStr += " AND o.fulfillerStatus=:fulfillerStatus";
@@ -331,6 +331,17 @@ public class ICareDao extends BaseDAO<Item> {
 		} else {
 			queryStr = queryStr + " INNER JOIN v.encounters e WHERE v.stopDatetime IS NULL ";
 			
+		}
+
+		if(!includeInactive){
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+
+			queryStr +=" v.stopDatetime IS NULL";
+
 		}
 		
 		if (search != null) {
