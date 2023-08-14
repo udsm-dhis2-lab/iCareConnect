@@ -323,7 +323,9 @@ export class PatientHistoryDataComponent implements OnInit {
               }
               .footer {
                 margin-top:50px
-                align-items: right;
+                right: 0px;
+                text-align: left;
+                float: right
               }
               .footer .userDetails .signature {
                 margin-top: 20px;
