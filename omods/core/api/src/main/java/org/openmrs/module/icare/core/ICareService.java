@@ -156,4 +156,6 @@ public interface ICareService extends OpenmrsService {
 	        URISyntaxException;
 	
 	List<String> generateCode(String globalProperty, String metadataType, Integer count) throws Exception;
+	
+	OrderStatus saveOrderStatus(OrderStatus orderStatus);
 }

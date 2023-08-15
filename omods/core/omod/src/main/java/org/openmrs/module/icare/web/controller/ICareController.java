@@ -261,6 +261,15 @@ public class ICareController {
         return messageList;
     }
 	
+	@RequestMapping(value = "orderstatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> onPostOrderStatus(@RequestBody Map<String, Object> orderStatusObject) {
+		OrderStatus orderStatus = OrderStatus.fromMap(orderStatusObject);
+		orderStatus = iCareService.saveOrderStatus(orderStatus);
+		
+		return orderStatus.toMap();
+	}
+	
 	@RequestMapping(value = "prescription", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> onPostDrugOrderCreation(@RequestBody Map<String, Object> orderObject) throws Exception {
