@@ -246,7 +246,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		ValidateUtil.setDisableValidation(true);
 		System.out.println("Validation:" + ValidateUtil.getDisableValidation());
 		prescription = (Prescription) Context.getOrderService().saveOrder(prescription, null);
-		// Set respective status
+		// Set respective sOrderStatustatus
 		if (status != null) {
 			OrderStatus orderStatus = Context.getService(StoreService.class).setDrugOrderStatus(prescription.getUuid(),
 			    status, remarks);
@@ -423,6 +423,13 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public List<String> generateCode(String globalPropertyUuid, String metadataType, Integer count) throws Exception {
 		return dao.generateCode(globalPropertyUuid, metadataType, count);
+	}
+	
+	@Override
+	public OrderStatus saveOrderStatus(OrderStatus orderStatus) {
+		OrderStatus savedOrderStatus = Context.getService(StoreService.class).setDrugOrderStatus(
+		    orderStatus.getOrder().getUuid(), orderStatus.getStatus().toString(), orderStatus.getRemarks());
+		return savedOrderStatus;
 	}
 	
 	@Override
