@@ -2,9 +2,9 @@
   <ng-container *ngFor="let field of fields">
     <div
       *ngIf="field"
-      class="{{ isFormHorizontal ? 'col' : 'col-12' }} {{
-        field?.hidden ? 'hidden-field' : ''
-      }}"
+      class="{{
+        isFormHorizontal ? (colClass ? colClass : 'col') : 'col-12'
+      }} {{ field?.hidden ? 'hidden-field' : '' }}"
     >
       <div class="row">
         <div
@@ -24,8 +24,16 @@
             [isCheckBoxButton]="shouldRenderAsCheckBoxesButton"
             [shouldDisable]="shouldDisable"
             (fieldUpdate)="onFieldUpdate($event)"
+            (enterKeyPressedFields)="onGetFieldsResponsedToEnterKey($event)"
             (fileFieldUpdate)="onFileFieldUpdate($event)"
           ></app-field>
+          <p
+            class="text-danger"
+            style="font-size: 0.8rem; margin-top: -10px; text-align: left"
+            *ngIf="validationIssues[field?.key]?.message"
+          >
+            {{ validationIssues[field?.key]?.message }}
+          </p>
         </div>
         <!-- TODO: Might need to show full (col-12) in case it is not number-->
 

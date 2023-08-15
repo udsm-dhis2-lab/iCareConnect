@@ -39,6 +39,7 @@ export class SampleResultsDashboardComponent implements OnInit {
   @Input() currentUser: any;
   @Input() privileges: any;
   @Input() providerDetails: any;
+  @Input() labTestRequestProgramStageId: string;
 
   labConfigs$: Observable<any>;
   privileges$: Observable<any>;
@@ -110,10 +111,12 @@ export class SampleResultsDashboardComponent implements OnInit {
                 .afterClosed()
             : this.dialog
                 .open(SharedSamplesVerificationIntegratedComponent, {
-                  width: "30%",
+                  minWidth: "30%",
                   data: {
                     ...this.selectedSample,
                     externalSystemsReferenceConceptUuid,
+                    labTestRequestProgramStageId:
+                      this.labTestRequestProgramStageId,
                   },
                 })
                 .afterClosed()
@@ -396,10 +399,11 @@ export class SampleResultsDashboardComponent implements OnInit {
     event.stopPropagation();
     this.dialog
       .open(SharedSamplesVerificationIntegratedComponent, {
-        width: "50%",
+        minWidth: "50%",
         data: {
           ...sample,
           externalSystemsReferenceConceptUuid,
+          labTestRequestProgramStageId: this.labTestRequestProgramStageId,
         },
       })
       .afterClosed()

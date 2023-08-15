@@ -5195,4 +5195,86 @@
             ALTER TABLE st_issue_item_status MODIFY COLUMN batch_no VARCHAR(32)
         </sql>
     </changeSet>
+
+    <changeSet id="update_st_stock_invoice_modify_invoice_number_supplier_unique" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_stock_invoice
+            ADD CONSTRAINT invoice_number_supplier_unique UNIQUE (invoice_number,supplier_id);
+        </sql>
+    </changeSet>
+
+    <changeSet id="add_columns_to_st_reorder_level" author="dennis-kibahila" dbms="mysql">
+        <addColumn tableName="st_reorder_level" >
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created"  type="DATETIME"/>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" defaultValueBoolean="false" type="BOOLEAN"/>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid"  type="char(38)" >
+                <constraints nullable="true"  unique="true"></constraints>
+            </column>
+
+        </addColumn>
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="st_reorder_level"
+                constraintName="st_reorder_level_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="st_reorder_level"
+                constraintName="st_reorder_level_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+    </changeSet>
+
+    <changeSet id="add_related_allocation_column_to_lb_test_allocation" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="related_allocation_uuid" tableName="lb_test_allocation"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_test_allocation" >
+            <column name="related_allocation_uuid" type="char(38)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="create_audit_log" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="audit_log" /></not>
+        </preConditions>
+        <comment>Adding audit_log table</comment>
+        <createTable tableName="audit_log">
+            <column name="audit_log_id" type="int" autoIncrement="true" >
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="type" type="varchar(512)"><constraints nullable="false" /></column>
+            <column name="action" type="TEXT"><constraints nullable="false" /></column>
+            <column name="user_id" type="int" />
+            <column name="serialized_data" type="longblob" />
+            <column name="date_created" type="DATETIME"><constraints nullable="false" /></column>
+            <column name="parent_auditlog_id" type="int" />
+            <column name="uuid" type="varchar(38)"><constraints nullable="false" unique="true" /></column>
+        </createTable>
+        <addForeignKeyConstraint
+                constraintName="authenticated_user"
+                baseTableName="audit_log" baseColumnNames="user_id"
+                referencedTableName="users" referencedColumnNames="user_id" />
+    </changeSet>
+
+    <changeSet id="update_st_transaction_add_order_column" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE st_transaction
+            ADD COLUMN order_id INT NULL AFTER transaction_id,
+            ADD FOREIGN KEY(order_id) REFERENCES orders(order_id);
+        </sql>
+    </changeSet>
+
+
 </databaseChangeLog>

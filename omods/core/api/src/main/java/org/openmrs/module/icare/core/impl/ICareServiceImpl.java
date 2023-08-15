@@ -23,23 +23,36 @@ import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
-import org.openmrs.module.icare.core.ICareService;
-import org.openmrs.module.icare.core.Item;
-import org.openmrs.module.icare.core.Message;
-import org.openmrs.module.icare.core.Summary;
+import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.store.models.OrderStatus;
+import org.openmrs.module.icare.store.services.StoreService;
 import org.openmrs.validator.ValidateUtil;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.Authenticator;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
 import javax.naming.ConfigurationException;
+import javax.mail.Transport;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import java.io.*;
 import java.net.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang.StringUtils;
+//import org.openmrs.module.reporting.report.Report;
+//import org.springframework.stereotype.Component;
 
 public class ICareServiceImpl extends BaseOpenmrsService implements ICareService {
 	
@@ -194,12 +207,13 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type) {
-		return dao.getItems(search, limit, startIndex, department, type);
+	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type,
+	        Boolean stockable) {
+		return dao.getItems(search, limit, startIndex, department, type, stockable);
 	}
 	
 	@Override
-	public Prescription savePrescription(Prescription prescription) {
+	public Prescription savePrescription(Prescription prescription, String status, String remarks) {
 		if (prescription.getUuid() != null) {
 			Prescription existingPrescription = (Prescription) Context.getOrderService().getOrderByUuid(
 			    prescription.getUuid());
@@ -218,12 +232,25 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 				prescription = existingPrescription;
 			}
 		}
+		
+		if (prescription.getPreviousOrder() != null) {
+			Double quantity = prescription.getQuantity();
+			Prescription previousOrder = (Prescription) Context.getOrderService().getOrderByUuid(
+			    prescription.getPreviousOrder().getUuid());
+			prescription.updatePrescription(previousOrder);
+			prescription.setQuantity(quantity);
+		}
 		AdministrationService administrationService = Context.getAdministrationService();
 		administrationService.setGlobalProperty("validation.disable", "true");
 		System.out.println("Validation:" + ValidateUtil.getDisableValidation());
 		ValidateUtil.setDisableValidation(true);
 		System.out.println("Validation:" + ValidateUtil.getDisableValidation());
 		prescription = (Prescription) Context.getOrderService().saveOrder(prescription, null);
+		// Set respective sOrderStatustatus
+		if (status != null) {
+			OrderStatus orderStatus = Context.getService(StoreService.class).setDrugOrderStatus(prescription.getUuid(),
+			    status, remarks);
+		}
 		administrationService.setGlobalProperty("validation.disable", "false");
 		return prescription;
 	}
@@ -232,9 +259,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
 	        String locationUuid, OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus,
 	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus) {
+	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
+	        String sampleCategory, String exclude, Boolean includeInactive) {
 		return this.dao.getVisitsByOrderType(search, orderTypeUuid, encounterTypeUuid, locationUuid, prescriptionStatus,
-		    fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus);
+		    fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus,
+		    visitAttributeTypeUuid, sampleCategory, exclude, includeInactive);
 	}
 	
 	@Override
@@ -397,6 +426,13 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
+	public OrderStatus saveOrderStatus(OrderStatus orderStatus) {
+		OrderStatus savedOrderStatus = Context.getService(StoreService.class).setDrugOrderStatus(
+		    orderStatus.getOrder().getUuid(), orderStatus.getStatus().toString(), orderStatus.getRemarks());
+		return savedOrderStatus;
+	}
+	
+	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);
 	}
@@ -476,8 +512,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public List<Concept> getConcepts(String q, String conceptClass, String searchTerm, Integer limit, Integer startIndex) {
-		return dao.getConceptsBySearchParams(q, conceptClass, searchTerm, limit, startIndex);
+	public ListResult getConcepts(String q, String conceptClass, String searchTerm, Integer limit, Integer startIndex,
+	        String searchTermOfConceptSetToExclude, String conceptSourceUuid, String referenceTermCode,
+	        String attributeType, String attributeValue, Pager pager) {
+		return dao.getConceptsBySearchParams(q, conceptClass, searchTerm, limit, startIndex,
+		    searchTermOfConceptSetToExclude, conceptSourceUuid, referenceTermCode, attributeType, attributeValue, pager);
 	}
 	
 	@Override
@@ -488,6 +527,16 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public List<ConceptSet> getConceptsSetsByConcept(String concept) {
 		return dao.getConceptsSetsByConcept(concept);
+	}
+	
+	@Override
+	public String unRetireConcept(String uuid) {
+		return dao.unRetireConcept(uuid);
+	}
+	
+	@Override
+	public List<Location> getLocations(String attributeType, String value, Integer limit, Integer startIndex) {
+		return dao.getLocations(attributeType, value, limit, startIndex);
 	}
 	
 	@Override
@@ -531,6 +580,130 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public List<Drug> getDrugs(String concept, Integer limit, Integer startIndex) {
 		return dao.getDrugs(concept, limit, startIndex);
+	}
+	
+	@Override
+	public Map<String, Object> createWorkFlowState(ProgramWorkflowState state) throws Exception {
+		try {
+			ProgramWorkflowService programWorkflowService = Context.getProgramWorkflowService();
+			programWorkflowService.getWorkflow(state.getProgramWorkflow().getId()).addState(state);
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Error occurred while sending  email", e);
+		}
+		return null;
+	}
+	
+	private Session emailSession = null;
+	
+	/**
+	 * Returns the email session
+	 */
+	@Override
+	public Session getEmailSession() throws Exception {
+		if (emailSession == null) {
+			AdministrationService as = Context.getAdministrationService();
+			Properties p = new Properties();
+			p.put("mail.transport.protocol", as.getGlobalProperty("mail.transport_protocol", "smtp"));
+			p.put("mail.smtp.host", as.getGlobalProperty("mail.smtp_host", "localhost"));
+			p.put("mail.smtp.port", as.getGlobalProperty("mail.smtp_port", "587")); // mail.smtp_port
+			p.put("mail.smtp.auth", as.getGlobalProperty("mail.smtp_auth", "test")); // mail.smtp_auth
+			p.put("mail.smtp.starttls.enable", as.getGlobalProperty("mail.smtp.starttls.enable"));
+			p.put("mail.debug", as.getGlobalProperty("mail.debug", "false"));
+			p.put("mail.from", as.getGlobalProperty("mail.from", ""));
+			final String user = as.getGlobalProperty("mail.user", "");
+			final String password = as.getGlobalProperty("mail.password", "");
+			
+			if (StringUtils.isNotBlank(user) && StringUtils.isNotBlank(password.toString())) {
+				emailSession = Session.getInstance(p, new Authenticator() {
+					
+					public PasswordAuthentication getPasswordAuthentication() {
+						return new PasswordAuthentication(user, password);
+					}
+				});
+			} else {
+				emailSession = Session.getInstance(p);
+			}
+		}
+		return emailSession;
+	}
+	
+	/**
+	 * Performs some action on the given report
+	 */
+	@Override
+	public String processEmail(Properties emailProperties) throws Exception {
+		try {
+			MimeMessage m = new MimeMessage(getEmailSession());
+			m.setFrom(new InternetAddress(emailProperties.getProperty("from")));
+			
+			for (String recipient : emailProperties.getProperty("to", "").split("\\,")) {
+				
+				m.addRecipient(javax.mail.Message.RecipientType.TO, new InternetAddress(recipient));
+			}
+			
+			// TODO: Make these such that they can contain report information
+			m.setSubject(emailProperties.getProperty("subject"));
+			Multipart multipart = new MimeMultipart();
+			MimeBodyPart contentBodyPart = new MimeBodyPart();
+			String content = emailProperties.getProperty("content", "");
+			if (emailProperties.getProperty("attachmentFile") != null) {
+				content += emailProperties.getProperty("attachmentFile");
+			}
+			contentBodyPart.setContent(content, "text/html");
+			multipart.addBodyPart(contentBodyPart);
+			
+			if (emailProperties.getProperty("attachment") != null) {
+				MimeBodyPart attachmentPart = new MimeBodyPart();
+				DataSource source = new FileDataSource(new File(emailProperties.getProperty("attachment")));
+				attachmentPart.setDataHandler(new DataHandler(source));
+				attachmentPart.setFileName(source.getName());
+				multipart.addBodyPart(attachmentPart);
+			}
+			
+			//			if (emailProperties.getProperty("attachmentFile") != null) {
+			//				String htmlContent = emailProperties.getProperty("attachmentFile");
+			//				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			//				Document document = new Document();
+			//
+			//				PdfWriter writer = PdfWriter.getInstance(document, outputStream);
+			//				document.open();
+			//				HTMLWorker htmlWorker = new HTMLWorker(document);
+			//				htmlWorker.parse(new StringReader(htmlContent));
+			//				document.close();
+			//
+			//				//File encryption implementation
+			//				//				PdfReader reader = new PdfReader(outputStream.toByteArray());
+			//				//				PdfStamper stamper = new PdfStamper(reader, outputStream);
+			//				//				stamper.setEncryption("a".getBytes("UTF-8"), "b".getBytes("UTF-8"), PdfWriter.ALLOW_PRINTING, PdfWriter.ENCRYPTION_AES_128);
+			//				//				stamper.close();
+			//				//				reader.close();
+			//				//
+			//				byte[] pdfContent = outputStream.toByteArray();
+			//
+			//				MimeBodyPart attachmentPart = new MimeBodyPart();
+			//
+			//				DataSource dataSource = new ByteArrayDataSource(pdfContent, "application/pdf");
+			//				attachmentPart.setDataHandler(new DataHandler(dataSource));
+			//				attachmentPart.setFileName(emailProperties.getProperty("attachmentFileName"));
+			//				multipart.addBodyPart(attachmentPart);
+			//			}
+			
+			//			if (report.getRenderedOutput() != null && "true".equalsIgnoreCase(configuration.getProperty("addOutputAsAttachment"))) {
+			//			MimeBodyPart attachment = new MimeBodyPart();
+			//			Object output = null;
+			//			attachment.setDataHandler(new DataHandler(output, "text/html"));
+			//			attachment.setFileName(emailProperties.getProperty("attachmentName"));
+			//			multipart.addBodyPart(attachment);
+			//			}
+			
+			m.setContent(multipart);
+			Transport.send(m);
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Error occurred while sending  email: " + e);
+		}
+		return "SENT EMAIL";
 	}
 	
 	public String getClientsFromExternalSystems(String identifier, String identifierReference, String basicAuthKey)
@@ -590,114 +763,114 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	public String createPimaCovidLabRequest(Map<String, Object> request, String basicAuthKey)
-	        throws IOException {
-		AdministrationService administrationService = Context.getService(AdministrationService.class);
-		
-		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
-		String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
-		String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
-		URL url;
-		if (baseUrl == null || baseUrl.trim().equals("")) {
-			throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
-		}
-		//		this.getCreator().getUserProperties().get("")
-		String path = "/api/events.json?";
-		url = new URL(baseUrl.concat(path));
-		System.out.println(request);
-		String returnValue = "";
+            throws IOException {
+			AdministrationService administrationService = Context.getService(AdministrationService.class);
 
-		BufferedReader reader;
-		String line;
-		StringBuffer responseContent = new StringBuffer();
-		
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		
+			String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
+			String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
+			String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
+			URL url;
+			if (baseUrl == null || baseUrl.trim().equals("")) {
+				throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
+			}
+			//		this.getCreator().getUserProperties().get("")
+			String path = "/api/events.json?";
+			url = new URL(baseUrl.concat(path));
+			System.out.println(request);
+			String returnValue = "";
+
+			BufferedReader reader;
+			String line;
+			StringBuffer responseContent = new StringBuffer();
+
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
 //		String basicAuth = "Basic " + basicAuthKey;
-		String userCredentials = username.concat(":").concat(password);
-		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
-		
-		con.setRequestMethod("POST");
-		con.setRequestProperty("Content-Type", "application/json; utf-8");
-		con.setRequestProperty("Accept", "application/json");
-		con.setRequestProperty("Authorization", basicAuth);
-		con.setDoOutput(true);
+			String userCredentials = username.concat(":").concat(password);
+			String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
 
-		ObjectMapper mapper = new ObjectMapper();
-		// Converting the Object to JSONString
-		String jsonString = mapper.writeValueAsString(request);
-		System.out.println(jsonString);
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/json; utf-8");
+			con.setRequestProperty("Accept", "application/json");
+			con.setRequestProperty("Authorization", basicAuth);
+			con.setDoOutput(true);
 
-		// int status = httpURLConnection.getResponseCode();
+			ObjectMapper mapper = new ObjectMapper();
+			// Converting the Object to JSONString
+			String jsonString = mapper.writeValueAsString(request);
+			System.out.println(jsonString);
 
-		try (OutputStream outputStream = con.getOutputStream()) {
-			byte[] input = jsonString.getBytes("utf-8");
-			outputStream.write(input, 0, input.length);
+			// int status = httpURLConnection.getResponseCode();
+
+			try (OutputStream outputStream = con.getOutputStream()) {
+				byte[] input = jsonString.getBytes("utf-8");
+				outputStream.write(input, 0, input.length);
+			}
+
+			reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			while ((line = reader.readLine()) != null) {
+				responseContent.append(line);
+			}
+			reader.close();
+			return responseContent.toString();
 		}
-
-		reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		while ((line = reader.readLine()) != null) {
-			responseContent.append(line);
-		}
-		reader.close();
-		return responseContent.toString();
-	}
 	
 	public String savePimaCovidLabResult(Map<String, Object> results)
-			throws IOException {
-		AdministrationService administrationService = Context.getService(AdministrationService.class);
+            throws IOException {
+			AdministrationService administrationService = Context.getService(AdministrationService.class);
 
-		String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
-		String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
-		String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
-		String usernamePropertyKey = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.usernamePropertyKey");
-		String passwordPropertyKey = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.passwordPropertyKey");
-		URL url;
-		if (baseUrl == null || baseUrl.trim().equals("")) {
-			throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
-		}
-		//		this.getCreator().getUserProperties().get("")
-		String usernameProperty = Context.getAuthenticatedUser().getUserProperties().get(usernamePropertyKey);
-		String passwordPropertyEncrypted = Context.getAuthenticatedUser().getUserProperties().get(passwordPropertyKey);
+			String baseUrl = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.baseUrl");
+			String username = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.username");
+			String password = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.password");
+			String usernamePropertyKey = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.usernamePropertyKey");
+			String passwordPropertyKey = administrationService.getGlobalProperty("iCare.externalSystems.integrated.pimaCovid.passwordPropertyKey");
+			URL url;
+			if (baseUrl == null || baseUrl.trim().equals("")) {
+				throw new VerificationException("Destination server address url is not set. Please set " + baseUrl + ".");
+			}
+			//		this.getCreator().getUserProperties().get("")
+			String usernameProperty = Context.getAuthenticatedUser().getUserProperties().get(usernamePropertyKey);
+			String passwordPropertyEncrypted = Context.getAuthenticatedUser().getUserProperties().get(passwordPropertyKey);
 
-		String path = "/api/events.json?";
-		url = new URL(baseUrl.concat(path));
-		System.out.println(results);
+			String path = "/api/events.json?";
+			url = new URL(baseUrl.concat(path));
+			System.out.println(results);
 
-		BufferedReader reader;
-		String line;
-		StringBuffer responseContent = new StringBuffer();
+			BufferedReader reader;
+			String line;
+			StringBuffer responseContent = new StringBuffer();
 
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
 //		String basicAuth = "Basic " + basicAuthKey;
-		String userCredentials = username.concat(":").concat(password);
-		String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+			String userCredentials = username.concat(":").concat(password);
+			String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
 
-		con.setRequestMethod("POST");
-		con.setRequestProperty("Content-Type", "application/json; utf-8");
-		con.setRequestProperty("Accept", "application/json");
-		con.setRequestProperty("Authorization", basicAuth);
-		con.setDoOutput(true);
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/json; utf-8");
+			con.setRequestProperty("Accept", "application/json");
+			con.setRequestProperty("Authorization", basicAuth);
+			con.setDoOutput(true);
 
-		ObjectMapper mapper = new ObjectMapper();
-		// Converting the Object to JSONString
-		String jsonString = mapper.writeValueAsString(results);
-		System.out.println(jsonString);
+			ObjectMapper mapper = new ObjectMapper();
+			// Converting the Object to JSONString
+			String jsonString = mapper.writeValueAsString(results);
+			System.out.println(jsonString);
 
-		// int status = httpURLConnection.getResponseCode();
+			// int status = httpURLConnection.getResponseCode();
 
-		try (OutputStream outputStream = con.getOutputStream()) {
-			byte[] input = jsonString.getBytes("utf-8");
-			outputStream.write(input, 0, input.length);
+			try (OutputStream outputStream = con.getOutputStream()) {
+				byte[] input = jsonString.getBytes("utf-8");
+				outputStream.write(input, 0, input.length);
+			}
+
+			reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			while ((line = reader.readLine()) != null) {
+				responseContent.append(line);
+			}
+			reader.close();
+			return responseContent.toString();
 		}
-
-		reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		while ((line = reader.readLine()) != null) {
-			responseContent.append(line);
-		}
-		reader.close();
-		return responseContent.toString();
-	}
 	
 	public String verifyExternalSystemCredentials(String username, String password, String systemKey) throws IOException {
 		AdministrationService administrationService = Context.getService(AdministrationService.class);

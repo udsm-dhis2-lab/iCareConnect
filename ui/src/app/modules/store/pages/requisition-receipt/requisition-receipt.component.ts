@@ -32,14 +32,14 @@ export class RequisitionReceiptComponent implements OnInit {
     this.requisitions$ = this.store.pipe(select(getRequisitionsReceived)).pipe(
       map((requisitions) => {
         this.filterLoaded = true;
-        return requisitions
+        return requisitions;
       })
     );
     this.loadingRequisitions$ = this.store.pipe(
       select(getRequisitionLoadingState)
     );
     this.stores$ = this.store.pipe(select(getLocations));
-    this.currentStore$ = this.store.pipe(select(getCurrentLocation));
+    this.currentStore$ = this.store.pipe(select(getCurrentLocation(false)));
     this.stockableItems$ = this.store.pipe(select(getAllStockableItems));
   }
 
@@ -51,9 +51,13 @@ export class RequisitionReceiptComponent implements OnInit {
         .pipe(select(getRequisitionsReceived))
         .pipe(
           map((requisitions) => {
-            if (this.searchTerm?.length > 0){
+            if (this.searchTerm?.length > 0) {
               let filteredRequisitions = requisitions?.filter((requisition) => {
-                if (requisition?.name?.toLowerCase().includes(this.searchTerm.toLowerCase())) {
+                if (
+                  requisition?.name
+                    ?.toLowerCase()
+                    .includes(this.searchTerm.toLowerCase())
+                ) {
                   return requisition;
                 }
               });

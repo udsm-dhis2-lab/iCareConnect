@@ -1,5 +1,8 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
+import { ExpiredItemsComponent } from "./components/expired-items/expired-items.component";
+import { NearlyExpiredItemsComponent } from "./components/nearly-expired/nearly-expired-items.component";
+import { NearlyStockedOutItemsComponent } from "./components/nearly-stocked-out/nearly-stocked-out-items.component";
 import { StockOutItemsComponent } from "./components/stock-out-items/stock-out-items.component";
 import { IssuingPageComponent } from "./pages/issuing-page/issuing-page.component";
 import { IssuingComponent } from "./pages/issuing/issuing.component";
@@ -29,10 +32,6 @@ const routes: Routes = [
         path: "requisition",
         component: RequisitionPageComponent,
       },
-      // {
-      //   path: "receipt",
-      //   component: RequisitionReceiptComponent,
-      // },
       {
         path: "issuing",
         component: IssuingPageComponent,
@@ -48,6 +47,18 @@ const routes: Routes = [
       {
         path: "stockout-items/:location",
         component: StockOutItemsComponent,
+      },
+      {
+        path: "expired-items/:location",
+        component: ExpiredItemsComponent,
+      },
+      {
+        path: "nearly-stocked-out-items/:location",
+        component: NearlyStockedOutItemsComponent,
+      },
+      {
+        path: "nearly-expired-items/:location",
+        component: NearlyExpiredItemsComponent,
       },
     ],
   },

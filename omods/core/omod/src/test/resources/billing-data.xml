@@ -62,16 +62,36 @@
     <concept concept_id="1005" retired="false" datatype_id="2" class_id="1" is_set="false" creator="1"
              date_created="2016-01-01 00:00:57.0" version="" uuid="e721ec30-mfy4-11e8-ie7c-40b69mdy79ee" />
 
-    <concept concept_id="1006" retired="false" datatype_id="2" class_id="1" is_set="false" creator="1"
+    <concept concept_id="1006" retired="true" datatype_id="3" class_id="1" is_set="false" creator="1"
              date_created="2016-01-01 00:00:57.0" version="" uuid="e721ec30-mfy4-11e8-ie7c-40b69mdy79et" />
+
+    <concept concept_id="1022" retired="false" datatype_id="3" class_id="1" is_set="false" creator="1"
+             date_created="2016-01-01 00:00:57.0" version="" uuid="UUU1ec30-mfy4-11e8-ie7c-40b69mdy79et" />
 
     <!-- dept concepts -->
 
     <concept concept_id="5000" retired="false" datatype_id="2" class_id="1" is_set="false" creator="1"
              date_created="2016-01-01 00:00:57.0" version="" uuid="z8211c30-5e44-11e8-ie7c-50b6etwQqQee" />
 
+    <concept concept_id="1020" retired="false" datatype_id="2" class_id="1" is_set="true" creator="1"
+             date_created="2016-01-01 00:00:57.0" version="" uuid="90981c30-5e44-11e8-ie7c-50b6etwQqQee" />
+
+    <concept_name concept_name_id="1020" concept_id="1020" name="PARENT ONE" locale="en_GB" creator="1"
+                  date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="1119b329-52b9-11e8-b60d-080027ea4288" />
+
+    <concept_name concept_name_id="1021" concept_id="1020" name="PARENT_ONE" locale="en_GB" creator="1"
+                  date_created="2014-01-12 00:00:00.0" concept_name_type="INDEX_TERM" locale_preferred="1" voided="false"
+                  uuid="1119b329-52b9-11e8-b60d-080027ea428a" />
+
+    <concept_name concept_name_id="1022" concept_id="1022" name="Answer one" locale="en_GB" creator="1"
+                  date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="YYY9b329-52b9-11e8-b60d-080027ea428a" />
+
+    <concept_set concept_set_id="4" concept_id="1000" sort_weight="1" uuid="88911c30-1f43-11d8-ie7c-50b6etwQqQee" concept_set="1020" creator="1" date_created="2020-12-27 00:00:00" />
+
     <!-- reception dept set members -->
-    <concept_set concept_set_id="1" concept_id="1005" uuid="c0011c30-1f43-11d8-ie7c-50b6etwQqQee" concept_set="5000" creator="1" date_created="2020-12-27 00:00:00" ></concept_set>
+    <concept_set concept_set_id="1" concept_id="1005" sort_weight="1" uuid="c0011c30-1f43-11d8-ie7c-50b6etwQqQee" concept_set="5000" creator="1" date_created="2020-12-27 00:00:00" />
 
 <!--    <concept_set concept_set_id="2" concept_id="" uuid="q9911c30-6q44-12e8-ie7c-50b6etwQqQee" concept_set="5000" creator="1" date_created="2020-12-27 00:00:00" ></concept_set>-->
 
@@ -103,6 +123,11 @@
     <concept_name concept_name_id="1000" concept_id="1000" name="OPD Service" locale="en_GB" creator="1"
                   date_created="2017-05-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="a457ac00-5345-11e8-9c7c-40mcpekrcfee" />
+
+    <concept_name concept_name_id="1012" concept_id="1000" name="SERVICE" locale="en_GB" creator="1"
+                  date_created="2017-05-12 00:00:00.0" concept_name_type="INDEX_TERM" locale_preferred="1" voided="false"
+                  uuid="9227ac00-5345-11e8-9c7c-40mcpek787ee" />
+
     <concept_name concept_name_id="1001" concept_id="1001" name="Billable Item" locale="en_GB" creator="1"
                   date_created="2017-05-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="a457ac00-5345-11e8-9c7c-40b0mskrcfee" />
@@ -127,6 +152,16 @@
     <concept_name concept_name_id="1006" concept_id="5000" name="Reception" locale="en_GB" creator="1"
                   date_created="2017-05-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="b657ac00-5345-nso8-9c7c-4ybs34kksxfe" />
+
+    <concept_map_type concept_map_type_id="1" name="SAME-AS" creator="1" date_created="2023-02-27 00:00:00.0" retired="false" is_hidden="false" uuid="8127bbb9-52b9-11zz-b60d-880027ae4212" description="SAME AS DESCRIPTION" />
+
+    <concept_reference_source concept_source_id="1" name="UNIFIED CODING REFERENCE" description="THIS IS UNIFIED CODING REFERENCE" hl7_code="SCT" creator="1" date_created="2023-02-27 00:00:00.0" retired="false" uuid="8387bbb9-52b9-11zz-b60d-880027ae421s"/>
+
+    <concept_reference_term concept_reference_term_id="2"  concept_source_id="1" code="CODEONE" creator="1" date_created="2023-02-27 00:00:00.0"  retired="false"  uuid="8187bbb9-52b9-11zz-b60d-880027ae4211"/>
+
+    <concept_reference_map concept_map_id="1" concept_reference_term_id="2" concept_map_type_id="1" creator="1" date_created="2023-02-27 00:00:00.0" concept_id="1000" uuid="8087bbb9-52b9-11zz-b60d-880027ae4211"/>
+
+    <concept_answer concept_answer_id="1" concept_id="1006" answer_concept="500" creator="1" uuid="000c46d2-5007-45e8-9512-969300717761" />
 
     <!-- Patient-Persons -->
     <person person_id="1000" gender="M" birthdate="1980-07-31" birthdate_estimated="0" dead="0" creator="1"
@@ -218,6 +253,11 @@
     <visit_attribute visit_attribute_id="107" visit_id="20" attribute_type_id="100" value_reference="e7jnec30-5344-11e8-ie7c-40b6etw3cfes" uuid="298b75eb-er45-12e8-9c7c-42b0yt63cfe1" creator="1"
                      voided="0" date_created="2020-12-27 00:00:00" />
 
+    <lb_sample uuid="ec2c9ec1-e742-4f89-979a-01560a60734" sample_id="205" visit_id="10" label="LB/22/00070" specimen_source_id="1006" concept_id="600" creator="1" date_created="2022-11-21 00:00:00" voided="false" date_time="2022-11-21 00:00:00"/>
+
+    <!-- Sample Status    -->
+    <lb_sample_status sample_status_id="1" sample_id="205" status="RECEIVED" category="RECEIVED" timestamp="2020-12-27 00:00:00" user_id="300" />
+    <lb_sample_status sample_status_id="2" sample_id="205" status="REJECTED" category="REJECTED" timestamp="2020-12-27 00:00:00" user_id="300" />
 
 
     <!-- Encounters -->
@@ -275,4 +315,17 @@
 
     <global_property property="icare.store.settings.requisition.id.format" property_value="RQ/D{YYYY}/COUNT:5" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c632" description="For requisition code format" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2022-12-10 15:51:57.0" changed_by="1" />
 
+    <global_property property="mail.debug" property_value="false" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c111" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.default_content_type" property_value="text/plain" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c222" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.from" property_value="info@openmrs.org" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c555" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.password" property_value="test" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c333" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.smtp.starttls.enable" property_value="false" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c666" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.smtp_auth" property_value="false" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c444" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.smtp_host" property_value="localhost" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c777" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.transport_protocol" property_value="smtp" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c888" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.smtp_port" property_value="25" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c616" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+    <global_property property="mail.user" property_value="test" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c999" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+
+    <audit_log audit_log_id="1" type="org.openmrs.module.icare.laboratory.models.Sample" action="CREATED" date_created="2023-04-18 09:51:57.0" user_id="400" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c631" />
+    <audit_log audit_log_id="2" type="org.openmrs.module.icare.laboratory.models.Sample" action="UPDATED" date_created="2023-04-18 09:51:57.0" user_id="300" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c630"/>
 </dataset>

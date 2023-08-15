@@ -10,7 +10,7 @@
   <!-- {{ params?.stockStatusOfTheItemOnRequestedStore | json }} -->
   <div class="p-3">
     <h3>
-      Available on <b>{{ data?.issue?.requestingLocation?.name }}</b> :
+      Available stock in requesting store:  <b>{{ data?.issue?.requestingLocation?.name }}</b> :
       <b>{{
         params?.stockStatusOfTheItemOnRequestingStore?.eligibleQuantity
       }}</b>

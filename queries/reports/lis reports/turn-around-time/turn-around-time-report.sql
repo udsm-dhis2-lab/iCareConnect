@@ -33,13 +33,15 @@ DATE_FORMAT(CONVERT_TZ(sp.date_time,'Etc/GMT+3','GMT'), "%d/%m/%Y %h:%i %p") AS 
         FROM lb_sample_status spstatus
         WHERE spstatus.sample_id = sp.sample_id
     ) AS received_registration,
-(SELECT GROUP_CONCAT( DISTINCT CASE WHEN talloc.order_id = so.order_id THEN ROUND((UNIX_TIMESTAMP(tres.date_created)- UNIX_TIMESTAMP(sp.date_time) )/60,0) ELSE NULL END)
-        FROM lb_sample_order so
-        INNER JOIN lb_test_allocation talloc ON talloc.order_id = so.order_id
-        INNER JOIN lb_test_result tres ON tres.test_allocation_id = talloc.test_allocation_id
-        WHERE test_order_order.order_id = talloc.order_id
+(SELECT GROUP_CONCAT( DISTINCT ROUND((UNIX_TIMESTAMP(st.timestamp)- UNIX_TIMESTAMP(sp.date_time))/60,0) )
+          FROM lb_sample_status st
+          WHERE sp.sample_id = st.sample_id AND st.category = 'HAS_RESULTS'
+--        FROM lb_sample_order so
+--        INNER JOIN lb_test_allocation talloc ON talloc.order_id = so.order_id
+--        INNER JOIN lb_test_result tres ON tres.test_allocation_id = talloc.test_allocation_id
+--        WHERE test_order_order.order_id = talloc.order_id AND  so.sample_id IN ( SELECT st.sample_id FROM lb_sample_status st WHERE st.category = 'HAS_RESULTS' )
     ) AS requested_full_result,
- (SELECT GROUP_CONCAT( DISTINCT CASE WHEN ob.order_id = so.order_id THEN ROUND((UNIX_TIMESTAMP(ob.obs_datetime)- UNIX_TIMESTAMP(sp.date_time) )/60,0) ELSE NULL END )
+ (SELECT GROUP_CONCAT(  CASE WHEN ob.order_id = so.order_id THEN ROUND((UNIX_TIMESTAMP(ob.obs_datetime)- UNIX_TIMESTAMP(sp.date_time) )/60,0) ELSE NULL END )
          FROM lb_sample_order so
          INNER JOIN lb_sample s ON s.sample_id = so.sample_id
          INNER JOIN obs ob ON ob.order_id = so.order_id

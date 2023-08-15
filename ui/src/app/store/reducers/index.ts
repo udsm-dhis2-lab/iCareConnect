@@ -21,6 +21,7 @@ import {
   NewLabSamplesState,
   VisitsState,
   DHIS2ReportsState,
+  SelectedSystemSettingsState,
 } from "../states";
 import { BillItemState } from "../states/bill-item.state";
 import { BillState, PendingBillState } from "../states/bill.state";
@@ -68,7 +69,7 @@ import { labOrdersBillingInfoReducer } from "./lab-orders-billing-info.reducer";
 import { visitsReducer } from "./visits.reducer";
 import { patientReducer } from "./patient.reducer";
 import { patientNotesReducer } from "./patient-notes.reducer";
-import { labSamplesReducer, newLabSamplesReducer } from "./lab-samples.reducer";
+import { newLabSamplesReducer } from "./lab-samples.reducer";
 import { DHIS2ReportsReducer } from "./dhis2-reports.reducer";
 import { FormPrivilegesConfigsState } from "../states/form-privileges-configs.state";
 import { formPrivilegesReducer } from "./form-privileges-configs.reducer";
@@ -76,6 +77,7 @@ import { consultationReducer } from "./consultation.reducer";
 import { ConsultationState } from "../states/consultation.state";
 import { LISConfigsReducer } from "./lis-configurations.reducer";
 import { LISConfigsState } from "../states/lis-configurations.states";
+import { systemSettingsReducer } from "./selected-system-settings.reducer";
 
 export interface AppState {
   router: RouterReducerState;
@@ -117,6 +119,7 @@ export interface AppState {
   formPrivileges: FormPrivilegesConfigsState;
   consultation: ConsultationState;
   lisConfigs: LISConfigsState;
+  systemSettings: SelectedSystemSettingsState;
 }
 
 export const reducers: ActionReducerMap<AppState> = {
@@ -159,6 +162,7 @@ export const reducers: ActionReducerMap<AppState> = {
   formPrivileges: formPrivilegesReducer,
   consultation: consultationReducer,
   lisConfigs: LISConfigsReducer,
+  systemSettings: systemSettingsReducer,
 };
 
 export const metaReducers: MetaReducer<AppState>[] = !environment.production

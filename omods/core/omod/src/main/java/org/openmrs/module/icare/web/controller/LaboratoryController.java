@@ -1,11 +1,9 @@
 package org.openmrs.module.icare.web.controller;
 
-import org.openmrs.Concept;
-import org.openmrs.Location;
-import org.openmrs.User;
-import org.openmrs.Visit;
+import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
@@ -28,6 +26,9 @@ public class LaboratoryController {
 	
 	@Autowired
 	LaboratoryService laboratoryService;
+	
+	@Autowired
+	ICareService iCareService;
 	
 	@Autowired
 	VisitService visitService;
@@ -166,7 +167,7 @@ public class LaboratoryController {
 	public List<Map<String, Object>> getSamplesByVisit(@RequestParam(value = "visit", required = false) String visitId,
 	        @RequestParam(value = "patient", required = false) String patient,
 	        @RequestParam(value = "startDate", required = false) String startDate,
-	        @RequestParam(value = "endDate", required = false) String endDate) {
+	        @RequestParam(value = "endDate", required = false) String endDate) throws Exception {
 		
 		Date sampleCreatedStartDate = null;
 		Date sampleCreatedEndDate = null;
@@ -204,9 +205,8 @@ public class LaboratoryController {
 	
 	@RequestMapping(value = "sample/{sampleUuid}", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getSamplesByUuid(@PathVariable String sampleUuid) {
+	public Map<String, Object> getSamplesByUuid(@PathVariable String sampleUuid) throws Exception {
 		Sample sample = laboratoryService.getSampleByUuid(sampleUuid);
-		
 		return sample.toMap();
 	}
 	
@@ -226,7 +226,10 @@ public class LaboratoryController {
 	        @RequestParam(value = "acceptedBy", required = false) String acceptedByUuid,
 	        @RequestParam(value = "test", required = false) String testConceptUuid,
 	        @RequestParam(value = "department", required = false) String departmentUuid,
-	        @RequestParam(value = "specimen", required = false) String specimenSourceUuid) throws ParseException {
+	        @RequestParam(value = "specimen", required = false) String specimenSourceUuid,
+	        @RequestParam(value = "instrument", required = false) String instrumentUuid,
+	        @RequestParam(value = "visit", required = false) String visitUuid,
+	        @RequestParam(value = "excludeStatus", required = false) String excludeStatus) throws Exception {
 		
 		Date start = null;
 		Date end = null;
@@ -244,13 +247,14 @@ public class LaboratoryController {
 		pager.setPage(page);
 		if (!excludeAllocations) {
 			ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
-			    testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid);
+			    testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid,
+			    instrumentUuid, visitUuid, excludeStatus);
 			return sampleResults.toMap();
 		}
 		if (excludeAllocations) {
 			ListResult<SampleExt> sampleResults = laboratoryService.getSamplesWithoutAllocations(start, end, pager,
 			    locationUuid, sampleCategory, testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid,
-			    specimenSourceUuid);
+			    specimenSourceUuid, instrumentUuid, visitUuid, excludeStatus);
 			return sampleResults.toMap();
 		}
 		
@@ -342,7 +346,7 @@ public class LaboratoryController {
 	
 	@RequestMapping(value = "sample/{sampleUuid}/orders", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getSampleOrdersBySampleUuid(@PathVariable String sampleUuid) {
+	public List<Map<String, Object>> getSampleOrdersBySampleUuid(@PathVariable String sampleUuid) throws Exception {
 		List<Map<String, Object>> orders = new ArrayList();
 		List<Sample> samples = laboratoryService.getSampleOrdersBySampleUuid(sampleUuid);
 		for (Sample sample : samples) {
@@ -355,7 +359,7 @@ public class LaboratoryController {
 	
 	@RequestMapping(value = "sampledorders/{visitUuid}", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getSampledOrdersByVisit(@PathVariable String visitUuid) {
+	public List<Map<String, Object>> getSampledOrdersByVisit(@PathVariable String visitUuid) throws Exception {
 		List<Map<String, Object>> orders = new ArrayList();
 		List<Sample> samples = laboratoryService.getSamplesByVisitOrPatientAndOrDates(visitUuid, null, null, null);
 		for (Sample sample : samples) {
@@ -414,6 +418,10 @@ public class LaboratoryController {
 					 for (SampleOrder order: sample.getSampleOrders()) {
 						 if (order.getTestAllocations().size() > 0) {
 							 for (TestAllocation allocation: order.getTestAllocations()) {
+
+								 //Getting concept sets for parameter headers
+//								 List<ConceptSet> conceptSets = iCareService.getConceptsSetsByConcept(allocation.getTestConcept().getUuid());
+//								 allocation.setConceptSets(conceptSets);
 								 allocations.add(allocation.toMap());
 							 }
 						 }
@@ -810,7 +818,7 @@ public class LaboratoryController {
 	@RequestMapping(value = "batchSample", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getBatchSampleByUuid(@RequestParam(value = "uuid", required = true) String uuid)
-	        throws ParseException {
+	        throws Exception {
 		
 		BatchSample batchSample = laboratoryService.getBatchSampleByUuid(uuid);
 		return batchSample.toMap();
@@ -835,7 +843,7 @@ public class LaboratoryController {
 	
 	@RequestMapping(value = "batchsamples",method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String,Object>> getBatchSamples(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) throws ParseException{
+	public List<Map<String,Object>> getBatchSamples(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit, @RequestParam(value = "batchUuid", required = false) String batchUuid) throws Exception {
 
 		Date start = null;
 		Date end = null;
@@ -846,7 +854,7 @@ public class LaboratoryController {
 			end = formatter.parse(endDate);
 		}
 
-		List<BatchSample> batchSamples = laboratoryService.getBatchSamples(start, end, q, startIndex, limit);
+		List<BatchSample> batchSamples = laboratoryService.getBatchSamples(start, end, q, startIndex, limit, batchUuid);
 
 		List<Map<String,Object>> responseBatchSampleObject = new ArrayList<>();
 		for(BatchSample batchSample : batchSamples){
@@ -1046,7 +1054,8 @@ public class LaboratoryController {
 															@RequestParam(value = "q", required = false) String q,
 															@RequestParam(defaultValue = "0") Integer startIndex,
 															@RequestParam(defaultValue = "100") Integer limit,
-															@RequestParam(value = "expirationDate", required = false) String expirationDate) throws ParseException{
+															@RequestParam(value = "expirationDate", required = false) String expirationDate,
+															@RequestParam(value="instrument", required = false) String instrumentUuid) throws ParseException{
 
 		Date start = null;
 		Date end = null;
@@ -1061,7 +1070,7 @@ public class LaboratoryController {
 			expirationDateFormatted = formatter.parse(expirationDate);
 		}
 
-		List<WorksheetDefinition> worksheetDefinitions = laboratoryService.getWorksheetDefinitions(start, end, q, startIndex, limit,expirationDateFormatted);
+		List<WorksheetDefinition> worksheetDefinitions = laboratoryService.getWorksheetDefinitions(start, end, q, startIndex, limit,expirationDateFormatted,instrumentUuid);
 
 		List<Map<String,Object>> worksheetDefinitionsObject = new ArrayList<>();
 		for(WorksheetDefinition worksheetDefinition : worksheetDefinitions){

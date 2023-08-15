@@ -1,23 +1,14 @@
-import { Component, Inject, Input, OnInit } from "@angular/core";
+import { Component, Inject, OnInit } from "@angular/core";
 import {
-  MatDialog,
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from "@angular/material/dialog";
-import { from, interval, Observable, of } from "rxjs";
-import { debounceTime, map, tap } from "rxjs/operators";
-import { LocationService } from "src/app/core/services";
-import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { map } from "rxjs/operators";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
-import { LocationGet } from "src/app/shared/resources/openmrs";
-import { LedgerInput } from "src/app/shared/resources/store/models/ledger-input.model";
-import { StockObject } from "src/app/shared/resources/store/models/stock.model";
-import { StockService } from "src/app/shared/resources/store/services/stock.service";
 import { SupplierService } from "src/app/shared/resources/store/services/supplier.service";
-import { AddNewStockReceivedComponent } from "../../modals/add-new-stock-received/add-new-stock-received.component";
 
 @Component({
   selector: "app-supplier-form",
@@ -37,6 +28,7 @@ export class SupplierFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log("==> Data: ", this.data)
     this.setFields();
   }
 
@@ -46,13 +38,13 @@ export class SupplierFormComponent implements OnInit {
         id: "supplierName",
         key: "supplierName",
         label: "Supplier's Name",
-        value: this.data?.supplier ? this.data?.supplier?.name : "",
+        value: this.data?.supplier ? this.data?.supplier?.name : null,
       }),
       new TextArea({
         id: "supplierDescription",
         key: "supplierDescription",
         label: "Supplier's Description",
-        value: this.data?.supplier ? this.data?.supplier?.description : "",
+        value: this.data?.supplier ? this.data?.supplier?.description : null,
       }),
       new Dropdown({
         id: "supplierLocation",

@@ -73,6 +73,7 @@ export class SharedConceptCreateComponent implements OnInit {
   conceptBeingEdited: ConceptGetFull;
 
   errors: any[] = [];
+  currentMappings: any[] = [];
   constructor(
     private conceptService: ConceptsService,
     private billableItemService: BillableItemsService
@@ -140,14 +141,27 @@ export class SharedConceptCreateComponent implements OnInit {
   }
 
   createCodesMappingSourceField(data?: any): void {
+    const conceptSourceUuid =
+      data && data?.mappings?.length > 0
+        ? data?.mappings[0]?.conceptReferenceTerm?.conceptSource?.uuid
+        : null;
+
+    console.log("conceptSourceUuid", conceptSourceUuid);
+    console.log(data?.mappings);
+
+    this.currentMappings =
+      data && data?.mappings?.length > 0
+        ? data?.mappings?.filter(
+            (mapping) =>
+              mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
+              conceptSourceUuid
+          ) || []
+        : [];
     this.codesMappingsSourceField = new Dropdown({
       id: "source",
       key: "source",
       label: "Mapping Reference",
-      value:
-        data && data?.length > 0
-          ? data[0]?.conceptReferenceTerm?.conceptSource?.uuid
-          : null,
+      value: conceptSourceUuid,
       options: this.conceptSources.map((source) => {
         return {
           key: source?.uuid,
@@ -258,6 +272,7 @@ export class SharedConceptCreateComponent implements OnInit {
       .subscribe((response) => {
         if (response) {
           this.createBasicConceptFields(response);
+          this.createCodesMappingSourceField(response);
           this.editingSet = true;
           this.readyToCollectCodes = false;
           this.selectedCodingItems =

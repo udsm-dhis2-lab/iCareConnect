@@ -8,11 +8,10 @@ import { RequisitionObject } from "src/app/shared/resources/store/models/requisi
 import { RequisitionService } from "src/app/shared/resources/store/services/requisition.service";
 import { omit } from "lodash";
 import { AppState } from "src/app/store/reducers";
-import {
-  getStoreLocations,
-} from "src/app/store/selectors";
+import { getStoreLocations } from "src/app/store/selectors";
 import { getAllStockableItems } from "src/app/store/selectors/pricing-item.selectors";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
+import { dateToISOStringMidnight } from "src/app/shared/helpers/format-date.helper";
 
 @Component({
   selector: "app-requisition",
@@ -36,7 +35,7 @@ export class RequisitionComponent implements OnInit {
   requisitions: RequisitionObject[];
   storedRequisitions: RequisitionObject[];
   page: number = 1;
-  pageSize: number = 50;
+  pageSize: number = 10;
   pageSizeOptions: number[] = [5, 10, 25, 50, 100];
   pager: any;
   statuses: string[] = [
@@ -54,6 +53,10 @@ export class RequisitionComponent implements OnInit {
   viewRequisitionItems: string;
   selectedItems: any = {};
   existingRequisition: any;
+  q: string;
+  startDate: Date;
+  endDate: Date;
+
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -81,13 +84,28 @@ export class RequisitionComponent implements OnInit {
       );
 
     this.requisitionCodeFormat$ =
-      this.systemSettingsService.getSystemSettingsMatchingAKey(
+      this.systemSettingsService.getSystemSettingsDetailsByKey(
         `iCare.store.requisition.id.format`
       );
     this.getAllRequisitions();
     this.currentStore$ = of(this.currentLocation);
     this.stores$ = this.store.pipe(select(getStoreLocations));
     this.stockableItems$ = this.store.pipe(select(getAllStockableItems));
+  }
+
+  onGetSearchingText(q: string): void {
+    this.q = q;
+    this.getAllRequisitions();
+  }
+
+  onGetEndDate(endDate: Date): void {
+    this.endDate = endDate;
+    this.getAllRequisitions();
+  }
+
+  onGetStartDate(startDate: Date): void {
+    this.startDate = startDate;
+    this.getAllRequisitions();
   }
 
   getAllRequisitions(event?: any): void {
@@ -99,14 +117,19 @@ export class RequisitionComponent implements OnInit {
         this.page,
         this.pageSize,
         this.selectedStatus,
-        "DESC"
-        )
-        .pipe(
-          map((requisitions) => {
-            this.pager = requisitions?.pager;
-            this.requisitions = requisitions?.requisitions;
-            this.storedRequisitions = requisitions?.requisitions;
-            this.loadedRequisitions = true;
+        "DESC",
+         {
+          q: this.q,
+          startDate: this.startDate,
+          endDate: this.endDate,
+        }
+      )
+      .pipe(
+        map((requisitions) => {
+          this.pager = requisitions?.pager;
+          this.requisitions = requisitions?.requisitions;
+          this.storedRequisitions = requisitions?.requisitions;
+          this.loadedRequisitions = true;
           return requisitions;
         })
       );
@@ -137,7 +160,7 @@ export class RequisitionComponent implements OnInit {
   onNewRequest(e: Event, params: any): void {
     e.stopPropagation();
     this.showRequisitionForm = !this.showRequisitionForm;
-    if(!this.showRequisitionForm) {
+    if (!this.showRequisitionForm) {
       this.getAllRequisitions();
     }
 
@@ -184,7 +207,7 @@ export class RequisitionComponent implements OnInit {
     // }
   }
 
-  onUpdateRequisition(e: any, requisition: any){
+  onUpdateRequisition(e: any, requisition: any) {
     this.showRequisitionForm = true;
     this.existingRequisition = requisition;
   }
@@ -209,16 +232,27 @@ export class RequisitionComponent implements OnInit {
 
   onDeleteRequisition(e: any, requisition: any) {
     e?.stopPropagation();
-    const requisitionObject = {
-      ...requisition,
-      voided: true,
-    };
-    this.requisitionService
-      .updateRequisition(requisition?.uuid, requisitionObject)
-      .subscribe((response) => {
-        localStorage.removeItem("availableRequisition");
-        this.getAllRequisitions();
-      });
+    this.dialog
+        .open(SharedConfirmationComponent, {
+          width: "25%",
+          data: {
+            modalTitle: "Are you sure to delete this Requisition",
+            modalMessage:
+              "This action is irreversible. Please, click confirm to delete and click cancel to cancel deletion.",
+          },
+        })
+        .afterClosed()
+        .subscribe((data) => {
+          if (data?.confirmed) {
+      
+        this.requisitionService
+          .deleteRequisition(requisition?.uuid)
+          .subscribe((response) => {
+            localStorage.removeItem("availableRequisition");
+            this.getAllRequisitions();
+          });
+        }
+      });    
   }
 
   receiveAllSelected(e: Event, requisition) {
@@ -239,8 +273,11 @@ export class RequisitionComponent implements OnInit {
             },
             quantity: this.selectedItems[key]?.quantity,
             batch: this.selectedItems[key]?.batch,
-          }
-        ]
+            expiryDate: dateToISOStringMidnight(
+              new Date(this.selectedItems[key]?.expiryDate)
+            ),
+          },
+        ],
       };
     });
     this.dialog
@@ -257,8 +294,9 @@ export class RequisitionComponent implements OnInit {
       .subscribe((issue) => {
         if (issue?.confirmed) {
           zip(
-            ...issueItems?.map((issueItem) => this.requisitionService
-              .receiveIssueItem(issueItem))
+            ...issueItems?.map((issueItem) =>
+              this.requisitionService.receiveIssueItem(issueItem)
+            )
           ).subscribe((response) => {
             if (response) {
               this.selectedItems = {};
@@ -266,7 +304,7 @@ export class RequisitionComponent implements OnInit {
             }
           });
         }
-      })
+      });
   }
 
   onReceiveRequisition(e: any, requisition: any) {
@@ -326,7 +364,8 @@ export class RequisitionComponent implements OnInit {
         width: "40%",
         data: {
           modalTitle: "Confirm Issues Rejection",
-          modalMessage: "Are you sure you want to reject this all selected items?",
+          modalMessage:
+            "Are you sure you want to reject this all selected items?",
           showRemarksInput: true,
           confirmationButtonText: "Reject",
         },
@@ -334,25 +373,29 @@ export class RequisitionComponent implements OnInit {
       .afterClosed()
       .subscribe((rejection) => {
         if (rejection?.confirmed) {
-          const rejectionObjects = Object.keys(this.selectedItems)?.map((key) => {
-            return {
-              issueItem: {
-                uuid: this.selectedItems[key]?.uuid,
-              },
-              status: "REJECTED",
-              remarks: rejection?.remarks || "",
-            };
-          })
+          const rejectionObjects = Object.keys(this.selectedItems)?.map(
+            (key) => {
+              return {
+                issueItem: {
+                  uuid: this.selectedItems[key]?.uuid,
+                },
+                status: "REJECTED",
+                remarks: rejection?.remarks || "",
+              };
+            }
+          );
           zip(
             ...rejectionObjects?.map((rejectionObject) => {
-              return this.requisitionService.createIssueItemStatus(rejectionObject);
+              return this.requisitionService.createIssueItemStatus(
+                rejectionObject
+              );
             })
           ).subscribe((response) => {
-              // Add support to catch error
-              if (response) {
-                this.getAllRequisitions();
-              }
-            });
+            // Add support to catch error
+            if (response) {
+              this.getAllRequisitions();
+            }
+          });
         }
       });
   }
@@ -373,6 +416,7 @@ export class RequisitionComponent implements OnInit {
           },
           quantity: e?.item?.quantity,
           batch: e?.item?.batch,
+          expiryDate: dateToISOStringMidnight(new Date(e?.item?.expiryDate)),
         },
       ],
     };

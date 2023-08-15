@@ -1,5 +1,6 @@
 import { AddNewStockReceivedComponent } from "./add-new-stock-received/add-new-stock-received.component";
 import { ConfirmRequisitionsModalComponent } from "./confirm-requisitions-modal/confirm-requisitions-modal.component";
+import { ConsumeStockItemModalComponent } from "./consume-stock-item-modal/consume-stock-item-modal.component";
 import { IssuingFormComponent } from "./issuing-form/issuing-form.component";
 import { LedgerFormComponent } from "./ledger-form/ledger-form.component";
 import { ManageLedgerComponent } from "./manage-ledger/manage-ledger.component";
@@ -20,4 +21,5 @@ export const storeModals: any[] = [
   ManageReOrderLevelModalComponent,
   StockInvoiceFormDialogComponent,
   RequisitionFormDialogComponent,
+  ConsumeStockItemModalComponent,
 ];

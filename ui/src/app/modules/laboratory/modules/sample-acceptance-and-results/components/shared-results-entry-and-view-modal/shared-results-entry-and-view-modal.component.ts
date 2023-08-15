@@ -7,7 +7,7 @@ import { ConceptGet } from "src/app/shared/resources/openmrs";
 import { SampleAllocationObject } from "src/app/shared/resources/sample-allocations/models/allocation.model";
 import { SampleAllocationService } from "src/app/shared/resources/sample-allocations/services/sample-allocation.service";
 
-import { omit, groupBy, flatten, orderBy } from "lodash";
+import { omit, groupBy, flatten, orderBy, isEqual } from "lodash";
 import { HttpClient } from "@angular/common/http";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { VisitsService } from "src/app/shared/resources/visits/services";
@@ -16,6 +16,7 @@ import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import { MatRadioChange } from "@angular/material/radio";
 import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: "app-shared-results-entry-and-view-modal",
@@ -44,6 +45,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   relatedResults: any[] = [];
   selectedParametersWithDefinedRelationship: any[];
   selectedInstruments: any = {};
+  multipleResults: any = [];
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -53,7 +55,8 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     private ordersService: OrdersService,
     private visitService: VisitsService,
     private store: Store<AppState>,
-    private sampleService: SamplesService
+    private sampleService: SamplesService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -329,7 +332,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                       .saveResultsViaAllocations(results)
                       .subscribe((response) => {
                         if (response) {
-                          this.saving = false;
                           if (
                             (
                               this.data?.sample?.statuses?.filter(
@@ -353,6 +355,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                               .subscribe((response) => {});
                           }
                           setTimeout(() => {
+                            this.saving = false;
                             this.getAllocations();
                           }, 100);
                         }
@@ -369,7 +372,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         .saveResultsViaAllocations(data)
         .subscribe((response) => {
           if (response) {
-            this.saving = false;
             let allocationAmendmentStatuses = [];
             if (alreadyApproved) {
               allocationAmendmentStatuses = response?.map((result) => {
@@ -414,11 +416,18 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               )?.length === 0
                 ? this.sampleService.saveSampleStatus(status)
                 : of(null)
-            ).subscribe((response) => {
-              setTimeout(() => {
-                this.getAllocations();
-              }, 100);
+            ).subscribe((response) => {});
+
+            this.snackBar.open(`Results saved successfully`, "OK", {
+              horizontalPosition: "center",
+              verticalPosition: "bottom",
+              duration: 3500,
+              panelClass: ["snack-color"],
             });
+            setTimeout(() => {
+              this.saving = false;
+              this.getAllocations();
+            }, 200);
           }
         });
     }
@@ -477,7 +486,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                     },
                   };
                 });
-              } else {
+              } else if (allocationData?.finalResult?.value) {
                 approvalStatuses = [
                   {
                     status:
@@ -511,7 +520,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         .saveAllocationStatuses(this.allocationStatuses)
         .subscribe((response) => {
           if (response && !response?.error) {
-            this.saving = false;
             if (
               (
                 this.allocationStatuses?.filter(
@@ -557,15 +565,42 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                 .subscribe((response) => {});
             }
             setTimeout(() => {
+              this.saving = false;
+              this.snackBar.open(`Authorized successfully`, "OK", {
+                horizontalPosition: "center",
+                verticalPosition: "bottom",
+                duration: 3500,
+                panelClass: ["snack-color"],
+              });
               this.getAllocations();
             }, 100);
           } else {
             this.saving = false;
+            this.snackBar.open(
+              `There is an issue with authorization`,
+              "ERROR",
+              {
+                horizontalPosition: "center",
+                verticalPosition: "bottom",
+                duration: 3500,
+                panelClass: ["snack-color"],
+              }
+            );
             this.errors = [this.errors, response];
           }
         });
     } else {
       this.shouldConfirm = true;
+      // if (!this.data?.LISConfigurations?.isLIS) {
+      //   this.shouldConfirm = true;
+      // } else {
+      //   this.shouldConfirm = true;
+      // }
+
+      // console.log(this.data?.LISConfigurations?.isLIS);
+      // console.log(order);
+      // console.log(this.data?.currentUser);
+      //finalResultsFedBy
     }
   }
 
@@ -682,67 +717,260 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     this.relatedResults = [];
     // console.log("results", results);
     Object.keys(results)?.forEach((key) => {
+      // console.log(results[key]);
+      // if (results[key]?.multipleResults) {
+      //   console.log(results[key]);
+      // }
       if (
         results[key]?.value &&
-        results[key]?.value != results[key]?.previousValue[0]
+        results[key]?.value?.length > 0 &&
+        results[key]?.value != results[key]?.previousValue
       ) {
-        this.relatedResults = [
-          ...this.relatedResults,
-          {
-            concept: {
-              uuid: results[key]?.parameter?.uuid,
-            },
-            testAllocation: {
-              uuid: results[key]?.allocation?.uuid,
-            },
-            valueNumeric: results[key]?.parameter?.isNumeric
-              ? results[key]?.value
-              : null,
-            valueText: results[key]?.parameter?.isText
-              ? results[key]?.value
-              : null,
-
-            valueCoded: results[key]?.parameter?.isCoded
-              ? {
-                  uuid: results[key]?.value,
-                }
-              : null,
-            resultGroup: {
-              uuid: results[key]?.relatedResult?.uuid,
-            },
-            instrument:
-              order && this.selectedInstruments[order?.concept?.uuid]
+        if (
+          results[key]?.multipleResults &&
+          !isEqual(
+            orderBy(results[key]?.value, ["value"], ["asc"])?.map(
+              (dataValue) => dataValue?.value
+            ) || [],
+            orderBy(
+              results[key]?.previousValue?.map((val) => {
+                return {
+                  val,
+                };
+              }),
+              ["val"],
+              ["asc"]
+            )?.map((dataValue) => dataValue?.val) || []
+          )
+        ) {
+          // console.log("kkdkd", results[key]);
+          this.multipleResults = [
+            ...(this.multipleResults?.filter(
+              (result) =>
+                result?.allocation?.id !== results[key]?.allocation?.id
+            ) || []),
+            results[key],
+          ];
+        } else if (!results[key]?.multipleResults) {
+          this.relatedResults = [
+            ...this.relatedResults,
+            {
+              concept: {
+                uuid: results[key]?.parameter?.uuid,
+              },
+              testAllocation: {
+                uuid: results[key]?.allocation?.uuid,
+              },
+              valueNumeric: results[key]?.parameter?.isNumeric
+                ? results[key]?.value
+                : null,
+              valueText: results[key]?.parameter?.isText
+                ? results[key]?.value
+                : null,
+              valueCoded: results[key]?.parameter?.isCoded
                 ? {
-                    uuid: this.selectedInstruments[order?.concept?.uuid],
+                    uuid: results[key]?.value,
                   }
                 : null,
-            abnormal: false,
-            status: this.remarksData[results[key]?.parameter?.uuid]
-              ? {
-                  category: "RESULT_REMARKS",
-                  status: "REMARKS",
-                  remarks: this.remarksData[results[key]?.parameter?.uuid],
-                }
-              : null,
-          },
-        ];
+              resultGroup: results[key]?.relatedResult
+                ? {
+                    uuid: results[key]?.relatedResult?.uuid,
+                  }
+                : null,
+              instrument:
+                order && this.selectedInstruments[order?.concept?.uuid]
+                  ? {
+                      uuid: this.selectedInstruments[order?.concept?.uuid],
+                    }
+                  : null,
+              abnormal: false,
+              status: this.remarksData[results[key]?.parameter?.uuid]
+                ? {
+                    category: "RESULT_REMARKS",
+                    status: "REMARKS",
+                    remarks: this.remarksData[results[key]?.parameter?.uuid],
+                  }
+                : null,
+            },
+          ];
+        }
       }
     });
   }
 
   onSaveRelatedResults(event: Event, order: any): void {
+    this.saving = true;
     event.stopPropagation();
-    // console.log("relatedResults", this.relatedResults);
-    this.sampleAllocationService
-      .saveResultsViaAllocations(this.relatedResults)
-      .subscribe((response) => {
-        if (response) {
-          this.saving = false;
-          setTimeout(() => {
-            this.getAllocations();
-          }, 100);
-        }
+    if (this.multipleResults?.length > 0) {
+      this.multipleResults.map((multipleResult) => {
+        const allocation = multipleResult?.allocation;
+        const parentAllocation = {
+          concept: {
+            uuid: allocation?.order?.concept?.uuid,
+          },
+          order: {
+            uuid: allocation?.order?.uuid,
+          },
+          container: {
+            uuid: "eb21ff23-a627-4a62-8bd0-efdc1db2ebb5", // Remove this hardcoded uuid
+          },
+          sample: {
+            uuid: allocation?.sample?.uuid,
+          },
+          label: allocation?.order?.orderNumber,
+        };
+        this.sampleAllocationService
+          .createTestAllocation(parentAllocation)
+          .subscribe((response) => {
+            if (response && !response?.error) {
+              const results = [
+                {
+                  concept: {
+                    uuid: allocation?.order?.concept?.uuid,
+                  },
+                  testAllocation: {
+                    uuid: response?.uuid,
+                  },
+                  valueNumeric: null,
+                  valueText: null,
+
+                  valueCoded: null,
+                  abnormal: false,
+                },
+              ];
+              this.sampleAllocationService
+                .saveResultsViaAllocations(results)
+                .subscribe((resultsResponse) => {
+                  if (resultsResponse) {
+                    const results = flatten(
+                      multipleResult?.value?.map((dataValue) => {
+                        return {
+                          concept: {
+                            uuid: multipleResult?.allocation?.parameter?.uuid,
+                          },
+                          testAllocation: {
+                            uuid: multipleResult?.allocation?.uuid,
+                          },
+                          valueNumeric: null,
+                          valueText: null,
+
+                          valueCoded: {
+                            uuid: dataValue?.value,
+                          },
+                          resultGroup: {
+                            uuid: resultsResponse[0]?.uuid,
+                          },
+                          instrument:
+                            order &&
+                            this.selectedInstruments[order?.concept?.uuid]
+                              ? {
+                                  uuid: this.selectedInstruments[
+                                    order?.concept?.uuid
+                                  ],
+                                }
+                              : null,
+                          abnormal: false,
+                          status: this.remarksData[
+                            multipleResult?.allocation?.parameter?.uuid
+                          ]
+                            ? {
+                                category: "RESULT_REMARKS",
+                                status: "REMARKS",
+                                remarks:
+                                  this.remarksData[
+                                    multipleResult?.allocation?.parameter?.uuid
+                                  ],
+                              }
+                            : null,
+                        };
+                      })
+                    );
+                    zip(
+                      this.sampleAllocationService.saveResultsViaAllocations(
+                        results
+                      ),
+                      this.sampleAllocationService.saveResultsViaAllocations(
+                        this.relatedResults
+                      )
+                    ).subscribe((response) => {
+                      if (response) {
+                        if (
+                          (
+                            this.data?.sample?.statuses?.filter(
+                              (status) => status?.category === "HAS_RESULTS"
+                            ) || []
+                          )?.length === 0
+                        ) {
+                          const status = {
+                            sample: {
+                              uuid: this.data?.sample?.uuid,
+                            },
+                            user: {
+                              uuid: localStorage.getItem("userUuid"),
+                            },
+                            remarks: "",
+                            status: "HAS RESULTS",
+                            category: "HAS_RESULTS",
+                          };
+                          this.sampleService
+                            .saveSampleStatus(status)
+                            .subscribe((response) => {
+                              setTimeout(() => {
+                                this.snackBar.open(
+                                  `Results saved successfully`,
+                                  "OK",
+                                  {
+                                    horizontalPosition: "center",
+                                    verticalPosition: "bottom",
+                                    duration: 3500,
+                                    panelClass: ["snack-color"],
+                                  }
+                                );
+                                this.saving = false;
+                                this.getAllocations();
+                              }, 100);
+                            });
+                        } else {
+                          setTimeout(() => {
+                            this.snackBar.open(
+                              `Results saved successfully`,
+                              "OK",
+                              {
+                                horizontalPosition: "center",
+                                verticalPosition: "bottom",
+                                duration: 3500,
+                                panelClass: ["snack-color"],
+                              }
+                            );
+                            this.saving = false;
+                            this.getAllocations();
+                          }, 100);
+                        }
+                      }
+                    });
+                  }
+                });
+            }
+          });
       });
+    } else {
+      this.sampleAllocationService
+        .saveResultsViaAllocations(this.relatedResults)
+        .subscribe((response) => {
+          if (response) {
+            setTimeout(() => {
+              this.saving = false;
+              this.snackBar.open(`Results saved successfully`, "OK", {
+                horizontalPosition: "center",
+                verticalPosition: "bottom",
+                duration: 3500,
+                panelClass: ["snack-color"],
+              });
+              this.getAllocations();
+            }, 100);
+          }
+        });
+    }
   }
 
   onGetSelectedInstrument(instrument: any, order: any): void {

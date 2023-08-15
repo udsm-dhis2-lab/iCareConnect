@@ -1,7 +1,10 @@
 <div
   [formGroup]="form"
   *ngIf="
-    isCommonField && !isReport && !field?.shouldHaveLiveSearchForDropDownFields
+    isCommonField &&
+    !isReport &&
+    !field?.shouldHaveLiveSearchForDropDownFields &&
+    !isDateTime
   "
 >
   <mat-form-field
@@ -45,7 +48,7 @@
         [formControlName]="field?.key"
         (keyup)="fileChangeEvent($event, field)"
         multiple="multiple"
-        accept=".pdf,.png,.jpeg,.jpg,.doc,.xls,.docx"
+        accept=".pdf,.png,.jpeg,.jpg,.doc,.xls,.xlsx,.docx"
       />
     </div>
     <!-- End of File upload for default complex -->
@@ -64,7 +67,8 @@
       [required]="field?.required"
       matInput
       autocomplete="off"
-      (keyup)="onFieldUpdate()"
+      (keyup)="onFieldUpdate($event)"
+      (keydown)="onListenKeyEvent($event)"
     />
     <!-- end of textbox -->
 
@@ -221,7 +225,7 @@
       [required]="field?.required"
       matInput
       [value]="
-        field?.value && (members$ | async)?.length == 1
+        field?.value && (members$ | async) && (members$ | async)?.length == 1
           ? (members$ | async)[0]?.display
           : ''
       "
@@ -323,7 +327,6 @@
     </mat-checkbox>
   </section>
 </div>
-
 <div [formGroup]="form" *ngIf="isDateTime && !isReport">
   <mat-form-field
     [hidden]="field?.hidden"

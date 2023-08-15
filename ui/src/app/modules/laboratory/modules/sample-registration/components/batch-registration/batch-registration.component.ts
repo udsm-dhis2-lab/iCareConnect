@@ -35,6 +35,9 @@ export class BatchRegistrationComponent implements OnInit {
   @Input() barcodeSettings: any;
   @Input() specimenSources: ConceptGetFull[];
 
+  @Input() personEmailAttributeTypeUuid: string;
+  @Input() personPhoneAttributeTypeUuid: string;
+
   @Output() reloadRegisterSample: EventEmitter<any> = new EventEmitter();
   formData: any;
   useExistingBatchset: boolean = false;

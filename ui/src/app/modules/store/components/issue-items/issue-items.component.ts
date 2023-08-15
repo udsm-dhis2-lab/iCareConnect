@@ -26,6 +26,7 @@ export class IssueItemsComponent implements OnInit {
   loadingRequisition: boolean = false;
   selectedItems: any = {};
   selectAllItems: boolean = false;
+  markAll: boolean = false;
 
   constructor(
     private requisitionService: RequisitionService,
@@ -40,6 +41,7 @@ export class IssueItemsComponent implements OnInit {
         map((response) => {
           const items = getFilteredIssueItems(response?.requisitionItems, response?.issues);
           this.loadingRequisition = false;
+          this.markAll = items?.filter((item) => item?.status === 'PENDING')?.length > 0;
           return {
             ...response,
             items: items
@@ -70,7 +72,7 @@ export class IssueItemsComponent implements OnInit {
   
   selectAll(e: MatCheckboxChange, items: any[]){
     if(e?.checked){
-      items.forEach((item) => {
+      items?.filter((item) => item?.status === 'PENDING')?.forEach((item) => {
         this.selectedItems = {
           ...this.selectedItems,
           [item]: item

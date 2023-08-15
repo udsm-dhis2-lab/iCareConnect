@@ -3,7 +3,7 @@ export function getFilterIssuedItemsInRequisitions(requisitionItems: any[], issu
     issues?.forEach((issue) => {
       issue?.issueItems?.forEach((issueItem) => {
         const issueReceivedStatuses = issueItem?.issueItemStatuses?.filter((status) => status?.status === 'RECEIVED')?.length;
-        const issueRejectedStatuses = issueItem?.issueItemStatuses?.filter((status) => status?.status === 'RECEIVED')?.length;
+        const issueRejectedStatuses = issueItem?.issueItemStatuses?.filter((status) => status?.status === 'REJECTED')?.length;
         console.log(issueReceivedStatuses);
         issueItems = [
           ...issueItems,

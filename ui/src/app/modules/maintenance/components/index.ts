@@ -6,6 +6,7 @@ import { ProviderAttributesFormComponent } from "./provider-attributes-form/prov
 import { ReportsGroupsListComponent } from "./reports-groups-list/reports-groups-list.component";
 import { ReportsGroupsComponent } from "./reports-groups/reports-groups.component";
 import { SystemSettingsListComponent } from "./system-settings-list/system-settings-list.component";
+import { UnitsOfMeasureSettingsComponent } from "./units-of-measure-settings/units-of-measure-settings.component";
 import { UsersListComponent } from "./users-list/users-list.component";
 
 export const maintenanceComponents: any[] = [
@@ -18,4 +19,5 @@ export const maintenanceComponents: any[] = [
   ReportsGroupsComponent,
   ReportsGroupsListComponent,
   ParameterConfigurationFormComponent,
+  UnitsOfMeasureSettingsComponent,
 ];

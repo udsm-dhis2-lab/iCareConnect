@@ -37,6 +37,8 @@ export class CompletedSamplesComponent implements OnInit {
 
   savingMessage: any = {};
   providerDetails$: Observable<any>;
+  tabType : string = "completed-samples";
+
 
   samplesToViewMoreDetails: any = {};
   saving: boolean = false;
@@ -58,6 +60,8 @@ export class CompletedSamplesComponent implements OnInit {
       "RESULT_AUTHORIZATION",
       "YES",
       this.excludeAllocations,
+      this.tabType,
+      null,
       null,
       {
         departments: this.labSamplesDepartments,

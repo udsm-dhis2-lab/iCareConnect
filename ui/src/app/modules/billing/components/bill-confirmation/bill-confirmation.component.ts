@@ -1,13 +1,13 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
-import { random } from 'lodash';
-import { Observable } from 'rxjs';
-import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
-import { ConceptsService } from 'src/app/shared/resources/concepts/services/concepts.service';
-import { AppState } from 'src/app/store/reducers';
-import { getCurrentUserDetails } from 'src/app/store/selectors/current-user.selectors';
-import { BillingService } from '../../services/billing.service';
+import { Component, Inject, OnInit } from "@angular/core";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { Store } from "@ngrx/store";
+import { random } from "lodash";
+import { Observable } from "rxjs";
+import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
+import { AppState } from "src/app/store/reducers";
+import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
+import { BillingService } from "../../services/billing.service";
 
 @Component({
   selector: "app-bill-confirmation",
@@ -62,7 +62,7 @@ export class BillConfirmationComponent implements OnInit {
     return `GEPG_MNL: ${this.controlNumber}`;
   }
 
- onFormUpdate(formValues: FormValue): void {
+  onFormUpdate(formValues: FormValue): void {
     this.isFormValid = formValues.isValid;
     this.formValues = { ...this.formValues, ...formValues.getValues() };
 
@@ -70,13 +70,14 @@ export class BillConfirmationComponent implements OnInit {
     const correntCN = new RegExp("\\d{11,}").test(
       String(formValues.getValues()[this.data?.gepgConceptUuid]?.value)
     );
-    if(correntCN){
-      this.controlNumber =
-        Number(formValues.getValues()[this.data?.gepgConceptUuid]?.value);
+    if (correntCN) {
+      this.controlNumber = Number(
+        formValues.getValues()[this.data?.gepgConceptUuid]?.value
+      );
     } else {
       this.controlNumber = undefined;
     }
- }
+  }
 
   onCancel(e): void {
     e.stopPropagation();
@@ -219,8 +220,10 @@ export class BillConfirmationComponent implements OnInit {
 
     // Change image from base64 then replace some text with empty string to get an image
     let image = "";
+    let header = "";
+    let subHeader = "";
 
-    this.facilityDetailsJson.attributes.map((attribute) => {
+    e.FacilityDetails.attributes.map((attribute) => {
       let attributeTypeName =
         attribute && attribute.attributeType
           ? attribute?.attributeType?.name.toLowerCase()
@@ -228,11 +231,13 @@ export class BillConfirmationComponent implements OnInit {
       if (attributeTypeName === "logo") {
         image = attribute?.value;
       }
+      header = attributeTypeName === "header" ? attribute?.value : "";
+      subHeader = attributeTypeName === "sub header" ? attribute?.value : "";
     });
 
     let patientMRN =
-      e?.CurrentPatient?.MRN ||
-      e?.CurrentPatient?.patient?.identifiers[0]?.identifier.replace(
+      e.CurrentPatient?.MRN ||
+      e.CurrentPatient?.patient?.identifiers[0]?.identifier.replace(
         "MRN = ",
         ""
       );
@@ -240,14 +245,21 @@ export class BillConfirmationComponent implements OnInit {
     frameDoc.document.write(`
     
       <center id="top">
+         <div class="info">
+          <h2>${header.length > 0 ? header : e.FacilityDetails.display} </h2>
+          </div>
         <div class="logo">
           <img src="${image}" alt="Facility's Logo"> 
         </div>
         
 
         <div class="info">
-          <h2>${e?.FacilityDetails?.display}</h2>
-          <h3>P.O Box ${e.FacilityDetails?.postalCode} ${e.FacilityDetails?.stateProvince}</h3>
+          <h2>${
+            subHeader.length > 0 ? subHeader : e.FacilityDetails.description
+          } </h2>
+          <h3>P.O Box ${e.FacilityDetails?.postalCode} ${
+      e.FacilityDetails?.stateProvince
+    }</h3>
           <h3>${e?.FacilityDetails?.country}</h3>
         </div>
         <!--End Info-->

@@ -200,7 +200,7 @@ export class RegistrationPatientComponent implements OnInit {
 
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
 
-    // this.store.select(getCurrentLocation).subscribe((res) => {
+    // this.store.select(getCurrentLocation(false)).subscribe((res) => {
     //   this.currentLocation = res;
     // });
 

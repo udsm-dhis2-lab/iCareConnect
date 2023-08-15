@@ -6,7 +6,9 @@
     lisConfigurations: lisConfigurations$ | async,
     currentLocation: currentLocation$ | async,
     userAssignedLocationsLoadedState: userAssignedLocationsLoadedState$ | async,
-    googleFormLink: googleFormLink$ | async
+    googleFormLink: googleFormLink$ | async,
+    securitySystemSettings: securitySystemSettings$ | async,
+    currentUser: currentUser$ | async
   } as params"
 >
   <div
@@ -71,16 +73,15 @@
             <small class="mt-1">{{ currentUser?.person?.display }}</small>
           </div>
           <button
-            class="mt-2 text-center"
-            id="btn-logout"
+            class="mt-2 text-left"
+            [disabled]="!params?.securitySystemSettings"
             mat-menu-item
-            (click)="onChangePassword($event)"
+            (click)="onChangePassword($event, params?.securitySystemSettings)"
           >
             Change Password
           </button>
-          <button
+          <!-- <button
             class="mt-2 text-center"
-            id="btn-logout"
             mat-menu-item
             *ngIf="params?.googleFormLink"
           >
@@ -91,23 +92,20 @@
             >
               Support
             </a>
-          </button>
-          <button
-            class="mt-2 text-center"
-            id="btn-logout"
-            mat-menu-item
-            (click)="onLogOut()"
-          >
-            Logout
-          </button>
+          </button> -->
           <button
             *ngIf="params?.lisConfigurations?.isLIS"
-            class="mt-2 text-center"
+            class="mt-2 text-left"
             mat-menu-item
-            (click)="onUpdateProfile()"
+            [disabled]="!params?.currentUser"
+            (click)="onUpdateProfile(params?.currentUser)"
           >
             <mat-icon>person</mat-icon>
             Update Profile
+          </button>
+          <button class="mt-2 text-left" mat-menu-item (click)="onLogOut()">
+            <mat-icon>input</mat-icon>
+            Logout
           </button>
         </mat-menu>
       </ng-container>

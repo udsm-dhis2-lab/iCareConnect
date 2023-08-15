@@ -65,7 +65,7 @@ export class InpatientHomeComponent implements OnInit {
      */
 
     // this.store
-    //   .select(getCurrentLocation)
+    //   .select(getCurrentLocation(false))
     //   .subscribe((response) => {
     //     this.currentLocation = response;
     //     // localStorage.setItem(
