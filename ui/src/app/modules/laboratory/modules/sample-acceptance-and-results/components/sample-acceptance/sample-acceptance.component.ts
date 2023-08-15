@@ -37,6 +37,8 @@ import { getProviderDetails } from "src/app/store/selectors/current-user.selecto
 import { PrintResultsModalComponent } from "../print-results-modal/print-results-modal.component";
 import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
 import { SharedResultsEntryAndViewModalComponent } from "../shared-results-entry-and-view-modal/shared-results-entry-and-view-modal.component";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { flatten } from "lodash";
 
 @Component({
   selector: "app-sample-acceptance",
@@ -82,10 +84,12 @@ export class SampleAcceptanceComponent implements OnInit {
   currentTabWithDataLoaded: number = 0;
   showPrintingPage: boolean = false;
   dataToPrint: any;
+  testRelationshipConceptSourceUuid$: Observable<string>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
-    private sampleService: SamplesService
+    private sampleService: SamplesService,
+    private systemSettingsService: SystemSettingsService
   ) {}
 
   ngOnInit(): void {
@@ -99,11 +103,40 @@ export class SampleAcceptanceComponent implements OnInit {
     this.settingLabSampleStatus$ = this.store.select(
       getSettingLabSampleStatusState
     );
+    this.testRelationshipConceptSourceUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `iCare.lis.testParameterRelationship.conceptSourceUuid`
+      );
   }
 
   onGetDataToPrint(data: any): void {
     this.dataToPrint = data;
-    this.showPrintingPage = true;
+    const statuses = flatten(
+      data?.patientDetailsAndSamples?.departments?.map((department) => {
+        return department?.samples;
+      })
+    )?.map((sample) => {
+      return {
+        sample: {
+          uuid: sample?.uuid,
+        },
+        user: {
+          uuid: this.userUuid,
+        },
+        remarks: "Printed Results",
+        category: "PRINT",
+        status: "PRINTED",
+      };
+    });
+    this.saving = true;
+    this.sampleService
+      .setMultipleSamplesStatuses(statuses)
+      .subscribe((response) => {
+        if (response) {
+          this.showPrintingPage = true;
+          this.saving = false;
+        }
+      });
   }
 
   togglePrintAndList(event: Event): void {
@@ -543,5 +576,11 @@ export class SampleAcceptanceComponent implements OnInit {
       disableClose: false,
       panelClass: "custom-dialog-container",
     });
+  }
+
+  onCancelFromResultsPage(shouldGoBack: boolean): void {
+    if (shouldGoBack) {
+      this.showPrintingPage = !this.showPrintingPage;
+    }
   }
 }

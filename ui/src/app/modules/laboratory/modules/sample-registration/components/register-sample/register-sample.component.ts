@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatRadioChange } from "@angular/material/radio";
 import { Store } from "@ngrx/store";
-import { Observable, zip } from "rxjs";
-import { map, take, tap, withLatestFrom } from "rxjs/operators";
+import { Observable, of, zip } from "rxjs";
+import { catchError, map, take, tap, withLatestFrom } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { LabSampleModel } from "src/app/modules/laboratory/resources/models";
 import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
@@ -13,6 +13,7 @@ import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import {
@@ -30,11 +31,15 @@ import { getCurrentUserDetails } from "src/app/store/selectors/current-user.sele
   styleUrls: ["./register-sample.component.scss"],
 })
 export class RegisterSampleComponent implements OnInit {
+  @Input() currentUser: any;
   @Input() provider: any;
   @Input() LISConfigurations: LISConfigurationsModel;
   @Input() labSections: ConceptGetFull[];
   @Input() fromMaintenance: boolean;
-  @Input() specimenSources: ConceptGetFull[]
+  @Input() specimenSources: ConceptGetFull[];
+  @Input() personEmailAttributeTypeUuid: string;
+  @Input() personPhoneAttributeTypeUuid: string;
+  @Input() sampleRegistrationCategoriesConceptUuid: string;
   registrationCategory: string = "single";
   currentUser$: Observable<any>;
 
@@ -78,6 +83,9 @@ export class RegisterSampleComponent implements OnInit {
   barcodeSettings$: Observable<any>;
   errors: any[] = [];
 
+  importExportCategory: string = "CLINICAL";
+  labTestRequestProgramStageId$: Observable<string>;
+
   get maximumDate() {
     let maxDate = new Date();
     let maxMonth =
@@ -91,16 +99,22 @@ export class RegisterSampleComponent implements OnInit {
     return `${maxDate.getFullYear()}-${maxMonth}-${maxDay}`;
   }
 
+  unifiedCodingReferenceConceptSourceUuid$: Observable<string>;
+  relatedMetadataAttributeUuid$: Observable<string>;
+  hfrCodeAttributeUuid$: Observable<string>;
+  sampleRegistrationCategories$: Observable<any>;
+  specimenSourceConceptUuid$: Observable<string>;
+
   constructor(
     private samplesService: SamplesService,
     private systemSettingsService: SystemSettingsService,
     private store: Store<AppState>,
-    private registrationService: RegistrationService
+    private registrationService: RegistrationService,
+    private conceptService: ConceptsService
   ) {}
 
   ngOnInit(): void {
-    this.currentUser$ = this.store.select(getCurrentUserDetails);
-
+    // console.log(this.currentUser);
     this.store.dispatch(
       loadLocationsByTagNames({ tagNames: ["Lab+Location"] })
     );
@@ -117,7 +131,45 @@ export class RegisterSampleComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "lis.attribute.referFromFacility"
       );
+    this.unifiedCodingReferenceConceptSourceUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `icare.laboratory.concept.unifiedCodingReference.conceptSourceUuid`
+      );
 
+    this.relatedMetadataAttributeUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `icare.laboratory.concept.relatedMetadata.attributeUuid`
+      );
+
+    this.hfrCodeAttributeUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `icare.location.attributes.hfrCode.attributeUuid`
+      );
+    this.labTestRequestProgramStageId$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.externalSystems.integrated.pimaCovid.programStages.testRequestStage"
+      );
+
+    this.specimenSourceConceptUuid$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        `lis.sampleRegistration.specimenSource.concept.uuid`
+      )
+      .pipe(
+        map((response) => {
+          if (response && response == "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  error: `Key: lis.sampleRegistration.specimenSource.concept.uuid is not set, contact IT`,
+                  message: `Key: lis.sampleRegistration.specimenSource.concept.uuid is not set, contact IT`,
+                },
+              },
+            ];
+          }
+          return response;
+        })
+      );
     this.agencyConceptConfigs$ = this.store.select(getConceptById, {
       id: this.LISConfigurations?.agencyConceptUuid,
     });
@@ -142,28 +194,27 @@ export class RegisterSampleComponent implements OnInit {
         "lis.attributes.referringDoctor"
       );
 
-    this.barcodeSettings$ =
-      this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.laboratory.settings.print.barcodeFormat"
-      ).pipe(tap((response) => {
-        if(response === "none"){
-          this.errors = [
-            ...this.errors,
-            {
-              error: {
-                message: "iCare.laboratory.settings.print.barcodeFormat is not set. You won't be able to print barcode."
+    this.barcodeSettings$ = this.systemSettingsService
+      .getSystemSettingsByKey("iCare.laboratory.settings.print.barcodeFormat")
+      .pipe(
+        tap((response) => {
+          if (response === "none") {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "iCare.laboratory.settings.print.barcodeFormat is not set. You won't be able to print barcode.",
+                },
+                type: "warning",
               },
-              type: "warning"
-            },
-          ]
-        }
-        if(response?.error){
-           this.errors = [
-            ...this.errors,
-            response?.error
-          ]
-        }
-      }));
+            ];
+          }
+          if (response?.error) {
+            this.errors = [...this.errors, response?.error];
+          }
+        })
+      );
 
     this.identifierTypes$ =
       this.registrationService.getPatientIdentifierTypes();
@@ -183,7 +234,22 @@ export class RegisterSampleComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "lis.settings.labNumber.charactersCount"
       );
-
+    this.sampleRegistrationCategories$ = this.conceptService
+      .getConceptDetailsByUuid(
+        this.sampleRegistrationCategoriesConceptUuid,
+        "custom:(uuid,display,setMembers:(uuid,display))"
+      )
+      .pipe(
+        map((response) =>
+          response?.setMembers?.map((setMember: any) => {
+            return {
+              ...setMember,
+              refKey: setMember?.display?.toLowerCase().split(" ").join(""),
+            };
+          })
+        ),
+        catchError((error) => of(error))
+      );
     this.initializeRegistrationFields();
   }
 
@@ -206,7 +272,7 @@ export class RegisterSampleComponent implements OnInit {
       specimen: new Dropdown({
         id: "specimen",
         key: "specimen",
-        label: "Specimen",
+        label: "Specimen type",
         searchTerm: "SPECIMEN_SOURCE",
         options: [],
         conceptClass: "Specimen",
@@ -227,7 +293,11 @@ export class RegisterSampleComponent implements OnInit {
         id: "agency",
         key: "agency",
         label: "Urgency/Priority",
-        shouldHaveLiveSearchForDropDownFields: false,
+        options: [],
+        conceptClass: "priority",
+        searchControlType: "concept",
+        searchTerm: "SAMPLE_PRIORITIES",
+        shouldHaveLiveSearchForDropDownFields: true,
       }),
       receivedBy: new Dropdown({
         id: "receivedBy",
@@ -271,7 +341,7 @@ export class RegisterSampleComponent implements OnInit {
         id: "collectedOn",
         key: "collectedOn",
         label: "Collected On",
-        allowCustomDateTime: true
+        allowCustomDateTime: true,
       }),
       collectedBy: new Textbox({
         id: "collectedBy",
@@ -482,5 +552,12 @@ export class RegisterSampleComponent implements OnInit {
       clinicalFormFields: this.clinicalFormFields,
       testFields: this.testFields,
     };
+  }
+
+  getSelectionCategory(event: MatRadioChange): void {
+    this.importExportCategory = null;
+    setTimeout(() => {
+      this.importExportCategory = event.value;
+    }, 10);
   }
 }

@@ -2,24 +2,37 @@
   *ngIf="{
     settingCurrentLocationStatus: settingCurrentLocationStatus$ | async,
     currentStore: currentStore$ | async,
-    privileges: privileges$ | async
+    privileges: privileges$ | async,
+    currentUser: currentUser$ | async,
+    isCurrentLocationPharmacy: isCurrentLocationPharmacy$ | async
   } as params"
   class="container-fluid"
 >
+
   <div
-    *ngIf="!params?.settingCurrentLocationStatus"
+    *ngIf="!params?.settingCurrentLocationStatus || !params?.currentUser"
     class="pt-2 store-container row"
   >
     <!-- store sidebar -->
     <div class="store-sidebar col-2">
-        <h3 class="pl-3 pt-3">Store: {{ params?.currentStore?.name }}</h3>
-        <mat-nav-list>
-          <ng-container *ngFor="let storePage of storePages">
+      <h3 class="pl-3 pt-3">Store: {{ params?.currentStore?.name }}</h3>
+      <mat-nav-list>
+        <ng-container *ngFor="let storePage of storePages">
+          <ng-container
+            *ngIf="
+             ( (!params?.currentStore?.isMainStore && params?.isCurrentLocationPharmacy &&
+                storePage?.id !== 'settings') ||
+              (params?.currentStore?.isMainStore &&
+                storePage?.id !== 'requisition' &&
+                storePage?.id !== 'received' ) )|| (!params?.currentStore?.isMainStore && !params?.isCurrentLocationPharmacy && storePage?.id !== 'issuing' && storePage?.id !== 'settings') 
+            "
+          >
             <mat-list-item
               *ngIf="
                 (storePage?.privilege &&
-                  params?.privileges[storePage?.privilege]) ||
-                !storePage?.privilege
+                  params?.currentUser?.userPrivileges[storePage?.privilege]) ||
+                params?.currentUser?.userPrivileges['ALL'] ||
+                params?.currentUser?.userPrivileges['STORE_ALL']
               "
               [ngClass]="{
                 'not-allowed-menu-item':
@@ -27,82 +40,30 @@
                   (storePage?.id === 'requisition' ||
                     storePage?.id === 'received'),
                 'store-active': storePage?.id === currentStorePage?.id,
-                'page': true
-              } "
+                page: true
+              }"
               (click)="onChangeRoute($event, storePage.url, storePage)"
               routerLinkActive="store-active"
             >
               <a matLine>{{ storePage?.name }}</a>
             </mat-list-item>
           </ng-container>
-        </mat-nav-list>
+        </ng-container>
+      </mat-nav-list>
     </div>
     <!-- end of store sidebar -->
 
+    <!-- Stock Metrics -->
     <!-- store-content -->
-    <div class="store-content col-10">
-      <!-- stock summary -->
-      <div class="row" *ngIf="!(stockMetrics$ | async)">
-        <div class="col p-2">
-          <mat-card class="border p-2">
-            <p>Loading Metrics . . .</p>
-            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-          </mat-card>
-        </div>
-      </div>
-
-      <div class="row" *ngIf="stockMetrics$ | async as metrics">
-        <div class="col mb-2">
-          <mat-card class="border p-3">
-            <mat-card-subtitle class="mb-3 h5 text-center">
-              Nearly Stocked Out
-            </mat-card-subtitle>
-            <mat-card-title class="h2 text-center">{{
-              metrics?.nearlyStockedOut
-            }}</mat-card-title>
-          </mat-card>
-        </div>
-        <div class="col mb-2">
-          <mat-card
-            class="border p-3"
-            style="cursor: pointer"
-            (click)="
-              onChangeRoute(
-                $event,
-                'stockout-items/' + params?.currentStore?.uuid,
-                currentStorePage
-              )
-            "
-          >
-            <mat-card-subtitle class="mb-3 h5 text-center">
-              Stocked Out
-            </mat-card-subtitle>
-            <mat-card-title class="h2 text-center">{{
-              metrics?.stockedOut
-            }}</mat-card-title>
-          </mat-card>
-        </div>
-        <div class="col mb-2">
-          <mat-card class="border p-3">
-            <mat-card-subtitle class="mb-3 h5 text-center">
-              Expired
-            </mat-card-subtitle>
-            <mat-card-title class="h2 text-center">{{
-              metrics?.expired
-            }}</mat-card-title>
-          </mat-card>
-        </div>
-        <div class="col mb-2">
-          <mat-card class="border p-3">
-            <mat-card-subtitle class="mb-3 h5 text-center">
-              Nearly Expired
-            </mat-card-subtitle>
-            <mat-card-title class="h2 text-center">{{
-              metrics?.nearlyExpired
-            }}</mat-card-title>
-          </mat-card>
-        </div>
-      </div>
+    <div
+      class="store-content col-10"
+      *ngIf="showStoreMetrics && params?.currentStore && currentStorePage"
+    >
+      <app-stock-metrics
+        [currentStorePage]="currentStorePage"
+        [currentStore]="params?.currentStore"
+        (changeRoute)="onChangeRoute($event)"
+      ></app-stock-metrics>
       <!-- end of stock summary -->
       <router-outlet></router-outlet>
     </div>

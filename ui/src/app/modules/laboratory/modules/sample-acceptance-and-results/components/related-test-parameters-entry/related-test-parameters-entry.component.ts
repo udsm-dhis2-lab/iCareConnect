@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { SampleAllocationObject } from "src/app/shared/resources/sample-allocations/models/allocation.model";
-
+import { orderBy } from "lodash";
 @Component({
   selector: "app-related-test-parameters-entry",
   templateUrl: "./related-test-parameters-entry.component.html",
@@ -12,27 +12,57 @@ export class RelatedTestParametersEntryComponent implements OnInit {
   @Input() isLIS: boolean;
   @Input() disabled: boolean;
   @Input() conceptNameType: string;
+  @Input() order: any;
   relatedAllocation: any;
   finalResultsForParentTestParameter: any;
   @Output() data: EventEmitter<any> = new EventEmitter<any>();
   results: any = {};
+  allocationsWithoutRelationShip: any[];
+  searchingText: string;
   constructor() {}
 
   ngOnInit(): void {
-    console.log(
-      "parametersWithDefinedRelationship",
-      this.parametersWithDefinedRelationship
-    );
+    // console.log(
+    //   "parametersWithDefinedRelationship",
+    //   this.parametersWithDefinedRelationship
+    // );
     this.relatedAllocation =
       this.parametersWithDefinedRelationship[0]?.relatedAllocation;
     this.finalResultsForParentTestParameter =
-      this.relatedAllocation?.finalResult?.groups[
-        this.relatedAllocation?.finalResult?.groups?.length - 1
-      ]?.results;
+      this.relatedAllocation?.finalResult &&
+      this.relatedAllocation?.finalResult?.groups
+        ? orderBy(
+            this.relatedAllocation?.finalResult?.groups?.map((group) => {
+              return {
+                dateCreated: group?.results[0]?.dateCreated,
+                ...group,
+              };
+            }),
+            ["dateCreated"],
+            ["asc"]
+          )[this.relatedAllocation?.finalResult?.groups?.length - 1]?.results
+        : [];
+    this.allocationsWithoutRelationShip =
+      this.order?.allocations?.filter(
+        (allocation) =>
+          (
+            this.order?.parametersWithDefinedRelationship?.filter(
+              (all) => all?.id === allocation?.id
+            ) || []
+          )?.length === 0
+      ) || [];
+
+    // console.log(this.order);
+    // console.log(
+    //   "this.allocationsWithoutRelationShip",
+    //   this.allocationsWithoutRelationShip
+    // );
   }
 
   getFedResult(data: any, relatedResult: any, allocation: any): void {
-    this.results[data?.parameter?.uuid + ":" + relatedResult?.uuid] = {
+    this.results[
+      data?.parameter?.uuid + (relatedResult ? ":" + relatedResult?.uuid : "")
+    ] = {
       ...data,
       relatedResult,
       allocation,

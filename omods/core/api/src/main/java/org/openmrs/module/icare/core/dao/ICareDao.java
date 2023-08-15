@@ -20,15 +20,18 @@ import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.Summary;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
-
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ICareDao extends BaseDAO<Item> {
 	
@@ -125,7 +128,8 @@ public class ICareDao extends BaseDAO<Item> {
 		return query.list();
 	}
 	
-	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type) {
+	public List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type,
+	        Boolean stockable) {
 		DbSession session = getSession();
 		String queryStr;
 		
@@ -146,16 +150,18 @@ public class ICareDao extends BaseDAO<Item> {
 			if (department != null) {
 				queryStr = "SELECT ip FROM Item ip "
 				        + "LEFT JOIN ip.concept as c WITH c.retired = false "
-				        + "LEFT JOIN c.names cn "
+				        + "LEFT JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED' "
 				        + "LEFT JOIN ip.drug as d WITH d.retired = false "
 				        + "LEFT JOIN d.concept as c1 WITH c1.retired = false "
-				        + "LEFT JOIN c1.names cn1 "
+				        + "LEFT JOIN c1.names cn1 WITH cn1.conceptNameType = 'FULLY_SPECIFIED' "
 				        + "WHERE (lower(cn.name) like :search OR lower(cn1.name) like :search OR lower(d.name) like :search) "
 				        + "AND ip.concept IN ((SELECT cs.concept FROM ConceptSet cs WHERE cs.conceptSet = (SELECT c FROM Concept c WHERE c.uuid = :department)))";
 			} else {
 				queryStr = "SELECT ip FROM Item ip " + "LEFT JOIN ip.concept as c WITH c.retired = false "
-				        + "LEFT JOIN c.names cn " + "LEFT JOIN ip.drug as d WITH d.retired=false "
-				        + "LEFT JOIN d.concept as c1 WITH c1.retired = false " + "LEFT JOIN c1.names cn1 "
+				        + "LEFT JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED' "
+				        + "LEFT JOIN ip.drug as d WITH d.retired=false "
+				        + "LEFT JOIN d.concept as c1 WITH c1.retired = false "
+				        + "LEFT JOIN c1.names cn1 WITH cn1.conceptNameType = 'FULLY_SPECIFIED' "
 				        + "WHERE lower(cn.name) like :search OR lower(cn1.name) like :search OR lower(d.name) like :search";
 			}
 			if (type == Item.Type.DRUG) {
@@ -164,6 +170,19 @@ public class ICareDao extends BaseDAO<Item> {
 			if (type == Item.Type.CONCEPT) {
 				queryStr += " AND ip.concept IS NOT NULL";
 			}
+			
+		}
+		
+		if (stockable != null) {
+			
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			
+			queryStr += " ip.stockable = :stockable";
+			
 		}
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
@@ -174,6 +193,11 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		if (department != null) {
 			query.setParameter("department", department);
+		}
+		
+		if (stockable != null) {
+			System.out.println(queryStr);
+			query.setParameter("stockable", stockable);
 		}
 		
 		return query.list();
@@ -260,30 +284,31 @@ public class ICareDao extends BaseDAO<Item> {
 	
 	public Prescription updatePrescription(Prescription prescription) {
 		DbSession session = getSession();
-		
-		String queryStr = "UPDATE prescription SET quantity=10 WHERE uuid=:uuid";
-		
+		String queryStr = "UPDATE prescription SET quantity=" + prescription.getQuantity().toString()
+		        + " WHERE orderId=:orderId";
 		SQLQuery query = session.createSQLQuery(queryStr);
-		query.setParameter("uuid", prescription.getUuid());
+		query.setParameter("orderId", prescription.getOrderId());
 		query.executeUpdate();
 		return prescription;
 	}
 	
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
-	        String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
-	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus) {
-		
+                                            String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
+                                            Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
+                                            String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
+                                            String sampleCategory, String exclude, Boolean includeInactive) {
+		//PatientIdentifier
 		Query query = null;
 		DbSession session = this.getSession();
 		new Patient();
+		
 		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p" + " LEFT JOIN p.names pname "
-		        + "LEFT JOIN p.identifiers pi ";
+		        + "LEFT JOIN p.identifiers pi INNER JOIN v.attributes va LEFT JOIN va.attributeType vat ";
 		//				+ " INNER JOIN p.attributes pattr";
 		
 		if (orderTypeUuid != null && encounterTypeUuid == null) {
 			queryStr = queryStr + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o" + " INNER JOIN o.orderType ot"
-			        + " WHERE ot.uuid=:orderTypeUuid " + " AND v.stopDatetime IS NULL ";
+			        + " WHERE ot.uuid=:orderTypeUuid " + "  ";
 			
 			if (fulfillerStatus != null) {
 				queryStr += " AND o.fulfillerStatus=:fulfillerStatus";
@@ -306,6 +331,17 @@ public class ICareDao extends BaseDAO<Item> {
 		} else {
 			queryStr = queryStr + " INNER JOIN v.encounters e WHERE v.stopDatetime IS NULL ";
 			
+		}
+
+		if(!includeInactive){
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+
+			queryStr +=" v.stopDatetime IS NULL";
+
 		}
 		
 		if (search != null) {
@@ -339,6 +375,61 @@ public class ICareDao extends BaseDAO<Item> {
 			}
 		}
 		
+		if (visitAttributeTypeUuid != null) {
+			
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			
+			queryStr += " vat.uuid = :visitAttributeTypeUuid";
+			
+		}
+		
+		if (sampleCategory != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			
+			queryStr += " v IN (SELECT sp.visit FROM Sample sp WHERE sp IN (SELECT sst.sample FROM SampleStatus sst WHERE sst.category =:sampleCategory))";
+
+			if(exclude != null){
+
+//				queryStr = queryStr.substring(0,queryStr.length()-1);
+
+				if (!queryStr.contains("WHERE")) {
+					queryStr += " WHERE ";
+				} else {
+					queryStr += " AND ";
+				}
+
+				queryStr += " v IN (SELECT sp.visit FROM Sample sp WHERE sp NOT IN (SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
+
+				//queryStr += " AND sp NOT IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
+
+				//System.out.println(excludedValue);
+
+//				String [] statuses = exclude.split(",");
+//				queryStr = queryStr.substring(0,queryStr.length()-1);
+//				for(int i=0 ; i < statuses.length ; i++){
+//
+//					queryStr += " AND sp NOT IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category =:statuses )";
+//
+//					//query = session.createQuery(queryStr);
+//					//query.setParameter("statuses",statuses[i]);
+//
+//				}
+//				queryStr +=")";
+//				System.out.println(queryStr);
+
+			}
+
+			
+		}
+		
 		if (orderBy == VisitWrapper.OrderBy.VISIT) {
 			queryStr += " ORDER BY v.startDatetime ";
 		} else if (orderBy == VisitWrapper.OrderBy.ENCOUNTER) {
@@ -354,7 +445,7 @@ public class ICareDao extends BaseDAO<Item> {
 		} else if (orderByDirection == VisitWrapper.OrderByDirection.DESC) {
 			queryStr += " DESC ";
 		}
-		
+		System.out.println(queryStr);
 		query = session.createQuery(queryStr);
 		if (orderTypeUuid != null) {
 			query.setParameter("orderTypeUuid", orderTypeUuid);
@@ -385,7 +476,26 @@ public class ICareDao extends BaseDAO<Item> {
 		if (attributeValueReference != null) {
 			query.setParameter("attributeValueReference", attributeValueReference);
 		}
-		
+		if (visitAttributeTypeUuid != null) {
+			query.setParameter("visitAttributeTypeUuid", visitAttributeTypeUuid);
+		}
+		if (sampleCategory != null) {
+			query.setParameter("sampleCategory", sampleCategory);
+		}
+		if(exclude != null){
+			Pattern pattern = Pattern.compile("List:\\[(.*?)\\]");
+			Matcher matcher = pattern.matcher(exclude);
+			String excludedValue;
+			if(matcher.find()){
+				excludedValue = matcher.group(1);
+			}else{
+				excludedValue = exclude;
+			}
+
+			String[] valuesArray = excludedValue.split(",");
+			List<String> valueList = new ArrayList<>(Arrays.asList(valuesArray));
+			query.setParameterList("statuses",valueList);
+		}
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
 		return query.list();
@@ -396,8 +506,7 @@ public class ICareDao extends BaseDAO<Item> {
 	        Order.FulfillerStatus fulfillerStatus, Integer limit, Integer startIndex) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT distinct o FROM Visit v" + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o"
-		        + " INNER JOIN o.orderType ot" + " WHERE ot.uuid=:orderTypeUuid " + " AND v.stopDatetime IS NULL "
-		        + " AND v.uuid=:visitUuid ";
+		        + " INNER JOIN o.orderType ot" + " WHERE ot.uuid=:orderTypeUuid " + " AND v.uuid=:visitUuid ";
 		if (fulfillerStatus != null) {
 			queryStr += " AND o.fulfillerStatus=:fulfillerStatus";
 		} else {
@@ -446,17 +555,20 @@ public class ICareDao extends BaseDAO<Item> {
 		return (long) query.list().get(0);
 	}
 	
-	public List<Concept> getConceptsBySearchParams(String q, String conceptClass, String searchTerm, Integer limit,
-	        Integer startIndex) {
+	public ListResult getConceptsBySearchParams(String q, String conceptClass, String searchTerm, Integer limit,
+	        Integer startIndex, String searchTermOfConceptSetToExclude, String conceptSourceUuid, String referenceTermCode,
+	        String attributeType, String attributeValue, Pager pager) {
 		DbSession session = getSession();
-		String searchConceptQueryStr = "SELECT DISTINCT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc LEFT JOIN c.names st";
+		String searchConceptQueryStr = "SELECT DISTINCT c FROM Concept c INNER JOIN c.names cn INNER JOIN c.conceptClass cc ";
+		
 		if (searchTerm != null) {
-			searchConceptQueryStr += " ON st.conceptNameType= 'INDEX_TERM'";
+			searchConceptQueryStr += " LEFT JOIN c.names st ON st.conceptNameType= 'INDEX_TERM'";
 		}
 		String where = "WHERE";
 		if (q != null) {
 			where += " lower(cn.name) like lower(:q)";
 		}
+		
 		if (conceptClass != null) {
 			if (!where.equals("WHERE")) {
 				where += " AND ";
@@ -469,9 +581,34 @@ public class ICareDao extends BaseDAO<Item> {
 			}
 			where += " lower(st.name) like lower(:searchTerm)";
 		}
+		
+		if (searchTermOfConceptSetToExclude != null) {
+			if (!where.equals("WHERE")) {
+				where += " AND ";
+			}
+			where += " c NOT IN (SELECT DISTINCT cs.concept FROM ConceptSet cs WHERE cs.conceptSet IN (SELECT DISTINCT conc FROM Concept conc JOIN conc.names stn WHERE stn.conceptNameType= 'INDEX_TERM' AND lower(stn.name) like lower(:searchTermOfConceptSetToExclude)))";
+		}
+		
+		if (attributeType != null && attributeValue != null) {
+			if (!where.equals("WHERE")) {
+				where += " AND ";
+			}
+			where += " c IN (SELECT attribute.concept FROM ConceptAttribute attribute WHERE attribute.valueReference =:attributeValue AND attribute.attributeType IN (SELECT cat FROM ConceptAttributeType cat WHERE cat.uuid =:attributeType))";
+		}
+		
+		if (referenceTermCode != null && conceptSourceUuid != null) {
+			if (!where.equals("WHERE")) {
+				where += " AND ";
+			}
+			where += " c IN (SELECT DISTINCT cms.concept FROM ConceptMap cms WHERE cms.conceptReferenceTerm IN (SELECT DISTINCT crt FROM ConceptReferenceTerm crt WHERE crt.conceptSource IN (SELECT cs FROM ConceptSource cs WHERE cs.uuid =:conceptSourceUuid) AND crt.code =:referenceTermCode))";
+		}
+		
 		if (!where.equals("WHERE")) {
 			searchConceptQueryStr += " " + where;
 		}
+		
+		searchConceptQueryStr += " ORDER BY c.dateCreated DESC";
+		
 		Query sqlQuery = session.createQuery(searchConceptQueryStr);
 		sqlQuery.setFirstResult(startIndex);
 		sqlQuery.setMaxResults(limit);
@@ -484,7 +621,31 @@ public class ICareDao extends BaseDAO<Item> {
 		if (conceptClass != null) {
 			sqlQuery.setParameter("conceptClass", "%" + conceptClass + "%");
 		}
-		return sqlQuery.list();
+		
+		if (searchTermOfConceptSetToExclude != null) {
+			sqlQuery.setParameter("searchTermOfConceptSetToExclude", searchTermOfConceptSetToExclude);
+		}
+		
+		if (referenceTermCode != null && conceptSourceUuid != null) {
+			sqlQuery.setParameter("referenceTermCode", referenceTermCode);
+			sqlQuery.setParameter("conceptSourceUuid", conceptSourceUuid);
+		}
+		
+		if (attributeType != null && attributeValue != null) {
+			sqlQuery.setParameter("attributeType", attributeType);
+			sqlQuery.setParameter("attributeValue", attributeValue);
+		}
+		
+		if (pager.isAllowed()) {
+			pager.setTotal(sqlQuery.list().size());
+			sqlQuery.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+			sqlQuery.setMaxResults(pager.getPageSize());
+		}
+		
+		ListResult listResults = new ListResult();
+		listResults.setPager(pager);
+		listResults.setResults(sqlQuery.list());
+		return listResults;
 	}
 	
 	public List<ConceptReferenceTerm> getConceptReferenceTermsBySearchParams(String q, String source, Integer limit,
@@ -527,6 +688,36 @@ public class ICareDao extends BaseDAO<Item> {
 		if (concept != null) {
 			sqlQuery.setParameter("concept", concept);
 		}
+		return sqlQuery.list();
+	}
+	
+	public String unRetireConcept(String uuid) {
+		DbSession session = getSession();
+		String queryStr = "UPDATE Concept SET retired='false' WHERE uuid=:uuid";
+		
+		SQLQuery query = session.createSQLQuery(queryStr);
+		query.setParameter("uuid", uuid);
+		query.executeUpdate();
+		return uuid;
+	}
+	
+	public List<Location> getLocations(String attributeType, String value, Integer limit, Integer startIndex) {
+		DbSession session = getSession();
+		new LocationAttribute();
+		String getLocationQuery = "SELECT DISTINCT location FROM Location location ";
+		
+		if (attributeType != null && value != null) {
+			getLocationQuery += " WHERE location IN (SELECT attribute.location FROM LocationAttribute attribute WHERE attribute.valueReference =:value AND attribute.attributeType IN (SELECT lat FROM LocationAttributeType lat WHERE lat.uuid =:attributeType))";
+		}
+		Query sqlQuery = session.createQuery(getLocationQuery);
+		
+		sqlQuery.setFirstResult(startIndex);
+		sqlQuery.setMaxResults(limit);
+		if (attributeType != null && value != null) {
+			sqlQuery.setParameter("attributeType", attributeType);
+			sqlQuery.setParameter("value", value);
+		}
+		
 		return sqlQuery.list();
 	}
 	

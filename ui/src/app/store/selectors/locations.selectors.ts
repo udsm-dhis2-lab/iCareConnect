@@ -147,9 +147,8 @@ export const getChildLocationsOfTheFirstLevelParentLocation = createSelector(
     })
 );
 
-export const getCurrentLocation = createSelector(
-  getLocationsState,
-  (state: LocationsState) => {
+export const getCurrentLocation = (isLIS?: boolean) =>
+  createSelector(getLocationsState, (state: LocationsState) => {
     const formsAttributes =
       state.currentUserCurrentLocation &&
       state.currentUserCurrentLocation?.attributes
@@ -160,12 +159,18 @@ export const getCurrentLocation = createSelector(
 
     // console.log(state.currentUserCurrentLocation);
     const localStoredLocation = localStorage.getItem("currentLocation");
-    const location = state.currentUserCurrentLocation
+    const location = !isLIS
       ? state.currentUserCurrentLocation
-      : localStoredLocation &&
-        localStoredLocation !== "undefined" &&
-        localStoredLocation !== ""
+        ? state.currentUserCurrentLocation
+        : localStoredLocation &&
+          localStoredLocation !== "undefined" &&
+          localStoredLocation !== ""
+        ? JSON.parse(localStoredLocation)
+        : null
+      : localStoredLocation?.indexOf("{") > -1
       ? JSON.parse(localStoredLocation)
+      : state.currentUserCurrentLocation
+      ? state.currentUserCurrentLocation
       : null;
     return {
       ...location,
@@ -180,7 +185,7 @@ export const getCurrentLocation = createSelector(
         : false,
       forms:
         formsAttributes?.length > 0
-          ? formsAttributes.map((attribute) => {
+          ? formsAttributes?.map((attribute) => {
               return attribute?.value;
             })
           : [],
@@ -195,23 +200,38 @@ export const getCurrentLocation = createSelector(
             )?.length > 0
           : false,
     };
-  }
-);
+  });
 
 export const getLocationLoadingStatus = createSelector(
   getLocationsState,
-  (locationState: LocationsState) => locationState.loading
+  (locationState: LocationsState) => locationState?.loading
 );
 
 export const getIfCurrentLocationIsMainStore = createSelector(
   getLocationsState,
-  getCurrentLocation,
+  getCurrentLocation(false),
   (state: LocationsState, currentLocation) => {
     return currentLocation &&
       currentLocation?.tags &&
       (
         currentLocation?.tags?.filter(
           (tag) => tag?.display?.toLowerCase() === "main store"
+        ) || []
+      )?.length > 0
+      ? true
+      : false;
+  }
+);
+
+export const getIfCurrentLocationIsPharmacy = createSelector(
+  getLocationsState,
+  getCurrentLocation(false),
+  (state: LocationsState, currentLocation) => {
+    return currentLocation &&
+      currentLocation?.tags &&
+      (
+        currentLocation?.tags?.filter(
+          (tag) => tag?.display?.toLowerCase() === "pharmacy location"
         ) || []
       )?.length > 0
       ? true

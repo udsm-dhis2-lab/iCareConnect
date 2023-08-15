@@ -108,9 +108,6 @@ export class VisitComponent implements OnInit {
   patientVisist$: Observable<any>;
   userPrivileges$: Observable<any>;
 
-
-
-
   showVisitStartForn: boolean = false;
   patientt: patientObj;
   formatedServiceDetails: any = {};
@@ -124,7 +121,7 @@ export class VisitComponent implements OnInit {
     private registrationService: RegistrationService,
     private router: Router,
     private visitService: VisitsService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.patientVisist$ = this.visitService
@@ -143,15 +140,15 @@ export class VisitComponent implements OnInit {
       );
     this.patientVisist$.subscribe((data: any) => {
       this.visitDetails["InsuranceID"] =
-        data?.length > 0
-          ? data
-          : (this.patientDetails?.person?.attributes?.filter(
-            (attribute) => attribute?.attributeType?.display === "ID"
-          ) || [])[0]?.value.length > 0
-            ? (this.patientDetails?.person?.attributes?.filter(
+        (this.patientDetails?.person?.attributes?.filter(
+          (attribute) => attribute?.attributeType?.display === "ID"
+        ) || [])[0]?.value.length > 0
+          ? (this.patientDetails?.person?.attributes?.filter(
               (attribute) => attribute?.attributeType?.display === "ID"
             ) || [])[0]?.value
-            : null;
+          : data?.length > 0
+          ? data
+          : null;
     });
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
     this.activeVisit$ = this.store.pipe(select(getActiveVisit));
@@ -227,8 +224,8 @@ export class VisitComponent implements OnInit {
           this.visitDetails?.Cash && this.visitDetails?.Cash?.uuid
             ? this.visitDetails?.Cash?.uuid
             : this.visitDetails?.insuranceScheme?.uuid
-              ? this.visitDetails?.insuranceScheme?.uuid
-              : null,
+            ? this.visitDetails?.insuranceScheme?.uuid
+            : null,
       });
 
       if (this.referralHospital) {
@@ -320,8 +317,6 @@ export class VisitComponent implements OnInit {
     this.store.dispatch(clearActiveVisit());
     this.startVisitEvent.emit();
   }
-
-
 
   searchRoom(event: Event) {
     event.stopPropagation();
@@ -553,48 +548,54 @@ export class VisitComponent implements OnInit {
     }
   }
 
-
-  onCloseActiveVisit(e, activeVisit: any, key?: string){
+  onCloseActiveVisit(e, activeVisit: any, key?: string) {
     e.stopPropagation();
     this.dialog
       .open(SharedConfirmationComponent, {
         width: "20%",
         data: {
-          modalTitle: key === 'close' ? `Close This Visit` : "Delete this Visit",
-          modalMessage: `Are you sure you want to ${key === 'close' ? 'close' : 'delete'} this visit?`,
+          modalTitle:
+            key === "close" ? `Close This Visit` : "Delete this Visit",
+          modalMessage: `Are you sure you want to ${
+            key === "close" ? "Close" : "delete"
+          } this visit?`,
           showRemarksInput: false,
-          confirmationButtonText: key === 'close' ? 'Close' : 'Delete',
-          remarksFieldLabel: "Reason"
+          confirmationButtonText: key === "close" ? "Yes" : "Delete",
+          remarksFieldLabel: "Reason",
         },
       })
       .afterClosed()
       .subscribe((results) => {
         if (results?.confirmed) {
           let visitObject: any = {
-            stopDatetime: toISOStringFormat()
-          }
+            stopDatetime: toISOStringFormat(),
+          };
 
-          if (key === 'void') {
+          if (key === "void") {
             visitObject = {
               ...visitObject,
               voided: true,
               // voidReason: results?.remarks || "No reason provided"
-            }
-            this.visitService.updateVisit(activeVisit?.uuid, visitObject).subscribe((response) => {
-              if (!response?.error) {
-                this.onCancel(e)
-              }
-            })
+            };
+            this.visitService
+              .updateVisit(activeVisit?.uuid, visitObject)
+              .subscribe((response) => {
+                if (!response?.error) {
+                  this.onCancel(e);
+                }
+              });
           }
-          if (key === 'close') {
-            this.visitService.updateVisit(activeVisit?.uuid, visitObject).subscribe((response) => {
-              if (!response?.error) {
-                this.onCancel(e)
-              }
-            })
+          if (key === "close") {
+            this.visitService
+              .updateVisit(activeVisit?.uuid, visitObject)
+              .subscribe((response) => {
+                if (!response?.error) {
+                  this.onCancel(e);
+                }
+              });
           }
         }
-      })
+      });
   }
 
   openSnackBar(message: string, action: string) {

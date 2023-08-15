@@ -6,11 +6,8 @@ import { Location } from "src/app/core/models";
 import {
   addLoadedUserDetails,
   addSessionStatus,
-  authenticateUser,
   go,
-  loadAllLocations,
   loadLocationByIds,
-  loadLocationsByTagName,
   loadLoginLocations,
   loadProviderDetails,
   loadRolesDetails,
@@ -19,10 +16,8 @@ import {
 } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
-  getChildLocationsOfTheFirstLevelParentLocation,
   getCurrentLocation,
   getUserAssignedLocationsLoadedState,
-  loadingLocationsByIdState,
 } from "src/app/store/selectors";
 import {
   getCurrentUserDetails,
@@ -34,13 +29,14 @@ import { LocationSelectModalComponent } from "src/app/shared/components/location
 import { showSearchPatientOnMenu } from "src/app/store/selectors/ui.selectors";
 import { ChangePasswordComponent } from "../change-password/change-password.component";
 import { AuthService } from "src/app/core/services/auth.service";
-import { formatCurrentUserDetails } from "src/app/core/helpers";
 import { initiateEncounterType } from "src/app/store/actions/encounter-type.actions";
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { OpenmrsHttpClientService } from "../../modules/openmrs-http-client/services/openmrs-http-client.service";
 import { catchError, map } from "rxjs/operators";
 import { ManageUserProfileModalComponent } from "../../dialogs/manage-user-profile-modal/manage-user-profile-modal.component";
+import { SystemUsersService } from "src/app/core/services/system-users.service";
+import { LabEditUserModalComponent } from "src/app/modules/laboratory/modules/settings/components/lab-edit-user-modal/lab-edit-user-modal.component";
 
 @Component({
   selector: "app-menu",
@@ -62,13 +58,15 @@ export class MenuComponent implements OnInit {
   userLocationsUuids: string[];
   userAssignedLocationsLoadedState$: Observable<boolean>;
   googleFormLink$: Observable<string>;
+  securitySystemSettings$: Observable<any[]>;
   constructor(
     private router: Router,
     public dialog: MatDialog,
     private store: Store<AppState>,
     private authService: AuthService,
     private systemSettingsService: SystemSettingsService,
-    private httpClient: OpenmrsHttpClientService
+    private httpClient: OpenmrsHttpClientService,
+    private service: SystemUsersService
   ) {
     this.store.dispatch(loadLoginLocations()); // This is also a main location
   }
@@ -92,6 +90,17 @@ export class MenuComponent implements OnInit {
       this.store.dispatch(
         addSessionStatus({ authenticated: sessionResponse?.authenticated })
       );
+
+      this.service
+        .getUserById(sessionResponse?.user?.uuid)
+        .subscribe((response: any) => {
+          if (response) {
+            this.store.dispatch(
+              addLoadedUserDetails({ userDetails: response })
+            );
+          }
+        });
+
       this.userLocationsUuids = JSON.parse(
         localStorage
           .getItem("userLocations")
@@ -115,7 +124,7 @@ export class MenuComponent implements OnInit {
 
     this.currentUser$ = this.store.select(getCurrentUserDetails);
     this.locationsForCurrentUser$ = this.store.select(getUserAssignedLocations);
-    this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
+    this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
     this.showPatientSearch$ = this.store.pipe(select(showSearchPatientOnMenu));
     this.userAssignedLocationsLoadedState$ = this.store.select(
       getUserAssignedLocationsLoadedState
@@ -125,6 +134,9 @@ export class MenuComponent implements OnInit {
     //   console.log("the sess response");
     //   console.log(sessionResponse);
     // });
+
+    this.securitySystemSettings$ =
+      this.systemSettingsService.getSystemSettingsMatchingAKey("security.");
     setInterval(() => {
       this.pingSession();
     }, 100000);
@@ -152,10 +164,11 @@ export class MenuComponent implements OnInit {
       panelClass: "custom-dialog-container",
     });
   }
-  onChangePassword(event: Event): void {
+  onChangePassword(event: Event, securitySystemSettings: any[]): void {
     // event.stopPropagation();
     this.matDialogRef = this.dialog.open(ChangePasswordComponent, {
-      width: "25%",
+      minWidth: "25%",
+      data: securitySystemSettings,
       disableClose: true,
     });
   }
@@ -187,7 +200,7 @@ export class MenuComponent implements OnInit {
       });
   }
 
-  onUpdateProfile(): void {
+  onUpdateProfile(currentUser: any): void {
     // TODO: Add support to capture multiple systems credentials ("pimaCovid" can be used as system reference key to support that)
     const requests = [
       this.systemSettingsService.getSystemSettingsByKey(
@@ -199,13 +212,26 @@ export class MenuComponent implements OnInit {
     ];
     zip(...requests.map((request) => request)).subscribe((responses) => {
       if (responses[0] && responses[1]) {
-        this.dialog.open(ManageUserProfileModalComponent, {
-          width: "40%",
-          data: {
-            usernamePropertyKey: responses[0],
-            passwordPropertyKey: responses[1],
-          },
-        });
+        this.service
+          .getUserById(currentUser?.uuid)
+          .subscribe((userResponse) => {
+            if (userResponse) {
+              const data = userResponse;
+              this.dialog.open(LabEditUserModalComponent, {
+                maxWidth: "70%",
+                data: { ...data, selfUpdate: true },
+              });
+            }
+          });
+
+        // this.dialog.open(ManageUserProfileModalComponent, {
+        //   width: "40%",
+        //   data: {
+        //     ...currentUser,
+        //     usernamePropertyKey: responses[0],
+        //     passwordPropertyKey: responses[1],
+        //   },
+        // });
       }
     });
   }

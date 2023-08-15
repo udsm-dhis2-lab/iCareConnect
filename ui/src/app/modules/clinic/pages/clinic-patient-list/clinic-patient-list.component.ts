@@ -36,7 +36,7 @@ export class ClinicPatientListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.currentLocation$ = this.store.pipe(select(getCurrentLocation));
+    this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
     this.settingCurrentLocationStatus$ = this.store.select(
       getSettingCurrentLocationStatus
     );

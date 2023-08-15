@@ -55,6 +55,9 @@
               [fields]="[codesMappingsSourceField]"
               (formUpdate)="onFormUpdateForSource($event)"
             ></app-form>
+            <!-- <div *ngFor="let mapping of currentMappings">
+              {{ mapping?.conceptReferenceTerm?.display }}
+            </div> -->
             <app-multiple-items-selection
               *ngIf="selectedCodingSource"
               [items]="[]"

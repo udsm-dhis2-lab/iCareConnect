@@ -23,16 +23,28 @@
       <ul
         class="w-100 ul-listed-items"
         *ngIf="items"
-        style="height: 270px; overflow: auto"
+        style="height: 250px; overflow: auto"
       >
         <li
           (click)="getSelectedItem($event, item, items)"
           *ngFor="let item of items"
           class="item-in-list"
+          [ngClass]="{ retired: item?.retired }"
         >
           {{ item?.display }}
         </li>
       </ul>
+
+      <div class="w-100 text-center">
+        <button
+          mat-button
+          [disabled]="items.length === 0"
+          style="cursor: pointer"
+          (click)="selectAll($event, items)"
+        >
+          Select all
+        </button>
+      </div>
       <mat-progress-bar
         class="w-100"
         *ngIf="!items"
@@ -63,12 +75,23 @@
     <div class="h6 text-left multiple-selection-header">Selected</div>
     <ul class="concept-list ul-listed-items" *ngIf="items$ | async as items">
       <li
-        class="item-in-list"
+        class="item-in-list selected-list"
         (click)="removeSelectedItem($event, item, items, itemType)"
         *ngFor="let item of currentSelectedItems"
+        [ngClass]="{ retired: item?.retired }"
       >
         {{ item?.display }}
       </li>
     </ul>
+    <div class="w-100 text-center">
+      <button
+        mat-button
+        [disabled]="currentSelectedItems.length === 0"
+        style="cursor: pointer"
+        (click)="UnSelectAll($event, currentSelectedItems)"
+      >
+        Remove all
+      </button>
+    </div>
   </div>
 </div>

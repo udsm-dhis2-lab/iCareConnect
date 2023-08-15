@@ -1,4 +1,5 @@
 import { AddNewUserComponent } from "./add-new-user/add-new-user.component";
+import { AuditLogsComponent } from "./audit-logs/audit-logs.component";
 import { CodedAnswersSelectionComponent } from "./coded-answers-selection/coded-answers-selection.component";
 import { CodedAnswersComponent } from "./coded-answers/coded-answers.component";
 import { CodesSelectionComponent } from "./codes-selection/codes-selection.component";
@@ -16,11 +17,13 @@ import { LabOrdersManagementDashboardComponent } from "./lab-orders-management-d
 import { LabOrdersManagementComponent } from "./lab-orders-management/lab-orders-management.component";
 import { LabsSectionManagementComponent } from "./labs-section-management/labs-section-management.component";
 import { LbPriceListContainerComponent } from "./lb-price-list-container/lb-price-list-container.component";
+import { LoggedinusersComponent } from "./loggedinusers/loggedinusers.component";
 import { ManageConceptAttributesComponent } from "./manage-concept-attributes/manage-concept-attributes.component";
 import { OtherParametersConfigsComponent } from "./other-parameters-configs/other-parameters-configs.component";
 import { ParametersListComponent } from "./parameters-list/parameters-list.component";
 import { ParametersComponent } from "./parameters/parameters.component";
 import { SampleTypesListComponent } from "./sample-types-list/sample-types-list.component";
+import { ServerLogsComponent } from "./server-logs/server-logs.component";
 import { SharedPriceListComponent } from "./shared-price-list/shared-price-list.component";
 import { StandardConceptCreationComponent } from "./standard-concept-creation/standard-concept-creation.component";
 import { TestMethodsComponent } from "./test-methods/test-methods.component";
@@ -66,6 +69,9 @@ export const components: any[] = [
   WorksheetControlsComponent,
   TestOrderParametersRelationshipComponent,
   ConceptReferenceTermsSelectionComponent,
+  ServerLogsComponent,
+  LoggedinusersComponent,
+  AuditLogsComponent,
 ];
 
 export const entrySettingComponents: any[] = [

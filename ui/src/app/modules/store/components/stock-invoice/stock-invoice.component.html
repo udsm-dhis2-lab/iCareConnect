@@ -1,18 +1,23 @@
-<div class="w-100" *ngIf="{
+<div
+  class="w-100"
+  *ngIf="{
     suppliers: suppliers$ | async,
     unitsOfMeasurementSettings: unitsOfMeasurementSettings$ | async
-} as params">
-  <mat-tab-group *ngIf="params?.unitsOfMeasurementSettings && params?.suppliers">
+  } as params"
+>
+  <mat-tab-group
+    *ngIf="params?.unitsOfMeasurementSettings && params?.suppliers"
+  >
     <mat-tab>
       <ng-template mat-tab-label>
         <span>Draft Invoices</span>
       </ng-template>
       <ng-template matTabContent>
-        <app-stock-invoices-list 
+        <app-stock-invoices-list
           [suppliers]="params?.suppliers"
           [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"
           [currentLocation]="currentLocation"
-          [status]="'DRAFT'" 
+          [status]="'DRAFT'"
         ></app-stock-invoices-list>
       </ng-template>
     </mat-tab>
@@ -21,7 +26,7 @@
         <span>Received Invoices</span>
       </ng-template>
       <ng-template matTabContent>
-        <app-stock-invoices-list 
+        <app-stock-invoices-list
           [suppliers]="params?.suppliers"
           [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"
           [status]="'RECEIVED'"
@@ -33,12 +38,12 @@
         <span>Receive New Items</span>
       </ng-template>
       <ng-template matTabContent>
-        <app-stock-receiving-form 
-            [suppliers]="params?.suppliers"
-            [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"
-            [currentLocation]="currentLocation"
-            [reloadForm]="reloadForm()"
-          ></app-stock-receiving-form>
+        <app-stock-receiving-form
+          [suppliers]="params?.suppliers"
+          [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"
+          [currentLocation]="currentLocation"
+          [reloadForm]="reloadForm()"
+        ></app-stock-receiving-form>
       </ng-template>
     </mat-tab>
   </mat-tab-group>

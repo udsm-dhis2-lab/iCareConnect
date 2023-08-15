@@ -20,18 +20,19 @@ import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.logic.op.In;
+import org.openmrs.module.icare.auditlog.AuditLog;
+import org.openmrs.module.icare.auditlog.api.AuditLogService;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
-import org.openmrs.module.icare.core.ICareService;
-import org.openmrs.module.icare.core.Item;
-import org.openmrs.module.icare.core.Message;
-import org.openmrs.module.icare.core.Summary;
+import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.models.PimaCovidLabRequest;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
+import org.openmrs.module.icare.laboratory.models.Sample;
+import org.openmrs.module.icare.laboratory.models.SampleStatus;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,10 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.Session;
 import javax.naming.ConfigurationException;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.*;
@@ -65,6 +68,9 @@ public class ICareController {
 	@Autowired
 	EncounterService encounterService;
 	
+	@Autowired
+	ConceptService conceptService;
+	
 	/** Logger for this class and subclasses */
 	protected final Log log = LogFactory.getLog(getClass());
 	
@@ -75,6 +81,7 @@ public class ICareController {
         List<String> ids = iCareService.generatePatientIds();
         results.put("identifiers", ids);
         return results;
+
     }
 	
 	@RequestMapping(value = "codegen", method = RequestMethod.GET)
@@ -82,7 +89,7 @@ public class ICareController {
 	public List<String> onGenerateCode(@RequestParam(value = "globalProperty", required = true) String globalProperty,
 	        @RequestParam(value = "metadataType", required = true) String metadataType,
 	        @RequestParam(value = "count", defaultValue = "1", required = false) Integer count) throws Exception {
-
+		
 		List<String> generatedCode = iCareService.generateCode(globalProperty, metadataType, count);
 		return generatedCode;
 	}
@@ -106,9 +113,9 @@ public class ICareController {
 	 */
 	@RequestMapping(value = "item", method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, Object> onGetItem(@RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String department, @RequestParam(required = false) Item.Type type) {
+    public Map<String, Object> onGetItem(@RequestParam(required = false) String q, @RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String department, @RequestParam(required = false) Item.Type type, @RequestParam(required = false) Boolean stockable) {
         List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-        for (Item item : iCareService.getItems(q, limit, startIndex, department, type)) {
+        for (Item item : iCareService.getItems(q, limit, startIndex, department, type,stockable)) {
             items.add(item.toMap());
         }
         Map<String, Object> results = new HashMap<>();
@@ -254,10 +261,24 @@ public class ICareController {
         return messageList;
     }
 	
+	@RequestMapping(value = "orderstatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> onPostOrderStatus(@RequestBody Map<String, Object> orderStatusObject) {
+		OrderStatus orderStatus = OrderStatus.fromMap(orderStatusObject);
+		orderStatus = iCareService.saveOrderStatus(orderStatus);
+		
+		return orderStatus.toMap();
+	}
+	
 	@RequestMapping(value = "prescription", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> onPostDrugOrderCreation(@RequestBody Map<String, Object> orderObject) throws Exception {
 		Prescription prescription = Prescription.fromMap(orderObject);
+		
+		String previousOrderUuid = null;
+		if (orderObject.get("previousOrder") != null) {
+			previousOrderUuid = orderObject.get("previousOrder").toString();
+		}
 		
 		ConceptService conceptService = Context.getConceptService();
 		OrderService orderService = Context.getOrderService();
@@ -293,7 +314,18 @@ public class ICareController {
 			throw new ConfigurationException("Prescription Order Type is not configured.");
 		}
 		prescription.setOrderType(orderType);
-		prescription = iCareService.savePrescription(prescription);
+		String orderStatus = null;
+		if (orderObject.get("status") != null) {
+			orderStatus = orderObject.get("status").toString();
+		}
+		String orderRemarks = null;
+		if (orderObject.get("remarks") != null) {
+			orderRemarks = orderObject.get("remarks").toString();
+		}
+		if (previousOrderUuid != null) {
+			prescription.setPreviousOrder(orderService.getOrderByUuid(previousOrderUuid));
+		}
+		prescription = iCareService.savePrescription(prescription, orderStatus, orderRemarks);
 		return prescription.toMap();
 	}
 	
@@ -310,10 +342,14 @@ public class ICareController {
                                                @RequestParam(defaultValue = "DESC") VisitWrapper.OrderByDirection orderByDirection,
                                                @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus,
 											   @RequestParam(required = false) String attributeValueReference,
-											   @RequestParam(required = false) VisitWrapper.PaymentStatus paymentStatus
+											   @RequestParam(required = false) VisitWrapper.PaymentStatus paymentStatus,
+											   @RequestParam(required = false) String visitAttributeTypeUuid,
+											   @RequestParam(required = false) String sampleCategory,
+											   @RequestParam(required = false) String exclude,
+											   @RequestParam(defaultValue = "false") Boolean includeInactive
 											   ) {
 
-        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, encounterTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus);
+        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, encounterTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus, visitAttributeTypeUuid, sampleCategory,exclude,includeInactive);
 
         List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
         for (Visit visit : visits) {
@@ -324,9 +360,9 @@ public class ICareController {
             responseSamplesObject.add(sampleObject);
 
         }
-        Map<String, Object> retults = new HashMap<>();
-        retults.put("results", responseSamplesObject);
-        return retults;
+        Map<String, Object> results = new HashMap<>();
+        results.put("results", responseSamplesObject);
+        return results;
     }
 	
 	@RequestMapping(value = "order", method = RequestMethod.GET)
@@ -335,7 +371,7 @@ public class ICareController {
                                                 @RequestParam(defaultValue = "0") Integer startIndex,
                                                 @RequestParam String orderTypeUuid,
                                                 @RequestParam String visitUuid,
-                                                @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus) {
+                                                @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus, @RequestParam(required = false) boolean includeInactiv) {
 
         List<Order> orders = iCareService.getOrdersByVisitAndOrderType(visitUuid, orderTypeUuid, fulfillerStatus, limit, startIndex);
 
@@ -369,12 +405,47 @@ public class ICareController {
 	
 	@RequestMapping(value = "concept", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getIcareConcepts(@RequestParam(value = "q", required = false) String q, @RequestParam(value = "conceptClass", required = false) String conceptClass, @RequestParam(value = "searchTerm", required = false) String searchTerm, @RequestParam(defaultValue = "50") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex) {
+	public Map<String, Object> getIcareConcepts(@RequestParam(value = "q", required = false) String q,
+												@RequestParam(value = "conceptClass", required = false) String conceptClass,
+												@RequestParam(value = "searchTerm", required = false) String searchTerm,
+												@RequestParam(defaultValue = "50") Integer limit,
+												@RequestParam(defaultValue = "0") Integer startIndex,
+												@RequestParam(value="searchTermOfConceptSetToExclude", required = false) String searchTermOfConceptSetToExclude,
+												@RequestParam(value="conceptSource", required = false) String conceptSourceUuid,
+												@RequestParam(value="referenceTermCode", required = false) String referenceTermCode,
+												@RequestParam(value="attributeType", required = false) String attributeType,
+												@RequestParam(value="attributeValue", required = false) String attributeValue,
+												@RequestParam(value="detailed", required = false) Boolean detailed,
+												@RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+												@RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+												@RequestParam(defaultValue = "1", value = "page", required = false) Integer page) {
 		List<Map<String, Object>> conceptsList = new ArrayList<>();
-		for (Concept conceptItem: iCareService.getConcepts(q, conceptClass, searchTerm, limit, startIndex)) {
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+		ListResult listResult = iCareService.getConcepts(q, conceptClass, searchTerm, limit, startIndex,
+				searchTermOfConceptSetToExclude,conceptSourceUuid, referenceTermCode,attributeType,attributeValue, pager);
+		for (Concept conceptItem: (List<Concept>) listResult.getResults()) {
 			Map<String, Object> conceptMap = new HashMap<String, Object>();
+			conceptMap.put("dateCreated", conceptItem.getDateCreated());
 			conceptMap.put("uuid", conceptItem.getUuid().toString());
 			conceptMap.put("display", conceptItem.getDisplayString());
+			conceptMap.put("systemName", conceptItem.getDisplayString());
+			conceptMap.put("retired", conceptItem.getRetired().booleanValue());
+			conceptMap.put("retiredOn", conceptItem.getDateRetired());
+			conceptMap.put("retiredReason", conceptItem.getRetireReason());
+//			Creator
+			Map<String, Object> creator = new HashMap<>();
+			creator.put("uuid", conceptItem.getCreator().getUuid());
+			creator.put("display", conceptItem.getCreator().getDisplayString());
+			conceptMap.put("createdBy", creator);
+//			Changed By
+			Map<String, Object> changedBy = new HashMap<>();
+			changedBy.put("uuid", conceptItem.getChangedBy().getUuid());
+			changedBy.put("display", conceptItem.getChangedBy().getDisplayString());
+			conceptMap.put("dateChanged", conceptItem.getDateChanged());
+			conceptMap.put("changedBy", changedBy);
 
 //			Class details
 			Map<String, Object> classDetails = new HashMap<String, Object>();
@@ -382,14 +453,54 @@ public class ICareController {
 			classDetails.put("name", conceptItem.getConceptClass().getName() );
 			conceptMap.put("class",  classDetails );
 //			Mappings
-			Map<String, Object> mappings = new HashMap<String, Object>();
-			mappings.put("name", conceptItem.getConceptMappings().getClass().getName() );
-
+			List<Map<String, Object>> mappings = new ArrayList<>();
+			for(ConceptMap mapping: conceptItem.getConceptMappings()) {
+				Map<String, Object> conceptMapping = new HashMap<>();
+				conceptMapping.put("uuid", mapping.getUuid());
+				conceptMapping.put("code", mapping.getConceptReferenceTerm().getCode());
+				conceptMapping.put("conceptSourceUuid", mapping.getConceptReferenceTerm().getConceptSource().getUuid());
+				mappings.add(conceptMapping);
+			}
 			conceptMap.put("mappings",  mappings );
+			// TODO: Change logic to use query parameters instead of detailed
+			if (detailed != null && detailed) {
+				// Set members
+				List<Map<String, Object>> setMembers = new ArrayList<>();
+				for(Concept setMember: conceptItem.getSetMembers()) {
+					Map<String, Object> member = new HashMap<>();
+					member.put("uuid", setMember.getUuid());
+					member.put("display", setMember.getFullySpecifiedName(null));
+					member.put("displayName", setMember.getDisplayString());
+					List<Map<String, Object>> answers = new ArrayList<>();
+					if (setMember.getDatatype().isCoded() == true) {
+						for(ConceptAnswer conceptAnswer: setMember.getAnswers()) {
+							if (!conceptAnswer.getAnswerConcept().isRetired()) {
+								Map<String, Object> answer = new HashMap<>();
+								answer.put("answerUuid", conceptAnswer.getUuid());
+								answer.put("uuid", conceptAnswer.getAnswerConcept().getUuid());
+								answer.put("display", conceptAnswer.getAnswerConcept().getDisplayString());
+								answer.put("retired", conceptAnswer.getAnswerConcept().isRetired());
+								answers.add(answer);
+							}
+						}
+					}
+					member.put("answers", answers);
+					Map<String, Object> datatype = new HashMap<>();
+					datatype.put("coded", setMember.getDatatype().isCoded());
+					datatype.put("text", setMember.getDatatype().isText());
+					datatype.put("boolean", setMember.getDatatype().isBoolean());
+					datatype.put("date", setMember.getDatatype().isDate());
+					datatype.put("datetime", setMember.getDatatype().isDateTime());
+					member.put("dataType", datatype);
+					setMembers.add(member);
+				}
+				conceptMap.put("setMembers", setMembers);
+			}
 			conceptsList.add(conceptMap);
 		}
 		Map<String, Object> results = new HashMap<>();
 		results.put("results", conceptsList);
+		results.put("pager", listResult.getPager());
 		return results;
 	}
 	
@@ -429,11 +540,31 @@ public class ICareController {
 			Map<String, Object> conceptSet = new HashMap<String, Object>();
 			conceptSet.put("uuid", conceptSets.getConceptSet().getUuid());
 			conceptSet.put("display", conceptSets.getConceptSet().getDisplayString());
+			conceptSet.put("systemName", conceptSets.getConceptSet().getDisplayString());
 			conceptSet.put("retired", conceptSets.getConceptSet().getRetired().booleanValue());
 			conceptSetsList.add(conceptSet);
 		}
 		Map<String, Object> results = new HashMap<>();
 		results.put("results", conceptSetsList);
+		return results;
+	}
+	
+	@RequestMapping(value = "location", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getLocations(@RequestParam(value = "attributeType", required = false) String attributeType,
+										   @RequestParam(value = "value", required = false) String value,
+										   @RequestParam(defaultValue = "50") Integer limit,
+										   @RequestParam(defaultValue = "0") Integer startIndex) {
+		List<Map<String, Object>> locationList = new ArrayList<>();
+		for(Location location: iCareService.getLocations(attributeType, value, limit, startIndex)) {
+			Map<String, Object> locationData = new HashMap<>();
+			locationData.put("uuid", location.getUuid());
+			locationData.put("name", location.getName());
+			locationData.put("display", location.getDisplayString());
+			locationList.add(locationData);
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", locationList);
 		return results;
 	}
 	
@@ -470,9 +601,7 @@ public class ICareController {
 
 		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
 		for (PatientWrapper patient: patients){
-
 			responseSamplesObject.add((Map<String, Object>) patient.toMap());
-
 		}
 		Map<String, Object> results = new HashMap<>();
 		results.put("results",responseSamplesObject);
@@ -669,6 +798,76 @@ public class ICareController {
 		return verificationInfo;
 	}
 	
+	@RequestMapping(value = "concept/{uuid}/retire", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> retireConcept(@PathVariable("uuid") String uuid, @RequestBody Map<String, Object> retireObject) {
+		Map<String, Object> returnResponse = new HashMap<>();
+		Concept concept = conceptService.getConceptByUuid((String) uuid);
+		if (concept == null){
+			throw new APIException("The concept with " + uuid+ " does not exist");
+		}
+		Concept changedConcept = new Concept();
+		if (retireObject.get("retire") == null) {
+			throw new APIException("The retire keyword is missing");
+		}
+
+		if ( retireObject.get("reason") == null &&  retireObject.get("retire").toString() == "true") {
+			throw new APIException("The retire reason is missing");
+		}
+		if ( retireObject.get("retire").toString() == "true") {
+			changedConcept =conceptService.retireConcept(concept, retireObject.get("reason").toString());
+		} else {
+			Concept conceptToUnRetire = conceptService.getConceptByUuid(uuid);
+			conceptToUnRetire.setRetired(false);
+			conceptService.saveConcept(conceptToUnRetire);
+			changedConcept = conceptService.getConceptByUuid(uuid);
+		}
+
+		returnResponse.put("uuid", changedConcept.getUuid());
+		returnResponse.put("display", changedConcept.getDisplayString());
+		returnResponse.put("retired", changedConcept.getRetired().booleanValue());
+		return returnResponse;
+	}
+	
+	@RequestMapping(value = "concept/{uuid}/answers", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> saveConceptAnswers(@PathVariable("uuid") String uuid, @RequestBody List<String> answers) {
+		Map<String, Object> returnResponse = new HashMap<>();
+		Concept concept = conceptService.getConceptByUuid(uuid);
+		if (answers.size() == 0){
+			throw new APIException("No answers to update ");
+		}
+
+		// Identify if the provided answers exist
+		List<String> conceptUuidForAnswers = answers;
+
+
+		if (concept.getAnswers().size() > 0) {
+
+			for (Iterator<ConceptAnswer> iterator = concept.getAnswers().iterator(); iterator.hasNext();) {
+				ConceptAnswer conceptAnswer = iterator.next();
+				iterator.remove(); // Remove the current element from the original list
+			}
+
+		}
+
+		if (conceptUuidForAnswers.size() > 0 ) {
+			for(String conceptForAnswerUuid: conceptUuidForAnswers) {
+				ConceptAnswer conceptAnswer = new ConceptAnswer();
+				conceptAnswer.setAnswerConcept(conceptService.getConceptByUuid(conceptForAnswerUuid));
+				concept.addAnswer(conceptAnswer);
+			}
+		}
+
+		Concept changedConcept = conceptService.saveConcept(concept);
+
+
+		returnResponse.put("uuid", changedConcept.getUuid());
+		returnResponse.put("display", changedConcept.getDisplayString());
+		returnResponse.put("answersCount", changedConcept.getAnswers().size());
+		return returnResponse;
+	}
+	
 	@RequestMapping(value = "voidorder", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> voidOrder(@RequestBody Map<String, Object> voidObj) {
@@ -703,5 +902,52 @@ public class ICareController {
 
 		returnResponse.put("encounter", voidedEncounter.getUuid());
 		return returnResponse;
+	}
+	
+	@RequestMapping(value = "emailsession", method = RequestMethod.GET)
+	@ResponseBody
+	public Session getEmailSession() {
+		Session response;
+		try {
+			response = iCareService.getEmailSession();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return response;
+	}
+	
+	@RequestMapping(value = "processemail", method = RequestMethod.POST)
+	@ResponseBody
+	public String processEmail(@RequestBody Properties emailProperties) {
+		
+		System.out.println(emailProperties);
+		
+		String response;
+		try {
+			response = iCareService.processEmail(emailProperties);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		System.out.println(response);
+		return response;
+	}
+	
+	@RequestMapping(value="auditlogs", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getAuditLogs(@RequestParam(required = false) List<Class<?>> clazzes, @RequestParam(required = false) List<String> actions, @RequestParam(required = false)  Date startDate, @RequestParam(required = false) Date endDate, @RequestParam(required = false)  boolean excludeChildAuditLogs, @RequestParam(required = false)  Integer start, @RequestParam(required = false)  Integer length){
+
+		List<Map<String,Object>> auditLogMapList = new ArrayList<>();
+
+		AuditLogService auditLogService = Context.getService(AuditLogService.class);
+
+		List<AuditLog> auditLogs = auditLogService.getAuditLogs(clazzes,actions,startDate,endDate,excludeChildAuditLogs,start,length);
+		for(AuditLog auditLog : auditLogs){
+			auditLogMapList.add(auditLog.toMap());
+		}
+
+		return auditLogMapList;
+
 	}
 }

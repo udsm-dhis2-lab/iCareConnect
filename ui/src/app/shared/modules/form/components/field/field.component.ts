@@ -46,6 +46,7 @@ export class FieldComponent implements AfterViewInit {
 
   @Output() fieldUpdate: EventEmitter<FormGroup> =
     new EventEmitter<FormGroup>();
+  @Output() enterKeyPressedFields: EventEmitter<any> = new EventEmitter<any>();
 
   @Output() fileFieldUpdate: EventEmitter<any> = new EventEmitter<any>();
 
@@ -143,8 +144,15 @@ export class FieldComponent implements AfterViewInit {
     return this.field?.id;
   }
 
-  onFieldUpdate(): void {
+  onFieldUpdate(event?: KeyboardEvent): void {
     this.fieldUpdate.emit(this.form);
+  }
+
+  onListenKeyEvent(event?: KeyboardEvent): void {
+    if (event && event.code === "Enter") {
+      this.enterKeyPressedFields.emit(this.field?.key);
+    } else {
+    }
   }
 
   fileChangeEvent(event, field): void {
@@ -175,7 +183,13 @@ export class FieldComponent implements AfterViewInit {
 
   searchItem(event: any, field?: any): void {
     // event.stopPropagation();
-    const searchingText = event.target.value;
+    const searchingText = (event.target as HTMLInputElement).value;
+    if (!searchingText) {
+      let objectToUpdate = {};
+      objectToUpdate[field?.key] = null;
+      this.form.patchValue(objectToUpdate);
+      this.fieldUpdate.emit(this.form);
+    }
     const parameters = {
       q: searchingText,
       limit: 50,
@@ -211,7 +225,7 @@ export class FieldComponent implements AfterViewInit {
     );
   }
 
-  getSelectedItemFromOption(event: Event, item, field): void {
+  getSelectedItemFromOption(event: Event, item: any, field: any): void {
     event.stopPropagation();
     const value = item?.isDrug
       ? item?.formattedKey

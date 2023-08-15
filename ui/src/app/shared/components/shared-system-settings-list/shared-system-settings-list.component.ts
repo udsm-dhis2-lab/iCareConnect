@@ -14,6 +14,7 @@ export class SharedSystemSettingsListComponent implements OnInit {
   page: number = 1;
   pageSize: number = 10;
   @Input() key: string;
+  @Input() currentUser: any;
   error: any;
 
   saving: boolean = false;

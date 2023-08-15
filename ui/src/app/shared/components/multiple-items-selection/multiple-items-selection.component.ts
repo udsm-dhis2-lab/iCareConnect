@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output } from "@angular/core";
 import { uniqBy, orderBy } from "lodash";
 import { Observable, of } from "rxjs";
 import {
@@ -16,7 +16,7 @@ import { ConceptsService } from "../../resources/concepts/services/concepts.serv
   templateUrl: "./multiple-items-selection.component.html",
   styleUrls: ["./multiple-items-selection.component.scss"],
 })
-export class MultipleItemsSelectionComponent implements OnInit {
+export class MultipleItemsSelectionComponent implements OnInit, OnChanges {
   @Input() items: any[];
   @Input() selectedItems: any[];
   @Input() itemType: string;
@@ -25,6 +25,7 @@ export class MultipleItemsSelectionComponent implements OnInit {
   @Input() source: string;
   @Input() conceptClass: string;
   @Input() multipleSelectionCompHeight: string;
+  @Input() searchTermOfConceptSetToExcludeFromTestOrders: string;
   currentSelectedItems: any[] = [];
   @Output() getSelectedItems: EventEmitter<any[]> = new EventEmitter<any[]>();
   items$: Observable<any[]>;
@@ -38,7 +39,7 @@ export class MultipleItemsSelectionComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentSelectedItems =
-      this.selectedItems?.filter((item) => !item?.retired) || [];
+      this.selectedItems || [];
     if (
       this.itemType &&
       this.itemType === "concept" &&
@@ -61,13 +62,17 @@ export class MultipleItemsSelectionComponent implements OnInit {
                 };
               })
             )
-          : this.conceptService.searchConcept({
-              q: this.standardSearchTerm,
-              conceptClass: this.conceptClass,
-              limit: this.pageSize,
-              startIndex: (this.page - 1) * this.pageSize,
-              searchTerm: this.standardSearchTerm,
-            });
+          : this.conceptService
+              .searchConcept({
+                q: this.standardSearchTerm,
+                conceptClass: this.conceptClass,
+                pageSize: this.pageSize,
+                page: this.page,
+                searchTerm: this.standardSearchTerm,
+                searchTermOfConceptSetToExclude:
+                  this.searchTermOfConceptSetToExcludeFromTestOrders,
+              })
+              .pipe(map((response: any) => response?.results));
     } else if (this.itemType === "conceptReferenceTerm") {
       this.items$ = this.conceptReferenceService
         .getConceptReferenceTermsByParameters({
@@ -95,6 +100,11 @@ export class MultipleItemsSelectionComponent implements OnInit {
       );
     }
   }
+
+ngOnChanges(): void {
+  this.currentSelectedItems =
+  this.selectedItems || [];
+}
 
   getSelectedItem(event: Event, item: any, items: any[]): void {
     event.stopPropagation();
@@ -143,13 +153,15 @@ export class MultipleItemsSelectionComponent implements OnInit {
         debounceTime(1000),
         distinctUntilChanged(),
         switchMap((term) =>
-          this.conceptService.searchConcept({
-            q: term,
-            conceptClass: this.conceptClass,
-            limit: this.pageSize,
-            startIndex: (this.page - 1) * this.pageSize,
-            searchTerm: this.standardSearchTerm,
-          })
+          this.conceptService
+            .searchConcept({
+              q: term,
+              conceptClass: this.conceptClass,
+              pageSize: this.pageSize,
+              page: this.page,
+              searchTerm: this.standardSearchTerm,
+            })
+            .pipe(map((response: any) => response?.results))
         )
       );
     } else if (itemType === "conceptReferenceTerm") {
@@ -178,5 +190,19 @@ export class MultipleItemsSelectionComponent implements OnInit {
         )
       );
     }
+  }
+
+  selectAll(event: Event, items: any[]): void {
+    event.stopPropagation();
+    this.currentSelectedItems = uniqBy([...this.selectedItems, ...items]);
+    this.items = [];
+    this.getSelectedItems.emit(this.currentSelectedItems);
+  }
+
+  UnSelectAll(event: Event, items: any[]): void {
+    event.stopPropagation();
+    this.currentSelectedItems = [];
+    this.items = [...this.items, ...items];
+    this.getSelectedItems.emit(this.currentSelectedItems);
   }
 }

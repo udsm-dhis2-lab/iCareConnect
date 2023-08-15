@@ -18,6 +18,7 @@ import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.module.icare.store.models.Stock;
 import org.openmrs.module.icare.store.models.StockableItem;
 import org.openmrs.module.icare.store.services.StoreService;
@@ -89,11 +90,11 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 					OrderMetaData<DrugOrder> orderMetaData = new OrderMetaData<DrugOrder>();
 					orderMetaData.setItemPrice(itemPrice);
 					
-					//StoreService storeService = Context.getService(StoreService.class);
+					// StoreService storeService = Context.getService(StoreService.class);
 					if (order.getAction() == Order.Action.NEW) {
 						Item item = orderMetaData.getItemPrice().getItem();
 						StoreService storeService = Context.getService(StoreService.class);
-						/*AdministrationService administrationService = Context.getAdministrationService();
+						/* AdministrationService administrationService = Context.getAdministrationService();
 						String stockLocations = administrationService.getGlobalProperty(ICareConfig.STOCK_LOCATIONS);
 						if (stockLocations == null) {
 							throw new ConfigurationException("Stock Locations is configured. Please set '"
@@ -201,11 +202,18 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 
 					order = (Prescription) invocation.proceed();
 					Prescription prescriptionOrder = (Prescription)Context.getOrderService().getOrderByUuid(order.getUuid());
-					orderMetaData.setOrder(prescriptionOrder);
-					billingService.processOrder(orderMetaData);
-
-					return order;
-
+//					List<OrderStatus> prescriptionOrderStatuses = Context.getService(StoreService.class).getOrderStatusByOrderUuid(prescriptionOrder.getUuid());
+					if (!orderMetaData.getItemPrice().getPaymentType().getName().getName().toLowerCase().equals("cash")) {
+						orderMetaData.setOrder(prescriptionOrder);
+						billingService.processOrder(orderMetaData);
+						return order;
+					} else if (order.getPreviousOrder() != null) {
+						orderMetaData.setOrder(prescriptionOrder);
+						billingService.processOrder(orderMetaData);
+						return order;
+					} else {
+						return  order;
+					}
 				} else {
 					order = (Prescription) invocation.proceed();
 					return order;

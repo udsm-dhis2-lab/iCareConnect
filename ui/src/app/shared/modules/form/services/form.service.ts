@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { from, Observable, of, zip } from "rxjs";
-import { catchError, map } from "rxjs/operators";
+import { catchError, map, mergeMap } from "rxjs/operators";
 import { Api, FormGet } from "src/app/shared/resources/openmrs";
 import { OpenmrsHttpClientService } from "../../openmrs-http-client/services/openmrs-http-client.service";
 import { getFormQueryFields } from "../helpers/get-form-query-field.helper";
@@ -8,24 +8,47 @@ import { getSanitizedFormObject } from "../helpers/get-sanitized-form-object.hel
 import { FormConfig } from "../models/form-config.model";
 import { ICAREForm } from "../models/form.model";
 import { orderBy, uniqBy, omit, keyBy, groupBy, sumBy, flatten } from "lodash";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Injectable({ providedIn: "root" })
 export class FormService {
-  constructor(private api: Api, private httpClient: OpenmrsHttpClientService) {}
+  constructor(
+    private api: Api,
+    private httpClient: OpenmrsHttpClientService,
+    private systemSettingsService: SystemSettingsService
+  ) {}
 
-  getForms(formConfigs: FormConfig[]): Observable<ICAREForm[]> {
-    return zip(
-      ...(formConfigs || []).map((formConfig) =>
-        from(this.getForm(formConfig.name, formConfig.formLevel))
+  getForms(formConfigs: FormConfig[]): Observable<any[]> {
+    return this.systemSettingsService
+      .getSystemSettingsByKey(
+        `icare.forms.formFieldsConcepts.dataTypeExtensionReference.conceptSourceUuid`
       )
-    ).pipe(
-      map((forms) => {
-        return (forms || []).filter((form) => form);
-      })
-    );
+      .pipe(
+        mergeMap((conceptSourceUuid) => {
+          return zip(
+            ...(formConfigs || []).map((formConfig) => {
+              return from(
+                this.getForm(
+                  formConfig.name,
+                  formConfig.formLevel,
+                  conceptSourceUuid
+                )
+              );
+            })
+          ).pipe(
+            map((forms) => {
+              return (forms || []).filter((form) => form);
+            })
+          );
+        })
+      );
   }
 
-  async getForm(formName: string, queryLevel: number): Promise<any> {
+  async getForm(
+    formName: string,
+    queryLevel: number,
+    conceptSourceUuid?: string
+  ): Promise<any> {
     const formConceptResult = await this.api.concept.getAllConcepts({
       name: formName,
       v: `custom:${getFormQueryFields(queryLevel)}`,
@@ -33,7 +56,7 @@ export class FormService {
 
     const formConcept: any = (formConceptResult?.results || [])[0];
 
-    return getSanitizedFormObject(formConcept);
+    return getSanitizedFormObject(formConcept, null, null, conceptSourceUuid);
   }
 
   searchItem(
@@ -253,28 +276,40 @@ export class FormService {
         ...["stock?locationUuid", "stockout?location"].map((stockApiPath) => {
           return this.httpClient
             .get(
-              `store/${stockApiPath}=${field?.locationUuid}&q=${parameters?.q}`
+              `store/${stockApiPath}=${field?.locationUuid}&q=${parameters?.q}&paging=false`
             )
             .pipe(
               map((response) => {
                 let formattedResponse = [];
+
                 if (stockApiPath === "stockout?location") {
-                  formattedResponse = response?.map((responseItem) => {
-                    stockOutItemsReference[responseItem?.uuid] = responseItem;
+                  formattedResponse = (response?.results || [])?.map(
+                    (responseItem) => {
+                      stockOutItemsReference[responseItem?.uuid] = responseItem;
+                      return {
+                        ...responseItem,
+                        item: {
+                          drug: responseItem?.drug,
+                          uuid: responseItem?.uuid,
+                        },
+                        quantity: 0,
+                      };
+                    }
+                  );
+                } else {
+                  formattedResponse = (
+                    response?.results?.filter(
+                      (batch) => batch?.expiryDate > new Date().getTime()
+                    ) || []
+                  )?.map((batch) => {
                     return {
-                      ...responseItem,
-                      item: {
-                        drug: responseItem?.drug,
-                        uuid: responseItem?.uuid,
-                      },
-                      quantity: 0,
+                      ...batch,
+                      isExpired: false,
                     };
                   });
-                } else {
-                  formattedResponse = response;
                 }
                 const groupedByItemUuid = groupBy(
-                  formattedResponse.map((batch) => {
+                  formattedResponse?.map((batch) => {
                     return {
                       ...batch,
                       itemUuid: batch?.item?.uuid,
@@ -282,31 +317,36 @@ export class FormService {
                   }),
                   "itemUuid"
                 );
-                return Object.keys(groupedByItemUuid).map((itemUuid) => {
-                  const totalQuantity = Number(
-                    sumBy(
-                      groupedByItemUuid[itemUuid].map((batchData) => {
-                        return batchData;
-                      }),
-                      "quantity"
-                    )
-                  );
-                  return {
-                    uuid: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
-                    id: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
-                    display:
-                      groupedByItemUuid[itemUuid][0]?.item?.drug?.display +
-                      " (" +
-                      totalQuantity.toLocaleString("en-US") +
-                      ") ",
-                    itemUuid,
-                    value: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
-                    batches: groupedByItemUuid[itemUuid],
-                    name: groupedByItemUuid[itemUuid][0]?.item?.drug?.display,
-                    quantity: totalQuantity,
-                    isStockOut: totalQuantity === 0 ? true : false,
-                  };
-                });
+                return (Object.keys(groupedByItemUuid) || [])?.map(
+                  (itemUuid) => {
+                    const totalQuantity = Number(
+                      sumBy(
+                        (groupedByItemUuid[itemUuid] || [])?.map(
+                          (batchData) => {
+                            return batchData;
+                          }
+                        ),
+                        "quantity"
+                      )
+                    );
+                    return {
+                      uuid: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                      id: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                      display:
+                        groupedByItemUuid[itemUuid][0]?.item?.drug?.display +
+                        " (" +
+                        totalQuantity.toLocaleString("en-US") +
+                        ") ",
+                      itemUuid,
+                      location: { uuid: field?.locationUuid },
+                      value: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
+                      batches: flatten(groupedByItemUuid[itemUuid]),
+                      name: groupedByItemUuid[itemUuid][0]?.item?.drug?.display,
+                      quantity: totalQuantity,
+                      isStockOut: totalQuantity === 0 ? true : false,
+                    };
+                  }
+                );
               })
             );
         })
@@ -318,20 +358,26 @@ export class FormService {
             ["asc"]["asc"]
           );
           const drugIitemsGroupedByItemUuid = groupBy(allDrugItems, "itemUuid");
-          const formattedDrugItems = Object.keys(
-            drugIitemsGroupedByItemUuid
-          ).map((itemUuid) => {
+          const formattedDrugItems = (
+            Object.keys(drugIitemsGroupedByItemUuid) || []
+          )?.map((itemUuid) => {
             const totalQuantity = Number(
               sumBy(
-                drugIitemsGroupedByItemUuid[itemUuid].map((batchData) => {
-                  return batchData;
-                }),
+                (drugIitemsGroupedByItemUuid[itemUuid] || []).map(
+                  (batchData) => {
+                    return batchData;
+                  }
+                ),
                 "quantity"
               )
             );
             return {
               ...drugIitemsGroupedByItemUuid[itemUuid][0],
-              batches: drugIitemsGroupedByItemUuid[itemUuid],
+              batches: flatten(
+                drugIitemsGroupedByItemUuid[itemUuid]?.map((batchDetails) => {
+                  return batchDetails?.batches;
+                })
+              ),
               display:
                 drugIitemsGroupedByItemUuid[itemUuid][0]?.name +
                 " (" +
@@ -416,10 +462,15 @@ export class FormService {
      * TODO:Dynamicall construct the fields
      */
     const fields =
-      "?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))";
-    return this.httpClient.get("form/" + uuid + fields).pipe(
-      map((response) => {
-        return response;
+      "?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,mappings:(uuid,conceptReferenceTerm:(uuid,display,conceptSource:(uuid))),hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,mappings:(uuid,conceptReferenceTerm:(uuid,display,conceptSource:(uuid))),hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,mappings:(uuid,conceptReferenceTerm:(uuid,display,conceptSource:(uuid))),conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))";
+    return zip(
+      this.httpClient.get("form/" + uuid + fields),
+      this.systemSettingsService.getSystemSettingsByKey(
+        `icare.forms.formFieldsConcepts.dataTypeExtensionReference.conceptSourceUuid`
+      )
+    ).pipe(
+      map((responses) => {
+        return { ...responses[0], conceptSourceUuid: responses[1] };
       }),
       catchError((error) => {
         return of(error);

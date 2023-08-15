@@ -78,6 +78,7 @@ export class OrdersService {
           return response?.results.map((orderDetails) => {
             return {
               ...orderDetails,
+              drugUuid: orderDetails?.drug?.uuid,
               paid: getDrugOrderPaymentStatus(orderDetails, visit),
             };
           });
@@ -95,19 +96,19 @@ export class OrdersService {
   }): Observable<any> {
     const voidReason =
       order?.voidReason.length > 0 ? order?.voidReason : "No reason";
-    return from(
-      this.openMRSHttpClient.post(`icare/voidorder`, {
+    return this.openMRSHttpClient
+      .post(`icare/voidorder`, {
         uuid: order?.uuid,
         voidReason: voidReason,
       })
-    ).pipe(
-      map((order) => {
-        return order;
-      }),
-      catchError((err) => {
-        return of(err);
-      })
-    );
+      .pipe(
+        map((order) => {
+          return order;
+        }),
+        catchError((err) => {
+          return of(err);
+        })
+      );
   }
 
   createOrdersViaCreatingEncounter(encounter): Observable<any> {

@@ -29,7 +29,7 @@
                 <td>{{ item?.expiryDate | date:"dd/MM/yyyy" }}</td>
                 <td [ngClass]="item?.stockInvoiceItemStatus[0]?.status !== 'RECEIVED' ? 'text-secondary' : 'text-success'">{{ item?.stockInvoiceItemStatus[0]?.status ? item?.stockInvoiceItemStatus[0]?.status : 'DRAFT' }}</td>
                 <td>{{ item?.batchQuantity }}</td>
-                <td>{{ item?.unitPrice }}</td>
+                <td>{{ item?.unitPrice | number: '.2' }}</td>
                 <td>{{ item?.amount | number: '.2' }}</td>
                 <ng-container *ngIf=" !updateStockInvoice">
                   <td *ngIf="(status !== 'RECEIVED' && item?.stockInvoiceItemStatus[0]?.status !== 'RECEIVED')">

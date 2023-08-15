@@ -24,7 +24,7 @@ SELECT
     CASE WHEN (TIMESTAMPDIFF(YEAR,p.birthdate,CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT'))) =0 AND (TIMESTAMPDIFF(MONTH,p.birthdate,CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT'))) =0 THEN CONCAT((TIMESTAMPDIFF(DAY,p.birthdate,CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT'))),' ',"Day(s)") WHEN (TIMESTAMPDIFF(YEAR,p.birthdate,CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT'))) =0 AND (TIMESTAMPDIFF(MONTH,p.birthdate,CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT'))) !=0 THEN CONCAT((TIMESTAMPDIFF(MONTH,p.birthdate,CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT'))),' ',"Month(s)") ELSE CONCAT((TIMESTAMPDIFF(YEAR,p.birthdate,CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT'))),' ',"Year(s)") END AS "age_years",
     CONCAT((TIMESTAMPDIFF(DAY,p.birthdate,CONVERT_TZ(v.date_started,'Etc/GMT+3','GMT')))) AS "age_days",
     DATE_FORMAT(CONVERT_TZ(p.birthdate	,'Etc/GMT+3','GMT'), "%d/%m/%Y ") AS "date_of_birth",
-    CASE WHEN p.gender='M' THEN 'M'  ELSE 'F' END AS "sex",
+    CASE WHEN p.gender='M' THEN 'M' WHEN p.gender='F' THEN 'F' ELSE 'UNKNOWN' END AS "sex",
 
     (SELECT GROUP_CONCAT( DISTINCT CASE WHEN spstatus.status = 'COLLECTED_ON' THEN spstatus.remarks ELSE NULL END)
         FROM lb_sample_status spstatus
@@ -60,7 +60,7 @@ SELECT
         FROM lb_sample_status spstatus
         INNER JOIN concept c ON c.uuid = spstatus.remarks
 		INNER JOIN concept_name cn ON cn.concept_id = c.concept_id and cn.concept_name_type = 'FULLY_SPECIFIED'
-        WHERE spstatus.sample_id = sp.sample_id AND spstatus.status = 'CONDITION'
+        WHERE spstatus.sample_id = sp.sample_id AND spstatus.category = 'CONDITION'
     ) AS "specimen_condition",
 
     (SELECT GROUP_CONCAT(cn.name)

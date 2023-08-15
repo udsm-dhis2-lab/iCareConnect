@@ -39,7 +39,7 @@ export class StockOutItemsComponent implements OnInit {
   ngOnInit(): void {
     this.locationId = this.route?.snapshot?.params["location"];
     this.ledgerTypes$ = this.store.pipe(select(getAllLedgerTypes));
-    this.currentStore$ = this.store.pipe(select(getCurrentLocation));
+    this.currentStore$ = this.store.pipe(select(getCurrentLocation(false)));
     this.currentStock$ = this.store.pipe(select(getCurrentStock));
     this.isCurrentLocationMainStore$ = this.store.pipe(
       select(getIfCurrentLocationIsMainStore)

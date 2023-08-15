@@ -1,6 +1,5 @@
-import { ConceptCreateFull } from 'src/app/shared/resources/openmrs';
-import { DropdownOption } from './dropdown-option.model';
-import { Field } from './field.model';
+import { DropdownOption } from "./dropdown-option.model";
+import { Field } from "./field.model";
 
 export interface ICAREForm {
   id: string;
@@ -12,6 +11,9 @@ export interface ICAREForm {
   formClass: string;
   formField?: Field<string>;
   formFields?: Field<string>[];
+  groupedFields?: any;
+  unGroupedFields?: any;
   concept?: any;
   isForm?: boolean;
+  required?: boolean;
 }

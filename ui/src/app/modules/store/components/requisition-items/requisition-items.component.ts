@@ -20,16 +20,19 @@ import { StockInvoiceFormDialogComponent } from "../../modals/stock-invoice-form
 })
 export class RequisitionItemsComponent implements OnInit {
   @Input() requisition: any;
+  @Input() isNew: boolean;
   @Output() receiveItem: EventEmitter<any> = new EventEmitter();
   @Output() rejectItem: EventEmitter<any> = new EventEmitter();
   @Output() selectionChange: EventEmitter<any> = new EventEmitter();
   @Output() reloadList: EventEmitter<any> = new EventEmitter();
+  @Output() restartProcess: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   errors: any[];
   specificRequisition$: Observable<any>;
   loadingRequisition: boolean = false;
   selectedItems: any = {};
   selectAllItems: boolean;
+  markAll: boolean = false;
   constructor(
     private requisitionService: RequisitionService,
     private dialog: MatDialog
@@ -37,20 +40,31 @@ export class RequisitionItemsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadingRequisition = true;
+    this.getSpecificRequsition();
+  }
+
+  getSpecificRequsition(): void {
     this.specificRequisition$ = this.requisitionService
       .getRequisitionByUuid(this.requisition?.uuid)
       .pipe(
         map((response) => {
-          if(!response?.error){
+          if (!response?.error) {
             const items = getFilterIssuedItemsInRequisitions(
               response?.requisitionItems,
               response?.issues
             );
             this.loadingRequisition = false;
+            this.markAll =
+              items?.filter(
+                (item) =>
+                  item?.requisitionItemStatuses[
+                    item?.requisitionItemStatuses?.length - 1
+                  ]?.status === "ISSUED"
+              ).length > 0;
             return {
               ...response,
-              requisitionItems: items
-            }
+              requisitionItems: items,
+            };
           }
         })
       );
@@ -106,6 +120,30 @@ export class RequisitionItemsComponent implements OnInit {
     }
   }
 
+  onDeleteRequsitionItem(requisitionItemUuid : string) {
+    
+      this.dialog
+        .open(SharedConfirmationComponent, {
+          width: "25%",
+          data: {
+            modalTitle: "Are you sure to delete this Item",
+            modalMessage:
+              "This action is irreversible. Please, click confirm to delete and click cancel to cancel deletion.",
+          },
+        })
+        .afterClosed()
+        .subscribe((data) => {
+          if (data?.confirmed) {
+            this.requisitionService
+              .deleteRequisitionItem(requisitionItemUuid)
+              .subscribe((response: any) => {
+                this.getSpecificRequsition();
+              });
+          }
+        });
+    
+  }
+
   onRejectItem(e: Event, item: any) {
     e.stopPropagation();
     this.rejectItem.emit({ event: e, item: item });
@@ -117,25 +155,32 @@ export class RequisitionItemsComponent implements OnInit {
 
   selectAll(e: MatCheckboxChange, items: any[]) {
     if (e?.checked) {
-      items.forEach((item) => {
-        this.selectedItems = {
-          ...this.selectedItems,
-          [item]: item
-        }
-        this.selectionChange.emit({ event: e, item: item });
-      })
+      items
+        ?.filter(
+          (item) =>
+            item?.requisitionItemStatuses[
+              item?.requisitionItemStatuses?.length - 1
+            ]?.status === "ISSUED"
+        )
+        ?.forEach((item) => {
+          this.selectedItems = {
+            ...this.selectedItems,
+            [item]: item,
+          };
+          this.selectionChange.emit({ event: e, item: item });
+        });
       this.selectAllItems = true;
     } else {
       this.selectAllItems = false;
-      this.selectedItems = {}
+      this.selectedItems = {};
       items.forEach((item) => {
         this.selectionChange.emit({ event: e, item: item });
-      })
+      });
     }
   }
 
   getSelection(event: MatCheckboxChange, item: any): void {
-    if(!event.checked){
+    if (!event.checked) {
       this.selectAllItems = false;
     }
     this.selectionChange.emit({ event: event, item: item });
@@ -143,5 +188,23 @@ export class RequisitionItemsComponent implements OnInit {
 
   get selectedItemsCount(): number {
     return this.selectedItems ? Object.keys(this.selectedItems)?.length : 0;
+  }
+
+  onSendRequisition(e: any, requisition: any) {
+    e?.stopPropagation();
+    const requisitionObject = {
+      ...requisition,
+      requisitionStatuses: [
+        {
+          status: "PENDING",
+        },
+      ],
+    };
+    this.requisitionService
+      .updateRequisition(requisition?.uuid, requisitionObject)
+      .subscribe((response) => {
+        localStorage.removeItem("availableRequisition");
+        this.restartProcess.emit(true);
+      });
   }
 }

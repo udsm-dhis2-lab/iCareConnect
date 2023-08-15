@@ -118,6 +118,10 @@ import { DateTimeFieldComponent } from "./date-time-field/date-time-field.compon
 import { PatientHistoryComponent } from "./patient-history/patient-history.component";
 import { PatientHistoryDataComponent } from "./patient-history-data/patient-history-data.component";
 import { SharedSamplesListComponent } from "./shared-samples-list/shared-samples-list.component";
+import { SharedReportsListComponent } from "./shared-reports-list/shared-reports-list.component";
+import { SharedCustomReportComponent } from "./shared-custom-report/shared-custom-report.component";
+import { SharedRenderReportDashboardComponent } from "./shared-render-report-dashboard/shared-render-report-dashboard.component";
+import { SharedDrugDosageInterpretationComponent } from "./shared-drug-dosage-interpretation/shared-drug-dosage-interpretation.component";
 export const components: any[] = [
   PatientAddressComponent,
   PatientSearchComponent,
@@ -239,6 +243,10 @@ export const components: any[] = [
   PatientHistoryDataComponent,
   SharedConfirmationComponent,
   SharedSamplesListComponent,
+  SharedReportsListComponent,
+  SharedCustomReportComponent,
+  SharedRenderReportDashboardComponent,
+  SharedDrugDosageInterpretationComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
