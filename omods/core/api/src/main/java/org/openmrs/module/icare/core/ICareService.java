@@ -158,4 +158,6 @@ public interface ICareService extends OpenmrsService {
 	List<String> generateCode(String globalProperty, String metadataType, Integer count) throws Exception;
 	
 	OrderStatus saveOrderStatus(OrderStatus orderStatus);
+
+	void updatePasswordHistory() throws Exception;
 }

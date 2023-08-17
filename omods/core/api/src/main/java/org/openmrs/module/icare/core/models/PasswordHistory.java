@@ -24,7 +24,7 @@ public class PasswordHistory implements Serializable {
     @JoinColumn(name="user_id", nullable = false)
     private User user;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = true)
     private String password;
 
     @Column(name = "change_date", nullable = false)
@@ -58,8 +58,9 @@ public class PasswordHistory implements Serializable {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String password) throws Exception {
+        String encryptedPassword = Encryption.encrypt(password);
+        this.password = encryptedPassword;
     }
 
     public static PasswordHistory fromMap(Map<String, Object> passwordHistoryMap) throws Exception {
