@@ -25,6 +25,8 @@ import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
 import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.dao.ICareDao;
+import org.openmrs.module.icare.core.dao.PasswordHistoryDAO;
+import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
@@ -59,6 +61,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	ICareDao dao;
 	
 	PatientDAO patientDAO;
+
+	PasswordHistoryDAO passwordHistoryDAO;
 	
 	UserService userService;
 	
@@ -68,7 +72,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public void setDao(ICareDao dao) {
 		this.dao = dao;
 	}
-	
+
+	public void setPasswordHistoryDAO(PasswordHistoryDAO passwordHistoryDAO) {
+		this.passwordHistoryDAO = passwordHistoryDAO;
+	}
+
 	/**
 	 * Injected in moduleApplicationContext.xml
 	 */
@@ -431,7 +439,25 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		    orderStatus.getOrder().getUuid(), orderStatus.getStatus().toString(), orderStatus.getRemarks());
 		return savedOrderStatus;
 	}
-	
+
+	@Override
+	public void updatePasswordHistory() throws Exception {
+		List<User> users = Context.getUserService().getAllUsers();
+		List<User> usersInPasswordHistory = this.passwordHistoryDAO.getUsersInPasswordHistory();
+		PasswordHistory passwordHistory = new PasswordHistory();
+		Date date = new Date();
+
+		for(User user: users){
+			if(!(usersInPasswordHistory.contains(user))){
+				passwordHistory.setUser(user);
+				passwordHistory.setChangedDate(date);
+				passwordHistory.setPassword("Password encryption");
+				this.passwordHistoryDAO.save(passwordHistory);
+
+			}
+		}
+	}
+
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);

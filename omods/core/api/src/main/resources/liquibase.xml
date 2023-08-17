@@ -5286,7 +5286,7 @@
                 <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="user_id" type="int" />
-            <column name="password" type="varchar(128)"><constraints nullable="false" /></column>
+            <column name="password" type="varchar(128)"><constraints nullable="true" /></column>
             <column name="change_date" type="DATETIME"><constraints nullable="false" /></column>
         </createTable>
         <addForeignKeyConstraint

@@ -7,7 +7,7 @@ import java.util.Base64;
 public class Encryption {
 
     private static final String ALGORITHM = "AES";
-    private static final String TRANSFORMATION = "AES/ECB/PKCS7Padding";
+    private static final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
 
     private static final String ENCRYPTION_KEY = "fTjWnZr4u7x!A%D*F-JaNdRgUkXp2s5v"; //256 bits
 
