@@ -61,7 +61,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	ICareDao dao;
 	
 	PatientDAO patientDAO;
-
+	
 	PasswordHistoryDAO passwordHistoryDAO;
 	
 	UserService userService;
@@ -72,11 +72,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public void setDao(ICareDao dao) {
 		this.dao = dao;
 	}
-
+	
 	public void setPasswordHistoryDAO(PasswordHistoryDAO passwordHistoryDAO) {
 		this.passwordHistoryDAO = passwordHistoryDAO;
 	}
-
+	
 	/**
 	 * Injected in moduleApplicationContext.xml
 	 */
@@ -439,25 +439,42 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		    orderStatus.getOrder().getUuid(), orderStatus.getStatus().toString(), orderStatus.getRemarks());
 		return savedOrderStatus;
 	}
-
+	
 	@Override
 	public void updatePasswordHistory() throws Exception {
 		List<User> users = Context.getUserService().getAllUsers();
 		List<User> usersInPasswordHistory = this.passwordHistoryDAO.getUsersInPasswordHistory();
 		PasswordHistory passwordHistory = new PasswordHistory();
 		Date date = new Date();
-
-		for(User user: users){
-			if(!(usersInPasswordHistory.contains(user))){
+		
+		for (User user : users) {
+			if (!(usersInPasswordHistory.contains(user))) {
 				passwordHistory.setUser(user);
 				passwordHistory.setChangedDate(date);
 				passwordHistory.setPassword("Password encryption");
 				this.passwordHistoryDAO.save(passwordHistory);
-
+				
 			}
 		}
 	}
+	
+	@Override
+	public PasswordHistory savePasswordHistory(User user, String newPassword) throws Exception {
+		Date date = new Date();
+		PasswordHistory passwordHistory = new PasswordHistory();
+		if (user != null) {
+			passwordHistory.setUser(user);
+		} else {
+			passwordHistory.setUser(Context.getAuthenticatedUser());
+		}
+		if (newPassword != null) {
+			passwordHistory.setPassword(newPassword);
+		}
+		passwordHistory.setChangedDate(date);
 
+		return passwordHistoryDAO.save(passwordHistory);
+	}
+	
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);
