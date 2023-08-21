@@ -18,6 +18,7 @@ import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
+import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
@@ -156,4 +157,12 @@ public interface ICareService extends OpenmrsService {
 	        URISyntaxException;
 	
 	List<String> generateCode(String globalProperty, String metadataType, Integer count) throws Exception;
+	
+	OrderStatus saveOrderStatus(OrderStatus orderStatus);
+	
+	void updatePasswordHistory() throws Exception;
+	
+	PasswordHistory savePasswordHistory(User user, String newPassword) throws Exception;
+	
+	List<PasswordHistory> getUserPasswordHistory(String uuid);
 }

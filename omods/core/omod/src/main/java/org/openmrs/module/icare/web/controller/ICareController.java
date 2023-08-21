@@ -28,6 +28,7 @@ import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.*;
+import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.models.PimaCovidLabRequest;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
@@ -260,6 +261,15 @@ public class ICareController {
         }
         return messageList;
     }
+	
+	@RequestMapping(value = "orderstatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> onPostOrderStatus(@RequestBody Map<String, Object> orderStatusObject) {
+		OrderStatus orderStatus = OrderStatus.fromMap(orderStatusObject);
+		orderStatus = iCareService.saveOrderStatus(orderStatus);
+		
+		return orderStatus.toMap();
+	}
 	
 	@RequestMapping(value = "prescription", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
@@ -940,5 +950,17 @@ public class ICareController {
 
 		return auditLogMapList;
 
+	}
+	
+	@RequestMapping(value="passwordhistory/{uuid}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getUserPasswordHistory(@PathVariable("uuid") String uuid){
+
+		List<Map<String,Object>> passwordHistoriesList = new ArrayList<>();
+		List<PasswordHistory> passwordHistories = iCareService.getUserPasswordHistory(uuid);
+		for(PasswordHistory passwordHistory : passwordHistories){
+			passwordHistoriesList.add(passwordHistory.toMap());
+		}
+		return passwordHistoriesList;
 	}
 }

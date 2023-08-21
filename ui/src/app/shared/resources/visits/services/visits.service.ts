@@ -54,6 +54,15 @@ export class VisitsService {
             ...encounter?.obs.map((observation) => {
               return {
                 ...observation,
+                value: !observation?.value?.uuid
+                  ? observation?.value
+                  : {
+                      ...observation?.value,
+                      display:
+                        observation?.value?.display?.indexOf(":") > -1
+                          ? observation?.value?.display.split(":")[1]
+                          : observation?.value?.display,
+                    },
                 encounterProvider: {
                   ...encounterProvider?.provider,
                   name:
