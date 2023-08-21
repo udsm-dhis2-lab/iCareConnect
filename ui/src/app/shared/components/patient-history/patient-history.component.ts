@@ -44,9 +44,9 @@ export class PatientHistoryComponent implements OnInit {
     username?: string;
     systemId?: string;
     userProperties?: object;
-    person?: PersonGetRef;
-    privileges?: PrivilegeGetRef[];
-    roles?: RoleGetRef[];
+    // person?: PersonGetRef;
+    // privileges?: PrivilegeGetRef[];
+    // roles?: RoleGetRef[];
     provider?: { uuid?: string; display?: string };
   }>;
   constructor(
