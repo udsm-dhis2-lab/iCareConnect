@@ -28,6 +28,7 @@ import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.*;
+import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.models.PimaCovidLabRequest;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
@@ -949,5 +950,17 @@ public class ICareController {
 
 		return auditLogMapList;
 
+	}
+
+	@RequestMapping(value="passwordhistory/{uuid}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getUserPasswordHistory(@PathVariable("uuid") String uuid){
+
+		List<Map<String,Object>> passwordHistoriesList = new ArrayList<>();
+		List<PasswordHistory> passwordHistories = iCareService.getUserPasswordHistory(uuid);
+		for(PasswordHistory passwordHistory : passwordHistories){
+			passwordHistoriesList.add(passwordHistory.toMap());
+		}
+		return passwordHistoriesList;
 	}
 }
