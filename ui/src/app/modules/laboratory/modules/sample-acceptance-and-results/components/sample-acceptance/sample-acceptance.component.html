@@ -16,12 +16,16 @@
     patientsWithResults: patientsWithResults$ | async,
     samplesLoadedState: samplesLoadedState$ | async,
     testRelationshipConceptSourceUuid:
-      testRelationshipConceptSourceUuid$ | async
+      testRelationshipConceptSourceUuid$ | async,
+    dataToPrint: dataToPrint$ | async
   } as sampleParams"
 >
-  <div class="loading-overlay" *ngIf="saving">
+  <div class="loading-overlay" *ngIf="saving || savingPrintInformation">
     <div class="text-center">
-      <div>Saving ....</div>
+      <div>
+        {{ !savingPrintInformation ? "Saving" : "Capturing print information" }}
+        ....
+      </div>
       <div class="mt-3 d-flex justify-content-center w-100">
         <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
       </div>
@@ -224,26 +228,32 @@
                 Back to List
               </button>
             </div>
+            <mat-progress-bar
+              mode="indeterminate"
+              *ngIf="!sampleParams?.dataToPrint"
+            ></mat-progress-bar>
             <app-print-results-page
               *ngIf="
                 sampleParams?.testRelationshipConceptSourceUuid &&
-                !LISConfigurations?.isLIS
+                !LISConfigurations?.isLIS &&
+                sampleParams?.dataToPrint
               "
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
               "
-              [data]="dataToPrint"
+              [data]="sampleParams?.dataToPrint[0]"
               (cancel)="onCancelFromResultsPage($event)"
             ></app-print-results-page>
             <app-shared-print-results-dashboard
               *ngIf="
                 sampleParams?.testRelationshipConceptSourceUuid &&
-                LISConfigurations?.isLIS
+                LISConfigurations?.isLIS &&
+                sampleParams?.dataToPrint
               "
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
               "
-              [data]="dataToPrint"
+              [data]="sampleParams?.dataToPrint[0]"
             ></app-shared-print-results-dashboard>
           </div>
         </div>
@@ -302,26 +312,34 @@
                 Back to List
               </button>
             </div>
+
+            <mat-progress-bar
+              mode="indeterminate"
+              *ngIf="!sampleParams?.dataToPrint"
+            ></mat-progress-bar>
+
             <app-print-results-page
               *ngIf="
                 sampleParams?.testRelationshipConceptSourceUuid &&
-                !LISConfigurations?.isLIS
+                !LISConfigurations?.isLIS &&
+                sampleParams?.dataToPrint
               "
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
               "
-              [data]="dataToPrint"
+              [data]="sampleParams?.dataToPrint[0]"
               (cancel)="onCancelFromResultsPage($event)"
             ></app-print-results-page>
             <app-shared-print-results-dashboard
               *ngIf="
                 sampleParams?.testRelationshipConceptSourceUuid &&
-                LISConfigurations?.isLIS
+                LISConfigurations?.isLIS &&
+                sampleParams?.dataToPrint
               "
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
               "
-              [data]="dataToPrint"
+              [data]="sampleParams?.dataToPrint[0]"
             ></app-shared-print-results-dashboard>
           </div>
         </div>
@@ -380,6 +398,10 @@
                 Back to List
               </button>
             </div>
+            <mat-progress-bar
+              mode="indeterminate"
+              *ngI="!sampleParams?.dataToPrint"
+            ></mat-progress-bar>
             <app-print-results-page
               *ngIf="
                 sampleParams?.testRelationshipConceptSourceUuid &&
@@ -389,17 +411,18 @@
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
               "
-              [data]="dataToPrint"
+              [data]="sampleParams?.dataToPrint[0]"
             ></app-print-results-page>
             <app-shared-print-results-dashboard
               *ngIf="
                 sampleParams?.testRelationshipConceptSourceUuid &&
-                LISConfigurations?.isLIS
+                LISConfigurations?.isLIS &&
+                sampleParams?.dataToPrint
               "
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
               "
-              [data]="dataToPrint"
+              [data]="sampleParams?.dataToPrint[0]"
             ></app-shared-print-results-dashboard>
           </div>
         </div>
@@ -449,26 +472,32 @@
                 Back to List
               </button>
             </div>
+            <mat-progress-bar
+              mode="indeterminate"
+              *ngIf="sampleParams?.dataToPrint"
+            ></mat-progress-bar>
             <app-print-results-page
               *ngIf="
                 sampleParams?.testRelationshipConceptSourceUuid &&
-                !LISConfigurations?.isLIS
+                !LISConfigurations?.isLIS &&
+                sampleParams?.dataToPrint
               "
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
               "
-              [data]="dataToPrint"
+              [data]="sampleParams?.dataToPrint[0]"
               (cancel)="onCancelFromResultsPage($event)"
             ></app-print-results-page>
             <app-shared-print-results-dashboard
               *ngIf="
                 sampleParams?.testRelationshipConceptSourceUuid &&
-                LISConfigurations?.isLIS
+                LISConfigurations?.isLIS &&
+                sampleParams?.dataToPrint
               "
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
               "
-              [data]="dataToPrint"
+              [data]="sampleParams?.dataToPrint[0]"
             ></app-shared-print-results-dashboard>
           </div>
         </div>
