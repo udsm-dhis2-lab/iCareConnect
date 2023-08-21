@@ -38,7 +38,8 @@ import { PrintResultsModalComponent } from "../print-results-modal/print-results
 import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
 import { SharedResultsEntryAndViewModalComponent } from "../shared-results-entry-and-view-modal/shared-results-entry-and-view-modal.component";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { flatten } from "lodash";
+import { flatten, groupBy } from "lodash";
+import { LabSample } from "src/app/modules/laboratory/resources/models";
 
 @Component({
   selector: "app-sample-acceptance",
@@ -83,8 +84,9 @@ export class SampleAcceptanceComponent implements OnInit {
   entryCategory: string = "INDIVIDUAL";
   currentTabWithDataLoaded: number = 0;
   showPrintingPage: boolean = false;
-  dataToPrint: any;
+  dataToPrint$: Observable<any>;
   testRelationshipConceptSourceUuid$: Observable<string>;
+  savingPrintInformation: boolean = false;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -109,13 +111,8 @@ export class SampleAcceptanceComponent implements OnInit {
       );
   }
 
-  onGetDataToPrint(data: any): void {
-    this.dataToPrint = data;
-    const statuses = flatten(
-      data?.patientDetailsAndSamples?.departments?.map((department) => {
-        return department?.samples;
-      })
-    )?.map((sample) => {
+  onGetDataToPrint(samplesDetails: any): void {
+    const statuses = [samplesDetails]?.map((sample) => {
       return {
         sample: {
           uuid: sample?.uuid,
@@ -128,13 +125,64 @@ export class SampleAcceptanceComponent implements OnInit {
         status: "PRINTED",
       };
     });
-    this.saving = true;
     this.sampleService
       .setMultipleSamplesStatuses(statuses)
       .subscribe((response) => {
         if (response) {
           this.showPrintingPage = true;
-          this.saving = false;
+          this.dataToPrint$ = this.sampleService
+            .getFormattedSampleByUuid(
+              samplesDetails?.uuid,
+              this.labSamplesDepartments,
+              this.sampleTypes,
+              this.codedSampleRejectionReasons
+            )
+            .pipe(
+              map((response) => {
+                const filteredCompletedSamples = [
+                  {
+                    ...response,
+                    mrn: response?.mrn,
+                    departmentName: response?.department?.name,
+                  },
+                ];
+                const groupedByMRN = groupBy(filteredCompletedSamples, "mrn");
+                return Object.keys(groupedByMRN).map((key) => {
+                  const samplesKeyedByDepartments = groupBy(
+                    groupedByMRN[key],
+                    "departmentName"
+                  );
+                  return {
+                    patientDetailsAndSamples: {
+                      mrn: key,
+                      patient: groupedByMRN[key][0]?.sample?.patient,
+                      departments: Object.keys(samplesKeyedByDepartments).map(
+                        (depName) => {
+                          return {
+                            departmentName: depName,
+                            samples: samplesKeyedByDepartments[depName].map(
+                              (sampleObject) => {
+                                const sample = new LabSample(
+                                  sampleObject,
+                                  this.labSamplesDepartments,
+                                  this.sampleTypes,
+                                  this.codedSampleRejectionReasons
+                                ).toJSon();
+                                return sample;
+                              }
+                            ),
+                          };
+                        }
+                      ),
+                    },
+                    labConfigs: this.labConfigs,
+                    LISConfigurations: this.LISConfigurations,
+                    user: samplesDetails?.providerDetails,
+                    authorized: true,
+                  };
+                });
+              })
+            );
         }
       });
   }
