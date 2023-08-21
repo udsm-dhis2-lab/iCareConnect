@@ -64,7 +64,18 @@ export class SharedSampleDetailsComponent implements OnInit {
                   ),
                   ["fieldNumber"],
                   ["asc"]
-                ),
+                )?.map((formField: any) => {
+                  return {
+                    ...formField,
+                    field: {
+                      ...formField?.field,
+                      display: formField?.field?.display?.replace(
+                        "SPECIMEN_SOURCE:",
+                        ""
+                      ),
+                    },
+                  };
+                }),
               },
             };
           });

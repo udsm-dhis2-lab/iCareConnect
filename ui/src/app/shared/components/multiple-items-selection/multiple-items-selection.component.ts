@@ -1,4 +1,12 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+} from "@angular/core";
 import { uniqBy, orderBy } from "lodash";
 import { Observable, of } from "rxjs";
 import {
@@ -10,6 +18,11 @@ import {
 import { LocationService } from "src/app/core/services";
 import { ReferenceTermsService } from "src/app/core/services/reference-terms.service";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
+import {
+  CdkDragDrop,
+  moveItemInArray,
+  transferArrayItem,
+} from "@angular/cdk/drag-drop";
 
 @Component({
   selector: "app-multiple-items-selection",
@@ -38,8 +51,7 @@ export class MultipleItemsSelectionComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit(): void {
-    this.currentSelectedItems =
-      this.selectedItems || [];
+    this.currentSelectedItems = this.selectedItems || [];
     if (
       this.itemType &&
       this.itemType === "concept" &&
@@ -101,10 +113,9 @@ export class MultipleItemsSelectionComponent implements OnInit, OnChanges {
     }
   }
 
-ngOnChanges(): void {
-  this.currentSelectedItems =
-  this.selectedItems || [];
-}
+  ngOnChanges(): void {
+    this.currentSelectedItems = this.selectedItems || [];
+  }
 
   getSelectedItem(event: Event, item: any, items: any[]): void {
     event.stopPropagation();
@@ -204,5 +215,22 @@ ngOnChanges(): void {
     this.currentSelectedItems = [];
     this.items = [...this.items, ...items];
     this.getSelectedItems.emit(this.currentSelectedItems);
+  }
+
+  drop(event: CdkDragDrop<any[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+    }
   }
 }

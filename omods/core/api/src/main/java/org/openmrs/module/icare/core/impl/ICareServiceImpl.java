@@ -25,6 +25,8 @@ import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
 import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.dao.ICareDao;
+import org.openmrs.module.icare.core.dao.PasswordHistoryDAO;
+import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
@@ -60,6 +62,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	PatientDAO patientDAO;
 	
+	PasswordHistoryDAO passwordHistoryDAO;
+	
 	UserService userService;
 	
 	/**
@@ -67,6 +71,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	 */
 	public void setDao(ICareDao dao) {
 		this.dao = dao;
+	}
+	
+	public void setPasswordHistoryDAO(PasswordHistoryDAO passwordHistoryDAO) {
+		this.passwordHistoryDAO = passwordHistoryDAO;
 	}
 	
 	/**
@@ -246,7 +254,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		ValidateUtil.setDisableValidation(true);
 		System.out.println("Validation:" + ValidateUtil.getDisableValidation());
 		prescription = (Prescription) Context.getOrderService().saveOrder(prescription, null);
-		// Set respective status
+		// Set respective sOrderStatustatus
 		if (status != null) {
 			OrderStatus orderStatus = Context.getService(StoreService.class).setDrugOrderStatus(prescription.getUuid(),
 			    status, remarks);
@@ -423,6 +431,54 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public List<String> generateCode(String globalPropertyUuid, String metadataType, Integer count) throws Exception {
 		return dao.generateCode(globalPropertyUuid, metadataType, count);
+	}
+	
+	@Override
+	public OrderStatus saveOrderStatus(OrderStatus orderStatus) {
+		OrderStatus savedOrderStatus = Context.getService(StoreService.class).setDrugOrderStatus(
+		    orderStatus.getOrder().getUuid(), orderStatus.getStatus().toString(), orderStatus.getRemarks());
+		return savedOrderStatus;
+	}
+	
+	@Override
+	public void updatePasswordHistory() throws Exception {
+		List<User> users = Context.getUserService().getAllUsers();
+		List<User> usersInPasswordHistory = this.passwordHistoryDAO.getUsersInPasswordHistory();
+		PasswordHistory passwordHistory = new PasswordHistory();
+		Date date = new Date();
+		
+		for (User user : users) {
+			if (!(usersInPasswordHistory.contains(user))) {
+				passwordHistory.setUser(user);
+				passwordHistory.setChangedDate(date);
+				passwordHistory.setPassword("Password encryption");
+				this.passwordHistoryDAO.save(passwordHistory);
+				
+			}
+		}
+	}
+	
+	@Override
+	public PasswordHistory savePasswordHistory(User user, String newPassword) throws Exception {
+		Date date = new Date();
+		PasswordHistory passwordHistory = new PasswordHistory();
+		if (user != null) {
+			passwordHistory.setUser(user);
+		} else {
+			passwordHistory.setUser(Context.getAuthenticatedUser());
+		}
+		if (newPassword != null) {
+			passwordHistory.setPassword(newPassword);
+		}
+		passwordHistory.setChangedDate(date);
+		
+		return passwordHistoryDAO.save(passwordHistory);
+	}
+	
+	@Override
+	public List<PasswordHistory> getUserPasswordHistory(String uuid) {
+		
+		return passwordHistoryDAO.getUsersPasswordHistory(uuid);
 	}
 	
 	@Override

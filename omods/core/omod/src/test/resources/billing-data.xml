@@ -328,4 +328,6 @@
 
     <audit_log audit_log_id="1" type="org.openmrs.module.icare.laboratory.models.Sample" action="CREATED" date_created="2023-04-18 09:51:57.0" user_id="400" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c631" />
     <audit_log audit_log_id="2" type="org.openmrs.module.icare.laboratory.models.Sample" action="UPDATED" date_created="2023-04-18 09:51:57.0" user_id="300" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c630"/>
+
+    <password_history password_history_id="1" user_id="400" password="iCARE110-TEST-OSDH-9beb-d30dcfc0ceee" change_date="2023-04-18 09:51:57.0" />
 </dataset>
