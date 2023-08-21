@@ -5276,5 +5276,24 @@
         </sql>
     </changeSet>
 
+    <changeSet id="create_password_history" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="password_history" /></not>
+        </preConditions>
+        <comment>Adding password_history table</comment>
+        <createTable tableName="password_history">
+            <column name="password_history_id" type="int" autoIncrement="true" >
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="user_id" type="int" />
+            <column name="password" type="varchar(128)"><constraints nullable="true" /></column>
+            <column name="change_date" type="DATETIME"><constraints nullable="false" /></column>
+        </createTable>
+        <addForeignKeyConstraint
+                constraintName="user_id"
+                baseTableName="password_history" baseColumnNames="user_id"
+                referencedTableName="users" referencedColumnNames="user_id" />
+    </changeSet>
+
 
 </databaseChangeLog>

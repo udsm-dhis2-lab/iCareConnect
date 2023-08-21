@@ -873,4 +873,13 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		
 		System.out.println(returnResponse.getContentAsString());
 	}
+
+	@Test
+	public void getUsersPasswordHistory() throws Exception {
+		MockHttpServletRequest passwordHistories = newGetRequest("icare/passwordhistory/e4ef4d4d-5cf2-47ff-af6b-bb9abdabdd60");
+		MockHttpServletResponse response = handle(passwordHistories);
+		List<Map<String,Object>> passwordHistoriesMap = (new ObjectMapper()).readValue(response.getContentAsString(), List.class);
+		System.out.println(response.getContentAsString());
+
+	}
 }

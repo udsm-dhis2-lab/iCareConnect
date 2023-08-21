@@ -25,6 +25,8 @@ import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
 import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.dao.ICareDao;
+import org.openmrs.module.icare.core.dao.PasswordHistoryDAO;
+import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
@@ -60,6 +62,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	PatientDAO patientDAO;
 	
+	PasswordHistoryDAO passwordHistoryDAO;
+	
 	UserService userService;
 	
 	/**
@@ -67,6 +71,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	 */
 	public void setDao(ICareDao dao) {
 		this.dao = dao;
+	}
+	
+	public void setPasswordHistoryDAO(PasswordHistoryDAO passwordHistoryDAO) {
+		this.passwordHistoryDAO = passwordHistoryDAO;
 	}
 	
 	/**
@@ -432,6 +440,47 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		return savedOrderStatus;
 	}
 	
+	@Override
+	public void updatePasswordHistory() throws Exception {
+		List<User> users = Context.getUserService().getAllUsers();
+		List<User> usersInPasswordHistory = this.passwordHistoryDAO.getUsersInPasswordHistory();
+		PasswordHistory passwordHistory = new PasswordHistory();
+		Date date = new Date();
+		
+		for (User user : users) {
+			if (!(usersInPasswordHistory.contains(user))) {
+				passwordHistory.setUser(user);
+				passwordHistory.setChangedDate(date);
+				passwordHistory.setPassword("Password encryption");
+				this.passwordHistoryDAO.save(passwordHistory);
+				
+			}
+		}
+	}
+	
+	@Override
+	public PasswordHistory savePasswordHistory(User user, String newPassword) throws Exception {
+		Date date = new Date();
+		PasswordHistory passwordHistory = new PasswordHistory();
+		if (user != null) {
+			passwordHistory.setUser(user);
+		} else {
+			passwordHistory.setUser(Context.getAuthenticatedUser());
+		}
+		if (newPassword != null) {
+			passwordHistory.setPassword(newPassword);
+		}
+		passwordHistory.setChangedDate(date);
+
+		return passwordHistoryDAO.save(passwordHistory);
+	}
+
+	@Override
+	public List<PasswordHistory> getUserPasswordHistory(String uuid) {
+
+		return passwordHistoryDAO.getUsersPasswordHistory(uuid);
+	}
+
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);
