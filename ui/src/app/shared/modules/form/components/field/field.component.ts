@@ -206,6 +206,7 @@ export class FieldComponent implements AfterViewInit {
           ? "custom:(uuid,display,datatype,conceptClass,mappings)"
           : "custom:(uuid,display)",
     };
+    console.log("field", field);
     this.members$ = this.formService.searchItem(
       parameters,
       this.field?.searchControlType,
@@ -227,13 +228,16 @@ export class FieldComponent implements AfterViewInit {
 
   getSelectedItemFromOption(event: Event, item: any, field: any): void {
     event.stopPropagation();
-    const value = item?.isDrug
-      ? item?.formattedKey
-      : item?.uuid
-      ? item?.uuid
-      : item?.id
-      ? item?.id
-      : item?.value;
+    const value =
+      field?.searchControlType == "person"
+        ? item?.display
+        : item?.isDrug
+        ? item?.formattedKey
+        : item?.uuid
+        ? item?.uuid
+        : item?.id
+        ? item?.id
+        : item?.value;
     let objectToUpdate = {};
     objectToUpdate[field?.key] =
       field?.searchControlType === "drugStock"
@@ -246,7 +250,7 @@ export class FieldComponent implements AfterViewInit {
     this.fieldUpdate.emit(this.form);
   }
 
-  getStockStatus(option) {
+  getStockStatus(option: any): any {
     const optionName = option?.display ? option?.display : option?.name;
     return optionName.includes("Available, Location") ? true : false;
   }
