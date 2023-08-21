@@ -23,6 +23,11 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
+                <property name="passwordHistoryDAO">
+                    <bean class="org.openmrs.module.icare.core.dao.PasswordHistoryDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
             </bean>
         </property>
         <property name="preInterceptors">
