@@ -474,7 +474,13 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 
 		return passwordHistoryDAO.save(passwordHistory);
 	}
-	
+
+	@Override
+	public List<PasswordHistory> getUserPasswordHistory(String uuid) {
+
+		return passwordHistoryDAO.getUsersPasswordHistory(uuid);
+	}
+
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);
