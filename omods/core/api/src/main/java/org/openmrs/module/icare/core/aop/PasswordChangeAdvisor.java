@@ -42,7 +42,7 @@ public class PasswordChangeAdvisor extends StaticMethodMatcherPointcutAdvisor im
 			} else {
 				iCareService.savePasswordHistory(null, invocation.getArguments()[1].toString());
 			}
-
+			
 			return invocation.proceed();
 		}
 	}

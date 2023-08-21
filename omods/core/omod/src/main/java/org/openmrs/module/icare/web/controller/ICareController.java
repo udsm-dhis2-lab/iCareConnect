@@ -951,7 +951,7 @@ public class ICareController {
 		return auditLogMapList;
 
 	}
-
+	
 	@RequestMapping(value="passwordhistory/{uuid}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String,Object>> getUserPasswordHistory(@PathVariable("uuid") String uuid){

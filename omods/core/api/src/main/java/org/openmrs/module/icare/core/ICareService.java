@@ -163,6 +163,6 @@ public interface ICareService extends OpenmrsService {
 	void updatePasswordHistory() throws Exception;
 	
 	PasswordHistory savePasswordHistory(User user, String newPassword) throws Exception;
-
-    List<PasswordHistory> getUserPasswordHistory(String uuid);
+	
+	List<PasswordHistory> getUserPasswordHistory(String uuid);
 }
