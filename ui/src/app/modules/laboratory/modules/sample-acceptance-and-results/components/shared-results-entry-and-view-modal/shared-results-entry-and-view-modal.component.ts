@@ -7,7 +7,7 @@ import { ConceptGet } from "src/app/shared/resources/openmrs";
 import { SampleAllocationObject } from "src/app/shared/resources/sample-allocations/models/allocation.model";
 import { SampleAllocationService } from "src/app/shared/resources/sample-allocations/services/sample-allocation.service";
 
-import { omit, groupBy, flatten, orderBy, isEqual } from "lodash";
+import { omit, groupBy, flatten, orderBy, isEqual, keyBy } from "lodash";
 import { HttpClient } from "@angular/common/http";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { VisitsService } from "src/app/shared/resources/visits/services";
@@ -614,12 +614,53 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     parameter: ConceptGet,
     allocation: SampleAllocationObject
   ): void {
-    // console.log(dataObject);
-    if (
-      (dataObject?.value && !dataObject?.previousValue) ||
-      (dataObject?.value &&
-        dataObject?.previousValue &&
-        dataObject?.value != dataObject?.previousValue)
+    // console.log("dataObject", dataObject);
+    if (dataObject?.value?.length === 0) {
+      this.dataValues = omit(this.dataValues, parameter?.uuid);
+    } else if (dataObject?.multipleResults) {
+      // console.log("JJDJDJDJD");
+      const prevValues =
+        orderBy(
+          dataObject?.previousValue?.map((prevValue: any) => {
+            return {
+              value: prevValue,
+            };
+          }),
+          ["value"],
+          ["asc"]
+        ) || [];
+      const valuesData = orderBy(dataObject?.value, ["value"], ["asc"]);
+      // console.log("prevValues", prevValues);
+      // console.log("valuesData", valuesData);
+      const keyedPrevValue: any = keyBy(prevValues, "value");
+      if (
+        prevValues?.length !== valuesData?.length &&
+        (
+          valuesData?.filter(
+            (valueData: any) => keyedPrevValue[valueData?.value]
+          ) || []
+        )?.length === prevValues?.length &&
+        valuesData?.length > 0
+      ) {
+        this.dataValues[parameter?.uuid] = {
+          ...dataObject,
+          allocation: allocation,
+          parent: allocation?.order?.concept,
+          sample: allocation?.sample,
+          order: allocation?.order,
+        };
+      } else {
+        this.dataValues = omit(this.dataValues, parameter?.uuid);
+      }
+    } else if (
+      !dataObject?.multipleResults &&
+      ((dataObject?.value &&
+        (!dataObject?.previousValue ||
+          dataObject?.previousValue?.length === 0)) ||
+        (dataObject?.value &&
+          dataObject?.value?.length > 0 &&
+          dataObject?.previousValue &&
+          dataObject?.value != dataObject?.previousValue))
     ) {
       this.dataValues[parameter?.uuid] = {
         ...dataObject,
@@ -629,6 +670,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         order: allocation?.order,
       };
     } else if (
+      !dataObject?.multipleResults &&
       dataObject?.value &&
       dataObject?.previousValue &&
       dataObject?.value == dataObject?.previousValue
@@ -715,43 +757,45 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
 
   getFedResults(results: any, order: any): void {
     this.relatedResults = [];
-    // console.log("results", results);
     Object.keys(results)?.forEach((key) => {
-      // console.log(results[key]);
-      // if (results[key]?.multipleResults) {
-      //   console.log(results[key]);
-      // }
       if (
-        results[key]?.value &&
-        results[key]?.value?.length > 0 &&
-        results[key]?.value != results[key]?.previousValue
+        results[key]?.multipleResults &&
+        !isEqual(
+          orderBy(results[key]?.value, ["value"], ["asc"])?.map(
+            (dataValue) => dataValue?.value
+          ) || [],
+          orderBy(
+            results[key]?.previousValue?.map((val) => {
+              return {
+                val,
+              };
+            }),
+            ["val"],
+            ["asc"]
+          )?.map((dataValue) => dataValue?.val) || []
+        )
       ) {
-        if (
-          results[key]?.multipleResults &&
-          !isEqual(
-            orderBy(results[key]?.value, ["value"], ["asc"])?.map(
-              (dataValue) => dataValue?.value
-            ) || [],
-            orderBy(
-              results[key]?.previousValue?.map((val) => {
-                return {
-                  val,
-                };
-              }),
-              ["val"],
-              ["asc"]
-            )?.map((dataValue) => dataValue?.val) || []
-          )
-        ) {
-          // console.log("kkdkd", results[key]);
-          this.multipleResults = [
-            ...(this.multipleResults?.filter(
-              (result) =>
-                result?.allocation?.id !== results[key]?.allocation?.id
-            ) || []),
-            results[key],
-          ];
-        } else if (!results[key]?.multipleResults) {
+        this.multipleResults = [
+          ...(this.multipleResults?.filter(
+            (result) => result?.allocation?.id !== results[key]?.allocation?.id
+          ) || []),
+          results[key],
+        ];
+      } else if (!results[key]?.multipleResults) {
+        const changed: boolean =
+          results[key]?.value &&
+          results[key]?.previousValue?.length > 0 &&
+          (
+            results[key]?.previousValue?.filter(
+              (prevValue: any) => prevValue === results[key]?.value
+            ) || []
+          )?.length > 0
+            ? false
+            : results[key]?.previousValue?.length === 0 && !results[key]?.value
+            ? false
+            : true;
+
+        if (changed) {
           this.relatedResults = [
             ...this.relatedResults,
             {

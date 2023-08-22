@@ -217,6 +217,14 @@ export class FieldComponent implements AfterViewInit {
     );
   }
 
+  onClearValue(event: any, field: any): void {
+    event.stopPropagation();
+    let objectToUpdate: any = {};
+    objectToUpdate[field?.key] = null;
+    this.form.patchValue(objectToUpdate);
+    this.fieldUpdate.emit(this.form);
+  }
+
   searchItemFromOptions(event: any, field: any): void {
     const searchingText = event.target.value;
     this.members$ = of(
@@ -227,8 +235,6 @@ export class FieldComponent implements AfterViewInit {
       ) || []
     );
     let objectToUpdate: any = {};
-    // console.log("searchingText", searchingText);
-    // console.log("LEN", searchingText?.length);
     if (!searchingText || searchingText?.length === 0) {
       objectToUpdate[field?.key] = null;
       this.form.patchValue(objectToUpdate);
