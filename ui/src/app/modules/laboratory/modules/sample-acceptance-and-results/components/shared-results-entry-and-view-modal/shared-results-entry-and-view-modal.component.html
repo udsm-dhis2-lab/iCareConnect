@@ -243,6 +243,20 @@
                               !order?.authorizationIsReady ? "Save" : "Amend"
                             }}
                           </button>
+                          <button
+                            *ngIf="
+                              data?.actionType == 'authorization' &&
+                              order?.authorizationIsReady
+                            "
+                            [disabled]="!isFormValid"
+                            mat-flat-button
+                            color="primary"
+                            (click)="
+                              onSave($event, order, order?.authorizationIsReady)
+                            "
+                          >
+                            Amend
+                          </button>
                         </div>
                         <div
                           class="mt-4 d-flex justify-content-end"
@@ -429,6 +443,21 @@
                           >
                             Save
                           </button>
+                          <button
+                            *ngIf="
+                              data?.actionType === 'authorization' &&
+                              order?.authorizationIsReady
+                            "
+                            [disabled]="
+                              relatedResults?.length == 0 &&
+                              multipleResults?.length === 0
+                            "
+                            mat-flat-button
+                            color="primary"
+                            (click)="onSaveRelatedResults($event, order)"
+                          >
+                            Amend
+                          </button>
                         </div>
                         <div
                           class="mt-4 d-flex justify-content-end"
@@ -469,6 +498,22 @@
                           >
                             {{ !shouldConfirm ? "Authorise" : "Confirm" }}
                           </button>
+                        </div>
+                        <div
+                          *ngIf="
+                            data?.actionType === 'authorization' &&
+                            data?.LISConfigurations?.isLIS &&
+                            order?.finalResultsFedBy?.uuid ===
+                              data?.currentUser?.uuid &&
+                            (
+                              order?.authorizationStatuses
+                              | filterAuthorizationStatuses: ''
+                            )?.length === 0
+                          "
+                          class="alert alert-warning mt-2"
+                          role="alert"
+                        >
+                          You can not authorise results processed by you
                         </div>
                         <div class="mt-2">
                           <p

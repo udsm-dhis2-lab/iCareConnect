@@ -52,12 +52,14 @@ export class FieldComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     if (typeof this.field?.value === "object") {
-      this.value = (this.field?.value as any[])?.map((val) => {
-        return {
-          ...val,
-          value: val?.value ? val?.value : val?.uuid,
-        };
-      });
+      this.value = this.field?.value
+        ? (this.field?.value as any[])?.map((val) => {
+            return {
+              ...val,
+              value: val?.value ? val?.value : val?.uuid,
+            };
+          })
+        : null;
     }
     if (
       this.field?.searchTerm ||
