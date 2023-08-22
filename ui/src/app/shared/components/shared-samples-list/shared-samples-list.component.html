@@ -208,8 +208,8 @@
             Gender
           </th>
           <th colspan="2" class="text-center">Test details</th>
-          <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
-          <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th>
+          <!-- <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received By</th>
+          <th rowspan="2" *ngIf="LISConfigurations?.isLIS">Received On</th> -->
           <th rowspan="2" *ngIf="LISConfigurations?.isLIS">
             {{ !LISConfigurations?.isLIS ? "Collected By" : "Registered By" }}
           </th>
@@ -327,7 +327,7 @@
                     : order?.order?.orderNumber
                 }}
               </td>
-              <td
+              <!-- <td
                 *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
                 [attr.rowspan]="sample?.orders?.length"
               >
@@ -342,7 +342,7 @@
                     ? (sample?.receivedOnStatus?.remarks | date: "medium")
                     : ""
                 }}
-              </td>
+              </td> -->
               <td
                 *ngIf="orderCount == 0 && LISConfigurations?.isLIS"
                 [attr.rowspan]="sample?.orders?.length"

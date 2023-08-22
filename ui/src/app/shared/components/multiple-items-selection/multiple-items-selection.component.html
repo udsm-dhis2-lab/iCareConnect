@@ -73,9 +73,16 @@
   <div style="width: 2%"></div>
   <div class="custom-selection">
     <div class="h6 text-left multiple-selection-header">Selected</div>
-    <ul class="concept-list ul-listed-items" *ngIf="items$ | async as items">
+    <ul
+      cdkDropList
+      [cdkDropListData]="currentSelectedItems"
+      (cdkDropListDropped)="drop($event)"
+      class="concept-list ul-listed-items"
+      *ngIf="items$ | async as items"
+    >
       <li
-        class="item-in-list selected-list"
+        cdkDrag
+        class="item-in-list selected-list list-item-dragged-box"
         (click)="removeSelectedItem($event, item, items, itemType)"
         *ngFor="let item of currentSelectedItems"
         [ngClass]="{ retired: item?.retired }"

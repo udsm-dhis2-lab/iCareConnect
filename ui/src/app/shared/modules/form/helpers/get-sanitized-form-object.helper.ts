@@ -41,7 +41,6 @@ export function getSanitizedFormObject(
     mappings,
     units,
   } = concept;
-  // console.log("mappings", mappings);
   // console.log(conceptSourceUuid);
   const formObject = {
     id: uuid,
@@ -54,10 +53,20 @@ export function getSanitizedFormObject(
             mappings?.filter(
               (mapping: any) =>
                 mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
-                conceptSourceUuid
+                  conceptSourceUuid &&
+                mapping?.conceptReferenceTerm == "TEXTAREA"
             ) || []
           )?.length > 0
         ? "Textarea"
+        : (
+            mappings?.filter(
+              (mapping: any) =>
+                mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
+                  conceptSourceUuid &&
+                mapping?.conceptReferenceTerm?.code == "USER"
+            ) || []
+          )?.length > 0
+        ? "Coded"
         : datatype?.display,
     formClass: conceptClass?.display,
     concept: concept,
@@ -67,8 +76,27 @@ export function getSanitizedFormObject(
     minOccurs: fieldsInfo?.minOccurs,
     maxOccurs: fieldsInfo?.fieldPart,
     required: fieldsInfo?.required,
-    searchControlType: "concept",
-    shouldHaveLiveSearchForDropDownFields: isDiagnosis ? true : false,
+    searchControlType:
+      (
+        mappings?.filter(
+          (mapping: any) =>
+            mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
+              conceptSourceUuid && mapping?.conceptReferenceTerm?.code == "USER"
+        ) || []
+      )?.length > 0
+        ? "person"
+        : "concept",
+    shouldHaveLiveSearchForDropDownFields:
+      isDiagnosis ||
+      (
+        mappings?.filter(
+          (mapping: any) =>
+            mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
+              conceptSourceUuid && mapping?.conceptReferenceTerm?.code == "USER"
+        ) || []
+      )?.length > 0
+        ? true
+        : false,
     conceptClass: conceptClass?.display,
     captureData: setMembers?.length == 0 ? true : false,
     options: getFormFieldOptions(answers),
@@ -83,6 +111,8 @@ export function getSanitizedFormObject(
     mappings: mappings,
     units: units,
   };
+
+  // console.log("formObject", formObject);
 
   const formField = getFormField(formObject, isDiagnosis, conceptSourceUuid);
   const formFields = getFormFields(formObject, isDiagnosis, conceptSourceUuid);
@@ -155,10 +185,15 @@ function getFormField(
         key: formObject.uuid,
         label: formObject.name,
         required: formObject?.required,
-        searchControlType: "concept",
+        searchControlType: formObject?.searchControlType
+          ? formObject?.searchControlType
+          : "concept",
         conceptClass: formObject?.concept?.conceptClass?.display,
         id: formObject.id,
-        shouldHaveLiveSearchForDropDownFields: isDiagnosis ? true : false,
+        shouldHaveLiveSearchForDropDownFields:
+          formObject?.shouldHaveLiveSearchForDropDownFields || isDiagnosis
+            ? true
+            : false,
         isDiagnosis,
         options: formObject.options,
       });

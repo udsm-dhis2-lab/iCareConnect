@@ -416,7 +416,7 @@ public class LaboratoryController {
 			 for(Sample sample: samplesResponse) {
 				 if (sample.getSampleOrders().size() > 0) {
 					 for (SampleOrder order: sample.getSampleOrders()) {
-						 if (order.getTestAllocations().size() > 0) {
+						 if (order.getTestAllocations().size() > 0 && order.getOrder().getVoided() == false) {
 							 for (TestAllocation allocation: order.getTestAllocations()) {
 
 								 //Getting concept sets for parameter headers

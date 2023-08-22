@@ -9,23 +9,26 @@ import { SampleAllocation } from "src/app/shared/resources/sample-allocations/mo
 export class SharedSampleOrderResultsComponent implements OnInit {
   @Input() ordersWithResults: any;
   @Input() testRelationshipConceptSourceUuid: string;
+  allTestAllocations: any[] = [];
   constructor() {}
 
   ngOnInit(): void {
     this.ordersWithResults = this.ordersWithResults?.map((orderWithResult) => {
+      const allAllocations = (
+        orderWithResult?.testAllocations?.filter(
+          (testAllocation) => testAllocation?.results?.length > 0
+        ) || []
+      )?.map((testAllocation) => {
+        return new SampleAllocation({
+          ...testAllocation,
+          testRelationshipConceptSourceUuid:
+            this.testRelationshipConceptSourceUuid,
+        }).toJson();
+      });
+      this.allTestAllocations = [...this.allTestAllocations, ...allAllocations];
       return {
         ...orderWithResult,
-        testAllocations: (
-          orderWithResult?.testAllocations?.filter(
-            (testAllocation) => testAllocation?.results?.length > 0
-          ) || []
-        )?.map((testAllocation) => {
-          return new SampleAllocation({
-            ...testAllocation,
-            testRelationshipConceptSourceUuid:
-              this.testRelationshipConceptSourceUuid,
-          }).toJson();
-        }),
+        testAllocations: allAllocations,
       };
     });
     // console.log("orderWithResults", this.ordersWithResults);

@@ -65,6 +65,7 @@ export class FormService {
     filteringItems?,
     field?
   ): Observable<any[]> {
+    // console.log("searchControlType", searchControlType);
     if (parameters?.class === "Diagnosis") {
       return from(this.api.concept.getAllConcepts(parameters)).pipe(
         map((response) => {
@@ -462,7 +463,7 @@ export class FormService {
      * TODO:Dynamicall construct the fields
      */
     const fields =
-      "?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,mappings:(uuid,conceptReferenceTerm:(uuid,display,conceptSource:(uuid))),hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,mappings:(uuid,conceptReferenceTerm:(uuid,display,conceptSource:(uuid))),hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,mappings:(uuid,conceptReferenceTerm:(uuid,display,conceptSource:(uuid))),conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))";
+      "?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,mappings:(uuid,conceptReferenceTerm:(uuid,display,code,conceptSource:(uuid))),hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,mappings:(uuid,conceptReferenceTerm:(uuid,display,code,conceptSource:(uuid))),hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,mappings:(uuid,conceptReferenceTerm:(uuid,display,code,conceptSource:(uuid))),conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))";
     return zip(
       this.httpClient.get("form/" + uuid + fields),
       this.systemSettingsService.getSystemSettingsByKey(
