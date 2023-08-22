@@ -59,7 +59,6 @@ export class FormComponent implements OnInit {
       this.fieldsData
     );
     this.values = this.form.getRawValue();
-    // console.log("values", this.values);
     // console.log("formValidationRules", this.formValidationRules);
     this.validationIssues = validateFormFields(
       this.formValidationRules,
@@ -75,20 +74,19 @@ export class FormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.formUpdate.emit(this.form.getRawValue());
+    // this.formUpdate.emit(this.form.getRawValue());
   }
 
   onFieldUpdate(form: FormGroup): void {
     if (!this.showSaveButton && form) {
-      this.formUpdate.emit(
-        new FormValue(this.form, this.fields, null, this.formId)
-      );
-
       this.values = form.getRawValue();
 
       this.validationIssues = validateFormFields(
         this.formValidationRules,
         this.values
+      );
+      this.formUpdate.emit(
+        new FormValue(this.form, this.fields, null, this.formId)
       );
     }
   }
