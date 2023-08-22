@@ -474,7 +474,7 @@
             </div>
             <mat-progress-bar
               mode="indeterminate"
-              *ngIf="sampleParams?.dataToPrint"
+              *ngIf="!sampleParams?.dataToPrint"
             ></mat-progress-bar>
             <app-print-results-page
               *ngIf="

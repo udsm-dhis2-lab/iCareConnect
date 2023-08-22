@@ -203,9 +203,7 @@ export class SampleAllocation {
             ) || [],
           authorizationStatuses: (
             this.allocation?.statuses?.filter(
-              (status) =>
-                status?.category === "RESULT_AUTHORIZATION" &&
-                status?.result?.uuid === finalResult?.uuid
+              (status) => status?.category === "RESULT_AUTHORIZATION"
             ) || []
           )?.map((authStatus) => {
             return {
@@ -226,10 +224,7 @@ export class SampleAllocation {
                   this.allocation?.statuses?.filter(
                     (status) =>
                       status?.category === "RESULT_AUTHORIZATION" &&
-                      status?.status == "AUTHORIZED" &&
-                      status?.result?.uuid ===
-                        orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
-                          ?.uuid
+                      status?.status == "AUTHORIZED"
                   ) || []
                 )?.length;
               return {
@@ -241,11 +236,7 @@ export class SampleAllocation {
                 ),
                 authorizationStatuses: (
                   this.allocation?.statuses?.filter(
-                    (status) =>
-                      status?.category === "RESULT_AUTHORIZATION" &&
-                      status?.result?.uuid ===
-                        orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
-                          ?.uuid
+                    (status) => status?.category === "RESULT_AUTHORIZATION"
                   ) || []
                 )?.map((authStatus) => {
                   return {
@@ -268,9 +259,7 @@ export class SampleAllocation {
             ) || [],
           authorizationStatuses: (
             this.allocation?.statuses?.filter(
-              (status) =>
-                status?.category === "RESULT_AUTHORIZATION" &&
-                status?.result?.uuid === finalResult?.uuid
+              (status) => status?.category === "RESULT_AUTHORIZATION"
             ) || []
           )?.map((authStatus) => {
             return {
@@ -293,9 +282,7 @@ export class SampleAllocation {
             ) || [],
           authorizationStatuses: (
             this.allocation?.statuses?.filter(
-              (status) =>
-                status?.category === "RESULT_AUTHORIZATION" &&
-                status?.result?.uuid === finalResult?.uuid
+              (status) => status?.category === "RESULT_AUTHORIZATION"
             ) || []
           )?.map((authStatus) => {
             return {
