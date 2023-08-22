@@ -217,7 +217,7 @@ export class FieldComponent implements AfterViewInit {
     );
   }
 
-  searchItemFromOptions(event, field): void {
+  searchItemFromOptions(event: any, field: any): void {
     const searchingText = event.target.value;
     this.members$ = of(
       field?.options?.filter(
@@ -226,6 +226,12 @@ export class FieldComponent implements AfterViewInit {
           -1
       ) || []
     );
+    let objectToUpdate: any = {};
+    if (!searchingText || searchingText?.length === 0) {
+      objectToUpdate[field?.key] = null;
+      this.form.patchValue(objectToUpdate);
+      this.fieldUpdate.emit(this.form);
+    }
   }
 
   getSelectedItemFromOption(event: Event, item: any, field: any): void {
