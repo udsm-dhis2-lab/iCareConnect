@@ -436,7 +436,7 @@ public class ICareController {
 			conceptMap.put("retired", conceptItem.getRetired().booleanValue());
 			conceptMap.put("retiredOn", conceptItem.getDateRetired());
 			conceptMap.put("retiredReason", conceptItem.getRetireReason());
-			conceptMap.put("billableItem", iCareService.getItemPricesByConceptId(conceptItem.getConceptId()) != null? true : false);
+			conceptMap.put("billableItem", iCareService.getItemPricesByConceptId(conceptItem.getConceptId()).size() > 0 ? true : false);
 
 //			Creator
 			Map<String, Object> creator = new HashMap<>();
