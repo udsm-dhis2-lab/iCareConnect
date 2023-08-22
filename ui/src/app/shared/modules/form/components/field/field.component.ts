@@ -227,6 +227,8 @@ export class FieldComponent implements AfterViewInit {
       ) || []
     );
     let objectToUpdate: any = {};
+    // console.log("searchingText", searchingText);
+    // console.log("LEN", searchingText?.length);
     if (!searchingText || searchingText?.length === 0) {
       objectToUpdate[field?.key] = null;
       this.form.patchValue(objectToUpdate);
