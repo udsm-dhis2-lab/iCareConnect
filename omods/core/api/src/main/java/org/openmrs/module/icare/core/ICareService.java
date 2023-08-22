@@ -70,6 +70,8 @@ public interface ICareService extends OpenmrsService {
 	
 	ItemPrice getItemPrice(Visit visit, Drug drug) throws ItemNotPayableException, ConfigurationException;
 	
+	List<ItemPrice> getItemPricesByConceptId(Integer Id);
+	
 	List<ItemPrice> getItemPrices();
 	
 	List<ItemPrice> getItemPrices(String paymentType, Integer limit, Integer startIndex);
@@ -163,6 +165,6 @@ public interface ICareService extends OpenmrsService {
 	void updatePasswordHistory() throws Exception;
 	
 	PasswordHistory savePasswordHistory(User user, String newPassword) throws Exception;
-
-    List<PasswordHistory> getUserPasswordHistory(String uuid);
+	
+	List<PasswordHistory> getUserPasswordHistory(String uuid);
 }

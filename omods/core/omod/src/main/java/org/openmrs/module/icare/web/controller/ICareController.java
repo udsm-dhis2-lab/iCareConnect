@@ -436,6 +436,8 @@ public class ICareController {
 			conceptMap.put("retired", conceptItem.getRetired().booleanValue());
 			conceptMap.put("retiredOn", conceptItem.getDateRetired());
 			conceptMap.put("retiredReason", conceptItem.getRetireReason());
+			conceptMap.put("billableItem", iCareService.getItemPricesByConceptId(conceptItem.getConceptId()) != null? true : false);
+
 //			Creator
 			Map<String, Object> creator = new HashMap<>();
 			creator.put("uuid", conceptItem.getCreator().getUuid());
@@ -951,7 +953,7 @@ public class ICareController {
 		return auditLogMapList;
 
 	}
-
+	
 	@RequestMapping(value="passwordhistory/{uuid}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String,Object>> getUserPasswordHistory(@PathVariable("uuid") String uuid){
