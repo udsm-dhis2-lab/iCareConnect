@@ -1092,7 +1092,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			for (Sample sample : batchSample.getSamples()) {
 				List<WorksheetSample> worksheetSamples = this.worksheetSampleDAO
 				        .getWorksheetSampleBySample(sample.getUuid());
-				if (worksheetSamples.get(0) != null) {
+				if (worksheetSamples.size() > 0) {
 					sample.setWorksheetSample(worksheetSamples.get(0));
 				}
 			}
