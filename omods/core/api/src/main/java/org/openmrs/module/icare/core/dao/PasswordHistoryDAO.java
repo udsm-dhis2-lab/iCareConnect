@@ -15,14 +15,14 @@ public class PasswordHistoryDAO extends BaseDAO<PasswordHistory> {
 		Query query = session.createQuery(queryStr);
 		return query.list();
 	}
-
-    public List<PasswordHistory> getUsersPasswordHistory(String uuid) {
+	
+	public List<PasswordHistory> getUsersPasswordHistory(String uuid) {
 		DbSession session = this.getSession();
 		String queryStr = " SELECT ph FROM PasswordHistory ph WHERE ph.user.uuid = :uuid";
-
+		
 		Query query = session.createQuery(queryStr);
-		query.setParameter("uuid",uuid);
-
+		query.setParameter("uuid", uuid);
+		
 		return query.list();
-    }
+	}
 }
