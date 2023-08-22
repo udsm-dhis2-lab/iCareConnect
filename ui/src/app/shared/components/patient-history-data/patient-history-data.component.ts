@@ -322,10 +322,11 @@ export class PatientHistoryDataComponent implements OnInit {
                 font-size: .7em;
               }
               .footer {
-                margin-top:50px
+                margin-top:70px
                 right: 0px;
                 text-align: left;
-                float: right
+                float: right;
+                padding-right:40px;
               }
               .footer .userDetails .signature {
                 margin-top: 20px;
@@ -604,7 +605,7 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
       if (visitData?.category === "PROCEDURE_ORDER") {
         frameDoc.document.write(`
 <tr><td>
-      ${visitData?.order?.display}
+      ${visitData?.concept?.display}
       </td>
       <td>  ${visitData?.provider} on 
       ${visitData?.date} ${visitData?.time}
@@ -668,7 +669,7 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
         if (visitData?.results?.length > 0) {
           frameDoc.document.write(`<td>`);
 
-          visitData?.results?.forEach((result) => {
+          visitData?.obs?.forEach((result) => {
             frameDoc.document.write(` ${result?.concept?.display} - 
             ${
               result?.value?.display ? result?.value?.display : result?.value

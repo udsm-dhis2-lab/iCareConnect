@@ -13,6 +13,8 @@ export interface ICAREForm {
   formFields?: Field<string>[];
   groupedFields?: any;
   unGroupedFields?: any;
+  searchControlType?: string;
+  shouldHaveLiveSearchForDropDownFields?: Boolean;
   concept?: any;
   isForm?: boolean;
   required?: boolean;

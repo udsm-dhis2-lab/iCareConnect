@@ -20,31 +20,35 @@
     <div class="col-md-8">
       <div class="d-flex">
         <div class="w-50">
-          <p>FileNO: {{ params?.sampleDetails?.mrn }}</p>
+          <p>
+            FileNO:
+            <b>
+              {{ params?.sampleDetails?.mrn }}
+            </b>
+          </p>
           <p>
             Names:
-            {{ sample?.patient?.givenName + " " + sample?.patient?.familyName }}
+            <b>
+              {{
+                sample?.patient?.givenName + " " + sample?.patient?.familyName
+              }}
+            </b>
           </p>
           <p>
-            <span> Gender:{{ sample?.patient?.gender }} </span>
-            <span class="ml-2">
-              Age: {{ sample?.patient?.age }}
-              <span class="text-muted">
-                ({{ sample?.patient?.dob | date }})
-              </span>
+            <span>
+              Gender:<b>
+                {{ sample?.patient?.gender }}
+              </b>
             </span>
-          </p>
-          <p *ngIf="params.sampleConditions?.TRANSPORT_CONDITION">
-            <span
-              >Transport Condition:
-              {{ params.sampleConditions?.TRANSPORT_CONDITION }}</span
-            >
-          </p>
-          <p *ngIf="params.sampleConditions?.TRANSPORT_TEMPERATURE">
-            <span
-              >Transportation Temperature:
-              {{ params.sampleConditions?.TRANSPORT_TEMPERATURE }}</span
-            >
+            <span class="ml-2">
+              Age:
+              <b>
+                {{ sample?.patient?.age }} years
+                <span class="text-muted">
+                  ({{ sample?.patient?.dob | date }})
+                </span>
+              </b>
+            </span>
           </p>
         </div>
         <div class="w-50">

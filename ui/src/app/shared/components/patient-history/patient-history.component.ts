@@ -12,6 +12,11 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { getParentLocation } from "src/app/store/selectors";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
+import {
+  PersonGetRef,
+  PrivilegeGetRef,
+  RoleGetRef,
+} from "../../resources/openmrs";
 
 @Component({
   selector: "app-patient-history",
@@ -39,9 +44,9 @@ export class PatientHistoryComponent implements OnInit {
     username?: string;
     systemId?: string;
     userProperties?: object;
-    person?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").PersonGetRef;
-    privileges?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").PrivilegeGetRef[];
-    roles?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").RoleGetRef[];
+    // person?: PersonGetRef;
+    // privileges?: PrivilegeGetRef[];
+    // roles?: RoleGetRef[];
     provider?: { uuid?: string; display?: string };
   }>;
   constructor(

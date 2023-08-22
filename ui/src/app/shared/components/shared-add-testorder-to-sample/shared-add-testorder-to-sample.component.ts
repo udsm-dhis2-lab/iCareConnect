@@ -119,7 +119,9 @@ export class SharedAddTestorderToSampleComponent implements OnInit {
       encounterProviders: [
         {
           provider: this.provider?.uuid,
-          encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
+          encounterRole: {
+            uuid: ICARE_CONFIG?.encounterRole?.uuid,
+          },
         },
       ],
       orders: this.valuesToSave?.map((value) => {
