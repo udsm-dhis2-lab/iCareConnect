@@ -90,10 +90,28 @@
         [matAutocomplete]="auto"
       />
       <span
-        style="position: relative; float: right; margin-top: -30px"
+        style="
+          position: relative;
+          float: right;
+          margin-top: -30px;
+          margin-right: 16px;
+        "
         *ngIf="field?.options?.length > 0"
       >
         <mat-icon>arrow_drop_down</mat-icon>
+      </span>
+      <span
+        *ngIf="field?.value && field?.options?.length > 0"
+        style="
+          position: relative;
+          float: right;
+          margin-top: -30px;
+          font-size: 0.7rem;
+        "
+      >
+        <mat-icon class="text-muted" (click)="onClearValue($event, field)"
+          >clear</mat-icon
+        >
       </span>
 
       <mat-autocomplete

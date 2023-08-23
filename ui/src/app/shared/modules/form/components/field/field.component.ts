@@ -52,12 +52,14 @@ export class FieldComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     if (typeof this.field?.value === "object") {
-      this.value = (this.field?.value as any[])?.map((val) => {
-        return {
-          ...val,
-          value: val?.value ? val?.value : val?.uuid,
-        };
-      });
+      this.value = this.field?.value
+        ? (this.field?.value as any[])?.map((val) => {
+            return {
+              ...val,
+              value: val?.value ? val?.value : val?.uuid,
+            };
+          })
+        : null;
     }
     if (
       this.field?.searchTerm ||
@@ -215,7 +217,15 @@ export class FieldComponent implements AfterViewInit {
     );
   }
 
-  searchItemFromOptions(event, field): void {
+  onClearValue(event: any, field: any): void {
+    event.stopPropagation();
+    let objectToUpdate: any = {};
+    objectToUpdate[field?.key] = null;
+    this.form.patchValue(objectToUpdate);
+    this.fieldUpdate.emit(this.form);
+  }
+
+  searchItemFromOptions(event: any, field: any): void {
     const searchingText = event.target.value;
     this.members$ = of(
       field?.options?.filter(
@@ -224,6 +234,12 @@ export class FieldComponent implements AfterViewInit {
           -1
       ) || []
     );
+    let objectToUpdate: any = {};
+    if (!searchingText || searchingText?.length === 0) {
+      objectToUpdate[field?.key] = null;
+      this.form.patchValue(objectToUpdate);
+      this.fieldUpdate.emit(this.form);
+    }
   }
 
   getSelectedItemFromOption(event: Event, item: any, field: any): void {

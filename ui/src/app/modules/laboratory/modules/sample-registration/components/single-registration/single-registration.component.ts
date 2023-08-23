@@ -789,7 +789,9 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                     this.personEmailAttributeTypeUuid,
                                   value: this.personDetailsData?.email,
                                 },
-                              ],
+                              ]?.filter(
+                                (personAttribute: any) => personAttribute?.value
+                              ),
                             },
                             identifiers:
                               this.registrationCategory?.refKey !==
