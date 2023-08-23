@@ -70,6 +70,8 @@ public interface ICareService extends OpenmrsService {
 	
 	ItemPrice getItemPrice(Visit visit, Drug drug) throws ItemNotPayableException, ConfigurationException;
 	
+	List<ItemPrice> getItemPricesByConceptId(Integer Id);
+	
 	List<ItemPrice> getItemPrices();
 	
 	List<ItemPrice> getItemPrices(String paymentType, Integer limit, Integer startIndex);
