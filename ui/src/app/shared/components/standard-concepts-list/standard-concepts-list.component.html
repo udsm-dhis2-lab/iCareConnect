@@ -97,6 +97,15 @@
                     <mat-icon>done</mat-icon>
                     <span>Enable</span>
                   </button>
+
+                  <button
+                    [disabled]="concept?.billableItem"
+                    mat-menu-item
+                    (click)="onSetBillable($event, concept)"
+                  >
+                    <mat-icon>local_atm</mat-icon>
+                    <span>Set Billable</span>
+                  </button>
                 </mat-menu>
               </td>
             </tr>

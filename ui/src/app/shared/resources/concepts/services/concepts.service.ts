@@ -15,6 +15,7 @@ import { flatten, omit } from "lodash";
   providedIn: "root",
 })
 export class ConceptsService {
+  
   constructor(private api: Api, private httpClient: OpenmrsHttpClientService) {}
 
   getConceptDetails(name: string, fields: string): Observable<any> {
@@ -497,6 +498,10 @@ export class ConceptsService {
           return of(error);
         })
       );
+  }
+
+  createBillable(uuid: any) {
+    throw new Error("Method not implemented.");
   }
 
   getConceptSetsByConceptUuids(uuids: string[]): Observable<ConceptGetFull[]> {
