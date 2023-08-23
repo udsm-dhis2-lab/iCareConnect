@@ -64,6 +64,7 @@ export class RelatedTestParametersEntryComponent implements OnInit {
       data?.parameter?.uuid + (relatedResult ? ":" + relatedResult?.uuid : "")
     ] = {
       ...data,
+      previousValue: data?.previousValue?.filter((prevValue: any) => prevValue),
       relatedResult,
       allocation,
     };

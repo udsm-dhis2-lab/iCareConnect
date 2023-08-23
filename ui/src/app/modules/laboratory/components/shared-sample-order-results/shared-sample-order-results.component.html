@@ -3,7 +3,12 @@
   data-pdfmake="{'widths':[200,157,38,37,37]}"
 >
   <tbody style="width: 100%">
-    <ng-container *ngFor="let orderWithResults of ordersWithResults">
+    <ng-container
+      *ngFor="
+        let orderWithResults of ordersWithResults;
+        let ordersCount = index
+      "
+    >
       <ng-container
         *ngIf="
           (orderWithResults?.testAllocations | groupParametersByHeaders)
@@ -17,7 +22,7 @@
             let count = index
           "
         >
-          <tr *ngIf="count === 0">
+          <tr *ngIf="count === 0 && ordersCount === 0">
             <td style="text-align: left; width: 50%"></td>
             <td style="text-align: left; width: 20%">Results</td>
             <td style="text-align: left; width: 10%">SI Units</td>
@@ -197,7 +202,7 @@
             ?.length > 0
         "
       >
-        <tr>
+        <tr *ngIf="ordersCount === 0">
           <td style="text-align: left; width: 50%"></td>
           <td style="text-align: left; width: 20%">Results</td>
           <td style="text-align: left; width: 10%">SI Units</td>
@@ -257,6 +262,18 @@
             </td>
           </tr>
         </ng-container>
+      </ng-container>
+
+      <ng-container>
+        <tr>
+          <td colspan="5">
+            <div style="text-align: left" class="mt-2">
+              <app-shared-sample-result-entry-and-authorization
+                [orderWithResults]="orderWithResults"
+              ></app-shared-sample-result-entry-and-authorization>
+            </div>
+          </td>
+        </tr>
       </ng-container>
     </ng-container>
   </tbody>
