@@ -38,7 +38,7 @@ import { PrintResultsModalComponent } from "../print-results-modal/print-results
 import { RejectionReasonComponent } from "../rejection-reason/rejection-reason.component";
 import { SharedResultsEntryAndViewModalComponent } from "../shared-results-entry-and-view-modal/shared-results-entry-and-view-modal.component";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { flatten, groupBy } from "lodash";
+import { groupBy } from "lodash";
 import { LabSample } from "src/app/modules/laboratory/resources/models";
 
 @Component({
@@ -525,6 +525,7 @@ export class SampleAcceptanceComponent implements OnInit {
           actionType: "review",
         },
         width: "100%",
+        maxHeight: "90vh",
         disableClose: false,
         panelClass: "custom-dialog-container",
       })
@@ -551,6 +552,7 @@ export class SampleAcceptanceComponent implements OnInit {
           actionType,
         },
         width: "100%",
+        maxHeight: "90vh",
         disableClose: false,
         panelClass: "custom-dialog-container",
       })
@@ -621,6 +623,7 @@ export class SampleAcceptanceComponent implements OnInit {
         actionType: "review",
       },
       width: "100%",
+      maxHeight: "90vh",
       disableClose: false,
       panelClass: "custom-dialog-container",
     });
