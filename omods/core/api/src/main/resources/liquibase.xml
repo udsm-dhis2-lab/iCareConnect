@@ -5295,5 +5295,13 @@
                 referencedTableName="users" referencedColumnNames="user_id" />
     </changeSet>
 
+    <changeSet id="update_lb_test_result_add_column_tested_by" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_test_result
+            ADD COLUMN tested_by INT NULL AFTER creator,
+            ADD FOREIGN KEY(tested_by) REFERENCES users(user_id);
+        </sql>
+    </changeSet>
+
 
 </databaseChangeLog>
