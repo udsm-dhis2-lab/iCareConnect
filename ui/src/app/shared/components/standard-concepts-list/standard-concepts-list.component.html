@@ -99,6 +99,7 @@
                   </button>
 
                   <button
+                    *ngIf="standardSearchTerm === 'TEST_ORDERS'"
                     [disabled]="concept?.billableItem"
                     mat-menu-item
                     (click)="onSetBillable($event, concept)"
