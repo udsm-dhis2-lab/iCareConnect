@@ -880,6 +880,17 @@ public class ICareDao extends BaseDAO<Item> {
 		return idLabels;
 
 	}
+	
+	public List<ItemPrice> getItemPricesByConceptId(Integer Id) {
+		DbSession session = getSession();
+		
+		String queryStr = " SELECT ip FROM ItemPrice ip WHERE ip.id.item IN ( SELECT it FROM Item it WHERE it.concept.conceptId = :Id)";
+		Query query = session.createQuery(queryStr);
+		query.setParameter("Id", Id);
+		return query.list();
+		
+	}
+	
 	//	public String voidOrder(String uuid, String voidReason) {
 	//		DbSession session = getSession();
 	//		new Order();

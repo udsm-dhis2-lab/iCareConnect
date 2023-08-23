@@ -167,6 +167,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
+	public List<ItemPrice> getItemPricesByConceptId(Integer Id) {
+		return dao.getItemPricesByConceptId(Id);
+	}
+	
+	@Override
 	public List<ItemPrice> getItemPrices() {
 		return dao.getItemPrices();
 	}

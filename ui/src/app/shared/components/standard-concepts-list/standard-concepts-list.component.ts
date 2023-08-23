@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { Observable } from "rxjs";
+import { Observable, zip } from "rxjs";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { SharedConfirmationDialogComponent } from "../shared-confirmation-dialog/shared-confirmation-dialog.component";
+import { BillableItemsService } from "../../resources/billable-items/services/billable-items.service";
 
 @Component({
   selector: "app-standard-concepts-list",
@@ -27,6 +28,7 @@ export class StandardConceptsListComponent implements OnInit {
     new EventEmitter<ConceptGetFull>();
   constructor(
     private conceptService: ConceptsService,
+    private billableItemService : BillableItemsService,
     private dialog: MatDialog
   ) {}
 
@@ -60,13 +62,7 @@ export class StandardConceptsListComponent implements OnInit {
             .subscribe((response) => {
               if (response) {
                 this.saving = false;
-                this.conceptsList$ = this.conceptService.searchConcept({
-                  q: this.searchingText,
-                  pageSize: this.pageSize,
-                  conceptClass: this.conceptClass,
-                  page: this.page,
-                  searchTerm: this.standardSearchTerm,
-                });
+                this.getConceptsList();
               }
             });
         }
@@ -89,17 +85,21 @@ export class StandardConceptsListComponent implements OnInit {
             .subscribe((response) => {
               if (response) {
                 this.saving = false;
-                this.conceptsList$ = this.conceptService.searchConcept({
-                  q: this.searchingText,
-                  pageSize: this.pageSize,
-                  conceptClass: this.conceptClass,
-                  page: this.page,
-                  searchTerm: this.standardSearchTerm,
-                });
+                this.getConceptsList();
               }
             });
         }
       });
+  }
+
+  getConceptsList(): void {
+    this.conceptsList$ = this.conceptService.searchConcept({
+      q: this.searchingText,
+      pageSize: this.pageSize,
+      conceptClass: this.conceptClass,
+      page: this.page,
+      searchTerm: this.standardSearchTerm,
+    });
   }
 
   onEnable(event: Event, concept: any): void {
@@ -129,6 +129,75 @@ export class StandardConceptsListComponent implements OnInit {
             });
         }
       });
+  }
+
+  onSetBillable(event : Event, concept: any){
+    this.dialog.open(SharedConfirmationDialogComponent, {
+      minWidth: "20%",
+      data: {
+        header: `Are you sure you want to set billable <b>${concept?.display}<b>`
+      }
+    })
+    .afterClosed()
+    .subscribe((shouldConfirm)=>{
+      if(shouldConfirm){
+        
+        const billableItem = {
+          concept: { uuid: concept?.uuid },
+          unit: "default",
+        };
+        this.billableItemService
+          .createBillableItem(billableItem)
+          .subscribe((billableItemResponse) => {
+            if (billableItemResponse && !billableItemResponse?.error) {
+              // Create prices
+              const prices = [
+                {
+                  item: {
+                    uuid: billableItemResponse?.uuid,
+                  },
+                  paymentScheme: {
+                    uuid: "00000102IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                  },
+                  paymentType: {
+                    uuid: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                  },
+                  price: "0",
+                },
+                {
+                  item: {
+                    uuid: billableItemResponse?.uuid,
+                  },
+                  paymentScheme: {
+                    uuid: "5f53b4e2-da03-4139-b32c-ad6edb699943",
+                  },
+                  paymentType: {
+                    uuid: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                  },
+                  price: "0",
+                },
+              ];
+              zip(
+                ...prices.map((priceObject) => {
+                  return this.billableItemService.createPrice(
+                    priceObject
+                  );
+                })
+              ).subscribe((priceResponses) => {
+                if (priceResponses) {
+                  this.saving = false;
+                  this.getConceptsList();
+                    
+                }
+              });
+            
+            }
+          });   
+          
+                  
+        
+      }
+    });
   }
 
   searchConcept(event: KeyboardEvent): void {
