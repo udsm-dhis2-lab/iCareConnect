@@ -8082,7 +8082,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getUser: (
       uuid: string,
-      query?: { v?: "ref" | "default" | "full" | "custom" },
+      query?: { v?: "ref" | "default" | "full" | "custom" | any },
       params?: RequestParams
     ) =>
       this.request<UserGet, any>(

@@ -48,7 +48,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   selectedInstruments: any = {};
   multipleResults: any = [];
   selectedTestedByDetails: any = {};
-  
+
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -113,7 +113,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
           }
         })
       );
-
   }
 
   toggleSideNavigation(event: Event, allocation?: any): void {
@@ -218,7 +217,8 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               remarks: this.remarksData[order?.concept?.uuid],
             },
             testedDate: this.selectedTestedByDetails[order?.concept?.uuid].date,
-            testedBy: this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
+            testedBy:
+              this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
           },
         ];
       } else {
@@ -253,9 +253,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               status: "REMARKS",
               remarks: this.remarksData[order?.concept?.uuid],
             },
-
             testedDate: this.selectedTestedByDetails[order?.concept?.uuid].date,
-            testedBy: this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
+            testedBy:
+              this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
           },
         ];
       }
@@ -324,6 +324,15 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                               resultGroup: {
                                 uuid: resultsResponse[0]?.uuid,
                               },
+
+                              testedDate:
+                                this.selectedTestedByDetails[
+                                  order?.concept?.uuid
+                                ].date,
+                              testedBy:
+                                this.selectedTestedByDetails[
+                                  order?.concept?.uuid
+                                ].testedBy,
                             },
                             [
                               "parent",
@@ -397,6 +406,10 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                   testResult: {
                     uuid: result?.uuid,
                   },
+                  testedDate:
+                    this.selectedTestedByDetails[order?.concept?.uuid].date,
+                  testedBy:
+                    this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
                 };
               });
             }
@@ -844,8 +857,10 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                     remarks: this.remarksData[results[key]?.parameter?.uuid],
                   }
                 : null,
-              testedDate: this.selectedTestedByDetails[order?.concept?.uuid].date,
-              testedBy: this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
+              testedDate:
+                this.selectedTestedByDetails[order?.concept?.uuid].date,
+              testedBy:
+                this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
             },
           ];
         }
@@ -925,8 +940,12 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                                 }
                               : null,
                           abnormal: false,
-                          testedDate: this.selectedTestedByDetails[order?.concept?.uuid].date,
-                          testedBy: this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
+                          testedDate:
+                            this.selectedTestedByDetails[order?.concept?.uuid]
+                              .date,
+                          testedBy:
+                            this.selectedTestedByDetails[order?.concept?.uuid]
+                              .testedBy,
                           status: this.remarksData[
                             multipleResult?.allocation?.parameter?.uuid
                           ]
@@ -1037,6 +1056,4 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   onGetSelectedTestedBy(testedByDetails: any, order: any): void {
     this.selectedTestedByDetails[order?.concept?.uuid] = testedByDetails;
   }
-
-
 }
