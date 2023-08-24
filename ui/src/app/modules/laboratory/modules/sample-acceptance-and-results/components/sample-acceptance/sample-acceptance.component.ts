@@ -87,6 +87,7 @@ export class SampleAcceptanceComponent implements OnInit {
   dataToPrint$: Observable<any>;
   testRelationshipConceptSourceUuid$: Observable<string>;
   savingPrintInformation: boolean = false;
+  formUuidsReferencesForSampleReportDisplay$: Observable<any[]>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -108,6 +109,11 @@ export class SampleAcceptanceComponent implements OnInit {
     this.testRelationshipConceptSourceUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
         `iCare.lis.testParameterRelationship.conceptSourceUuid`
+      );
+
+    this.formUuidsReferencesForSampleReportDisplay$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `iCare.lis.forms.formsToDisplayOnLabSampleReport.uuids`
       );
   }
 
