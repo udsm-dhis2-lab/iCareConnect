@@ -359,6 +359,17 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		resultsObject.put("valueComplex", this.getValueComplex());
 		resultsObject.put("valueModifier", this.getValueModifier());
 		resultsObject.put("valueDateTime", this.getValueDatetime());
+		if(this.getTestedBy() != null){
+			Map<String, Object> testedByObject = new HashMap<String, Object>();
+			testedByObject.put("uuid",this.getTestedBy().getUuid());
+			testedByObject.put("name",this.getTestedBy().getDisplayString());
+			resultsObject.put("testedBy", testedByObject);
+		}
+
+		if(this.getTestedDate() != null){
+			resultsObject.put("testedDate",this.getTestedDate().toString());
+		}
+
 
 		if (this.getAbnormal() != null) {
 			resultsObject.put("abnormal", this.getAbnormal());
