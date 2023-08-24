@@ -17,6 +17,7 @@ import { getProviderDetails } from "src/app/store/selectors/current-user.selecto
 import { MatRadioChange } from "@angular/material/radio";
 import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 
 @Component({
   selector: "app-shared-results-entry-and-view-modal",
@@ -46,6 +47,8 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   selectedParametersWithDefinedRelationship: any[];
   selectedInstruments: any = {};
   multipleResults: any = [];
+  selectedTestedByDetails: any = {};
+  
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -110,6 +113,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
           }
         })
       );
+
   }
 
   toggleSideNavigation(event: Event, allocation?: any): void {
@@ -213,6 +217,8 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               status: "REMARKS",
               remarks: this.remarksData[order?.concept?.uuid],
             },
+            testedDate: this.selectedTestedByDetails[order?.concept?.uuid].date,
+            testedBy: this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
           },
         ];
       } else {
@@ -247,6 +253,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               status: "REMARKS",
               remarks: this.remarksData[order?.concept?.uuid],
             },
+
+            testedDate: this.selectedTestedByDetails[order?.concept?.uuid].date,
+            testedBy: this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
           },
         ];
       }
@@ -835,6 +844,8 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                     remarks: this.remarksData[results[key]?.parameter?.uuid],
                   }
                 : null,
+              testedDate: this.selectedTestedByDetails[order?.concept?.uuid].date,
+              testedBy: this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
             },
           ];
         }
@@ -914,6 +925,8 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                                 }
                               : null,
                           abnormal: false,
+                          testedDate: this.selectedTestedByDetails[order?.concept?.uuid].date,
+                          testedBy: this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
                           status: this.remarksData[
                             multipleResult?.allocation?.parameter?.uuid
                           ]
@@ -1020,4 +1033,10 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   onGetSelectedInstrument(instrument: any, order: any): void {
     this.selectedInstruments[order?.concept?.uuid] = instrument;
   }
+
+  onGetSelectedTestedBy(testedByDetails: any, order: any): void {
+    this.selectedTestedByDetails[order?.concept?.uuid] = testedByDetails;
+  }
+
+
 }

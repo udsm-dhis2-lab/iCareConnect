@@ -323,7 +323,7 @@
                                 order?.authorizationStatuses
                                 | filterAuthorizationStatuses: ''
                               )?.length === 0
-                            "
+                            "validateFormFields
                           >
                             Approved, but waiting another approval
                           </p>
@@ -364,6 +364,10 @@
                           class="w-75 ml-1"
                           *ngIf="data?.LISConfigurations?.isLIS"
                         >
+                        <app-shared-tested-by-result-entry-fields>
+                          (selectedTestedByFormFields) = "onGetSelectedTestedBy($event, order)"
+                        </app-shared-tested-by-result-entry-fields>
+
                           <app-shared-instrument-selection
                             [conceptReferenceTerm]="'LIS_INSTRUMENT'"
                             [order]="order"
