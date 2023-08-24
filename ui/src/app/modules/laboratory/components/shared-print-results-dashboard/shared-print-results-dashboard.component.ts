@@ -19,6 +19,7 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
   @Input() testRelationshipConceptSourceUuid: string;
   @Input() data: any;
   @Input() currentUser: any;
+  @Input() formUuidsReferencesForSampleReportDisplay!: any[];
 
   @ViewChild("report") pdfTable: ElementRef;
   collectionDateAndTimeUuids$: Observable<any>;

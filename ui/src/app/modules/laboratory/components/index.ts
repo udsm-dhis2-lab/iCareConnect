@@ -6,6 +6,7 @@ import { SampleTemplateTableComponent } from "./sample-template-table/sample-tem
 import { SamplesToCollectComponent } from "./samples-to-collect/samples-to-collect.component";
 import { SamplesToExportComponent } from "./samples-to-export/samples-to-export.component";
 import { SharedAssociatedFieldResultsEntryComponent } from "./shared-associated-field-results-entry/shared-associated-field-results-entry.component";
+import { SharedLabReportFormDataComponent } from "./shared-lab-report-form-data/shared-lab-report-form-data.component";
 import { SharedLabReportHeaderComponent } from "./shared-lab-report-header/shared-lab-report-header.component";
 import { SharedLocationDisplayComponent } from "./shared-location-display/shared-location-display.component";
 import { SharedPrintResultsDashboardComponent } from "./shared-print-results-dashboard/shared-print-results-dashboard.component";
@@ -36,4 +37,5 @@ export const labSharedComponents: any[] = [
   SharedLocationDisplayComponent,
   SharedRelatedResultsComponent,
   SharedRelatedResultParameterValueComponent,
+  SharedLabReportFormDataComponent,
 ];

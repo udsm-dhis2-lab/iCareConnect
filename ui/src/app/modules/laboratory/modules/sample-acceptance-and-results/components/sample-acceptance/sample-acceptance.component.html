@@ -17,7 +17,9 @@
     samplesLoadedState: samplesLoadedState$ | async,
     testRelationshipConceptSourceUuid:
       testRelationshipConceptSourceUuid$ | async,
-    dataToPrint: dataToPrint$ | async
+    dataToPrint: dataToPrint$ | async,
+    formUuidsReferencesForSampleReportDisplay:
+      formUuidsReferencesForSampleReportDisplay$ | async
   } as sampleParams"
 >
   <div class="loading-overlay" *ngIf="saving || savingPrintInformation">
@@ -248,10 +250,14 @@
               *ngIf="
                 sampleParams?.testRelationshipConceptSourceUuid &&
                 LISConfigurations?.isLIS &&
-                sampleParams?.dataToPrint
+                sampleParams?.dataToPrint &&
+                sampleParams?.formUuidsReferencesForSampleReportDisplay
               "
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
+              "
+              [formUuidsReferencesForSampleReportDisplay]="
+                sampleParams?.formUuidsReferencesForSampleReportDisplay
               "
               [data]="sampleParams?.dataToPrint[0]"
             ></app-shared-print-results-dashboard>
@@ -334,7 +340,11 @@
               *ngIf="
                 sampleParams?.testRelationshipConceptSourceUuid &&
                 LISConfigurations?.isLIS &&
-                sampleParams?.dataToPrint
+                sampleParams?.dataToPrint &&
+                sampleParams?.formUuidsReferencesForSampleReportDisplay
+              "
+              [formUuidsReferencesForSampleReportDisplay]="
+                sampleParams?.formUuidsReferencesForSampleReportDisplay
               "
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
@@ -417,10 +427,14 @@
               *ngIf="
                 sampleParams?.testRelationshipConceptSourceUuid &&
                 LISConfigurations?.isLIS &&
-                sampleParams?.dataToPrint
+                sampleParams?.dataToPrint &&
+                sampleParams?.formUuidsReferencesForSampleReportDisplay
               "
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
+              "
+              [formUuidsReferencesForSampleReportDisplay]="
+                sampleParams?.formUuidsReferencesForSampleReportDisplay
               "
               [data]="sampleParams?.dataToPrint[0]"
             ></app-shared-print-results-dashboard>
@@ -492,10 +506,14 @@
               *ngIf="
                 sampleParams?.testRelationshipConceptSourceUuid &&
                 LISConfigurations?.isLIS &&
-                sampleParams?.dataToPrint
+                sampleParams?.dataToPrint &&
+                sampleParams?.formUuidsReferencesForSampleReportDisplay
               "
               [testRelationshipConceptSourceUuid]="
                 sampleParams?.testRelationshipConceptSourceUuid
+              "
+              [formUuidsReferencesForSampleReportDisplay]="
+                sampleParams?.formUuidsReferencesForSampleReportDisplay
               "
               [data]="sampleParams?.dataToPrint[0]"
             ></app-shared-print-results-dashboard>

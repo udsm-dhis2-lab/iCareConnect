@@ -65,7 +65,25 @@
           [samplesData]="department?.samples"
         ></app-shared-sample-orders>
       </div>
-
+      <div
+        style="
+          margin-top: 12px;
+          width: 100%;
+          margin-left: 16px;
+          margin-right: 16px;
+        "
+        *ngIf="
+          formUuidsReferencesForSampleReportDisplay &&
+          formUuidsReferencesForSampleReportDisplay.length > 0
+        "
+      >
+        <app-shared-lab-report-form-data
+          [formUuidsReferencesForSampleReportDisplay]="
+            formUuidsReferencesForSampleReportDisplay
+          "
+          [visit]="department?.samples[0]?.visit"
+        ></app-shared-lab-report-form-data>
+      </div>
       <div style="margin-top: 8px; width: 100%">
         <app-shared-sample-order-results
           [ordersWithResults]="department?.samples[0]?.ordersWithResults"
