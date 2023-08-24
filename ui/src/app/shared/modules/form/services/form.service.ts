@@ -151,9 +151,17 @@ export class FormService {
         })
       );
     } else if (searchControlType === "user") {
-      return from(this.api.user.getAllUsers({ q: parameters?.q })).pipe(
+      const v: string =
+        "custom:(uuid,username,person:(uuid,display))".toString();
+      return from(this.api.user.getAllUsers({ q: parameters?.q, v })).pipe(
         map((response) => {
-          return response?.results || [];
+          return (response?.results || [])?.map((user: any) => {
+            return {
+              ...user,
+              display: user?.person?.display,
+              name: user?.person?.display,
+            };
+          });
         })
       );
     } else if (searchControlType === "location") {

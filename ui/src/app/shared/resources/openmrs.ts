@@ -8053,7 +8053,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: "ref" | "default" | "full" | "custom";
+        v?: "ref" | "default" | "full" | "custom" | any;
         q?: string;
         username?: string;
       },
