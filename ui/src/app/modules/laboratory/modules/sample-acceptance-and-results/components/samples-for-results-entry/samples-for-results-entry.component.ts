@@ -97,6 +97,7 @@ export class SamplesForResultsEntryComponent implements OnInit {
           actionType,
         },
         width: "100%",
+        maxHeight: "90vh",
         disableClose: false,
         panelClass: "custom-dialog-container",
       })
