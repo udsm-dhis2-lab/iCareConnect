@@ -2,7 +2,10 @@ package org.openmrs.module.icare.laboratory.models;
 
 import org.openmrs.*;
 
+import javax.naming.Context;
 import javax.persistence.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -78,6 +81,13 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "result")
 	private List<AssociatedFieldResult> associatedFieldResults = new ArrayList<>(0);
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "tested_by", nullable = true)
+	private User testedBy;
+
+	@Column(name = "date_tested")
+	private Date testedDate;
 
 	@Transient
 	private String instrumentCode;
@@ -201,7 +211,23 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		this.associatedFieldResults = associatedFieldResults;
 	}
 
-	public static Result fromMap(Map<String, Object> map) {
+	public void setTestedBy(User testedBy) {
+		this.testedBy = testedBy;
+	}
+
+	public User getTestedBy() {
+		return testedBy;
+	}
+
+	public void setTestedDate(Date testedDate) {
+		this.testedDate = testedDate;
+	}
+
+	public Date getTestedDate() {
+		return testedDate;
+	}
+
+	public static Result fromMap(Map<String, Object> map) throws ParseException {
 		Result result = new Result();
 		
 		if ((map.get("valueText")) != null) {
@@ -295,6 +321,21 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 
 			associatedFieldResultsList.add(associatedFieldResult);
 			result.setAssociatedFieldResults(associatedFieldResultsList);
+		}
+
+		if(map.get("testedBy") != null){
+			User user = new User();
+			user.setUuid(map.get("testedBy").toString());
+			result.setTestedBy(user);
+		}
+
+		if(map.get("testedDate") != null){
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			if (map.get("testedDate").toString().length() == 10) {
+				result.setTestedDate(dateFormat.parse(map.get("testedDate").toString()));
+			} else {
+				result.setTestedDate(dateFormat.parse(map.get("testedDate").toString().substring(0, map.get("testedDate").toString().indexOf("T"))));
+			}
 		}
 		
 		Concept concept = new Concept();

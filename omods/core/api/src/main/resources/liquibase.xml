@@ -5302,6 +5302,12 @@
             ADD FOREIGN KEY(tested_by) REFERENCES users(user_id);
         </sql>
     </changeSet>
+    <changeSet id="update_lb_test_result_add_column_tested_date" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_test_result
+            ADD COLUMN date_tested DATETIME NULL AFTER tested_by;
+        </sql>
+    </changeSet>
 
 
 </databaseChangeLog>
