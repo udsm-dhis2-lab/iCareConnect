@@ -22,10 +22,6 @@ export class RelatedTestParametersEntryComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    // console.log(
-    //   "parametersWithDefinedRelationship",
-    //   this.parametersWithDefinedRelationship
-    // );
     this.relatedAllocation =
       this.parametersWithDefinedRelationship[0]?.relatedAllocation;
     this.finalResultsForParentTestParameter =
@@ -41,6 +37,9 @@ export class RelatedTestParametersEntryComponent implements OnInit {
             ["dateCreated"],
             ["asc"]
           )[this.relatedAllocation?.finalResult?.groups?.length - 1]?.results
+        : this.relatedAllocation?.finalResult &&
+          this.relatedAllocation?.finalResult?.value
+        ? [this.relatedAllocation?.finalResult]
         : [];
     this.allocationsWithoutRelationShip =
       this.order?.allocations?.filter(
