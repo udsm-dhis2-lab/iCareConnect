@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { VisitsService } from "src/app/shared/resources/visits/services";
-import { orderBy } from "lodash";
+import { orderBy, uniqBy } from "lodash";
 
 @Component({
   selector: "app-shared-lab-report-form-data",
@@ -25,7 +25,7 @@ export class SharedLabReportFormDataComponent implements OnInit {
       })
       .pipe(
         map((encounters) => {
-          const formattedEncounters: any[] =
+          const formattedEncounters: any[] = uniqBy(
             encounters?.map((encounter) => {
               return {
                 ...encounter,
@@ -52,7 +52,9 @@ export class SharedLabReportFormDataComponent implements OnInit {
                   }),
                 },
               };
-            }) || [];
+            }) || [],
+            "formUuid"
+          );
           return formattedEncounters &&
             formattedEncounters?.length > 0 &&
             this.formUuidsReferencesForSampleReportDisplay != "none"
