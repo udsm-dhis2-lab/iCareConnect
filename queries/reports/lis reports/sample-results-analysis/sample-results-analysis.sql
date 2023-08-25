@@ -30,20 +30,17 @@
 
      	DATE_FORMAT(CONVERT_TZ(sp.date_time	,'Etc/GMT+3','GMT'), "%d/%m/%Y %h:%i %p") AS "reg_date",
 
-     	(SELECT GROUP_CONCAT( DISTINCT spstatus.remarks)
-			FROM lb_sample_status spstatus
-			WHERE spstatus.sample_id = sp.sample_id AND spstatus.status = 'COLLECTED_ON'
-		) AS "collected_on",
+     	(SELECT GROUP_CONCAT( DISTINCT CASE WHEN ob.concept_id = 220300 THEN ob.value_datetime ELSE NULL END)
+              FROM obs ob
+              INNER JOIN encounter e ON e.encounter_id = ob.encounter_id
+              WHERE e.visit_id = sp.visit_id
+        ) AS "collected_on",
 
-     	(SELECT GROUP_CONCAT( DISTINCT  spstatus.remarks)
-			FROM lb_sample_status spstatus
-			WHERE spstatus.sample_id = sp.sample_id AND spstatus.status = 'RECEIVED_ON'
-		) AS "received_on",
-
-        (SELECT GROUP_CONCAT(DISTINCT  spstatus.remarks)
-			FROM lb_sample_status spstatus
-            WHERE spstatus.sample_id = sp.sample_id AND spstatus.status = 'DELIVERED_ON'
-        ) AS"delivered_on",
+     	(SELECT GROUP_CONCAT( DISTINCT CASE WHEN ob.concept_id = 220311 THEN ob.value_datetime ELSE NULL END)
+             FROM obs ob
+             INNER JOIN encounter e ON e.encounter_id = ob.encounter_id
+              WHERE e.visit_id = sp.visit_id
+        ) AS "received_on",
 
         (SELECT GROUP_CONCAT(DISTINCT diagnosis_concept_name.name)
 			FROM visit v
