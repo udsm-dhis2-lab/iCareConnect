@@ -300,14 +300,20 @@ public class LaboratoryController {
 		        .get("allocations");
 		
 		List<TestAllocation> allocationsToSave = new ArrayList<TestAllocation>();
+		List<Concept> unretiredConcepts = new ArrayList<>();
 		for (Map<String, Object> allocationMap : allocationsMapList) {
-			
-			TestAllocation testAllocation = TestAllocation.fromMap(allocationMap);
-			
-			allocationsToSave.add(testAllocation);
+			Concept concept = Context.getConceptService().getConceptByUuid(((Map)allocationMap.get("concept")).get("uuid").toString());
+
+			if(!concept.getRetired()) {
+				unretiredConcepts.add(concept);
+				TestAllocation testAllocation = TestAllocation.fromMap(allocationMap);
+				allocationsToSave.add(testAllocation);
+			}
 			
 		}
-		
+		if(unretiredConcepts.size() == 0){
+			throw new Exception("All sample allocations are retired");
+		}
 		List<TestAllocation> savedAllocations = laboratoryService.createAllocationsForSample(allocationsToSave);
 		
 		Map<String, Object> response = new HashMap<String, Object>();

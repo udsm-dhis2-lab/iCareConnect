@@ -426,11 +426,14 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			throw new Exception("Concept with id '" + result.getConcept().getUuid() + "' does not exist");
 		}
 		
-		User testedBy = Context.getUserService().getUserByUuid(result.getTestedBy().getUuid());
-		if (result.getTestedBy().getUuid() == null) {
-			throw new Exception("User is null. User for the result must be provided");
+		if (result.getTestedBy() != null) {
+			//			if (result.getTestedBy().getUuid() == null) {
+			//				throw new Exception("User is null. User for the result must be provided");
+			//			}
+			User testedBy = Context.getUserService().getUserByUuid(result.getTestedBy().getUuid());
+			result.setTestedBy(testedBy);
 		}
-		result.setTestedBy(testedBy);
+		
 		result.setConcept(concept);
 		
 		TestAllocation testAllocation = this.testAllocationDAO.findByUuid(result.getTestAllocation().getUuid());
