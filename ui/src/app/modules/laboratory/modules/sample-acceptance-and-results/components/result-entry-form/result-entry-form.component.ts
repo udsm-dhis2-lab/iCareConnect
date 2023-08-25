@@ -36,28 +36,29 @@ export class ResultEntryFormComponent implements OnInit {
             attribute?.attributeType?.uuid == this.multipleResultsAttributeType
         ) || []
       )?.length > 0;
-    this.value =
-      !this.hasMultipleAnswers && !this.latestResult?.isArray
+    this.value = this.hasMultipleAnswers
+      ? [this.latestResult?.value]
+      : !this.hasMultipleAnswers && !this.latestResult?.isArray
+      ? this.latestResult?.value
         ? this.latestResult?.value
-          ? this.latestResult?.value
-          : this.latestResult?.valueNumeric
-          ? this.latestResult?.valueNumeric
-          : this.latestResult?.valueBoolean
-          ? this.latestResult?.valueBoolean
-          : this.latestResult?.valueComplex
-          ? this.latestResult?.valueComplex
-          : this.latestResult?.valueCoded
-          ? this.latestResult?.valueCoded
-          : this.latestResult?.valueText
-          ? this.latestResult?.valueText
-          : this.latestResult?.valueModifier
-          ? this.latestResult?.valueModifier
-          : null
-        : !this.hasMultipleAnswers &&
-          this.latestResult?.isArray &&
-          this.latestResult?.value
-        ? this.latestResult?.value[0]
-        : this.latestResult?.value;
+        : this.latestResult?.valueNumeric
+        ? this.latestResult?.valueNumeric
+        : this.latestResult?.valueBoolean
+        ? this.latestResult?.valueBoolean
+        : this.latestResult?.valueComplex
+        ? this.latestResult?.valueComplex
+        : this.latestResult?.valueCoded
+        ? this.latestResult?.valueCoded
+        : this.latestResult?.valueText
+        ? this.latestResult?.valueText
+        : this.latestResult?.valueModifier
+        ? this.latestResult?.valueModifier
+        : null
+      : !this.hasMultipleAnswers &&
+        this.latestResult?.isArray &&
+        this.latestResult?.value
+      ? this.latestResult?.value[0]
+      : this.latestResult?.value;
     this.label = !this.conceptNameType
       ? this.parameter?.display
       : (this.parameter?.names?.filter(

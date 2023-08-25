@@ -559,6 +559,30 @@
                         </div>
                       </td>
                     </tr>
+
+                    <tr>
+                      <td colspan="100%">
+                        <div class="w-75 ml-2">
+                          <app-shared-tested-by-result-entry-fields
+                            [order]="order"
+                            (selectedTestedByFormFields)="
+                              onGetSelectedTestedBy($event, order)
+                            "
+                          >
+                          </app-shared-tested-by-result-entry-fields>
+                        </div>
+                        <div class="w-100">
+                          <app-shared-remarks-entry
+                            [order]="order"
+                            [disabled]="
+                              data?.actionType === 'review' &&
+                              !data?.LISConfigurations?.isLIS
+                            "
+                            (remarks)="onGetRemarks($event, order)"
+                          ></app-shared-remarks-entry>
+                        </div>
+                      </td>
+                    </tr>
                     <tr>
                       <td colspan="100%">
                         <div
