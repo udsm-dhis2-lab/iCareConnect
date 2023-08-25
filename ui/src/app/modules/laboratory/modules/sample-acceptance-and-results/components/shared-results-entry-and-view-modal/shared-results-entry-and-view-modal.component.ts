@@ -216,9 +216,16 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               status: "REMARKS",
               remarks: this.remarksData[order?.concept?.uuid],
             },
-            testedDate: this.selectedTestedByDetails[order?.concept?.uuid].date,
+            testedDate:
+              this.selectedTestedByDetails[order?.concept?.uuid] &&
+              this.selectedTestedByDetails[order?.concept?.uuid].date
+                ? this.selectedTestedByDetails[order?.concept?.uuid].date
+                : null,
             testedBy:
-              this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
+              this.selectedTestedByDetails[order?.concept?.uuid] &&
+              this.selectedTestedByDetails[order?.concept?.uuid]?.testedBy
+                ? this.selectedTestedByDetails[order?.concept?.uuid].testedBy
+                : null,
           },
         ];
       } else {
@@ -253,9 +260,16 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               status: "REMARKS",
               remarks: this.remarksData[order?.concept?.uuid],
             },
-            testedDate: this.selectedTestedByDetails[order?.concept?.uuid].date,
+            testedDate:
+              this.selectedTestedByDetails[order?.concept?.uuid] &&
+              this.selectedTestedByDetails[order?.concept?.uuid].date
+                ? this.selectedTestedByDetails[order?.concept?.uuid].date
+                : null,
             testedBy:
-              this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
+              this.selectedTestedByDetails[order?.concept?.uuid] &&
+              this.selectedTestedByDetails[order?.concept?.uuid]?.testedBy
+                ? this.selectedTestedByDetails[order?.concept?.uuid].testedBy
+                : null,
           },
         ];
       }
@@ -324,15 +338,28 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                               resultGroup: {
                                 uuid: resultsResponse[0]?.uuid,
                               },
-
                               testedDate:
                                 this.selectedTestedByDetails[
                                   order?.concept?.uuid
-                                ].date,
+                                ] &&
+                                this.selectedTestedByDetails[
+                                  order?.concept?.uuid
+                                ].date
+                                  ? this.selectedTestedByDetails[
+                                      order?.concept?.uuid
+                                    ].date
+                                  : null,
                               testedBy:
                                 this.selectedTestedByDetails[
                                   order?.concept?.uuid
-                                ].testedBy,
+                                ] &&
+                                this.selectedTestedByDetails[
+                                  order?.concept?.uuid
+                                ]?.testedBy
+                                  ? this.selectedTestedByDetails[
+                                      order?.concept?.uuid
+                                    ].testedBy
+                                  : null,
                             },
                             [
                               "parent",
@@ -407,9 +434,16 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                     uuid: result?.uuid,
                   },
                   testedDate:
-                    this.selectedTestedByDetails[order?.concept?.uuid].date,
+                    this.selectedTestedByDetails[order?.concept?.uuid] &&
+                    this.selectedTestedByDetails[order?.concept?.uuid].date
+                      ? this.selectedTestedByDetails[order?.concept?.uuid].date
+                      : null,
                   testedBy:
-                    this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
+                    this.selectedTestedByDetails[order?.concept?.uuid] &&
+                    this.selectedTestedByDetails[order?.concept?.uuid]?.testedBy
+                      ? this.selectedTestedByDetails[order?.concept?.uuid]
+                          .testedBy
+                      : null,
                 };
               });
             }
@@ -636,7 +670,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     parameter: ConceptGet,
     allocation: SampleAllocationObject
   ): void {
-    // console.log("dataObject", dataObject);
     if (dataObject?.value?.length === 0) {
       this.dataValues = omit(this.dataValues, parameter?.uuid);
     } else if (dataObject?.multipleResults) {
@@ -652,17 +685,15 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
           ["asc"]
         ) || [];
       const valuesData = orderBy(dataObject?.value, ["value"], ["asc"]);
-      // console.log("prevValues", prevValues);
-      // console.log("valuesData", valuesData);
       const keyedPrevValue: any = keyBy(prevValues, "value");
       if (
-        prevValues?.length !== valuesData?.length &&
-        (
+        prevValues?.length !== valuesData?.length ||
+        ((
           valuesData?.filter(
             (valueData: any) => keyedPrevValue[valueData?.value]
           ) || []
-        )?.length === prevValues?.length &&
-        valuesData?.length > 0
+        )?.length !== prevValues?.length &&
+          valuesData?.length > 0)
       ) {
         this.dataValues[parameter?.uuid] = {
           ...dataObject,
@@ -858,9 +889,15 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                   }
                 : null,
               testedDate:
-                this.selectedTestedByDetails[order?.concept?.uuid].date,
+                this.selectedTestedByDetails[order?.concept?.uuid] &&
+                this.selectedTestedByDetails[order?.concept?.uuid].date
+                  ? this.selectedTestedByDetails[order?.concept?.uuid].date
+                  : null,
               testedBy:
-                this.selectedTestedByDetails[order?.concept?.uuid].testedBy,
+                this.selectedTestedByDetails[order?.concept?.uuid] &&
+                this.selectedTestedByDetails[order?.concept?.uuid]?.testedBy
+                  ? this.selectedTestedByDetails[order?.concept?.uuid].testedBy
+                  : null,
             },
           ];
         }
@@ -941,11 +978,25 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                               : null,
                           abnormal: false,
                           testedDate:
+                            this.selectedTestedByDetails[
+                              order?.concept?.uuid
+                            ] &&
                             this.selectedTestedByDetails[order?.concept?.uuid]
-                              .date,
+                              .date
+                              ? this.selectedTestedByDetails[
+                                  order?.concept?.uuid
+                                ].date
+                              : null,
                           testedBy:
+                            this.selectedTestedByDetails[
+                              order?.concept?.uuid
+                            ] &&
                             this.selectedTestedByDetails[order?.concept?.uuid]
-                              .testedBy,
+                              ?.testedBy
+                              ? this.selectedTestedByDetails[
+                                  order?.concept?.uuid
+                                ].testedBy
+                              : null,
                           status: this.remarksData[
                             multipleResult?.allocation?.parameter?.uuid
                           ]
@@ -1054,6 +1105,8 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   }
 
   onGetSelectedTestedBy(testedByDetails: any, order: any): void {
-    this.selectedTestedByDetails[order?.concept?.uuid] = testedByDetails;
+    if (testedByDetails?.date || testedByDetails?.testedBy) {
+      this.selectedTestedByDetails[order?.concept?.uuid] = testedByDetails;
+    }
   }
 }

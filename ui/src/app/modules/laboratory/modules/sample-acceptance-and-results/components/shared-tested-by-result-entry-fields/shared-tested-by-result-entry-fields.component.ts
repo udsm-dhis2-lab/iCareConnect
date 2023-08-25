@@ -36,6 +36,19 @@ export class SharedTestedByResultEntryFieldsComponent implements OnInit {
           : this.testedDate;
 
         this.createTestedByDetailsField();
+      } else if (formattedAllocation?.finalResult?.groups) {
+        const results: any[] =
+          formattedAllocation?.finalResult?.groups[
+            formattedAllocation?.finalResult?.groups?.length - 1
+          ]?.results;
+        const currentResult = results[results?.length - 1];
+        this.testedBy = !this.testedBy
+          ? currentResult?.testedBy
+          : this.testedBy;
+        this.testedDate = !this.testedDate
+          ? formatDateToYYMMDD(new Date(currentResult?.testedDate))
+          : this.testedDate;
+        this.createTestedByDetailsField();
       } else {
         this.createTestedByDetailsField();
       }
@@ -64,8 +77,12 @@ export class SharedTestedByResultEntryFieldsComponent implements OnInit {
 
   onFormUpdate(formValue: FormValue): void {
     this.selectedTestedByFormFields.emit({
-      date: formatDateToYYMMDD(new Date(formValue.getValues()?.date?.value)),
-      testedBy: formValue.getValues()?.testedBy?.value,
+      date: formValue.getValues()?.date?.value
+        ? formatDateToYYMMDD(new Date(formValue.getValues()?.date?.value))
+        : null,
+      testedBy: formValue.getValues()?.testedBy?.value
+        ? formValue.getValues()?.testedBy?.value
+        : null,
     });
   }
 }
