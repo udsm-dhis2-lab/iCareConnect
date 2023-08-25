@@ -243,7 +243,10 @@
       [required]="field?.required"
       matInput
       [value]="
-        field?.value && (members$ | async) && (members$ | async)?.length == 1
+        field?.value &&
+        (members$ | async) &&
+        (members$ | async)?.length == 1 &&
+        (members$ | async)[0]
           ? (members$ | async)[0]?.display
           : ''
       "
