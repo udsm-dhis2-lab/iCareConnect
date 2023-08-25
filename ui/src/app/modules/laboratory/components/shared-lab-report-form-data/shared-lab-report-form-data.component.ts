@@ -10,7 +10,7 @@ import { orderBy } from "lodash";
   styleUrls: ["./shared-lab-report-form-data.component.scss"],
 })
 export class SharedLabReportFormDataComponent implements OnInit {
-  @Input() formUuidsReferencesForSampleReportDisplay: any[];
+  @Input() formUuidsReferencesForSampleReportDisplay: any;
   @Input() visit: any;
   @Input() encounterInformation$: Observable<any>;
   constructor(private visitService: VisitsService) {}
@@ -25,8 +25,8 @@ export class SharedLabReportFormDataComponent implements OnInit {
       })
       .pipe(
         map((encounters) => {
-          return encounters
-            ?.map((encounter) => {
+          const formattedEncounters: any[] =
+            encounters?.map((encounter) => {
               return {
                 ...encounter,
                 formUuid: encounter?.form?.uuid,
@@ -52,15 +52,20 @@ export class SharedLabReportFormDataComponent implements OnInit {
                   }),
                 },
               };
-            })
-            ?.filter(
-              (encounter: any) =>
-                (
-                  this.formUuidsReferencesForSampleReportDisplay?.filter(
-                    (uuid: string) => uuid === encounter?.formUuid
-                  ) || []
-                )?.length > 0
-            );
+            }) || [];
+          return formattedEncounters &&
+            formattedEncounters?.length > 0 &&
+            this.formUuidsReferencesForSampleReportDisplay != "none"
+            ? formattedEncounters?.filter(
+                (encounter: any) =>
+                  (
+                    (
+                      this.formUuidsReferencesForSampleReportDisplay || []
+                    )?.filter((uuid: string) => uuid === encounter?.formUuid) ||
+                    []
+                  )?.length > 0
+              )
+            : [];
         })
       );
   }
