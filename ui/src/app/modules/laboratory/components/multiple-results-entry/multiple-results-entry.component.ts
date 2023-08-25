@@ -60,7 +60,6 @@ export class MultipleResultsEntryComponent implements OnInit {
   }
 
   setList(list: any[]) {
-    // console.log(list);
     this.list = list;
     const defaultValues =
       this.list?.filter(

@@ -153,17 +153,33 @@ export class FormService {
     } else if (searchControlType === "user") {
       const v: string =
         "custom:(uuid,username,person:(uuid,display))".toString();
-      return from(this.api.user.getAllUsers({ q: parameters?.q, v })).pipe(
-        map((response) => {
-          return (response?.results || [])?.map((user: any) => {
-            return {
+      if (parameters?.value) {
+        return from(
+          this.api.user.getUser(parameters?.value, {
+            v,
+          })
+        ).pipe(
+          map((user: any) => [
+            {
               ...user,
               display: user?.person?.display,
               name: user?.person?.display,
-            };
-          });
-        })
-      );
+            },
+          ])
+        );
+      } else {
+        return from(this.api.user.getAllUsers({ q: parameters?.q, v })).pipe(
+          map((response) => {
+            return (response?.results || [])?.map((user: any) => {
+              return {
+                ...user,
+                display: user?.person?.display,
+                name: user?.person?.display,
+              };
+            });
+          })
+        );
+      }
     } else if (searchControlType === "location") {
       return from(
         this.api.location.getAllLocations({

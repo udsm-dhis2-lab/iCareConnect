@@ -116,7 +116,7 @@ export class TestParameterEntryComponent implements OnInit {
   }
 
   onGetFormData(data: any, parameter: any): void {
-    this.data.emit({
+    const resultPayload: any = {
       value: data,
       previousValue: this.latestResult?.value
         ? this.latestResult?.value
@@ -129,6 +129,7 @@ export class TestParameterEntryComponent implements OnInit {
         isText: parameter?.datatype?.name === "Text",
         isFile: parameter?.datatype?.name == "Complex",
       },
-    });
+    };
+    this.data.emit(resultPayload);
   }
 }

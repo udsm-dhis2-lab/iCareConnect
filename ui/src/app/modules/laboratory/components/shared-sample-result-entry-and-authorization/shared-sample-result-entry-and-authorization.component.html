@@ -1,5 +1,5 @@
 <p style="text-align: left; margin: 2px !important; font-size: 12px">
-  <b>Tested by:</b>
+  <b>Results fed by:</b>
   {{
     ordersWithResults?.length > 0
       ? ordersWithResults[0]?.testAllocations[0]?.finalResult &&
@@ -30,6 +30,66 @@
             ordersWithResults[0]?.testAllocations[0]?.finalResult?.groups
               ?.length - 1
           ]?.results[0]?.dateCreated | date: "medium")
+        : "-"
+      : "-"
+  }}
+</p>
+
+<p style="text-align: left; margin: 2px !important; font-size: 12px">
+  <b>Tested by:</b>
+  {{
+    ordersWithResults?.length > 0 &&
+    ordersWithResults[0]?.testAllocations?.length > 0
+      ? ordersWithResults[0]?.testAllocations[
+          ordersWithResults[0]?.testAllocations?.length - 1
+        ]?.finalResult &&
+        !ordersWithResults[0]?.testAllocations[
+          ordersWithResults[0]?.testAllocations?.length - 1
+        ]?.finalResult?.groups
+        ? ordersWithResults[0]?.testAllocations[
+            ordersWithResults[0]?.testAllocations?.length - 1
+          ]?.finalResult?.testedBy?.display
+        : ordersWithResults[0]?.testAllocations[
+            ordersWithResults[0]?.testAllocations?.length - 1
+          ]?.finalResult &&
+          ordersWithResults[0]?.testAllocations[
+            ordersWithResults[0]?.testAllocations?.length - 1
+          ]?.finalResult?.groups?.length > 0
+        ? ordersWithResults[0]?.testAllocations[
+            ordersWithResults[0]?.testAllocations?.length - 1
+          ]?.finalResult?.groups[
+            ordersWithResults[0]?.testAllocations[
+              ordersWithResults[0]?.testAllocations?.length - 1
+            ]?.finalResult?.groups?.length - 1
+          ]?.results[0]?.testedBy?.display
+        : "-"
+      : "-"
+  }}
+  <b>Tested on:</b>
+  {{
+    ordersWithResults?.length > 0
+      ? ordersWithResults[0]?.testAllocations[
+          ordersWithResults[0]?.testAllocations?.length - 1
+        ]?.finalResult &&
+        !ordersWithResults[0]?.testAllocations[
+          ordersWithResults[0]?.testAllocations?.length - 1
+        ]?.finalResult?.groups
+        ? (ordersWithResults[0]?.testAllocations[
+            ordersWithResults[0]?.testAllocations?.length - 1
+          ]?.finalResult?.testedDate | date)
+        : ordersWithResults[0]?.testAllocations[
+            ordersWithResults[0]?.testAllocations?.length - 1
+          ]?.finalResult &&
+          ordersWithResults[0]?.testAllocations[
+            ordersWithResults[0]?.testAllocations?.length - 1
+          ]?.finalResult?.groups?.length > 0
+        ? (ordersWithResults[0]?.testAllocations[
+            ordersWithResults[0]?.testAllocations?.length - 1
+          ]?.finalResult?.groups[
+            ordersWithResults[0]?.testAllocations[
+              ordersWithResults[0]?.testAllocations?.length - 1
+            ]?.finalResult?.groups?.length - 1
+          ]?.results[0]?.testedDate | date)
         : "-"
       : "-"
   }}

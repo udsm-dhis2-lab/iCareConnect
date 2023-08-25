@@ -332,7 +332,8 @@
                                 order?.authorizationStatuses
                                 | filterAuthorizationStatuses: ''
                               )?.length === 0
-                            "validateFormFields
+                            "
+                            validateFormFields
                           >
                             Approved, but waiting another approval
                           </p>
@@ -357,14 +358,25 @@
                     </tr>
                     <tr>
                       <td colspan="100%">
-                        <app-shared-remarks-entry
-                          [order]="order"
-                          [disabled]="
-                            data?.actionType === 'review' &&
-                            !data?.LISConfigurations?.isLIS
-                          "
-                          (remarks)="onGetRemarks($event, order)"
-                        ></app-shared-remarks-entry>
+                        <div class="w-75 ml-2">
+                          <app-shared-tested-by-result-entry-fields
+                            [order]="order"
+                            (selectedTestedByFormFields)="
+                              onGetSelectedTestedBy($event, order)
+                            "
+                          >
+                          </app-shared-tested-by-result-entry-fields>
+                        </div>
+                        <div class="w-100">
+                          <app-shared-remarks-entry
+                            [order]="order"
+                            [disabled]="
+                              data?.actionType === 'review' &&
+                              !data?.LISConfigurations?.isLIS
+                            "
+                            (remarks)="onGetRemarks($event, order)"
+                          ></app-shared-remarks-entry>
+                        </div>
                       </td>
                     </tr>
                     <tr>
@@ -373,10 +385,6 @@
                           class="w-75 ml-1"
                           *ngIf="data?.LISConfigurations?.isLIS"
                         >
-                        <app-shared-tested-by-result-entry-fields>
-                          (selectedTestedByFormFields) = "onGetSelectedTestedBy($event, order)"
-                        </app-shared-tested-by-result-entry-fields>
-
                           <app-shared-instrument-selection
                             [conceptReferenceTerm]="'LIS_INSTRUMENT'"
                             [order]="order"
@@ -548,6 +556,30 @@
                               ></b
                             >
                           </p>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td colspan="100%">
+                        <div class="w-75 ml-2">
+                          <app-shared-tested-by-result-entry-fields
+                            [order]="order"
+                            (selectedTestedByFormFields)="
+                              onGetSelectedTestedBy($event, order)
+                            "
+                          >
+                          </app-shared-tested-by-result-entry-fields>
+                        </div>
+                        <div class="w-100">
+                          <app-shared-remarks-entry
+                            [order]="order"
+                            [disabled]="
+                              data?.actionType === 'review' &&
+                              !data?.LISConfigurations?.isLIS
+                            "
+                            (remarks)="onGetRemarks($event, order)"
+                          ></app-shared-remarks-entry>
                         </div>
                       </td>
                     </tr>
