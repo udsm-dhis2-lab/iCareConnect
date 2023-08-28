@@ -37,11 +37,11 @@ public class PasswordChangeAdvisor extends StaticMethodMatcherPointcutAdvisor im
 			ICareService iCareService = Context.getService(ICareService.class);
 			
 			if (invocation.getArguments()[0] instanceof User) {
-
+				
 				iCareService.savePasswordHistory((User) invocation.getArguments()[0],
 				    invocation.getArguments()[2].toString());
 			} else {
-
+				
 				iCareService.savePasswordHistory(null, invocation.getArguments()[1].toString());
 			}
 			

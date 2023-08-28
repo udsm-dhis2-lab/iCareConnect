@@ -26,6 +26,8 @@ import org.openmrs.module.icare.billing.services.insurance.VerificationException
 import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.dao.PasswordHistoryDAO;
+import org.openmrs.module.icare.core.dao.PrivilegeDAO;
+import org.openmrs.module.icare.core.dao.RoleDAO;
 import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
@@ -64,6 +66,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	PasswordHistoryDAO passwordHistoryDAO;
 	
+	RoleDAO roleDAO;
+	
+	PrivilegeDAO privilegeDAO;
+	
 	UserService userService;
 	
 	/**
@@ -75,6 +81,14 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	public void setPasswordHistoryDAO(PasswordHistoryDAO passwordHistoryDAO) {
 		this.passwordHistoryDAO = passwordHistoryDAO;
+	}
+	
+	public void setRoleDAO(RoleDAO roleDAO) {
+		this.roleDAO = roleDAO;
+	}
+	
+	public void setPrivilegeDAO(PrivilegeDAO privilegeDAO) {
+		this.privilegeDAO = privilegeDAO;
 	}
 	
 	/**
@@ -484,6 +498,16 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public List<PasswordHistory> getUserPasswordHistory(String uuid) {
 		
 		return passwordHistoryDAO.getUsersPasswordHistory(uuid);
+	}
+	
+	@Override
+	public List<Role> getRoles(String q, Integer startIndex, Integer limit) {
+		return roleDAO.getRoles(q, startIndex, limit);
+	}
+	
+	@Override
+	public List<Privilege> getPrivileges(String q, Integer startIndex, Integer limit) {
+		return privilegeDAO.getPrivileges(q, startIndex, limit);
 	}
 	
 	@Override
