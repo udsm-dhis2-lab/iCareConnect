@@ -330,4 +330,10 @@
     <audit_log audit_log_id="2" type="org.openmrs.module.icare.laboratory.models.Sample" action="UPDATED" date_created="2023-04-18 09:51:57.0" user_id="300" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c630"/>
 
     <password_history password_history_id="1" user_id="400" password="iCARE110-TEST-OSDH-9beb-d30dcfc0ceee" change_date="2023-04-18 09:51:57.0" />
+
+    <role role="Role 1" description="This is role 1" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c999"/>
+    <role role="Role 2" description="This is role 2" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c991"/>
+
+    <privilege privilege="priv 1" description="This is priv 1" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c999"/>
+    <privilege privilege="priv 2" description="This is prv 2" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c991"/>
 </dataset>

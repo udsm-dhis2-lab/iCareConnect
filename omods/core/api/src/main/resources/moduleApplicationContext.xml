@@ -28,6 +28,17 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
+                <property name="roleDAO">
+                    <bean class="org.openmrs.module.icare.core.dao.RoleDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="privilegeDAO">
+                    <bean class="org.openmrs.module.icare.core.dao.PrivilegeDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
             </bean>
         </property>
         <property name="preInterceptors">

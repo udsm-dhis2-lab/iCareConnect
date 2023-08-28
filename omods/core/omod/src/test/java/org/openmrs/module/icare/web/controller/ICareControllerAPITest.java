@@ -1,6 +1,7 @@
 package org.openmrs.module.icare.web.controller;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -882,5 +883,19 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		    List.class);
 		System.out.println(response.getContentAsString());
 		
+	}
+	
+	@Test
+	public void getRolesAndPrivileges() throws Exception {
+		MockHttpServletRequest roles = newGetRequest("icare/roles", new Parameter("q", "role 1"));
+		MockHttpServletResponse response = handle(roles);
+		List<Map<String, Object>> rolesMap = (new ObjectMapper()).readValue(response.getContentAsString(), List.class);
+		assertThat("There is one role", rolesMap.size(), is(1));
+		
+		MockHttpServletRequest privileges = newGetRequest("icare/privileges", new Parameter("q", "priv 1"));
+		response = handle(privileges);
+		List<Map<String, Object>> privilegesMap = (new ObjectMapper()).readValue(response.getContentAsString(), List.class);
+		System.out.println(response.getContentAsString());
+		//assertThat("There is one role", rolesMap.size(),is(1));
 	}
 }

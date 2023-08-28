@@ -965,4 +965,34 @@ public class ICareController {
 		}
 		return passwordHistoriesList;
 	}
+	
+	@RequestMapping(value="roles", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getRoles(@RequestParam(required = true) String q,@RequestParam(required = false, defaultValue = "0") Integer startIndex, @RequestParam(required = false, defaultValue = "10") Integer limit){
+		List<Map<String, Object>> rolesMapList = new ArrayList<>();
+		List<Role> roles = iCareService.getRoles(q, startIndex, limit);
+		for(Role role : roles){
+			Map<String, Object> rolesMap = new HashMap<>();
+			rolesMap.put("display", role.getRole());
+			rolesMap.put("description", role.getDescription());
+			rolesMap.put("uuid", role.getDescription());
+			rolesMapList.add(rolesMap);
+		}
+		return rolesMapList;
+	}
+	
+	@RequestMapping(value="privileges", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getPrivileges(@RequestParam(required = true) String q,@RequestParam(required = false, defaultValue = "0") Integer startIndex, @RequestParam(required = false, defaultValue = "10") Integer limit){
+		List<Map<String, Object>> privilegesMapList = new ArrayList<>();
+		List<Privilege> privileges = iCareService.getPrivileges(q, startIndex, limit);
+		for(Privilege privilege: privileges ){
+			Map<String, Object> privilegesMap = new HashMap<>();
+			privilegesMap.put("display", privilege.getPrivilege());
+			privilegesMap.put("description", privilege.getDescription());
+			privilegesMap.put("uuid", privilege.getDescription());
+			privilegesMapList.add(privilegesMap);
+		}
+		return privilegesMapList;
+	}
 }

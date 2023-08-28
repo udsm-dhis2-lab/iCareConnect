@@ -167,4 +167,8 @@ public interface ICareService extends OpenmrsService {
 	PasswordHistory savePasswordHistory(User user, String newPassword) throws Exception;
 	
 	List<PasswordHistory> getUserPasswordHistory(String uuid);
+	
+	List<Role> getRoles(String q, Integer startIndex, Integer limit);
+	
+	List<Privilege> getPrivileges(String q, Integer startIndex, Integer limit);
 }
