@@ -84,10 +84,6 @@ export class PrivilegesAndRolesService {
       inheritedRoles: role?.inheritedRoles
 
     }
-
-    console.log("role: ",role);
-    console.log("roleToSave: ", this.roleToSave);
-
     return (
       role?.uuid
         ? from(this.api.role.updateRole(role?.uuid, role))
