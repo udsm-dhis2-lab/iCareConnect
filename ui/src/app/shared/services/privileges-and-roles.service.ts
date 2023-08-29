@@ -16,6 +16,7 @@ import {
   providedIn: "root",
 })
 export class PrivilegesAndRolesService {
+  roleToSave: any = {}
   constructor(private api: Api, private httpClient: OpenmrsHttpClientService) {}
 
   getPrivileges(parameters: any): Observable<PrivilegeGetFull[]> {
@@ -75,10 +76,22 @@ export class PrivilegesAndRolesService {
   }
 
   addNewOrUpdateRole(role: RoleCreate): Observable<RoleCreateFull> {
+    // roleToSave is created so as to eliminate uuid in role to enable saving
+    this.roleToSave = {
+      description: role?.description,
+      name: role?.name,
+      privileges: role?.privileges,
+      inheritedRoles: role?.inheritedRoles
+
+    }
+
+    console.log("role: ",role);
+    console.log("roleToSave: ", this.roleToSave);
+
     return (
       role?.uuid
         ? from(this.api.role.updateRole(role?.uuid, role))
-        : from(this.api.role.createRole(role))
+        : from(this.api.role.createRole(this.roleToSave))
     ).pipe(
       map((response) => {
         return response;
