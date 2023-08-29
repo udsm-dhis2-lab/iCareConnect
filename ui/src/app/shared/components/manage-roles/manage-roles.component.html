@@ -30,8 +30,7 @@
         <section class="w-100 mt-1">
           <mat-checkbox
             class="mr-2 mb-2"
-            (change)="checkBoxSelectionChange($event, role?.uuid)"
-            [disabled]="role?.selected"
+            (change)="checkBoxForRolesSelectionChange($event, role?.uuid)"
             [checked]="role?.selected"
             *ngFor="
               let role of params?.roles
@@ -85,7 +84,7 @@
             class="ml-2 action-control-btn"
             (click)="getItems($event, 'next')"
             [disabled]="privilegePageSize > params?.privileges?.length"
-            >Nex</a
+            >Next</a
           >
         </div>
         <mat-progress-bar
