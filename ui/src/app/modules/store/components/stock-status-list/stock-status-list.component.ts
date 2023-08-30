@@ -129,7 +129,12 @@ export class StockStatusListComponent implements OnInit {
         );
     } else if (this.isStockOutPage) {
       this.stocksList$ = this.stockService
-        .getStockOuts(this.currentLocation?.uuid, this.page, this.pageSize)
+        .getStockOuts(
+          this.currentLocation?.uuid,
+          { q: this.searchTerm },
+          this.page,
+          this.pageSize
+        )
         .pipe(
           map((response) => {
             this.pager = response?.pager;
@@ -138,7 +143,12 @@ export class StockStatusListComponent implements OnInit {
         );
     } else if (this.status === "EXPIRED") {
       this.stocksList$ = this.stockService
-        .getExpiredItems(this.currentLocation?.uuid, this.page, this.pageSize)
+        .getExpiredItems(
+          this.currentLocation?.uuid,
+          { q: this.searchTerm },
+          this.page,
+          this.pageSize
+        )
         .pipe(
           map((response) => {
             this.pager = response?.pager;
@@ -149,6 +159,7 @@ export class StockStatusListComponent implements OnInit {
       this.stocksList$ = this.stockService
         .getNearlyStockedOutItems(
           this.currentLocation?.uuid,
+          { q: this.searchTerm },
           this.page,
           this.pageSize
         )
@@ -162,6 +173,7 @@ export class StockStatusListComponent implements OnInit {
       this.stocksList$ = this.stockService
         .getNearlyExpiredItems(
           this.currentLocation?.uuid,
+          { q: this.searchTerm },
           this.page,
           this.pageSize
         )
@@ -235,7 +247,7 @@ export class StockStatusListComponent implements OnInit {
     ledgerTypes: any[],
     currentLocation: any
   ): void {
-    console.log("===>",this.currentLocation)
+    console.log("===>", this.currentLocation);
     this.dialog
       .open(ConsumeStockItemModalComponent, {
         minWidth: "40%",
