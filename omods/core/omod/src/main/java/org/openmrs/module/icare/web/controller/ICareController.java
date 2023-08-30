@@ -975,7 +975,7 @@ public class ICareController {
 			Map<String, Object> rolesMap = new HashMap<>();
 			rolesMap.put("display", role.getRole());
 			rolesMap.put("description", role.getDescription());
-			rolesMap.put("uuid", role.getDescription());
+			rolesMap.put("uuid", role.getUuid());
 			rolesMapList.add(rolesMap);
 		}
 		return rolesMapList;
@@ -990,7 +990,7 @@ public class ICareController {
 			Map<String, Object> privilegesMap = new HashMap<>();
 			privilegesMap.put("display", privilege.getPrivilege());
 			privilegesMap.put("description", privilege.getDescription());
-			privilegesMap.put("uuid", privilege.getDescription());
+			privilegesMap.put("uuid", privilege.getUuid());
 			privilegesMapList.add(privilegesMap);
 		}
 		return privilegesMapList;

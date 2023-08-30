@@ -116,6 +116,7 @@ export class ManageRolesComponent implements OnInit {
     this.selectedRoles = event?.checked
       ? [...this.selectedRoles, id]
       : (this.selectedRoles || [])?.filter((role) => role != id) || [];
+
   }
 
   onFormUpdate(formValues: FormValue): void {
