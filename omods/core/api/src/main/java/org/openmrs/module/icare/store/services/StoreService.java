@@ -149,11 +149,11 @@ public interface StoreService extends OpenmrsService {
 	
 	public IssueItem getIssueItemByUuid(String IssueItemUuid);
 	
-	ListResult<Item> getNearlyStockedOutByLocation(String locationUuid, Pager pager);
+	ListResult<Item> getNearlyStockedOutByLocation(String locationUuid, Pager pager, String q);
 	
-	ListResult<Item> getNearlyExpiredByLocation(String locationUuid, Pager pager);
+	ListResult<Item> getNearlyExpiredByLocation(String locationUuid, Pager pager, String q);
 	
-	ListResult<Item> getExpiredItemsByLocation(String locationUuid, Pager pager);
+	ListResult<Item> getExpiredItemsByLocation(String locationUuid, Pager pager, String q);
 	
 	ReorderLevel updateReorderLevel(ReorderLevel reorderLevel);
 	
