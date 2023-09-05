@@ -33,7 +33,11 @@
       </div>
     </div>
   </div>
-  <mat-tab-group (selectedTabChange)="onOpenNewTab($event)">
+  <mat-tab-group
+    [selectedIndex]="selectedIndex"
+    [animationDuration]="'2000ms'"
+    (selectedTabChange)="onOpenNewTab($event)"
+  >
     <mat-tab
       label="Sample Acceptance"
       *ngIf="
@@ -96,32 +100,6 @@
           ])
       "
     >
-      <!-- <ng-template matTabContent>
-        <div class="p-2">
-          <app-rejected-samples
-            [codedSampleRejectionReasons]="params?.codedSampleRejectionReasons"
-            [labConfigs]="labConfigs"
-            [datesParameters]="datesParameters"
-            [LISConfigurations]="LISConfigurations"
-            [patients]="patients"
-            [sampleTypes]="sampleTypes"
-            [labSamplesDepartments]="labSamplesDepartments"
-            [labSamplesContainers]="labSamplesContainers"
-            [userUuid]="userUuid"
-          ></app-rejected-samples>
-        </div>
-      </ng-template>
-    </mat-tab>
-    <mat-tab
-      label="Rejected at Laboratory"
-      *ngIf="
-        currentUser &&
-        (currentUser?.userPrivileges['ALL'] ||
-          currentUser?.userPrivileges[
-            'SAMPLE TESTING AND RESULTS_REJECTED_SAMPLES_VIEW_LIST'
-          ])
-      "
-    > -->
       <ng-template matTabContent>
         <div class="p-2">
           <app-samples-rejected-after-registration
