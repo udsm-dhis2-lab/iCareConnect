@@ -172,6 +172,12 @@ export class SampleAllocationService {
             ),
             authorizationIsReady,
             finalResults: finalResults,
+            savedOnce:
+              (
+                finalResults?.filter(
+                  (finalResult: any) => finalResult?.savedOnce
+                ) || []
+              )?.length > 0,
             finalResultsFedBy: finalResultsFedBy?.uuid
               ? finalResultsFedBy
               : finalResults && finalResults?.length > 0
@@ -204,6 +210,13 @@ export class SampleAllocationService {
 
   createTestAllocation(data: any): Observable<any> {
     return this.httpClient.post(`lab/allocation`, data).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
+  }
+
+  voidResults(data: any): Observable<any> {
+    return this.httpClient.put(`lab/voidmultipleresults`, data).pipe(
       map((response) => response),
       catchError((error) => of(error))
     );
