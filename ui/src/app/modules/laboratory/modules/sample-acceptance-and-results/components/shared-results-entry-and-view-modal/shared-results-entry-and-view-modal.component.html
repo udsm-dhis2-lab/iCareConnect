@@ -252,6 +252,20 @@
                               !order?.authorizationIsReady ? "Save" : "Amend"
                             }}
                           </button>
+
+                          <button
+                            class="mt-2"
+                            *ngIf="
+                              data?.actionType !== 'authorization' &&
+                              order?.savedOnce &&
+                              !order?.authorizationIsReady
+                            "
+                            mat-flat-button
+                            color="warn"
+                            (click)="onDeleteResults($event, order)"
+                          >
+                            Delete
+                          </button>
                           <button
                             *ngIf="
                               data?.actionType == 'authorization' &&
@@ -463,6 +477,19 @@
                             (click)="onSaveRelatedResults($event, order)"
                           >
                             Save
+                          </button>
+                          <button
+                            class="mt-2"
+                            *ngIf="
+                              data?.actionType !== 'authorization' &&
+                              order?.savedOnce &&
+                              !order?.authorizationIsReady
+                            "
+                            mat-flat-button
+                            color="warn"
+                            (click)="onDeleteResults($event, order)"
+                          >
+                            Delete
                           </button>
                           <button
                             *ngIf="
