@@ -47,7 +47,6 @@ export class PharmacyComponent implements OnInit {
       navigationDetails && navigationDetails?.path[0]
         ? navigationDetails?.path[0]?.replace("/pharmacy/", "")
         : "";
-    console.log("currentRoutePath", this.currentRoutePath);
     this.store.dispatch(
       go({
         path: ["/pharmacy/" + this.currentRoutePath],

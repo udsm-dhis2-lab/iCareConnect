@@ -139,6 +139,24 @@
             !params?.iCareConnectConfigurations?.isPharmacy || !showMenuItems
         }"
       >
+        <div class="row">
+          <div
+            class="col-12"
+            *ngIf="params?.iCareConnectConfigurations?.isPharmacy"
+          >
+            <div class="d-flex justify-content-left">
+              <button
+                [title]="showMenuItems ? 'Hide side menu' : 'Show side menu'"
+                (click)="toggleMenuItems($event)"
+                mat-icon-button
+                color="primary"
+                style="margin-top: -10px; margin-left: -10px"
+              >
+                <mat-icon>menu</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
         <div class="pharmacy-home-content w-100">
           <router-outlet></router-outlet>
         </div>
