@@ -36,7 +36,7 @@
         color="primary"
         mat-flat-button
         [disabled]="!isFormValid"
-        color="primary"
+        [color]="data?.type == 'warn' ? 'warn' : 'primary'"
         (click)="onConfirm($event)"
       >
         {{

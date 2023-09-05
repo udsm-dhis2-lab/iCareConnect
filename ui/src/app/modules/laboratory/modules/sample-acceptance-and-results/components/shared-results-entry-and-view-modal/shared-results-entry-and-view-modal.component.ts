@@ -497,20 +497,20 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
 
   onDeleteResults(event: Event, order: any): void {
     event.stopPropagation();
-    console.log(order);
     this.dialog
       .open(SharedConfirmationComponent, {
         minWidth: "20%",
         data: {
           modalTitle: "Delete results",
           modalMessage: `Are you sure you want to delete results?`,
-          showRemarksInput: false,
+          showRemarksInput: true,
           confirmationButtonText: "Delete",
+          type: "warn",
           remarksFieldLabel: "Reason",
         },
       })
       .afterClosed()
-      .subscribe((confirmed: boolean) => {
+      .subscribe((confirmed: any) => {
         if (confirmed) {
           const voidObject: any = {
             results: order?.finalResults?.map((result: any) => {
@@ -519,7 +519,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               };
             }),
             voided: true,
-            voidReason: "Deleted",
+            voidReason: confirmed?.remarks,
           };
           this.sampleAllocationService
             .voidResults(voidObject)
