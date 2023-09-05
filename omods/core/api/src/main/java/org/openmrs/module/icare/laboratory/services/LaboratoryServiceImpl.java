@@ -427,9 +427,6 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		}
 		
 		if (result.getTestedBy() != null) {
-			//			if (result.getTestedBy().getUuid() == null) {
-			//				throw new Exception("User is null. User for the result must be provided");
-			//			}
 			User testedBy = Context.getUserService().getUserByUuid(result.getTestedBy().getUuid());
 			result.setTestedBy(testedBy);
 		}
@@ -515,6 +512,39 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		for (Result result: results) {
 
 			Result response = this.recordTestAllocationResults(result);
+            /*
+			End of save status via results
+			* */
+//			TODO: Add support to accommodate new status on the allocation response
+			resultResponses.add(response.toMap());
+		}
+		return  resultResponses;
+	}
+	
+	@Override
+	public Result deleteTestAllocationResults(Result result) throws Exception {
+		return null;
+	}
+	
+	@Override
+	public Result updateTestAllocationResults(Result result) throws Exception {
+		Result response = this.resultDAO.update(result);
+		return response;
+	}
+	
+	@Override
+	public Result voidTestAllocationResults(Result result) throws Exception {
+		Result response = this.resultDAO.update(result);
+		return response;
+	}
+	
+	public List<Map<String, Object>> voidMultipleResults(Map<String, Object> resultsToVoid) throws Exception {
+		List<Map<String, Object>> resultResponses = new ArrayList<>();
+		for (Map<String, Object> result: (List<Map<String, Object>>) resultsToVoid.get("results")) {
+			Result resultData = resultDAO.findByUuid(result.get("uuid").toString());
+			resultData.setVoidReason(resultsToVoid.get("voidReason").toString());
+			resultData.setVoided((Boolean) resultsToVoid.get("voided"));
+			Result response = this.voidTestAllocationResults(resultData);
             /*
 			End of save status via results
 			* */

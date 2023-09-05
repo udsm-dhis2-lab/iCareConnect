@@ -55,6 +55,14 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	List<Map<String, Object>> saveMultipleResults(List<Result> results) throws Exception;
 	
+	Result deleteTestAllocationResults(Result result) throws Exception;
+	
+	Result updateTestAllocationResults(Result result) throws Exception;
+	
+	Result voidTestAllocationResults(Result result) throws Exception;
+	
+	List<Map<String, Object>> voidMultipleResults(Map<String, Object> resultsToVoid) throws Exception;
+	
 	Map<String, Object> saveResultsInstrument(Map<String, Object> resultsInstrumentObject) throws Exception;
 	
 	Sample getSampleByUuid(String sampleUuid);
