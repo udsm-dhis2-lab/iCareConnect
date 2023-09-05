@@ -244,9 +244,6 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 				mappings = null;
 			}
 			testConceptMap.put("mappings", mappings);
-			//			testConceptMap.put("names", this.getTestConcept().getNames());
-			//			testConceptMap.put("shortNames", this.getTestConcept().getShortNames());
-
 
 			if(this.getConceptSets() != null){
 				List<Map<String,Object>> parametersHeadersListMap = new ArrayList<>();
@@ -276,11 +273,14 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 		}
 		testAllocationMap.put("statuses", testAllocationStatusMap);
 		
-		List<Map<String, Object>> resultssMap = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> resultsMap = new ArrayList<Map<String, Object>>();
 		for (Result result : this.getTestAllocationResults()) {
-			resultssMap.add(result.toMap());
+			// Filter voided results
+			if (result.getVoided() == null || result.getVoided() == false) {
+				resultsMap.add(result.toMap());
+			}
 		}
-		testAllocationMap.put("results", resultssMap);
+		testAllocationMap.put("results", resultsMap);
 		Map<String, Object> order = new HashMap<String, Object>();
 		order.put("uuid", this.sampleOrder.getOrder().getUuid());
 		Map<String, Object> orderer = new HashMap<String, Object>();
