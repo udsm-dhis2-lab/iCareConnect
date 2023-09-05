@@ -497,6 +497,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
 
   onDeleteResults(event: Event, order: any): void {
     event.stopPropagation();
+    // console.log(order);
     this.dialog
       .open(SharedConfirmationComponent, {
         minWidth: "20%",
@@ -513,11 +514,27 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
       .subscribe((confirmed: any) => {
         if (confirmed) {
           const voidObject: any = {
-            results: order?.finalResults?.map((result: any) => {
-              return {
-                uuid: result?.uuid,
-              };
-            }),
+            results: flatten(
+              order?.finalResults?.map((result: any) => {
+                if (result?.uuid) {
+                  return {
+                    uuid: result?.uuid,
+                  };
+                } else {
+                  return flatten(
+                    result?.groups?.map((group: any) => {
+                      return flatten(
+                        group?.results?.map((result: any) => {
+                          return {
+                            uuid: result?.uuid,
+                          };
+                        })
+                      );
+                    })
+                  );
+                }
+              })
+            ),
             voided: true,
             voidReason: confirmed?.remarks,
           };
