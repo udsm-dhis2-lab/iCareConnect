@@ -727,12 +727,12 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
         } else if (testOrdersWithNoDepartments.length > 0) {
           this.errorMessage = `Test${
             testOrdersWithNoDepartments.length > 1 ? "s" : ""
-          }
-            (
+          }s
+            ${(
               testOrdersWithNoDepartments?.map(
                 (testOrderWithNoDept: any) => testOrderWithNoDept?.display
               ) || []
-            ).join(", ")
+            ).join(", ")}
             " ${
               testOrdersWithNoDepartments?.length > 1 ? " have " : " has "
             } no departments set, Contact IT for support`;
