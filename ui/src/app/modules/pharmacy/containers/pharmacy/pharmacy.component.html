@@ -89,7 +89,6 @@
             "
             (click)="changeRoute($event, 'home')"
             routerLinkActive="active-route"
-            routerLink="'/pharmacy/cashier'"
             [ngClass]="{
               'active-route': currentRoutePath === 'home',
               'for-lis-chip': params?.iCareConnectConfigurations?.isPharmacy
@@ -112,7 +111,6 @@
               params?.iCareConnectConfigurations?.isPharmacy
             "
             (click)="changeRoute($event, 'cashier')"
-            routerLink="'/pharmacy/cashier'"
             routerLinkActive="active-route"
             [ngClass]="{
               'active-route': currentRoutePath === 'cashier',
@@ -128,6 +126,98 @@
             }"
           >
             Cashier
+          </mat-chip>
+          <mat-chip
+            class="w-20"
+            *ngIf="
+              params?.privileges &&
+              params?.iCareConnectConfigurations?.isPharmacy
+            "
+            (click)="changeRoute($event, 'stock')"
+            routerLinkActive="active-route"
+            [ngClass]="{
+              'active-route': currentRoutePath === 'stock',
+              'for-lis-chip': params?.iCareConnectConfigurations?.isPharmacy
+            }"
+            [ngStyle]="{
+              'border-radius': params?.iCareConnectConfigurations?.isPharmacy
+                ? '0 !important'
+                : '',
+              padding: params?.iCareConnectConfigurations?.isPharmacy
+                ? '12px !important'
+                : ''
+            }"
+          >
+            Stock
+          </mat-chip>
+          <mat-chip
+            class="w-20"
+            *ngIf="
+              params?.privileges &&
+              params?.iCareConnectConfigurations?.isPharmacy
+            "
+            (click)="changeRoute($event, 'requisition')"
+            routerLinkActive="active-route"
+            [ngClass]="{
+              'active-route': currentRoutePath === 'requisition',
+              'for-lis-chip': params?.iCareConnectConfigurations?.isPharmacy
+            }"
+            [ngStyle]="{
+              'border-radius': params?.iCareConnectConfigurations?.isPharmacy
+                ? '0 !important'
+                : '',
+              padding: params?.iCareConnectConfigurations?.isPharmacy
+                ? '12px !important'
+                : ''
+            }"
+          >
+            Request
+          </mat-chip>
+          <mat-chip
+            class="w-20"
+            *ngIf="
+              params?.privileges &&
+              params?.iCareConnectConfigurations?.isPharmacy
+            "
+            (click)="changeRoute($event, 'issuing')"
+            routerLinkActive="active-route"
+            [ngClass]="{
+              'active-route': currentRoutePath === 'issuing',
+              'for-lis-chip': params?.iCareConnectConfigurations?.isPharmacy
+            }"
+            [ngStyle]="{
+              'border-radius': params?.iCareConnectConfigurations?.isPharmacy
+                ? '0 !important'
+                : '',
+              padding: params?.iCareConnectConfigurations?.isPharmacy
+                ? '12px !important'
+                : ''
+            }"
+          >
+            Issuing
+          </mat-chip>
+          <mat-chip
+            class="w-20"
+            *ngIf="
+              params?.privileges &&
+              params?.iCareConnectConfigurations?.isPharmacy
+            "
+            (click)="changeRoute($event, 'settings')"
+            routerLinkActive="active-route"
+            [ngClass]="{
+              'active-route': currentRoutePath === 'settings',
+              'for-lis-chip': params?.iCareConnectConfigurations?.isPharmacy
+            }"
+            [ngStyle]="{
+              'border-radius': params?.iCareConnectConfigurations?.isPharmacy
+                ? '0 !important'
+                : '',
+              padding: params?.iCareConnectConfigurations?.isPharmacy
+                ? '12px !important'
+                : ''
+            }"
+          >
+            Settings
           </mat-chip>
         </mat-chip-list>
       </div>
