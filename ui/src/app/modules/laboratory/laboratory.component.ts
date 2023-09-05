@@ -30,11 +30,11 @@ import {
   getCurrentLocation,
   getLoadedSystemSettingsState,
 } from "src/app/store/selectors";
-import { LISConfigurationsModel } from "./resources/models/lis-configurations.model";
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 import { Title } from "@angular/platform-browser";
 import { LocationService } from "src/app/core/services";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
 
 @Component({
   selector: "lab-root",
@@ -77,7 +77,7 @@ export class LaboratoryComponent implements OnInit {
    * 2. iCare.Laboratory.agencyConceptUuid
    */
 
-  LISConfigurations$: Observable<LISConfigurationsModel>;
+  LISConfigurations$: Observable<iCareConnectConfigurationsModel>;
   currentLocation$: Observable<any>;
   labs$: Observable<any[]>;
   errors: any[] = [];

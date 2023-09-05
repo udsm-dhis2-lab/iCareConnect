@@ -9,8 +9,8 @@ import {
   getProviderDetails,
 } from "src/app/store/selectors/current-user.selectors";
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
-import { LISConfigurationsModel } from "../../../resources/models/lis-configurations.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
+import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
 
 @Component({
   selector: "app-settings",
@@ -20,7 +20,7 @@ import { ConceptsService } from "src/app/shared/resources/concepts/services/conc
 export class SettingsComponent implements OnInit {
   selectedTab = new FormControl(0);
 
-  LISConfigurations$: Observable<LISConfigurationsModel>;
+  LISConfigurations$: Observable<iCareConnectConfigurationsModel>;
   provider$: Observable<any>;
   labSections$: any;
   currentUser$: Observable<any>;
