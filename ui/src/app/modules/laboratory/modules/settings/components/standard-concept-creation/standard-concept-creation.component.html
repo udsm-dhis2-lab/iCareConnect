@@ -104,7 +104,11 @@
         <fieldset *ngIf="standardSearchTerm === 'TEST_ORDERS'">
           <legend>Interpretations</legend>
           <div>
-            <app-test-interpretations></app-test-interpretations>
+            <app-test-interpretations
+              *ngIf="interpretationsReady"
+              [descriptions]="conceptBeingEdited?.descriptions"
+              (definedInterpretations)="onGetInterpretations($event)"
+            ></app-test-interpretations>
           </div>
 
           <mat-progress-bar
