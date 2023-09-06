@@ -26,6 +26,7 @@ import { SampleTypesListComponent } from "./sample-types-list/sample-types-list.
 import { ServerLogsComponent } from "./server-logs/server-logs.component";
 import { SharedPriceListComponent } from "./shared-price-list/shared-price-list.component";
 import { StandardConceptCreationComponent } from "./standard-concept-creation/standard-concept-creation.component";
+import { TestInterpretationsComponent } from "./test-interpretations/test-interpretations.component";
 import { TestMethodsComponent } from "./test-methods/test-methods.component";
 import { TestOrderParametersRelationshipComponent } from "./test-order-parameters-relationship/test-order-parameters-relationship.component";
 import { TestsControlComponent } from "./tests-control/tests-control.component";
@@ -72,6 +73,7 @@ export const components: any[] = [
   ServerLogsComponent,
   LoggedinusersComponent,
   AuditLogsComponent,
+  TestInterpretationsComponent,
 ];
 
 export const entrySettingComponents: any[] = [

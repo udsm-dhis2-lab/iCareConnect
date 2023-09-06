@@ -188,7 +188,7 @@ export class StandardConceptCreationComponent implements OnInit {
         id: "description",
         key: "description",
         value: descriptionsDetails ? descriptionsDetails?.description : null,
-        label: "Description/Interpretation",
+        label: "Description",
       }),
     ];
   }
@@ -290,7 +290,6 @@ export class StandardConceptCreationComponent implements OnInit {
           }, 200);
         }
       });
-      
   }
 
   onGetSelectedCodes(selectedCodes: any): void {

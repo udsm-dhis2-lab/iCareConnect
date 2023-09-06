@@ -11,6 +11,8 @@ import {
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
+import { MatTabChangeEvent } from "@angular/material/tabs";
+import { go } from "src/app/store/actions";
 
 @Component({
   selector: "app-settings",
@@ -24,13 +26,36 @@ export class SettingsComponent implements OnInit {
   provider$: Observable<any>;
   labSections$: any;
   currentUser$: Observable<any>;
+  selectedIndex: number = 0;
   constructor(
-    private router: Router,
     private store: Store<AppState>,
     private conceptService: ConceptsService
   ) {}
 
   ngOnInit(): void {
+    try {
+      this.selectedIndex =
+        localStorage.getItem("labSettingsModuleTab") &&
+        Number(JSON.parse(localStorage.getItem("labSettingsModuleTab"))?.index)
+          ? Number(
+              JSON.parse(localStorage.getItem("labSettingsModuleTab"))?.index
+            )
+          : this.selectedIndex;
+      const label: string =
+        localStorage.getItem("labSettingsModuleTab") &&
+        JSON.parse(localStorage.getItem("labSettingsModuleTab"))?.label
+          ? JSON.parse(localStorage.getItem("labSettingsModuleTab"))?.label
+          : "";
+      this.store.dispatch(
+        go({
+          path: ["/laboratory/settings"],
+          query: { queryParams: { tab: label } },
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+
     this.LISConfigurations$ = this.store.select(getLISConfigurations);
     this.provider$ = this.store.select(getProviderDetails);
     this.labSections$ =
@@ -39,19 +64,17 @@ export class SettingsComponent implements OnInit {
     this.currentUser$ = this.store.select(getCurrentUserDetails);
   }
 
-  changeRoute(e, val, path) {
-    e.stopPropagation();
-    this.selectedTab.setValue(val);
-  }
-
-  onChangeRoute(e) {
-    // console.log(e);
-    // if (e.index == 0) {
-    //   this.router.navigate(['/laboratory/settings/tests-control']);
-    // } else if (e.index == 1) {
-    //   this.router.navigate(['/laboratory/settings/tests-settings']);
-    // } else if (e.index == 2) {
-    //   this.router.navigate(['/laboratory/settings/lab-configurations']);
-    // }
+  onChangeTab(event: MatTabChangeEvent): void {
+    const tabsDetails: any = {
+      index: event?.index,
+      label: event?.tab?.textLabel?.split(" ").join("-"),
+    };
+    localStorage.setItem("labSettingsModuleTab", JSON.stringify(tabsDetails));
+    this.store.dispatch(
+      go({
+        path: ["/laboratory/settings"],
+        query: { queryParams: { tab: tabsDetails?.label } },
+      })
+    );
   }
 }
