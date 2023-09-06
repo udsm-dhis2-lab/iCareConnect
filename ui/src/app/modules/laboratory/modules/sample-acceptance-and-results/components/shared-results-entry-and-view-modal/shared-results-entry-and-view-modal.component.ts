@@ -535,6 +535,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                 }
               })
             ),
+            sample: this.data?.sample?.uuid,
             voided: true,
             voidReason: confirmed?.remarks,
           };
