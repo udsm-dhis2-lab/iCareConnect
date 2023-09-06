@@ -13,9 +13,9 @@
   ></mat-progress-bar>
   <mat-tab-group
     *ngIf="params?.LISConfigurations && params?.currentUser"
-    [selectedIndex]="selectedTab.value"
-    (selectedTabChange)="onChangeRoute($event)"
-    (selectedIndexChange)="selectedTab.setValue($event)"
+    [selectedIndex]="selectedIndex"
+    [animationDuration]="'1800ms'"
+    (selectedTabChange)="onChangeTab($event)"
   >
     <mat-tab
       label="Tests Parameters Management"

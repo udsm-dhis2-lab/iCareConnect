@@ -101,6 +101,17 @@
             mode="indeterminate"
           ></mat-progress-bar>
         </fieldset>
+        <fieldset *ngIf="standardSearchTerm === 'TEST_ORDERS'">
+          <legend>Interpretations</legend>
+          <div>
+            <app-test-interpretations></app-test-interpretations>
+          </div>
+
+          <mat-progress-bar
+            *ngIf="!params?.conceptSources"
+            mode="indeterminate"
+          ></mat-progress-bar>
+        </fieldset>
       </div>
     </div>
     <div class="w-100" *ngIf="savingMessage">
