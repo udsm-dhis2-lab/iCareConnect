@@ -545,6 +545,26 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			resultData.setVoidReason(resultsToVoid.get("voidReason").toString());
 			resultData.setVoided((Boolean) resultsToVoid.get("voided"));
 			Result response = this.voidTestAllocationResults(resultData);
+			// retire corresponding sample status for results
+			String sampleUuid = resultsToVoid.get("sample").toString();
+			Sample sample = sampleDAO.findByUuid(sampleUuid);
+			for (SampleStatus sampleStatus: sample.getSampleStatuses()) {
+				if (sampleStatus.getCategory().equals("HAS_RESULTS")) {
+					sampleStatus.setRetired(true);
+					SampleStatus statusUpdateResponse = sampleStatusDAO.update(sampleStatus);
+
+					SampleStatus newSampleStatus = new SampleStatus();
+					newSampleStatus.setSample(sample);
+					newSampleStatus.setCategory("RESULTS_DELETED");
+					newSampleStatus.setStatus("DELETED RESULTS");
+					newSampleStatus.setRemarks("Auto saved status");
+					User user = Context.getAuthenticatedUser();
+					newSampleStatus.setUser(user);
+					Date date = new Date();
+					newSampleStatus.setTimestamp(date);
+					SampleStatus newStatusResponse = sampleStatusDAO.save(newSampleStatus);
+				}
+			}
             /*
 			End of save status via results
 			* */
@@ -1072,7 +1092,6 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		testOrderLocation.setLocation(location);
 		testOrderLocation.setUser(user);
 		testOrderLocation.setDateTime(date);
-		System.out.println(testOrderLocation.toMap());
 		
 		testOrderLocationDAO.save(testOrderLocation);
 		
