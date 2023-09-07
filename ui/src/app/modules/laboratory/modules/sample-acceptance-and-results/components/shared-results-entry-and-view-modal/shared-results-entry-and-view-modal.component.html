@@ -9,10 +9,10 @@
   <mat-toolbar color="primary">
     <div class="w-100 d-flex justify-content-between">
       <div class="w-50 d-flex justify-content-left">
-        Result entry & Review -
+        Result entry & Review
         <span class="ml-4" *ngIf="!data?.LISConfigurations?.isLIS">
           <span
-            >Patient:
+            >- Patient:
             {{ data?.sample?.patient?.givenName }}
             {{ data?.sample?.patient?.midllename }}
             {{ data?.sample?.patient?.familyName }} | </span
@@ -93,6 +93,29 @@
                         >
                           <ng-container>
                             <div
+                              class="col-12"
+                              *ngIf="order?.allocations?.length > 0"
+                            >
+                              <mat-form-field
+                                class="w-50 search-input"
+                                style="font-size: 0.9rem"
+                              >
+                                <mat-label>Search</mat-label>
+                                <mat-icon matPrefix>search</mat-icon
+                                ><input
+                                  type="text"
+                                  placeholder="Search"
+                                  matInput
+                                  autocomplete="off"
+                                  [(ngModel)]="
+                                    parametersSearchingText[
+                                      order?.concept?.uuid
+                                    ]
+                                  "
+                                />
+                              </mat-form-field>
+                            </div>
+                            <div
                               [ngClass]="{
                                 'col-12':
                                   !allocationData?.isSetMember ||
@@ -117,7 +140,13 @@
                               matTooltip="Double Click to view history"
                               [matTooltipPosition]="'above'"
                               class="entry-col"
-                              *ngFor="let allocationData of order?.allocations"
+                              *ngFor="
+                                let allocationData of order?.allocations
+                                  | filterAllocationsByName
+                                    : parametersSearchingText[
+                                        order?.concept?.uuid
+                                      ]
+                              "
                             >
                               <div
                                 class="w-100"
@@ -173,6 +202,27 @@
                               {{ header?.display }}
                             </div>
                             <div
+                              class="col-12"
+                              *ngIf="header?.allocations?.length >= 5"
+                            >
+                              <mat-form-field
+                                class="w-50 search-input"
+                                style="font-size: 0.9rem"
+                              >
+                                <mat-label>Search</mat-label>
+                                <mat-icon matPrefix>search</mat-icon
+                                ><input
+                                  type="text"
+                                  placeholder="Search"
+                                  matInput
+                                  autocomplete="off"
+                                  [(ngModel)]="
+                                    parametersSearchingText[header?.headerUuid]
+                                  "
+                                />
+                              </mat-form-field>
+                            </div>
+                            <div
                               [ngClass]="{
                                 'col-12':
                                   !allocationData?.isSetMember ||
@@ -197,7 +247,13 @@
                               matTooltip="Double Click to view history"
                               [matTooltipPosition]="'above'"
                               class="entry-col"
-                              *ngFor="let allocationData of header?.allocations"
+                              *ngFor="
+                                let allocationData of header?.allocations
+                                  | filterAllocationsByName
+                                    : parametersSearchingText[
+                                        header?.headerUuid
+                                      ]
+                              "
                             >
                               <div
                                 class="w-100"

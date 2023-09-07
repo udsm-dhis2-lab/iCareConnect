@@ -53,6 +53,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   selectedInstruments: any = {};
   multipleResults: any = [];
   selectedTestedByDetails: any = {};
+  parametersSearchingText: any = {};
 
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
