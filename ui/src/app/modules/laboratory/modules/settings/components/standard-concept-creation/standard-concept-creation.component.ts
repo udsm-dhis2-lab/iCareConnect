@@ -318,6 +318,7 @@ export class StandardConceptCreationComponent implements OnInit {
     relatedMetadataAttributeUuid?: string
   ): void {
     event.stopPropagation();
+    this.interpretationsReady = false;
     const conceptName =
       (this.standardSearchTerm ? this.standardSearchTerm + ":" : "") +
       this.formData["name"]?.value;
@@ -495,6 +496,7 @@ export class StandardConceptCreationComponent implements OnInit {
           ).subscribe((response: any) => {
             if (response) {
               // Update attribute if exists
+              this.interpretationsReady = false;
               this.conceptService
                 .updateConceptAttribute(
                   response?.uuid,
