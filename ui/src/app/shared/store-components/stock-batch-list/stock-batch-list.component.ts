@@ -30,7 +30,6 @@ export class StockBatchListComponent implements OnInit {
   constructor(private dialog: MatDialog, private store: Store<AppState>) {}
 
   ngOnInit() {
-    console.log("currentStore", this.currentStore);
     this.userPrivileges$ = this.store.select(getCurrentUserPrivileges);
     this.isCurrentLocationMainStore$ = this.store.pipe(
       select(getIfCurrentLocationIsMainStore)

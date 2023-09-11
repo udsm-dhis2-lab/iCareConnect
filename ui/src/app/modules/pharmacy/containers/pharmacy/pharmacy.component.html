@@ -83,10 +83,7 @@
           </div>
           <mat-chip
             class="w-20"
-            *ngIf="
-              params?.privileges &&
-              params?.iCareConnectConfigurations?.isPharmacy
-            "
+            *ngIf="params?.privileges"
             (click)="changeRoute($event, 'home')"
             routerLinkActive="active-route"
             [ngClass]="{
@@ -106,10 +103,7 @@
           </mat-chip>
           <mat-chip
             class="w-20"
-            *ngIf="
-              params?.privileges &&
-              params?.iCareConnectConfigurations?.isPharmacy
-            "
+            *ngIf="params?.privileges"
             (click)="changeRoute($event, 'cashier')"
             routerLinkActive="active-route"
             [ngClass]="{
@@ -129,10 +123,7 @@
           </mat-chip>
           <mat-chip
             class="w-20"
-            *ngIf="
-              params?.privileges &&
-              params?.iCareConnectConfigurations?.isPharmacy
-            "
+            *ngIf="params?.privileges"
             (click)="changeRoute($event, 'stock')"
             routerLinkActive="active-route"
             [ngClass]="{
@@ -152,10 +143,7 @@
           </mat-chip>
           <mat-chip
             class="w-20"
-            *ngIf="
-              params?.privileges &&
-              params?.iCareConnectConfigurations?.isPharmacy
-            "
+            *ngIf="params?.privileges"
             (click)="changeRoute($event, 'requisition')"
             routerLinkActive="active-route"
             [ngClass]="{
@@ -175,10 +163,7 @@
           </mat-chip>
           <mat-chip
             class="w-20"
-            *ngIf="
-              params?.privileges &&
-              params?.iCareConnectConfigurations?.isPharmacy
-            "
+            *ngIf="params?.privileges"
             (click)="changeRoute($event, 'issuing')"
             routerLinkActive="active-route"
             [ngClass]="{
@@ -198,10 +183,7 @@
           </mat-chip>
           <mat-chip
             class="w-20"
-            *ngIf="
-              params?.privileges &&
-              params?.iCareConnectConfigurations?.isPharmacy
-            "
+            *ngIf="params?.privileges"
             (click)="changeRoute($event, 'settings')"
             routerLinkActive="active-route"
             [ngClass]="{
