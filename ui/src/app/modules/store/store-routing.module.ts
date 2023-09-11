@@ -10,11 +10,12 @@ import { StockOutItemsComponent } from "src/app/shared/store-components/stock-ou
 import { StoreSettingsComponent } from "src/app/shared/store-pages/store-settings/store-settings.component";
 import { NearlyStockedOutItemsComponent } from "src/app/shared/store-components/nearly-stocked-out/nearly-stocked-out-items.component";
 import { NearlyExpiredItemsComponent } from "src/app/shared/store-components/nearly-expired/nearly-expired-items.component";
+import { StoreHomePageComponent } from "./pages/store-home-page/store-home-page.component";
 
 const routes: Routes = [
   {
     path: "",
-    component: StoreHomeComponent,
+    component: StoreHomePageComponent,
     children: [
       {
         path: "",
