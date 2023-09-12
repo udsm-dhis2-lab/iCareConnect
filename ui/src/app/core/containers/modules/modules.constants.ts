@@ -121,6 +121,14 @@ export const ICARE_APPS: ICAREApp[] = [
     order: 7,
   },
   {
+    name: "Pharmacy",
+    id: "pharmacy",
+    image: "assets/material/dispensing.png",
+    icon: "store",
+    path: "./pharmacy",
+    order: 25,
+  },
+  {
     name: "Store",
     id: "store",
     image: "assets/material/store.png",

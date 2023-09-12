@@ -14,7 +14,7 @@
         ><input matInput (keyup)="onSearchSamples($event)" />
       </mat-form-field>
 
-      <mat-form-field appearance="fill" class="w-50 ml-2">
+      <mat-form-field appearance="fill" class="ml-2">
         <mat-label
           >Select
           {{ !LISConfigurations?.isLIS ? "Department" : "Section" }}</mat-label
@@ -46,69 +46,6 @@
         (formUpdate)="onSearchByEquipment($event)"
       ></app-form>
     </div>
-
-    <div
-      class="col-md-12 col-sx-12 col-sm-12 d-flex justify-content-end"
-      style="height: 20px"
-      *ngIf="showLegend"
-    >
-      <table style="border: none; margin-left: 15px">
-        <tr style="height: 30px">
-          <td style="width: 40px; border: solid 1px #eee"></td>
-          <td>
-            <div style="margin-left: 3px; margin-right: 20px">
-              No results filled
-            </div>
-          </td>
-          <td
-            style="background-color: #ec864acf; width: 40px; margin-left: 20px"
-          ></td>
-          <td>
-            <div style="margin-left: 3px; margin-right: 20px">Has results</div>
-          </td>
-          <td
-            style="width: 40px; margin-left: 20x"
-            [ngStyle]="{
-              'background-color': !LISConfigurations?.isLIS
-                ? '#f5f171f7'
-                : '#0080009e'
-            }"
-          ></td>
-          <td>
-            <div style="margin-left: 3px; margin-right: 20px">
-              {{
-                !LISConfigurations?.isLIS
-                  ? "Waiting second approval"
-                  : "Authorized"
-              }}
-            </div>
-          </td>
-          <!-- <td
-            *ngIf="LISConfigurations?.isLIS"
-            style="background-color: #d04747ab; width: 40px; margin-left: 20px"
-          ></td>
-          <td *ngIf="LISConfigurations?.isLIS">
-            <div style="margin-left: 3px">Has Amended results</div>
-          </td> -->
-
-          <td
-            *ngIf="!LISConfigurations?.isLIS"
-            style="background-color: #d04747ab; width: 40px; margin-left: 20px"
-          ></td>
-          <td *ngIf="!LISConfigurations?.isLIS">
-            <div style="margin-left: 3px">Has rejected results</div>
-          </td>
-
-          <td
-            *ngIf="!LISConfigurations?.isLIS"
-            style="background-color: #6fd67bcf; width: 40px; margin-left: 20px"
-          ></td>
-          <td *ngIf="!LISConfigurations?.isLIS">
-            <div style="margin-left: 3px">Completed</div>
-          </td>
-        </tr>
-      </table>
-    </div>
   </div>
 
   <mat-progress-bar
@@ -116,7 +53,7 @@
     *ngIf="!params?.samples"
   ></mat-progress-bar>
   <div class="row">
-    <div class="col-md-6 col-sx-12 col-sm-12 d-flex justify-content-left">
+    <div class="col-md-3 col-sx-12 col-sm-12 d-flex justify-content-left">
       <mat-radio-group *ngIf="!LISConfigurations?.isLIS">
         <mat-radio-button
           color="primary"
@@ -137,9 +74,9 @@
     </div>
     <div
       *ngIf="params?.samples"
-      class="col-md-6 col-sx-12 col-sm-12 mt-3 d-flex justify-content-end"
+      class="col-md-9 col-sx-12 col-sm-12 mt-1 d-flex justify-content-end"
     >
-      <section>
+      <section class="w-50 d-flex justify-content-end">
         <mat-checkbox
           *ngIf="LISConfigurations?.isLIS"
           [disabled]="
@@ -184,6 +121,81 @@
           >Names</mat-checkbox
         >
       </section>
+
+      <div
+        class="w-50 mb-2 d-flex justify-content-end"
+        style="height: 20px"
+        *ngIf="showLegend"
+      >
+        <table style="border: none; margin-left: 15px">
+          <tr style="height: 20px">
+            <td style="width: 30px; border: solid 1px #e2e2e2"></td>
+            <td>
+              <div style="margin-left: 3px; margin-right: 20px">No results</div>
+            </td>
+            <td
+              style="
+                background-color: #ec864acf;
+                width: 30px;
+                margin-left: 20px;
+              "
+            ></td>
+            <td>
+              <div style="margin-left: 3px; margin-right: 20px">
+                Has results
+              </div>
+            </td>
+            <td
+              style="width: 30px; margin-left: 20x"
+              [ngStyle]="{
+                'background-color': !LISConfigurations?.isLIS
+                  ? '#f5f171f7'
+                  : '#0080009e'
+              }"
+            ></td>
+            <td>
+              <div style="margin-left: 3px; margin-right: 20px">
+                {{
+                  !LISConfigurations?.isLIS
+                    ? "Waiting second approval"
+                    : "Authorized"
+                }}
+              </div>
+            </td>
+            <!-- <td
+          *ngIf="LISConfigurations?.isLIS"
+          style="background-color: #d04747ab; width: 40px; margin-left: 20px"
+        ></td>
+        <td *ngIf="LISConfigurations?.isLIS">
+          <div style="margin-left: 3px">Has Amended results</div>
+        </td> -->
+
+            <td
+              *ngIf="!LISConfigurations?.isLIS"
+              style="
+                background-color: #d04747ab;
+                width: 40px;
+                margin-left: 20px;
+              "
+            ></td>
+            <td *ngIf="!LISConfigurations?.isLIS">
+              <div style="margin-left: 3px">Has rejected results</div>
+            </td>
+
+            <td
+              *ngIf="!LISConfigurations?.isLIS"
+              style="
+                background-color: #6fd67bcf;
+                width: 40px;
+                margin-left: 20px;
+              "
+            ></td>
+            <td *ngIf="!LISConfigurations?.isLIS">
+              <div style="margin-left: 3px">Completed</div>
+            </td>
+          </tr>
+        </table>
+      </div>
     </div>
   </div>
   <ng-container *ngIf="listType === 'samples'">
@@ -396,7 +408,7 @@
                     Dispose
                   </button>
                 </div>
-                <div class="d-flex justify-content-center">
+                <div class="d-flex justify-content-end">
                   <div
                     class="d-flex justify-content-end"
                     *ngIf="
@@ -473,7 +485,7 @@
                     >
                       Reject
                     </button>
-                    <section class="ml-4" title="Tick to accept or reject">
+                    <section class="ml-4 mt-2" title="Tick to accept or reject">
                       <mat-checkbox
                         color="primary"
                         [checked]="keyedSelectedSamples[sample?.id]"
@@ -495,7 +507,7 @@
                     Send
                   </button>
                 </div>
-                <div class="w-100">
+                <div class="w-100 d-flex justify-content-end">
                   <button
                     *ngIf="LISConfigurations?.isLIS"
                     mat-flat-button
@@ -860,7 +872,7 @@
                                       Reject
                                     </button>
                                     <section
-                                      class="ml-4"
+                                      class="ml-4 mt-2"
                                       title="Tick to accept or reject"
                                     >
                                       <mat-checkbox
@@ -900,7 +912,7 @@
                                     Send
                                   </button>
                                 </div>
-                                <div class="w-100">
+                                <div class="w-100 d-flex justify-content-end">
                                   <button
                                     *ngIf="LISConfigurations?.isLIS"
                                     mat-flat-button

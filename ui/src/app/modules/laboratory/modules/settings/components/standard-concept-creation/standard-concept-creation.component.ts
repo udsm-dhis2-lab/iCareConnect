@@ -43,6 +43,7 @@ export class StandardConceptCreationComponent implements OnInit {
   selectedCodingItems: any[] = [];
   mappings: any[] = [];
   readyToCollectCodes: boolean = false;
+  interpretationsReady: boolean = false;
 
   @Output() conceptCreated: EventEmitter<boolean> = new EventEmitter<boolean>();
 
@@ -69,6 +70,7 @@ export class StandardConceptCreationComponent implements OnInit {
   relatedMetadataAttributeUuid$: Observable<string>;
   errors: any[];
   attributesValues: any[] = [];
+  interpretations: any[] = [];
   constructor(
     private conceptService: ConceptsService,
     private billableItemService: BillableItemsService,
@@ -166,8 +168,14 @@ export class StandardConceptCreationComponent implements OnInit {
     ) || [])[0];
     // Add support to support multiple languages
     const descriptionsDetails =
-      data?.descriptions?.length > 0 ? data?.descriptions[0] : null;
+      data?.descriptions?.length > 0
+        ? (data?.descriptions?.filter(
+            (description: any) =>
+              description?.description?.indexOf("INTERPRETATION") === -1
+          ) || [])[0]
+        : null;
     this.readyToCollectCodes = true;
+    this.interpretationsReady = true;
     this.basicConceptFields = [
       new Textbox({
         id: "name",
@@ -188,7 +196,7 @@ export class StandardConceptCreationComponent implements OnInit {
         id: "description",
         key: "description",
         value: descriptionsDetails ? descriptionsDetails?.description : null,
-        label: "Description/Interpretation",
+        label: "Description",
       }),
     ];
   }
@@ -222,6 +230,11 @@ export class StandardConceptCreationComponent implements OnInit {
 
   onGetSelectedSetMembers(selectedSetMembers: ConceptGetFull[]): void {
     this.selectedSetMembers = selectedSetMembers;
+  }
+
+  onGetInterpretations(interpretations: any[]): void {
+    console.log("interpretations", interpretations);
+    this.interpretations = interpretations;
   }
 
   onCancel(event: Event): void {
@@ -272,6 +285,8 @@ export class StandardConceptCreationComponent implements OnInit {
 
           this.editingSet = true;
           this.readyToCollectCodes = false;
+
+          this.interpretationsReady = false;
           this.selectedCodingItems =
             response?.mappings.map((mapping) => {
               return {
@@ -286,11 +301,11 @@ export class StandardConceptCreationComponent implements OnInit {
             this.editingSet = false;
             this.setMembersReadySet = true;
             this.readyToCollectCodes = true;
+            this.interpretationsReady = true;
             this.selectedSetMembers = response?.setMembers;
           }, 200);
         }
       });
-      
   }
 
   onGetSelectedCodes(selectedCodes: any): void {
@@ -303,6 +318,7 @@ export class StandardConceptCreationComponent implements OnInit {
     relatedMetadataAttributeUuid?: string
   ): void {
     event.stopPropagation();
+    this.interpretationsReady = false;
     const conceptName =
       (this.standardSearchTerm ? this.standardSearchTerm + ":" : "") +
       this.formData["name"]?.value;
@@ -411,7 +427,17 @@ export class StandardConceptCreationComponent implements OnInit {
           description: this.formData["description"]?.value,
           locale: "en",
         },
-      ],
+        ...this.interpretations.map((interpretation: any) => {
+          return {
+            description:
+              "INTERPRETATION:" +
+              interpretation?.label?.value +
+              "::" +
+              interpretation?.interpretation?.value,
+            locale: "en",
+          };
+        }),
+      ]?.filter((description: any) => description?.description),
       datatype: this.dataType
         ? this.dataType
         : this.formData["datatype"]?.value
@@ -470,6 +496,7 @@ export class StandardConceptCreationComponent implements OnInit {
           ).subscribe((response: any) => {
             if (response) {
               // Update attribute if exists
+              this.interpretationsReady = false;
               this.conceptService
                 .updateConceptAttribute(
                   response?.uuid,

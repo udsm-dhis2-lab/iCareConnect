@@ -529,7 +529,7 @@ export class LabSample {
   get hasResults(): boolean {
     return (
       this.sample?.statuses?.filter(
-        (status) => status?.category === "HAS_RESULTS"
+        (status) => status?.category === "HAS_RESULTS" && !status?.retired
       ) || []
     )?.length > 0
       ? true

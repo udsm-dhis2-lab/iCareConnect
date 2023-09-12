@@ -3,9 +3,9 @@ import { MatRadioChange } from "@angular/material/radio";
 import { Store } from "@ngrx/store";
 import { Observable, of, zip } from "rxjs";
 import { catchError, map, take, tap, withLatestFrom } from "rxjs/operators";
+import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { LabSampleModel } from "src/app/modules/laboratory/resources/models";
-import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
 import { RegistrationService } from "src/app/modules/registration/services/registration.services";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { DateTimeField } from "src/app/shared/modules/form/models/date-time-field.model";
@@ -33,7 +33,7 @@ import { getCurrentUserDetails } from "src/app/store/selectors/current-user.sele
 export class RegisterSampleComponent implements OnInit {
   @Input() currentUser: any;
   @Input() provider: any;
-  @Input() LISConfigurations: LISConfigurationsModel;
+  @Input() LISConfigurations: iCareConnectConfigurationsModel;
   @Input() labSections: ConceptGetFull[];
   @Input() fromMaintenance: boolean;
   @Input() specimenSources: ConceptGetFull[];

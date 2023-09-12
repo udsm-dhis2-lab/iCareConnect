@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { AppState } from "src/app/store/reducers";
 import {
@@ -41,7 +41,7 @@ export class HomeComponent implements OnInit {
   configs$: Observable<any>;
   codedSampleRejectionReasons$: Observable<any>;
 
-  LISConfigurations$: Observable<LISConfigurationsModel>;
+  LISConfigurations$: Observable<iCareConnectConfigurationsModel>;
   currentUser$: Observable<any>;
   privileges$: Observable<any>;
   providerDetails$: Observable<any>;

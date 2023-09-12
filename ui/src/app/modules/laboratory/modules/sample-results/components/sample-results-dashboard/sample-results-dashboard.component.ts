@@ -3,8 +3,8 @@ import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { orderBy } from "lodash";
 import { Observable, zip } from "rxjs";
+import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
 import { OtherClientLevelSystemsService } from "src/app/modules/laboratory/resources/services/other-client-level-systems.service";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { SharedSamplesVerificationIntegratedComponent } from "src/app/shared/dialogs/shared-samples-verification-integrated/shared-samples-verification-integrated.component";
@@ -35,7 +35,7 @@ export class SampleResultsDashboardComponent implements OnInit {
   @Input() labSamplesContainers: any;
   @Input() configs: any;
   @Input() codedSampleRejectionReasons: any;
-  @Input() LISConfigurations: LISConfigurationsModel;
+  @Input() LISConfigurations: iCareConnectConfigurationsModel;
   @Input() currentUser: any;
   @Input() privileges: any;
   @Input() providerDetails: any;
