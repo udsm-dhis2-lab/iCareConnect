@@ -203,6 +203,9 @@ export class ModulesSelectorComponent implements OnInit {
                 (this.currentModule?.app?.path === "/laboratory" &&
                 this.lisConfigurations?.isLIS
                   ? "/dashboard-lab"
+                  : this.currentModule?.app?.path === "/pharmacy" &&
+                    this.lisConfigurations?.isPharmacy
+                  ? "/home"
                   : "") +
                 (this.currentModule?.app?.considerLocationRoute
                   ? "/" + this.currentLocation?.uuid

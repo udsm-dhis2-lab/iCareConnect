@@ -13,7 +13,7 @@
                  date_created="2016-12-28 11:54:56" voided="false" uuid="ee11bea3-3aad-4266-a5d7-bc6f3a6aaee5" />
 
     <!-- Users -->
-    <users user_id="300" system_id="300-3" username=""
+    <users user_id="300" system_id="300-3" username="administrator"
            password=""
            salt=""
            secret_question="" creator="1" date_created="2016-08-22 13:56:44" changed_by="1" date_changed="2017-02-02 11:21:25"
@@ -215,7 +215,7 @@
     <lb_test_allocation test_allocation_id="323" uuid="222yyy70-7777-11e3-1221-0sndiu87hsju" sample_id="203" order_id="302" label="Allocation Lable x" concept_id="501"  date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
 
 
-    <lb_test_result uuid="222yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="123" test_allocation_id="323" concept_id="900" value_text="positive" date_created="2020-12-27 00:00:00" voided="false" creator="1" instrument_id="10"/>
+    <lb_test_result uuid="222yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="123" test_allocation_id="323" concept_id="900" value_text="positive" date_created="2020-12-27 00:00:00" voided="false" void_reason="" creator="1" instrument_id="10"/>
 
     <lb_test_result uuid="223yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="223" test_allocation_id="322" concept_id="500" value_text="positive" date_created="2020-12-27 00:00:00" voided="false" creator="1" instrument_id="10"/>
     <lb_test_result uuid="245yyy70-7777-11e3-1221-0sndiu87hsj3" test_result_id="223" test_allocation_id="322" concept_id="501" value_text="DETECTED" date_created="2020-12-27 00:00:00" voided="false" creator="1" instrument_id="810"/>

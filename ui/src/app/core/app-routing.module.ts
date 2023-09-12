@@ -59,6 +59,14 @@ const routes: Routes = [
         canActivate: [AuthGuard],
       },
       {
+        path: "pharmacy",
+        loadChildren: () =>
+          import("../modules/pharmacy/pharmacy.module").then(
+            (m) => m.PharmacyModule
+          ),
+        canActivate: [AuthGuard],
+      },
+      {
         path: "dispensing",
         loadChildren: () =>
           import("../modules/dispensing/dispensing.module").then(

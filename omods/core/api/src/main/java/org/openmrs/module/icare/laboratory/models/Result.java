@@ -103,8 +103,8 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		return this.abnormal;
 	}
 	
-	public void setAbnormal(Boolean abormalResults) {
-		this.abnormal = abormalResults;
+	public void setAbnormal(Boolean abnormalResults) {
+		this.abnormal = abnormalResults;
 	}
 	
 	public TestAllocation getTestAllocation() {
@@ -229,7 +229,10 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 
 	public static Result fromMap(Map<String, Object> map) throws ParseException {
 		Result result = new Result();
-		
+
+		if ((map.get("uuid")) != null) {
+			result.setUuid((map.get("uuid").toString()));
+		}
 		if ((map.get("valueText")) != null) {
 			result.setValueText((map.get("valueText").toString()));
 		}
@@ -273,6 +276,22 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 				result.abnormal = true;
 			} else {
 				result.abnormal = false;
+			}
+		}
+
+		if (map.get("voided") != null) {
+			if ((Boolean) map.get("voided")) {
+				result.setVoided(true);
+				if (map.get("voidReason") != null) {
+					result.setVoidReason(map.get("voidReason").toString());
+				}
+				if (map.get("voidedBy") != null) {
+					User voidedBy = new User();
+					voidedBy.setUuid(map.get("voidedBy").toString());
+					result.setVoidedBy(voidedBy);
+				}
+			} else {
+				result.setVoided(false);
 			}
 		}
 		
@@ -366,8 +385,22 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 			resultsObject.put("testedBy", testedByObject);
 		}
 
-		if(this.getTestedDate() != null){
+		if (this.getTestedDate() != null) {
 			resultsObject.put("testedDate",this.getTestedDate().toString());
+		}
+
+		if (this.getVoided() != null) {
+			resultsObject.put("voided",this.getVoided());
+		}
+		if (this.getVoidedBy() != null) {
+			Map<String, Object> voidedBy = new HashMap<>();
+			voidedBy.put("uuid", this.getVoidedBy().getUuid());
+			voidedBy.put("display", this.getVoidedBy().getDisplayString());
+			resultsObject.put("voidedBy",voidedBy);
+		}
+
+		if (this.getVoidReason() != null) {
+			resultsObject.put("voidReason",this.getVoidReason());
 		}
 
 
@@ -401,7 +434,9 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 			instrumentsCodes = getCodes();
 			instrument.put("uuid", this.getInstrument().getUuid());
 			instrument.put("display", this.getInstrument().getDisplayString());
-			instrument.put("name", this.getInstrument().getName().getName());
+			if (this.getInstrument().getName() != null && this.getInstrument().getName().getName() != null) {
+				instrument.put("name", this.getInstrument().getName().getName());
+			}
 			instrument.put("instrumentCodes", instrumentsCodes);
 		} else {
 			instrument = null;

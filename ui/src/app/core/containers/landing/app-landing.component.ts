@@ -38,6 +38,14 @@ export class LandingComponent implements OnInit {
               : ["/laboratory/dashboard-lab"],
           })
         );
+      } else if (response?.isPharmacy) {
+        this.store.dispatch(
+          go({
+            path: isNavigationDetailsAvailable
+              ? navigationDetails?.path
+              : ["/pharmacy/home"],
+          })
+        );
       }
     });
   }

@@ -1,5 +1,9 @@
 import { Component, Inject, OnInit } from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialog,
+} from "@angular/material/dialog";
 import { Observable, of, zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
@@ -18,6 +22,7 @@ import { MatRadioChange } from "@angular/material/radio";
 import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 
 @Component({
   selector: "app-shared-results-entry-and-view-modal",
@@ -48,6 +53,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   selectedInstruments: any = {};
   multipleResults: any = [];
   selectedTestedByDetails: any = {};
+  parametersSearchingText: any = {};
 
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
@@ -59,7 +65,8 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     private visitService: VisitsService,
     private store: Store<AppState>,
     private sampleService: SamplesService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -487,6 +494,61 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
           }
         });
     }
+  }
+
+  onDeleteResults(event: Event, order: any): void {
+    event.stopPropagation();
+    // console.log(order);
+    this.dialog
+      .open(SharedConfirmationComponent, {
+        minWidth: "20%",
+        data: {
+          modalTitle: "Delete results",
+          modalMessage: `Are you sure you want to delete results?`,
+          showRemarksInput: true,
+          confirmationButtonText: "Delete",
+          type: "warn",
+          remarksFieldLabel: "Reason",
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmed: any) => {
+        if (confirmed) {
+          const voidObject: any = {
+            results: flatten(
+              order?.finalResults?.map((result: any) => {
+                if (result?.uuid) {
+                  return {
+                    uuid: result?.uuid,
+                  };
+                } else {
+                  return flatten(
+                    result?.groups?.map((group: any) => {
+                      return flatten(
+                        group?.results?.map((result: any) => {
+                          return {
+                            uuid: result?.uuid,
+                          };
+                        })
+                      );
+                    })
+                  );
+                }
+              })
+            ),
+            sample: this.data?.sample?.uuid,
+            voided: true,
+            voidReason: confirmed?.remarks,
+          };
+          this.sampleAllocationService
+            .voidResults(voidObject)
+            .subscribe((response: any) => {
+              if (response) {
+                this.getAllocations();
+              }
+            });
+        }
+      });
   }
 
   onAuthorize(

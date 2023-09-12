@@ -446,7 +446,6 @@ public class LaboratoryController {
 		result.setCreator(Context.getAuthenticatedUser());
 		Result savedResults = laboratoryService.recordTestAllocationResults(result);
 		return savedResults.toMap();
-		
 	}
 	
 	@RequestMapping(value = "multipleresults", method = RequestMethod.POST)
@@ -460,7 +459,13 @@ public class LaboratoryController {
 		}
 		List<Map<String, Object>> savedResultsResponse = laboratoryService.saveMultipleResults(formattedResults);
 		return savedResultsResponse;
-
+	}
+	
+	@RequestMapping(value = "voidmultipleresults", method = RequestMethod.PUT)
+	@ResponseBody
+	public List<Map<String, Object>> voidMultipleResults(@RequestBody Map<String, Object> resultsToVoid) throws Exception {
+		List<Map<String, Object>> savedResultsResponse = laboratoryService.voidMultipleResults(resultsToVoid);
+		return savedResultsResponse;
 	}
 	
 	@RequestMapping(value = "resultsinstrument", method = RequestMethod.POST)

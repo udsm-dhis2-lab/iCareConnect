@@ -14,6 +14,7 @@ import {
   clearLoadedLabSamples,
   updateSample,
   loadSampleByUuid,
+  go,
 } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
@@ -40,6 +41,7 @@ import { SharedResultsEntryAndViewModalComponent } from "../shared-results-entry
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { groupBy } from "lodash";
 import { LabSample } from "src/app/modules/laboratory/resources/models";
+import { MatTabChangeEvent } from "@angular/material/tabs";
 
 @Component({
   selector: "app-sample-acceptance",
@@ -82,7 +84,7 @@ export class SampleAcceptanceComponent implements OnInit {
   samplesLoadedState$: Observable<boolean>;
 
   entryCategory: string = "INDIVIDUAL";
-  currentTabWithDataLoaded: number = 0;
+  selectedIndex: number = 0;
   showPrintingPage: boolean = false;
   dataToPrint$: Observable<any>;
   testRelationshipConceptSourceUuid$: Observable<string>;
@@ -96,6 +98,28 @@ export class SampleAcceptanceComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    try {
+      this.selectedIndex =
+        localStorage.getItem("resultsAndTestingTab") &&
+        Number(JSON.parse(localStorage.getItem("resultsAndTestingTab"))?.index)
+          ? Number(
+              JSON.parse(localStorage.getItem("resultsAndTestingTab"))?.index
+            )
+          : this.selectedIndex;
+      const label: string =
+        localStorage.getItem("resultsAndTestingTab") &&
+        JSON.parse(localStorage.getItem("resultsAndTestingTab"))?.label
+          ? JSON.parse(localStorage.getItem("resultsAndTestingTab"))?.label
+          : "";
+      this.store.dispatch(
+        go({
+          path: ["/laboratory/sample-acceptance-and-results"],
+          query: { queryParams: { tab: label } },
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
     this.userUuid = this.currentUser?.uuid;
     this.samplesLoadedState$ = this.store.select(
       getFormattedLabSamplesLoadedState
@@ -484,39 +508,20 @@ export class SampleAcceptanceComponent implements OnInit {
     this.entryCategory = event?.value;
   }
 
-  onOpenNewTab(e): void {
+  onOpenNewTab(event: MatTabChangeEvent): void {
+    const tabsDetails: any = {
+      index: event?.index,
+      label: event?.tab?.textLabel?.split(" ").join("-"),
+    };
+    localStorage.setItem("resultsAndTestingTab", JSON.stringify(tabsDetails));
     this.searchingText = "";
     this.selectedDepartment = "";
-    // if (e.index === 0) {
-    //   this.store.dispatch(
-    //     loadLabSamplesByCollectionDates({
-    //       datesParameters: this.datesParameters,
-    //       patients: this.patients,
-    //       sampleTypes: this.sampleTypes,
-    //       departments: this.labSamplesDepartments,
-    //       containers: this.labSamplesContainers,
-    //       hasStatus: "NO",
-    //       configs: this.labConfigs,
-    //       codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-    //     })
-    //   );
-    //   this.currentTabWithDataLoaded = e.index;
-    // } else if (this.currentTabWithDataLoaded === 0) {
-    //   this.store.dispatch(
-    //     loadLabSamplesByCollectionDates({
-    //       datesParameters: this.datesParameters,
-    //       patients: this.patients,
-    //       sampleTypes: this.sampleTypes,
-    //       departments: this.labSamplesDepartments,
-    //       containers: this.labSamplesContainers,
-    //       hasStatus: "YES",
-    //       category: "ACCEPTED",
-    //       configs: this.labConfigs,
-    //       codedSampleRejectionReasons: this.codedSampleRejectionReasons,
-    //     })
-    //   );
-    //   this.currentTabWithDataLoaded = e.index;
-    // }
+    this.store.dispatch(
+      go({
+        path: ["/laboratory/sample-acceptance-and-results"],
+        query: { queryParams: { tab: tabsDetails?.label } },
+      })
+    );
   }
 
   onResultsReview(event: Event, sample, providerDetails): void {
