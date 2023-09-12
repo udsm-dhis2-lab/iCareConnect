@@ -25,7 +25,8 @@ import { SupplierFormComponent } from "./supplier-form/supplier-form.component";
 import { SuppliersListComponent } from "./suppliers-list/suppliers-list.component";
 import { TotalizeStockUnitsQuantityComponent } from "./totalize-stock-units-quantity/totalize-stock-units-quantity.component";
 
-export const stockComponents: any[] = [
+// export const stockComponents: any[] = [
+export const sharedStoreComponents: any[] = [
   AddAllToPaginator,
   StockBatchListComponent,
   StockStatusListComponent,
