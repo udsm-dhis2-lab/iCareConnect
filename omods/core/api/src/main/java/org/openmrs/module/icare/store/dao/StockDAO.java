@@ -392,7 +392,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		} else {
 			queryStr += " AND ";
 		}
-		queryStr += "item.stockable = true AND item.voided=false AND ((item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date AND stock2.location.uuid =:locationUuid) <= 0) ) OR (item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date AND stock2.location.uuid =:locationUuid) = NULL)))";
+		queryStr += "item.stockable = true AND item.voided=false AND ((item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date AND stock2.location.uuid =:locationUuid) <= 0) ) OR (item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date AND stock2.location.uuid =:locationUuid) = NULL)) OR (item NOT IN( SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid)))";
 		
 		Query query = session.createQuery(queryStr);
 		//		query.setFirstResult(startIndex);
