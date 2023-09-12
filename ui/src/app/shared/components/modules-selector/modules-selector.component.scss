@@ -67,6 +67,12 @@
   overflow: hidden;
 }
 
+@media print {
+  .dont-print {
+    display: none !important;
+  }
+}
+
 // My css
 ::ng-deep .mat-chip-list-wrapper {
   flex-wrap: nowrap !important;
