@@ -101,7 +101,9 @@
             [length]="pager?.total"
             [pageSize]="pageSize"
             [pageSizeOptions]="pageSizeOptions"
+            [pageSizeLabels]="pageSizeLabels"
             (page)="onPageChange($event)"
+            appAddAllToPaginator
           >
           </mat-paginator>
         </div>
