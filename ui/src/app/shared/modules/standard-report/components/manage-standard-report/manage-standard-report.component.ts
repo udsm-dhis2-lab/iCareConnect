@@ -65,6 +65,9 @@ export class ManageStandardReportComponent implements OnInit {
     this.thereIsAssociatedDataSetQueries =
       this.report?.value?.queries && this.report?.value?.queries?.length > 0;
     this.selectedQueries = this.report?.value?.queries || [];
+    this.useDefaultPeFilter = this.report?.value
+      ? this.report?.value?.useDefaultPeFilter
+      : this.useDefaultPeFilter;
   }
 
   createReportFields(data?: any): void {

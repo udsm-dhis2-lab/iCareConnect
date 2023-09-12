@@ -697,12 +697,45 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
           });
         }
 
+        const testOrdersWithNoDepartments: any[] = flatten(
+          this.groupedTestOrdersByDepartments
+            ?.map((groupedTestOrdersByDepartment: any) => {
+              if (
+                (
+                  groupedTestOrdersByDepartment?.filter(
+                    (testOrder: any) => !testOrder?.departmentUuid
+                  ) || []
+                )?.length > 0
+              ) {
+                return (
+                  groupedTestOrdersByDepartment?.filter(
+                    (testOrder: any) => !testOrder?.departmentUuid
+                  ) || []
+                );
+              }
+            })
+            ?.filter(
+              (testOrdersWithNoDepartment: any) => testOrdersWithNoDepartment
+            )
+        );
         this.personDetailsData =
           this.registrationCategory?.refKey !== "non-clinical"
             ? this.personDetailsData
             : NON_CLINICAL_PERSON_DATA;
         if (this.testOrders?.length === 0) {
           this.errorMessage = "No test has been selected";
+        } else if (testOrdersWithNoDepartments.length > 0) {
+          this.errorMessage = `Test${
+            testOrdersWithNoDepartments.length > 1 ? "s" : ""
+          }s
+            ${(
+              testOrdersWithNoDepartments?.map(
+                (testOrderWithNoDept: any) => testOrderWithNoDept?.display
+              ) || []
+            ).join(", ")}
+            " ${
+              testOrdersWithNoDepartments?.length > 1 ? " have " : " has "
+            } no departments set, Contact IT for support`;
         } else {
           this.errorMessage = "";
           const orderConceptUuids =
@@ -1115,10 +1148,10 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                         )
                                       ).subscribe((responses: any[]) => {
                                         if (responses) {
-                                          console.log(
-                                            "responsesjsjsj",
-                                            flatten(responses)
-                                          );
+                                          // console.log(
+                                          //   "responsesjsjsj",
+                                          //   flatten(responses)
+                                          // );
                                           responses.forEach(
                                             (encounterResponse, index) => {
                                               if (!encounterResponse?.error) {

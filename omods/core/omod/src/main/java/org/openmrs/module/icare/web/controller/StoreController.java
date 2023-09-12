@@ -685,14 +685,15 @@ public class StoreController {
 	        @RequestParam(required = false, value = "location") String locationUuid,
 	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) throws Exception {
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(required = false) String q) throws Exception {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 		
-		ListResult<Item> nearlyStockedItems = storeService.getNearlyStockedOutByLocation(locationUuid, pager);
+		ListResult<Item> nearlyStockedItems = storeService.getNearlyStockedOutByLocation(locationUuid, pager, q);
 		
 		return nearlyStockedItems.toMap();
 	}
@@ -703,14 +704,15 @@ public class StoreController {
 	        @RequestParam(required = false, value = "location") String locationUuid,
 	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) throws Exception {
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(required = false) String q) throws Exception {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 		
-		ListResult<Item> nearlyExpiredItems = storeService.getNearlyExpiredByLocation(locationUuid, pager);
+		ListResult<Item> nearlyExpiredItems = storeService.getNearlyExpiredByLocation(locationUuid, pager, q);
 		
 		return nearlyExpiredItems.toMap();
 	}
@@ -720,14 +722,15 @@ public class StoreController {
 	public Map<String, Object> getExpiredItems(@RequestParam(required = false, value = "location") String locationUuid,
 	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page) throws Exception {
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(required = false) String q) throws Exception {
 		
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 		
-		ListResult<Item> expiredItems = storeService.getExpiredItemsByLocation(locationUuid, pager);
+		ListResult<Item> expiredItems = storeService.getExpiredItemsByLocation(locationUuid, pager, q);
 		
 		return expiredItems.toMap();
 	}

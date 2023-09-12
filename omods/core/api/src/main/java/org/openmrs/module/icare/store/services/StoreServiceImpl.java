@@ -911,24 +911,24 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public ListResult<Item> getNearlyStockedOutByLocation(String locationUuid, Pager pager) {
+	public ListResult<Item> getNearlyStockedOutByLocation(String locationUuid, Pager pager, String q) {
 		
-		ListResult<Item> items = stockDAO.getNearlyStockedOut(locationUuid, pager);
+		ListResult<Item> items = stockDAO.getNearlyStockedOut(locationUuid, pager, q);
 		
 		return items;
 	}
 	
 	@Override
-	public ListResult<Item> getNearlyExpiredByLocation(String locationUuid, Pager pager) {
+	public ListResult<Item> getNearlyExpiredByLocation(String locationUuid, Pager pager, String q) {
 		
-		ListResult<Item> items = stockDAO.getNearlyExpiredByLocation(locationUuid, pager);
+		ListResult<Item> items = stockDAO.getNearlyExpiredByLocation(locationUuid, pager, q);
 		return items;
 	}
 	
 	@Override
-	public ListResult<Item> getExpiredItemsByLocation(String locationUuid, Pager pager) {
+	public ListResult<Item> getExpiredItemsByLocation(String locationUuid, Pager pager, String q) {
 		
-		ListResult<Item> items = stockDAO.getExpiredItemsByLocation(locationUuid, pager);
+		ListResult<Item> items = stockDAO.getExpiredItemsByLocation(locationUuid, pager, q);
 		return items;
 	}
 	
