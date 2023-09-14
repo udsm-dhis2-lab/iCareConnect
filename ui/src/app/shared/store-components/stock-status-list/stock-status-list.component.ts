@@ -45,7 +45,7 @@ export class StockStatusListComponent implements OnInit {
   pageSize: number = 15;
   page: number = 1;
   pager: number;
-  pageSizeOptions: number[] = [5, 10, 15, 25, 50];
+  pageSizeOptions: number[] = [5, 10, 15, 25, 50, 100];
   consumeLedgerUuid$: Observable<string>;
   facilityDetails$: Observable<any>;
   currentUser$: Observable<any>;

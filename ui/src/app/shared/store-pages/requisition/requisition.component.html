@@ -12,7 +12,9 @@
       referenceTagsThatCanRequestFromPharmacyConfigs$ | async,
     mainStoreLocationTagUuid: mainStoreLocationTagUuid$ | async,
     pharmacyLocationTagUuid: pharmacyLocationTagUuid$ | async,
-    requisitionCodeFormat: requisitionCodeFormat$ | async
+    requisitionCodeFormat: requisitionCodeFormat$ | async,
+    facilityDetails: facilityDetails$ | async,
+    currentUser: currentUser$ | async
   } as params"
 >
   <mat-card class="border">
@@ -253,7 +255,27 @@
               <div class="col-4">
                 <div class="float-right">
                   <a
-                    class="anchor-button ml-4"
+                    *ngIf="
+                      viewRequisitionItems &&
+                      viewRequisitionItems === requisition?.uuid
+                    "
+                    class="anchor-button ml-2"
+                    color="primary"
+                    (click)="
+                      onPrint(
+                        $event,
+                        requisition,
+                        params?.facilityDetails,
+                        params?.currentUser
+                      )
+                    "
+                  >
+                    <mat-icon color="primary" matTooltip="Print"
+                      >print</mat-icon
+                    >
+                  </a>
+                  <a
+                    class="anchor-button ml-2"
                     color="primary"
                     (click)="onViewRequisitionItems(requisition?.uuid)"
                     matTooltip="{{

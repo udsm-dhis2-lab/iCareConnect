@@ -11,7 +11,7 @@
   ></mat-progress-bar>
   <div class="w-100" *ngIf="params?.report">
     <div class="w-100 d-flex justify-content-between">
-      <div class="w-50 justify-content-left">
+      <div class="w-50 justify-content-left dont-print">
         <button
           mat-flat-button
           matTooltip="Go to list"
@@ -52,7 +52,7 @@
         </mat-form-field>
       </div>
     </div>
-    <div class="w-100 d-flex justify-content-end mt-1 mb-2">
+    <div class="w-100 d-flex justify-content-end mt-1 mb-2 dont-print">
       <!-- <button
           (click)="onDownloadCSV($event)"
           mat-stroked-button
