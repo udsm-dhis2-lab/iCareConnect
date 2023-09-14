@@ -1,0 +1,53 @@
+import { Injectable } from "@angular/core";
+import { Observable, of } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+
+@Injectable({
+  providedIn: "root",
+})
+export class TestTimeConfigService {
+  constructor(private httpClient: OpenmrsHttpClientService) {}
+
+  createTestTimeConfig(data: any): Observable<any> {
+    return this.httpClient.post(`lab/testtime`, data).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
+  getTestTimeConfig(parameters: any): Observable<any> {
+    let queryParams = "";
+
+    if (parameters?.q) {
+      queryParams = "q=" + parameters?.q;
+    }
+    if (parameters?.limit) {
+      queryParams +=
+        (queryParams?.length > 0 ? "&" : "") + "limit=" + parameters?.limit;
+    }
+
+    if (parameters?.startIndex) {
+      queryParams +=
+        (queryParams?.length > 0 ? "&" : "") +
+        "startIndex=" +
+        parameters?.startIndex;
+    }
+
+    return this.httpClient.get(`lab/testtime?${queryParams}`).pipe(
+      map((response) => {
+        return response.map(item => {
+          if (item?.concept && typeof item.concept.display === 'string') {
+            item.concept.display = item.concept.display.replace('TEST_ORDERS:', '');
+          }
+          return item;
+        });
+      }),
+      catchError((error) => of(error))
+    );
+  }
+
+  
+}

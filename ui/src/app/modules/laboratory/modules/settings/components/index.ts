@@ -29,6 +29,8 @@ import { StandardConceptCreationComponent } from "./standard-concept-creation/st
 import { TestInterpretationsComponent } from "./test-interpretations/test-interpretations.component";
 import { TestMethodsComponent } from "./test-methods/test-methods.component";
 import { TestOrderParametersRelationshipComponent } from "./test-order-parameters-relationship/test-order-parameters-relationship.component";
+import { TestTargetCreationComponent } from "./test-target-creation/test-target-creation.component";
+import { TestTargetListComponent } from "./test-target-list/test-target-list.component";
 import { TestsControlComponent } from "./tests-control/tests-control.component";
 import { UserManagementDashboardComponent } from "./user-management-dashboard/user-management-dashboard.component";
 import { UsersListComponent } from "./users-list/users-list.component";
@@ -74,6 +76,8 @@ export const components: any[] = [
   LoggedinusersComponent,
   AuditLogsComponent,
   TestInterpretationsComponent,
+  TestTargetCreationComponent,
+  TestTargetListComponent
 ];
 
 export const entrySettingComponents: any[] = [

@@ -1,6 +1,7 @@
 package org.openmrs.module.icare.laboratory.dao;
 
 import org.hibernate.Query;
+import org.openmrs.Concept;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.laboratory.models.TestRangeConfig;
@@ -53,5 +54,29 @@ public class TestTimeConfigDAO extends BaseDAO<TestTimeConfig> {
 			
 		}
 		
+	}
+	
+	public List<TestTimeConfig> getConfig(String q) {
+		
+		DbSession session = this.getSession();
+		
+		String queryStr = "SELECT ttc FROM TestTimeConfig ttc INNER JOIN ttc.concept c INNER JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED'";
+		
+		if (q != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND";
+			}
+			
+			queryStr += " (lower(cn.name) LIKE lower(:q) OR ttc.standardTAT LIKE :q)";
+		}
+		
+		Query query = session.createQuery(queryStr);
+		if (q != null) {
+			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
+		}
+		
+		return query.list();
 	}
 }

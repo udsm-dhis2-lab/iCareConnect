@@ -92,7 +92,7 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	TestTimeConfig updateTestTimeConfig(TestTimeConfig testTimeConfig);
 	
-	List<TestTimeConfig> getTestTimeConfigs();
+	List<TestTimeConfig> getTestTimeConfigs(String q);
 	
 	TestTimeConfig getTestTimeConfig(String uuid);
 	

@@ -1017,8 +1017,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
-	public List<TestTimeConfig> getTestTimeConfigs() {
-		return IteratorUtils.toList(this.testTimeConfigDAO.findAll().iterator());
+	public List<TestTimeConfig> getTestTimeConfigs(String q) {
+		//return IteratorUtils.toList(this.testTimeConfigDAO.findAll().iterator());
+		return this.testTimeConfigDAO.getConfig(q);
 	}
 	
 	@Override

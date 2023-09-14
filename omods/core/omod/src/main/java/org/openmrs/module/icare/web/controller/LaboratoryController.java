@@ -555,10 +555,10 @@ public class LaboratoryController {
 	@RequestMapping(value = "testtime", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getTestTimeConfigurations(
-	        @RequestParam(value = "concept", required = false) String conceptUuid) {
+	        @RequestParam(value = "concept", required = false) String conceptUuid, @RequestParam(required = false) String q) {
 		
 		if (conceptUuid == null) {
-			List<TestTimeConfig> testTimeConfigs = this.laboratoryService.getTestTimeConfigs();
+			List<TestTimeConfig> testTimeConfigs = this.laboratoryService.getTestTimeConfigs(q);
 			
 			List<Map<String, Object>> configsMapList = new ArrayList<Map<String, Object>>();
 			
