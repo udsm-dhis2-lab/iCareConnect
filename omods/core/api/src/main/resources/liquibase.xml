@@ -5309,5 +5309,12 @@
         </sql>
     </changeSet>
 
+    <changeSet id="update_lb_test_time_configuration" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_test_time_configuration
+            ADD CONSTRAINT concept_id UNIQUE (concept_id);
+        </sql>
+    </changeSet>
+
 
 </databaseChangeLog>
