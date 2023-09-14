@@ -7,6 +7,8 @@ import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-cl
   providedIn: "root",
 })
 export class TestTimeConfigService {
+
+  
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
   createTestTimeConfig(data: any): Observable<any> {
@@ -47,6 +49,17 @@ export class TestTimeConfigService {
       }),
       catchError((error) => of(error))
     );
+  }
+
+  deleteTestTimeConfig(uuid: any) {
+    return this.httpClient.delete(`lab/testtime/${uuid}`).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
+
+    this.getTestTimeConfig(null);
   }
 
   

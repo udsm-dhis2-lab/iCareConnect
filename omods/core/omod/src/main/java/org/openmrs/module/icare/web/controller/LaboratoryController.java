@@ -9,6 +9,7 @@ import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.laboratory.models.*;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
+import org.openmrs.module.icare.store.models.Requisition;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -579,6 +580,13 @@ public class LaboratoryController {
 			
 		}
 		
+	}
+	
+	@RequestMapping(value = "testtime/{testConfigUuid}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public Map<String, Object> deletetestTimeConfiguration(@PathVariable("testConfigUuid") String testConfigUuid) {
+		TestTimeConfig testTimeConfig = laboratoryService.deleteTestTimeConfiguration(testConfigUuid);
+		return testTimeConfig.toMap();
 	}
 	
 	@RequestMapping(value = "testrange", method = RequestMethod.POST)

@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { TestTimeConfigService } from "src/app/modules/laboratory/resources/services/test-time-config.service";
+import { SharedConfirmationDialogComponent } from "src/app/shared/components/shared-confirmation-dialog/shared-confirmation-dialog.component";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
@@ -31,7 +33,8 @@ export class TestTargetListComponent implements OnInit {
 
   constructor(
     private conceptService: ConceptsService,
-    private testTimeConfigService: TestTimeConfigService
+    private testTimeConfigService: TestTimeConfigService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +56,28 @@ export class TestTargetListComponent implements OnInit {
       this.testTimeConfigList = response;
     });
 
+  }
+
+  onPermanentDelete(event: Event, testConfig: any): void {
+    this.dialog
+      .open(SharedConfirmationDialogComponent, {
+        minWidth: "20%",
+        data: {
+          header: `Are you sure to delete  <b>${testConfig?.concept?.display}</b> configuration?`,
+        },
+      })
+      .afterClosed()
+      .subscribe((shouldConfirm) => {
+        if (shouldConfirm) {
+          this.testTimeConfigService
+            .deleteTestTimeConfig(testConfig?.uuid)
+            .subscribe((response) => {
+              if (response) {
+                this.saving = false;
+              }
+            });
+        }
+      });
   }
 
   

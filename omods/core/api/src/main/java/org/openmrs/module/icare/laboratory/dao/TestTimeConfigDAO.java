@@ -6,6 +6,7 @@ import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.laboratory.models.TestRangeConfig;
 import org.openmrs.module.icare.laboratory.models.TestTimeConfig;
+import org.openmrs.module.icare.store.models.Requisition;
 
 import java.util.List;
 
@@ -78,5 +79,32 @@ public class TestTimeConfigDAO extends BaseDAO<TestTimeConfig> {
 		}
 		
 		return query.list();
+	}
+	
+	public TestTimeConfig deleteTestConfig(String testConfigUuid) {
+		
+		DbSession session = this.getSession();
+		String selectQueryStr = "SELECT ttc FROM TestTimeConfig ttc WHERE ttc.uuid = :testConfigUuid";
+		;
+		
+		Query selectQuery = session.createQuery(selectQueryStr);
+		selectQuery.setParameter("testConfigUuid", testConfigUuid);
+		
+		TestTimeConfig deletedTestTimeConfig = (TestTimeConfig) selectQuery.uniqueResult(); // Fetch the object before deletion
+		
+		if (deletedTestTimeConfig != null) {
+			String deleteQueryStr = "DELETE FROM TestTimeConfig ttc WHERE ttc.uuid = :testConfigUuid";
+			
+			Query deleteQuery = session.createQuery(deleteQueryStr);
+			deleteQuery.setParameter("testConfigUuid", testConfigUuid);
+			
+			int deletedCount = deleteQuery.executeUpdate(); // Perform the deletion
+			
+			// Now 'deletedRequisition' contains the deleted object
+		}
+		
+		//session.getTransaction().commit(); // Commit the transaction
+		
+		return deletedTestTimeConfig;
 	}
 }

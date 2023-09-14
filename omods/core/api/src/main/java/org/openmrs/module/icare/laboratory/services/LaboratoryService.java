@@ -195,4 +195,5 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	AssociatedField updateAssociatedField(String associatedFieldUuid, AssociatedField associatedField);
 	
+	TestTimeConfig deleteTestTimeConfiguration(String testConfigUuid);
 }
