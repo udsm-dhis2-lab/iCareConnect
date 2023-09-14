@@ -1255,6 +1255,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		return associatedFieldDAO.updateAssociatedField(associatedFieldUuid, associatedField);
 	}
 	
+	@Override
+	public TestTimeConfig deleteTestTimeConfiguration(String testConfigUuid) {
+		return testTimeConfigDAO.deleteTestConfig(testConfigUuid);
+	}
+	
 	public BatchSet addBatchSet(BatchSet batchSet) {
 		return batchSetDAO.save(batchSet);
 	}
