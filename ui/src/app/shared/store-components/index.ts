@@ -20,11 +20,14 @@ import { StockOutItemsComponent } from "./stock-out-items/stock-out-items.compon
 import { StockReceivingFormFieldsComponent } from "./stock-receiving-form-fields/stock-receiving-form-fields.component";
 import { StockReceivingFormComponent } from "./stock-receiving-form/stock-receiving-form.component";
 import { StockStatusListComponent } from "./stock-status-list/stock-status-list.component";
+import { AddAllToPaginator } from "./stock-status-list/add-All-To-Paginator.directive";
 import { SupplierFormComponent } from "./supplier-form/supplier-form.component";
 import { SuppliersListComponent } from "./suppliers-list/suppliers-list.component";
 import { TotalizeStockUnitsQuantityComponent } from "./totalize-stock-units-quantity/totalize-stock-units-quantity.component";
 
+// export const stockComponents: any[] = [
 export const sharedStoreComponents: any[] = [
+  AddAllToPaginator,
   StockBatchListComponent,
   StockStatusListComponent,
   StockOutItemsComponent,
