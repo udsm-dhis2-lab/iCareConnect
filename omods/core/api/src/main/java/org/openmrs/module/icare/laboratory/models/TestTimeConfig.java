@@ -118,19 +118,22 @@ public class TestTimeConfig extends BaseOpenmrsData implements java.io.Serializa
 		
 		conceptMap.put("display", this.getConcept().getDisplayString());
 		conceptMap.put("uuid", this.getConcept().getUuid());
-		conceptMap.put("name", this.getConcept().getName().getName());
 		
 		testTimeConfigMap.put("concept", conceptMap);
 		
 		testTimeConfigMap.put("uuid", this.getUuid());
-		
-		testTimeConfigMap.put("standardTAT", this.getStandardTAT());
-		
-		testTimeConfigMap.put("urgentTAT", this.getUrgentTAT());
-		
-		testTimeConfigMap.put("version", this.getVersion());
-		
-		testTimeConfigMap.put("additionalReqTimeLimit", this.getAddReqTimeLimit());
+		if (this.getStandardTAT() != null) {
+			testTimeConfigMap.put("standardTAT", this.getStandardTAT());
+		}
+		if (this.getUrgentTAT() != null) {
+			testTimeConfigMap.put("urgentTAT", this.getUrgentTAT());
+		}
+		if (this.version != null) {
+			testTimeConfigMap.put("version", this.getVersion());
+		}
+		if (this.getAddReqTimeLimit() != null) {
+			testTimeConfigMap.put("additionalReqTimeLimit", this.getAddReqTimeLimit());
+		}
 		Map<String, Object> creatorObject = new HashMap<String, Object>();
 		
 		if (this.getCreator() != null) {

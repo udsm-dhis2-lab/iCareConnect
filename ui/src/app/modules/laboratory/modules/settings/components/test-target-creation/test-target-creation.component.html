@@ -1,0 +1,57 @@
+<div class="row"
+*ngIf="{
+  selectedLabTestDetails: selectedLabTestDetails$ | async
+  
+} as params"
+>
+  <div class="col-6">
+    <div class="h5">New Configuration</div>
+    <div class="w-100">
+      <app-form
+            [fields]="[labTestField]"
+            (formUpdate)="onFormUpdateLabTest($event)"
+      ></app-form>
+
+      <app-form
+      [fields]="basicTATConfigFields"
+      (formUpdate)="onFormUpdate($event)"
+    ></app-form>
+
+    <div class="w-100" *ngIf="savingMessage">
+      <div class="alert alert-{{ alertType }}" role="alert">
+        {{ savingMessage }}
+      </div>
+    </div>
+
+    <div class="w-100 d-flex justify-content-end mt-2">
+      <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
+      <button
+        class="ml-2"
+        mat-stroked-button
+        [disabled]="
+          (!isFormValid)
+        "
+        (click)="
+          onSave(
+            $event,
+            params?.selectedLabTestDetails
+          )
+        "
+        color="primary"
+      >
+        {{ !conceptUuid ? "Save" : "Update" }}
+      </button>
+    </div>
+
+
+
+    </div>
+    
+
+  </div>
+
+  <div class="col-6">
+    <app-test-target-list></app-test-target-list>
+    
+  </div>
+</div>
