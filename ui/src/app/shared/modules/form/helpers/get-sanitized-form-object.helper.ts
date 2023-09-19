@@ -50,23 +50,22 @@ export function getSanitizedFormObject(
       answers?.length > 0 || isDiagnosis
         ? "Coded"
         : (
-            mappings?.filter(
-              (mapping: any) =>
-                mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
-                  conceptSourceUuid &&
-                mapping?.conceptReferenceTerm == "TEXTAREA"
-            ) || []
-          )?.length > 0
-        ? "Textarea"
+          mappings?.filter(
+            (mapping: any) =>
+              mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
+                conceptSourceUuid &&
+              mapping?.conceptReferenceTerm?.code == "USER"
+          ) || []
+        )?.length > 0
+      ? "Coded"
         : (
             mappings?.filter(
               (mapping: any) =>
                 mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
-                  conceptSourceUuid &&
-                mapping?.conceptReferenceTerm?.code == "USER"
+                  conceptSourceUuid 
             ) || []
           )?.length > 0
-        ? "Coded"
+        ? "Textarea"
         : datatype?.display,
     formClass: conceptClass?.display,
     concept: concept,
