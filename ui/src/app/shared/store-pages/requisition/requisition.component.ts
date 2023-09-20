@@ -23,10 +23,10 @@ import { getFilterIssuedItemsInRequisitions } from "src/app/shared/helpers/requi
   templateUrl: "./requisition.component.html",
   styleUrls: ["./requisition.component.scss"],
 })
-export class RequisitionComponent implements OnInit, OnDestroy {
+export class RequisitionComponent implements OnInit {
   @Input() currentLocation: any;
 
-  subscription: Subscription;
+  // subscription: Subscription;
   requisitions$: Observable<RequisitionObject[]>;
   loadingRequisitions$: Observable<boolean>;
   stores$: Observable<any>;
@@ -103,9 +103,9 @@ export class RequisitionComponent implements OnInit, OnDestroy {
     this.currentUser$ = this.store.select(getCurrentUserDetails);
   }
 
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-  }
+  // ngOnDestroy(): void {
+  //   this.subscription.unsubscribe();
+  // }
 
   onGetSearchingText(q: string): void {
     this.q = q;
@@ -573,7 +573,7 @@ export class RequisitionComponent implements OnInit, OnDestroy {
 
   onPrint(e: Event, requisition: any, facilityDetails: any, currentUser: any) {
     let itemsToPrint: any;
-    this.subscription = this.requisitionService
+    this.requisitionService
       .getRequisitionByUuid(requisition?.uuid)
       .pipe(
         map((response) => {
