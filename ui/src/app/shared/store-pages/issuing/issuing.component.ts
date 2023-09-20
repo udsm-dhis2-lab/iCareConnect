@@ -25,10 +25,10 @@ import { formatDateToString } from "../../helpers/format-date.helper";
   templateUrl: "./issuing.component.html",
   styleUrls: ["./issuing.component.scss"],
 })
-export class IssuingComponent implements OnInit, OnDestroy {
+export class IssuingComponent implements OnInit {
   @Input() currentLocation: any;
 
-  subscription: Subscription;
+  // subscription: Subscription;
   issuingList$: Observable<IssuingObject[]>;
   loadingIssuingList$: Observable<boolean>;
   currentStore$: Observable<LocationGet>;
@@ -71,9 +71,9 @@ export class IssuingComponent implements OnInit, OnDestroy {
     this.facilityDetails$ = this.store.select(getParentLocation);
     this.currentUser$ = this.store.select(getCurrentUserDetails);
   }
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-  }
+  // ngOnDestroy(): void {
+  //   this.subscription.unsubscribe();
+  // }
   onGetSearchingText(q: string): void {
     this.q = q;
     this.getAllIssuing();
@@ -380,7 +380,7 @@ export class IssuingComponent implements OnInit, OnDestroy {
   onPrint(e: Event, issue: any, facilityDetails: any, currentUser: any) {
     let itemsToPrint: any;
     // this.specificRequisition$ =
-    this.subscription = this.requisitionService
+    this.requisitionService
       .getRequisitionByUuid(issue?.uuid)
       .pipe(
         map((response) => {
