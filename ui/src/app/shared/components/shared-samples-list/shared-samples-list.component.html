@@ -817,8 +817,9 @@
                                     >
                                       <span *ngIf="tabType !== 'authorization'">
                                         {{
-                                          sample?.ordersWithResults?.length ===
-                                          0
+                                          (sample?.ordersWithResults?.length ===
+                                          0 || sample?.ordersWithResults?.length ===
+                                          null )
                                             ? "Results entry"
                                             : "Edit Results"
                                         }}
