@@ -48,7 +48,7 @@
         ]?.finalResult?.groups
         ? ordersWithResults[0]?.testAllocations[
             ordersWithResults[0]?.testAllocations?.length - 1
-          ]?.finalResult?.testedBy?.display
+          ]?.finalResult?.testedBy?.name
         : ordersWithResults[0]?.testAllocations[
             ordersWithResults[0]?.testAllocations?.length - 1
           ]?.finalResult &&
@@ -61,7 +61,7 @@
             ordersWithResults[0]?.testAllocations[
               ordersWithResults[0]?.testAllocations?.length - 1
             ]?.finalResult?.groups?.length - 1
-          ]?.results[0]?.testedBy?.display
+          ]?.results[0]?.testedBy?.name
         : "-"
       : "-"
   }}
