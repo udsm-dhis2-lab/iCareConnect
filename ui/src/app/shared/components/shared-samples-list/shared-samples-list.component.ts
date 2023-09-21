@@ -356,6 +356,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
   onPrint(event: Event, sample: any): void {
     event.stopPropagation();
+    console.log("aaa: ",sample)
     this.selectedSampleDetails.emit(sample);
   }
 
