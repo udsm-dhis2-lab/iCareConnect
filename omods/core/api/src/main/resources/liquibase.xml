@@ -5316,5 +5316,12 @@
         </sql>
     </changeSet>
 
+    <changeSet id="update_lb_test_time_configuration_add_urgent_tat" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_test_time_configuration
+            ADD COLUMN referall_tat INT NULL AFTER urgent_tat;
+        </sql>
+    </changeSet>
+
 
 </databaseChangeLog>

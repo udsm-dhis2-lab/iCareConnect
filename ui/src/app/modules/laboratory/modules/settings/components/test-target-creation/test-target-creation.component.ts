@@ -28,6 +28,13 @@ export class TestTargetCreationComponent implements OnInit {
   saving: boolean = false;
   conceptUuid: string;
 
+  selectedOption: string;
+  radioOptions = [
+    { label: ' Hrs & Mins ', value: 'option1' },
+    { label: ' Days & Hrs ', value: 'option2' },
+    { label: ' Mnths & Days ', value: 'option3' }
+  ];
+
   constructor(
     private conceptService: ConceptsService,
     private testTimeConfigService: TestTimeConfigService
