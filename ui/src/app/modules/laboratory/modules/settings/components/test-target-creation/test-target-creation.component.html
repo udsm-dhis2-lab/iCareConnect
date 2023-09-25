@@ -6,6 +6,14 @@
 >
   <div class="col-6">
     <div class="h5">New Configuration</div>
+
+    <mat-radio-group [(ngModel)]="selectedOption">
+      <mat-radio-button *ngFor="let option of radioOptions" [value]="option.value" color="primary" class="registration-category-btn ml-2">
+        {{ option.label }}
+      </mat-radio-button>
+    </mat-radio-group>
+    
+
     <div class="w-100">
       <app-form
             [fields]="[labTestField]"
