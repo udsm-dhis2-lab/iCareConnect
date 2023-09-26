@@ -5316,10 +5316,11 @@
         </sql>
     </changeSet>
 
-    <changeSet id="update_lb_test_time_configuration_add_urgent_tat" author="dennis-kibahila" dbms="mysql">
+    <changeSet id="update_lb_test_time_configuration_add_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_test_time_configuration
-            ADD COLUMN referall_tat INT NULL AFTER urgent_tat;
+            ADD COLUMN referral_tat INT NULL AFTER urgent_tat,
+            ADD COLUMN config_type VARCHAR(20) NULL AFTER additional_request_time_limit;
         </sql>
     </changeSet>
 
