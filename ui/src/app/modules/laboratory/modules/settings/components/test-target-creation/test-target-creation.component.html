@@ -7,24 +7,32 @@
   <div class="col-6">
     <div class="h5">New Configuration</div>
 
-    <mat-radio-group [(ngModel)]="selectedOption">
-      <mat-radio-button *ngFor="let option of radioOptions" [value]="option.value" color="primary" class="registration-category-btn ml-2">
-        {{ option.label }}
-      </mat-radio-button>
-    </mat-radio-group>
     
 
-    <div class="w-100">
+    <div class="w-100" >
       <app-form
             [fields]="[labTestField]"
             (formUpdate)="onFormUpdateLabTest($event)"
       ></app-form>
-
-      <app-form
-      [fields]="basicTATConfigFields"
-      (formUpdate)="onFormUpdate($event)"
-    ></app-form>
-
+      <div>
+      <div *ngFor="let tatOption of turnaroundOptions">  
+        <p><b>{{tatOption.label}}</b></p>
+        <mat-radio-group [(ngModel)]="selectedOption">
+          <mat-radio-button *ngFor="let option of radioOptions" [value]="option.value" color="primary" class="registration-category-btn ml-2" (change)="onRadioButtonChange(option.value)">
+            {{ option.label }}
+          </mat-radio-button>
+        </mat-radio-group>
+        
+        <div>
+          <app-form
+          [fields]="urgentTATConfigFields"
+          (formUpdate)="onFormUpdate($event)"
+          [isFormHorizontal]="true"
+          ></app-form>
+        </div>
+      </div>    
+      
+     </div> 
     <div class="w-100" *ngIf="savingMessage">
       <div class="alert alert-{{ alertType }}" role="alert">
         {{ savingMessage }}

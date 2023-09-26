@@ -15,7 +15,9 @@ import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 })
 export class TestTargetCreationComponent implements OnInit {
 
-  basicTATConfigFields: any[];
+  urgentTATConfigFields: any[];
+  routineTATConfigFields: any[];
+  referralTATConfigFields: any[];
   labTestField: any;
   formData: any = {};
   isFormValid: boolean = false;
@@ -30,10 +32,16 @@ export class TestTargetCreationComponent implements OnInit {
 
   selectedOption: string;
   radioOptions = [
-    { label: ' Hrs & Mins ', value: 'option1' },
-    { label: ' Days & Hrs ', value: 'option2' },
-    { label: ' Mnths & Days ', value: 'option3' }
+    { label: ' Hrs & Mins ', value: 'HRSMIN' },
+    { label: ' Days & Hrs ', value: 'DAYSHRS' },
+    { label: ' Mnths & Days ', value: 'MNTHSDAYS' }
   ];
+
+  turnaroundOptions = [
+    { label: 'Urgent turnarounds', value: 'UTAT'},
+    { label: 'Routine turnarounds', value: 'RTAT'},
+    { label: 'Referral turnarounds', value: 'REFTAT'}
+  ]
 
   constructor(
     private conceptService: ConceptsService,
@@ -61,12 +69,23 @@ export class TestTargetCreationComponent implements OnInit {
     })
   }
 
+  onRadioButtonChange(selectedOption: string) {
+    this.createBasicTATConfigFields(selectedOption);
+  }
+
   createBasicTATConfigFields(data?:any){
-    this.basicTATConfigFields = [
+
+    this.urgentTATConfigFields = [
       new Textbox({
         id: "standardTime",
         key: "standardTime",
-        label: " Standard Time in minutes",
+        label: data === "HRSMIN" ? "HOURS" : data === "DAYSHRS" ? "DAYS" : data === "MNTHSDAYS" ? "MONTHS" : "" ,
+        required: true
+      }),
+      new Textbox({
+        id: "standardTime",
+        key: "standardTime",
+        label: data === "HRSMIN" ? "MINS" : data === "DAYSHRS" ? "HRS" : data === "MNTHSDAYS" ? "DAYS" : "" ,
         required: true
       })
     ]
