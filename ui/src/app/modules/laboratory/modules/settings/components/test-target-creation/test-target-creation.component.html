@@ -17,15 +17,30 @@
       <div>
       <div *ngFor="let tatOption of turnaroundOptions">  
         <p><b>{{tatOption.label}}</b></p>
-        <mat-radio-group [(ngModel)]="selectedOption">
-          <mat-radio-button *ngFor="let option of radioOptions" [value]="option.value" color="primary" class="registration-category-btn ml-2" (change)="onRadioButtonChange(option.value)">
+        <mat-radio-group [(ngModel)]="selectedOption[tatOption.value]">
+          <mat-radio-button *ngFor="let option of radioOptions" [value]="option.value" color="primary" class="registration-category-btn ml-2" (change)="onRadioButtonChange(tatOption.value,option.value)">
             {{ option.label }}
           </mat-radio-button>
         </mat-radio-group>
         
         <div>
           <app-form
+          *ngIf="tatOption.value === 'UTAT'"
           [fields]="urgentTATConfigFields"
+          (formUpdate)="onFormUpdate($event)"
+          [isFormHorizontal]="true"
+          ></app-form>
+
+          <app-form
+          *ngIf="tatOption.value === 'RTAT'"
+          [fields]="routineTATConfigFields"
+          (formUpdate)="onFormUpdate($event)"
+          [isFormHorizontal]="true"
+          ></app-form>
+
+          <app-form
+          *ngIf="tatOption.value === 'REFTAT'"
+          [fields]="referralTATConfigFields"
           (formUpdate)="onFormUpdate($event)"
           [isFormHorizontal]="true"
           ></app-form>

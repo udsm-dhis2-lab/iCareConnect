@@ -36,6 +36,9 @@ public class TestTimeConfig extends BaseOpenmrsData implements java.io.Serializa
 	
 	@Column(name = "urgent_tat")
 	private Integer urgentTAT;
+
+	@Column(name = "referral_tat")
+	private Integer referralTAT;
 	
 	@Column(name = "additional_request_time_limit")
 	private Integer addReqTimeLimit;
@@ -59,7 +62,15 @@ public class TestTimeConfig extends BaseOpenmrsData implements java.io.Serializa
 	public Integer getUrgentTAT() {
 		return urgentTAT;
 	}
-	
+
+	public void setReferralTAT(Integer referralTAT) {
+		this.referralTAT = referralTAT;
+	}
+
+	public Integer getReferralTAT() {
+		return referralTAT;
+	}
+
 	public void setAddReqTimeLimit(Integer addReqTimeLimit) {
 		this.addReqTimeLimit = addReqTimeLimit;
 	}
@@ -94,6 +105,7 @@ public class TestTimeConfig extends BaseOpenmrsData implements java.io.Serializa
 		testTimeConfig.setAddReqTimeLimit((Integer) testTimeConfigMap.get("additionalReqTimeLimit"));
 		testTimeConfig.setStandardTAT((Integer) testTimeConfigMap.get("standardTAT"));
 		testTimeConfig.setUrgentTAT((Integer) testTimeConfigMap.get("urgentTAT"));
+		testTimeConfig.setReferralTAT((Integer) testTimeConfigMap.get("referralTAT"));
 		testTimeConfig.setVersion((String) testTimeConfigMap.get("version"));
 		
 		if (testTimeConfigMap.get("uuid") == null) {
@@ -127,6 +139,9 @@ public class TestTimeConfig extends BaseOpenmrsData implements java.io.Serializa
 		}
 		if (this.getUrgentTAT() != null) {
 			testTimeConfigMap.put("urgentTAT", this.getUrgentTAT());
+		}
+		if(this.getReferralTAT() != null){
+			testTimeConfigMap.put("referralTAT", this.getReferralTAT());
 		}
 		if (this.version != null) {
 			testTimeConfigMap.put("version", this.getVersion());
