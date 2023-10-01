@@ -29,12 +29,20 @@ export class TestTargetCreationComponent implements OnInit {
   savingMessage: string;
   saving: boolean = false;
   conceptUuid: string;
+  urgentTATinMilliseconds : number;
+  routineTATinMilliseconds : number;
+  referralTATinMilliseconds : number;
+  urgentConfigType: string;
+  routineConfigType: string;
+  referralConfigType: string;
 
-  selectedOption: string;
+
+  selectedOption:{[key: string] : string} = {};
+  selectedFormOptions: any = {}
   radioOptions = [
-    { label: ' Hrs & Mins ', value: 'HRSMIN' },
-    { label: ' Days & Hrs ', value: 'DAYSHRS' },
-    { label: ' Mnths & Days ', value: 'MNTHSDAYS' }
+    { label: ' Hrs & Mins ', value: 'HRS_MIN' },
+    { label: ' Days & Hrs ', value: 'DAY_HRS' },
+    { label: ' Mnths & Days ', value: 'MTH_DAY' }
   ];
 
   turnaroundOptions = [
@@ -49,7 +57,9 @@ export class TestTargetCreationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.createBasicTATConfigFields();
+    this.createUrgentTATConfigFields();
+    this.createRoutineTATConfigFields();
+    this.createReferralTATConfigFields();
     this.createLabTestField();
   }
 
@@ -69,26 +79,183 @@ export class TestTargetCreationComponent implements OnInit {
     })
   }
 
-  onRadioButtonChange(selectedOption: string) {
-    this.createBasicTATConfigFields(selectedOption);
+  onRadioButtonChange(optionValue: string, selectedValue: string) {
+    this.selectedOption[optionValue] = selectedValue;
+    
+    if(optionValue === 'UTAT'){
+      this.selectedFormOptions = {optionValue,selectedValue}
+      this.createUrgentTATConfigFields(selectedValue);
+    }
+    if(optionValue === 'RTAT'){
+      this.selectedFormOptions = {optionValue,selectedValue}
+      this.createRoutineTATConfigFields(selectedValue);
+    }
+    if(optionValue === 'REFTAT'){
+      this.selectedFormOptions = {optionValue,selectedValue}
+      this.createReferralTATConfigFields(selectedValue);
+    }   
+    
   }
 
-  createBasicTATConfigFields(data?:any){
+  createUrgentTATConfigFields(data?:any){
+    
+      this.urgentTATConfigFields = [
+        new Textbox({
+          id: "UTAT",
+          key: "UTAT",
+          label: data === "HRS_MIN"  ? "HOURS" : data === "DAY_HRS" ? "DAYS" : data === "MTH_DAY" ? "MONTHS" : "" ,
+          required: true
+        }),
+        new Textbox({
+          id: "UTAT2",
+          key: "UTAT2",
+          label: data === "HRS_MIN" ? "MINUTES" : data === "DAY_HRS" ? "HOURS" : data === "MTH_DAY" ? "DAYS" : "" ,
+          required: true
+        })
+      ] 
 
-    this.urgentTATConfigFields = [
+  }
+
+  createRoutineTATConfigFields(data?:any){
+    this.routineTATConfigFields = [
       new Textbox({
-        id: "standardTime",
-        key: "standardTime",
-        label: data === "HRSMIN" ? "HOURS" : data === "DAYSHRS" ? "DAYS" : data === "MNTHSDAYS" ? "MONTHS" : "" ,
+        id: "RTAT",
+        key: "RTAT",
+        label: data === "HRS_MIN"  ? "HOURS" : data === "DAY_HRS" ? "DAYS" : data === "MTH_DAY" ? "MONTHS" : "" ,
         required: true
       }),
       new Textbox({
-        id: "standardTime",
-        key: "standardTime",
-        label: data === "HRSMIN" ? "MINS" : data === "DAYSHRS" ? "HRS" : data === "MNTHSDAYS" ? "DAYS" : "" ,
+        id: "RTAT2",
+        key: "RTAT2",
+        label: data === "HRS_MIN" ? "MINUTES" : data === "DAY_HRS" ? "HOURS" : data === "MTH_DAY" ? "DAYS" : "" ,
         required: true
       })
     ]
+  }
+
+  createReferralTATConfigFields(data? : any){
+    this.referralTATConfigFields = [
+      new Textbox({
+        id: "REFTAT",
+        key: "REFTAT",
+        label: data === "HRS_MIN"  ? "HOURS" : data === "DAY_HRS" ? "DAYS" : data === "MTH_DAY" ? "MONTHS" : "" ,
+        required: true
+      }),
+      new Textbox({
+        id: "REFTAT2",
+        key: "REFTAT2",
+        label: data === "HRS_MIN" ? "MINUTES" : data === "DAY_HRS"  ? "HOURS" : data === "MTH_DAY" ? "DAYS" : "" ,
+        required: true
+      })
+    ]
+  }
+
+  onChangeToMilliseconds(formData : any){
+
+    if(formData["UTAT"]?.value.length > 0 && formData["UTAT2"]?.value.length > 0){
+
+      if(formData["UTAT"].id === "UTAT"){
+        if(formData["UTAT"].label === "HOURS"){
+          this.urgentTATinMilliseconds = +this.formData["UTAT"]?.value * 3600000;
+          this.urgentConfigType = "HRS_MIN"
+        }
+
+        if(formData["UTAT"].label === "DAYS"){
+          this.urgentTATinMilliseconds = +this.formData["UTAT"]?.value * 86400000;
+          this.urgentConfigType = "DAY_HRS"
+        }
+
+        if(formData["UTAT"].label === "MONTHS"){
+          const millisecondsPerMonth = 30 * 24 * 60 * 60 * 1000;
+          this.urgentTATinMilliseconds = +this.formData["UTAT"]?.value * millisecondsPerMonth;
+          this.urgentConfigType = "MTH_DAY"
+        }
+      }
+      
+      if(formData["UTAT2"].id === "UTAT2"){
+        if(formData["UTAT2"].label === "MINUTES"){
+          this.urgentTATinMilliseconds += +this.formData["UTAT2"]?.value * 60000;
+        }
+
+        if(formData["UTAT2"].label === "HOURS"){
+          this.urgentTATinMilliseconds += +this.formData["UTAT2"]?.value * 3600000;
+        }
+
+        if(formData["UTAT2"].label === "DAYS"){
+          this.urgentTATinMilliseconds += +this.formData["UTAT2"]?.value * 86400000;
+        }
+      }
+    }
+
+    if(formData["RTAT"]?.value.length > 0 && formData["RTAT2"]?.value.length > 0){
+
+      if(formData["RTAT"].id === "RTAT"){
+        if(formData["RTAT"].label === "HOURS"){
+          this.routineTATinMilliseconds = +this.formData["RTAT"]?.value * 3600000;
+          this.routineConfigType = "HRS_MIN"
+        }
+
+        if(formData["RTAT"].label === "DAYS"){
+          this.routineTATinMilliseconds = +this.formData["RTAT"]?.value * 86400000;
+          this.routineConfigType = "DAY_HRS"
+        }
+
+        if(formData["RTAT"].label === "MONTHS"){
+          const millisecondsPerMonth = 30 * 24 * 60 * 60 * 1000;
+          this.routineTATinMilliseconds = +this.formData["RTAT"]?.value * millisecondsPerMonth;
+          this.routineConfigType = "MTH_DAY"
+        }
+      }
+      
+      if(formData["RTAT2"].id === "RTAT2"){
+        if(formData["RTAT2"].label === "MINUTES"){
+          this.routineTATinMilliseconds += +this.formData["RTAT2"]?.value * 60000;
+        }
+
+        if(formData["RTAT2"].label === "HOURS"){
+          this.routineTATinMilliseconds += +this.formData["RTAT2"]?.value * 3600000;
+        }
+
+        if(formData["RTAT2"].label === "DAYS"){
+          this.routineTATinMilliseconds += +this.formData["RTAT2"]?.value * 86400000;
+        }
+      }
+    }
+
+    if(formData["REFTAT"]?.value.length > 0 && formData["REFTAT2"]?.value.length > 0){
+
+      if(formData["REFTAT"].id === "REFTAT"){
+        if(formData["REFTAT"].label === "HOURS"){
+          this.referralTATinMilliseconds = +this.formData["REFTAT"]?.value * 3600000;
+          this.referralConfigType = "HRS_MIN"
+        }
+
+        if(formData["REFTAT"].label === "DAYS"){
+          this.referralTATinMilliseconds = +this.formData["REFTAT"]?.value * 86400000;
+          this.referralConfigType = "DAY_HRS"
+        }
+
+        if(formData["REFTAT"].label === "MONTHS"){
+          const millisecondsPerMonth = 30 * 24 * 60 * 60 * 1000;
+          this.referralTATinMilliseconds = +this.formData["REFTAT"]?.value * millisecondsPerMonth;
+          this.referralConfigType = "MTH_DAY"
+        }
+      }
+      
+      if(formData["REFTAT2"].id === "REFTAT2"){
+        if(formData["REFTAT2"].label === "MINUTES"){
+          this.referralTATinMilliseconds += +this.formData["REFTAT2"]?.value * 60000;
+        }
+
+        if(formData["REFTAT2"].label === "HOURS"){
+          this.referralTATinMilliseconds += +this.formData["REFTAT2"]?.value * 3600000;
+        }
+
+        if(formData["REFTAT2"].label === "DAYS"){
+          this.referralTATinMilliseconds += +this.formData["REFTAT2"]?.value * 86400000;
+        }
+      }
+    }
   }
 
   onFormUpdate(formValues: FormValue): void {
@@ -108,7 +275,7 @@ export class TestTargetCreationComponent implements OnInit {
 
       this.selectedLabTestDetails$.subscribe((response: any) => {
         if (response && !this.conceptBeingEdited) {
-          this.createBasicTATConfigFields(response);
+          //this.createUrgentTATConfigFields(response);
         }
       });
     }
@@ -116,7 +283,9 @@ export class TestTargetCreationComponent implements OnInit {
 
   onCancel(event: Event): void {
     event.stopPropagation();
-    this.createBasicTATConfigFields();
+    this.createUrgentTATConfigFields();
+    this.createRoutineTATConfigFields();
+    this.createReferralTATConfigFields();
     
   }
 
@@ -125,10 +294,20 @@ export class TestTargetCreationComponent implements OnInit {
     selectedLabTestDetails?: any
   ): void {
     event.stopPropagation();
+    this.onChangeToMilliseconds(this.formData);
+
     let testConfigData = {
       concept: selectedLabTestDetails?.uuid,
-      standardTAT: +this.formData["standardTime"]?.value
+      urgentTAT: this.urgentTATinMilliseconds,
+      routineTAT : this.routineTATinMilliseconds,
+      referralTAT: this.referralTATinMilliseconds,
+      urgentConfigType: this.urgentConfigType,
+      routineConfigType : this.routineConfigType,
+      referralConfigType : this.referralConfigType
+      
     }
+
+    console.log("aab:",testConfigData);
 
     this.testTimeConfigService.createTestTimeConfig(testConfigData)
     .subscribe((response) => {
@@ -139,7 +318,9 @@ export class TestTargetCreationComponent implements OnInit {
         this.alertType = "success";
       }
     });
-    this.createBasicTATConfigFields();
+    this.createUrgentTATConfigFields();
+    this.createRoutineTATConfigFields();
+    this.createReferralTATConfigFields()
     this.createLabTestField();
 
   }
