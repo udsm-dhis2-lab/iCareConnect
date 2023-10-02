@@ -31,8 +31,9 @@
           <tr>
             <th>SN</th>
             <th>Name</th>
-            <th>TAT time(In minutes)</th>
-            <th></th>
+            <th>Routine TAT</th>
+            <th>Urgent TAT</th>
+            <th>Referral TAT</th>
           </tr>
         </thead>
         <tbody>
@@ -55,7 +56,13 @@
                 {{ testConfig?.concept?.display }}
               </td>
               <td>
-                {{ testConfig?.standardTAT }}
+                {{ testConfig?.standardTAT | timeConversion : testConfig?.routineConfigType }}
+              </td>
+              <td>
+                {{ testConfig?.urgentTAT | timeConversion : testConfig?.urgentConfigType }}
+              </td>
+              <td>
+                {{ testConfig?.referralTAT | timeConversion : testConfig?.referralConfigType }}
               </td>
               <td>
                 <button mat-icon-button [matMenuTriggerFor]="menu">

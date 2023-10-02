@@ -44,6 +44,7 @@ export class TestTimeConfigService {
           if (item?.concept && typeof item.concept.display === 'string') {
             item.concept.display = item.concept.display.replace('TEST_ORDERS:', '');
           }
+          console.log("aa: ", item);
           return item;
         });
       }),
