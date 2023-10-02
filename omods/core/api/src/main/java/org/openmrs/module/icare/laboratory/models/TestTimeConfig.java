@@ -135,17 +135,33 @@ public class TestTimeConfig extends BaseOpenmrsData implements java.io.Serializa
 		
 		TestTimeConfig testTimeConfig = new TestTimeConfig();
 		
-		testTimeConfig.setAddReqTimeLimit((Integer) testTimeConfigMap.get("additionalReqTimeLimit"));
+		if (testTimeConfigMap.get("additionalReqTimeLimit") != null) {
+			testTimeConfig.setAddReqTimeLimit((Integer) testTimeConfigMap.get("additionalReqTimeLimit"));
+		}
 		//		testTimeConfig.setStandardTAT(((Integer) testTimeConfigMap.get("standardTAT")).longValue());
 		//		testTimeConfig.setUrgentTAT(((Integer) testTimeConfigMap.get("urgentTAT")).longValue());
 		//		testTimeConfig.setReferralTAT(((Integer) testTimeConfigMap.get("referralTAT")).longValue());
-		testTimeConfig.setStandardTAT(Long.parseLong(testTimeConfigMap.get("standardTAT").toString()));
-		testTimeConfig.setReferralTAT(Long.parseLong(testTimeConfigMap.get("referralTAT").toString()));
-		testTimeConfig.setUrgentTAT(Long.parseLong(testTimeConfigMap.get("urgentTAT").toString()));
-		testTimeConfig.setVersion((String) testTimeConfigMap.get("version"));
-		testTimeConfig.setUrgentConfigType((String) testTimeConfigMap.get("urgentConfigType"));
-		testTimeConfig.setRoutineConfigType((String) testTimeConfigMap.get("routineConfigType"));
-		testTimeConfig.setReferralConfigType((String) testTimeConfigMap.get("referralConfigType"));
+		if (testTimeConfigMap.get("standardTAT") != null) {
+			testTimeConfig.setStandardTAT(Long.parseLong(testTimeConfigMap.get("standardTAT").toString()));
+		}
+		if (testTimeConfigMap.get("referralTAT") != null) {
+			testTimeConfig.setReferralTAT(Long.parseLong(testTimeConfigMap.get("referralTAT").toString()));
+		}
+		if (testTimeConfigMap.get("urgentTAT") != null) {
+			testTimeConfig.setUrgentTAT(Long.parseLong(testTimeConfigMap.get("urgentTAT").toString()));
+		}
+		if (testTimeConfigMap.get("version") != null) {
+			testTimeConfig.setVersion((String) testTimeConfigMap.get("version"));
+		}
+		if (testTimeConfigMap.get("urgentConfigType") != null) {
+			testTimeConfig.setUrgentConfigType((String) testTimeConfigMap.get("urgentConfigType"));
+		}
+		if (testTimeConfigMap.get("routineConfigType") != null) {
+			testTimeConfig.setRoutineConfigType((String) testTimeConfigMap.get("routineConfigType"));
+		}
+		if (testTimeConfigMap.get("referralConfigType") != null) {
+			testTimeConfig.setReferralConfigType((String) testTimeConfigMap.get("referralConfigType"));
+		}
 		
 		if (testTimeConfigMap.get("uuid") == null) {
 			

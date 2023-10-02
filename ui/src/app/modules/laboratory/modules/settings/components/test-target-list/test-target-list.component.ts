@@ -55,7 +55,6 @@ export class TestTargetListComponent implements OnInit {
     .subscribe((response) =>{
       this.testTimeConfigList = response;
     });
-
   }
 
   onPermanentDelete(event: Event, testConfig: any): void {
