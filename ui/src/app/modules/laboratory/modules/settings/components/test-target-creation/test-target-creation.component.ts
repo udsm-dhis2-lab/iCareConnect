@@ -299,7 +299,7 @@ export class TestTargetCreationComponent implements OnInit {
     let testConfigData = {
       concept: selectedLabTestDetails?.uuid,
       urgentTAT: this.urgentTATinMilliseconds,
-      routineTAT : this.routineTATinMilliseconds,
+      standardTAT : this.routineTATinMilliseconds,
       referralTAT: this.referralTATinMilliseconds,
       urgentConfigType: this.urgentConfigType,
       routineConfigType : this.routineConfigType,
@@ -307,7 +307,6 @@ export class TestTargetCreationComponent implements OnInit {
       
     }
 
-    console.log("aab:",testConfigData);
 
     this.testTimeConfigService.createTestTimeConfig(testConfigData)
     .subscribe((response) => {
