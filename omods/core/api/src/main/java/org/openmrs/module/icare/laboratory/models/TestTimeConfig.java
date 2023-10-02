@@ -32,51 +32,84 @@ public class TestTimeConfig extends BaseOpenmrsData implements java.io.Serializa
 	private String version;
 	
 	@Column(name = "standard_tat")
-	private Integer standardTAT;
+	private Long standardTAT;
 	
 	@Column(name = "urgent_tat")
-	private Integer urgentTAT;
-
+	private Long urgentTAT;
+	
 	@Column(name = "referral_tat")
-	private Integer referralTAT;
+	private Long referralTAT;
 	
 	@Column(name = "additional_request_time_limit")
 	private Integer addReqTimeLimit;
+	
+	@Column(name = "urgent_config_type")
+	private String urgentConfigType;
+	
+	@Column(name = "routine_config_type")
+	private String routineConfigType;
+	
+	@Column(name = "referral_config_type")
+	private String referralConfigType;
 	
 	public TestTimeConfig() {
 		
 	}
 	
-	public void setStandardTAT(Integer stdTAT) {
+	public void setStandardTAT(Long stdTAT) {
 		this.standardTAT = stdTAT;
 	}
 	
-	public Integer getStandardTAT() {
+	public Long getStandardTAT() {
 		return standardTAT;
 	}
 	
-	public void setUrgentTAT(Integer urgTAT) {
+	public void setUrgentTAT(Long urgTAT) {
 		this.urgentTAT = urgTAT;
 	}
 	
-	public Integer getUrgentTAT() {
+	public Long getUrgentTAT() {
 		return urgentTAT;
 	}
-
-	public void setReferralTAT(Integer referralTAT) {
+	
+	public void setReferralTAT(Long referralTAT) {
 		this.referralTAT = referralTAT;
 	}
-
-	public Integer getReferralTAT() {
+	
+	public Long getReferralTAT() {
 		return referralTAT;
 	}
-
+	
 	public void setAddReqTimeLimit(Integer addReqTimeLimit) {
 		this.addReqTimeLimit = addReqTimeLimit;
 	}
 	
 	public Integer getAddReqTimeLimit() {
 		return addReqTimeLimit;
+	}
+	
+	public void setUrgentConfigType(String urgentConfigType) {
+		this.urgentConfigType = urgentConfigType;
+	}
+	
+	public String getUrgentConfigType() {
+		return urgentConfigType;
+	}
+	
+	public void setRoutineConfigType(String routineConfigType) {
+		this.routineConfigType = routineConfigType;
+	}
+	
+	public String getRoutineConfigType() {
+		return routineConfigType;
+	}
+	
+	public void setReferralConfigType(String referralConfigType) {
+		this.referralConfigType = referralConfigType;
+	}
+	
+	public String getReferralConfigType() {
+		return referralConfigType;
 	}
 	
 	@Override
@@ -103,10 +136,16 @@ public class TestTimeConfig extends BaseOpenmrsData implements java.io.Serializa
 		TestTimeConfig testTimeConfig = new TestTimeConfig();
 		
 		testTimeConfig.setAddReqTimeLimit((Integer) testTimeConfigMap.get("additionalReqTimeLimit"));
-		testTimeConfig.setStandardTAT((Integer) testTimeConfigMap.get("standardTAT"));
-		testTimeConfig.setUrgentTAT((Integer) testTimeConfigMap.get("urgentTAT"));
-		testTimeConfig.setReferralTAT((Integer) testTimeConfigMap.get("referralTAT"));
+		//		testTimeConfig.setStandardTAT(((Integer) testTimeConfigMap.get("standardTAT")).longValue());
+		//		testTimeConfig.setUrgentTAT(((Integer) testTimeConfigMap.get("urgentTAT")).longValue());
+		//		testTimeConfig.setReferralTAT(((Integer) testTimeConfigMap.get("referralTAT")).longValue());
+		testTimeConfig.setStandardTAT(Long.parseLong(testTimeConfigMap.get("standardTAT").toString()));
+		testTimeConfig.setReferralTAT(Long.parseLong(testTimeConfigMap.get("referralTAT").toString()));
+		testTimeConfig.setUrgentTAT(Long.parseLong(testTimeConfigMap.get("urgentTAT").toString()));
 		testTimeConfig.setVersion((String) testTimeConfigMap.get("version"));
+		testTimeConfig.setUrgentConfigType((String) testTimeConfigMap.get("urgentConfigType"));
+		testTimeConfig.setRoutineConfigType((String) testTimeConfigMap.get("routineConfigType"));
+		testTimeConfig.setReferralConfigType((String) testTimeConfigMap.get("referralConfigType"));
 		
 		if (testTimeConfigMap.get("uuid") == null) {
 			
@@ -140,9 +179,19 @@ public class TestTimeConfig extends BaseOpenmrsData implements java.io.Serializa
 		if (this.getUrgentTAT() != null) {
 			testTimeConfigMap.put("urgentTAT", this.getUrgentTAT());
 		}
-		if(this.getReferralTAT() != null){
+		if (this.getReferralTAT() != null) {
 			testTimeConfigMap.put("referralTAT", this.getReferralTAT());
 		}
+		if (this.getUrgentConfigType() != null) {
+			testTimeConfigMap.put("urgentConfigType", this.getUrgentConfigType());
+		}
+		if (this.getRoutineConfigType() != null) {
+			testTimeConfigMap.put("routineConfigType", this.getRoutineConfigType());
+		}
+		if (this.getReferralConfigType() != null) {
+			testTimeConfigMap.put("referralConfigType", this.getReferralConfigType());
+		}
+		
 		if (this.version != null) {
 			testTimeConfigMap.put("version", this.getVersion());
 		}
