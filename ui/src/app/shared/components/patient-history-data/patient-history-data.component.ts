@@ -6,6 +6,10 @@ import {
 } from "../../helpers/visits.helper";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { formatDateToString } from "../../helpers/format-date.helper";
+import {
+  getAgeInYearsMonthsDays,
+  getDateDifferenceYearsMonthsDays,
+} from "src/app/shared/helpers/date.helpers";
 
 @Component({
   selector: "app-patient-history-data",
@@ -362,6 +366,16 @@ export class PatientHistoryDataComponent implements OnInit {
         "26742868-a38c-4e6a-ac1d-ae283c414c2e"
     )[0]?.identifier;
 
+    let patientAge = getAgeInYearsMonthsDays(
+      this.visit?.visit?.patient?.person?.birthdate
+    );
+    let patientPhone = this.visit?.visit?.patient?.person?.attributes
+      ?.filter((attribute) => {
+        attribute.uuid === "60003ddc-3e8e-49c6-a6d2-bdf82b5eb572";
+        return attribute;
+      })[0]
+      ?.display.split(" = ")[1];
+
     frameDoc.document.write(`
     
       <center id="top">
@@ -393,6 +407,18 @@ export class PatientHistoryDataComponent implements OnInit {
           <p> 
               MRN : ${patientMRN}</br>
           </p>
+          <p>Gender : ${
+            this.visit?.visit?.patient?.person?.gender
+              ? this.visit?.visit?.patient?.person?.gender == "F"
+                ? "Female"
+                : "Male"
+              : ""
+          }</p>
+          <p>Age : ${patientAge?.years} <i>yrs,</i> ${
+      patientAge?.months
+    } <i>months, </i> ${patientAge?.days} <i>days</i> </p>
+    <p> Phone : ${patientPhone}</p>
+    <hr style="width:27%;text-align:left;margin-left:0;color:#ddd; opacity:0.5">
         </div>
       </div>
       
@@ -404,7 +430,7 @@ export class PatientHistoryDataComponent implements OnInit {
     ) {
       frameDoc.document
         .write(`<p>Visit started on : <i>${this.visitHistory?.visitStartDateTime?.date} at ${this.visitHistory?.visitStartDateTime?.time}</i></p> 
-     <p> Visit stopped on: <i>
+     <p>Visit stopped on: <i>
 ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopDateTime?.time}</i></p> <br>
 `);
     }
