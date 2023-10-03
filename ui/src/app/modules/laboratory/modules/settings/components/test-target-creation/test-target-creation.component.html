@@ -15,10 +15,10 @@
             (formUpdate)="onFormUpdateLabTest($event)"
       ></app-form>
       <div>
-      <div *ngFor="let tatOption of turnaroundOptions">  
+      <div *ngFor="let tatOption of turnaroundOptions; let i = index">  
         <p><b>{{tatOption.label}}</b></p>
-        <mat-radio-group [(ngModel)]="selectedOption[tatOption.value]">
-          <mat-radio-button *ngFor="let option of radioOptions" [value]="option.value" color="primary" class="registration-category-btn ml-2" (change)="onRadioButtonChange(tatOption.value,option.value)">
+        <mat-radio-group [formControl]="dynamicControls[i]" >
+          <mat-radio-button *ngFor="let option of radioOptions" [value]="option.value" color="primary" class="registration-category-btn ml-2"  (change)="onRadioButtonChange(tatOption.value,option.value)">
             {{ option.label }}
           </mat-radio-button>
         </mat-radio-group>
