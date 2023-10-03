@@ -22,6 +22,7 @@ export class TestTargetListComponent implements OnInit {
   @Input() conceptClass: string;
   conceptsList$: Observable<ConceptGetFull[]>;
   testTimeConfigList: any [];
+  testTimeConfigToEdit: any;
   saving: boolean = false;
 
   page: number = 1;
@@ -77,6 +78,10 @@ export class TestTargetListComponent implements OnInit {
             });
         }
       });
+  }
+
+  onEdit(testTimeConfigToEdit){
+    this.testTimeConfigService.testTimeToEdit.emit(testTimeConfigToEdit);
   }
 
   
