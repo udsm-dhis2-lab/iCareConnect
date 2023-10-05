@@ -23,10 +23,11 @@ export class TestTimeConfigService {
   }
 
   editTestTimeConfig(data: any) : Observable<any>{
-    return this.httpClient.post(`lab/testime/${data?.uuid}`,data).pipe(
+    return this.httpClient.post(`lab/testtime/${data?.uuid}`,data).pipe(
       map((response) =>{
         return response;
-      })
+      }),
+      catchError((error) => of(error))
     )
   }
 
