@@ -38,6 +38,33 @@ public class TestTimeConfigDAO extends BaseDAO<TestTimeConfig> {
 			queryStr += " standardTAT = :standardTAT";
 			
 		}
+		if (testTimeConfig.getRoutineConfigType() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " , ";
+			}
+			queryStr += " routineConfigType = :routineConfigType";
+			
+		}
+		if (testTimeConfig.getUrgentConfigType() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " , ";
+			}
+			queryStr += " urgentConfigType = :urgentConfigType";
+			
+		}
+		if (testTimeConfig.getReferralConfigType() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " , ";
+			}
+			queryStr += " referralConfigType = :referralConfigType";
+			
+		}
 		
 		if (testTimeConfig.getUrgentTAT() != null) {
 			if (!queryStr.contains("SET")) {
@@ -96,6 +123,18 @@ public class TestTimeConfigDAO extends BaseDAO<TestTimeConfig> {
 		
 		if (testTimeConfig.getReferralTAT() != null) {
 			query.setParameter("referralTAT", testTimeConfig.getReferralTAT());
+		}
+		
+		if (testTimeConfig.getReferralConfigType() != null) {
+			query.setParameter("referralConfigType", testTimeConfig.getReferralConfigType());
+		}
+		
+		if (testTimeConfig.getUrgentConfigType() != null) {
+			query.setParameter("urgentConfigType", testTimeConfig.getUrgentConfigType());
+		}
+		
+		if (testTimeConfig.getRoutineConfigType() != null) {
+			query.setParameter("routineConfigType", testTimeConfig.getRoutineConfigType());
 		}
 		
 		if (testTimeConfig.getAddReqTimeLimit() != null) {

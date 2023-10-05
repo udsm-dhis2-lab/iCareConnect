@@ -31,8 +31,8 @@
           <tr>
             <th>SN</th>
             <th>Name</th>
-            <th>Routine TAT</th>
             <th>Urgent TAT</th>
+            <th>Routine TAT</th>
             <th>Referral TAT</th>
           </tr>
         </thead>
@@ -56,10 +56,10 @@
                 {{ testConfig?.concept?.display }}
               </td>
               <td>
-                {{ testConfig?.standardTAT | timeConversion : testConfig?.routineConfigType }}
+                {{ testConfig?.urgentTAT | timeConversion : testConfig?.urgentConfigType }}
               </td>
               <td>
-                {{ testConfig?.urgentTAT | timeConversion : testConfig?.urgentConfigType }}
+                {{ testConfig?.standardTAT | timeConversion : testConfig?.routineConfigType }}
               </td>
               <td>
                 {{ testConfig?.referralTAT | timeConversion : testConfig?.referralConfigType }}
