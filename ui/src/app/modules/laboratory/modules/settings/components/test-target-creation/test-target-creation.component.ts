@@ -139,17 +139,17 @@ export class TestTargetCreationComponent implements OnInit, OnDestroy {
     this.selectedOption[optionValue] = selectedValue;
     if (optionValue === "UTAT") {
       this.selectedFormOptions = { optionValue, selectedValue };
-      this.createUrgentTATConfigFields(selectedValue,null);
+      this.isEditMode ? this.createUrgentTATConfigFields(null,[null,null,selectedValue]): this.createUrgentTATConfigFields(selectedValue,null);
     }
     if (optionValue === "RTAT") {
       
       this.selectedFormOptions = { optionValue, selectedValue };
-      this.createRoutineTATConfigFields(selectedValue,null);
+      this.isEditMode ? this.createRoutineTATConfigFields(null, [null,null,selectedValue]) : this.createRoutineTATConfigFields(selectedValue,null);
     }
     if (optionValue === "REFTAT") {
       
       this.selectedFormOptions = { optionValue, selectedValue };
-      this.createReferralTATConfigFields(selectedValue,null);
+      this.isEditMode ? this.createReferralTATConfigFields(null,[null,null,selectedValue]) : this.createReferralTATConfigFields(selectedValue,null);
     }
   }
 
