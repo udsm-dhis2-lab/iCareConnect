@@ -27,21 +27,80 @@ public class TestTimeConfigDAO extends BaseDAO<TestTimeConfig> {
 	public TestTimeConfig updateConfig(TestTimeConfig testTimeConfig) {
 		DbSession session = this.getSession();
 		
-		String queryStr = "UPDATE TestTimeConfig set " + "standardTAT = :standardTAT," + "urgentTAT = :urgentTAT,"
-		        + "addReqTimeLimit = :addReqTimeLimit," + "version = :version, " + "creator = :creator,"
-		        + "dateCreated = :dateCreated," + "changedBy = :changedBy, " + "dateChanged = :dateChanged "
-		        + "where uuid = :uuid";
+		String queryStr = "UPDATE TestTimeConfig";
+		
+		if (testTimeConfig.getStandardTAT() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " , ";
+			}
+			queryStr += " standardTAT = :standardTAT";
+			
+		}
+		
+		if (testTimeConfig.getUrgentTAT() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " , ";
+			}
+			queryStr += " urgentTAT = :urgentTAT";
+		}
+		
+		if (testTimeConfig.getReferralTAT() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " , ";
+			}
+			queryStr += " referralTAT = :referralTAT";
+		}
+		
+		if (testTimeConfig.getAddReqTimeLimit() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " , ";
+			}
+			queryStr += " addReqTimeLimit = :addReqTimeLimit";
+		}
+		
+		if (testTimeConfig.getAddReqTimeLimit() != null) {
+			if (!queryStr.contains("SET")) {
+				queryStr += " SET ";
+			} else {
+				queryStr += " , ";
+			}
+			queryStr += " version = :version";
+		}
+		
+		queryStr += " WHERE uuid = :uuid";
+		
+		//		if (supplier.getName() != null) {
+		//			if (!queryStr.contains("SET")) {
+		//				queryStr += " SET ";
+		//			} else {
+		//				queryStr += " , ";
+		//			}
+		//			queryStr += " sp.name = :name";
+		//		}
 		
 		Query query = session.createQuery(queryStr);
-		query.setParameter("standardTAT", testTimeConfig.getStandardTAT());
-		query.setParameter("urgentTAT", testTimeConfig.getUrgentTAT());
-		query.setParameter("addReqTimeLimit", testTimeConfig.getAddReqTimeLimit());
-		query.setParameter("version", testTimeConfig.getVersion());
+		if (testTimeConfig.getStandardTAT() != null) {
+			query.setParameter("standardTAT", testTimeConfig.getStandardTAT());
+		}
+		if (testTimeConfig.getUrgentTAT() != null) {
+			query.setParameter("urgentTAT", testTimeConfig.getUrgentTAT());
+		}
+		if (testTimeConfig.getAddReqTimeLimit() != null) {
+			query.setParameter("addReqTimeLimit", testTimeConfig.getAddReqTimeLimit());
+		}
+		if (testTimeConfig.getVersion() != null) {
+			query.setParameter("version", testTimeConfig.getVersion());
+		}
+		
 		query.setParameter("uuid", testTimeConfig.getUuid());
-		query.setParameter("changedBy", testTimeConfig.getChangedBy());
-		query.setParameter("dateChanged", testTimeConfig.getDateChanged());
-		query.setParameter("creator", testTimeConfig.getCreator());
-		query.setParameter("dateCreated", testTimeConfig.getDateCreated());
 		
 		Integer success = query.executeUpdate();
 		
