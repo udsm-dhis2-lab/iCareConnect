@@ -93,6 +93,11 @@ public class TestTimeConfigDAO extends BaseDAO<TestTimeConfig> {
 		if (testTimeConfig.getUrgentTAT() != null) {
 			query.setParameter("urgentTAT", testTimeConfig.getUrgentTAT());
 		}
+		
+		if (testTimeConfig.getReferralTAT() != null) {
+			query.setParameter("referralTAT", testTimeConfig.getReferralTAT());
+		}
+		
 		if (testTimeConfig.getAddReqTimeLimit() != null) {
 			query.setParameter("addReqTimeLimit", testTimeConfig.getAddReqTimeLimit());
 		}
