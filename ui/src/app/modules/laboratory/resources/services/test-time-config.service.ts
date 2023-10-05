@@ -22,6 +22,14 @@ export class TestTimeConfigService {
     );
   }
 
+  editTestTimeConfig(data: any) : Observable<any>{
+    return this.httpClient.post(`lab/testime/${data?.uuid}`,data).pipe(
+      map((response) =>{
+        return response;
+      })
+    )
+  }
+
   getTestTimeConfig(parameters: any): Observable<any> {
     let queryParams = "";
 
