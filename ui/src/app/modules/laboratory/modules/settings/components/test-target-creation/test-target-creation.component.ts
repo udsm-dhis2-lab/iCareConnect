@@ -576,6 +576,7 @@ export class TestTargetCreationComponent implements OnInit, OnDestroy {
       })
     }
 
+    this.testTimeConfigService.savedOrEditedData.emit(event);
     this.createUrgentTATConfigFields();
     this.createRoutineTATConfigFields();
     this.createReferralTATConfigFields();

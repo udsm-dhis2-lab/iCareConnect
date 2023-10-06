@@ -13,6 +13,8 @@ export class TestTimeConfigService {
 
   testTimeToEdit = new EventEmitter<any>();
 
+  savedOrEditedData = new EventEmitter<any>();
+
   createTestTimeConfig(data: any): Observable<any> {
     return this.httpClient.post(`lab/testtime`, data).pipe(
       map((response) => {
