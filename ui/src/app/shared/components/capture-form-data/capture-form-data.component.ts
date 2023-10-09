@@ -29,7 +29,6 @@ export class CaptureFormDataComponent implements OnInit {
   constructor(private visitService: VisitsService) {}
 
   ngOnInit(): void {
-    console.log("FORM", this.form);
     this.observations$ = this.visitService.getVisitObservationsByVisitUuid({
       uuid: this.visit?.uuid,
       query: {

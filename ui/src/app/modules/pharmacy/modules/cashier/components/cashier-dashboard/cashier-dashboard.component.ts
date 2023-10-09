@@ -20,6 +20,7 @@ export class CashierDashboardComponent implements OnInit {
   searchItemFormField: any;
   selectedItems: any[] = [];
   formData: any;
+  saving: boolean = false;
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
@@ -62,5 +63,16 @@ export class CashierDashboardComponent implements OnInit {
     this.selectedItems = this.selectedItems?.filter(
       (item: any) => item?.name != itemToRemove?.name
     );
+  }
+
+  onSave(event, items): void {
+    event.stopPropagation();
+    console.log(items);
+    this.saving = true;
+    setTimeout(() => {
+      this.selectedItems = [];
+      this.createSearchItemFormField();
+      this.saving = false;
+    }, 2000);
   }
 }
