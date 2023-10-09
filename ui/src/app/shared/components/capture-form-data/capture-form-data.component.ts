@@ -17,7 +17,9 @@ export class CaptureFormDataComponent implements OnInit {
   @Input() visit: Visit;
   @Input() patient: Patient;
   @Input() isLIS: boolean;
+  @Input() isGenericForm: boolean;
   @Input() formValidationRules: any[];
+  @Input() isFormHorizontal: boolean;
   observations$: Observable<any>;
 
   @Output() formDataUpdate: EventEmitter<FormValue> =
@@ -27,6 +29,7 @@ export class CaptureFormDataComponent implements OnInit {
   constructor(private visitService: VisitsService) {}
 
   ngOnInit(): void {
+    console.log("FORM", this.form);
     this.observations$ = this.visitService.getVisitObservationsByVisitUuid({
       uuid: this.visit?.uuid,
       query: {
@@ -44,5 +47,11 @@ export class CaptureFormDataComponent implements OnInit {
     this.legendControl[itemName] = this.legendControl[itemName]
       ? !this.legendControl[itemName]
       : true;
+  }
+
+  get getFields(): any[] {
+    return (
+      this.form?.formFields?.map((formField: any) => formField?.formField) || []
+    );
   }
 }
