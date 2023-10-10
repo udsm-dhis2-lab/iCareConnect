@@ -1,1 +1,24 @@
-<p>cashier-home works!</p>
+<div
+  class="w-100 p-2"
+  *ngIf="{
+    currentUser: currentUser$ | async,
+    pharmacyClientDetailsFormUuid: pharmacyClientDetailsFormUuid$ | async
+  } as params"
+>
+  <div
+    class="mt-5 d-flex justify-content-center w-100"
+    *ngIf="!params?.currentUser || !params?.pharmacyClientDetailsFormUuid"
+  >
+    <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
+  </div>
+  <div
+    class="w-100"
+    *ngIf="params?.currentUser && params?.pharmacyClientDetailsFormUuid"
+  >
+    <app-cashier-dashboard
+      [currentUser]="params?.currentUser"
+      [currentLocation]="currentLocation"
+      [formId]="params?.pharmacyClientDetailsFormUuid"
+    ></app-cashier-dashboard>
+  </div>
+</div>
