@@ -531,6 +531,7 @@ export class TestTargetCreationComponent implements OnInit, OnDestroy {
   onSave(event: Event, selectedLabTestDetails?: any): void {
     event.stopPropagation();
     this.onChangeToMilliseconds(this.formData);
+    this.saving = true;
     if(!this.isEditMode){
       let testConfigData = {
         concept: selectedLabTestDetails?.uuid,
@@ -570,13 +571,14 @@ export class TestTargetCreationComponent implements OnInit, OnDestroy {
       .editTestTimeConfig(editedTestConfigData)
       .subscribe((response) => {
         if(response){
+          this.saving = false;
           this.savingMessage = "Successfully updated";
           this.alertType = "success";
         }
       })
     }
 
-    this.testTimeConfigService.savedOrEditedData.emit(event);
+    //this.testTimeConfigService.savedOrEditedData.emit(event);
     this.createUrgentTATConfigFields();
     this.createRoutineTATConfigFields();
     this.createReferralTATConfigFields();

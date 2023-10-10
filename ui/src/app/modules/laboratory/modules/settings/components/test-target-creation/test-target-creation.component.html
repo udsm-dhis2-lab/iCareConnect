@@ -70,7 +70,7 @@
         "
         color="primary"
       >
-        {{ !conceptUuid ? "Save" : "Update" }}
+        {{ !isEditMode ? "Save" : "Update" }}
       </button>
     </div>
 
@@ -82,7 +82,7 @@
   </div>
 
   <div class="col-6">
-    <app-test-target-list></app-test-target-list>
+    <app-test-target-list *ngIf="!saving"></app-test-target-list>
     
   </div>
 </div>
