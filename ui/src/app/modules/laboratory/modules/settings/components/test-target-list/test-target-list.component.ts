@@ -41,9 +41,10 @@ export class TestTargetListComponent implements OnInit {
   ngOnInit(): void {
     this.getTestTimeConfig(null)
 
-    this.testTimeConfigService.savedOrEditedData.subscribe((data) =>{
-      this.getTestTimeConfig(null);
-    });
+    // this.testTimeConfigService.savedOrEditedData.subscribe((data) =>{
+    //   this.getTestTimeConfig(null);
+    // });
+    
   }
 
 
