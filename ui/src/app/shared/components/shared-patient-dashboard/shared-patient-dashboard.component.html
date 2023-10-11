@@ -155,8 +155,7 @@
               />
             </span>
             <button
-              *ngIf="isInpatient"
-              [disabled]="!activeVisit?.waitingToBeAdmitted"
+              *ngIf="isInpatient && activeVisit?.waitingToBeAdmitted"
               mat-stroked-button
               class="mr-2 float-right"
               (click)="onAssignBed($event)"
@@ -186,7 +185,7 @@
               (click)="
                 onDischargePatient($event, dashboardParams?.patientInvoice)
               "
-              *ngIf="activeVisit?.isAdmitted && isInpatient"
+              *ngIf="activeVisit?.isAdmitted"
               mat-stroked-button
               class="mr-2 float-right"
             >
@@ -320,7 +319,6 @@
               ></app-is-first-visit>
             </span>
             <button
-              class="ml-2"
               [disabled]="
                 codedVisitCloseStatus && codedVisitCloseStatus?.display
               "
