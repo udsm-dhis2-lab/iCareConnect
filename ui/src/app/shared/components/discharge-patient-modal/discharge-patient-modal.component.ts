@@ -15,6 +15,7 @@ export class DischargePatientModalComponent implements OnInit {
   visitDetails: any;
   dischargeObjects: any = {};
   savingData: boolean = false;
+  showInvoiceDetails: boolean = false;
   constructor(
     private dialogRef: MatDialogRef<DischargePatientModalComponent>,
     @Inject(MAT_DIALOG_DATA) data,
@@ -61,5 +62,10 @@ export class DischargePatientModalComponent implements OnInit {
         }
       });
     this.dialogRef.close(true);
+  }
+
+  toggleInvoiceDetails(event: Event, invoice: any): void {
+    event.stopPropagation();
+    this.showInvoiceDetails = !this.showInvoiceDetails;
   }
 }
