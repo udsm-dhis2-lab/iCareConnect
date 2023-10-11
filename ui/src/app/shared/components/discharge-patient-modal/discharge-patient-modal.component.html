@@ -17,9 +17,65 @@
 
 <mat-dialog-content class="mat-typography">
   <div>
-    <span *ngIf="visitDetails?.invoice?.length > 0" style="color: red"
-      >This patient has pending bills, <br /></span
-    >Are you sure to discharge this patient?
+    <p *ngIf="visitDetails?.invoice?.length > 0">
+      <span style="color: red"> This patient has pending bills/Invoice? </span>
+      <span
+        ><button
+          mat-button
+          (click)="toggleInvoiceDetails($event, visitDetails?.invoice)"
+        >
+          {{ showInvoiceDetails ? "Hide bill details" : "View bill details" }}
+        </button></span
+      >
+    </p>
+    <div class="w-100" style="max-height: 40vh; overflow: auto">
+      <table class="table" *ngIf="showInvoiceDetails">
+        <thead>
+          <tr>
+            <th>SN</th>
+            <th>Payment mode</th>
+            <th>Service/Order</th>
+            <th>Quantity</th>
+            <th>Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container
+            *ngFor="let invoice of visitDetails?.invoice; let count = index"
+          >
+            <tr
+              *ngFor="
+                let item of invoice?.billDetails?.items;
+                let itemsCount = index
+              "
+            >
+              <td
+                *ngIf="itemsCount === 0"
+                [attr.rowspan]="invoice?.items?.length"
+              >
+                {{ count + 1 }}
+              </td>
+              <td
+                *ngIf="itemsCount === 0"
+                [attr.rowspan]="invoice?.items?.length"
+              >
+                {{ invoice?.billDetails?.paymentMode?.display }}
+              </td>
+              <td>
+                {{ item?.item?.concept?.name }}
+              </td>
+              <td>
+                {{ item?.quantity }}
+              </td>
+              <td>
+                {{ item?.price }}
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-center">Are you sure to discharge this patient?</p>
   </div>
 </mat-dialog-content>
 
