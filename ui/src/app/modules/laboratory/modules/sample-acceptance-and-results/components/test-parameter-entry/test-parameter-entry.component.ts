@@ -23,8 +23,10 @@ export class TestParameterEntryComponent implements OnInit {
   @Input() finalResult: any;
   @Input() parametersRelationshipConceptSourceUuid: string;
   @Input() relatedResult: any;
+  @Input() calculatedValueExpressionAttributeType: any;
   testParameter$: Observable<ConceptGet>;
   @Output() data: EventEmitter<any> = new EventEmitter<any>();
+  @Output() attributes : EventEmitter<any> = new EventEmitter<any>();
   latestResult: any;
   errors: any[] = [];
   multipleResultsAttributeType$: Observable<string>;
@@ -131,5 +133,9 @@ export class TestParameterEntryComponent implements OnInit {
       },
     };
     this.data.emit(resultPayload);
+  }
+
+  onGetAttributes(data: any, ) {
+    this.attributes.emit(data);
   }
 }
