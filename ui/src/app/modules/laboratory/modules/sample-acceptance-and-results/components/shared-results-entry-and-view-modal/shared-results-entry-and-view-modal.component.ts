@@ -32,6 +32,7 @@ import { SharedConfirmationComponent } from "src/app/shared/components/shared-co
 export class SharedResultsEntryAndViewModalComponent implements OnInit {
   sampleAllocations$: Observable<any[]>;
   multipleResultsAttributeType$: Observable<any>;
+  calculatedValueExpressionAttributeType$: Observable<any>;
   errors: any[] = [];
   dataValues: any = {};
   saving: boolean = false;
@@ -54,6 +55,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   multipleResults: any = [];
   selectedTestedByDetails: any = {};
   parametersSearchingText: any = {};
+  attributes: any;
+  attributeTypeUuid: any;
+  calculatedParameters: any = {};
 
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
@@ -86,9 +90,26 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
           } else {
             this.errors = [...this.errors, response];
             return response;
+            console.log();
           }
         })
       );
+
+    this.calculatedValueExpressionAttributeType$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        `iCare.laboratory.settings.testParameters.calculateValueExpressionAttributeTypeUuid`
+      )
+      .pipe(
+        map((response) => {
+          if (response && !response?.error) {
+            return response;
+          } else {
+            this.errors = [...this.errors, response];
+            return response;
+          }
+        })
+      );
+
     this.getAllocations();
     this.visitDetails$ = this.visitService
       .getVisitDetailsByVisitUuid(this.data?.sample?.visit?.uuid, {
@@ -732,6 +753,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     parameter: ConceptGet,
     allocation: SampleAllocationObject
   ): void {
+    if(this.calculatedParameters[parameter?.uuid])
+    this.calculateValue(parameter, dataObject);
+
     if (dataObject?.value?.length === 0) {
       this.dataValues = omit(this.dataValues, parameter?.uuid);
     } else if (dataObject?.multipleResults) {
@@ -1170,5 +1194,56 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     if (testedByDetails?.date || testedByDetails?.testedBy) {
       this.selectedTestedByDetails[order?.concept?.uuid] = testedByDetails;
     }
+  }
+
+  onGetAttributes(data: any, calculatedValueExpressionAttributeType: string,parameterUuid: string) {
+    console.log("calculatedValueExpressionAttributeType",calculatedValueExpressionAttributeType)
+    console.log("data: ",data);
+    console.log("param: ",parameterUuid)
+    if (parameterUuid && data[0]?.parameter?.uuid) {
+      this.attributes = data;
+      this.calculatedParameters[data[0]?.parameter?.uuid] = {
+        render: false,
+        value: {},
+        attributes: data,
+        calculatedValueExpressionAttributeType,
+      };
+  
+      console.log("param2: ",this.calculatedParameters);
+    }
+  }
+
+  calculateValue(parameter: any, dataObject: any): void {
+    // console.log("aabb: ",parameter?.uuid,"bbb: ",dataObject?.value);
+    console.log("attr: ",this.attributes);
+    // console.log("uuid",this.calculatedValueExpressionAttributeType$);
+    // calculate value
+    console.log("calc param: ",this.calculatedParameters[
+      parameter?.uuid
+    ]?.attributes);
+
+    console.log("attributeType", this.calculatedParameters[parameter?.uuid]
+    ?.calculatedValueExpressionAttributeType);
+
+
+    const regex = /{([^}]*)}/;
+    const expressionAttribute: any = (this.calculatedParameters[
+      parameter?.uuid
+    ]?.attributes?.filter(
+      (attribute: any) =>
+        attribute?.attributeTypeUuid ===
+        this.calculatedParameters[parameter?.uuid]
+          ?.calculatedValueExpressionAttributeType
+    ) || [])[0];
+
+    const match = expressionAttribute?.value.match(regex);
+    console.log("aa:",match[1]);
+    setTimeout(() => {
+      this.calculatedParameters[parameter?.uuid] = {
+        ...this.calculatedParameters[parameter?.uuid],
+        render: true,
+        value: {},
+      };
+    }, 20);
   }
 }

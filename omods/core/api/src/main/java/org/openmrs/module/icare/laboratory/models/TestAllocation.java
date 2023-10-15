@@ -221,6 +221,18 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 				testConceptMap.put("allowDecimal", conceptNumeric.getAllowDecimal());
 			}
 
+			List<Map<String,Object>> attributesListMap = new ArrayList<>();
+			if(!this.getTestConcept().getAttributes().isEmpty()){
+				for(ConceptAttribute attribute : this.getTestConcept().getAttributes()){
+					Map<String, Object> conceptAttributeMap = new HashMap<>();
+					conceptAttributeMap.put("attributeType",attribute.getAttributeType().getName());
+					conceptAttributeMap.put("attributeTypeUuid", attribute.getAttributeType().getUuid());
+					conceptAttributeMap.put("value", attribute.getValueReference());
+					attributesListMap.add(conceptAttributeMap);
+				}
+			}
+			testConceptMap.put("attributes",attributesListMap);
+
 
 			List<Map<String, Object>> mappings = new ArrayList<>();
 			if (testConcept.getConceptMappings().size() > 0) {
