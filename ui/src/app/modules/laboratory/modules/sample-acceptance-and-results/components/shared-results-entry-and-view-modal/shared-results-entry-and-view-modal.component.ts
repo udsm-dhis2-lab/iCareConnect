@@ -1197,9 +1197,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   }
 
   onGetAttributes(data: any, calculatedValueExpressionAttributeType: string,parameterUuid: string) {
-    console.log("calculatedValueExpressionAttributeType",calculatedValueExpressionAttributeType)
-    console.log("data: ",data);
-    console.log("param: ",parameterUuid)
     if (parameterUuid && data[0]?.parameter?.uuid) {
       this.attributes = data;
       this.calculatedParameters[data[0]?.parameter?.uuid] = {
@@ -1214,17 +1211,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   }
 
   calculateValue(parameter: any, dataObject: any): void {
-    // console.log("aabb: ",parameter?.uuid,"bbb: ",dataObject?.value);
-    console.log("attr: ",this.attributes);
-    // console.log("uuid",this.calculatedValueExpressionAttributeType$);
-    // calculate value
-    console.log("calc param: ",this.calculatedParameters[
-      parameter?.uuid
-    ]?.attributes);
-
-    console.log("attributeType", this.calculatedParameters[parameter?.uuid]
-    ?.calculatedValueExpressionAttributeType);
-
 
     const regex = /{([^}]*)}/;
     const expressionAttribute: any = (this.calculatedParameters[
