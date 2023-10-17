@@ -4,6 +4,11 @@ import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { Field } from "src/app/shared/modules/form/models/field.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { SampleAllocationObject } from "src/app/shared/resources/sample-allocations/models/allocation.model";
+import { omit} from "lodash";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-result-entry-form",
@@ -19,14 +24,20 @@ export class ResultEntryFormComponent implements OnInit {
   @Input() conceptNameType: string;
   @Input() isLIS: boolean;
   @Input() latestResult: any;
+  @Input() allocation : SampleAllocationObject;
+  @Input() calculatedValueExpressionAttributeType : any;
   formField: Field<string>;
   @Output() formData: EventEmitter<any> = new EventEmitter<any>();
+  @Output() attributes: EventEmitter<any> = new EventEmitter<any>();
+  @Output() formDataProperties: EventEmitter<any> = new EventEmitter<any>();
+  calculatedValueExpressionAttributeType$: Observable<any>;
   fieldsData: any = {};
   label: string;
   options: any[];
   constructor() {}
 
   ngOnInit(): void {
+
     this.conceptNameType =
       !this.conceptNameType && this.isLIS ? "SHORT" : this.conceptNameType;
     this.hasMultipleAnswers =
@@ -121,7 +132,27 @@ export class ResultEntryFormComponent implements OnInit {
             disabled: this.disabled,
             required: true,
           });
-  }
+        
+        //if(this.allocation?.parameter?.attributes.length > 0){  
+
+       if( (this.allocation?.parameter?.attributes?.filter(
+          (attribute) =>
+            attribute?.attributeTypeUuid === this.calculatedValueExpressionAttributeType
+        ) || []
+      )?.length > 0){
+
+        this.attributes.emit(this.allocation?.parameter?.attributes?.map((attribute: any) => {
+          return {
+            ...attribute,
+            parameter: omit(this.allocation?.parameter, ['attributes'])
+          }
+        }));
+        
+      }
+
+    }
+            
+  //}
 
   onFormUpdate(formValue: FormValue): void {
     this.formData.emit(formValue?.getValues()[this.parameter?.uuid]?.value);
