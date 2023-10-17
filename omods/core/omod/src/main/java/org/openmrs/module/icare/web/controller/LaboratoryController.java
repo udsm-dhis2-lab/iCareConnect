@@ -297,8 +297,7 @@ public class LaboratoryController {
 		SampleStatus sampleStatus = SampleStatus.fromMap(sampleStatusMap);
 		SampleStatus savedSampleStatus = laboratoryService.updateSampleStatus(sampleStatus);
 		
-		List<Map<String, Object>> allocationsMapList = (List<Map<String, Object>>) sampleStatusWithAllocations
-		        .get("allocations");
+		List<Map<String, Object>> allocationsMapList = (List<Map<String, Object>>) sampleStatusWithAllocations.get("allocations");
 		
 		List<TestAllocation> allocationsToSave = new ArrayList<TestAllocation>();
 		List<Concept> unretiredConcepts = new ArrayList<>();
