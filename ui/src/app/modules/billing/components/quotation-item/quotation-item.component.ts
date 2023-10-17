@@ -330,7 +330,7 @@ export class QuotationItemComponent implements OnInit {
     let header = "";
     let subHeader = "";
 
-    e.FacilityDetails.attributes.map((attribute) => {
+    e.FacilityDetails?.attributes?.map((attribute) => {
       let attributeTypeName =
         attribute && attribute.attributeType
           ? attribute?.attributeType?.name.toLowerCase()

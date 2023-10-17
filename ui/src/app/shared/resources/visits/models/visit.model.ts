@@ -128,6 +128,14 @@ export class Visit {
     );
   }
 
+  get admissionEncounter(): any {
+    return (this.visit.encounters.filter(
+      (encounter) =>
+        encounter?.encounterType?.uuid ===
+        "e22e39fd-7db2-45e7-80f1-60fa0d5a4378"
+    ) || [])[0];
+  }
+
   get attributes(): VisitAttribute[] {
     return (this.visit?.attributes || []).map(
       (attribute) => new VisitAttribute(attribute)
@@ -463,6 +471,7 @@ export class Visit {
       hasConfirmedDiagnosis: this.hasConfirmedDiagnosis,
       observations: this.observations,
       drugOrders: this.drugOrders,
+      admissionEncounter: this.admissionEncounter,
     };
   }
 
