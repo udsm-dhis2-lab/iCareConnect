@@ -1,0 +1,67 @@
+<div class="w-100">
+  <mat-radio-group class="registration-category">
+    <mat-radio-button
+      *ngFor="let regCategoryItem of sampleRegistrationCategories"
+      (change)="getRegistrationCategorySelection($event)"
+      class="registration-category-btn ml-2"
+      [value]="regCategoryItem"
+      [checked]="registrationCategory?.refKey === regCategoryItem?.refKey"
+      color="primary"
+    >
+      {{ regCategoryItem?.display }}
+    </mat-radio-button>
+  </mat-radio-group>
+  <div class="row">
+    <div class="col-lg-3 col-md-3 col-sm-12 col-sx-12">
+      <fieldset>
+        <legend>Batch Information</legend>
+        <div class="row">
+          <div class="col-12 d-flex ml-1">
+            <h4 class="w-75">Use existing batch set</h4>
+            <mat-slide-toggle
+              color="primary"
+              class="w-25"
+              (click)="toggleExistingBatchOrBatchSet($event, 'batchset')"
+            >
+            </mat-slide-toggle>
+          </div>
+          <div class="col-12">
+            <app-shared-batch-set-form
+              [useExisitingBatchSet]="useExisitingBatchSet"
+              *ngIf="useExisitingBatchSet"
+            ></app-shared-batch-set-form>
+            <app-shared-batch-set-form
+              [useExisitingBatchSet]="useExisitingBatchSet"
+              *ngIf="!useExisitingBatchSet"
+            ></app-shared-batch-set-form>
+          </div>
+          <div class="col-12 d-flex ml-1">
+            <h4 class="w-75">Use existing batch</h4>
+            <mat-slide-toggle
+              color="primary"
+              class="w-25"
+              (click)="toggleExistingBatchOrBatchSet($event, 'batch')"
+            >
+            </mat-slide-toggle>
+          </div>
+          <div class="col-12">
+            <app-shared-batch-form
+              *ngIf="useExistingBatch"
+              [useExistingBatch]="useExistingBatch"
+            ></app-shared-batch-form>
+            <app-shared-batch-form
+              *ngIf="!useExistingBatch"
+              [useExistingBatch]="useExistingBatch"
+            ></app-shared-batch-form>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+    <div class="col-lg-9 col-md-9 col-sm-12 col-sx-12">
+      <app-shared-batch-fields-definitions
+        *ngIf="showBatchFieldsDefinition"
+        [registrationCategory]="registrationCategory"
+      ></app-shared-batch-fields-definitions>
+    </div>
+  </div>
+</div>

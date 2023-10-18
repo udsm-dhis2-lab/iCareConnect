@@ -1,0 +1,10 @@
+<!-- <app-form
+  [fields]="[fieldsSelector]"
+  (formUpdate)="onFormUpdate($event)"
+></app-form> -->
+
+<app-multiple-results-entry
+  [options]="fieldsAsOptions"
+  [value]="selectedFields"
+  (selectedList)="onGetSelectedFields($event)"
+></app-multiple-results-entry>

@@ -151,7 +151,8 @@
             params?.identifierTypes &&
             params?.batchsets &&
             params?.batches &&
-            params?.barcodeSettings
+            params?.barcodeSettings &&
+            params?.sampleRegistrationCategories
           "
         >
           <app-batch-registration
@@ -187,6 +188,12 @@
             [personEmailAttributeTypeUuid]="personEmailAttributeTypeUuid"
             (reloadRegisterSample)="onReloadRegisterSample($event)"
           ></app-batch-registration>
+          <app-shared-batch-registration
+            [currentUser]="currentUser"
+            [sampleRegistrationCategories]="
+              params?.sampleRegistrationCategories
+            "
+          ></app-shared-batch-registration>
         </div>
       </div>
       <div class="w-100" *ngIf="selectedTabGroup === 'IMPORT-EXPORT'">

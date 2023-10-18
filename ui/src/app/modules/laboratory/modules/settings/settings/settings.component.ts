@@ -13,6 +13,7 @@ import { ConceptsService } from "src/app/shared/resources/concepts/services/conc
 import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
 import { MatTabChangeEvent } from "@angular/material/tabs";
 import { go } from "src/app/store/actions";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "app-settings",
@@ -27,9 +28,12 @@ export class SettingsComponent implements OnInit {
   labSections$: any;
   currentUser$: Observable<any>;
   selectedIndex: number = 0;
+  sampleRegistrationCategoriesConceptUuid$: Observable<any>;
+  errors: any[] = [];
   constructor(
     private store: Store<AppState>,
-    private conceptService: ConceptsService
+    private conceptService: ConceptsService,
+    private systemSettingsService: SystemSettingsService
   ) {}
 
   ngOnInit(): void {
@@ -62,6 +66,26 @@ export class SettingsComponent implements OnInit {
       this.conceptService.getConceptsBySearchTerm("LAB_DEPARTMENT");
 
     this.currentUser$ = this.store.select(getCurrentUserDetails);
+
+    this.sampleRegistrationCategoriesConceptUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `lis.registration.sampleRegistrationCategories.concept.uuid`
+      );
+    this.sampleRegistrationCategoriesConceptUuid$.subscribe((response: any) => {
+      if (response && response === "none") {
+        this.errors = [
+          ...this.errors,
+          {
+            error: {
+              error:
+                "Key lis.registration.sampleRegistrationCategories.concept.uuid as not available",
+              message:
+                "Key lis.registration.sampleRegistrationCategories.concept.uuid as not available",
+            },
+          },
+        ];
+      }
+    });
   }
 
   onChangeTab(event: MatTabChangeEvent): void {
