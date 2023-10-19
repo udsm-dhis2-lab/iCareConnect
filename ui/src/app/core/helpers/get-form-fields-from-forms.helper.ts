@@ -1,7 +1,6 @@
 import { flatten } from "lodash";
 
 export function getFormFieldsFromForms(forms: any[]): any[] {
-  console.log(forms);
   let fields: any[] = [];
   forms?.forEach((form: any) => {
     fields = [

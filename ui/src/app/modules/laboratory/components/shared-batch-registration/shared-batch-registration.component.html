@@ -61,6 +61,8 @@
       <app-shared-batch-fields-definitions
         *ngIf="showBatchFieldsDefinition"
         [registrationCategory]="registrationCategory"
+        (selectedFieldsByCategory)="onGetSelectedFields($event)"
+        (selectedFieldsData)="onGetFormFieldsData($event)"
       ></app-shared-batch-fields-definitions>
     </div>
   </div>

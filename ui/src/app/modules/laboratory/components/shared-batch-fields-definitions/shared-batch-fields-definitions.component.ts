@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
@@ -11,6 +11,10 @@ export class SharedBatchFieldsDefinitionsComponent implements OnInit {
   @Input() registrationCategory: any;
   formUuids$: Observable<any>;
   errors: any[] = [];
+
+  @Output() selectedFieldsByCategory: EventEmitter<any> =
+    new EventEmitter<any>();
+  @Output() selectedFieldsData: EventEmitter<any> = new EventEmitter<any>();
   constructor(private systemSettingsService: SystemSettingsService) {}
 
   ngOnInit(): void {
@@ -36,5 +40,13 @@ export class SharedBatchFieldsDefinitionsComponent implements OnInit {
         ];
       }
     });
+  }
+
+  onGetSelectedFields(fields: any): void {
+    this.selectedFieldsByCategory.emit(fields);
+  }
+
+  onGetFormFieldsData(formData: any): void {
+    this.selectedFieldsData.emit(formData);
   }
 }
