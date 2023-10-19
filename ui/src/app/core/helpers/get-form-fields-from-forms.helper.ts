@@ -1,6 +1,10 @@
-import { flatten } from "lodash";
+import { flatten, keyBy } from "lodash";
 
-export function getFormFieldsFromForms(forms: any[]): any[] {
+export function getFormFieldsFromForms(
+  forms: any[],
+  existingBatchFieldsInformations?: any
+): any[] {
+  const keyedExistingValues = keyBy(existingBatchFieldsInformations, "id");
   let fields: any[] = [];
   forms?.forEach((form: any) => {
     fields = [
@@ -15,5 +19,10 @@ export function getFormFieldsFromForms(forms: any[]): any[] {
       fields = [...fields, form?.formField?.FormFields];
     }
   });
-  return fields;
+  return fields?.map((field: any) => {
+    return {
+      ...field,
+      value: keyedExistingValues[field?.id]?.value,
+    };
+  });
 }

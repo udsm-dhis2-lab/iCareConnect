@@ -5,6 +5,7 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { loadCustomOpenMRSForms } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
+import { keyBy } from "lodash";
 
 @Component({
   selector: "app-shared-batch-fields-definitions-form",
@@ -13,6 +14,7 @@ import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selecto
 })
 export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
   @Input() formUuids: string[];
+  @Input() existingBatchFieldsInformations: any;
   forms$: Observable<any>;
   keyedSelectedFields: any = {};
   formData: any = {};
@@ -51,7 +53,35 @@ export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
 
   onFormUpdate(formValue: FormValue, fieldsReferenceKey: string): void {
     // console.log(formValue.getValues());
+    const unKeyedSavedDataValues = keyBy(
+      [
+        ...this.existingBatchFieldsInformations?.fixedFields,
+        ...this.existingBatchFieldsInformations?.staticFields,
+        ...this.existingBatchFieldsInformations?.dynamicFields,
+      ],
+      "id"
+    );
     this.formData = { ...this.formData, ...formValue.getValues() };
+    // this.formData = keyBy(
+    //   Object.keys(this.formData)?.map((key: string) => {
+    //     if (
+    //       (!this.formData[key]?.value || this.formData[key]?.value === "") &&
+    //       unKeyedSavedDataValues[key]?.value
+    //     ) {
+    //       return {
+    //         key,
+    //         ...this.formData[key],
+    //         value: unKeyedSavedDataValues[key]?.value,
+    //       };
+    //     } else {
+    //       return {
+    //         key,
+    //         ...this.formData[key],
+    //       };
+    //     }
+    //   }) || [],
+    //   "key"
+    // );
     this.selectedFieldsData.emit(this.formData);
     // this.keyedSelectedFields[fieldsReferenceKey] = this.keyedSelectedFields[
     //   fieldsReferenceKey

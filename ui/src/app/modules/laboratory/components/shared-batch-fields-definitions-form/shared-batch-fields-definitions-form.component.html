@@ -17,8 +17,17 @@
                 </div>
                 <app-shared-render-batch-defn-fields
                   [forms]="[form]"
+                  [existingBatchFieldsInformations]="
+                    existingBatchFieldsInformations?.fixedFields || []
+                  "
                   [selectedFields]="
                     keyedSelectedFields['fixed' + '-' + form?.uuid] || []
+                  "
+                  [fieldsToFilter1]="
+                    keyedSelectedFields['static' + '-' + form?.uuid]
+                  "
+                  [fieldsToFilter2]="
+                    keyedSelectedFields['dynamic' + '-' + form?.uuid]
                   "
                   (selectedBatchFields)="
                     onGetSelectedBatchFields($event, form, 'fixed')
@@ -49,6 +58,9 @@
                 </div>
                 <app-shared-render-batch-defn-fields
                   [forms]="[form]"
+                  [existingBatchFieldsInformations]="
+                    existingBatchFieldsInformations?.staticFields || []
+                  "
                   [selectedFields]="
                     keyedSelectedFields['static' + '-' + form?.uuid] || []
                   "
@@ -87,6 +99,9 @@
                 </div>
                 <app-shared-render-batch-defn-fields
                   [forms]="[form]"
+                  [existingBatchFieldsInformations]="
+                    existingBatchFieldsInformations?.dynamicFields || []
+                  "
                   [selectedFields]="
                     keyedSelectedFields['dynamic' + '-' + form?.uuid] || []
                   "

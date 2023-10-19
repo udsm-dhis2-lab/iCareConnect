@@ -1,4 +1,7 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { SamplesService } from "src/app/shared/services/samples.service";
 
 @Component({
   selector: "app-shared-batch-set-form",
@@ -6,10 +9,33 @@ import { Component, Input, OnInit } from "@angular/core";
   styleUrls: ["./shared-batch-set-form.component.scss"],
 })
 export class SharedBatchSetFormComponent implements OnInit {
-  @Input() useExisitingBatchSet: boolean;
-  constructor() {}
+  @Input() useExistingBatchSet: boolean;
+  batchsets$: Observable<any>;
+  @Output() formData: EventEmitter<any> = new EventEmitter<any>();
+  constructor(private samplesService: SamplesService) {}
 
   ngOnInit(): void {
-    console.log(this.useExisitingBatchSet);
+    if (this.useExistingBatchSet) {
+      this.batchsets$ = this.samplesService.getBatchsets().pipe(
+        map((response: any) => {
+          if (!response?.error) {
+            return response;
+          }
+        })
+      );
+    }
+  }
+
+  onGetFormData(formData: any, batchsets?: any): void {
+    this.formData.emit({
+      ...formData,
+      useExistingBatchSet: this.useExistingBatchSet,
+      selectedBatchset:
+        batchsets && batchsets?.length > 0 && this.useExistingBatchSet
+          ? (batchsets?.filter(
+              (batchset: any) => batchset?.uuid === formData?.name?.value
+            ) || [])[0]
+          : null,
+    });
   }
 }

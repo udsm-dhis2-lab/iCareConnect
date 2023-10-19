@@ -1,1 +1,12 @@
-<p>shared-batch-form works!</p>
+<ng-container *ngIf="{ batches: batches$ | async } as params">
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="!params?.batches && useExistingBatch"
+  ></mat-progress-bar>
+  <app-shared-batch-entry-fields
+    *ngIf="params?.batches || !useExistingBatch"
+    [options]="params?.batches"
+    [dropDown]="useExistingBatch"
+    (formData)="onGetFormData($event, params?.batches)"
+  ></app-shared-batch-entry-fields>
+</ng-container>

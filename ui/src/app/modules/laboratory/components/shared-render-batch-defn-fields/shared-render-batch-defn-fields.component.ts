@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { getFormFieldsFromForms } from "src/app/core/helpers/get-form-fields-from-forms.helper";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { Field } from "src/app/shared/modules/form/models/field.model";
+import { uniq } from "lodash";
 
 @Component({
   selector: "app-shared-render-batch-defn-fields",
@@ -11,7 +12,8 @@ import { Field } from "src/app/shared/modules/form/models/field.model";
 export class SharedRenderBatchDefnFieldsComponent implements OnInit {
   @Input() forms: any[];
   @Input() fieldsToFilter1: Field<any>[];
-  @Input() fieldsToFilter2: Field<any>[] = [];
+  @Input() fieldsToFilter2: Field<any>[];
+  @Input() existingBatchFieldsInformations: any[];
   formFields: any[];
   fieldsSelector: Field<any>;
   @Input() selectedFields: any[];
@@ -23,19 +25,25 @@ export class SharedRenderBatchDefnFieldsComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.selectedFields =
+    this.selectedFields = uniq(
       (
-        this.selectedFields?.map((formField: any) => {
-          return {
-            name: formField?.label,
-            label: formField?.label,
-            value: formField?.id,
-            key: formField?.id,
-          };
-        }) || []
-      )?.map((fieldValue: any) => fieldValue?.value) || [];
+        [...this.selectedFields, ...this.existingBatchFieldsInformations]?.map(
+          (formField: any) => {
+            return {
+              name: formField?.label,
+              label: formField?.label,
+              value: formField?.id,
+              key: formField?.id,
+            };
+          }
+        ) || []
+      )?.map((fieldValue: any) => fieldValue?.value) || []
+    );
 
-    this.formFields = getFormFieldsFromForms(this.forms);
+    this.formFields = getFormFieldsFromForms(
+      this.forms,
+      this.existingBatchFieldsInformations
+    );
     this.createFieldsSelectorField();
     this.fieldsAsOptions = this.formFields?.map((formField: any) => {
       return {
