@@ -18,6 +18,8 @@
             (params?.formUuids && registrationCategory) || !registrationCategory
           "
           [formUuids]="params?.formUuids"
+          (selectedFieldsByCategory)="onGetSelectedFields($event)"
+          (selectedFieldsData)="onGetFormFieldsData($event)"
         ></app-shared-batch-fields-definitions-form>
       </div>
     </ng-container>

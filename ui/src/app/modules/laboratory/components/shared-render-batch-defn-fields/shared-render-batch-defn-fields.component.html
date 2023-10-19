@@ -1,10 +1,5 @@
-<!-- <app-form
-  [fields]="[fieldsSelector]"
-  (formUpdate)="onFormUpdate($event)"
-></app-form> -->
-
 <app-multiple-results-entry
-  [options]="fieldsAsOptions"
+  [options]="fieldsAsOptions | filterFields: fieldsToFilter1:fieldsToFilter2"
   [value]="selectedFields"
   (selectedList)="onGetSelectedFields($event)"
 ></app-multiple-results-entry>

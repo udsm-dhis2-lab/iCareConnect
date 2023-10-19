@@ -18,6 +18,7 @@ export class SharedBatchRegistrationComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
+    this.registrationCategory = this.sampleRegistrationCategories[0];
     console.log(JSON.stringify(this.sampleRegistrationCategories));
   }
 
@@ -36,5 +37,13 @@ export class SharedBatchRegistrationComponent implements OnInit {
     setTimeout(() => {
       this.showBatchFieldsDefinition = true;
     }, 20);
+  }
+
+  onGetSelectedFields(fields: any): void {
+    console.log(fields);
+  }
+
+  onGetFormFieldsData(formData: any): void {
+    console.log(formData);
   }
 }

@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { getFormFieldsFromForms } from "src/app/core/helpers/get-form-fields-from-forms.helper";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { Field } from "src/app/shared/modules/form/models/field.model";
-import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 
 @Component({
   selector: "app-shared-render-batch-defn-fields",
@@ -11,16 +10,32 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 })
 export class SharedRenderBatchDefnFieldsComponent implements OnInit {
   @Input() forms: any[];
+  @Input() fieldsToFilter1: Field<any>[];
+  @Input() fieldsToFilter2: Field<any>[] = [];
   formFields: any[];
   fieldsSelector: Field<any>;
-  selectedFields: any[] = [];
+  @Input() selectedFields: any[];
   fieldsAsOptions: any[] = [];
   @Output() selectedBatchFields: EventEmitter<any> = new EventEmitter<any>();
+
+  // @ViewChild(MultipleResultsEntryComponent)
+  // multipleResultsEntryComponent!: MultipleResultsEntryComponent;
   constructor() {}
 
   ngOnInit(): void {
+    this.selectedFields =
+      (
+        this.selectedFields?.map((formField: any) => {
+          return {
+            name: formField?.label,
+            label: formField?.label,
+            value: formField?.id,
+            key: formField?.id,
+          };
+        }) || []
+      )?.map((fieldValue: any) => fieldValue?.value) || [];
+
     this.formFields = getFormFieldsFromForms(this.forms);
-    // console.log(this.formFields);
     this.createFieldsSelectorField();
     this.fieldsAsOptions = this.formFields?.map((formField: any) => {
       return {
@@ -30,6 +45,21 @@ export class SharedRenderBatchDefnFieldsComponent implements OnInit {
         key: formField?.id,
       };
     });
+  }
+
+  setFormFieldsToFilter(fields: any[]): void {
+    // this.fieldsToFilter = fields;
+    // console.log("IMPORTED FIELDS", fields);
+    // this.multipleResultsEntryComponent.setList(
+    //   this.fieldsAsOptions?.filter(
+    //     (option: any) =>
+    //       (
+    //         this.fieldsToFilter?.filter(
+    //           (field: any) => field?.key === option?.key
+    //         ) || []
+    //       )?.length === 0
+    //   ) || []
+    // );
   }
 
   createFieldsSelectorField(): void {
@@ -48,19 +78,18 @@ export class SharedRenderBatchDefnFieldsComponent implements OnInit {
     });
   }
 
-  onFormUpdate(formValue: FormValue): void {
-    console.log(formValue.getValues());
-  }
-
   onGetSelectedFields(selectedItems: any[]): void {
-    this.selectedFields = selectedItems;
-    console.log(this.selectedFields);
-    this.selectedBatchFields.emit(
-      this.selectedFields?.map((selectedField: any) => {
-        return (this.formFields?.filter(
-          (formField: any) => formField?.id === selectedField?.value
-        ) || [])[0];
-      })
+    this.selectedFields = (selectedItems || [])?.map(
+      (fieldValue: any) => fieldValue?.value
     );
+    if (selectedItems?.length > 0) {
+      this.selectedBatchFields.emit(
+        this.selectedFields?.map((selectedField: any) => {
+          return (this.formFields?.filter(
+            (formField: any) => formField?.id === selectedField
+          ) || [])[0];
+        })
+      );
+    }
   }
 }
