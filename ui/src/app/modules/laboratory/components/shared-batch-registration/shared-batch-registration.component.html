@@ -11,7 +11,15 @@
       {{ regCategoryItem?.display }}
     </mat-radio-button>
   </mat-radio-group>
-  <div class="row">
+  <div class="loading-overlay" *ngIf="saving">
+    <div class="text-center">
+      <div>Saving batch information ....</div>
+      <div class="mt-3 d-flex justify-content-center w-100">
+        <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="!saving">
     <div class="col-lg-3 col-md-3 col-sm-12 col-sx-12">
       <fieldset>
         <legend>Batch Information</legend>
@@ -27,15 +35,17 @@
           </div>
           <div class="col-12">
             <app-shared-batch-set-form
-              [useExisitingBatchSet]="useExisitingBatchSet"
-              *ngIf="useExisitingBatchSet"
+              [useExistingBatchSet]="useExistingBatchSet"
+              *ngIf="useExistingBatchSet"
+              (formData)="onGetBatchAndBatchSetFormData($event, 'batchset')"
             ></app-shared-batch-set-form>
             <app-shared-batch-set-form
-              [useExisitingBatchSet]="useExisitingBatchSet"
-              *ngIf="!useExisitingBatchSet"
+              [useExistingBatchSet]="useExistingBatchSet"
+              *ngIf="!useExistingBatchSet"
+              (formData)="onGetBatchAndBatchSetFormData($event, 'batchset')"
             ></app-shared-batch-set-form>
           </div>
-          <div class="col-12 d-flex ml-1">
+          <!-- <div class="col-12 d-flex ml-1">
             <h4 class="w-75">Use existing batch</h4>
             <mat-slide-toggle
               color="primary"
@@ -43,15 +53,20 @@
               (click)="toggleExistingBatchOrBatchSet($event, 'batch')"
             >
             </mat-slide-toggle>
+          </div> -->
+          <div class="col-12 mt-2">
+            <div class="h5 text-muted">Batch</div>
           </div>
           <div class="col-12">
             <app-shared-batch-form
               *ngIf="useExistingBatch"
               [useExistingBatch]="useExistingBatch"
+              (formData)="onGetBatchAndBatchSetFormData($event, 'batch')"
             ></app-shared-batch-form>
             <app-shared-batch-form
               *ngIf="!useExistingBatch"
               [useExistingBatch]="useExistingBatch"
+              (formData)="onGetBatchAndBatchSetFormData($event, 'batch')"
             ></app-shared-batch-form>
           </div>
         </div>
@@ -61,9 +76,27 @@
       <app-shared-batch-fields-definitions
         *ngIf="showBatchFieldsDefinition"
         [registrationCategory]="registrationCategory"
+        [existingBatchFieldsInformations]="existingBatchFieldsInformations"
         (selectedFieldsByCategory)="onGetSelectedFields($event)"
         (selectedFieldsData)="onGetFormFieldsData($event)"
       ></app-shared-batch-fields-definitions>
+    </div>
+
+    <div class="col-12 d-flex justify-content-end">
+      <button
+        mat-flat-button
+        color="primary"
+        [disabled]="
+          (keyedBatchFields?.fixed?.length === 0 &&
+            keyedBatchFields?.static?.length === 0 &&
+            keyedBatchFields?.dynamic?.length === 0) ||
+          !batchAndBatchSetsData['batch']?.name?.value ||
+          !batchAndBatchSetsData['batchset']?.name?.value
+        "
+        (click)="onSave($event)"
+      >
+        Save
+      </button>
     </div>
   </div>
 </div>

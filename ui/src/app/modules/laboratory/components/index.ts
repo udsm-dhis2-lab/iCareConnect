@@ -6,6 +6,7 @@ import { SampleTemplateTableComponent } from "./sample-template-table/sample-tem
 import { SamplesToCollectComponent } from "./samples-to-collect/samples-to-collect.component";
 import { SamplesToExportComponent } from "./samples-to-export/samples-to-export.component";
 import { SharedAssociatedFieldResultsEntryComponent } from "./shared-associated-field-results-entry/shared-associated-field-results-entry.component";
+import { SharedBatchEntryFieldsComponent } from "./shared-batch-entry-fields/shared-batch-entry-fields.component";
 import { SharedBatchFieldsDefinitionsFormComponent } from "./shared-batch-fields-definitions-form/shared-batch-fields-definitions-form.component";
 import { SharedBatchFieldsDefinitionsComponent } from "./shared-batch-fields-definitions/shared-batch-fields-definitions.component";
 import { SharedBatchFormComponent } from "./shared-batch-form/shared-batch-form.component";
@@ -52,4 +53,5 @@ export const labSharedComponents: any[] = [
   SharedBatchFieldsDefinitionsComponent,
   SharedBatchFieldsDefinitionsFormComponent,
   SharedRenderBatchDefnFieldsComponent,
+  SharedBatchEntryFieldsComponent,
 ];

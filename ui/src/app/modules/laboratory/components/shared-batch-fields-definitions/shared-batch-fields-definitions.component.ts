@@ -9,6 +9,7 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 })
 export class SharedBatchFieldsDefinitionsComponent implements OnInit {
   @Input() registrationCategory: any;
+  @Input() existingBatchFieldsInformations: any;
   formUuids$: Observable<any>;
   errors: any[] = [];
 
