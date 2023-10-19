@@ -5,7 +5,7 @@ import { tap } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { CurrentUser } from "src/app/shared/models/current-user.models";
 import { SamplesService } from "src/app/shared/services/samples.service";
-import { flatten } from "lodash";
+import { flatten, uniqBy } from "lodash";
 
 @Component({
   selector: "app-shared-batch-registration",
@@ -84,10 +84,13 @@ export class SharedBatchRegistrationComponent implements OnInit {
         ?.length > 0
     ) {
       Object.keys(fields).forEach((keyText: string) => {
-        this.keyedBatchFields[keyText.split("-")[0]] = [
-          ...(this.keyedBatchFields[keyText.split("-")[0]] || []),
-          ...(fields[keyText] || []),
-        ];
+        this.keyedBatchFields[keyText.split("-")[0]] = uniqBy(
+          [
+            ...(this.keyedBatchFields[keyText.split("-")[0]] || []),
+            ...(fields[keyText] || []),
+          ],
+          "id"
+        );
       });
     } else {
       this.keyedBatchFields = {};
