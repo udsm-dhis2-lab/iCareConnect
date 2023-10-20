@@ -11,6 +11,7 @@ import { SharedBatchFieldsDefinitionsFormComponent } from "./shared-batch-fields
 import { SharedBatchFieldsDefinitionsComponent } from "./shared-batch-fields-definitions/shared-batch-fields-definitions.component";
 import { SharedBatchFormComponent } from "./shared-batch-form/shared-batch-form.component";
 import { SharedBatchRegistrationComponent } from "./shared-batch-registration/shared-batch-registration.component";
+import { SharedBatchSamplesListEntryComponent } from "./shared-batch-samples-list-entry/shared-batch-samples-list-entry.component";
 import { SharedBatchSetFormComponent } from "./shared-batch-set-form/shared-batch-set-form.component";
 import { SharedLabReportFormDataComponent } from "./shared-lab-report-form-data/shared-lab-report-form-data.component";
 import { SharedLabReportHeaderComponent } from "./shared-lab-report-header/shared-lab-report-header.component";
@@ -22,6 +23,7 @@ import { SharedRenderBatchDefnFieldsComponent } from "./shared-render-batch-defn
 import { SharedSampleInformationComponent } from "./shared-sample-information/shared-sample-information.component";
 import { SharedSampleOrderResultsComponent } from "./shared-sample-order-results/shared-sample-order-results.component";
 import { SharedSampleOrdersComponent } from "./shared-sample-orders/shared-sample-orders.component";
+import { SharedSampleRegistrationViaBatchComponent } from "./shared-sample-registration-via-batch/shared-sample-registration-via-batch.component";
 import { SharedSampleResultEntryAndAuthorizationComponent } from "./shared-sample-result-entry-and-authorization/shared-sample-result-entry-and-authorization.component";
 import { SharedSamplesSummaryDashboardComponent } from "./shared-samples-summary-dashboard/shared-samples-summary-dashboard.component";
 import { TestOrderInterpretationsComponent } from "./test-order-interpretations/test-order-interpretations.component";
@@ -54,4 +56,6 @@ export const labSharedComponents: any[] = [
   SharedBatchFieldsDefinitionsFormComponent,
   SharedRenderBatchDefnFieldsComponent,
   SharedBatchEntryFieldsComponent,
+  SharedSampleRegistrationViaBatchComponent,
+  SharedBatchSamplesListEntryComponent,
 ];

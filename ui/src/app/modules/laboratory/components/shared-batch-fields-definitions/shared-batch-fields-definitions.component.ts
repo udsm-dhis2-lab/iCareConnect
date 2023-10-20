@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { uniqBy } from "lodash";
 
 @Component({
   selector: "app-shared-batch-fields-definitions",
@@ -17,6 +18,8 @@ export class SharedBatchFieldsDefinitionsComponent implements OnInit {
   @Output() selectedFieldsByCategory: EventEmitter<any> =
     new EventEmitter<any>();
   @Output() selectedFieldsData: EventEmitter<any> = new EventEmitter<any>();
+  @Output() fields: EventEmitter<any> = new EventEmitter<any>();
+  allFields: any[] = [];
   constructor(private systemSettingsService: SystemSettingsService) {}
 
   ngOnInit(): void {
@@ -42,6 +45,11 @@ export class SharedBatchFieldsDefinitionsComponent implements OnInit {
         ];
       }
     });
+  }
+
+  onGetAllFields(fields: any[]): void {
+    this.allFields = uniqBy([...this.allFields, ...fields], "id");
+    this.fields.emit(this.allFields);
   }
 
   onGetSelectedFields(fields: any): void {

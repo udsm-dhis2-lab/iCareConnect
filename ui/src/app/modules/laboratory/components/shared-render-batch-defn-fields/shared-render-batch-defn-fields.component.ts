@@ -14,6 +14,7 @@ export class SharedRenderBatchDefnFieldsComponent implements OnInit {
   @Input() fieldsToFilter1: Field<any>[];
   @Input() fieldsToFilter2: Field<any>[];
   @Input() existingBatchFieldsInformations: any[];
+  @Output() fields: EventEmitter<any> = new EventEmitter<any>();
   formFields: any[];
   fieldsSelector: Field<any>;
   @Input() selectedFields: any[];
@@ -44,6 +45,7 @@ export class SharedRenderBatchDefnFieldsComponent implements OnInit {
       this.forms,
       this.existingBatchFieldsInformations
     );
+    this.fields.emit(this.formFields);
     this.createFieldsSelectorField();
     this.fieldsAsOptions = this.formFields?.map((formField: any) => {
       return {

@@ -32,6 +32,7 @@
                   (selectedBatchFields)="
                     onGetSelectedBatchFields($event, form, 'fixed')
                   "
+                  (fields)="onGetAllFields($event)"
                 ></app-shared-render-batch-defn-fields>
 
                 <app-form
@@ -73,6 +74,7 @@
                   (selectedBatchFields)="
                     onGetSelectedBatchFields($event, form, 'static')
                   "
+                  (fields)="onGetAllFields($event)"
                 ></app-shared-render-batch-defn-fields>
 
                 <app-form
@@ -114,6 +116,7 @@
                   (selectedBatchFields)="
                     onGetSelectedBatchFields($event, form, 'dynamic')
                   "
+                  (fields)="onGetAllFields($event)"
                 ></app-shared-render-batch-defn-fields>
 
                 <app-form

@@ -28,15 +28,21 @@ export class SharedBatchFormComponent implements OnInit {
   }
 
   onGetFormData(formData: any, batches?: any): void {
+    const selectedBatch =
+      batches && batches?.length > 0 && this.useExistingBatch
+        ? (batches?.filter(
+            (batch: any) => batch?.uuid === formData?.name?.value
+          ) || [])[0]
+        : null;
+    if (selectedBatch) {
+      localStorage.setItem("batchUuid", selectedBatch?.uuid);
+    } else {
+      localStorage.removeItem("batchUuid");
+    }
     this.formData.emit({
       ...formData,
       useExistingBatch: this.useExistingBatch,
-      selectedBatch:
-        batches && batches?.length > 0 && this.useExistingBatch
-          ? (batches?.filter(
-              (batch: any) => batch?.uuid === formData?.name?.value
-            ) || [])[0]
-          : null,
+      selectedBatch: selectedBatch ? selectedBatch : null,
     });
   }
 }

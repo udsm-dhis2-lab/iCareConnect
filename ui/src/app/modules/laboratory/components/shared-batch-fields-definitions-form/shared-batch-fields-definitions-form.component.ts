@@ -5,7 +5,7 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { loadCustomOpenMRSForms } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
-import { keyBy } from "lodash";
+import { keyBy, uniqBy } from "lodash";
 
 @Component({
   selector: "app-shared-batch-fields-definitions-form",
@@ -16,6 +16,8 @@ export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
   @Input() formUuids: string[];
   @Input() existingBatchFieldsInformations: any;
   @Input() fromMaintenance: boolean;
+  @Output() fields: EventEmitter<any> = new EventEmitter<any>();
+  allFields: any[] = [];
   forms$: Observable<any>;
   keyedSelectedFields: any = {};
   formData: any = {};
@@ -27,7 +29,6 @@ export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
-    console.log("fromMaintenance");
     this.store.dispatch(
       loadCustomOpenMRSForms({
         formUuids: this.formUuids,
@@ -51,6 +52,11 @@ export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
     //     })
     //   )
     // );
+  }
+
+  onGetAllFields(fields: any[]): void {
+    this.allFields = uniqBy([...this.allFields, ...fields], "id");
+    this.fields.emit(this.allFields);
   }
 
   onFormUpdate(formValue: FormValue, fieldsReferenceKey: string): void {

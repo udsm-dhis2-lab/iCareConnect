@@ -28,15 +28,21 @@ export class SharedBatchSetFormComponent implements OnInit {
   }
 
   onGetFormData(formData: any, batchsets?: any): void {
+    const selectedBatchset =
+      batchsets && batchsets?.length > 0 && this.useExistingBatchSet
+        ? (batchsets?.filter(
+            (batchset: any) => batchset?.uuid === formData?.name?.value
+          ) || [])[0]
+        : null;
+    if (selectedBatchset) {
+      localStorage.setItem("batchsetUuid", selectedBatchset?.uuid);
+    } else {
+      localStorage.removeItem("batchsetUuid");
+    }
     this.formData.emit({
       ...formData,
       useExistingBatchSet: this.useExistingBatchSet,
-      selectedBatchset:
-        batchsets && batchsets?.length > 0 && this.useExistingBatchSet
-          ? (batchsets?.filter(
-              (batchset: any) => batchset?.uuid === formData?.name?.value
-            ) || [])[0]
-          : null,
+      selectedBatchset: selectedBatchset ? selectedBatchset : null,
     });
   }
 }
