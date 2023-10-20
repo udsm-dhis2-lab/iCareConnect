@@ -6,6 +6,8 @@
   <app-shared-batch-entry-fields
     *ngIf="params?.batchsets || !useExistingBatchSet"
     [options]="params?.batchsets"
+    [nameFieldName]="'Batch set'"
+    [hideDescription]="hideDescription"
     [dropDown]="useExistingBatchSet"
     (formData)="onGetFormData($event, params?.batchsets)"
   ></app-shared-batch-entry-fields>

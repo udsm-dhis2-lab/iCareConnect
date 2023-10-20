@@ -10,6 +10,7 @@ import { SamplesService } from "src/app/shared/services/samples.service";
 })
 export class SharedBatchFormComponent implements OnInit {
   @Input() useExistingBatch: boolean;
+  @Input() hideDescription: boolean;
   batches$: Observable<any>;
   @Output() formData: EventEmitter<any> = new EventEmitter<any>();
   constructor(private samplesService: SamplesService) {}

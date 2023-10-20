@@ -15,6 +15,7 @@ import { keyBy } from "lodash";
 export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
   @Input() formUuids: string[];
   @Input() existingBatchFieldsInformations: any;
+  @Input() fromMaintenance: boolean;
   forms$: Observable<any>;
   keyedSelectedFields: any = {};
   formData: any = {};
@@ -26,6 +27,7 @@ export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
+    console.log("fromMaintenance");
     this.store.dispatch(
       loadCustomOpenMRSForms({
         formUuids: this.formUuids,

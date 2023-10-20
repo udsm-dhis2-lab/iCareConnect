@@ -20,8 +20,14 @@
     </div>
   </div>
   <div class="row" *ngIf="!saving">
-    <div class="col-lg-3 col-md-3 col-sm-12 col-sx-12">
-      <fieldset>
+    <div
+      class="col-sm-12 col-sx-12"
+      [ngClass]="{
+        'col-lg-3 col-md-3': fromMaintenance,
+        'col-12': !fromMaintenance
+      }"
+    >
+      <fieldset *ngIf="fromMaintenance">
         <legend>Batch Information</legend>
         <div class="row">
           <div class="col-12 d-flex ml-1">
@@ -72,11 +78,34 @@
         </div>
       </fieldset>
     </div>
-    <div class="col-lg-9 col-md-9 col-sm-12 col-sx-12">
+    <div class="col-12 d-flex justify-content-end">
+      <div class="w-25">
+        <app-shared-batch-set-form
+          [useExistingBatchSet]="true"
+          [hideDescription]="true"
+          (formData)="onGetBatchAndBatchSetFormData($event, 'batchset')"
+        ></app-shared-batch-set-form>
+      </div>
+      <div class="w-25">
+        <app-shared-batch-form
+          [useExistingBatch]="true"
+          [hideDescription]="true"
+          (formData)="onGetBatchAndBatchSetFormData($event, 'batch')"
+        ></app-shared-batch-form>
+      </div>
+    </div>
+    <div
+      class="col-sm-12 col-sx-12"
+      [ngClass]="{
+        'col-lg-9 col-md-9': fromMaintenance,
+        'col-12': !fromMaintenance
+      }"
+    >
       <app-shared-batch-fields-definitions
         *ngIf="showBatchFieldsDefinition"
         [registrationCategory]="registrationCategory"
         [existingBatchFieldsInformations]="existingBatchFieldsInformations"
+        [fromMaintenance]="fromMaintenance"
         (selectedFieldsByCategory)="onGetSelectedFields($event)"
         (selectedFieldsData)="onGetFormFieldsData($event)"
       ></app-shared-batch-fields-definitions>

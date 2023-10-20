@@ -15,6 +15,7 @@ import { flatten, uniqBy } from "lodash";
 export class SharedBatchRegistrationComponent implements OnInit {
   @Input() currentUser: CurrentUser;
   @Input() sampleRegistrationCategories: any;
+  @Input() fromMaintenance: boolean;
   useExistingBatchSet: boolean = false;
   useExistingBatch: boolean = false;
   registrationCategory: any;
