@@ -6,6 +6,7 @@ import { loadCustomOpenMRSForms } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
 import { keyBy, uniqBy } from "lodash";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-shared-batch-fields-definitions-form",
@@ -16,6 +17,8 @@ export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
   @Input() formUuids: string[];
   @Input() existingBatchFieldsInformations: any;
   @Input() fromMaintenance: boolean;
+  @Input() clinicalFields: any[];
+  @Input() personFields: any[];
   @Output() fields: EventEmitter<any> = new EventEmitter<any>();
   allFields: any[] = [];
   forms$: Observable<any>;
@@ -35,7 +38,29 @@ export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
       })
     );
 
-    this.forms$ = this.store.select(getCustomOpenMRSFormsByIds(this.formUuids));
+    this.forms$ = this.store
+      .select(getCustomOpenMRSFormsByIds(this.formUuids))
+      .pipe(
+        map((response: any) => {
+          return [
+            {
+              id: "person",
+              uuid: "person",
+              name: "Person details",
+              display: "Person details",
+              formFields: this.personFields,
+            },
+            {
+              id: "diagnosis_and_istory",
+              uuid: "diagnosis_and_istory",
+              name: "Diagnosis & History",
+              display: "Diagnosis & History",
+              formFields: this.clinicalFields,
+            },
+            ...response,
+          ];
+        })
+      );
   }
 
   onGetSelectedBatchFields(selectedFields: any, form: any, key: string): void {
@@ -63,9 +88,9 @@ export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
     // console.log(formValue.getValues());
     const unKeyedSavedDataValues = keyBy(
       [
-        ...this.existingBatchFieldsInformations?.fixedFields,
-        ...this.existingBatchFieldsInformations?.staticFields,
-        ...this.existingBatchFieldsInformations?.dynamicFields,
+        ...(this.existingBatchFieldsInformations?.fixedFields || []),
+        ...(this.existingBatchFieldsInformations?.staticFields || []),
+        ...(this.existingBatchFieldsInformations?.dynamicFields || []),
       ],
       "id"
     );

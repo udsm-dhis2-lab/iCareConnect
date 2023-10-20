@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { uniqBy } from "lodash";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 
@@ -13,6 +13,7 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
   @Input() existingBatchFieldsInformations: any;
   fieldsNotSetOnBatch: any[] = [];
   dynamicFields: any[] = [];
+  @Output() fedDynamicFieldsData: EventEmitter<any> = new EventEmitter<any>();
   constructor() {}
 
   ngOnInit(): void {
@@ -40,16 +41,21 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
       this.existingBatchFieldsInformations?.dynamicFields || [],
       "id"
     )?.map((savedField: any) => {
-      return (this.fields?.filter(
+      const dynamicField = (this.fields?.filter(
         (field: any) => field?.id === savedField?.id
       ) || [])[0];
+      return {
+        ...dynamicField,
+        value: savedField?.value ? savedField?.value : dynamicField?.value,
+      };
     });
-    console.log(this.fieldsNotSetOnBatch);
-    console.log(this.dynamicFields);
+    // console.log(this.fieldsNotSetOnBatch);
+    // console.log(this.dynamicFields);
   }
 
   onFormUpdate(formValue: FormValue): void {
-    console.log(formValue.getValues());
+    // console.log(formValue.getValues());
+    this.fedDynamicFieldsData.emit(formValue.getValues());
   }
 
   onAddSample(event: Event): void {

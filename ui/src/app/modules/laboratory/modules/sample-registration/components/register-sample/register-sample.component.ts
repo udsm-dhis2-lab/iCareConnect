@@ -10,6 +10,7 @@ import { RegistrationService } from "src/app/modules/registration/services/regis
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { DateTimeField } from "src/app/shared/modules/form/models/date-time-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
+import { Field } from "src/app/shared/modules/form/models/field.model";
 import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
@@ -85,7 +86,8 @@ export class RegisterSampleComponent implements OnInit {
 
   importExportCategory: string = "CLINICAL";
   labTestRequestProgramStageId$: Observable<string>;
-
+  newClinicalFormFields: Field<any>[] = [];
+  newPersonlFormFields: Field<any>[] = [];
   get maximumDate() {
     let maxDate = new Date();
     let maxMonth =
@@ -360,6 +362,29 @@ export class RegisterSampleComponent implements OnInit {
         label: "Delivered By",
       }),
     };
+
+    this.newClinicalFormFields = [
+      new Dropdown({
+        id: "icd10",
+        key: "icd10",
+        label: "ICD 10",
+        options: [],
+        conceptClass: "Diagnosis",
+        shouldHaveLiveSearchForDropDownFields: true,
+      }),
+      new TextArea({
+        id: "notes",
+        key: "notes",
+        label: "Clinical Information / History",
+        type: "text",
+      }),
+      new Textbox({
+        id: "diagnosis",
+        key: "diagnosis",
+        label: "Diagnosis - Clinical",
+        type: "text",
+      }),
+    ];
     this.clinicalFormFields = {
       icd10: new Dropdown({
         id: "icd10",
@@ -382,6 +407,92 @@ export class RegisterSampleComponent implements OnInit {
         type: "text",
       }),
     };
+
+    this.newPersonlFormFields = [
+      new Textbox({
+        id: "firstName",
+        key: "firstName",
+        label: "First name",
+        required: true,
+        type: "text",
+      }),
+      new Textbox({
+        id: "middleName",
+        key: "middleName",
+        label: "Middle name",
+        type: "text",
+      }),
+      new Textbox({
+        id: "lastName",
+        key: "lastName",
+        label: "Last name",
+        required: true,
+        type: "text",
+      }),
+      new Dropdown({
+        id: "gender",
+        key: "gender",
+        label: "Gender",
+        required: false,
+        type: "text",
+        options: [
+          {
+            key: "Male",
+            label: "Male",
+            value: "M",
+          },
+          {
+            key: "Female",
+            label: "Female",
+            value: "F",
+          },
+        ],
+        shouldHaveLiveSearchForDropDownFields: false,
+      }),
+      new Textbox({
+        id: "age",
+        key: "age",
+        label: "Age",
+        required: false,
+        type: "number",
+        min: 0,
+        max: 150,
+      }),
+      new DateField({
+        id: "dob",
+        key: "dob",
+        label: "Date of birth",
+        required: true,
+        type: "date",
+        max: this.maximumDate,
+      }),
+      new PhoneNumber({
+        id: "mobileNumber",
+        key: "mobileNumber",
+        label: "Mobile number",
+        required: false,
+        type: "number",
+        min: 0,
+        placeholder: "Mobile number",
+        category: "phoneNumber",
+      }),
+      new Textbox({
+        id: "email",
+        key: "email",
+        label: "Email",
+        required: false,
+        type: "text",
+        placeholder: "Email",
+        category: "email",
+      }),
+      new TextArea({
+        id: "address",
+        key: "address",
+        label: "Address",
+        required: false,
+        type: "text",
+      }),
+    ];
     this.personFields = {
       firstName: new Textbox({
         id: "firstName",

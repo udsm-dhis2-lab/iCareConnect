@@ -19,7 +19,9 @@ export class SharedBatchSamplesListEntryComponent implements OnInit {
         this.batchSampleUuid
       );
     } else {
-      this.batchSampleDetails$ = of([]);
+      this.batchSampleDetails$ = of({
+        samples: [],
+      });
     }
   }
 }

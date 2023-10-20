@@ -78,7 +78,11 @@
         </div>
       </fieldset>
     </div>
-    <div class="col-12 d-flex justify-content-end">
+    <div
+      class="col-12 d-flex justify-content-end"
+      style="margin-bottom: -24px"
+      *ngIf="!fromMaintenance"
+    >
       <div class="w-25">
         <app-shared-batch-set-form
           [useExistingBatchSet]="true"
@@ -106,6 +110,8 @@
         [registrationCategory]="registrationCategory"
         [existingBatchFieldsInformations]="existingBatchFieldsInformations"
         [fromMaintenance]="fromMaintenance"
+        [clinicalFields]="clinicalFields"
+        [personFields]="personFields"
         (selectedFieldsByCategory)="onGetSelectedFields($event)"
         (selectedFieldsData)="onGetFormFieldsData($event)"
         (fields)="onGetAllFields($event)"
@@ -117,6 +123,7 @@
           [fields]="allFields"
           [keyedBatchFields]="keyedBatchFields"
           [existingBatchFieldsInformations]="existingBatchFieldsInformations"
+          (fedDynamicFieldsData)="onGetFedDynamicFieldsData($event)"
         ></app-shared-sample-registration-via-batch>
       </div>
     </div>
