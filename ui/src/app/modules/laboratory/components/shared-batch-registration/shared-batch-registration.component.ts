@@ -16,6 +16,8 @@ export class SharedBatchRegistrationComponent implements OnInit {
   @Input() currentUser: CurrentUser;
   @Input() sampleRegistrationCategories: any;
   @Input() fromMaintenance: boolean;
+  @Input() clinicalFields: any[];
+  @Input() personFields: any[];
   useExistingBatchSet: boolean = false;
   useExistingBatch: boolean = false;
   registrationCategory: any;
@@ -30,6 +32,7 @@ export class SharedBatchRegistrationComponent implements OnInit {
   existingBatchFieldsInformations: any = {};
   allFields: any[] = [];
   showSampleRegistration: boolean = false;
+  currentDynamicFieldsData: any = {};
   constructor(
     private systemSettingsService: SystemSettingsService,
     private samplesService: SamplesService
@@ -139,6 +142,20 @@ export class SharedBatchRegistrationComponent implements OnInit {
         this.showBatchFieldsDefinition = true;
       }, 20);
     }
+  }
+
+  onGetFedDynamicFieldsData(formData: any): void {
+    this.currentDynamicFieldsData = formData;
+
+    this.existingBatchFieldsInformations["dynamicFields"] =
+      this.existingBatchFieldsInformations["dynamicFields"]?.map(
+        (dynamicField: any) => {
+          return {
+            ...dynamicField,
+            value: formData[dynamicField?.id]?.value || null,
+          };
+        }
+      );
   }
 
   onSave(event: Event): void {

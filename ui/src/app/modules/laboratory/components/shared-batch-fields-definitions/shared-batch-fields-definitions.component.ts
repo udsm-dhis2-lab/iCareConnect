@@ -12,6 +12,8 @@ export class SharedBatchFieldsDefinitionsComponent implements OnInit {
   @Input() registrationCategory: any;
   @Input() existingBatchFieldsInformations: any;
   @Input() fromMaintenance: boolean;
+  @Input() clinicalFields: any[];
+  @Input() personFields: any[];
   formUuids$: Observable<any>;
   errors: any[] = [];
 

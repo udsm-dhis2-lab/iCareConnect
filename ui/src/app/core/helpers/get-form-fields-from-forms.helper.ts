@@ -11,7 +11,7 @@ export function getFormFieldsFromForms(
       ...fields,
       ...flatten(
         form?.formFields?.map((formField: any) => {
-          return formField?.formFields;
+          return formField?.formFields ? formField?.formFields : formField;
         })
       ),
     ];

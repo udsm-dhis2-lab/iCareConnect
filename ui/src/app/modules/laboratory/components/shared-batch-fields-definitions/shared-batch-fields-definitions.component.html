@@ -20,6 +20,8 @@
           [formUuids]="params?.formUuids"
           [existingBatchFieldsInformations]="existingBatchFieldsInformations"
           [fromMaintenance]="fromMaintenance"
+          [clinicalFields]="clinicalFields"
+          [personFields]="personFields"
           (selectedFieldsByCategory)="onGetSelectedFields($event)"
           (selectedFieldsData)="onGetFormFieldsData($event)"
           (fields)="onGetAllFields($event)"
