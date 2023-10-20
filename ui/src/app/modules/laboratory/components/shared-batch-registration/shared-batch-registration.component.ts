@@ -28,6 +28,8 @@ export class SharedBatchRegistrationComponent implements OnInit {
   formData: any = {};
   saving: boolean = false;
   existingBatchFieldsInformations: any = {};
+  allFields: any[] = [];
+  showSampleRegistration: boolean = false;
   constructor(
     private systemSettingsService: SystemSettingsService,
     private samplesService: SamplesService
@@ -96,6 +98,14 @@ export class SharedBatchRegistrationComponent implements OnInit {
     } else {
       this.keyedBatchFields = {};
     }
+  }
+
+  onGetAllFields(fields: any[]): void {
+    this.allFields = uniqBy([...this.allFields, ...fields], "id");
+    this.showSampleRegistration = false;
+    setTimeout(() => {
+      this.showSampleRegistration = true;
+    }, 20);
   }
 
   onGetFormFieldsData(formData: any): void {
