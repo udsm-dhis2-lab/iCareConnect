@@ -13,6 +13,8 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 export class SharedBatchEntryFieldsComponent implements OnInit {
   @Input() dropDown: boolean;
   @Input() options: any[];
+  @Input() hideDescription: boolean;
+  @Input() nameFieldName: string;
   fields: Field<any>[];
   @Output() formData: EventEmitter<any> = new EventEmitter<any>();
   constructor() {}
@@ -24,13 +26,13 @@ export class SharedBatchEntryFieldsComponent implements OnInit {
         ? new Textbox({
             id: "name",
             key: "name",
-            label: "Name",
+            label: this.nameFieldName,
             required: true,
           })
         : new Dropdown({
             id: "name",
             key: "name",
-            label: "Name",
+            label: this.nameFieldName,
             options: this.options?.map((option: any) => {
               return {
                 key: option?.id ? option?.id : option?.uuid,
@@ -40,13 +42,15 @@ export class SharedBatchEntryFieldsComponent implements OnInit {
               };
             }),
           }),
-      new TextArea({
-        id: "description",
-        key: "description",
-        label: "Description",
-        required: true,
-      }),
-    ];
+      !this.hideDescription
+        ? new TextArea({
+            id: "description",
+            key: "description",
+            label: "Description",
+            required: true,
+          })
+        : null,
+    ]?.filter((field: any) => field);
   }
 
   onFormUpdate(formValue: FormValue): void {
