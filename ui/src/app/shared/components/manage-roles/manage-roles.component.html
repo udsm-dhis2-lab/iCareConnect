@@ -27,6 +27,22 @@
       </div>
       <div class="roles-selection w-100 p-2">
         <div class="h5">Inherited roles</div>
+
+        <div class="d-flex justify-content-between w-100 mt-2">
+          <mat-form-field class="w-50" apperance="fill" style="font-size: 0.9rem">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon
+            ><input
+              type="text"
+              placeholder="Search"
+              class="search-input"
+              matInput
+              autocomplete="off"
+              (keyup)="searchRoleItem($event)"
+            />
+          </mat-form-field>
+        </div>
+
         <section class="w-100 mt-1">
           <mat-checkbox
             class="mr-2 mb-2"
@@ -61,6 +77,22 @@
       </div>
       <div class="privileges-selection w-100 p-2 mt-3">
         <div class="h5">Select privileges</div>
+
+        <div class="d-flex justify-content-between w-100 mt-2">
+          <mat-form-field class="w-50" apperance="fill" style="font-size: 0.9rem">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon
+            ><input
+              type="text"
+              placeholder="Search"
+              class="search-input"
+              matInput
+              autocomplete="off"
+              (keyup)="searchPrivilegeItem($event)"
+            />
+          </mat-form-field>
+        </div>
+
         <section class="w-100 mt-1">
           <mat-checkbox
             class="mr-2 mb-2"

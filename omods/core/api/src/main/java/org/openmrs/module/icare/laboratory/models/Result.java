@@ -260,9 +260,11 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		}
 		
 		if ((map.get("valueCoded")) != null) {
-			Concept valueCoded = new Concept();
-			valueCoded.setUuid(((Map) map.get("valueCoded")).get("uuid").toString());
-			result.setValueCoded(valueCoded);
+			if(((Map) map.get("valueCoded")).get("uuid") != null ) {
+				Concept valueCoded = new Concept();
+				valueCoded.setUuid(((Map) map.get("valueCoded")).get("uuid").toString());
+				result.setValueCoded(valueCoded);
+			}
 		}
 		
 		if ((map.get("valueDrug")) != null) {
