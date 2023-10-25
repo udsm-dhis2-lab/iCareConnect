@@ -151,10 +151,11 @@
             params?.identifierTypes &&
             params?.batchsets &&
             params?.batches &&
-            params?.barcodeSettings
+            params?.barcodeSettings &&
+            params?.sampleRegistrationCategories
           "
         >
-          <app-batch-registration
+          <!-- <app-batch-registration
             [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
             [preferredPersonIdentifier]="params?.preferredPersonIdentifier"
             [provider]="provider"
@@ -186,7 +187,16 @@
             [personPhoneAttributeTypeUuid]="personPhoneAttributeTypeUuid"
             [personEmailAttributeTypeUuid]="personEmailAttributeTypeUuid"
             (reloadRegisterSample)="onReloadRegisterSample($event)"
-          ></app-batch-registration>
+          ></app-batch-registration> -->
+          <app-shared-batch-registration
+            [currentUser]="currentUser"
+            [sampleRegistrationCategories]="
+              params?.sampleRegistrationCategories
+            "
+            [clinicalFields]="newClinicalFormFields"
+            [personFields]="newPersonlFormFields"
+            [fromMaintenance]="fromMaintenance"
+          ></app-shared-batch-registration>
         </div>
       </div>
       <div class="w-100" *ngIf="selectedTabGroup === 'IMPORT-EXPORT'">

@@ -4,7 +4,9 @@
     LISConfigurations: LISConfigurations$ | async,
     labSections: labSections$ | async,
     provider: provider$ | async,
-    currentUser: currentUser$ | async
+    currentUser: currentUser$ | async,
+    sampleRegistrationCategoriesConceptUuid:
+      sampleRegistrationCategoriesConceptUuid$ | async
   } as params"
 >
   <mat-progress-bar
@@ -14,7 +16,7 @@
   <mat-tab-group
     *ngIf="params?.LISConfigurations && params?.currentUser"
     [selectedIndex]="selectedIndex"
-    [animationDuration]="'1800ms'"
+    [animationDuration]="'1300ms'"
     (selectedTabChange)="onChangeTab($event)"
   >
     <mat-tab
@@ -110,29 +112,48 @@
     >
       <ng-template matTabContent>
         <div class="p-3">
-          <app-register-sample
-            *ngIf="
-              params?.currentUser && params?.currentUser?.userPrivileges['ALL']
-            "
-            [provider]="params?.provider"
-            [labSections]="params?.labSections"
-            [LISConfigurations]="params?.LISConfigurations"
-            [fromMaintenance]="true"
-          ></app-register-sample>
-          <mat-progress-bar mode="indeterminate" *ngIf="!params?.currentUser">
-          </mat-progress-bar>
-          <div
-            class="alert alert-warning"
-            role="alert"
-            *ngIf="
-              params?.currentUser && !params?.currentUser?.userPrivileges['ALL']
-            "
-          >
-            Seems you do not have access to view this page
-          </div>
+          <ng-container *ngIf="!errors || (errors && errors?.length === 0)">
+            <app-register-sample
+              *ngIf="
+                params?.currentUser &&
+                params?.sampleRegistrationCategoriesConceptUuid &&
+                params?.currentUser?.userPrivileges['ALL']
+              "
+              [provider]="params?.provider"
+              [labSections]="params?.labSections"
+              [LISConfigurations]="params?.LISConfigurations"
+              [fromMaintenance]="true"
+              [sampleRegistrationCategoriesConceptUuid]="
+                params?.sampleRegistrationCategoriesConceptUuid
+              "
+            ></app-register-sample>
+            <mat-progress-bar
+              mode="indeterminate"
+              *ngIf="
+                !params?.currentUser ||
+                !params?.sampleRegistrationCategoriesConceptUuid
+              "
+            >
+            </mat-progress-bar>
+            <div
+              class="alert alert-warning"
+              role="alert"
+              *ngIf="
+                params?.currentUser &&
+                !params?.currentUser?.userPrivileges['ALL']
+              "
+            >
+              Seems you do not have access to view this page
+            </div>
+          </ng-container>
+          <app-shared-error
+            *ngIf="errors && errors?.length > 0"
+            [errors]="errors"
+          ></app-shared-error>
         </div>
       </ng-template>
     </mat-tab>
+
     <mat-tab
       label="Worksheets Management"
       *ngIf="params?.LISConfigurations?.isLIS"

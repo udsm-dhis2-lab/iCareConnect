@@ -348,7 +348,7 @@ export class PatientHistoryDataComponent implements OnInit {
     let header = "";
     let subHeader = "";
 
-    this.FacilityDetails.attributes.map((attribute) => {
+    this.FacilityDetails?.attributes?.map((attribute) => {
       let attributeTypeName =
         attribute && attribute.attributeType
           ? attribute?.attributeType?.name.toLowerCase()
