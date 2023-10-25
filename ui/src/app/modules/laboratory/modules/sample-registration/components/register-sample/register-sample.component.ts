@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatRadioChange } from "@angular/material/radio";
+import { MatTabChangeEvent } from "@angular/material/tabs";
 import { Store } from "@ngrx/store";
 import { Observable, of, zip } from "rxjs";
 import { catchError, map, take, tap, withLatestFrom } from "rxjs/operators";
@@ -18,6 +19,7 @@ import { ConceptsService } from "src/app/shared/resources/concepts/services/conc
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import {
+  go,
   loadConceptByUuid,
   loadLocationsByTagName,
   loadLocationsByTagNames,
@@ -88,6 +90,7 @@ export class RegisterSampleComponent implements OnInit {
   labTestRequestProgramStageId$: Observable<string>;
   newClinicalFormFields: Field<any>[] = [];
   newPersonlFormFields: Field<any>[] = [];
+  currentLocation: any;
   get maximumDate() {
     let maxDate = new Date();
     let maxMonth =
@@ -106,7 +109,7 @@ export class RegisterSampleComponent implements OnInit {
   hfrCodeAttributeUuid$: Observable<string>;
   sampleRegistrationCategories$: Observable<any>;
   specimenSourceConceptUuid$: Observable<string>;
-
+  specimenTypeConceptUuid: string = "f1945a2f-dc6a-43f8-b485-65c443593f0b"; // TODO: Softcode this using system settings
   constructor(
     private samplesService: SamplesService,
     private systemSettingsService: SystemSettingsService,
@@ -117,6 +120,17 @@ export class RegisterSampleComponent implements OnInit {
 
   ngOnInit(): void {
     // console.log(this.currentUser);
+    this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
+    try {
+      this.selectedTabGroup = localStorage.getItem(
+        "labSampleRegistrationModuleTab"
+      )
+        ? localStorage.getItem("labSampleRegistrationModuleTab")
+        : this.selectedTabGroup;
+    } catch (error) {
+      console.log(error);
+    }
+
     this.store.dispatch(
       loadLocationsByTagNames({ tagNames: ["Lab+Location"] })
     );
@@ -262,6 +276,16 @@ export class RegisterSampleComponent implements OnInit {
   setTabGroup(event: Event, group: string): void {
     event.stopPropagation();
     this.selectedTabGroup = group;
+    localStorage.setItem(
+      "labSampleRegistrationModuleTab",
+      this.selectedTabGroup
+    );
+    // this.store.dispatch(
+    //   go({
+    //     path: ["/laboratory/sample-registration"],
+    //     query: { queryParams: { tab: this.selectedTabGroup } },
+    //   })
+    // );
   }
 
   onReloadRegisterSample(eventData: any) {
@@ -448,6 +472,16 @@ export class RegisterSampleComponent implements OnInit {
           },
         ],
         shouldHaveLiveSearchForDropDownFields: false,
+      }),
+      new Dropdown({
+        id: "attribute-" + "47da17a9-a910-4382-8149-736de57dab18", // Referred from: TODO softcode this visit attribute type
+        key: "attribute-" + "47da17a9-a910-4382-8149-736de57dab18",
+        options: [],
+        label: "Facility Name",
+        shouldHaveLiveSearchForDropDownFields: true,
+        searchControlType: "healthFacility",
+        searchTerm: "Health Facility",
+        controlType: "location",
       }),
       new Textbox({
         id: "age",

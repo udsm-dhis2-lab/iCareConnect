@@ -18,6 +18,18 @@ export class SharedBatchRegistrationComponent implements OnInit {
   @Input() fromMaintenance: boolean;
   @Input() clinicalFields: any[];
   @Input() personFields: any[];
+  @Input() mrnGeneratorSourceUuid: string;
+  @Input() specimenTypeConceptUuid: string;
+
+  @Input() preferredPersonIdentifier: string;
+  @Input() personPhoneAttributeTypeUuid: string;
+  @Input() personEmailAttributeTypeUuid: string;
+  @Input() barcodeSettings: any;
+  @Input() labTestRequestProgramStageId: string;
+  @Input() currentLocation: any;
+  @Input() referFromFacilityVisitAttribute: any;
+  @Input() provider: any;
+
   useExistingBatchSet: boolean = false;
   useExistingBatch: boolean = false;
   registrationCategory: any;
@@ -84,7 +96,7 @@ export class SharedBatchRegistrationComponent implements OnInit {
   }
 
   onGetSelectedFields(fields: any): void {
-    // console.log(fields);
+    this.showSampleRegistration = false;
     if (
       flatten(Object.keys(fields)?.map((keyText: string) => fields[keyText]))
         ?.length > 0
@@ -97,10 +109,18 @@ export class SharedBatchRegistrationComponent implements OnInit {
           ],
           "id"
         );
+        if (keyText?.indexOf("testorders") > -1) {
+          this.formData["testorders"] = {
+            value: fields[keyText][0]?.value,
+          };
+        }
       });
     } else {
       this.keyedBatchFields = {};
     }
+    setTimeout(() => {
+      this.showSampleRegistration = true;
+    }, 30);
   }
 
   onGetAllFields(fields: any[]): void {
@@ -122,19 +142,19 @@ export class SharedBatchRegistrationComponent implements OnInit {
   onGetBatchAndBatchSetFormData(formData: any, category: string): void {
     this.batchAndBatchSetsData[category] = formData;
     if (
-      (this.batchAndBatchSetsData["batch"]?.useExistingBatch &&
-        this.batchAndBatchSetsData["batchset"]["selectedBatch"]) ||
-      (this.batchAndBatchSetsData["batchset"]?.useExistingBatchSet &&
+      (this.batchAndBatchSetsData["batch"]?.name?.value &&
+        this.batchAndBatchSetsData["batch"]["selectedBatch"]) ||
+      (this.batchAndBatchSetsData["batchset"]?.name?.value &&
         this.batchAndBatchSetsData["batchset"]["selectedBatchset"])
     ) {
       this.showBatchFieldsDefinition = false;
-      if (this.batchAndBatchSetsData["batchset"]?.useExistingBatchSet) {
+      if (this.batchAndBatchSetsData["batch"]?.name?.value) {
         this.existingBatchFieldsInformations = JSON.parse(
-          this.batchAndBatchSetsData["batchset"]["selectedBatchset"]?.fields
+          this.batchAndBatchSetsData["batch"]["selectedBatch"]?.fields
         );
       } else {
         this.existingBatchFieldsInformations = JSON.parse(
-          this.batchAndBatchSetsData["batchset"]["selectedBatch"]?.fields
+          this.batchAndBatchSetsData["batchset"]["selectedBatchset"]?.fields
         );
       }
 
@@ -208,6 +228,7 @@ export class SharedBatchRegistrationComponent implements OnInit {
       {
         label: this.batchAndBatchSetsData["batch"]?.name?.value,
         name: this.batchAndBatchSetsData["batch"]?.name?.value,
+        description: this.batchAndBatchSetsData["batch"]?.description?.value,
         fields: JSON.stringify({
           fixedFields:
             this.keyedBatchFields?.fixed?.map((field: any) => {
@@ -232,7 +253,6 @@ export class SharedBatchRegistrationComponent implements OnInit {
             };
           }),
         }),
-        description: this.batchAndBatchSetsData["batch"]?.name?.value || "",
       },
     ];
 
@@ -240,7 +260,13 @@ export class SharedBatchRegistrationComponent implements OnInit {
     this.existingBatchFieldsInformations = {};
     this.useExistingBatch = false;
     this.useExistingBatchSet = false;
-    if (batchsetsInformation && !this.useExistingBatchSet) {
+    if (
+      batchsetsInformation &&
+      (!this.batchAndBatchSetsData["batchset"]["selectedBatchset"] ||
+        (this.batchAndBatchSetsData["batchset"] &&
+          this.batchAndBatchSetsData["batchset"]["selectedBatchset"] &&
+          !this.batchAndBatchSetsData["batchset"]["selectedBatchset"]?.uuid))
+    ) {
       this.samplesService
         .createBatchsets(batchsetsInformation)
         .subscribe((response) => {
@@ -262,19 +288,25 @@ export class SharedBatchRegistrationComponent implements OnInit {
           }
         });
     } else {
-      batches = !this.useExistingBatchSet
-        ? batches
-        : batches.map((batch) => {
-            return {
-              ...batch,
-              batchSet: {
-                uuid: this.batchAndBatchSetsData["batchset"]["selectedBatchset"]
-                  ?.uuid,
-                name: this.batchAndBatchSetsData["batchset"]["selectedBatchset"]
-                  ?.name,
-              },
-            };
-          });
+      batches =
+        !this.batchAndBatchSetsData["batchset"]["selectedBatchset"] ||
+        (this.batchAndBatchSetsData["batchset"] &&
+          this.batchAndBatchSetsData["batchset"]["selectedBatchset"] &&
+          !this.batchAndBatchSetsData["batchset"]["selectedBatchset"]?.uuid)
+          ? batches
+          : batches.map((batch) => {
+              return {
+                ...batch,
+                batchSet: {
+                  uuid: this.batchAndBatchSetsData["batchset"][
+                    "selectedBatchset"
+                  ]?.uuid,
+                  name: this.batchAndBatchSetsData["batchset"][
+                    "selectedBatchset"
+                  ]?.name,
+                },
+              };
+            });
       this.samplesService.createBatch(batches).subscribe((response) => {
         this.saving = false;
       });
