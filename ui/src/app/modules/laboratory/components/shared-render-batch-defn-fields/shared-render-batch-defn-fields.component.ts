@@ -40,6 +40,7 @@ export class SharedRenderBatchDefnFieldsComponent implements OnInit {
         ) || []
       )?.map((fieldValue: any) => fieldValue?.value) || []
     );
+
     this.formFields = getFormFieldsFromForms(
       this.forms,
       this.existingBatchFieldsInformations

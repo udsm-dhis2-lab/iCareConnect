@@ -112,6 +112,7 @@
         [fromMaintenance]="fromMaintenance"
         [clinicalFields]="clinicalFields"
         [personFields]="personFields"
+        [specimenTypeConceptUuid]="specimenTypeConceptUuid"
         (selectedFieldsByCategory)="onGetSelectedFields($event)"
         (selectedFieldsData)="onGetFormFieldsData($event)"
         (fields)="onGetAllFields($event)"
@@ -121,8 +122,20 @@
       <div class="p-2 ml-2 mr-2">
         <app-shared-sample-registration-via-batch
           [fields]="allFields"
+          [category]="
+            batchAndBatchSetsData['batch']?.name?.value ? 'batch' : 'batchset'
+          "
+          [mrnGeneratorSourceUuid]="mrnGeneratorSourceUuid"
+          [preferredPersonIdentifier]="preferredPersonIdentifier"
+          [personPhoneAttributeTypeUuid]="personPhoneAttributeTypeUuid"
+          [personEmailAttributeTypeUuid]="personEmailAttributeTypeUuid"
+          [barcodeSettings]="barcodeSettings"
+          [registrationCategory]="registrationCategory"
           [keyedBatchFields]="keyedBatchFields"
           [existingBatchFieldsInformations]="existingBatchFieldsInformations"
+          [currentLocation]="currentLocation"
+          [provider]="provider"
+          [referFromFacilityVisitAttribute]="referFromFacilityVisitAttribute"
           (fedDynamicFieldsData)="onGetFedDynamicFieldsData($event)"
         ></app-shared-sample-registration-via-batch>
       </div>

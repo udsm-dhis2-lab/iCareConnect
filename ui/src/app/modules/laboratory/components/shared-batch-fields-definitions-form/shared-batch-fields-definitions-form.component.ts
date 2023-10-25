@@ -19,6 +19,8 @@ export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
   @Input() fromMaintenance: boolean;
   @Input() clinicalFields: any[];
   @Input() personFields: any[];
+  @Input() specimenTypeConceptUuid: string;
+
   @Output() fields: EventEmitter<any> = new EventEmitter<any>();
   allFields: any[] = [];
   forms$: Observable<any>;
@@ -29,9 +31,28 @@ export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
   @Output() selectedFieldsData: EventEmitter<any> = new EventEmitter<any>();
   // @ViewChild(SharedRenderBatchDefnFieldsComponent)
   // sharedRenderBatchDefnFieldsComponent!: SharedRenderBatchDefnFieldsComponent;
+  showTestOrderSelection: boolean = true;
+  selectedTestOrdersValues: any[] = [];
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
+    this.showTestOrderSelection = false;
+    this.selectedTestOrdersValues =
+      [
+        ...(this.existingBatchFieldsInformations?.fixedFields?.filter(
+          (fixedField: any) => fixedField?.id === "testorders"
+        ) || []),
+        ...(this.existingBatchFieldsInformations?.staticFields?.filter(
+          (staticField: any) => staticField?.id === "testorders"
+        ) || []),
+        ...(this.existingBatchFieldsInformations?.dynamicFields?.filter(
+          (dynamicField: any) => dynamicField?.id === "testorders"
+        ) || []),
+      ][0]?.value || [];
+    if (this.selectedTestOrdersValues) {
+      this.showTestOrderSelection = true;
+    }
+    console.log("selectedTestOrdersValues", this.selectedTestOrdersValues);
     this.store.dispatch(
       loadCustomOpenMRSForms({
         formUuids: this.formUuids,
@@ -66,17 +87,6 @@ export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
   onGetSelectedBatchFields(selectedFields: any, form: any, key: string): void {
     this.keyedSelectedFields[key + "-" + form?.uuid] = selectedFields;
     this.selectedFieldsByCategory.emit(this.keyedSelectedFields);
-    // this.sharedRenderBatchDefnFieldsComponent.setFormFieldsToFilter(
-    //   flatten(
-    //     (
-    //       Object.keys(this.keyedSelectedFields)?.filter(
-    //         (keyText: string) => keyText?.indexOf(key) === -1
-    //       ) || []
-    //     )?.map((keyText: string) => {
-    //       return this.keyedSelectedFields[keyText];
-    //     })
-    //   )
-    // );
   }
 
   onGetAllFields(fields: any[]): void {
@@ -85,46 +95,40 @@ export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
   }
 
   onFormUpdate(formValue: FormValue, fieldsReferenceKey: string): void {
-    // console.log(formValue.getValues());
-    const unKeyedSavedDataValues = keyBy(
-      [
-        ...(this.existingBatchFieldsInformations?.fixedFields || []),
-        ...(this.existingBatchFieldsInformations?.staticFields || []),
-        ...(this.existingBatchFieldsInformations?.dynamicFields || []),
-      ],
-      "id"
-    );
-    this.formData = { ...this.formData, ...formValue.getValues() };
-    // this.formData = keyBy(
-    //   Object.keys(this.formData)?.map((key: string) => {
-    //     if (
-    //       (!this.formData[key]?.value || this.formData[key]?.value === "") &&
-    //       unKeyedSavedDataValues[key]?.value
-    //     ) {
-    //       return {
-    //         key,
-    //         ...this.formData[key],
-    //         value: unKeyedSavedDataValues[key]?.value,
-    //       };
-    //     } else {
-    //       return {
-    //         key,
-    //         ...this.formData[key],
-    //       };
-    //     }
-    //   }) || [],
-    //   "key"
+    // const unKeyedSavedDataValues = keyBy(
+    //   [
+    //     ...(this.existingBatchFieldsInformations?.fixedFields || []),
+    //     ...(this.existingBatchFieldsInformations?.staticFields || []),
+    //     ...(this.existingBatchFieldsInformations?.dynamicFields || []),
+    //   ],
+    //   "id"
     // );
+    this.formData = { ...this.formData, ...formValue.getValues() };
     this.selectedFieldsData.emit(this.formData);
-    // this.keyedSelectedFields[fieldsReferenceKey] = this.keyedSelectedFields[
-    //   fieldsReferenceKey
-    // ]?.map((field: Field<any>) => {
-    //   return {
-    //     ...field,
-    //     value: this.formData[field?.key]?.value,
-    //   };
-    // });
-    // console.log(this.keyedSelectedFields);
-    // Assigned values to the keyed fields
+    if (
+      this.specimenTypeConceptUuid &&
+      this.formData[this.specimenTypeConceptUuid]?.value
+    ) {
+      this.showTestOrderSelection = false;
+      setTimeout(() => {
+        this.showTestOrderSelection = true;
+      }, 20);
+    }
+  }
+
+  onGetSelectedOrders(orders: any[], category): void {
+    if (orders && orders?.length > 0) {
+      this.keyedSelectedFields[category + "-testorders"] = [
+        {
+          id: "testorders",
+          name: "Test orders",
+          label: "Test orders",
+          value: orders?.map((order: any) => order?.uuid),
+          selectedItems: orders,
+        },
+      ];
+      this.selectedTestOrdersValues = orders?.map((order: any) => order?.uuid);
+      this.selectedFieldsByCategory.emit(this.keyedSelectedFields);
+    }
   }
 }
