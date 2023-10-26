@@ -5,10 +5,20 @@ import { catchError, map } from "rxjs/operators";
 import { LocationService } from "src/app/core/services";
 import { IdentifiersService } from "src/app/core/services/identifiers.service";
 import { RegistrationService } from "src/app/modules/registration/services/registration.services";
+import { OpenMRSGenericOrder } from "src/app/shared/models/orders.models";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
+import {
+  EncounterCreateFull,
+  ObsCreate,
+} from "src/app/shared/resources/openmrs";
 import { VisitsService } from "src/app/shared/resources/visits/services";
+import { LabOrdersService } from "../../resources/services/lab-orders.service";
+import { SamplesService } from "src/app/shared/services/samples.service";
+import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
+import { keyBy, omit, groupBy } from "lodash";
 
 @Component({
   selector: "app-shared-sample-registration-via-batch",
@@ -28,6 +38,7 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
   @Input() referFromFacilityVisitAttribute: any;
   @Input() barcodeSettings: any;
   @Input() provider: any;
+  @Input() specimenTypeConceptUuid: string;
   fieldsNotSetOnBatch: any[] = [];
   dynamicFields: any[] = [];
   @Output() fedDynamicFieldsData: EventEmitter<any> = new EventEmitter<any>();
@@ -42,7 +53,10 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
     private locationService: LocationService,
     private identifierService: IdentifiersService,
     private visitsService: VisitsService,
-    private conceptsService: ConceptsService
+    private conceptsService: ConceptsService,
+    private labOrdersService: LabOrdersService,
+    private samplesService: SamplesService,
+    private orderService: OrdersService
   ) {}
 
   ngOnInit(): void {
@@ -123,53 +137,7 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
 
   onAddSample2(event: Event): void {
     event.stopPropagation();
-    this.errors = [];
-    console.log(this.testOrderField);
-    zip(
-      ...this.testOrderField?.value.map((testOrderConceptUuid: string) => {
-        return this.conceptsService
-          .getConceptSetsByConceptUuids([testOrderConceptUuid])
-          .pipe(
-            map((response: any) => {
-              return {
-                testOrderConceptUuid,
-                department: (response?.filter(
-                  (item: any) =>
-                    item?.systemName?.toLowerCase()?.indexOf("lab_department") >
-                    -1
-                ) || [])[0],
-              };
-            })
-          );
-      })
-    ).subscribe((response: any) => {
-      console.log(response);
-      // Create message is there is missing department
-      this.errors = [
-        ...this.errors,
-        response?.filter(
-          (orderDepartmentDetails: any) => !orderDepartmentDetails?.department
-        ),
-      ];
-      // Create orders via encounter
-      const testOrders = (
-        response?.filter(
-          (orderDepartmentDetails: any) => orderDepartmentDetails?.department
-        ) || []
-      )?.map((orderDepartmentDetails: any) => {
-        return {
-          concept: orderDepartmentDetails?.testOrderConceptUuid,
-          orderType: "52a447d3-a64a-11e3-9aeb-50e549534c5e", // TODO: Find a way to soft code this
-          action: "NEW",
-          orderer: this.provider?.uuid,
-          patient: "",
-          careSetting: "OUTPATIENT",
-          urgency: "ROUTINE", // TODO: Change to reflect users input
-          instructions: "",
-          type: "testorder",
-        };
-      });
-    });
+    this.addingSample = true;
   }
 
   onAddSample(event: Event): void {
@@ -315,149 +283,256 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
                   this.createOrUpdateVisit(visitObject).subscribe(
                     (visitResponse: any) => {
                       if (visitResponse) {
-                        this.addingSample = false;
-                        console.log("personDataResponse", personDataResponse);
-                        console.log("visitResponse", visitResponse);
                         // Create encounter with orders
-                        console.log("test order", this.testOrderField);
-                        // zip(
-                        //   ...this.groupedTestOrdersByDepartments?.map(
-                        //     (groupedTestOrders) => {
-                        //       const orders = uniqBy(
-                        //         groupedTestOrders,
-                        //         "testOrder"
-                        //       ).map((testOrder) => {
-                        //         // TODO: Remove hard coded order type
-                        //         return {
-                        //           concept: testOrder?.testOrder,
-                        //           orderType:
-                        //             "52a447d3-a64a-11e3-9aeb-50e549534c5e", // TODO: Find a way to soft code this
-                        //           action: "NEW",
-                        //           orderer: this.provider?.uuid,
-                        //           patient: patientResponse?.uuid,
-                        //           careSetting: "OUTPATIENT",
-                        //           urgency: "ROUTINE", // TODO: Change to reflect users input
-                        //           instructions: "",
-                        //           type: "testorder",
-                        //         };
-                        //       });
+                        this.errors = [];
+                        zip(
+                          ...this.testOrderField?.value.map(
+                            (testOrderConceptUuid: string) => {
+                              return this.conceptsService
+                                .getConceptSetsByConceptUuids([
+                                  testOrderConceptUuid,
+                                ])
+                                .pipe(
+                                  map((response: any) => {
+                                    return {
+                                      testOrder: testOrderConceptUuid,
+                                      department: (response?.filter(
+                                        (item: any) =>
+                                          item?.systemName
+                                            ?.toLowerCase()
+                                            ?.indexOf("lab_department") > -1
+                                      ) || [])[0],
+                                    };
+                                  })
+                                );
+                            }
+                          )
+                        ).subscribe((response: any) => {
+                          // console.log(response);
+                          // Create error message is there is missing department
+                          this.errors = [
+                            ...this.errors,
+                            response?.filter(
+                              (orderDepartmentDetails: {
+                                testOrder: string;
+                                department: any;
+                              }) => !orderDepartmentDetails?.department
+                            ),
+                          ];
+                          // Create orders via encounter
+                          const testOrders: OpenMRSGenericOrder[] = (
+                            response?.filter(
+                              (orderDepartmentDetails: {
+                                testOrder: string;
+                                department: any;
+                              }) => orderDepartmentDetails?.department
+                            ) || []
+                          )?.map(
+                            (orderDepartmentDetails: {
+                              testOrder: string;
+                              department: any;
+                            }) => {
+                              return {
+                                concept: orderDepartmentDetails?.testOrder,
+                                orderType:
+                                  "52a447d3-a64a-11e3-9aeb-50e549534c5e", // TODO: Find a way to soft code this
+                                action: "NEW",
+                                orderer: this.provider?.uuid,
+                                patient: personDataResponse?.uuid,
+                                careSetting: "OUTPATIENT",
+                                urgency: "ROUTINE", // TODO: Change to reflect users input
+                                instructions: "",
+                                type: "testorder",
+                                department:
+                                  orderDepartmentDetails?.department?.uuid,
+                                specimenSource: "",
+                              };
+                            }
+                          );
 
-                        //       let obs = [];
-                        //       if (this.formData["notes"]?.value) {
-                        //         obs = [
-                        //           {
-                        //             concept:
-                        //               "3a010ff3-6361-4141-9f4e-dd863016db5a",
-                        //             value:
-                        //               this.formData["notes"]
-                        //                 ?.value,
-                        //           },
-                        //         ];
-                        //       }
-                        //       let encounterObjects = [
-                        //         {
-                        //           visit: visitResponse?.uuid,
-                        //           patient: patientResponse?.uuid,
-                        //           encounterType:
-                        //             "9b46d3fe-1c3e-4836-a760-f38d286b578b",
-                        //           location:
-                        //             this.currentLocation?.uuid,
-                        //           orders,
-                        //           obs:
-                        //             obs?.filter(
-                        //               (observation) =>
-                        //                 observation?.value
-                        //             ) || [],
-                        //           encounterProviders: [
-                        //             {
-                        //               provider:
-                        //                 this.provider?.uuid,
-                        //               encounterRole:
-                        //                 ICARE_CONFIG.encounterRole,
-                        //             },
-                        //           ],
-                        //         },
-                        //       ];
-                        //       encounterObjects = [
-                        //         ...encounterObjects,
-                        //         ...Object.keys(
-                        //           this.generalObservationsData
-                        //         ).map((key) => {
-                        //           return {
-                        //             visit: visitResponse?.uuid,
-                        //             patient:
-                        //               patientResponse?.uuid,
-                        //             encounterType:
-                        //               "9b46d3fe-1c3e-4836-a760-f38d286b578b",
-                        //             location:
-                        //               this.currentLocation?.uuid,
-                        //             orders: [],
-                        //             obs: (
-                        //               this.generalObservationsData[
-                        //                 key
-                        //               ]?.map((obs) =>
-                        //                 omit(obs, "form")
-                        //               ) || []
-                        //             )
-                        //               .filter((obs) => obs?.value)
-                        //               .map((obsValue) => {
-                        //                 return {
-                        //                   ...obsValue,
-                        //                   value:
-                        //                     obsValue?.value?.indexOf(
-                        //                       "GMT+"
-                        //                     ) === -1
-                        //                       ? obsValue?.value
-                        //                       : formatDateToYYMMDD(
-                        //                           new Date(
-                        //                             obsValue?.value
-                        //                           )
-                        //                         ) +
-                        //                         " " +
-                        //                         this.formatDimeChars(
-                        //                           new Date(
-                        //                             obsValue?.value
-                        //                           )
-                        //                             .getHours()
-                        //                             .toString()
-                        //                         ) +
-                        //                         ":" +
-                        //                         this.formatDimeChars(
-                        //                           new Date(
-                        //                             obsValue?.value
-                        //                           )
-                        //                             .getMinutes()
-                        //                             .toString()
-                        //                         ),
-                        //                 };
-                        //               }),
-                        //             encounterProviders: [
-                        //               {
-                        //                 provider:
-                        //                   this.provider?.uuid,
-                        //                 encounterRole:
-                        //                   ICARE_CONFIG.encounterRole,
-                        //               },
-                        //             ],
-                        //             form: key,
-                        //           };
-                        //         }),
-                        //       ];
-                        //       return zip(
-                        //         ...encounterObjects.map(
-                        //           (encounterObject) =>
-                        //             this.labOrdersService.createLabOrdersViaEncounter(
-                        //               encounterObject
-                        //             )
-                        //         )
-                        //       ).pipe(
-                        //         map((responses) => {
-                        //           return responses[0];
-                        //         })
-                        //       );
-                        //     }
-                        //   )
-                        // )
+                          let obs: ObsCreate[] = [];
+
+                          let encounterObjects = [
+                            {
+                              visit: visitResponse?.uuid,
+                              patient: personDataResponse?.uuid,
+                              encounterType:
+                                "9b46d3fe-1c3e-4836-a760-f38d286b578b",
+                              location: this.currentLocation?.uuid,
+                              orders: testOrders?.map((testOrder: any) => {
+                                return omit(testOrder, [
+                                  "department",
+                                  "specimenSource",
+                                ]);
+                              }),
+                              obs:
+                                obs?.filter(
+                                  (observation) => observation?.value
+                                ) || [],
+                              encounterProviders: [
+                                {
+                                  provider: this.provider?.uuid,
+                                  encounterRole: ICARE_CONFIG.encounterRole,
+                                },
+                              ],
+                            },
+                          ];
+                          zip(
+                            ...encounterObjects.map((encounterObject: any) =>
+                              this.labOrdersService.createLabOrdersViaEncounter(
+                                encounterObject
+                              )
+                            )
+                          ).subscribe(
+                            (encountersResponses: EncounterCreateFull[]) => {
+                              // console.log(encountersResponses);
+
+                              const testOrdersGroupedByDepartments: any =
+                                groupBy(testOrders, "department");
+                              const orderUuids: string[] =
+                                encountersResponses[0]?.orders?.map(
+                                  (order: any) => order?.uuid
+                                );
+                              this.orderService
+                                .getOrdersByUuids(orderUuids)
+                                .subscribe((ordersResponse) => {
+                                  if (ordersResponse) {
+                                    const configs = {
+                                      otherContainer: {
+                                        id: "eb21ff23-a627-4a62-8bd0-efdc1db2ebb5",
+                                        uuid: "eb21ff23-a627-4a62-8bd0-efdc1db2ebb5",
+                                      },
+                                    };
+                                    // console.log(
+                                    //   "orders response",
+                                    //   ordersResponse
+                                    // );
+
+                                    const keyedOrdersByConceptUuid: any = keyBy(
+                                      ordersResponse?.map((order: any) => {
+                                        return {
+                                          ...order,
+                                          conceptUuid: order?.concept?.uuid,
+                                        };
+                                      }),
+                                      "conceptUuid"
+                                    );
+                                    console.log(
+                                      "keyedOrdersByConceptUuid",
+                                      keyedOrdersByConceptUuid
+                                    );
+                                    console.log(
+                                      "grouped test orders",
+                                      testOrdersGroupedByDepartments
+                                    );
+                                    testOrdersGroupedByDepartments?.map(
+                                      (department: string) => {
+                                        this.samplesService
+                                          .getIncreamentalSampleLabel()
+                                          .subscribe((sampleLabel) => {
+                                            if (sampleLabel) {
+                                              const sample = {
+                                                visit: {
+                                                  uuid: visitResponse?.uuid,
+                                                },
+                                                label: sampleLabel,
+                                                concept: {
+                                                  uuid: department,
+                                                },
+                                                specimenSource: {
+                                                  uuid: testOrdersGroupedByDepartments[
+                                                    department
+                                                  ][0]?.specimenSource,
+                                                },
+                                                location: {
+                                                  uuid: this.currentLocation
+                                                    ?.uuid,
+                                                },
+                                                orders:
+                                                  testOrdersGroupedByDepartments[
+                                                    department
+                                                  ]?.map(
+                                                    (testOrderDetails: any) => {
+                                                      return {
+                                                        uuid: keyedOrdersByConceptUuid[
+                                                          testOrderDetails
+                                                        ],
+                                                      };
+                                                    }
+                                                  ),
+                                              };
+                                              // Create sample
+                                              this.samplesService
+                                                .createLabSample(sample)
+                                                .subscribe(
+                                                  (sampleResponse: any) => {
+                                                    console.log(
+                                                      "sampleResponse",
+                                                      sampleResponse
+                                                    );
+                                                    if (sampleResponse) {
+                                                      this.addingSample = false;
+                                                      let statuses: any = [];
+                                                      statuses = [
+                                                        ...statuses,
+                                                        {
+                                                          sample: {
+                                                            uuid: sampleResponse?.uuid,
+                                                          },
+                                                          user: {
+                                                            uuid: localStorage.getItem(
+                                                              "userUuid"
+                                                            ),
+                                                          },
+                                                          category:
+                                                            "SAMPLE_REGISTRATION_CATEGORY",
+                                                          remarks:
+                                                            "Sample registration form type reference",
+                                                          status:
+                                                            this.registrationCategory?.refKey?.toUpperCase(),
+                                                        },
+                                                        {
+                                                          sample: {
+                                                            uuid: sampleResponse?.uuid,
+                                                          },
+                                                          user: {
+                                                            uuid: localStorage.getItem(
+                                                              "userUuid"
+                                                            ),
+                                                          },
+                                                          remarks:
+                                                            "Sample collection",
+                                                          category: "COLLECTED",
+                                                          status: "COLLECTED",
+                                                        },
+                                                      ];
+
+                                                      zip(
+                                                        this.samplesService.setMultipleSampleStatuses(
+                                                          statuses
+                                                        )
+                                                      ).subscribe(
+                                                        (
+                                                          sampleStatusResponses: any[]
+                                                        ) => {
+                                                          console.log(
+                                                            "sampleStatusResponses",
+                                                            sampleStatusResponses
+                                                          );
+                                                        }
+                                                      );
+                                                    }
+                                                  }
+                                                );
+                                            }
+                                          });
+                                      }
+                                    );
+                                  }
+                                });
+                            }
+                          );
+                        });
                       }
                     }
                   );
