@@ -193,9 +193,23 @@
             [sampleRegistrationCategories]="
               params?.sampleRegistrationCategories
             "
+            [mrnGeneratorSourceUuid]="params?.mrnGeneratorSourceUuid"
+            [specimenTypeConceptUuid]="specimenTypeConceptUuid"
+            [preferredPersonIdentifier]="params?.preferredPersonIdentifier"
+            [personPhoneAttributeTypeUuid]="personPhoneAttributeTypeUuid"
+            [personEmailAttributeTypeUuid]="personEmailAttributeTypeUuid"
+            [barcodeSettings]="params?.barcodeSettings"
             [clinicalFields]="newClinicalFormFields"
             [personFields]="newPersonlFormFields"
             [fromMaintenance]="fromMaintenance"
+            [labTestRequestProgramStageId]="
+              params?.labTestRequestProgramStageId
+            "
+            [currentLocation]="currentLocation"
+            [referFromFacilityVisitAttribute]="
+              params?.referFromFacilityVisitAttribute
+            "
+            [provider]="provider"
           ></app-shared-batch-registration>
         </div>
       </div>

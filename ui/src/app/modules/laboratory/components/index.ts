@@ -13,6 +13,7 @@ import { SharedBatchFormComponent } from "./shared-batch-form/shared-batch-form.
 import { SharedBatchRegistrationComponent } from "./shared-batch-registration/shared-batch-registration.component";
 import { SharedBatchSamplesListEntryComponent } from "./shared-batch-samples-list-entry/shared-batch-samples-list-entry.component";
 import { SharedBatchSetFormComponent } from "./shared-batch-set-form/shared-batch-set-form.component";
+import { SharedBatchTestordersSelectionComponent } from "./shared-batch-testorders-selection/shared-batch-testorders-selection.component";
 import { SharedLabReportFormDataComponent } from "./shared-lab-report-form-data/shared-lab-report-form-data.component";
 import { SharedLabReportHeaderComponent } from "./shared-lab-report-header/shared-lab-report-header.component";
 import { SharedLocationDisplayComponent } from "./shared-location-display/shared-location-display.component";
@@ -58,4 +59,5 @@ export const labSharedComponents: any[] = [
   SharedBatchEntryFieldsComponent,
   SharedSampleRegistrationViaBatchComponent,
   SharedBatchSamplesListEntryComponent,
+  SharedBatchTestordersSelectionComponent,
 ];
