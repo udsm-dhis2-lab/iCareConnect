@@ -47,6 +47,7 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
   addingSample: boolean = false;
   testOrderField: any;
   errors: any[] = [];
+  fieldsWithData;
   constructor(
     private httpClient: OpenmrsHttpClientService,
     private registrationService: RegistrationService,
@@ -60,7 +61,7 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // console.log("allFields::", this.fields);
+    console.log("specimenTypeConceptUuid::", this.specimenTypeConceptUuid);
     console.log(this.keyedBatchFields);
     console.log(
       "referFromFacilityVisitAttribute",
@@ -122,6 +123,15 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
       ) || [];
     // console.log(this.fieldsNotSetOnBatch);
     console.log(this.dynamicFields);
+    this.fieldsWithData = uniqBy(
+      [
+        ...(this.existingBatchFieldsInformations?.fixedFields || []),
+        ...(this.existingBatchFieldsInformations?.staticFields || []),
+        ...(this.existingBatchFieldsInformations?.dynamicFields || []),
+      ],
+      "id"
+    )?.filter((field: any) => field?.value);
+    console.log("fieldsWithData", this.fieldsWithData);
   }
 
   onFormUpdate(formValue: FormValue): void {
@@ -345,7 +355,10 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
                                 type: "testorder",
                                 department:
                                   orderDepartmentDetails?.department?.uuid,
-                                specimenSource: "",
+                                specimenSource: keyBy(
+                                  this.fieldsWithData,
+                                  "id"
+                                )[this.specimenTypeConceptUuid]?.value,
                               };
                             }
                           );
@@ -425,109 +438,110 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
                                       "grouped test orders",
                                       testOrdersGroupedByDepartments
                                     );
-                                    testOrdersGroupedByDepartments?.map(
-                                      (department: string) => {
-                                        this.samplesService
-                                          .getIncreamentalSampleLabel()
-                                          .subscribe((sampleLabel) => {
-                                            if (sampleLabel) {
-                                              const sample = {
-                                                visit: {
-                                                  uuid: visitResponse?.uuid,
-                                                },
-                                                label: sampleLabel,
-                                                concept: {
-                                                  uuid: department,
-                                                },
-                                                specimenSource: {
-                                                  uuid: testOrdersGroupedByDepartments[
-                                                    department
-                                                  ][0]?.specimenSource,
-                                                },
-                                                location: {
-                                                  uuid: this.currentLocation
-                                                    ?.uuid,
-                                                },
-                                                orders:
-                                                  testOrdersGroupedByDepartments[
-                                                    department
-                                                  ]?.map(
-                                                    (testOrderDetails: any) => {
-                                                      return {
-                                                        uuid: keyedOrdersByConceptUuid[
-                                                          testOrderDetails
-                                                        ],
-                                                      };
-                                                    }
-                                                  ),
-                                              };
-                                              // Create sample
-                                              this.samplesService
-                                                .createLabSample(sample)
-                                                .subscribe(
-                                                  (sampleResponse: any) => {
-                                                    console.log(
-                                                      "sampleResponse",
-                                                      sampleResponse
-                                                    );
-                                                    if (sampleResponse) {
-                                                      this.addingSample = false;
-                                                      let statuses: any = [];
-                                                      statuses = [
-                                                        ...statuses,
-                                                        {
-                                                          sample: {
-                                                            uuid: sampleResponse?.uuid,
-                                                          },
-                                                          user: {
-                                                            uuid: localStorage.getItem(
-                                                              "userUuid"
-                                                            ),
-                                                          },
-                                                          category:
-                                                            "SAMPLE_REGISTRATION_CATEGORY",
-                                                          remarks:
-                                                            "Sample registration form type reference",
-                                                          status:
-                                                            this.registrationCategory?.refKey?.toUpperCase(),
-                                                        },
-                                                        {
-                                                          sample: {
-                                                            uuid: sampleResponse?.uuid,
-                                                          },
-                                                          user: {
-                                                            uuid: localStorage.getItem(
-                                                              "userUuid"
-                                                            ),
-                                                          },
-                                                          remarks:
-                                                            "Sample collection",
-                                                          category: "COLLECTED",
-                                                          status: "COLLECTED",
-                                                        },
-                                                      ];
-
-                                                      zip(
-                                                        this.samplesService.setMultipleSampleStatuses(
-                                                          statuses
-                                                        )
-                                                      ).subscribe(
-                                                        (
-                                                          sampleStatusResponses: any[]
-                                                        ) => {
-                                                          console.log(
-                                                            "sampleStatusResponses",
-                                                            sampleStatusResponses
-                                                          );
-                                                        }
-                                                      );
-                                                    }
+                                    Object.keys(
+                                      testOrdersGroupedByDepartments
+                                    )?.map((department: string) => {
+                                      this.samplesService
+                                        .getIncreamentalSampleLabel()
+                                        .subscribe((sampleLabel) => {
+                                          if (sampleLabel) {
+                                            const sample = {
+                                              visit: {
+                                                uuid: visitResponse?.uuid,
+                                              },
+                                              label: sampleLabel,
+                                              concept: {
+                                                uuid: department,
+                                              },
+                                              specimenSource: {
+                                                uuid: testOrdersGroupedByDepartments[
+                                                  department
+                                                ][0]?.specimenSource,
+                                              },
+                                              location: {
+                                                uuid: this.currentLocation
+                                                  ?.uuid,
+                                              },
+                                              orders:
+                                                testOrdersGroupedByDepartments[
+                                                  department
+                                                ]?.map(
+                                                  (testOrderDetails: any) => {
+                                                    return {
+                                                      uuid: keyedOrdersByConceptUuid[
+                                                        testOrderDetails
+                                                          ?.concept
+                                                      ]?.uuid,
+                                                    };
                                                   }
-                                                );
-                                            }
-                                          });
-                                      }
-                                    );
+                                                ),
+                                            };
+                                            // Create sample
+                                            this.samplesService
+                                              .createLabSample(sample)
+                                              .subscribe(
+                                                (sampleResponse: any) => {
+                                                  console.log(
+                                                    "sampleResponse",
+                                                    sampleResponse
+                                                  );
+                                                  if (sampleResponse) {
+                                                    this.addingSample = false;
+                                                    let statuses: any = [];
+                                                    statuses = [
+                                                      ...statuses,
+                                                      {
+                                                        sample: {
+                                                          uuid: sampleResponse?.uuid,
+                                                        },
+                                                        user: {
+                                                          uuid: localStorage.getItem(
+                                                            "userUuid"
+                                                          ),
+                                                        },
+                                                        category:
+                                                          "SAMPLE_REGISTRATION_CATEGORY",
+                                                        remarks:
+                                                          "Sample registration form type reference",
+                                                        status:
+                                                          this.registrationCategory?.refKey?.toUpperCase(),
+                                                      },
+                                                      {
+                                                        sample: {
+                                                          uuid: sampleResponse?.uuid,
+                                                        },
+                                                        user: {
+                                                          uuid: localStorage.getItem(
+                                                            "userUuid"
+                                                          ),
+                                                        },
+                                                        remarks:
+                                                          "Sample collection",
+                                                        category: "COLLECTED",
+                                                        status: "COLLECTED",
+                                                      },
+                                                    ];
+
+                                                    zip(
+                                                      this.samplesService.setMultipleSampleStatuses(
+                                                        statuses
+                                                      )
+                                                    ).subscribe(
+                                                      (
+                                                        sampleStatusResponses: any[]
+                                                      ) => {
+                                                        console.log(
+                                                          "sampleStatusResponses",
+                                                          sampleStatusResponses
+                                                        );
+                                                      }
+                                                    );
+                                                  }
+                                                }
+                                              );
+                                          }
+                                        });
+                                    });
                                   }
                                 });
                             }
