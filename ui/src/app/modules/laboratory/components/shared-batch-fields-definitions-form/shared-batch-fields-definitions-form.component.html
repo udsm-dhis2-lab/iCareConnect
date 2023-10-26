@@ -47,6 +47,19 @@
                   "
                 ></app-form>
               </ng-container>
+              <div class="h6 text-muted">Test orders</div>
+              <app-shared-batch-testorders-selection
+                *ngIf="
+                  showTestOrderSelection &&
+                  !keyedSelectedFields['static-testorder'] &&
+                  !keyedSelectedFields['dyanmic-testorder']
+                "
+                [testOrderParentConceptUuid]="
+                  formData[specimenTypeConceptUuid]?.value
+                "
+                [selectedOrders]="selectedTestOrdersValues"
+                (selectedItems)="onGetSelectedOrders($event, 'fixed')"
+              ></app-shared-batch-testorders-selection>
             </div>
           </ng-template>
         </mat-tab>
@@ -89,6 +102,19 @@
                   "
                 ></app-form>
               </ng-container>
+              <div class="h6 text-muted">Test orders</div>
+              <app-shared-batch-testorders-selection
+                *ngIf="
+                  showTestOrderSelection &&
+                  !keyedSelectedFields['fixed-testorder'] &&
+                  !keyedSelectedFields['dyanmic-testorder']
+                "
+                [testOrderParentConceptUuid]="
+                  formData[specimenTypeConceptUuid]?.value
+                "
+                [selectedOrders]="selectedTestOrdersValues"
+                (selectedItems)="onGetSelectedOrders($event, 'static')"
+              ></app-shared-batch-testorders-selection>
             </div>
           </ng-template>
         </mat-tab>
@@ -132,6 +158,19 @@
                   "
                 ></app-form>
               </ng-container>
+              <div class="h6 text-muted">Test orders</div>
+              <app-shared-batch-testorders-selection
+                *ngIf="
+                  showTestOrderSelection &&
+                  !keyedSelectedFields['fixed-testorder'] &&
+                  !keyedSelectedFields['static-testorder']
+                "
+                [testOrderParentConceptUuid]="
+                  formData[specimenTypeConceptUuid]?.value
+                "
+                [selectedOrders]="selectedTestOrdersValues"
+                (selectedItems)="onGetSelectedOrders($event, 'dynamic')"
+              ></app-shared-batch-testorders-selection>
             </div>
           </ng-template>
         </mat-tab>
