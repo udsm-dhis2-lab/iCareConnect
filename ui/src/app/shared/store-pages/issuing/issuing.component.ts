@@ -487,7 +487,7 @@ export class IssuingComponent implements OnInit {
         let header = "";
         let subHeader = "";
 
-        facilityDetails.attributes.map((attribute) => {
+        facilityDetails?.attributes?.map((attribute) => {
           let attributeTypeName =
             attribute && attribute.attributeType
               ? attribute?.attributeType?.name.toLowerCase()

@@ -22,6 +22,7 @@ export class TestTargetListComponent implements OnInit {
   @Input() conceptClass: string;
   conceptsList$: Observable<ConceptGetFull[]>;
   testTimeConfigList: any [];
+  testTimeConfigToEdit: any;
   saving: boolean = false;
 
   page: number = 1;
@@ -39,6 +40,11 @@ export class TestTargetListComponent implements OnInit {
 
   ngOnInit(): void {
     this.getTestTimeConfig(null)
+
+    // this.testTimeConfigService.savedOrEditedData.subscribe((data) =>{
+    //   this.getTestTimeConfig(null);
+    // });
+    
   }
 
 
@@ -55,7 +61,6 @@ export class TestTargetListComponent implements OnInit {
     .subscribe((response) =>{
       this.testTimeConfigList = response;
     });
-
   }
 
   onPermanentDelete(event: Event, testConfig: any): void {
@@ -78,6 +83,10 @@ export class TestTargetListComponent implements OnInit {
             });
         }
       });
+  }
+
+  onEdit(testTimeConfigToEdit){
+    this.testTimeConfigService.testTimeToEdit.emit(testTimeConfigToEdit);
   }
 
   

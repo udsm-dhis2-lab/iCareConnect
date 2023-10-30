@@ -12,6 +12,6 @@ export class AuditLogsComponent implements OnInit {
   constructor(private httpClientService: OpenmrsHttpClientService) {}
 
   ngOnInit(): void {
-    this.auditLogs$ = this.httpClientService.get("icare/auditlogs");
+    this.auditLogs$ = this.httpClientService.get("icare/auditlogs?length=50");
   }
 }

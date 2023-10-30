@@ -5316,5 +5316,30 @@
         </sql>
     </changeSet>
 
+    <changeSet id="update_lb_test_time_configuration_add_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_test_time_configuration
+            ADD COLUMN referral_tat BIGINT NULL AFTER urgent_tat,
+            MODIFY COLUMN standard_tat BIGINT,
+            MODIFY COLUMN urgent_tat BIGINT,
+            ADD COLUMN config_type VARCHAR(20) NULL AFTER additional_request_time_limit;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_test_time_configuration_add_tat_column" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_test_time_configuration
+            ADD COLUMN routine_config_type VARCHAR(20) NULL AFTER config_type,
+            ADD COLUMN referral_config_type VARCHAR(20) NULL AFTER routine_config_type;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_test_time_config_rename_config_type" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_test_time_configuration
+            CHANGE config_type urgent_config_type  VARCHAR(20);
+        </sql>
+    </changeSet>
+
 
 </databaseChangeLog>

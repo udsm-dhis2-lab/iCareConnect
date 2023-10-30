@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { EventEmitter, Injectable } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
@@ -11,6 +11,10 @@ export class TestTimeConfigService {
   
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
+  testTimeToEdit = new EventEmitter<any>();
+
+  savedOrEditedData = new EventEmitter<any>();
+
   createTestTimeConfig(data: any): Observable<any> {
     return this.httpClient.post(`lab/testtime`, data).pipe(
       map((response) => {
@@ -18,6 +22,15 @@ export class TestTimeConfigService {
       }),
       catchError((error) => of(error))
     );
+  }
+
+  editTestTimeConfig(data: any) : Observable<any>{
+    return this.httpClient.post(`lab/testtime/${data?.uuid}`,data).pipe(
+      map((response) =>{
+        return response;
+      }),
+      catchError((error) => of(error))
+    )
   }
 
   getTestTimeConfig(parameters: any): Observable<any> {

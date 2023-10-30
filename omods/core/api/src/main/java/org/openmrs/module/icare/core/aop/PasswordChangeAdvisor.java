@@ -24,6 +24,7 @@ public class PasswordChangeAdvisor extends StaticMethodMatcherPointcutAdvisor im
 		if (method.getName().equals("changePassword"))
 			return true;
 		return false;
+		
 	}
 	
 	@Override
@@ -35,7 +36,6 @@ public class PasswordChangeAdvisor extends StaticMethodMatcherPointcutAdvisor im
 		
 		public Object invoke(MethodInvocation invocation) throws Throwable {
 			ICareService iCareService = Context.getService(ICareService.class);
-			
 			if (invocation.getArguments()[0] instanceof User) {
 				
 				iCareService.savePasswordHistory((User) invocation.getArguments()[0],
