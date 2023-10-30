@@ -370,10 +370,11 @@ export class PatientHistoryDataComponent implements OnInit {
       this.visit?.visit?.patient?.person?.birthdate
     );
     let patientPhone = this.visit?.visit?.patient?.person?.attributes
-      ?.filter((attribute) => {
-        attribute.uuid === "60003ddc-3e8e-49c6-a6d2-bdf82b5eb572";
-        return attribute;
-      })[0]
+      ?.filter(
+        (attribute) =>
+          attribute.uuid == "60003ddc-3e8e-49c6-a6d2-bdf82b5eb572" ||
+          attribute.uuid == "bc5022b6-6c53-4f3d-9433-734b91937a23"
+      )[0]
       ?.display.split(" = ")[1];
 
     frameDoc.document.write(`
@@ -394,6 +395,8 @@ export class PatientHistoryDataComponent implements OnInit {
       this.FacilityDetails.stateProvince
     }</h3>
           <h3>${this.FacilityDetails.country}</h3>
+          <br /><br />
+          <h3>PATIENT HISTORY</h3>
         </div>
         <!--End Info-->
       </center>
