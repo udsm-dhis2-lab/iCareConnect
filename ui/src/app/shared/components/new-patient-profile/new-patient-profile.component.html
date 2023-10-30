@@ -61,10 +61,30 @@
                 {{ (activeVisit$ | async)?.isEnsured ? "INSURANCE" : "CASH" }}
               </span>
             </span>
-            <app-patient-address
-              [personUuid]="currentPatient?.patient?.person?.uuid"
-            >
-            </app-patient-address>
+            <div class="w-100 d-flex justify-content-left">
+              <div class="w-50">
+                <app-patient-address
+                  [personUuid]="currentPatient?.patient?.person?.uuid"
+                >
+                </app-patient-address>
+              </div>
+              <div class="w-50 text-muted">
+                <mat-icon style="font-size: 20px"> location_on </mat-icon>
+                <span>
+                  {{ (activeVisit$ | async)?.isAdmitted ? "Bed: " : "" }}
+                  {{ (activeVisit$ | async)?.location?.display }}
+                  <span>
+                    {{
+                      (activeVisit$ | async)?.location?.parentLocation
+                        ? "/" +
+                          (activeVisit$ | async)?.location?.parentLocation
+                            ?.display
+                        : ""
+                    }}
+                  </span>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
         <div
@@ -74,9 +94,11 @@
           "
           class="col-md-7 col-sm-12 col-sx-12"
         >
-          <app-patient-visit-attributes-details
-            [attributes]="activeVisit?.patientProfileAttributes"
-          ></app-patient-visit-attributes-details>
+          <div class="w-100">
+            <app-patient-visit-attributes-details
+              [attributes]="activeVisit?.patientProfileAttributes"
+            ></app-patient-visit-attributes-details>
+          </div>
         </div>
       </div>
     </div>

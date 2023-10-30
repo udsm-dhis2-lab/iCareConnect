@@ -2,6 +2,7 @@
   *ngIf="{
     sampleAllocations: sampleAllocations$ | async,
     multipleResultsAttributeType: multipleResultsAttributeType$ | async,
+    calculatedValueExpressionAttributeType : calculatedValueExpressionAttributeType$ | async,
     visitDetails: visitDetails$ | async,
     providerDetails: providerDetails$ | async
   } as params"
@@ -158,7 +159,7 @@
                                 "
                               >
                                 <app-test-parameter-entry
-                                  *ngIf="preferredName"
+                                  *ngIf="preferredName && ((calculatedParameters['allocationData?.parameter?.uuid'] && calculatedParameters['allocationData?.parameter?.uuid']?.render == true) || !calculatedParameters['allocationData?.parameter?.uuid'])"
                                   [parameterUuid]="
                                     allocationData?.parameter?.uuid
                                   "
@@ -170,7 +171,7 @@
                                     data?.actionType === 'review' &&
                                     !data?.LISConfigurations?.isLIS
                                   "
-                                  [finalResult]="allocationData?.finalResult"
+                                  [finalResult]="calculatedParameters['allocationData?.parameter?.uuid'] ?  calculatedParameters['allocationData?.parameter?.uuid']?.value: allocationData?.finalResult"
                                   [isLIS]="data?.LISConfigurations?.isLIS"
                                   [conceptNameType]="preferredName"
                                   (data)="
@@ -265,7 +266,7 @@
                                 "
                               >
                                 <app-test-parameter-entry
-                                  *ngIf="preferredName"
+                                  *ngIf="preferredName && params.calculatedValueExpressionAttributeType"
                                   [parameterUuid]="
                                     allocationData?.parameter?.uuid
                                   "
@@ -278,6 +279,8 @@
                                     !data?.LISConfigurations?.isLIS
                                   "
                                   [finalResult]="allocationData?.finalResult"
+                                  [calculatedValueExpressionAttributeType] = "params.calculatedValueExpressionAttributeType"
+                                  (attributes) = "onGetAttributes($event, params.calculatedValueExpressionAttributeType,allocationData?.parameter?.uuid)"
                                   [isLIS]="data?.LISConfigurations?.isLIS"
                                   [conceptNameType]="preferredName"
                                   (data)="

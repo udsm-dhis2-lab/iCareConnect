@@ -23,6 +23,8 @@ import { SearchingItemPipe } from "./searching-item.pipe";
 import { GroupParametersByHeadersPipe } from "./group-parameters-by-headers.pipe";
 import { IdentifyParametersWithoutHeadersPipe } from "./identify-parameters-without-headers.pipe";
 import { FilterDrugOrdersPipe } from "./filter-drug-orders.pipe";
+import { TimeConversionPipe } from "./time-conversion.pipe";
+
 
 export const sharedPipes: any[] = [
   FilterByPipe,
@@ -50,4 +52,5 @@ export const sharedPipes: any[] = [
   GroupParametersByHeadersPipe,
   IdentifyParametersWithoutHeadersPipe,
   FilterDrugOrdersPipe,
+  TimeConversionPipe
 ];

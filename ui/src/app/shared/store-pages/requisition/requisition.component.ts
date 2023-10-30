@@ -586,8 +586,6 @@ export class RequisitionComponent implements OnInit {
       )
       .subscribe((response) => {
         itemsToPrint = response.items;
-
-        console.log("Items", itemsToPrint);
         let contents: string;
         let printingDate = formatDateToString(new Date());
         let requisitionDate = formatDateToString(
@@ -682,7 +680,7 @@ export class RequisitionComponent implements OnInit {
         let header = "";
         let subHeader = "";
 
-        facilityDetails.attributes.map((attribute) => {
+        facilityDetails?.attributes?.map((attribute) => {
           let attributeTypeName =
             attribute && attribute.attributeType
               ? attribute?.attributeType?.name.toLowerCase()
