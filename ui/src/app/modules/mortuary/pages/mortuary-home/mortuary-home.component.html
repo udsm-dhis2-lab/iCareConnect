@@ -2,15 +2,22 @@
   *ngIf="{
     cabinets: cabinetsUnderCurrentLocation$ | async,
     loadingVisit: loadingVisit$ | async,
-    currentLocation: currentLocation$ | async
+    currentLocation: currentLocation$ | async,
+    deathRegistryEncounterTypeUuid: deathRegistryEncounterTypeUuid$ | async
   } as params"
 >
-  <mat-progress-bar
-    *ngIf="params?.loadingVisit"
+  <!-- <mat-progress-bar
+    *ngIf="params?.loadingVisit || params?.deathRegistryEncounterTypeUuid"
     mode="indeterminate"
-  ></mat-progress-bar>
+  ></mat-progress-bar> -->
+  <div
+    class="mt-5 d-flex justify-content-center w-100"
+    *ngIf="params?.loadingVisit || !params?.deathRegistryEncounterTypeUuid"
+  >
+    <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
+  </div>
 
-  <div *ngIf="params?.cabinets">
+  <div *ngIf="params?.cabinets && params?.deathRegistryEncounterTypeUuid">
     <mat-tab-group mat-align-tabs="start" dynamicHeight="true">
       <mat-tab label="Patients">
         <div class="centered-container-patient-list">
@@ -19,8 +26,10 @@
               Search for a patient
             </div>
             <app-patient-list
-              (selectPatient)="onSelectPatient()"
-              [currentLocation]="params?.cabinets"
+              [encounterType]="params?.deathRegistryEncounterTypeUuid"
+              (selectPatient)="onSelectPatient($event)"
+              [shouldShowParentLocation]="true"
+              [isTabularList]="true"
             ></app-patient-list>
           </div>
         </div>
