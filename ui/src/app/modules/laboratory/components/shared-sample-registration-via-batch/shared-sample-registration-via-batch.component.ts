@@ -39,6 +39,7 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
   @Input() barcodeSettings: any;
   @Input() provider: any;
   @Input() specimenTypeConceptUuid: string;
+  @Input() batchSampleCodeFormatReference: string;
   fieldsNotSetOnBatch: any[] = [];
   dynamicFields: any[] = [];
   @Output() fedDynamicFieldsData: EventEmitter<any> = new EventEmitter<any>();
@@ -475,6 +476,9 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
                                                     };
                                                   }
                                                 ),
+                                              batchSample: {
+                                                uuid: "",
+                                              },
                                             };
                                             // Create sample
                                             this.samplesService

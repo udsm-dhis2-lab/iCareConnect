@@ -1,4 +1,9 @@
-<div class="w-100">
+<div
+  class="w-100"
+  *ngIf="{
+    batchSampleCodeFormatReference: batchSampleCodeFormatReference$ | async
+  } as params"
+>
   <mat-radio-group class="registration-category">
     <mat-radio-button
       *ngFor="let regCategoryItem of sampleRegistrationCategories"
@@ -136,6 +141,9 @@
           [existingBatchFieldsInformations]="existingBatchFieldsInformations"
           [currentLocation]="currentLocation"
           [provider]="provider"
+          [batchSampleCodeFormatReference]="
+            params?.batchSampleCodeFormatReference
+          "
           [referFromFacilityVisitAttribute]="referFromFacilityVisitAttribute"
           (fedDynamicFieldsData)="onGetFedDynamicFieldsData($event)"
         ></app-shared-sample-registration-via-batch>
