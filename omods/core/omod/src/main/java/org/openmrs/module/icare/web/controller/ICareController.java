@@ -995,4 +995,55 @@ public class ICareController {
 		}
 		return privilegesMapList;
 	}
+
+	@RequestMapping(value = "workflow", method = RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String, Object>> createWorkflows(@RequestBody List<Map<String, Object>> workflowList) throws Exception {
+
+		List<Map<String, Object>> workFlowList = new ArrayList<>();
+		for(Map<String, Object> workflowObject : workflowList){
+			ProgramWorkflow programWorkflow = new ProgramWorkflow();
+			Map<String, Object> programWorkflowMap = new HashMap<>();
+			Concept concept = Context.getConceptService().getConceptByUuid(workflowObject.get("concept").toString());
+			Program program = Context.getProgramWorkflowService().getProgramByUuid(workflowObject.get("program").toString());
+			if(concept == null){
+				throw new Exception(" The concept with this uuid does not exist");
+			}
+			if(program == null){
+				throw new Exception(" The program with this uuid does not exist");
+			}
+			programWorkflow.setConcept(Context.getConceptService().getConceptByUuid(workflowObject.get("concept").toString()));
+			programWorkflow.setProgram(Context.getProgramWorkflowService().getProgramByUuid(workflowObject.get("program").toString()));
+
+			ProgramWorkflow savedProgramWorkflow = iCareService.saveProgramWorkflow(programWorkflow);
+
+			Map<String, Object> conceptMap = new HashMap<>();
+			conceptMap.put("uuid",savedProgramWorkflow.getConcept().getUuid());
+			conceptMap.put("name",savedProgramWorkflow.getConcept().getName().getName());
+
+			Map<String, Object> programMap = new HashMap<>();
+			programMap.put("uuid",savedProgramWorkflow.getProgram().getUuid());
+			programMap.put("name",savedProgramWorkflow.getProgram().getName());
+
+			programWorkflowMap.put("concept",conceptMap);
+			programWorkflowMap.put("program",programMap);
+
+			workFlowList.add(programWorkflowMap);
+		}
+
+		return workflowList;
+
+	}
+
+//	@RequestMapping(value="workflow", method = RequestMethod.GET)
+//	@ResponseBody
+//	public List<Map<String, Object>> getWorkflows(){
+//		List<Map<String, Object>> workFlowMapList = new ArrayList<>();
+//		List<ProgramWorkflow> programWorkflows = iCareService.getWorkFlows();
+//
+//	}
+
+
 }
+
+
