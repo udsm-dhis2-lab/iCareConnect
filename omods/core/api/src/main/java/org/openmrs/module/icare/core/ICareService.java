@@ -171,4 +171,6 @@ public interface ICareService extends OpenmrsService {
 	List<Role> getRoles(String q, Integer startIndex, Integer limit);
 	
 	List<Privilege> getPrivileges(String q, Integer startIndex, Integer limit);
+
+	ProgramWorkflow saveProgramWorkflow(ProgramWorkflow programWorkflow);
 }
