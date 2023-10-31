@@ -417,7 +417,8 @@ export const getAllLocationsUnderWardAsFlatArray = createSelector(
       currentLocation.attributes?.length > 0
         ? (currentLocation?.attributes?.filter(
             (attribute) =>
-              attribute?.attributeType?.display === "Patients per bed"
+              attribute?.attributeType?.display === "Patients per bed" ||
+              attribute?.attributeType?.display === "Clients per location"
           ) || [])[0]
         : null;
 
@@ -437,6 +438,53 @@ export const getAllLocationsUnderWardAsFlatArray = createSelector(
         )?.length > 0,
       patientsPerBed: patientPerBedAttribute
         ? parseInt(patientPerBedAttribute?.value)
+        : 1,
+    };
+    return _.uniq([
+      currentLocation?.uuid,
+      ...flattenList([formattedLocation])
+        .map((item) => item.id)
+        ?.filter((uuid) => uuid),
+    ]);
+  }
+);
+
+export const getAllLocationsMortuaryAsFlatArray = createSelector(
+  getLocations,
+  (locations: Location[], props) => {
+    let currentLocation = (locations.filter(
+      (location: any) => location?.uuid === props?.id && !location?.retired
+    ) || [])[0];
+    if (!currentLocation) {
+      return [];
+    }
+
+    const patientPerCabinetAttribute =
+      currentLocation &&
+      currentLocation.attributes &&
+      currentLocation.attributes?.length > 0
+        ? (currentLocation?.attributes?.filter(
+            (attribute) =>
+              attribute?.attributeType?.display === "Clients per location"
+          ) || [])[0]
+        : null;
+
+    const formattedLocation = {
+      ...currentLocation,
+      childMembers: getChildLocationMembers(
+        currentLocation?.childLocations,
+        locations
+      ),
+      isBed:
+        currentLocation &&
+        currentLocation?.tags &&
+        (
+          currentLocation?.tags?.filter(
+            (tag) => tag?.display === "Mortuary Location"
+          ) || []
+        )?.length > 0,
+      bodiesPerCabinet: patientPerCabinetAttribute
+        ? parseInt(patientPerCabinetAttribute?.value)
         : 1,
     };
     return _.uniq([

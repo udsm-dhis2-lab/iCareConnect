@@ -5,23 +5,21 @@ import { Observable } from "rxjs";
 import { take, tap } from "rxjs/operators";
 import { Location } from "src/app/core/models";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import {
   go,
   loadLocationById,
   loadLocationsByTagName,
+  loadOrderTypes,
 } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import {
-  getAllBedsUnderCurrentWard,
   getAllCabinetsUnderCurrentLocation,
-  getBedsGroupedByTheCurrentLocationChildren,
+  getAllLocationsMortuaryAsFlatArray,
+  getAllLocationsUnderWardAsFlatArray,
   getCurrentLocation,
+  getOrderTypesByName,
 } from "src/app/store/selectors";
-import {
-  getAllAdmittedPatientVisits,
-  getVisitLoadingState,
-} from "src/app/store/selectors/visit.selectors";
+import { getVisitLoadingState } from "src/app/store/selectors/visit.selectors";
 
 @Component({
   selector: "app-mortuary-home",
@@ -35,6 +33,9 @@ export class MortuaryHomeComponent implements OnInit {
   currentLocation$: Observable<Location>;
   deathRegistryEncounterTypeUuid$: Observable<string>;
   errors: any[] = [];
+  cabinets$: Observable<any>;
+  locationsIds$: Observable<any>;
+  orderType$: Observable<any>;
 
   constructor(
     private store: Store<AppState>,
@@ -80,10 +81,39 @@ export class MortuaryHomeComponent implements OnInit {
           return response;
         })
       );
+
+    this.cabinets$ = this.store.select(getAllLocationsMortuaryAsFlatArray, {
+      id: this.currentLocation?.uuid,
+      tagName: "Mortuary Location",
+    });
+    this.locationsIds$ = this.store.select(
+      getAllLocationsUnderWardAsFlatArray,
+      {
+        id: this.currentLocation?.uuid,
+        tagName: "Mortuary Location",
+      }
+    );
+    this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
+    this.store.dispatch(loadOrderTypes());
+    this.orderType$ = this.store.select(getOrderTypesByName, {
+      name: "Bed Order",
+    });
   }
 
   onSelectPatient(event: any): void {
-    console.log("EVENT", event);
-    this.store.dispatch(go({ path: ["/mortuary/dashboard"] }));
+    this.store.dispatch(
+      go({
+        path: [
+          "/mortuary/dashboard/" +
+            event?.patient?.uuid +
+            "/" +
+            event?.visitUuid,
+        ],
+      })
+    );
+  }
+
+  onGetCabinetStatus(status: any): void {
+    console.log(status);
   }
 }

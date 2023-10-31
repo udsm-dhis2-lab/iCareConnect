@@ -1,9 +1,11 @@
 <div
   *ngIf="{
-    cabinets: cabinetsUnderCurrentLocation$ | async,
+    cabinets: cabinets$ | async,
     loadingVisit: loadingVisit$ | async,
+    locationsIds: locationsIds$ | async,
     currentLocation: currentLocation$ | async,
-    deathRegistryEncounterTypeUuid: deathRegistryEncounterTypeUuid$ | async
+    deathRegistryEncounterTypeUuid: deathRegistryEncounterTypeUuid$ | async,
+    orderType: orderType$ | async
   } as params"
 >
   <!-- <mat-progress-bar
@@ -37,6 +39,14 @@
       <mat-tab label="Cabinets">
         <div class="p-3">
           <app-cabinets-list
+            *ngIf="
+              params?.cabinets && params?.locationsIds && params?.orderType
+            "
+            [cabinets]="params?.cabinets"
+            [locationsIds]="params?.locationsIds"
+            [encounterType]="params?.deathRegistryEncounterTypeUuid"
+            [currentLocation]="currentLocation"
+            (cabinetStatus)="onGetCabinetStatus($event, params?.orderType)"
             [currentLocation]="currentLocation"
           ></app-cabinets-list>
         </div>
