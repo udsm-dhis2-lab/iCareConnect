@@ -1,1 +1,24 @@
-<p>mortuary-dashboard works!</p>
+<div
+  *ngIf="{
+    patient: patient$ | async,
+    loadingVisit: loadingVisit$ | async,
+    visitLoadedState: visitLoadedState$ | async,
+    visit: visit$ | async
+  } as params"
+>
+  <div
+    class="mt-6 d-flex justify-content-center w-100"
+    *ngIf="params?.loadingVisit || !params?.patient"
+  >
+    <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
+  </div>
+  <div *ngIf="params?.patient && params?.visitLoadedState">
+    <!-- {{ params?.patient | json }} -->
+    <div class="patient-profile-sticky">
+      <app-new-patient-profile
+        *ngIf="params?.patient"
+        [currentPatient]="params?.patient"
+      ></app-new-patient-profile>
+    </div>
+  </div>
+</div>
