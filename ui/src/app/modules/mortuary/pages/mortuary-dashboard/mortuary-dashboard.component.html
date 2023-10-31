@@ -3,12 +3,14 @@
     patient: patient$ | async,
     loadingVisit: loadingVisit$ | async,
     visitLoadedState: visitLoadedState$ | async,
-    visit: visit$ | async
+    visit: visit$ | async,
+    forms: forms$ | async,
+    currentLocation: currentLocation$ | async
   } as params"
 >
   <div
     class="mt-6 d-flex justify-content-center w-100"
-    *ngIf="params?.loadingVisit || !params?.patient"
+    *ngIf="params?.loadingVisit || !params?.patient || !params?.currentLocation"
   >
     <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
   </div>
@@ -19,6 +21,104 @@
         *ngIf="params?.patient"
         [currentPatient]="params?.patient"
       ></app-new-patient-profile>
+    </div>
+    <div class="w-100 patient-other-details-padding">
+      <div
+        class="d-flex justify-content-between align-items-center pt-2 pl-3 pr-3"
+      >
+        <div class="d-flex justify-content-left">
+          <button
+            class="float-left mr-4"
+            mat-stroked-button
+            (click)="onBackToList($event)"
+            matTooltip="Back to List"
+          >
+            <mat-icon>arrow_back</mat-icon>
+            Back to Client List
+          </button>
+          <ng-container>
+            <button
+              *ngFor="let form of params?.forms"
+              class="mr-2"
+              [ngClass]="{
+                'selected-form':
+                  (selectedForm &&
+                    !showHistoryDetails &&
+                    selectedForm?.uuid === form?.uuid) ||
+                  (!selectedForm &&
+                    !showHistoryDetails &&
+                    params?.forms[0] &&
+                    params?.forms[0]?.uuid === form?.uuid)
+              }"
+              mat-stroked-button
+              (click)="getSelectedForm($event, form)"
+            >
+              {{ form?.name }}
+            </button>
+          </ng-container>
+        </div>
+
+        <div class="w-50 d-flex justify-content-end">
+          <button
+            mat-stroked-button
+            class="mr-2 float-right"
+            (click)="onAssignCabinet($event)"
+          >
+            Assign Cabinet
+          </button>
+
+          <button
+            *ngIf="isInpatient"
+            mat-stroked-button
+            class="mr-2 float-right"
+            (click)="
+              onOpenTransferWithinPopup(
+                $event,
+                'a007bbfe-fbe5-11e2-8ff2-fd54ab5fdb2a',
+                'Bed Location',
+                dashboardParams?.currentPatient,
+                activeVisit,
+                dashboardParams?.currentLocation,
+                true
+              )
+            "
+          >
+            Transfer within
+          </button>
+          <button
+            (click)="onDischarge($event)"
+            mat-stroked-button
+            class="mr-2 float-right"
+          >
+            Discharge
+          </button>
+          <button
+            mat-stroked-button
+            [ngClass]="{ 'selected-form': showHistoryDetails }"
+            (click)="onToggleVisibityIcons($event)"
+            class="mr-2 float-right"
+          >
+            History
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="w-100 mt-2"
+        *ngIf="showHistoryDetails && params?.currentLocation"
+      >
+        <mat-accordion>
+          <mat-expansion-panel class="mb-2 border p-0" [expanded]="true">
+            <mat-expansion-panel-header>
+              <mat-panel-title>Patient History </mat-panel-title>
+            </mat-expansion-panel-header>
+            <app-patient-history
+              [patient]="params?.patient?.patient"
+              [location]="params?.currentLocation"
+            ></app-patient-history>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
     </div>
   </div>
 </div>
