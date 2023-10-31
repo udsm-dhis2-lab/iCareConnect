@@ -24,10 +24,7 @@ import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
 import org.openmrs.module.icare.core.*;
-import org.openmrs.module.icare.core.dao.ICareDao;
-import org.openmrs.module.icare.core.dao.PasswordHistoryDAO;
-import org.openmrs.module.icare.core.dao.PrivilegeDAO;
-import org.openmrs.module.icare.core.dao.RoleDAO;
+import org.openmrs.module.icare.core.dao.*;
 import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
@@ -69,6 +66,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	RoleDAO roleDAO;
 	
 	PrivilegeDAO privilegeDAO;
+
+	ProgramWorkflowDAO programWorkflowDAO;
 	
 	UserService userService;
 	
@@ -90,7 +89,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public void setPrivilegeDAO(PrivilegeDAO privilegeDAO) {
 		this.privilegeDAO = privilegeDAO;
 	}
-	
+
+	public void setProgramWorkflowDAO(ProgramWorkflowDAO programWorkflowDAO) {
+		this.programWorkflowDAO = programWorkflowDAO;
+	}
+
 	/**
 	 * Injected in moduleApplicationContext.xml
 	 */
@@ -509,7 +512,12 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public List<Privilege> getPrivileges(String q, Integer startIndex, Integer limit) {
 		return privilegeDAO.getPrivileges(q, startIndex, limit);
 	}
-	
+
+	@Override
+	public ProgramWorkflow saveProgramWorkflow(ProgramWorkflow programWorkflow) {
+		return programWorkflowDAO.save(programWorkflow);
+	}
+
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);
