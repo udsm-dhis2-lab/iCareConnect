@@ -46,7 +46,9 @@ import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URISyntaxException;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -995,7 +997,37 @@ public class ICareController {
 		}
 		return privilegesMapList;
 	}
+	
+	@RequestMapping(value = "patientprogram", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getPatientPrograms(@RequestParam(required = false, value = "program") String programUuid,
+	        @RequestParam(required = false, value = "patient") String patientUuid,
+	        @RequestParam(required = false, defaultValue = "0") Integer startIndex,
+	        @RequestParam(required = false, defaultValue = "10") Integer limit) throws Exception {
+		
+				List<Map<String,Object>> programMapList = new ArrayList<>();
+				List<PatientProgram> patientPrograms= iCareService.getPatientProgram(programUuid,patientUuid,startIndex,limit);
+				for(PatientProgram patientProgram : patientPrograms){
+					Map<String,Object> patientProgramMap = new HashMap<>();
+					if(programUuid != null) {
+						PatientWrapper patientWrapper = new PatientWrapper(patientProgram.getPatient());
+						patientProgramMap.put("patient", patientWrapper.toMap());
+					}
+					if(patientUuid != null) {
+						Map<String, Object> programMap = new HashMap<>();
+						programMap.put("uuid", patientProgram.getProgram().getUuid());
+						programMap.put("name", patientProgram.getProgram().getName());
+						patientProgramMap.put("program", programMap);
+					}
 
+					programMapList.add(patientProgramMap);
+
+				}
+
+		return programMapList.subList(startIndex,programMapList.size() > limit? limit : programMapList.size());
+		
+	}
+	
 	@RequestMapping(value = "workflow", method = RequestMethod.POST)
 	@ResponseBody
 	public List<Map<String, Object>> createWorkflows(@RequestBody List<Map<String, Object>> workflowList) throws Exception {
@@ -1034,16 +1066,12 @@ public class ICareController {
 		return workflowList;
 
 	}
-
-//	@RequestMapping(value="workflow", method = RequestMethod.GET)
-//	@ResponseBody
-//	public List<Map<String, Object>> getWorkflows(){
-//		List<Map<String, Object>> workFlowMapList = new ArrayList<>();
-//		List<ProgramWorkflow> programWorkflows = iCareService.getWorkFlows();
-//
-//	}
-
-
+	//	@RequestMapping(value="workflow", method = RequestMethod.GET)
+	//	@ResponseBody
+	//	public List<Map<String, Object>> getWorkflows(){
+	//		List<Map<String, Object>> workFlowMapList = new ArrayList<>();
+	//		List<ProgramWorkflow> programWorkflows = iCareService.getWorkFlows();
+	//
+	//	}
+	
 }
-
-

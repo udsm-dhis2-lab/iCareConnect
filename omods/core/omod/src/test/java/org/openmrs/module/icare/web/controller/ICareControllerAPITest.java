@@ -898,17 +898,18 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		System.out.println(response.getContentAsString());
 		//assertThat("There is one role", rolesMap.size(),is(1));
 	}
-
+	
 	@Test
 	public void testCreateProgramWorkflow() throws Exception {
 		String dto = this.readFile("dto/core/program-workflow-create.json");
 		List<Map<String, Object>> programWorkflowDetails = (new ObjectMapper()).readValue(dto, List.class);
 		MockHttpServletRequest workflowCreateRequest = newPostRequest("icare/workflow", programWorkflowDetails);
-
+		
 		MockHttpServletResponse returnResponse = handle(workflowCreateRequest);
-		List<Map<String, Object>> createadWorkflows = (new ObjectMapper()).readValue(returnResponse.getContentAsString(), List.class);
-
+		List<Map<String, Object>> createadWorkflows = (new ObjectMapper()).readValue(returnResponse.getContentAsString(),
+		    List.class);
+		
 		assertThat("created 1 workflow", createadWorkflows.size(), is(1));
-
+		
 	}
 }
