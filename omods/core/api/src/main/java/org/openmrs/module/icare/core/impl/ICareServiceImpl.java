@@ -25,6 +25,7 @@ import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
 import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.dao.*;
+import org.openmrs.module.icare.core.models.EncounterWorkflowState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
@@ -68,6 +69,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	PrivilegeDAO privilegeDAO;
 	
 	ProgramWorkflowDAO programWorkflowDAO;
+
+	EncounterWorkflowStateDAO encounterWorkflowStateDAO;
 	
 	UserService userService;
 	
@@ -93,7 +96,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public void setProgramWorkflowDAO(ProgramWorkflowDAO programWorkflowDAO) {
 		this.programWorkflowDAO = programWorkflowDAO;
 	}
-	
+
+	public void setEncounterWorkflowStateDAO(EncounterWorkflowStateDAO encounterWorkflowStateDAO) {
+		this.encounterWorkflowStateDAO = encounterWorkflowStateDAO;
+	}
+
 	/**
 	 * Injected in moduleApplicationContext.xml
 	 */
@@ -537,10 +544,15 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			}
 			
 		}
-		
+		// TODO: ADD SUPPORT FOR THE API TO ACCOMODATE THE REMAINING PARAMETERS
 		return Context.getProgramWorkflowService().getPatientPrograms(patient, program, null, null, null, null, false);
 	}
-	
+
+	@Override
+	public EncounterWorkflowState saveEncounterWorkflowState(EncounterWorkflowState encounterWorkflowState) {
+		return encounterWorkflowStateDAO.save(encounterWorkflowState);
+	}
+
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);

@@ -912,4 +912,18 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertThat("created 1 workflow", createadWorkflows.size(), is(1));
 		
 	}
+
+	@Test
+	public void testCreateEncounterWorkflowState() throws Exception {
+		String dto = this.readFile("dto/core/encounter-workflow-state-create.json");
+		Map<String, Object> encounterWorkflowStateDetails = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest encounterworkflowStateCreateRequest = newPostRequest("icare/encounterworkflowstate", encounterWorkflowStateDetails);
+
+		MockHttpServletResponse returnResponse = handle(encounterworkflowStateCreateRequest);
+		List<Map<String, Object>> createadWorkflowState = (new ObjectMapper()).readValue(returnResponse.getContentAsString(),
+				List.class);
+
+		assertThat("created 2 workflow", createadWorkflowState.size(), is(2));
+
+	}
 }

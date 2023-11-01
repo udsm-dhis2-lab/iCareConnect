@@ -28,6 +28,7 @@ import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.*;
+import org.openmrs.module.icare.core.models.EncounterWorkflowState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.models.PimaCovidLabRequest;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
@@ -1066,12 +1067,33 @@ public class ICareController {
 		return workflowList;
 
 	}
-	//	@RequestMapping(value="workflow", method = RequestMethod.GET)
-	//	@ResponseBody
-	//	public List<Map<String, Object>> getWorkflows(){
-	//		List<Map<String, Object>> workFlowMapList = new ArrayList<>();
-	//		List<ProgramWorkflow> programWorkflows = iCareService.getWorkFlows();
-	//
-	//	}
+
+	@RequestMapping(value = "encounterworkflowstate", method = RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String, Object>> createEncounterWorkflowState(@RequestBody Map<String, Object> encounterWorkflowStateMap) {
+
+		List<Map<String, Object>> encounterWorkflowStateListMap = new ArrayList<>();
+		if (encounterWorkflowStateMap.get("encounters") != null) {
+			for (Map<String, Object> encounterMap : (List<Map<String, Object>>) encounterWorkflowStateMap.get("encounters")) {
+
+				EncounterWorkflowState encounterWorkflowState = new EncounterWorkflowState();
+				Encounter encounter = Context.getEncounterService().getEncounterByUuid(encounterMap.get("uuid").toString());
+				encounterWorkflowState.setEncounter(encounter);
+
+				if (encounterWorkflowStateMap.get("programWorkflowState") != null) {
+					ProgramWorkflowState programWorkflowState = Context.getProgramWorkflowService().getStateByUuid(((Map) encounterWorkflowStateMap.get("programWorkflowState")).get("uuid").toString());
+					encounterWorkflowState.setProgramWorkflowState(programWorkflowState);
+				}
+				EncounterWorkflowState savedEncounterWorkflowState = iCareService.saveEncounterWorkflowState(encounterWorkflowState);
+				encounterWorkflowStateListMap.add(savedEncounterWorkflowState.toMap());
+			}
+		}
+
+		return encounterWorkflowStateListMap;
+
+	}
+
+	}
+
 	
-}
+
