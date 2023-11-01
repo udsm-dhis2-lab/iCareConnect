@@ -998,7 +998,7 @@ public class ICareController {
 		return privilegesMapList;
 	}
 	
-	@RequestMapping(value = "patientprogram", method = RequestMethod.GET)
+	@RequestMapping(value = "patientprogramenrollment", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String,Object>> getPatientPrograms(@RequestParam(required = false, value = "program") String programUuid,
 	        @RequestParam(required = false, value = "patient") String patientUuid,
@@ -1019,7 +1019,7 @@ public class ICareController {
 						programMap.put("name", patientProgram.getProgram().getName());
 						patientProgramMap.put("program", programMap);
 					}
-
+					patientProgramMap.put("uuid",patientProgram.getUuid());
 					programMapList.add(patientProgramMap);
 
 				}
