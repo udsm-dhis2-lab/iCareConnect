@@ -23,29 +23,43 @@
     <mat-tab-group mat-align-tabs="start" dynamicHeight="true">
       <mat-tab label="Patients">
         <div class="centered-container-patient-list">
-          <div class="w-100 text-centered">
+          <div
+            class="w-100 text-centered"
+            *ngIf="!errors || errors?.length == 0"
+          >
             <app-patient-list
               [encounterType]="params?.deathRegistryEncounterTypeUuid"
               (selectPatient)="onSelectPatient($event)"
               [shouldShowParentLocation]="true"
               [isTabularList]="true"
             ></app-patient-list>
+            <app-shared-error
+              *ngIf="errors && errors?.length > 0"
+              [errors]="errors"
+            ></app-shared-error>
           </div>
         </div>
       </mat-tab>
       <mat-tab label="Cabinets">
         <div class="p-3">
-          <app-cabinets-list
-            *ngIf="
-              params?.cabinets && params?.locationsIds && params?.orderType
-            "
-            [cabinets]="params?.cabinets"
-            [locationsIds]="params?.locationsIds"
-            [encounterType]="params?.deathRegistryEncounterTypeUuid"
-            [currentLocation]="currentLocation"
-            (cabinetStatus)="onGetCabinetStatus($event, params?.orderType)"
-            [currentLocation]="currentLocation"
-          ></app-cabinets-list>
+          <ng-container *ngIf="!errors || errors?.length == 0">
+            <app-cabinets-list
+              *ngIf="
+                params?.cabinets && params?.locationsIds && params?.orderType
+              "
+              [cabinets]="params?.cabinets"
+              [locationsIds]="params?.locationsIds"
+              [encounterType]="params?.deathRegistryEncounterTypeUuid"
+              [currentLocation]="currentLocation"
+              (cabinetStatus)="onGetCabinetStatus($event, params?.orderType)"
+              [currentLocation]="currentLocation"
+            ></app-cabinets-list>
+          </ng-container>
+
+          <app-shared-error
+            *ngIf="errors && errors?.length > 0"
+            [errors]="errors"
+          ></app-shared-error>
         </div>
       </mat-tab>
     </mat-tab-group>
