@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { go } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation } from "src/app/store/selectors";
+import { ProgramsService } from "../../services/programs.service";
 
 @Component({
   selector: "app-vertical-program-patient-list",
@@ -12,10 +13,15 @@ import { getCurrentLocation } from "src/app/store/selectors";
 })
 export class VerticalProgramsPatientListComponent implements OnInit {
   currentLocation$: Observable<any>;
-  constructor(private store: Store<AppState>) {}
+  programs$: Observable<any>;
+  constructor(
+    private store: Store<AppState>,
+    private programService: ProgramsService
+  ) {}
 
   ngOnInit() {
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
+    this.programs$ = this.programService.getAllPrograms();
   }
 
   onSelectPatient(patient: any): void {
