@@ -18,6 +18,7 @@ import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
+import org.openmrs.module.icare.core.models.EncounterWorkflowState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
@@ -176,4 +177,6 @@ public interface ICareService extends OpenmrsService {
 	
 	List<PatientProgram> getPatientProgram(String programUuid, String patientUuid, Integer startIndex, Integer limit)
 	        throws Exception;
+
+	EncounterWorkflowState saveEncounterWorkflowState(EncounterWorkflowState encounterWorkflowState);
 }
