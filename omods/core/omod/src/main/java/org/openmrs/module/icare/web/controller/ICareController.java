@@ -1093,7 +1093,84 @@ public class ICareController {
 
 	}
 
+	@RequestMapping(value = "encounterworkflowstate/{workflowStateUuid}",method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getEncountersByWorkflowState(@PathVariable("workflowStateUuid") String workflowStateUuid){
+
+		List<Map<String,Object>> encountersListMap = new ArrayList<>();
+		List<Encounter> encounters = iCareService.getEncountersByWorkflowState(workflowStateUuid);
+		for( Encounter encounter : encounters){
+			Map<String, Object> encounterMap = new HashMap<>();
+
+			encounterMap.put("uuid", encounter.getUuid());
+
+			Map<String, Object> patientMap = new HashMap<>();
+			patientMap.put("uuid", encounter.getPatient().getUuid());
+			patientMap.put("name", encounter.getPatient().getPerson().getPersonName().getFullName());
+			encounterMap.put("patient",patientMap);
+
+			Map<String, Object> encounterTypeMap = new HashMap<>();
+			if(encounter.getEncounterType() != null) {
+				encounterTypeMap.put("uuid", encounter.getEncounterType().getUuid());
+				encounterTypeMap.put("name", encounter.getEncounterType().getName());
+			}
+			encounterMap.put("encounterType",encounterTypeMap);
+
+			List<Map<String,Object>> obsMapList = new ArrayList<>();
+			for(Obs obs : encounter.getObs()){
+				Map<String, Object> obsMap = new HashMap<>();
+				obsMap.put("uuid",obs.getUuid());
+				obsMap.put("datetime",obs.getObsDatetime().toString());
+				if(obs.getValueNumeric() != null) {
+					obsMap.put("valuenumeric", obs.getValueNumeric());
+				}
+				if(obs.getValueCoded() != null) {
+					obsMap.put("valuecoded", obs.getValueCoded().getName().getName());
+				}
+				if(obs.getValueText() != null) {
+					obsMap.put("valuetext", obs.getValueText());
+				}
+				obsMapList.add(obsMap);
+			}
+			encounterMap.put("obs",obsMapList);
+
+			Map<String, Object> formMap = new HashMap<>();
+			if(encounter.getForm() != null) {
+				formMap.put("uuid", encounter.getForm().getUuid());
+				formMap.put("name", encounter.getForm().getName());
+			}
+			encounterMap.put("form", formMap);
+
+			if(encounter.getDateCreated() != null) {
+				Date date = encounter.getDateCreated();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+				encounterMap.put("created", dateFormat.format(date));
+			}
+
+			Map<String, Object> locationMap = new HashMap<>();
+			if(encounter.getLocation() != null) {
+				locationMap.put("uuid", encounter.getLocation().getUuid());
+				locationMap.put("name", encounter.getLocation().getDisplayString());
+			}
+			encounterMap.put("location",locationMap);
+
+			Map<String,Object> userMap = new HashMap<>();
+			if(encounter.getCreator() != null) {
+				userMap.put("uuid", encounter.getCreator().getUuid());
+				userMap.put("name", encounter.getCreator().getDisplayString());
+			}
+			encounterMap.put("creator",userMap);
+
+			encountersListMap.add(encounterMap);
+
+		}
+		return encountersListMap;
+
 	}
+
+
+	}
+
 
 	
 
