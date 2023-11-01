@@ -1,11 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { ProgramsService } from "../../services/programs.service";
 import { Observable } from "rxjs";
 import { Location } from "src/app/core/models";
 import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { go } from "src/app/store/actions";
+import { ProgramsService } from "src/app/shared/resources/programs/services/programs.service";
 
 @Component({
   selector: "app-enrolled-patients-list",
@@ -41,7 +41,7 @@ export class EnrolledPatientsListComponent implements OnInit {
   }
 
   onViewPatient(patientEnrollment: any): void {
-    console.log(patientEnrollment);
+    // console.log(patientEnrollment);
     this.store.dispatch(
       go({
         path: [

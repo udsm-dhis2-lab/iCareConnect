@@ -1,10 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { ProgramsService } from "src/app/shared/resources/programs/services/programs.service";
 import { go } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation } from "src/app/store/selectors";
-import { ProgramsService } from "../../services/programs.service";
 
 @Component({
   selector: "app-vertical-program-patient-list",
@@ -25,7 +25,6 @@ export class VerticalProgramsPatientListComponent implements OnInit {
   }
 
   onSelectPatient(patient: any): void {
-    console.log("patient", patient);
     this.store.dispatch(go({ path: ["/vertical-programs/dashboard"] }));
   }
 }

@@ -2,7 +2,7 @@ import { Input } from "@angular/core";
 import { Component, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
-import { ProgramsService } from "../../services/programs.service";
+import { ProgramsService } from "src/app/shared/resources/programs/services/programs.service";
 
 @Component({
   selector: "app-patient-enrollments",
