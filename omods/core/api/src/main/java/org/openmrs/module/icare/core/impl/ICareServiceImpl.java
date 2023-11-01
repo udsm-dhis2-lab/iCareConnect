@@ -66,7 +66,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	RoleDAO roleDAO;
 	
 	PrivilegeDAO privilegeDAO;
-
+	
 	ProgramWorkflowDAO programWorkflowDAO;
 	
 	UserService userService;
@@ -89,11 +89,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public void setPrivilegeDAO(PrivilegeDAO privilegeDAO) {
 		this.privilegeDAO = privilegeDAO;
 	}
-
+	
 	public void setProgramWorkflowDAO(ProgramWorkflowDAO programWorkflowDAO) {
 		this.programWorkflowDAO = programWorkflowDAO;
 	}
-
+	
 	/**
 	 * Injected in moduleApplicationContext.xml
 	 */
@@ -512,12 +512,35 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public List<Privilege> getPrivileges(String q, Integer startIndex, Integer limit) {
 		return privilegeDAO.getPrivileges(q, startIndex, limit);
 	}
-
+	
 	@Override
 	public ProgramWorkflow saveProgramWorkflow(ProgramWorkflow programWorkflow) {
 		return programWorkflowDAO.save(programWorkflow);
 	}
-
+	
+	@Override
+	public List<PatientProgram> getPatientProgram(String programUuid, String patientUuid, Integer startIndex, Integer limit)
+	        throws Exception {
+		Program program = null;
+		if (programUuid != null) {
+			program = Context.getProgramWorkflowService().getProgramByUuid(programUuid);
+			if (program == null) {
+				throw new Exception("The program with the given Uuid does not exist");
+			}
+		}
+		
+		Patient patient = null;
+		if (patientUuid != null) {
+			patient = Context.getPatientService().getPatientByUuid(patientUuid);
+			if (patient == null) {
+				throw new Exception("The patient with the given Uuid does not exist");
+			}
+			
+		}
+		
+		return Context.getProgramWorkflowService().getPatientPrograms(patient, program, null, null, null, null, false);
+	}
+	
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);
