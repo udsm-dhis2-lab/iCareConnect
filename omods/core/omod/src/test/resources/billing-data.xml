@@ -268,7 +268,7 @@
 
     <encounter encounter_id="101" patient_id="2000" uuid="444395c-dd07-488d-8fd7-a748c9570022" visit_id="10" encounter_datetime="2020-10-14 00:00:00" date_created="2020-10-14 00:00:00" voided="false"/>
 
-    <encounter encounter_id="200" patient_id="2000" uuid="444395c-dd07-488d-8fd7-a748c9570001" visit_id="20" encounter_datetime="2020-10-15 00:00:00" date_created="2020-10-15 00:00:00" voided="false"/>
+    <encounter encounter_id="200"  patient_id="2000" uuid="444395c-dd07-488d-8fd7-a748c9570001" visit_id="20" encounter_datetime="2020-10-15 00:00:00" date_created="2020-10-15 00:00:00" voided="false"/>
 
     <encounter encounter_id="300" patient_id="2000" encounter_type="2" uuid="444395c-dd07-488d-8fd7-a748c9570003" visit_id="20" encounter_datetime="2020-10-15 00:00:00" date_created="2020-10-15 00:00:00" voided="false"/>
 
@@ -343,5 +343,5 @@
 
     <program_workflow_state program_workflow_state_id="1" concept_id="1006" initial="0" terminal="0"  retired="0" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c992" creator="1" date_created="2023-04-18 09:51:57.0" />
 
-    <encounter_workflow_state encounter_workflow_state_id="1" encounter_id="200" program_workflow_state_id="1"  voided="0"  uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c992" creator="1" date_created="2023-04-18 09:51:57.0" />
+    <encounter_workflow_state encounter_workflow_state_id="1" encounter_id="300" program_workflow_state_id="1"  voided="0"  uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c992" creator="1" date_created="2023-04-18 09:51:57.0" />
 </dataset>

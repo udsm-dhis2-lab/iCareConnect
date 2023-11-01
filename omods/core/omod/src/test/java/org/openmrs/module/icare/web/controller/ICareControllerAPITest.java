@@ -925,5 +925,12 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 
 		assertThat("created 2 workflow", createadWorkflowState.size(), is(2));
 
+		MockHttpServletRequest encounters = newGetRequest("icare/encounterworkflowstate/iCARE110-TEST-OSDH-9beb-d30dcfc0c992");
+		MockHttpServletResponse response = handle(encounters);
+		List<Map<String, Object>> encountersMap = (new ObjectMapper()).readValue(response.getContentAsString(), List.class);
+		System.out.println(response.getContentAsString());
+
+
+
 	}
 }

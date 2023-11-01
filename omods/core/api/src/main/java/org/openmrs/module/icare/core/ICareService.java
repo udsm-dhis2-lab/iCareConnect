@@ -179,4 +179,6 @@ public interface ICareService extends OpenmrsService {
 	        throws Exception;
 
 	EncounterWorkflowState saveEncounterWorkflowState(EncounterWorkflowState encounterWorkflowState);
+
+	List<Encounter> getEncountersByWorkflowState(String workflowStateUuid);
 }

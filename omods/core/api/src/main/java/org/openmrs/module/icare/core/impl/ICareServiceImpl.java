@@ -554,6 +554,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 
 	@Override
+	public List<Encounter> getEncountersByWorkflowState(String workflowStateUuid) {
+		return encounterWorkflowStateDAO.getEncountersBYWorkflowState(workflowStateUuid);
+	}
+
+	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);
 	}
