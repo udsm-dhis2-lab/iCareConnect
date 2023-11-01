@@ -1,0 +1,12 @@
+<div class="w-100" *ngIf="{ forms: forms$ | async } as params">
+  <div class="mt-5 d-flex justify-content-center w-100" *ngIf="!params?.forms">
+    <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
+  </div>
+  <div class="w-100" *ngIf="params?.forms">
+    <app-workflow-state-form-data
+      [forms]="params?.forms"
+      [workflowState]="workflowState"
+      [patientEnrollmentDetails]="patientEnrollmentDetails"
+    ></app-workflow-state-form-data>
+  </div>
+</div>

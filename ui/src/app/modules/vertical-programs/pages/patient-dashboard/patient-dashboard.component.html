@@ -22,7 +22,7 @@
         [currentPatient]="params?.patient"
       ></app-new-patient-profile>
     </div>
-    <div class="row patient-other-details-padding">
+    <div class="row mt-2 patient-other-details-padding">
       <div class="col-md-8 col-sm-12 col-sx-12">
         <mat-tab-group>
           <mat-tab
@@ -58,10 +58,20 @@
                     </ul>
                   </div>
                   <div class="col-md-9 col-sm-12 col-sx-12">
-                    {{
-                      (selectedState ? selectedState : workflow?.states[0])
-                        | json
-                    }}
+                    <div class="h5">
+                      {{
+                        (selectedState ? selectedState : workflow?.states[0])
+                          ?.concept?.display
+                      }}
+                    </div>
+                    <app-workflow-state
+                      [workflowState]="
+                        selectedState ? selectedState : workflow?.states[0]
+                      "
+                      [patientEnrollmentDetails]="
+                        params?.patientEnrollmentDetails
+                      "
+                    ></app-workflow-state>
                   </div>
                 </div>
                 <div
