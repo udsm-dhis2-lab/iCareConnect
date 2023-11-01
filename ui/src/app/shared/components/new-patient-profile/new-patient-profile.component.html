@@ -74,7 +74,7 @@
             (activeVisit$ | async)?.isEnsured &&
             (activeVisit$ | async) as activeVisit
           "
-          class="col-md-6 col-sm-12 col-sx-12"
+          class="col-md-5 col-sm-12 col-sx-12"
         >
           <div class="w-100">
             <app-patient-visit-attributes-details
@@ -82,7 +82,7 @@
             ></app-patient-visit-attributes-details>
           </div>
         </div>
-        <div class="col-md-1 col-sm-12 col-sx-12">
+        <div class="col-md-2 col-sm-12 col-sx-12">
           <mat-icon style="font-size: 20px"> location_on </mat-icon>
           <span class="text-muted">
             {{ (activeVisit$ | async)?.isAdmitted ? "Bed: " : "" }}
