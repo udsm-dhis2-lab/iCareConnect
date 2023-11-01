@@ -69,7 +69,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	PrivilegeDAO privilegeDAO;
 	
 	ProgramWorkflowDAO programWorkflowDAO;
-
+	
 	EncounterWorkflowStateDAO encounterWorkflowStateDAO;
 	
 	UserService userService;
@@ -96,11 +96,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public void setProgramWorkflowDAO(ProgramWorkflowDAO programWorkflowDAO) {
 		this.programWorkflowDAO = programWorkflowDAO;
 	}
-
+	
 	public void setEncounterWorkflowStateDAO(EncounterWorkflowStateDAO encounterWorkflowStateDAO) {
 		this.encounterWorkflowStateDAO = encounterWorkflowStateDAO;
 	}
-
+	
 	/**
 	 * Injected in moduleApplicationContext.xml
 	 */
@@ -547,17 +547,17 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		// TODO: ADD SUPPORT FOR THE API TO ACCOMODATE THE REMAINING PARAMETERS
 		return Context.getProgramWorkflowService().getPatientPrograms(patient, program, null, null, null, null, false);
 	}
-
+	
 	@Override
 	public EncounterWorkflowState saveEncounterWorkflowState(EncounterWorkflowState encounterWorkflowState) {
 		return encounterWorkflowStateDAO.save(encounterWorkflowState);
 	}
-
+	
 	@Override
 	public List<Encounter> getEncountersByWorkflowState(String workflowStateUuid) {
 		return encounterWorkflowStateDAO.getEncountersBYWorkflowState(workflowStateUuid);
 	}
-
+	
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);
