@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { FormValue } from "../../modules/form/models/form-value.model";
 import { Patient } from "../../resources/patient/models/patient.model";
 import { Visit } from "../../resources/visits/models/visit.model";
@@ -29,12 +29,16 @@ export class CaptureFormDataComponent implements OnInit {
   constructor(private visitService: VisitsService) {}
 
   ngOnInit(): void {
-    this.observations$ = this.visitService.getVisitObservationsByVisitUuid({
-      uuid: this.visit?.uuid,
-      query: {
-        v: "custom:(encounters:(uuid,obs))",
-      },
-    });
+    this.observations$ = this.visit
+      ? this.visitService.getVisitObservationsByVisitUuid({
+          uuid: this.visit?.uuid,
+          query: {
+            v: "custom:(encounters:(uuid,obs))",
+          },
+        })
+      : this.observations
+      ? of(this.observations)
+      : of([]);
   }
 
   onFormUpdate(data: FormValue) {

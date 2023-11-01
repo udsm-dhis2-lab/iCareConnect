@@ -150,6 +150,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   updateMedication: boolean = true;
   tabsToShow: string[] = ["LABORATORY", "PROCEDURE", "RADIOLOGY"];
   currentFormDetails: any = {};
+  useSiderBar: boolean = false;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -320,6 +321,11 @@ export class SharedPatientDashboardComponent implements OnInit {
         })
       );
     this.showHistoryDetails = this.activeVisit?.isAdmitted;
+  }
+
+  toggleSideBarMenu(event: Event): void {
+    event.stopPropagation();
+    this.useSiderBar = !this.useSiderBar;
   }
 
   onToggleVitalsSummary(event: Event): void {
