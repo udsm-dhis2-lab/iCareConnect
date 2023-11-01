@@ -7,11 +7,13 @@ import {
   ProgramenrollmentGetFull,
 } from "src/app/shared/resources/openmrs";
 
-@Injectable()
+@Injectable({
+  providedIn: "root",
+})
 export class ProgramsService {
   constructor(private httpClient: OpenmrsHttpClientService, private api: Api) {}
 
-  getPatientsEnrollments(parameters: string[]): Observable<any> {
+  getPatientsEnrollments(parameters: string[]): Observable<any[]> {
     return this.httpClient
       .get(`icare/patientprogramenrollment?${parameters.join("&")}`)
       .pipe(
@@ -33,7 +35,7 @@ export class ProgramsService {
     );
   }
 
-  getEnrollmentsByPatient(patientUuid: string) {
+  getEnrollmentsByPatient(patientUuid: string): Observable<any> {
     const url = `programenrollment?patient=${patientUuid}&v=full`;
     return this.httpClient.get(url).pipe(
       map((response: any) => {
@@ -43,7 +45,7 @@ export class ProgramsService {
     );
   }
 
-  getAllPrograms(parameters?: string[]) {
+  getAllPrograms(parameters?: string[]): Observable<any[]> {
     const url = `program?${parameters ? parameters?.join("&") : ""}`;
 
     return this.httpClient.get(url).pipe(
