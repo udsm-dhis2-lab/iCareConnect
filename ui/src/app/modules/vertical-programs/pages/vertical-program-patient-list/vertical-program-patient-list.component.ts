@@ -18,7 +18,8 @@ export class VerticalProgramsPatientListComponent implements OnInit {
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
   }
 
-  onSelectPatient() {
+  onSelectPatient(patient: any): void {
+    console.log("patient", patient);
     this.store.dispatch(go({ path: ["/vertical-programs/dashboard"] }));
   }
 }

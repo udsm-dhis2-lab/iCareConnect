@@ -24,9 +24,6 @@
       <mat-tab label="Patients">
         <div class="centered-container-patient-list">
           <div class="w-100 text-centered">
-            <div class="text-muted h6 mb-4 text-center">
-              Search for a patient
-            </div>
             <app-patient-list
               [encounterType]="params?.deathRegistryEncounterTypeUuid"
               (selectPatient)="onSelectPatient($event)"
