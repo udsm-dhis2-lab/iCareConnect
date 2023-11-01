@@ -1067,7 +1067,7 @@ public class ICareController {
 		return workflowList;
 
 	}
-
+	
 	@RequestMapping(value = "encounterworkflowstate", method = RequestMethod.POST)
 	@ResponseBody
 	public List<Map<String, Object>> createEncounterWorkflowState(@RequestBody Map<String, Object> encounterWorkflowStateMap) {
@@ -1092,7 +1092,7 @@ public class ICareController {
 		return encounterWorkflowStateListMap;
 
 	}
-
+	
 	@RequestMapping(value = "encounterworkflowstate/{workflowStateUuid}",method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getEncountersByWorkflowState(@PathVariable("workflowStateUuid") String workflowStateUuid){
@@ -1167,10 +1167,4 @@ public class ICareController {
 		return encountersListMap;
 
 	}
-
-
-	}
-
-
-	
-
+}
