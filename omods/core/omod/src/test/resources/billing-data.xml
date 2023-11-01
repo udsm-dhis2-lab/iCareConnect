@@ -336,4 +336,6 @@
 
     <privilege privilege="priv 1" description="This is priv 1" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c999"/>
     <privilege privilege="priv 2" description="This is prv 2" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c991"/>
+
+    <program program_id="1" concept_id="1006" outcomes_concept_id="1006" name="Antenatal" retired="0" description="Antenatal" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c992" creator="1" date_created="2023-04-18 09:51:57.0" />
 </dataset>

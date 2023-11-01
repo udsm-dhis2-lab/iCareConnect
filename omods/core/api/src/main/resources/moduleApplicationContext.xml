@@ -39,6 +39,11 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
+                <property name="programWorkflowDAO">
+                    <bean class="org.openmrs.module.icare.core.dao.ProgramWorkflowDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
             </bean>
         </property>
         <property name="preInterceptors">
