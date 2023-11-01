@@ -3817,7 +3817,7 @@ export interface LocationAttributeGetFull {
   links?: { rel?: string; uri?: string }[];
   display?: string;
   uuid?: string;
-  attributeType?: string;
+  attributeType?: any;
   value?: string;
   voided?: boolean;
 }
