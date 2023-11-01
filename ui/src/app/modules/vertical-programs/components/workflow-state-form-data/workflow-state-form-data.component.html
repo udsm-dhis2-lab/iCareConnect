@@ -1,2 +1,15 @@
-<p>workflow-state-form-data works!</p>
-{{ forms | json }}
+<div class="w-100" *ngIf="{ formDetails: formDetails$ | async } as params">
+  <div
+    class="mt-5 d-flex justify-content-center w-100"
+    *ngIf="!params?.formDetails"
+  >
+    <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
+  </div>
+  <div class="w-100" *ngIf="params?.formDetails">
+    <app-capture-form-data
+      *ngIf="params?.formDetails"
+      [form]="params?.formDetails"
+      (formDataUpdate)="onFormUpdate($event)"
+    ></app-capture-form-data>
+  </div>
+</div>

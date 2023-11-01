@@ -3,10 +3,10 @@
     <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
   </div>
   <div class="w-100" *ngIf="params?.forms">
-    <app-workflow-state-form-data
+    <app-workflow-state-forms
       [forms]="params?.forms"
       [workflowState]="workflowState"
       [patientEnrollmentDetails]="patientEnrollmentDetails"
-    ></app-workflow-state-form-data>
+    ></app-workflow-state-forms>
   </div>
 </div>

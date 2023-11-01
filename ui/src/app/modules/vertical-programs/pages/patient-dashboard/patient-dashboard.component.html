@@ -2,19 +2,11 @@
   *ngIf="{
     currentUser: currentUser$ | async,
     patientEnrollmentDetails: patientEnrollmentDetails$ | async,
-    patient: patient$ | async
+    patient: patient$ | async,
+    currentLocation: currentLocation$ | async,
+    locationFormsAttributeTypeUuid: locationFormsAttributeTypeUuid$ | async
   } as params"
 >
-  <div
-    class="mt-5 d-flex justify-content-center w-100"
-    *ngIf="
-      !params?.currentUser ||
-      !params?.patientEnrollmentDetails ||
-      !params?.patient
-    "
-  >
-    <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
-  </div>
   <div class="w-100">
     <div class="patient-profile-sticky">
       <app-new-patient-profile
@@ -22,7 +14,29 @@
         [currentPatient]="params?.patient"
       ></app-new-patient-profile>
     </div>
-    <div class="row mt-2 patient-other-details-padding">
+    <div
+      class="mt-5 d-flex justify-content-center w-100"
+      *ngIf="
+        !params?.currentUser ||
+        !params?.patientEnrollmentDetails ||
+        !params?.patient ||
+        !params?.currentLocation ||
+        !params?.locationFormsAttributeTypeUuid
+      "
+    >
+      <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
+    </div>
+    <div
+      class="row mt-2 patient-other-details-padding"
+      *ngIf="
+        params?.currentLocation &&
+        params?.patientEnrollmentDetails &&
+        params?.patient &&
+        params?.currentUser &&
+        errors?.length === 0 &&
+        params?.locationFormsAttributeTypeUuid
+      "
+    >
       <div class="col-md-8 col-sm-12 col-sx-12">
         <mat-tab-group>
           <mat-tab
@@ -65,12 +79,16 @@
                       }}
                     </div>
                     <app-workflow-state
+                      *ngIf="renderWorkflowState"
                       [workflowState]="
                         selectedState ? selectedState : workflow?.states[0]
                       "
                       [patientEnrollmentDetails]="
                         params?.patientEnrollmentDetails
                       "
+                      [currentLocation]="params?.currentLocation"
+                      [currentUser]="params?.currentUser"
+                      [patient]="params?.patient"
                     ></app-workflow-state>
                   </div>
                 </div>
@@ -86,7 +104,20 @@
           </mat-tab>
         </mat-tab-group>
       </div>
-      <div class="col-md-4 col-sm-12 col-sx-12">Forms</div>
+      <div class="col-md-4 col-sm-12 col-sx-12 right-side-panel">
+        <app-general-client-program-forms
+          [patientEnrollmentDetails]="params?.patientEnrollmentDetails"
+          [currentLocation]="params?.currentLocation"
+          [currentUser]="params?.currentUser"
+          [patient]="params?.patient"
+          [locationFormsAttributeTypeUuid]="
+            params?.locationFormsAttributeTypeUuid
+          "
+        ></app-general-client-program-forms>
+      </div>
+    </div>
+    <div class="w-100" *ngIf="errors && errors?.length > 0">
+      <app-shared-error [errors]="errors"></app-shared-error>
     </div>
   </div>
 </div>

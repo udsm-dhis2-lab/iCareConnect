@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Observable } from "rxjs";
+import { Location } from "src/app/core/models";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { CurrentUser } from "src/app/shared/models/current-user.models";
 import { WorkflowStateGetFull } from "src/app/shared/resources/openmrs";
 
 @Component({
@@ -11,6 +13,9 @@ import { WorkflowStateGetFull } from "src/app/shared/resources/openmrs";
 export class WorkflowStateComponent implements OnInit {
   @Input() workflowState: WorkflowStateGetFull;
   @Input() patientEnrollmentDetails: any;
+  @Input() currentLocation: Location;
+  @Input() currentUser: CurrentUser;
+  @Input() patient: any;
   forms$: Observable<any>;
   constructor(private systemSettingsService: SystemSettingsService) {}
 
