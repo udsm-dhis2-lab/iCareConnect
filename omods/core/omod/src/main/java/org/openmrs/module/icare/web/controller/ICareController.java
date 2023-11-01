@@ -46,7 +46,9 @@ import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URISyntaxException;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -995,4 +997,81 @@ public class ICareController {
 		}
 		return privilegesMapList;
 	}
+	
+	@RequestMapping(value = "patientprogram", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String,Object>> getPatientPrograms(@RequestParam(required = false, value = "program") String programUuid,
+	        @RequestParam(required = false, value = "patient") String patientUuid,
+	        @RequestParam(required = false, defaultValue = "0") Integer startIndex,
+	        @RequestParam(required = false, defaultValue = "10") Integer limit) throws Exception {
+		
+				List<Map<String,Object>> programMapList = new ArrayList<>();
+				List<PatientProgram> patientPrograms= iCareService.getPatientProgram(programUuid,patientUuid,startIndex,limit);
+				for(PatientProgram patientProgram : patientPrograms){
+					Map<String,Object> patientProgramMap = new HashMap<>();
+					if(programUuid != null) {
+						PatientWrapper patientWrapper = new PatientWrapper(patientProgram.getPatient());
+						patientProgramMap.put("patient", patientWrapper.toMap());
+					}
+					if(patientUuid != null) {
+						Map<String, Object> programMap = new HashMap<>();
+						programMap.put("uuid", patientProgram.getProgram().getUuid());
+						programMap.put("name", patientProgram.getProgram().getName());
+						patientProgramMap.put("program", programMap);
+					}
+
+					programMapList.add(patientProgramMap);
+
+				}
+
+		return programMapList.subList(startIndex,programMapList.size() > limit? limit : programMapList.size());
+		
+	}
+	
+	@RequestMapping(value = "workflow", method = RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String, Object>> createWorkflows(@RequestBody List<Map<String, Object>> workflowList) throws Exception {
+
+		List<Map<String, Object>> workFlowList = new ArrayList<>();
+		for(Map<String, Object> workflowObject : workflowList){
+			ProgramWorkflow programWorkflow = new ProgramWorkflow();
+			Map<String, Object> programWorkflowMap = new HashMap<>();
+			Concept concept = Context.getConceptService().getConceptByUuid(workflowObject.get("concept").toString());
+			Program program = Context.getProgramWorkflowService().getProgramByUuid(workflowObject.get("program").toString());
+			if(concept == null){
+				throw new Exception(" The concept with this uuid does not exist");
+			}
+			if(program == null){
+				throw new Exception(" The program with this uuid does not exist");
+			}
+			programWorkflow.setConcept(Context.getConceptService().getConceptByUuid(workflowObject.get("concept").toString()));
+			programWorkflow.setProgram(Context.getProgramWorkflowService().getProgramByUuid(workflowObject.get("program").toString()));
+
+			ProgramWorkflow savedProgramWorkflow = iCareService.saveProgramWorkflow(programWorkflow);
+
+			Map<String, Object> conceptMap = new HashMap<>();
+			conceptMap.put("uuid",savedProgramWorkflow.getConcept().getUuid());
+			conceptMap.put("name",savedProgramWorkflow.getConcept().getName().getName());
+
+			Map<String, Object> programMap = new HashMap<>();
+			programMap.put("uuid",savedProgramWorkflow.getProgram().getUuid());
+			programMap.put("name",savedProgramWorkflow.getProgram().getName());
+
+			programWorkflowMap.put("concept",conceptMap);
+			programWorkflowMap.put("program",programMap);
+
+			workFlowList.add(programWorkflowMap);
+		}
+
+		return workflowList;
+
+	}
+	//	@RequestMapping(value="workflow", method = RequestMethod.GET)
+	//	@ResponseBody
+	//	public List<Map<String, Object>> getWorkflows(){
+	//		List<Map<String, Object>> workFlowMapList = new ArrayList<>();
+	//		List<ProgramWorkflow> programWorkflows = iCareService.getWorkFlows();
+	//
+	//	}
+	
 }

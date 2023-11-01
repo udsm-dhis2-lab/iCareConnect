@@ -1,0 +1,53 @@
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { ProgramsService } from "../../services/programs.service";
+import { Observable } from "rxjs";
+import { Location } from "src/app/core/models";
+import { CdkDragDrop, moveItemInArray } from "@angular/cdk/drag-drop";
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+import { go } from "src/app/store/actions";
+
+@Component({
+  selector: "app-enrolled-patients-list",
+  templateUrl: "./enrolled-patients-list.component.html",
+  styleUrls: ["./enrolled-patients-list.component.scss"],
+})
+export class EnrolledPatientsListComponent implements OnInit {
+  @Input() isTabularList: boolean;
+  @Input() currentLocation: Location;
+  @Input() programs: any[];
+  @Output() selectedPatient: EventEmitter<any> = new EventEmitter<any>();
+  enrolledPatients$: Observable<any>;
+  parameters: string[] = [];
+  programsList: any[] = [];
+  constructor(
+    private programsService: ProgramsService,
+    private store: Store<AppState>
+  ) {}
+
+  ngOnInit(): void {
+    this.parameters = [...this.parameters, `program=${this.programs[0]?.uuid}`];
+    this.getEnrollments();
+  }
+
+  getEnrollments(): void {
+    this.enrolledPatients$ = this.programsService.getPatientsEnrollments(
+      this.parameters
+    );
+  }
+
+  drop(event: CdkDragDrop<any[]>) {
+    moveItemInArray(this.programs, event.previousIndex, event.currentIndex);
+  }
+
+  onViewPatient(patientEnrollment: any): void {
+    console.log(patientEnrollment);
+    this.store.dispatch(
+      go({
+        path: [
+          `/vertical-programs/dashboard/${patientEnrollment?.uuid}/${patientEnrollment?.patient?.uuid}`,
+        ],
+      })
+    );
+  }
+}

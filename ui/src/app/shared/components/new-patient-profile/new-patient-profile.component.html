@@ -1,9 +1,9 @@
 <div class="patient-profile-container" *ngIf="patientDetails">
   <div class="row">
-    <div class="col-md-1 col-sm-6 col-sx-6">
+    <div class="col-md-1 col-sm-12 col-sx-12">
       <mat-icon class="text-muted" style="font-size: 80px">person</mat-icon>
     </div>
-    <div class="col-md-11 col-sm-6 col-sx-6">
+    <div class="col-md-11 col-sm-12 col-sx-12">
       <div
         color="primary"
         class="row patient-prifile-header d-flex justify-content-left"
@@ -31,7 +31,7 @@
           justify-content-between
         "
       >
-        <div class="col-md-5 col-sm-6 col-sx-6">
+        <div class="col-md-5 col-sm-12 col-sx-12">
           <div class="item-left p-items">
             MRN: <span class="text-muted"> {{ patientDetails?.mrn }}</span>
             <span class="ml-2">
@@ -62,28 +62,10 @@
               </span>
             </span>
             <div class="w-100 d-flex justify-content-left">
-              <div class="w-50">
-                <app-patient-address
-                  [personUuid]="currentPatient?.patient?.person?.uuid"
-                >
-                </app-patient-address>
-              </div>
-              <div class="w-50 text-muted">
-                <mat-icon style="font-size: 20px"> location_on </mat-icon>
-                <span>
-                  {{ (activeVisit$ | async)?.isAdmitted ? "Bed: " : "" }}
-                  {{ (activeVisit$ | async)?.location?.display }}
-                  <span>
-                    {{
-                      (activeVisit$ | async)?.location?.parentLocation
-                        ? "/" +
-                          (activeVisit$ | async)?.location?.parentLocation
-                            ?.display
-                        : ""
-                    }}
-                  </span>
-                </span>
-              </div>
+              <app-patient-address
+                [personUuid]="currentPatient?.patient?.person?.uuid"
+              >
+              </app-patient-address>
             </div>
           </div>
         </div>
@@ -92,13 +74,28 @@
             (activeVisit$ | async)?.isEnsured &&
             (activeVisit$ | async) as activeVisit
           "
-          class="col-md-7 col-sm-12 col-sx-12"
+          class="col-md-5 col-sm-12 col-sx-12"
         >
           <div class="w-100">
             <app-patient-visit-attributes-details
               [attributes]="activeVisit?.patientProfileAttributes"
             ></app-patient-visit-attributes-details>
           </div>
+        </div>
+        <div class="col-md-2 col-sm-12 col-sx-12">
+          <mat-icon style="font-size: 20px"> location_on </mat-icon>
+          <span class="text-muted">
+            {{ (activeVisit$ | async)?.isAdmitted ? "Bed: " : "" }}
+            {{ (activeVisit$ | async)?.location?.display }}
+            <span>
+              {{
+                (activeVisit$ | async)?.location?.parentLocation
+                  ? "/" +
+                    (activeVisit$ | async)?.location?.parentLocation?.display
+                  : ""
+              }}
+            </span>
+          </span>
         </div>
       </div>
     </div>
