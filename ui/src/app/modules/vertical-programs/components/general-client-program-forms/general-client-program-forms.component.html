@@ -1,0 +1,30 @@
+<div class="w-100 p-3" *ngIf="{ forms: forms$ | async } as params">
+  <p>general-client-program-forms works!</p>
+  <div class="mt-5 d-flex justify-content-center w-100" *ngIf="!params?.forms">
+    <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
+  </div>
+  <div class="w-100">
+    <mat-accordion>
+      <mat-expansion-panel
+        [expanded]="count === 0"
+        *ngFor="let form of params?.forms; let count = index"
+      >
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{ form?.display }}
+          </mat-panel-title>
+          <mat-panel-description>
+            <!-- Description -->
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="w-100">
+          <!-- {{ form | json }} -->
+          <app-capture-form-data
+            [form]="form"
+            (formDataUpdate)="onFormUpdate($event)"
+          ></app-capture-form-data>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</div>

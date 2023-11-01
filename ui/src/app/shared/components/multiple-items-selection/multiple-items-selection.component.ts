@@ -23,6 +23,7 @@ import {
   moveItemInArray,
   transferArrayItem,
 } from "@angular/cdk/drag-drop";
+import { OpenMRSFormsService } from "../../resources/forms/services/openmrs-forms.services";
 
 @Component({
   selector: "app-multiple-items-selection",
@@ -47,7 +48,8 @@ export class MultipleItemsSelectionComponent implements OnInit, OnChanges {
   constructor(
     private conceptService: ConceptsService,
     private conceptReferenceService: ReferenceTermsService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private formsService: OpenMRSFormsService
   ) {}
 
   ngOnInit(): void {
@@ -99,6 +101,32 @@ export class MultipleItemsSelectionComponent implements OnInit, OnChanges {
             return response?.filter((item) => !item?.retired) || [];
           })
         );
+    }
+    if (this.itemType && this.itemType === "form") {
+      this.items$ =
+        this.items?.length > 0
+          ? of(
+              this.items?.map((item) => {
+                return {
+                  ...item,
+                  display:
+                    item?.display?.indexOf(":") > -1
+                      ? item?.display?.split(":")[1]
+                      : item?.display,
+                  name:
+                    item?.display?.indexOf(":") > -1
+                      ? item?.display?.split(":")[1]
+                      : item?.display,
+                };
+              })
+            )
+          : this.formsService
+              .getAllForms([
+                `startIndex=0`,
+                `limit=${this.pageSize}`,
+                `v=custom:(uuid,display,name)`,
+              ])
+              .pipe(map((response: any) => response?.results));
     } else {
       this.items$ = of(
         this.items.filter(
@@ -119,8 +147,8 @@ export class MultipleItemsSelectionComponent implements OnInit, OnChanges {
 
   getSelectedItem(event: Event, item: any, items: any[]): void {
     event.stopPropagation();
-    this.currentSelectedItems = uniqBy([...this.selectedItems, item]);
-    this.items = this.items.filter(
+    this.currentSelectedItems = uniqBy([...(this.selectedItems || []), item]);
+    this.items = (this.items || [])?.filter(
       (metadataItem) =>
         (
           this.currentSelectedItems?.filter(
@@ -200,6 +228,22 @@ export class MultipleItemsSelectionComponent implements OnInit, OnChanges {
           })
         )
       );
+    } else if (itemType === "form") {
+      this.items$ = of(searchingText).pipe(
+        debounceTime(1000),
+        distinctUntilChanged(),
+        switchMap((term) =>
+          this.formsService
+            .getAllForms([
+              `q=${term}`,
+              `startIndex=0`,
+              `limit=${this.pageSize}`,
+              `v=custom:(uuid,display,name)`,
+            ])
+            .pipe(map((response: any) => response?.results))
+        )
+      );
+    } else {
     }
   }
 

@@ -69,15 +69,17 @@ export class MortuaryHomeComponent implements OnInit {
       .getSystemSettingsByKey(`iCare.mortuary.settings.encounterTypeUuid`)
       .pipe(
         tap((response: any) => {
-          this.errors = [
-            ...this.errors,
-            {
-              error: {
-                message:
-                  "iCare.mortuary.settings.encounterTypeUuid is not set, contact IT",
+          if (response?.error) {
+            this.errors = [
+              ...this.errors,
+              {
+                error: {
+                  message:
+                    "iCare.mortuary.settings.encounterTypeUuid is not set, contact IT",
+                },
               },
-            },
-          ];
+            ];
+          }
           return response;
         })
       );

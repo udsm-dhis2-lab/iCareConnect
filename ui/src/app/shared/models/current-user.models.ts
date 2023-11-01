@@ -1,14 +1,16 @@
+import { PersonGetFull, RoleGetFull } from "../resources/openmrs";
+
 export interface CurrentUser {
-  uuid: string;
-  display: string;
-  roles?: AllRole[];
-  allRoles?: AllRole[];
-  privileges?: AllRole[];
-  username: string;
+  uuid?: string;
+  display?: string;
+  roles?: RoleGetFull[];
+  allRoles?: RoleGetFull[];
+  privileges?: any[];
+  username?: string;
   userProperties?: UserProperties;
   retired?: boolean;
-  person?: Person;
-  userPrivileges?: { [key: string]: AllRole };
+  person?: PersonGetFull;
+  userPrivileges?: { [key: string]: RoleGetFull };
 }
 
 export interface AllRole {
@@ -96,6 +98,6 @@ export interface PreferredName {
 
 export interface UserProperties {
   preferredModules?: string;
-  loginAttempts: string;
+  loginAttempts?: string;
   locations?: string;
 }
