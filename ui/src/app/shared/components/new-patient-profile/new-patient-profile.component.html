@@ -21,6 +21,7 @@
           {{ patientDetails?.person?.middleName }}
         </span>
         <span
+          *ngIf="!patientDetails?.person?.dead"
           class="mr-2 age-and-gender-details"
           [ngClass]="{ 'text-danger': patientDetails?.person?.dead }"
           >(<b>{{
@@ -30,6 +31,29 @@
           {{ patientDetails?.person?.age }} Yrs |
           {{ patientDetails?.person?.birthdate | date }}
           )
+        </span>
+        <span
+          *ngIf="patientDetails?.person?.dead && ageAtDeathDetails"
+          class="mr-2 age-and-gender-details"
+          [ngClass]="{ 'text-danger': patientDetails?.person?.dead }"
+        >
+          Died at {{ ageAtDeathDetails?.years }} years,
+          {{ ageAtDeathDetails?.months }} months,
+          {{ ageAtDeathDetails?.days }} days,
+        </span>
+        <span
+          class="ml-2"
+          style="text-align: right"
+          [ngClass]="{ 'text-danger': patientDetails?.person?.dead }"
+        >
+          | <b>Cause of Death</b>:
+          {{
+            patientDetails?.person?.causeOfDeath
+              ? patientDetails?.person?.causeOfDeath?.display
+              : patientDetails?.person?.causeOfDeathNonCoded
+              ? patientDetails?.person?.causeOfDeathNonCoded
+              : "-"
+          }}
         </span>
       </div>
       <div

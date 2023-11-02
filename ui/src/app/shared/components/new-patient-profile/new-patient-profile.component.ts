@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { calculateDifferenceBetweenDates } from "src/app/core/helpers/calculate_age.helper";
 import { AppState } from "src/app/store/reducers";
 import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 
@@ -14,8 +15,8 @@ export class NewPatientProfileComponent implements OnInit {
   patientDetails: any;
   vitalsIsSet: boolean = false;
   activeVisit$: Observable<any>;
+  ageAtDeathDetails: any;
   // @ViewChild(SharedConceptDisplayComponent) conceptDisplay: any[];
-
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
@@ -48,7 +49,15 @@ export class NewPatientProfileComponent implements OnInit {
           identifier?.identifierType?.display === "OpenEMPI ID"
       ) || [])[0]?.identifier,
     };
-    console.log("patient", this.patientDetails);
+    if (
+      this.patientDetails?.person?.dead &&
+      this.patientDetails?.person?.deathDate
+    ) {
+      this.ageAtDeathDetails = calculateDifferenceBetweenDates(
+        new Date(this.patientDetails?.person?.birthdate),
+        new Date(this.patientDetails?.person?.deathDate)
+      );
+    }
 
     this.activeVisit$ = this.store.select(getActiveVisit);
   }
