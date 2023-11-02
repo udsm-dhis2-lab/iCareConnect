@@ -44,8 +44,8 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
-                <property name="encounterWorkflowStateDAO">
-                    <bean class="org.openmrs.module.icare.core.dao.EncounterWorkflowStateDAO">
+                <property name="encounterPatientStateDAO">
+                    <bean class="org.openmrs.module.icare.core.dao.EncounterPatientStateDAO">
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
