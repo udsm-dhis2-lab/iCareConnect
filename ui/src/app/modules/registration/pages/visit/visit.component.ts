@@ -39,6 +39,7 @@ import { SharedConfirmationComponent } from "src/app/shared/components/shared-co
 import { ProgramsService } from "src/app/shared/resources/programs/services/programs.service";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { ProgramEnrollment } from "src/app/modules/vertical-programs/models/programEnrollment.model";
+import { ProgramGetFull } from "src/app/shared/resources/openmrs";
 
 @Component({
   selector: "app-visit",
@@ -160,7 +161,7 @@ export class VisitComponent implements OnInit {
           ? data
           : null;
     });
-    this.verticalPrograms$ = this.programsService.getAllPrograms();
+    this.verticalPrograms$ = this.programsService.getAllPrograms(["v=full"]);
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
     this.activeVisit$ = this.store.pipe(select(getActiveVisit));
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
@@ -331,6 +332,10 @@ export class VisitComponent implements OnInit {
 
     this.store.dispatch(clearActiveVisit());
     this.startVisitEvent.emit();
+  }
+
+  onGetSelectedProgram(selectedProgram: ProgramGetFull): void {
+    console.log(selectedProgram);
   }
 
   enrollToProgam(event, payload: ProgramEnrollment) {
@@ -566,7 +571,7 @@ export class VisitComponent implements OnInit {
       this.visitDetails["service"] = service;
       this.currentVisitService = service;
     }
-    if (service["setMembers"]) {
+    if (service?.uuid) {
       this.store.dispatch(
         loadConceptByUuid({
           uuid: service?.uuid,
