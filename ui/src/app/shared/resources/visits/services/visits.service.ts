@@ -303,7 +303,8 @@ export class VisitsService {
     filterBy?: string,
     encounterType?: string,
     sampleCategory?: string,
-    excludedSampleCategories?: string[]
+    excludedSampleCategories?: string[],
+    includeDeadPatients?: boolean
   ): Observable<any> {
     const locationUuids: any = isArray(location)
       ? location
@@ -345,6 +346,10 @@ export class VisitsService {
 
     if (excludedSampleCategories && excludedSampleCategories?.length > 0) {
       parametersString += `&exclude=${excludedSampleCategories.join(",")}`;
+    }
+
+    if (includeDeadPatients && includeDeadPatients === true) {
+      parametersString += `&includeDeadPatients=true`;
     }
     //
     return (

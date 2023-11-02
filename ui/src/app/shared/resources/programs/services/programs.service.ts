@@ -81,12 +81,23 @@ export class ProgramsService {
       );
   }
 
-  createEncounterWorkflowState(data: any): Observable<any> {
-    return this.httpClient.post(`icare/encounterworkflowstate`, data).pipe(
+  createEncounterPatientState(data: any): Observable<any> {
+    return this.httpClient.post(`icare/encounterpatientstate`, data).pipe(
       map((response: any) => {
         return response;
       }),
       catchError((error: any) => of(error))
     );
+  }
+
+  getPatientStateEncounterDetails(patientStateUuid: string): Observable<any> {
+    return this.httpClient
+      .get(`icare/encounterpatientstate/${patientStateUuid}`)
+      .pipe(
+        map((response: any) => {
+          return response;
+        }),
+        catchError((error: any) => of(error))
+      );
   }
 }
