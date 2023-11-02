@@ -44,6 +44,11 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
+                <property name="encounterPatientStateDAO">
+                    <bean class="org.openmrs.module.icare.core.dao.EncounterPatientStateDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
             </bean>
         </property>
         <property name="preInterceptors">

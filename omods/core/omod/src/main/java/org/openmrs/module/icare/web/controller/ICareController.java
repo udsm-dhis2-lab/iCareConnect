@@ -9,17 +9,13 @@
  */
 package org.openmrs.module.icare.web.controller;
 
-import com.mysql.fabric.xmlrpc.Client;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.azeckoski.reflectutils.transcoders.ObjectEncoder;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.util.JSONPObject;
 import org.json.JSONObject;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
-import org.openmrs.logic.op.In;
 import org.openmrs.module.icare.auditlog.AuditLog;
 import org.openmrs.module.icare.auditlog.api.AuditLogService;
 import org.openmrs.module.icare.billing.models.ItemPrice;
@@ -28,12 +24,10 @@ import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.*;
+import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
-import org.openmrs.module.icare.core.models.PimaCovidLabRequest;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
-import org.openmrs.module.icare.laboratory.models.Sample;
-import org.openmrs.module.icare.laboratory.models.SampleStatus;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +38,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.mail.Session;
 import javax.naming.ConfigurationException;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -349,10 +342,11 @@ public class ICareController {
 											   @RequestParam(required = false) String visitAttributeTypeUuid,
 											   @RequestParam(required = false) String sampleCategory,
 											   @RequestParam(required = false) String exclude,
-											   @RequestParam(defaultValue = "false") Boolean includeInactive
+											   @RequestParam(defaultValue = "false") Boolean includeInactive,
+											   @RequestParam(defaultValue = "false") Boolean includeDeadPatients
 											   ) {
 
-        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, encounterTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus, visitAttributeTypeUuid, sampleCategory,exclude,includeInactive);
+        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, encounterTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus, visitAttributeTypeUuid, sampleCategory,exclude,includeInactive,includeDeadPatients);
 
         List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
         for (Visit visit : visits) {
@@ -998,7 +992,7 @@ public class ICareController {
 		return privilegesMapList;
 	}
 	
-	@RequestMapping(value = "patientprogram", method = RequestMethod.GET)
+	@RequestMapping(value = "patientprogramenrollment", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String,Object>> getPatientPrograms(@RequestParam(required = false, value = "program") String programUuid,
 	        @RequestParam(required = false, value = "patient") String patientUuid,
@@ -1019,7 +1013,7 @@ public class ICareController {
 						programMap.put("name", patientProgram.getProgram().getName());
 						patientProgramMap.put("program", programMap);
 					}
-
+					patientProgramMap.put("uuid",patientProgram.getUuid());
 					programMapList.add(patientProgramMap);
 
 				}
@@ -1066,12 +1060,105 @@ public class ICareController {
 		return workflowList;
 
 	}
-	//	@RequestMapping(value="workflow", method = RequestMethod.GET)
-	//	@ResponseBody
-	//	public List<Map<String, Object>> getWorkflows(){
-	//		List<Map<String, Object>> workFlowMapList = new ArrayList<>();
-	//		List<ProgramWorkflow> programWorkflows = iCareService.getWorkFlows();
-	//
-	//	}
 	
+	@RequestMapping(value = "encounterpatientstate", method = RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String, Object>> createEncounterPatientState(@RequestBody Map<String, Object> encounterPatientStateMap) {
+
+		List<Map<String, Object>> encounterWorkflowStateListMap = new ArrayList<>();
+		if (encounterPatientStateMap.get("encounters") != null) {
+			for (Map<String, Object> encounterMap : (List<Map<String, Object>>) encounterPatientStateMap.get("encounters")) {
+
+				EncounterPatientState encounterPatientState = new EncounterPatientState();
+				Encounter encounter = Context.getEncounterService().getEncounterByUuid(encounterMap.get("uuid").toString());
+				encounterPatientState.setEncounter(encounter);
+
+				if (encounterPatientStateMap.get("patientState") != null) {
+
+					PatientState patientState = Context.getProgramWorkflowService().getPatientStateByUuid(((Map) encounterPatientStateMap.get("patientState")).get("uuid").toString());
+					encounterPatientState.setPatientState(patientState);
+				}
+				EncounterPatientState savedEncounterPatientState = iCareService.saveEncounterPatientState(encounterPatientState);
+				encounterWorkflowStateListMap.add(savedEncounterPatientState.toMap());
+			}
+		}
+
+		return encounterWorkflowStateListMap;
+
+	}
+	
+	@RequestMapping(value = "encounterpatientstate/{patientStateUuid}",method = RequestMethod.GET)
+	@ResponseBody
+	public List<Map<String, Object>> getEncountersByWorkflowState(@PathVariable("patientStateUuid") String patientStateUuid){
+
+		List<Map<String,Object>> encountersListMap = new ArrayList<>();
+		List<Encounter> encounters = iCareService.getEncountersByPatientState(patientStateUuid);
+		for( Encounter encounter : encounters){
+			Map<String, Object> encounterMap = new HashMap<>();
+
+			encounterMap.put("uuid", encounter.getUuid());
+
+			Map<String, Object> patientMap = new HashMap<>();
+			patientMap.put("uuid", encounter.getPatient().getUuid());
+			patientMap.put("name", encounter.getPatient().getPerson().getPersonName().getFullName());
+			encounterMap.put("patient",patientMap);
+
+			Map<String, Object> encounterTypeMap = new HashMap<>();
+			if(encounter.getEncounterType() != null) {
+				encounterTypeMap.put("uuid", encounter.getEncounterType().getUuid());
+				encounterTypeMap.put("name", encounter.getEncounterType().getName());
+			}
+			encounterMap.put("encounterType",encounterTypeMap);
+
+			List<Map<String,Object>> obsMapList = new ArrayList<>();
+			for(Obs obs : encounter.getObs()){
+				Map<String, Object> obsMap = new HashMap<>();
+				obsMap.put("uuid",obs.getUuid());
+				obsMap.put("datetime",obs.getObsDatetime().toString());
+				if(obs.getValueNumeric() != null) {
+					obsMap.put("valuenumeric", obs.getValueNumeric());
+				}
+				if(obs.getValueCoded() != null) {
+					obsMap.put("valuecoded", obs.getValueCoded().getName().getName());
+				}
+				if(obs.getValueText() != null) {
+					obsMap.put("valuetext", obs.getValueText());
+				}
+				obsMapList.add(obsMap);
+			}
+			encounterMap.put("obs",obsMapList);
+
+			Map<String, Object> formMap = new HashMap<>();
+			if(encounter.getForm() != null) {
+				formMap.put("uuid", encounter.getForm().getUuid());
+				formMap.put("name", encounter.getForm().getName());
+			}
+			encounterMap.put("form", formMap);
+
+			if(encounter.getDateCreated() != null) {
+				Date date = encounter.getDateCreated();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+				encounterMap.put("created", dateFormat.format(date));
+			}
+
+			Map<String, Object> locationMap = new HashMap<>();
+			if(encounter.getLocation() != null) {
+				locationMap.put("uuid", encounter.getLocation().getUuid());
+				locationMap.put("name", encounter.getLocation().getDisplayString());
+			}
+			encounterMap.put("location",locationMap);
+
+			Map<String,Object> userMap = new HashMap<>();
+			if(encounter.getCreator() != null) {
+				userMap.put("uuid", encounter.getCreator().getUuid());
+				userMap.put("name", encounter.getCreator().getDisplayString());
+			}
+			encounterMap.put("creator",userMap);
+
+			encountersListMap.add(encounterMap);
+
+		}
+		return encountersListMap;
+
+	}
 }

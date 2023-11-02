@@ -1,7 +1,6 @@
 package org.openmrs.module.icare.web.controller;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -9,20 +8,16 @@ import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
-import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
-import org.openmrs.module.icare.core.impl.ICareServiceImpl;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import java.io.File;
-import java.nio.file.Files;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -910,6 +905,26 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		    List.class);
 		
 		assertThat("created 1 workflow", createadWorkflows.size(), is(1));
+		
+	}
+	
+	@Test
+	public void testCreateEncounterWorkflowState() throws Exception {
+		String dto = this.readFile("dto/core/encounter-patient-state-create.json");
+		Map<String, Object> encounterWorkflowStateDetails = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest encounterworkflowStateCreateRequest = newPostRequest("icare/encounterpatientstate",
+		    encounterWorkflowStateDetails);
+		
+		MockHttpServletResponse returnResponse = handle(encounterworkflowStateCreateRequest);
+		List<Map<String, Object>> createadWorkflowState = (new ObjectMapper()).readValue(
+		    returnResponse.getContentAsString(), List.class);
+		
+		assertThat("created 2 workflow", createadWorkflowState.size(), is(2));
+		
+		MockHttpServletRequest encounters = newGetRequest("icare/encounterpatientstate/iCARE110-TEST-OSDH-9beb-d30dcfc0c992");
+		MockHttpServletResponse response = handle(encounters);
+		List<Map<String, Object>> encountersMap = (new ObjectMapper()).readValue(response.getContentAsString(), List.class);
+		System.out.println(response.getContentAsString());
 		
 	}
 }

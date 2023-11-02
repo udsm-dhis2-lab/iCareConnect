@@ -18,6 +18,7 @@ import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
+import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
@@ -107,7 +108,7 @@ public interface ICareService extends OpenmrsService {
 	        OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus, Integer limit,
 	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
 	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
-	        String sampleCategory, String exclude, Boolean includeInactive);
+	        String sampleCategory, String exclude, Boolean includeInactive, Boolean includeDeadPatients);
 	
 	List<Order> getOrdersByVisitAndOrderType(String visitUuid, String orderTypeUuid, Order.FulfillerStatus fulfillerStatus,
 	        Integer limit, Integer startIndex);
@@ -176,4 +177,8 @@ public interface ICareService extends OpenmrsService {
 	
 	List<PatientProgram> getPatientProgram(String programUuid, String patientUuid, Integer startIndex, Integer limit)
 	        throws Exception;
+	
+	EncounterPatientState saveEncounterPatientState(EncounterPatientState encounterPatientState);
+	
+	List<Encounter> getEncountersByPatientState(String patientStateUuid);
 }
