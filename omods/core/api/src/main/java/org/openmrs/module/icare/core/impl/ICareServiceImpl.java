@@ -297,10 +297,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	        String locationUuid, OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus,
 	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
 	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
-	        String sampleCategory, String exclude, Boolean includeInactive) {
+	        String sampleCategory, String exclude, Boolean includeInactive, Boolean includeDeadPatients) {
 		return this.dao.getVisitsByOrderType(search, orderTypeUuid, encounterTypeUuid, locationUuid, prescriptionStatus,
 		    fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus,
-		    visitAttributeTypeUuid, sampleCategory, exclude, includeInactive);
+		    visitAttributeTypeUuid, sampleCategory, exclude, includeInactive, includeDeadPatients);
 	}
 	
 	@Override
