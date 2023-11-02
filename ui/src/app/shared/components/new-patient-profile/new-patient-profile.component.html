@@ -2,17 +2,27 @@
   <div class="row">
     <div class="col-md-1 col-sm-12 col-sx-12">
       <mat-icon class="text-muted" style="font-size: 80px">person</mat-icon>
+      <img
+        height="80"
+        style="position: absolute; margin-left: -24px"
+        src="assets/images/transparent_cross.png"
+      />
     </div>
     <div class="col-md-11 col-sm-12 col-sx-12">
       <div
         color="primary"
         class="row patient-prifile-header d-flex justify-content-left"
       >
-        <span class="mr-2 client-names">
+        <span
+          class="mr-2 client-names"
+          [ngClass]="{ 'text-danger': patientDetails?.person?.dead }"
+        >
           {{ patientDetails?.person?.display }},
           {{ patientDetails?.person?.middleName }}
         </span>
-        <span class="mr-2 age-and-gender-details"
+        <span
+          class="mr-2 age-and-gender-details"
+          [ngClass]="{ 'text-danger': patientDetails?.person?.dead }"
           >(<b>{{
             patientDetails?.person?.gender === "M" ? "Male" : "Female"
           }}</b>
