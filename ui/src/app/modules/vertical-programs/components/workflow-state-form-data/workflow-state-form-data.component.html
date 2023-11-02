@@ -1,7 +1,16 @@
-<div class="w-100" *ngIf="{ formDetails: formDetails$ | async } as params">
+<div
+  class="w-100"
+  *ngIf="{
+    formDetails: formDetails$ | async,
+    patientStateEncounterDetails: patientStateEncounterDetails$ | async
+  } as params"
+>
   <div
     class="mt-5 d-flex justify-content-center w-100"
-    *ngIf="!params?.formDetails"
+    *ngIf="
+      !params?.formDetails ||
+      (patientWorkflowState && !params?.patientStateEncounterDetails)
+    "
   >
     <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
   </div>
@@ -15,7 +24,10 @@
       </div>
     </div>
     <app-capture-form-data
-      *ngIf="params?.formDetails"
+      *ngIf="
+        params?.formDetails &&
+        patientWorkflowState && params?.patientStateEncounterDetails
+      "
       [form]="params?.formDetails"
       (formDataUpdate)="onFormUpdate($event)"
     ></app-capture-form-data>

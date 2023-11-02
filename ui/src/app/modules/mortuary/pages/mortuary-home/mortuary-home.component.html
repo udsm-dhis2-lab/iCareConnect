@@ -32,6 +32,7 @@
               (selectPatient)="onSelectPatient($event)"
               [shouldShowParentLocation]="true"
               [isTabularList]="true"
+              [includeDeadPatients]="true"
             ></app-patient-list>
             <app-shared-error
               *ngIf="errors && errors?.length > 0"

@@ -33,6 +33,7 @@ export class WorkflowStateFormDataComponent implements OnInit {
   isFormValid: boolean = false;
   formData: any = {};
   saving: boolean = false;
+  patientStateEncounterDetails$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private encountersService: EncountersService,
@@ -48,6 +49,16 @@ export class WorkflowStateFormDataComponent implements OnInit {
     this.formDetails$ = this.store.select(
       getCustomOpenMRSFormById(this.form?.uuid)
     );
+    if (this.patientWorkflowState) {
+      this.patientStateEncounterDetails$ =
+        this.programsService.getPatientStateEncounterDetails(
+          this.patientWorkflowState?.uuid
+        );
+
+      this.patientStateEncounterDetails$.subscribe((response: any) =>
+        console.log("ENC", response)
+      );
+    }
   }
 
   onFormUpdate(formValue: FormValue): void {
@@ -86,7 +97,7 @@ export class WorkflowStateFormDataComponent implements OnInit {
 
         if (response) {
           const data = {
-            programWorkflowState: {
+            patientState: {
               uuid: this.patientWorkflowState?.uuid,
             },
             encounters: [
@@ -96,9 +107,13 @@ export class WorkflowStateFormDataComponent implements OnInit {
             ],
           };
           this.programsService
-            .createEncounterWorkflowState(data)
+            .createEncounterPatientState(data)
             .subscribe((response: any) => {
               if (response) {
+                this.patientStateEncounterDetails$ =
+                  this.programsService.getPatientStateEncounterDetails(
+                    this.patientWorkflowState?.uuid
+                  );
                 this.saving = false;
               }
             });
