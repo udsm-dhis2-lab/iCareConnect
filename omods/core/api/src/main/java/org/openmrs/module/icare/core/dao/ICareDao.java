@@ -296,7 +296,7 @@ public class ICareDao extends BaseDAO<Item> {
                                             String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
                                             Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
                                             String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
-                                            String sampleCategory, String exclude, Boolean includeInactive) {
+                                            String sampleCategory, String exclude, Boolean includeInactive, Boolean includeDeadPatients) {
 		//PatientIdentifier
 		Query query = null;
 		DbSession session = this.getSession();
@@ -343,6 +343,8 @@ public class ICareDao extends BaseDAO<Item> {
 			queryStr +=" v.stopDatetime IS NULL";
 
 		}
+
+
 		
 		if (search != null) {
 			queryStr += " AND (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search) OR lower(pname.givenName) LIKE lower(:search) OR lower(pname.middleName) LIKE lower(:search) OR lower(pname.familyName) LIKE lower(:search) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:search) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:search) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:search)  OR pi.identifier LIKE :search)";
@@ -398,8 +400,6 @@ public class ICareDao extends BaseDAO<Item> {
 
 			if(exclude != null){
 
-//				queryStr = queryStr.substring(0,queryStr.length()-1);
-
 				if (!queryStr.contains("WHERE")) {
 					queryStr += " WHERE ";
 				} else {
@@ -408,27 +408,19 @@ public class ICareDao extends BaseDAO<Item> {
 
 				queryStr += " v IN (SELECT sp.visit FROM Sample sp WHERE sp NOT IN (SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
 
-				//queryStr += " AND sp NOT IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
-
-				//System.out.println(excludedValue);
-
-//				String [] statuses = exclude.split(",");
-//				queryStr = queryStr.substring(0,queryStr.length()-1);
-//				for(int i=0 ; i < statuses.length ; i++){
-//
-//					queryStr += " AND sp NOT IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category =:statuses )";
-//
-//					//query = session.createQuery(queryStr);
-//					//query.setParameter("statuses",statuses[i]);
-//
-//				}
-//				queryStr +=")";
-//				System.out.println(queryStr);
 
 			}
 
 			
 		}
+
+		if (!queryStr.contains("WHERE")) {
+			queryStr += " WHERE ";
+		} else {
+			queryStr += " AND ";
+		}
+
+		queryStr +=" p.dead = :includeDeadPatients";
 		
 		if (orderBy == VisitWrapper.OrderBy.VISIT) {
 			queryStr += " ORDER BY v.startDatetime ";
@@ -482,6 +474,9 @@ public class ICareDao extends BaseDAO<Item> {
 		if (sampleCategory != null) {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
+
+		query.setParameter("includeDeadPatients",includeDeadPatients);
+
 		if(exclude != null){
 			Pattern pattern = Pattern.compile("List:\\[(.*?)\\]");
 			Matcher matcher = pattern.matcher(exclude);

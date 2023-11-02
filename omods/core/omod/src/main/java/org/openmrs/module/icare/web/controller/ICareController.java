@@ -350,10 +350,11 @@ public class ICareController {
 											   @RequestParam(required = false) String visitAttributeTypeUuid,
 											   @RequestParam(required = false) String sampleCategory,
 											   @RequestParam(required = false) String exclude,
-											   @RequestParam(defaultValue = "false") Boolean includeInactive
+											   @RequestParam(defaultValue = "false") Boolean includeInactive,
+											   @RequestParam(defaultValue = "false") Boolean includeDeadPatients
 											   ) {
 
-        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, encounterTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus, visitAttributeTypeUuid, sampleCategory,exclude,includeInactive);
+        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, encounterTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus, visitAttributeTypeUuid, sampleCategory,exclude,includeInactive,includeDeadPatients);
 
         List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
         for (Visit visit : visits) {
