@@ -48,6 +48,7 @@ export class NewPatientProfileComponent implements OnInit {
           identifier?.identifierType?.display === "OpenEMPI ID"
       ) || [])[0]?.identifier,
     };
+    console.log("patient", this.patientDetails);
 
     this.activeVisit$ = this.store.select(getActiveVisit);
   }
