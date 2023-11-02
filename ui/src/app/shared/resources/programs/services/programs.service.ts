@@ -57,9 +57,32 @@ export class ProgramsService {
   }
 
   newEnrollment(patientId, payload) {
-    const url = `programenrollment?${patientId}/state`;
+    const url = `programenrollment/${patientId}/state`;
 
     return this.httpClient.post(url, payload).pipe(
+      map((response: any) => {
+        return response;
+      }),
+      catchError((error: any) => of(error))
+    );
+  }
+
+  createPatientWorkflowState(
+    data: any,
+    enrollmentUuid: string
+  ): Observable<any> {
+    return this.httpClient
+      .post(`programenrollment/${enrollmentUuid}`, data)
+      .pipe(
+        map((response: any) => {
+          return response;
+        }),
+        catchError((error: any) => of(error))
+      );
+  }
+
+  createEncounterWorkflowState(data: any): Observable<any> {
+    return this.httpClient.post(`icare/encounterworkflowstate`, data).pipe(
       map((response: any) => {
         return response;
       }),
