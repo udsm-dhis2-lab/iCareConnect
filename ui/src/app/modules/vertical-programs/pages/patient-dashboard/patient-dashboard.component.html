@@ -4,7 +4,8 @@
     patientEnrollmentDetails: patientEnrollmentDetails$ | async,
     patient: patient$ | async,
     currentLocation: currentLocation$ | async,
-    locationFormsAttributeTypeUuid: locationFormsAttributeTypeUuid$ | async
+    locationFormsAttributeTypeUuid: locationFormsAttributeTypeUuid$ | async,
+    provider: provider$ | async
   } as params"
 >
   <div class="w-100">
@@ -21,7 +22,8 @@
         !params?.patientEnrollmentDetails ||
         !params?.patient ||
         !params?.currentLocation ||
-        !params?.locationFormsAttributeTypeUuid
+        !params?.locationFormsAttributeTypeUuid ||
+        !params?.provider
       "
     >
       <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
@@ -34,7 +36,8 @@
         params?.patient &&
         params?.currentUser &&
         errors?.length === 0 &&
-        params?.locationFormsAttributeTypeUuid
+        params?.locationFormsAttributeTypeUuid &&
+        params?.provider
       "
     >
       <div class="col-md-8 col-sm-12 col-sx-12">
@@ -89,6 +92,7 @@
                       [currentLocation]="params?.currentLocation"
                       [currentUser]="params?.currentUser"
                       [patient]="params?.patient"
+                      [provider]="params?.provider"
                     ></app-workflow-state>
                   </div>
                 </div>
@@ -110,6 +114,7 @@
           [currentLocation]="params?.currentLocation"
           [currentUser]="params?.currentUser"
           [patient]="params?.patient"
+          [provider]="params?.provider"
           [locationFormsAttributeTypeUuid]="
             params?.locationFormsAttributeTypeUuid
           "
