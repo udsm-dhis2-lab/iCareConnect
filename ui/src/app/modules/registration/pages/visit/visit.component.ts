@@ -36,6 +36,9 @@ import { map } from "rxjs/operators";
 import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.selectors";
 import { toISOStringFormat } from "src/app/shared/helpers/format-date.helper";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
+import { ProgramsService } from "src/app/shared/resources/programs/services/programs.service";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { ProgramEnrollment } from "src/app/modules/vertical-programs/models/programEnrollment.model";
 
 @Component({
   selector: "app-visit",
@@ -79,6 +82,7 @@ export class VisitComponent implements OnInit {
   paymentsCategories: Array<any>;
   currentPaymentCategory: any;
   missingBillingConceptError: string;
+  allProgarm: Observable<any>;
 
   @Input() visitTypes: any;
   @Input() servicesConfigs: any;
@@ -113,6 +117,10 @@ export class VisitComponent implements OnInit {
   formatedServiceDetails: any = {};
   currentLocation: any;
   paymentsCategories$: Observable<any>;
+  verticalPrograms$: Observable<any[]>;
+  isVerticalProgram: boolean = false;
+  verticalProgramUuid$: Observable<any>;
+  selectedService$: Observable<any>;
 
   constructor(
     private store: Store<AppState>,
@@ -120,7 +128,9 @@ export class VisitComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private registrationService: RegistrationService,
     private router: Router,
-    private visitService: VisitsService
+    private visitService: VisitsService,
+    private programsService: ProgramsService,
+    private systemSettingsService: SystemSettingsService
   ) {}
 
   ngOnInit(): void {
@@ -150,6 +160,7 @@ export class VisitComponent implements OnInit {
           ? data
           : null;
     });
+    this.verticalPrograms$ = this.programsService.getAllPrograms();
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
     this.activeVisit$ = this.store.pipe(select(getActiveVisit));
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
@@ -166,6 +177,10 @@ export class VisitComponent implements OnInit {
       tagName: "Admission Location",
     });
 
+    this.verticalProgramUuid$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.visits.types.verticalProgam"
+      );
     this.registrationService
       .getServicesConceptHierarchy()
       .subscribe((response) => {
@@ -318,6 +333,10 @@ export class VisitComponent implements OnInit {
     this.startVisitEvent.emit();
   }
 
+  enrollToProgam(event, payload: ProgramEnrollment) {
+    this.programsService.newEnrollment(this.patientt.uuid, payload);
+  }
+
   searchRoom(event: Event) {
     event.stopPropagation();
     this.searchTerm = (event.target as HTMLInputElement).value;
@@ -362,9 +381,10 @@ export class VisitComponent implements OnInit {
     this.cancelVisitChanges.emit(this.visitDetails);
   }
 
-  setVisitTypeOption(option, isEmergency?) {
-    // console.log('the option', option);
+  setVisitTypeOption(option, verticalProgamUuid?, isEmergency?) {
     // console.log('the hierarchy', this.visitsHierarchy2);
+    this.isVerticalProgram = verticalProgamUuid === option?.uuid;
+
     const matchedServiceConfigs = (this.servicesConfigs.filter(
       (config) => config.uuid === option?.uuid
     ) || [])[0];
@@ -545,6 +565,18 @@ export class VisitComponent implements OnInit {
     } else {
       this.visitDetails["service"] = service;
       this.currentVisitService = service;
+    }
+    if (service["setMembers"]) {
+      this.store.dispatch(
+        loadConceptByUuid({
+          uuid: service?.uuid,
+          fields:
+            "custom:(uuid,name,display,setMembers:(uuid,name,names,display))",
+        })
+      );
+      this.selectedService$ = this.store.select(getConceptById, {
+        id: service?.uuid,
+      });
     }
   }
 
