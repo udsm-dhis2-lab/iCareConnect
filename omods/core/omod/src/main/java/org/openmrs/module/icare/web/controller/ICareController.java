@@ -9,17 +9,13 @@
  */
 package org.openmrs.module.icare.web.controller;
 
-import com.mysql.fabric.xmlrpc.Client;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.azeckoski.reflectutils.transcoders.ObjectEncoder;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.util.JSONPObject;
 import org.json.JSONObject;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
-import org.openmrs.logic.op.In;
 import org.openmrs.module.icare.auditlog.AuditLog;
 import org.openmrs.module.icare.auditlog.api.AuditLogService;
 import org.openmrs.module.icare.billing.models.ItemPrice;
@@ -28,13 +24,10 @@ import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.*;
-import org.openmrs.module.icare.core.models.EncounterWorkflowState;
+import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
-import org.openmrs.module.icare.core.models.PimaCovidLabRequest;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
-import org.openmrs.module.icare.laboratory.models.Sample;
-import org.openmrs.module.icare.laboratory.models.SampleStatus;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +38,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.mail.Session;
 import javax.naming.ConfigurationException;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -350,10 +342,11 @@ public class ICareController {
 											   @RequestParam(required = false) String visitAttributeTypeUuid,
 											   @RequestParam(required = false) String sampleCategory,
 											   @RequestParam(required = false) String exclude,
-											   @RequestParam(defaultValue = "false") Boolean includeInactive
+											   @RequestParam(defaultValue = "false") Boolean includeInactive,
+											   @RequestParam(defaultValue = "false") Boolean includeDeadPatients
 											   ) {
 
-        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, encounterTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus, visitAttributeTypeUuid, sampleCategory,exclude,includeInactive);
+        List<Visit> visits = iCareService.getVisitsByOrderType(q, orderTypeUuid, encounterTypeUuid, locationUuid, orderStatusCode, fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus, visitAttributeTypeUuid, sampleCategory,exclude,includeInactive,includeDeadPatients);
 
         List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
         for (Visit visit : visits) {
@@ -1068,24 +1061,25 @@ public class ICareController {
 
 	}
 	
-	@RequestMapping(value = "encounterworkflowstate", method = RequestMethod.POST)
+	@RequestMapping(value = "encounterpatientstate", method = RequestMethod.POST)
 	@ResponseBody
-	public List<Map<String, Object>> createEncounterWorkflowState(@RequestBody Map<String, Object> encounterWorkflowStateMap) {
+	public List<Map<String, Object>> createEncounterPatientState(@RequestBody Map<String, Object> encounterPatientStateMap) {
 
 		List<Map<String, Object>> encounterWorkflowStateListMap = new ArrayList<>();
-		if (encounterWorkflowStateMap.get("encounters") != null) {
-			for (Map<String, Object> encounterMap : (List<Map<String, Object>>) encounterWorkflowStateMap.get("encounters")) {
+		if (encounterPatientStateMap.get("encounters") != null) {
+			for (Map<String, Object> encounterMap : (List<Map<String, Object>>) encounterPatientStateMap.get("encounters")) {
 
-				EncounterWorkflowState encounterWorkflowState = new EncounterWorkflowState();
+				EncounterPatientState encounterPatientState = new EncounterPatientState();
 				Encounter encounter = Context.getEncounterService().getEncounterByUuid(encounterMap.get("uuid").toString());
-				encounterWorkflowState.setEncounter(encounter);
+				encounterPatientState.setEncounter(encounter);
 
-				if (encounterWorkflowStateMap.get("programWorkflowState") != null) {
-					ProgramWorkflowState programWorkflowState = Context.getProgramWorkflowService().getStateByUuid(((Map) encounterWorkflowStateMap.get("programWorkflowState")).get("uuid").toString());
-					encounterWorkflowState.setProgramWorkflowState(programWorkflowState);
+				if (encounterPatientStateMap.get("patientState") != null) {
+
+					PatientState patientState = Context.getProgramWorkflowService().getPatientStateByUuid(((Map) encounterPatientStateMap.get("patientState")).get("uuid").toString());
+					encounterPatientState.setPatientState(patientState);
 				}
-				EncounterWorkflowState savedEncounterWorkflowState = iCareService.saveEncounterWorkflowState(encounterWorkflowState);
-				encounterWorkflowStateListMap.add(savedEncounterWorkflowState.toMap());
+				EncounterPatientState savedEncounterPatientState = iCareService.saveEncounterPatientState(encounterPatientState);
+				encounterWorkflowStateListMap.add(savedEncounterPatientState.toMap());
 			}
 		}
 
@@ -1093,12 +1087,12 @@ public class ICareController {
 
 	}
 	
-	@RequestMapping(value = "encounterworkflowstate/{workflowStateUuid}",method = RequestMethod.GET)
+	@RequestMapping(value = "encounterpatientstate/{patientStateUuid}",method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getEncountersByWorkflowState(@PathVariable("workflowStateUuid") String workflowStateUuid){
+	public List<Map<String, Object>> getEncountersByWorkflowState(@PathVariable("patientStateUuid") String patientStateUuid){
 
 		List<Map<String,Object>> encountersListMap = new ArrayList<>();
-		List<Encounter> encounters = iCareService.getEncountersByWorkflowState(workflowStateUuid);
+		List<Encounter> encounters = iCareService.getEncountersByPatientState(patientStateUuid);
 		for( Encounter encounter : encounters){
 			Map<String, Object> encounterMap = new HashMap<>();
 

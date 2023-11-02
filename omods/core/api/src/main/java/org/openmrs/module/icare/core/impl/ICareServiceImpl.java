@@ -25,7 +25,7 @@ import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
 import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.dao.*;
-import org.openmrs.module.icare.core.models.EncounterWorkflowState;
+import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
@@ -70,7 +70,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	ProgramWorkflowDAO programWorkflowDAO;
 	
-	EncounterWorkflowStateDAO encounterWorkflowStateDAO;
+	EncounterPatientStateDAO encounterPatientStateDAO;
 	
 	UserService userService;
 	
@@ -97,8 +97,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		this.programWorkflowDAO = programWorkflowDAO;
 	}
 	
-	public void setEncounterWorkflowStateDAO(EncounterWorkflowStateDAO encounterWorkflowStateDAO) {
-		this.encounterWorkflowStateDAO = encounterWorkflowStateDAO;
+	public void setEncounterPatientStateDAO(EncounterPatientStateDAO encounterPatientStateDAO) {
+		this.encounterPatientStateDAO = encounterPatientStateDAO;
 	}
 	
 	/**
@@ -297,10 +297,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	        String locationUuid, OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus,
 	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
 	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
-	        String sampleCategory, String exclude, Boolean includeInactive) {
+	        String sampleCategory, String exclude, Boolean includeInactive, Boolean includeDeadPatients) {
 		return this.dao.getVisitsByOrderType(search, orderTypeUuid, encounterTypeUuid, locationUuid, prescriptionStatus,
 		    fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus,
-		    visitAttributeTypeUuid, sampleCategory, exclude, includeInactive);
+		    visitAttributeTypeUuid, sampleCategory, exclude, includeInactive, includeDeadPatients);
 	}
 	
 	@Override
@@ -549,13 +549,13 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public EncounterWorkflowState saveEncounterWorkflowState(EncounterWorkflowState encounterWorkflowState) {
-		return encounterWorkflowStateDAO.save(encounterWorkflowState);
+	public EncounterPatientState saveEncounterPatientState(EncounterPatientState encounterPatientState) {
+		return encounterPatientStateDAO.save(encounterPatientState);
 	}
 	
 	@Override
-	public List<Encounter> getEncountersByWorkflowState(String workflowStateUuid) {
-		return encounterWorkflowStateDAO.getEncountersBYWorkflowState(workflowStateUuid);
+	public List<Encounter> getEncountersByPatientState(String patientStateUuid) {
+		return encounterPatientStateDAO.getEncountersByPatientState(patientStateUuid);
 	}
 	
 	@Override

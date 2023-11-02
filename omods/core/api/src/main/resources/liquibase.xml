@@ -5401,5 +5401,27 @@
 
     </changeSet>
 
+    <!-- Wrongly named the table and its column -->
+    <changeSet id="rename_encounter_workflow_state_table" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE encounter_workflow_state RENAME encounter_patient_state;
+        </sql>
+    </changeSet>
+
+    <changeSet id="rename_patient_state_id_field" author="dennis-kibahila" dbms="mysql">
+        <sql>
+                ALTER TABLE encounter_patient_state
+                CHANGE program_workflow_state_id patient_state_id INT;
+        </sql>
+    </changeSet>
+
+    <!-- foreign key was wrongly referenced in encounter_patient_state -->
+    <changeSet id="update_encounter_patient_state_change_state_id_foreign_key" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE encounter_patient_state DROP FOREIGN KEY state_state_id_workflow_state_fk,
+            ADD FOREIGN KEY state_state_id_patient_state_fk(patient_state_id) REFERENCES patient_state(patient_state_id);
+        </sql>
+    </changeSet>
+
 
 </databaseChangeLog>
