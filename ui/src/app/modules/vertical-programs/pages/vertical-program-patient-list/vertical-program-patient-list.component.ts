@@ -25,6 +25,6 @@ export class VerticalProgramsPatientListComponent implements OnInit {
   }
 
   onSelectPatient(patient: any): void {
-    this.store.dispatch(go({ path: ["/vertical-programs/dashboard"] }));
+    this.store.dispatch(go({ path: ["/vertical_programs/dashboard"] }));
   }
 }

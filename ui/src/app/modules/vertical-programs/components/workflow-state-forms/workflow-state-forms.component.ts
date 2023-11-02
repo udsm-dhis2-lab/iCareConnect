@@ -13,6 +13,7 @@ export class WorkflowStateFormsComponent implements OnInit {
   @Input() patientEnrollmentDetails: any;
   @Input() currentLocation: Location;
   @Input() provider: any;
+  @Input() patientWorkflowState: any;
   constructor() {}
 
   ngOnInit(): void {}

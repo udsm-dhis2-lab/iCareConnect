@@ -5,6 +5,7 @@ import { Location } from "src/app/core/models";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { WorkflowStateGetFull } from "src/app/shared/resources/openmrs";
+import { ProgramsService } from "src/app/shared/resources/programs/services/programs.service";
 import { EncountersService } from "src/app/shared/services/encounters.service";
 import {
   loadCustomOpenMRSForm,
@@ -27,17 +28,18 @@ export class WorkflowStateFormDataComponent implements OnInit {
   @Input() patientEnrollmentDetails: any;
   @Input() provider: any;
   @Input() currentLocation: Location;
+  @Input() patientWorkflowState: any;
   formDetails$: Observable<any>;
   isFormValid: boolean = false;
   formData: any = {};
   saving: boolean = false;
   constructor(
     private store: Store<AppState>,
-    private encountersService: EncountersService
+    private encountersService: EncountersService,
+    private programsService: ProgramsService
   ) {}
 
   ngOnInit(): void {
-    console.log("patientEnrollmentDetails", this.patientEnrollmentDetails);
     this.store.dispatch(
       loadCustomOpenMRSForm({
         formUuid: this.form?.uuid,
@@ -46,7 +48,6 @@ export class WorkflowStateFormDataComponent implements OnInit {
     this.formDetails$ = this.store.select(
       getCustomOpenMRSFormById(this.form?.uuid)
     );
-    this.formDetails$.subscribe((response: any) => console.log(response));
   }
 
   onFormUpdate(formValue: FormValue): void {
@@ -82,8 +83,25 @@ export class WorkflowStateFormDataComponent implements OnInit {
       .createEncounter(encounter)
       .subscribe((response: any) => {
         // TODO: Handle error
-        if (encounter) {
-          this.saving = false;
+
+        if (response) {
+          const data = {
+            programWorkflowState: {
+              uuid: this.patientWorkflowState?.uuid,
+            },
+            encounters: [
+              {
+                uuid: response?.uuid,
+              },
+            ],
+          };
+          this.programsService
+            .createEncounterWorkflowState(data)
+            .subscribe((response: any) => {
+              if (response) {
+                this.saving = false;
+              }
+            });
         }
       });
   }

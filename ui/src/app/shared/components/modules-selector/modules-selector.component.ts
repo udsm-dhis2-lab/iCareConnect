@@ -42,7 +42,6 @@ export class ModulesSelectorComponent implements OnInit {
               )?.length > 0
           ) || [])[0]
         : null;
-
     const storedLocation =
       localStorage.getItem("currentLocation") == "undefined" ||
       !localStorage.getItem("currentLocation")
