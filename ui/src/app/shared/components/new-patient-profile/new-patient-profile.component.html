@@ -3,6 +3,7 @@
     <div class="col-md-1 col-sm-12 col-sx-12">
       <mat-icon class="text-muted" style="font-size: 80px">person</mat-icon>
       <img
+        *ngIf="patientDetails?.person?.dead"
         height="80"
         style="position: absolute; margin-left: -24px"
         src="assets/images/transparent_cross.png"
@@ -42,6 +43,7 @@
           {{ ageAtDeathDetails?.days }} days,
         </span>
         <span
+          *ngIf="patientDetails?.person?.dead"
           class="ml-2"
           style="text-align: right"
           [ngClass]="{ 'text-danger': patientDetails?.person?.dead }"
