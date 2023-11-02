@@ -1,0 +1,9 @@
+<div *ngIf="program">
+  <label>Programs</label>
+  masembo
+  <mat-chip-list aria-label="Visit services">
+    <mat-chip *ngFor="let service of program['setMembers']">{{
+      service?.display
+    }}</mat-chip>
+  </mat-chip-list>
+</div>
