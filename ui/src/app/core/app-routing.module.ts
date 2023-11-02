@@ -31,7 +31,7 @@ const routes: Routes = [
         canActivate: [AuthGuard],
       },
       {
-        path: "vertical-programs",
+        path: "vertical_programs",
         loadChildren: () =>
           import("../modules/vertical-programs/vertical-program.module").then(
             (m) => m.VerticalProgramsModule

@@ -50,8 +50,6 @@ export class GeneralClientProgramFormsComponent implements OnInit {
     this.forms$ = this.store.select(
       getCustomOpenMRSFormsByIds(this.formsUuids)
     );
-
-    this.forms$.subscribe((response: any) => console.log("RESPONSE", response));
   }
 
   onFormUpdate(formValue: FormValue): void {

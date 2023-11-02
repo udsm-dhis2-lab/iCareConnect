@@ -45,7 +45,7 @@ export class EnrolledPatientsListComponent implements OnInit {
     this.store.dispatch(
       go({
         path: [
-          `/vertical-programs/dashboard/${patientEnrollment?.uuid}/${patientEnrollment?.patient?.uuid}`,
+          `/vertical_programs/dashboard/${patientEnrollment?.uuid}/${patientEnrollment?.patient?.uuid}`,
         ],
       })
     );
