@@ -16,6 +16,7 @@ export class WorkflowStateComponent implements OnInit {
   @Input() currentLocation: Location;
   @Input() currentUser: CurrentUser;
   @Input() patient: any;
+  @Input() provider: any;
   forms$: Observable<any>;
   constructor(private systemSettingsService: SystemSettingsService) {}
 
