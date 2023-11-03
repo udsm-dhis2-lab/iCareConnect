@@ -1,6 +1,5 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
-import { PatientConsultationComponent } from "./pages/patient-consultation/patient-consultation.component";
 import { PatientDashboardComponent } from "./pages/patient-dashboard/patient-dashboard.component";
 import { PatientHomeComponent } from "./pages/patient-home/patient-home.component";
 import { VerticalProgramsPatientListComponent } from "./pages/vertical-program-patient-list/vertical-program-patient-list.component";
@@ -15,10 +14,6 @@ const routes: Routes = [
       {
         path: "dashboard/:id/:patient",
         component: PatientDashboardComponent,
-      },
-      {
-        path: "consultation",
-        component: PatientConsultationComponent,
       },
     ],
   },

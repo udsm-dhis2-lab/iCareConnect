@@ -14,7 +14,7 @@ import {
   WorkflowStateGetFull,
 } from "src/app/shared/resources/openmrs";
 import { map, tap } from "rxjs/operators";
-import { loadCurrentPatient } from "src/app/store/actions";
+import { go, loadCurrentPatient } from "src/app/store/actions";
 import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import { ProgramsService } from "src/app/shared/resources/programs/services/programs.service";
 import { Location } from "src/app/core/models";
@@ -103,5 +103,10 @@ export class PatientDashboardComponent implements OnInit {
     setTimeout(() => {
       this.renderWorkflowState = true;
     }, 20);
+  }
+
+  onBackToList(event: Event, url: string): void {
+    event.stopPropagation();
+    this.store.dispatch(go({ path: [url] }));
   }
 }
