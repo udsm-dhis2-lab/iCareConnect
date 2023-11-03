@@ -123,7 +123,7 @@ export class MortuaryDashboardComponent implements OnInit {
   ): void {
     event.stopPropagation();
     this.dialog.open(AssignCabinetModalComponent, {
-      minWidth: "50%",
+      minWidth: "70%",
       data: {
         patient,
         visit,
@@ -142,7 +142,7 @@ export class MortuaryDashboardComponent implements OnInit {
   ): void {
     event.stopPropagation();
     this.dialog.open(AssignCabinetModalComponent, {
-      minWidth: "50%",
+      minWidth: "70%",
       data: {
         patient,
         visit,

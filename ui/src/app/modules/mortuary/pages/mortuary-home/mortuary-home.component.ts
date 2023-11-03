@@ -89,13 +89,6 @@ export class MortuaryHomeComponent implements OnInit {
       id: this.currentLocation?.uuid,
       tagName: "Cabinet Location",
     });
-    this.locationsIds$ = this.store.select(
-      getAllLocationsUnderWardAsFlatArray,
-      {
-        id: this.currentLocation?.uuid,
-        tagName: "Cabinet Location",
-      }
-    );
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
     this.store.dispatch(loadOrderTypes());
     this.orderType$ = this.store.select(getOrderTypesByName, {
