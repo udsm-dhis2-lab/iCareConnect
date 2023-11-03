@@ -40,6 +40,7 @@ import { ProgramsService } from "src/app/shared/resources/programs/services/prog
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { ProgramEnrollment } from "src/app/modules/vertical-programs/models/programEnrollment.model";
 import { ProgramGet, ProgramGetFull } from "src/app/shared/resources/openmrs";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 
 @Component({
   selector: "app-visit",
@@ -134,7 +135,8 @@ export class VisitComponent implements OnInit {
     private router: Router,
     private visitService: VisitsService,
     private programsService: ProgramsService,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private conceptsService: ConceptsService
   ) {}
 
   dismissAlert() {
@@ -598,6 +600,8 @@ export class VisitComponent implements OnInit {
   }
 
   setService(service) {
+    this.selectedProgram = null; // nullfy selectedprogram until you select one
+    this.visible = false;
     if (this.visitDetails["service"]?.attributeUuid) {
       this.visitDetails["service"] = {
         attributeUuid: this.visitDetails["service"]?.attributeUuid,
@@ -611,17 +615,13 @@ export class VisitComponent implements OnInit {
       this.visitDetails["service"] = service;
       this.currentVisitService = service;
     }
+    // console.log("service ", service);
+    this.selectedService$ = of(null);
     if (service?.uuid) {
-      this.store.dispatch(
-        loadConceptByUuid({
-          uuid: service?.uuid,
-          fields:
-            "custom:(uuid,name,display,setMembers:(uuid,name,names,display))",
-        })
+      this.selectedService$ = this.conceptsService.getConceptDetailsByUuid(
+        service?.uuid,
+        "custom:(uuid,name,display,setMembers:(uuid,name,names,display))"
       );
-      this.selectedService$ = this.store.select(getConceptById, {
-        id: service?.uuid,
-      });
     }
     // console.log("selectedService", service);
   }
