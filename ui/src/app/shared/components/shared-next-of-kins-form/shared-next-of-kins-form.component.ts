@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Observable } from "rxjs";
 import { PatientService } from "../../resources/patient/services/patients.service";
 import { PersonattributetypeGetFull } from "../../resources/openmrs";
@@ -12,6 +12,7 @@ import { map } from "rxjs/operators";
 export class SharedNextOfKinsFormComponent implements OnInit {
   @Input() patient: any;
   personAttributeTypes$: Observable<PersonattributetypeGetFull[]>;
+  @Output() nextOfKinsData: EventEmitter<any> = new EventEmitter<any>();
   constructor(private patientService: PatientService) {}
 
   ngOnInit(): void {
@@ -25,5 +26,9 @@ export class SharedNextOfKinsFormComponent implements OnInit {
           );
         })
       );
+  }
+
+  onGetNextOfKinsData(nextOfKinsData: any): void {
+    this.nextOfKinsData.emit(nextOfKinsData);
   }
 }

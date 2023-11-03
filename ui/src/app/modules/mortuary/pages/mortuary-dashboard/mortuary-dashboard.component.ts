@@ -49,6 +49,7 @@ export class MortuaryDashboardComponent implements OnInit {
   formDataDetails: any;
   saving: boolean = false;
   showNextOfKins: boolean = true;
+  nextOfKinsData: any;
   constructor(
     private activatedRoute: ActivatedRoute,
     private store: Store<AppState>,
@@ -184,7 +185,14 @@ export class MortuaryDashboardComponent implements OnInit {
         },
       ],
       visit: visit?.uuid,
-      obs: [],
+      obs: Object.keys(this.formDataDetails?.data)?.map((key: string) => {
+        return {
+          obsDatetime: new Date(),
+          concept: key,
+          value: this.formDataDetails?.data[key]?.value,
+          person: patient?.patient?.person?.uuid,
+        };
+      }),
     };
     this.encounterService
       .createEncounter(encounter)
@@ -200,5 +208,15 @@ export class MortuaryDashboardComponent implements OnInit {
     this.showNextOfKins = true;
     this.showHistoryDetails = false;
     this.showMortuaryNotesArea = false;
+  }
+
+  onSaveNextOfKinDetails(event: Event, patient: any): void {
+    event.stopPropagation();
+    console.log(patient);
+  }
+
+  onGetNextOfKinsData(nextOfKinsData: any): void {
+    // console.log("next of kins details", nextOfKinsData);
+    this.nextOfKinsData = nextOfKinsData;
   }
 }

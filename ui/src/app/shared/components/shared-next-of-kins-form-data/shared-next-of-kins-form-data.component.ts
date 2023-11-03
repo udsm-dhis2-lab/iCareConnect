@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { PersonattributetypeGetFull } from "../../resources/openmrs";
 import { Textbox } from "../../modules/form/models/text-box.model";
 import { FormValue } from "../../modules/form/models/form-value.model";
@@ -11,6 +11,7 @@ import { FormValue } from "../../modules/form/models/form-value.model";
 export class SharedNextOfKinsFormDataComponent implements OnInit {
   @Input() personAttributeTypes: PersonattributetypeGetFull[];
   formFields: any[];
+  @Output() nextOfKinsData: EventEmitter<any> = new EventEmitter<any>();
   constructor() {}
 
   ngOnInit(): void {
@@ -25,5 +26,10 @@ export class SharedNextOfKinsFormDataComponent implements OnInit {
     );
   }
 
-  onFormUpdate(formValue: FormValue): void {}
+  onFormUpdate(formValue: FormValue): void {
+    this.nextOfKinsData.emit({
+      data: formValue.getValues(),
+      isFormValid: formValue.isValid,
+    });
+  }
 }
