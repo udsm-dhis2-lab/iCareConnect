@@ -27,9 +27,11 @@ export class ProgramSelectionComponent implements OnInit {
     this.filteredPrograms = this.programs?.filter(
       (program: ProgramGetFull) => keyedProgramConcepts[program?.concept?.uuid]
     );
+    // console.log("inafika", this.programConcepts);
   }
 
   onGetProgram(event: Event, program: ProgramGetFull): void {
+    // console.log("the programs", this.filteredPrograms);
     event.stopPropagation();
     this.keyedSelectedPrograms[program?.uuid] = program;
     this.selectedProgram.emit(program);
