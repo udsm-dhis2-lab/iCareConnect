@@ -11,6 +11,7 @@
   <div class="w-100" *ngIf="params?.personAttributeTypes">
     <app-shared-next-of-kins-form-data
       [personAttributeTypes]="params?.personAttributeTypes"
+      (nextOfKinsData)="onGetNextOfKinsData($event)"
     ></app-shared-next-of-kins-form-data>
   </div>
 </div>

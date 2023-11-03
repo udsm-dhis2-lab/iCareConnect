@@ -250,21 +250,15 @@
                 <div class="mt-2">
                   <app-shared-next-of-kins-form
                     [patient]="params?.patient?.patient"
+                    (nextOfKinsData)="onGetNextOfKinsData($event)"
                   ></app-shared-next-of-kins-form>
                   <div class="w-100 d-flex justify-content-end">
                     <button
                       color="primary"
-                      (click)="
-                        onSave(
-                          $event,
-                          params?.patient,
-                          params?.visit,
-                          params?.provider
-                        )
-                      "
+                      (click)="onSaveNextOfKinDetails($event, params?.patient)"
                       mat-flat-button
                       [disabled]="
-                        !formDataDetails || !formDataDetails?.isFormValid
+                        true || !nextOfKinsData || !nextOfKinsData?.isFormValid
                       "
                     >
                       Save
