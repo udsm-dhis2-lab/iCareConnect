@@ -317,6 +317,7 @@
                       !params?.selectedService || !params?.verticalPrograms
                     "
                   ></mat-progress-bar>
+                  <!-- {{ params?.selectedService | json }} -->
                   <app-program-selection
                     *ngIf="params?.selectedService && params?.verticalPrograms"
                     [programs]="params?.verticalPrograms"
@@ -324,6 +325,17 @@
                     (selectedProgram)="onGetSelectedProgram($event)"
                   ></app-program-selection>
                 </div>
+                <!-- alert.component.html -->
+                <div
+                  *ngIf="visible"
+                  class="alert alert-info alert-dismissible w-100 mt-2"
+                >
+                  <button type="button" class="close" (click)="dismissAlert()">
+                    <span>&times;</span>
+                  </button>
+                  patient is already enrolled in this program
+                </div>
+                <!-- end of visit form -->
 
                 <div
                   class="w-100 rooms-status-container"
@@ -816,6 +828,7 @@
               color="primary"
               (click)="enrollToProgam($event)"
               [disabled]="
+                visible ||
                 !(
                   (!editMode &&
                     visitDetails?.visitType?.uuid &&
