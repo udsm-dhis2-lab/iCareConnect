@@ -176,6 +176,7 @@ export class RegistrationHomeComponent implements OnInit {
         data: {
           patient: { ...patient["patient"], id: patient["patient"]["uuid"] },
         },
+        disableClose: false,
       })
       .afterClosed()
       .subscribe((visitDetails) => {
