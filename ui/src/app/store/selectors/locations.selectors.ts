@@ -11,7 +11,7 @@ import {
 
 const getLocationsState = createSelector(
   getRootState,
-  (state: AppState) => state.locations
+  (state: AppState) => state?.locations
 );
 
 export const getLocationsLoadingError = createSelector(
@@ -551,16 +551,48 @@ export const getAllBedsUnderCurrentWard = createSelector(
         )?.length > 0,
     };
     return formattedLocation;
-    // const beds = getBedsUnderCurrentLocation(locations, props?.id);
-
-    // return _.uniq([
-    //   ..._.map(getBedsUnderCurrentLocation(locations, props?.id), (bed) => {
-    //     return bed?.uuid;
-    //   }),
-    //   props?.id,
-    // ]);
   }
 );
+
+export const getAllCabinetsDetailsUnderCurrentLocation = (
+  currentLocationUuid
+) =>
+  createSelector(
+    getLocations,
+    getLocationEntities,
+    (locations: Location[], locationEntities) => {
+      let currentLocation = (locations.filter(
+        (location) => location?.uuid === currentLocationUuid
+      ) || [])[0];
+      console.log(currentLocation);
+      if (!currentLocation) {
+        return {};
+      }
+      const formattedLocation = {
+        ...currentLocation,
+        childMembers: getChildLocationMembers(
+          (
+            currentLocation?.childLocations?.filter(
+              (location: any) => !location?.retired
+            ) || []
+          ).map((childLocation) => {
+            // console.log("CHILD", locationEntities[childLocation?.uuid]);
+            return locationEntities[childLocation?.uuid];
+          }),
+          locations
+        ),
+        isBed:
+          currentLocation &&
+          currentLocation?.tags &&
+          (
+            currentLocation?.tags?.filter(
+              (tag) => tag?.display === "Cabinet Location"
+            ) || []
+          )?.length > 0,
+      };
+      return formattedLocation;
+    }
+  );
 
 export const getAllCabinetsUnderCurrentLocation = createSelector(
   getLocations,

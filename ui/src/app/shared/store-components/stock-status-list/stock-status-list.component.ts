@@ -16,7 +16,7 @@ import { Store, select } from "@ngrx/store";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import { AddNewStockReceivedComponent } from "../../store-modals/add-new-stock-received/add-new-stock-received.component";
 import { ConsumeStockItemModalComponent } from "../../store-modals/consume-stock-item-modal/consume-stock-item-modal.component";
-
+import { sortBy } from "lodash";
 @Component({
   selector: "app-stock-status-list",
   templateUrl: "./stock-status-list.component.html",
@@ -123,7 +123,7 @@ export class StockStatusListComponent implements OnInit {
         .pipe(
           map((response) => {
             this.pager = response?.pager;
-            return response?.results;
+            return sortBy(response?.results, (stock) => stock?.name);
           })
         );
     } else if (this.isStockOutPage) {
@@ -137,7 +137,7 @@ export class StockStatusListComponent implements OnInit {
         .pipe(
           map((response) => {
             this.pager = response?.pager;
-            return response?.results;
+            return sortBy(response?.results, (stock) => stock?.name);
           })
         );
     } else if (this.status === "EXPIRED") {
@@ -151,7 +151,7 @@ export class StockStatusListComponent implements OnInit {
         .pipe(
           map((response) => {
             this.pager = response?.pager;
-            return response?.results;
+            return sortBy(response?.results, (stock) => stock?.name);
           })
         );
     } else if (this.status === "NEARLYSTOCKEDOUT") {
@@ -165,7 +165,7 @@ export class StockStatusListComponent implements OnInit {
         .pipe(
           map((response) => {
             this.pager = response?.pager;
-            return response?.results;
+            return sortBy(response?.results, (stock) => stock?.name);
           })
         );
     } else if (this.status === "NEARLYEXPIRED") {
@@ -179,7 +179,7 @@ export class StockStatusListComponent implements OnInit {
         .pipe(
           map((response) => {
             this.pager = response?.pager;
-            return response?.results;
+            return sortBy(response?.results, (stock) => stock?.name);
           })
         );
     }

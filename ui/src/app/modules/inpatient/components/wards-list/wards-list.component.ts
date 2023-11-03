@@ -42,7 +42,7 @@ export class WardsListComponent implements OnInit {
     );
 
     this.admittedPatientsVisits$ = this.visitService
-      .getAdmittedPatientsVisitsByEncounterType(this.encounterType)
+      .getPatientsVisitsByEncounterType(this.encounterType)
       .pipe(
         map((response: any) => {
           return keyBy(response, "locationUuid");

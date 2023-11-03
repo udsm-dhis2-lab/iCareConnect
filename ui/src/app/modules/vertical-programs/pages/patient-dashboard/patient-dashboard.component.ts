@@ -2,7 +2,10 @@ import { Component, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { AppState } from "src/app/store/reducers";
-import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
+import {
+  getCurrentUserDetails,
+  getProviderDetails,
+} from "src/app/store/selectors/current-user.selectors";
 import { ActivatedRoute } from "@angular/router";
 import { CurrentUser } from "src/app/shared/models/current-user.models";
 import {
@@ -11,7 +14,7 @@ import {
   WorkflowStateGetFull,
 } from "src/app/shared/resources/openmrs";
 import { map, tap } from "rxjs/operators";
-import { loadCurrentPatient } from "src/app/store/actions";
+import { go, loadCurrentPatient } from "src/app/store/actions";
 import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import { ProgramsService } from "src/app/shared/resources/programs/services/programs.service";
 import { Location } from "src/app/core/models";
@@ -30,6 +33,7 @@ export class PatientDashboardComponent implements OnInit {
   currentUser$: Observable<CurrentUser>;
   patientEnrollmentDetails$: Observable<ProgramenrollmentGetFull>;
   patient$: Observable<any>;
+  provider$: Observable<any>;
   selectedState: any;
   renderWorkflowState: boolean = true;
   currentLocation$: Observable<Location>;
@@ -51,6 +55,7 @@ export class PatientDashboardComponent implements OnInit {
     this.patient$ = this.store.select(getCurrentPatient);
     this.getEnrollmentDetails();
     this.currentLocation$ = this.store.select(getCurrentLocation());
+    this.provider$ = this.store.select(getProviderDetails);
     this.locationFormsAttributeTypeUuid$ = this.systemSettingsService
       .getSystemSettingsByKey(
         `iCare.location.general.systemSettings.formsAttributeTypeUuid`
@@ -98,5 +103,10 @@ export class PatientDashboardComponent implements OnInit {
     setTimeout(() => {
       this.renderWorkflowState = true;
     }, 20);
+  }
+
+  onBackToList(event: Event, url: string): void {
+    event.stopPropagation();
+    this.store.dispatch(go({ path: [url] }));
   }
 }

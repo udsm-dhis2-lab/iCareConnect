@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { Location } from "src/app/core/models";
 import { WorkflowStateGetFull } from "src/app/shared/resources/openmrs";
 
 @Component({
@@ -10,6 +11,9 @@ export class WorkflowStateFormsComponent implements OnInit {
   @Input() forms: any;
   @Input() workflowState: WorkflowStateGetFull;
   @Input() patientEnrollmentDetails: any;
+  @Input() currentLocation: Location;
+  @Input() provider: any;
+  @Input() patientWorkflowState: any;
   constructor() {}
 
   ngOnInit(): void {}
