@@ -166,7 +166,7 @@ function checkIfTheChildAreCabinets(childLocations) {
    */
   return childLocations && childLocations?.length > 0
     ? childLocations[0]?.tags?.some(
-        (tag) => tag?.display === "Mortuary Location"
+        (tag) => tag?.display === "Cabinet Location"
       )
     : false;
 }
