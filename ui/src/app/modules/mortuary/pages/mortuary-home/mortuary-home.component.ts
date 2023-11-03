@@ -20,6 +20,7 @@ import {
   getOrderTypesByName,
 } from "src/app/store/selectors";
 import { getVisitLoadingState } from "src/app/store/selectors/visit.selectors";
+import { CabinetOccupancySummaryModalComponent } from "../../modals/cabinet-occupancy-summary-modal/cabinet-occupancy-summary-modal.component";
 
 @Component({
   selector: "app-mortuary-home",
@@ -53,14 +54,14 @@ export class MortuaryHomeComponent implements OnInit {
          */
         this.currentLocation = location;
         this.store.dispatch(
-          loadLocationsByTagName({ tagName: "Mortuary+Location" })
+          loadLocationsByTagName({ tagName: "Cabinet+Location" })
         );
         this.store.dispatch(loadLocationById({ locationUuid: location?.uuid }));
         this.cabinetsUnderCurrentLocation$ = this.store.select(
           getAllCabinetsUnderCurrentLocation,
           {
             id: location?.uuid,
-            tagName: "Mortuary Location",
+            tagName: "Cabinet Location",
           }
         );
       });
@@ -86,19 +87,19 @@ export class MortuaryHomeComponent implements OnInit {
 
     this.cabinets$ = this.store.select(getAllLocationsMortuaryAsFlatArray, {
       id: this.currentLocation?.uuid,
-      tagName: "Mortuary Location",
+      tagName: "Cabinet Location",
     });
     this.locationsIds$ = this.store.select(
       getAllLocationsUnderWardAsFlatArray,
       {
         id: this.currentLocation?.uuid,
-        tagName: "Mortuary Location",
+        tagName: "Cabinet Location",
       }
     );
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
     this.store.dispatch(loadOrderTypes());
     this.orderType$ = this.store.select(getOrderTypesByName, {
-      name: "Bed Order",
+      name: "Cabinet Order",
     });
   }
 
@@ -115,7 +116,10 @@ export class MortuaryHomeComponent implements OnInit {
     );
   }
 
-  onGetCabinetStatus(status: any): void {
-    console.log(status);
+  onGetCabinetStatus(cabinetStatus: any): void {
+    this.dialog.open(CabinetOccupancySummaryModalComponent, {
+      minWidth: "30%",
+      data: cabinetStatus,
+    });
   }
 }

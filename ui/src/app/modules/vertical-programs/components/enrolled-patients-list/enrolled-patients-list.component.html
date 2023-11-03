@@ -7,7 +7,12 @@
     cdkDropListOrientation="horizontal"
     (cdkDropListDropped)="drop($event)"
   >
-    <mat-chip class="example-box" cdkDrag *ngFor="let program of programs">
+    <mat-chip
+      color="primary"
+      [selected]="program?.uuid == selectedProgram?.uuid"
+      cdkDrag
+      *ngFor="let program of programs"
+    >
       {{ program?.name ? program?.name : program?.display }}
     </mat-chip>
   </mat-chip-list>
@@ -17,58 +22,26 @@
   >
     <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
   </div>
-  <div
-    class="w-100 mt-2 mat-elevation-z1"
-    style="overflow: auto"
-    *ngIf="params?.enrolledPatients"
-  >
-    <!-- {{ params?.enrolledPatients | json }} -->
-    <table class="table">
-      <thead>
-        <tr>
-          <th style="width: 20px">SN</th>
-          <th>MRN</th>
-          <th>Names</th>
-          <th>Gender</th>
-          <th>Age</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          *ngFor="
-            let patientEnrollment of params?.enrolledPatients;
-            let count = index
-          "
-        >
-          <td>
-            {{ count + 1 }}
-          </td>
-          <td>
-            {{ patientEnrollment?.patient?.identifiers[0]?.identifier }}
-          </td>
-          <td>
-            {{ patientEnrollment?.patient?.person?.display }}
-          </td>
-          <td>
-            {{ patientEnrollment?.patient?.person?.gender }}
-          </td>
-          <td>
-            {{ patientEnrollment?.patient?.person?.age }}
-          </td>
-          <td>
-            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu">
-              <button mat-menu-item (click)="onViewPatient(patientEnrollment)">
-                <mat-icon>remove_red_eye</mat-icon>
-                <span>View</span>
-              </button>
-            </mat-menu>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="search-input-card p-2 border mb-3 mt-3">
+    <mat-icon matPrefix class="text-muted">search</mat-icon>
+    <input
+      class="ml-2 w-100 search-input"
+      matInput
+      autocomplete="off"
+      placeholder="Search enrolled clients"
+      (keyup)="onSearchClient($event)"
+    />
+  </div>
+  <div class="w-100 pl-2 pr-2">
+    <div
+      class="w-100 mt-2"
+      style="overflow: auto"
+      *ngIf="params?.enrolledPatients"
+    >
+      <app-render-loaded-clients-list
+        [enrolledPatients]="params?.enrolledPatients"
+        (enrollment)="onViewPatientEnrollment($event)"
+      ></app-render-loaded-clients-list>
+    </div>
   </div>
 </div>

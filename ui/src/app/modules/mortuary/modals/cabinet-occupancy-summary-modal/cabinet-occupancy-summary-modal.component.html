@@ -1,0 +1,34 @@
+<ng-container>
+  <mat-toolbar color="primary">
+    <span>Cabinet occupancy status</span>
+    <span class="toolbar-spacer"></span>
+    <button mat-icon-button mat-dialog-close matTooltip="close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-toolbar>
+  <mat-dialog-content class="mat-typography">
+    <div class="p-3">
+      <ng-container *ngIf="data?.visit">
+        <p class="text-left"><b> MRN: </b> {{ mrn }}</p>
+        <p class="text-left">
+          <b> Client names: </b> {{ data?.visit?.patient?.person?.display }}
+        </p>
+        <p class="text-left"><b> MRN: </b> {{ mrn }}</p>
+        <p class="text-left">
+          <b> Gender: </b> {{ data?.visit?.patient?.person?.gender }}
+        </p>
+        <p class="text-left">
+          <b> Age: </b> {{ data?.visit?.patient?.person?.age }}
+        </p>
+      </ng-container>
+      <ng-container *ngIf="!data?.visit">
+        <div class="alert alert-info" role="alert">
+          {{ data?.display }} is not occupied.
+        </div>
+      </ng-container>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end" class="m-0 p-3">
+    <button mat-button mat-dialog-close>Close</button>
+  </mat-dialog-actions>
+</ng-container>
