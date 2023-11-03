@@ -3,13 +3,16 @@ package org.openmrs.module.icare.web.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.DrugOrder;
+import org.openmrs.Encounter;
 import org.openmrs.Location;
+import org.openmrs.PatientProgram;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
+import org.openmrs.module.icare.core.models.EncounterPatientProgram;
 import org.openmrs.module.icare.laboratory.models.Sample;
 import org.openmrs.module.icare.store.models.*;
 import org.openmrs.module.icare.store.services.StoreService;
@@ -931,4 +934,29 @@ public class StoreController {
 		return stockInvoiceItem.toMap();
 	}
 	
+	@RequestMapping(value = "encounterpatientprogram", method = RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String, Object>> createEncounterPatientProgram(@RequestBody Map<String, Object> encounterPatientProgramMap) {
+
+		List<Map<String, Object>> encounterWorkflowStateListMap = new ArrayList<>();
+		if (encounterPatientProgramMap.get("encounters") != null) {
+			for (Map<String, Object> encounterMap : (List<Map<String, Object>>) encounterPatientProgramMap.get("encounters")) {
+
+				EncounterPatientProgram encounterPatientProgram = new EncounterPatientProgram();
+				Encounter encounter = Context.getEncounterService().getEncounterByUuid(encounterMap.get("uuid").toString());
+				encounterPatientProgram.setEncounter(encounter);
+
+				if (encounterPatientProgramMap.get("patientProgram") != null) {
+
+					PatientProgram patientProgram = Context.getProgramWorkflowService().getPatientProgramByUuid(((Map) encounterPatientProgramMap.get("patientProgram")).get("uuid").toString());
+					encounterPatientProgram.setPatientProgram(patientProgram);
+				}
+				EncounterPatientProgram savedEncounterPatientProgram = iCareService.saveEncounterPatientProgram(encounterPatientProgram);
+				encounterWorkflowStateListMap.add(savedEncounterPatientProgram.toMap());
+			}
+		}
+
+		return encounterWorkflowStateListMap;
+
+	}
 }

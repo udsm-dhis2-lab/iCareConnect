@@ -40,14 +40,15 @@ export class MortuaryDashboardComponent implements OnInit {
   patient$: Observable<any>;
   visit$: Observable<any>;
   forms$: Observable<any>;
-  showHistoryDetails: boolean = true;
+  showHistoryDetails: boolean = false;
   currentLocation$: Observable<any>;
   provider$: Observable<any>;
   useSideBar: boolean = true;
   selectedForm: any;
-  showMortuaryNotesArea: boolean = true;
+  showMortuaryNotesArea: boolean = false;
   formDataDetails: any;
   saving: boolean = false;
+  showNextOfKins: boolean = true;
   constructor(
     private activatedRoute: ActivatedRoute,
     private store: Store<AppState>,
@@ -106,6 +107,7 @@ export class MortuaryDashboardComponent implements OnInit {
     event.stopPropagation();
     this.selectedForm = form;
     this.showMortuaryNotesArea = false;
+    this.showNextOfKins = false;
     this.showHistoryDetails = false;
     setTimeout(() => {
       this.showMortuaryNotesArea = true;
@@ -191,5 +193,12 @@ export class MortuaryDashboardComponent implements OnInit {
           this.saving = false;
         }
       });
+  }
+
+  onOpenNextOfKinsForm(event: Event): void {
+    event.stopPropagation();
+    this.showNextOfKins = true;
+    this.showHistoryDetails = false;
+    this.showMortuaryNotesArea = false;
   }
 }

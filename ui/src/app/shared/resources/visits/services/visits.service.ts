@@ -350,7 +350,6 @@ export class VisitsService {
     if (excludedSampleCategories && excludedSampleCategories?.length > 0) {
       parametersString += `&exclude=${excludedSampleCategories.join(",")}`;
     }
-
     if (includeDeadPatients && includeDeadPatients === true) {
       parametersString += `&includeDeadPatients=true`;
     }

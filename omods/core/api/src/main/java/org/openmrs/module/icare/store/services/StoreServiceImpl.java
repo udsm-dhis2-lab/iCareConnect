@@ -12,6 +12,8 @@ import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.ICareDao;
+import org.openmrs.module.icare.core.models.EncounterPatientProgram;
+import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.store.dao.*;
 import org.openmrs.module.icare.store.models.*;
 import org.openmrs.module.icare.store.util.StockOutException;
@@ -52,6 +54,10 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	SupplierDAO supplierDAO;
 	
+	EncounterPatientProgramDAO encounterPatientProgramDAO;
+	
+	EncounterPatientStateDAO encounterPatientStateDAO;
+	
 	StockInvoiceStatusDAO stockInvoiceStatusDAO;
 	
 	StockInvoiceItemDAO stockInvoiceItemDAO;
@@ -86,6 +92,14 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	
 	public void setLedgerTypeDAO(LedgerTypeDAO ledgerTypeDAO) {
 		this.ledgerTypeDAO = ledgerTypeDAO;
+	}
+	
+	public void setEncounterPatientStateDAO(EncounterPatientStateDAO encounterPatientStateDAO) {
+		this.encounterPatientStateDAO = encounterPatientStateDAO;
+	}
+	
+	public void setEncounterPatientProgramDAO(EncounterPatientProgramDAO encounterPatientProgramDAO) {
+		this.encounterPatientProgramDAO = encounterPatientProgramDAO;
 	}
 	
 	public void setDao(ICareDao dao) {
@@ -799,7 +813,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 			}
 			supplier.setLocation(location);
 		}
-		return this.supplierDAO.updateSupplier(supplier);
+		return supplierDAO.updateSupplier(supplier);
 	}
 	
 	@Override
@@ -1048,6 +1062,16 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	@Override
 	public StockInvoiceItemStatus deleteStockInvoiceItemStatus(String stockInvoiceItemStatusUuid) {
 		return stockDAO.deleteStockInvoiceItemStatus(stockInvoiceItemStatusUuid);
+	}
+	
+	@Override
+	public EncounterPatientState saveEncounterPatientState(EncounterPatientState encounterPatientState) {
+		return encounterPatientStateDAO.save(encounterPatientState);
+	}
+	
+	@Override
+	public EncounterPatientProgram saveEncounterPatientProgram(EncounterPatientProgram encounterPatientProgram) {
+		return encounterPatientProgramDAO.save(encounterPatientProgram);
 	}
 	
 	@Override
