@@ -24,11 +24,13 @@ import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.*;
+import org.openmrs.module.icare.core.models.EncounterPatientProgram;
 import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
+import org.openmrs.module.icare.store.services.StoreService;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -54,6 +56,9 @@ public class ICareController {
 	
 	@Autowired
 	ICareService iCareService;
+	
+	@Autowired
+	StoreService storeService;
 	
 	@Autowired
 	BillingService billingService;
@@ -997,10 +1002,11 @@ public class ICareController {
 	public List<Map<String,Object>> getPatientPrograms(@RequestParam(required = false, value = "program") String programUuid,
 	        @RequestParam(required = false, value = "patient") String patientUuid,
 	        @RequestParam(required = false, defaultValue = "0") Integer startIndex,
-	        @RequestParam(required = false, defaultValue = "10") Integer limit) throws Exception {
+	        @RequestParam(required = false, defaultValue = "10") Integer limit,
+			@RequestParam(defaultValue = "false") Boolean includeDeadPatients) throws Exception {
 		
 				List<Map<String,Object>> programMapList = new ArrayList<>();
-				List<PatientProgram> patientPrograms= iCareService.getPatientProgram(programUuid,patientUuid,startIndex,limit);
+				List<PatientProgram> patientPrograms= iCareService.getPatientProgram(programUuid,patientUuid,startIndex,limit,includeDeadPatients);
 				for(PatientProgram patientProgram : patientPrograms){
 					Map<String,Object> patientProgramMap = new HashMap<>();
 					if(programUuid != null) {
@@ -1078,7 +1084,7 @@ public class ICareController {
 					PatientState patientState = Context.getProgramWorkflowService().getPatientStateByUuid(((Map) encounterPatientStateMap.get("patientState")).get("uuid").toString());
 					encounterPatientState.setPatientState(patientState);
 				}
-				EncounterPatientState savedEncounterPatientState = iCareService.saveEncounterPatientState(encounterPatientState);
+				EncounterPatientState savedEncounterPatientState = storeService.saveEncounterPatientState(encounterPatientState);
 				encounterWorkflowStateListMap.add(savedEncounterPatientState.toMap());
 			}
 		}
@@ -1159,6 +1165,32 @@ public class ICareController {
 
 		}
 		return encountersListMap;
+
+	}
+	
+	@RequestMapping(value = "encounterpatientprogram", method = RequestMethod.POST)
+	@ResponseBody
+	public List<Map<String, Object>> createEncounterPatientProgram(@RequestBody Map<String, Object> encounterPatientProgramMap) {
+
+		List<Map<String, Object>> encounterWorkflowStateListMap = new ArrayList<>();
+		if (encounterPatientProgramMap.get("encounters") != null) {
+			for (Map<String, Object> encounterMap : (List<Map<String, Object>>) encounterPatientProgramMap.get("encounters")) {
+
+				EncounterPatientProgram encounterPatientProgram = new EncounterPatientProgram();
+				Encounter encounter = Context.getEncounterService().getEncounterByUuid(encounterMap.get("uuid").toString());
+				encounterPatientProgram.setEncounter(encounter);
+
+				if (encounterPatientProgramMap.get("patientProgram") != null) {
+
+					PatientProgram patientProgram = Context.getProgramWorkflowService().getPatientProgramByUuid(((Map) encounterPatientProgramMap.get("patientProgram")).get("uuid").toString());
+					encounterPatientProgram.setPatientProgram(patientProgram);
+				}
+				EncounterPatientProgram savedEncounterPatientProgram = storeService.saveEncounterPatientProgram(encounterPatientProgram);
+				encounterWorkflowStateListMap.add(savedEncounterPatientProgram.toMap());
+			}
+		}
+
+		return encounterWorkflowStateListMap;
 
 	}
 }

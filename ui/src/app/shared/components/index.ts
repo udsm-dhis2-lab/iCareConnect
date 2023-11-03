@@ -124,6 +124,8 @@ import { SharedRenderReportDashboardComponent } from "./shared-render-report-das
 import { SharedDrugDosageInterpretationComponent } from "./shared-drug-dosage-interpretation/shared-drug-dosage-interpretation.component";
 import { SharedLocationBasedLogoComponent } from "./shared-location-based-logo/shared-location-based-logo.component";
 import { SharedPatientDischargeDetailsComponent } from "./shared-patient-discharge-details/shared-patient-discharge-details.component";
+import { SharedNextOfKinsFormComponent } from "./shared-next-of-kins-form/shared-next-of-kins-form.component";
+import { SharedNextOfKinsFormDataComponent } from "./shared-next-of-kins-form-data/shared-next-of-kins-form-data.component";
 export const components: any[] = [
   PatientAddressComponent,
   PatientSearchComponent,
@@ -251,6 +253,8 @@ export const components: any[] = [
   SharedDrugDosageInterpretationComponent,
   SharedLocationBasedLogoComponent,
   SharedPatientDischargeDetailsComponent,
+  SharedNextOfKinsFormComponent,
+  SharedNextOfKinsFormDataComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
