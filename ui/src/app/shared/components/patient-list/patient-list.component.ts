@@ -74,7 +74,9 @@ export class PatientListComponent implements OnInit, OnChanges {
     private router: Router,
     private dialog: MatDialog,
     private systemSettingsService: SystemSettingsService
-  ) {}
+  ) {
+    
+  }
 
   ngOnChanges() {}
 
@@ -95,7 +97,13 @@ export class PatientListComponent implements OnInit, OnChanges {
       this.paymentTypeSelected = this.defaultFilter;
     }
     this.itemsPerPage = this.itemsPerPage ? this.itemsPerPage : 10;
+    if(this.filterCategory === "billing"){
+      this.includeDeadPatients = true;
+    }
     this.getVisits(this.visits);
+    
+    
+    
   }
 
   private getVisits(visits: Visit[]) {
