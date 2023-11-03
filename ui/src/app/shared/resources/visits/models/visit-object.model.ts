@@ -33,4 +33,7 @@ export interface VisitObject {
   observations?: any;
   drugOrders?: any;
   admissionEncounter?: any;
+  waitingToBeGivenCabinet?: boolean;
+  deathEncounter?: any;
+  isDead?: boolean;
 }
