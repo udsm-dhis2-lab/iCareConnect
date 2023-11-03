@@ -290,7 +290,7 @@ public class ICareDao extends BaseDAO<Item> {
 		query.setParameter("orderId", prescription.getOrderId());
 		query.executeUpdate();
 		return prescription;
-
+		
 	}
 	
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,

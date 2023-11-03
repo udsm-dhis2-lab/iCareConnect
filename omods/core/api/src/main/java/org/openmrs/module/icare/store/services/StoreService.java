@@ -5,6 +5,8 @@ import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
+import org.openmrs.module.icare.core.models.EncounterPatientProgram;
+import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.store.models.*;
 import org.openmrs.module.icare.store.util.StockOutException;
 
@@ -176,4 +178,8 @@ public interface StoreService extends OpenmrsService {
 	StockInvoiceItem deleteStockInvoiceItem(String stockInvoiceItemUuid);
 	
 	StockInvoiceItemStatus deleteStockInvoiceItemStatus(String stockInvoiceItemStatusUuid);
+	
+	EncounterPatientProgram saveEncounterPatientProgram(EncounterPatientProgram encounterPatientProgram);
+	
+	EncounterPatientState saveEncounterPatientState(EncounterPatientState encounterPatientState);
 }

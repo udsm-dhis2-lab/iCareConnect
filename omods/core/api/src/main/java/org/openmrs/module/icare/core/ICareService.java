@@ -18,6 +18,7 @@ import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
+import org.openmrs.module.icare.core.models.EncounterPatientProgram;
 import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
@@ -181,4 +182,6 @@ public interface ICareService extends OpenmrsService {
 	EncounterPatientState saveEncounterPatientState(EncounterPatientState encounterPatientState);
 	
 	List<Encounter> getEncountersByPatientState(String patientStateUuid);
+	
+	EncounterPatientProgram saveEncounterPatientProgram(EncounterPatientProgram encounterPatientProgram);
 }

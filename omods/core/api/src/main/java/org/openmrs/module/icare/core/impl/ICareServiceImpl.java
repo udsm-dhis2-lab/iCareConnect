@@ -25,6 +25,7 @@ import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
 import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.dao.*;
+import org.openmrs.module.icare.core.models.EncounterPatientProgram;
 import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
@@ -72,6 +73,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	EncounterPatientStateDAO encounterPatientStateDAO;
 	
+	EncounterPatientProgramDAO encounterPatientProgramDAO;
+	
 	UserService userService;
 	
 	/**
@@ -99,6 +102,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	public void setEncounterPatientStateDAO(EncounterPatientStateDAO encounterPatientStateDAO) {
 		this.encounterPatientStateDAO = encounterPatientStateDAO;
+	}
+	
+	public void setEncounterPatientProgramDAO(EncounterPatientProgramDAO encounterPatientProgramDAO) {
+		this.encounterPatientProgramDAO = encounterPatientProgramDAO;
 	}
 	
 	/**
@@ -556,6 +563,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public List<Encounter> getEncountersByPatientState(String patientStateUuid) {
 		return encounterPatientStateDAO.getEncountersByPatientState(patientStateUuid);
+	}
+	
+	@Override
+	public EncounterPatientProgram saveEncounterPatientProgram(EncounterPatientProgram encounterPatientProgram) {
+		return encounterPatientProgramDAO.save(encounterPatientProgram);
 	}
 	
 	@Override
