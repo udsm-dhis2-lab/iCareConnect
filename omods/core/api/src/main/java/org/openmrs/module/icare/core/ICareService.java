@@ -176,8 +176,8 @@ public interface ICareService extends OpenmrsService {
 	
 	ProgramWorkflow saveProgramWorkflow(ProgramWorkflow programWorkflow);
 	
-	List<PatientProgram> getPatientProgram(String programUuid, String patientUuid, Integer startIndex, Integer limit)
-	        throws Exception;
+	List<PatientProgram> getPatientProgram(String programUuid, String patientUuid, Integer startIndex, Integer limit,
+	        Boolean includeDeadPatients) throws Exception;
 	
 	EncounterPatientState saveEncounterPatientState(EncounterPatientState encounterPatientState);
 	

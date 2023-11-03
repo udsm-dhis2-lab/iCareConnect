@@ -11,7 +11,7 @@ public class EncounterPatientStateDAO extends BaseDAO<EncounterPatientState> {
 	
 	public List<Encounter> getEncountersByPatientState(String patientStateUuid) {
 		DbSession session = this.getSession();
-		String queryStr = " SELECT DISTINCT wfs.encounter FROM EncounterPatientState wfs WHERE wfs.patientState.uuid =:patientStateUuid";
+		String queryStr = " SELECT wfs.encounter FROM EncounterPatientState wfs WHERE wfs.patientState.uuid =:patientStateUuid";
 		Query query = session.createQuery(queryStr);
 		query.setParameter("patientStateUuid", patientStateUuid);
 		return query.list();

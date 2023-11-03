@@ -1002,10 +1002,11 @@ public class ICareController {
 	public List<Map<String,Object>> getPatientPrograms(@RequestParam(required = false, value = "program") String programUuid,
 	        @RequestParam(required = false, value = "patient") String patientUuid,
 	        @RequestParam(required = false, defaultValue = "0") Integer startIndex,
-	        @RequestParam(required = false, defaultValue = "10") Integer limit) throws Exception {
+	        @RequestParam(required = false, defaultValue = "10") Integer limit,
+			@RequestParam(defaultValue = "false") Boolean includeDeadPatients) throws Exception {
 		
 				List<Map<String,Object>> programMapList = new ArrayList<>();
-				List<PatientProgram> patientPrograms= iCareService.getPatientProgram(programUuid,patientUuid,startIndex,limit);
+				List<PatientProgram> patientPrograms= iCareService.getPatientProgram(programUuid,patientUuid,startIndex,limit,includeDeadPatients);
 				for(PatientProgram patientProgram : patientPrograms){
 					Map<String,Object> patientProgramMap = new HashMap<>();
 					if(programUuid != null) {
