@@ -11,7 +11,7 @@ import {
 
 const getLocationsState = createSelector(
   getRootState,
-  (state: AppState) => state.locations
+  (state: AppState) => state?.locations
 );
 
 export const getLocationsLoadingError = createSelector(
