@@ -15,7 +15,12 @@ export class FieldControlService {
         group[field.key] = field.required
           ? new FormControl(
               {
-                value: fieldData?.value || field.value || "",
+                value:
+                  (!fieldData?.value?.uuid
+                    ? fieldData?.value
+                    : fieldData?.value?.uuid) ||
+                  field.value ||
+                  "",
                 disabled: field?.disabled,
               },
               [
@@ -30,7 +35,12 @@ export class FieldControlService {
             )
           : new FormControl(
               {
-                value: fieldData?.value || field.value || "",
+                value:
+                  (!fieldData?.value?.uuid
+                    ? fieldData?.value
+                    : fieldData?.value?.uuid) ||
+                  field.value ||
+                  "",
                 disabled: field?.disabled,
               },
 
