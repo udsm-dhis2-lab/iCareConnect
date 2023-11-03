@@ -73,7 +73,7 @@
             <a mat-icon-button class="mr-4" (click)="toggleSideBarMenu($event)">
               <mat-icon>menu</mat-icon>
             </a>
-            <ng-container *ngIf="!useSiderBar">
+            <ng-container *ngIf="!useSideBar">
               <button
                 *ngFor="let form of dashboardParams?.forms"
                 class="mr-2"
@@ -367,7 +367,7 @@
             <div class="row">
               <div
                 class="col-md-2 col-sx-12 col-sm-12 side-bar-menu"
-                *ngIf="useSiderBar"
+                *ngIf="useSideBar"
               >
                 <div class="row">
                   <ul class="side-menu-bar-list">
@@ -394,8 +394,8 @@
               <div
                 class="col-sm-12 col-sx-12"
                 [ngClass]="{
-                  'col-md-10': useSiderBar,
-                  'col-md-12': !useSiderBar
+                  'col-md-10': useSideBar,
+                  'col-md-12': !useSideBar
                 }"
               >
                 <div class="row">

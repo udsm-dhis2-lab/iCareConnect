@@ -6,12 +6,13 @@ import { Observable } from "rxjs";
 import {
   go,
   loadCurrentPatient,
+  loadCustomOpenMRSForms,
   loadLocationsByTagName,
 } from "src/app/store/actions";
 import { loadPatientBills } from "src/app/store/actions/bill.actions";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { AppState } from "src/app/store/reducers";
-import { getCurrentLocation } from "src/app/store/selectors";
+import { getCurrentLocation, getLocationById } from "src/app/store/selectors";
 import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import {
   getActiveVisit,
@@ -20,6 +21,11 @@ import {
 } from "src/app/store/selectors/visit.selectors";
 import { AssignCabinetModalComponent } from "../../modals/assign-cabinet-modal/assign-cabinet-modal.component";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { LocationService } from "src/app/core/services";
+import { formatLocationsPayLoad } from "src/app/core";
+import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
+import { ICARE_CONFIG } from "src/app/shared/resources/config";
+import { EncountersService } from "src/app/shared/services/encounters.service";
 
 @Component({
   selector: "app-mortuary-dashboard",
@@ -37,10 +43,17 @@ export class MortuaryDashboardComponent implements OnInit {
   showHistoryDetails: boolean = true;
   currentLocation$: Observable<any>;
   provider$: Observable<any>;
+  useSideBar: boolean = true;
+  selectedForm: any;
+  showMortuaryNotesArea: boolean = true;
+  formDataDetails: any;
+  saving: boolean = false;
   constructor(
     private activatedRoute: ActivatedRoute,
     private store: Store<AppState>,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private locationService: LocationService,
+    private encounterService: EncountersService
   ) {}
 
   ngOnInit(): void {
@@ -59,6 +72,29 @@ export class MortuaryDashboardComponent implements OnInit {
     );
     this.currentLocation$ = this.store.select(getCurrentLocation());
     this.provider$ = this.store.select(getProviderDetails);
+    this.visit$.subscribe((visitDetails: any) => {
+      if (visitDetails) {
+        this.locationService
+          .getLocationById(visitDetails?.location?.uuid)
+          .subscribe((response: any) => {
+            if (response) {
+              const formattedVisitLocation: any = formatLocationsPayLoad([
+                response,
+              ])[0];
+              if (formattedVisitLocation?.forms) {
+                this.store.dispatch(
+                  loadCustomOpenMRSForms({
+                    formUuids: formattedVisitLocation?.forms,
+                  })
+                );
+                this.forms$ = this.store.select(
+                  getCustomOpenMRSFormsByIds(formattedVisitLocation?.forms)
+                );
+              }
+            }
+          });
+      }
+    });
   }
 
   onBackToList(event: Event): void {
@@ -68,7 +104,12 @@ export class MortuaryDashboardComponent implements OnInit {
 
   getSelectedForm(event: Event, form: any): void {
     event.stopPropagation();
-    console.log(form);
+    this.selectedForm = form;
+    this.showMortuaryNotesArea = false;
+    this.showHistoryDetails = false;
+    setTimeout(() => {
+      this.showMortuaryNotesArea = true;
+    }, 20);
   }
 
   onAssignCabinet(
@@ -116,5 +157,39 @@ export class MortuaryDashboardComponent implements OnInit {
   onToggleVisibityIcons(event: Event): void {
     event.stopPropagation();
     this.showHistoryDetails = !this.showHistoryDetails;
+  }
+
+  toggleSideBarMenu(event: Event): void {
+    event.stopPropagation();
+    this.useSideBar = !this.useSideBar;
+  }
+
+  onGetFormDataDetails(formDataDetails: any): void {
+    this.formDataDetails = formDataDetails;
+  }
+
+  onSave(event: Event, patient: any, visit: any, provider: any): void {
+    event.stopPropagation();
+    this.saving = true;
+    const encounter = {
+      patient: patient?.patient?.uuid,
+      encounterType: this.formDataDetails?.encounterType?.uuid,
+      location: visit?.location?.uuid,
+      encounterProviders: [
+        {
+          provider: provider?.uuid,
+          encounterRole: ICARE_CONFIG.encounterRole?.uuid,
+        },
+      ],
+      visit: visit?.uuid,
+      obs: [],
+    };
+    this.encounterService
+      .createEncounter(encounter)
+      .subscribe((response: any) => {
+        if (response) {
+          this.saving = false;
+        }
+      });
   }
 }
