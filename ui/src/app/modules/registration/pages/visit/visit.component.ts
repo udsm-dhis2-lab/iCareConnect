@@ -341,16 +341,16 @@ export class VisitComponent implements OnInit {
 
     this.store.dispatch(clearActiveVisit());
     this.startVisitEvent.emit();
+    this.dialog.closeAll();
   }
 
   onGetSelectedProgram(selectedProgram: ProgramGetFull): void {
-    if (this.enrolledPrograms && selectedProgram) {
+    if (selectedProgram) {
       // this.enrolledPrograms.
       this.visible =
         this.enrolledPrograms.filter(
-          (program) => program.uuid === selectedProgram.uuid
+          (program) => program?.uuid === selectedProgram?.uuid
         ).length > 0;
-    } else {
       this.selectedProgram = selectedProgram;
     }
     // console.log(selectedProgram);
@@ -366,10 +366,16 @@ export class VisitComponent implements OnInit {
       outcome: null,
     };
 
-    if (this.enrolledPrograms) {
+    if (this.enrolledPrograms.length > 0) {
       this.visible = true;
     } else {
-      this.programsService.newEnrollment(this.patientDetails?.id, payload);
+      this.programsService
+        .newEnrollment(this.patientDetails?.id, payload)
+        .subscribe((response) => {
+          return response;
+        });
+      this.openSnackBar("Patient enrolled Sucessfully", null);
+      this.dialog.closeAll();
     }
   }
 
@@ -423,7 +429,6 @@ export class VisitComponent implements OnInit {
 
   setVisitTypeOption(option, verticalProgamUuid?, isEmergency?) {
     this.isVerticalProgram = verticalProgamUuid === option?.uuid;
-
     const matchedServiceConfigs = (this.servicesConfigs.filter(
       (config) => config.uuid === option?.uuid
     ) || [])[0];
@@ -469,6 +474,7 @@ export class VisitComponent implements OnInit {
         });
       }
     );
+    console.log("patient id", this.patientDetails?.id);
   }
 
   get servicesAsPerVisitType() {
