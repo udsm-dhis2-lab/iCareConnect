@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Observable, of } from "rxjs";
+import { Observable, from, of } from "rxjs";
 import {
   catchError,
   debounceTime,
@@ -10,12 +10,13 @@ import {
 } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "../../../modules/openmrs-http-client/services/openmrs-http-client.service";
 import { Patient } from "../models/patient.model";
+import { Api, PersonattributetypeGetFull } from "../../openmrs";
 
 @Injectable({
   providedIn: "root",
 })
 export class PatientService {
-  constructor(private httpClient: OpenmrsHttpClientService) {}
+  constructor(private httpClient: OpenmrsHttpClientService, private API: Api) {}
 
   getPatients(searchTerm: string): Observable<any> {
     return of(searchTerm).pipe(
@@ -53,6 +54,19 @@ export class PatientService {
   createPatient(data: any): Observable<any> {
     return this.httpClient.post(`patient`, data).pipe(
       map((response) => response),
+      catchError((e) => of(e))
+    );
+  }
+
+  getPersonAttributeTypes(): Observable<PersonattributetypeGetFull[]> {
+    return from(this.API.personattributetype.getAllPersonAttributeTypes()).pipe(
+      map(
+        (response: any) =>
+          response?.results?.filter(
+            (attributeType: PersonattributetypeGetFull) =>
+              !attributeType?.retired
+          ) || []
+      ),
       catchError((e) => of(e))
     );
   }
