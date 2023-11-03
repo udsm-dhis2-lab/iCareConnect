@@ -5,16 +5,22 @@
     visitLoadedState: visitLoadedState$ | async,
     visit: visit$ | async,
     forms: forms$ | async,
-    currentLocation: currentLocation$ | async
+    currentLocation: currentLocation$ | async,
+    provider: provider$ | async
   } as params"
 >
   <div
     class="mt-6 d-flex justify-content-center w-100"
-    *ngIf="params?.loadingVisit || !params?.patient || !params?.currentLocation"
+    *ngIf="
+      params?.loadingVisit ||
+      !params?.patient ||
+      !params?.currentLocation ||
+      !params?.provider
+    "
   >
     <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
   </div>
-  <div *ngIf="params?.patient && params?.visitLoadedState">
+  <div *ngIf="params?.patient && params?.visitLoadedState && params?.provider">
     <!-- {{ params?.patient | json }} -->
     <div class="patient-profile-sticky">
       <app-new-patient-profile
@@ -59,31 +65,43 @@
         </div>
 
         <div class="w-50 d-flex justify-content-end">
+          <span class="mr-2">
+            <img height="30" src="assets/images/mortuary_icon.png" />
+          </span>
           <button
+            *ngIf="params?.visit?.waitingToBeGivenCabinet"
             mat-stroked-button
             class="mr-2 float-right"
-            (click)="onAssignCabinet($event)"
+            (click)="
+              onAssignCabinet(
+                $event,
+                params?.patient,
+                params?.visit,
+                params?.currentLocation,
+                params?.provider
+              )
+            "
           >
             Assign Cabinet
           </button>
 
           <button
-            *ngIf="isInpatient"
+            *ngIf="
+              params?.visit?.isDead && !params?.visit?.waitingToBeGivenCabinet
+            "
             mat-stroked-button
-            class="mr-2 float-right"
             (click)="
-              onOpenTransferWithinPopup(
+              onTransferCabinet(
                 $event,
-                'a007bbfe-fbe5-11e2-8ff2-fd54ab5fdb2a',
-                'Bed Location',
-                dashboardParams?.currentPatient,
-                activeVisit,
-                dashboardParams?.currentLocation,
-                true
+                params?.patient,
+                params?.visit,
+                params?.currentLocation,
+                params?.provider
               )
             "
+            class="mr-2 float-right"
           >
-            Transfer within
+            Transfer cabinet
           </button>
           <button
             (click)="onDischarge($event)"
