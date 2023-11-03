@@ -1,7 +1,7 @@
 export interface ProgramEnrollment {
   patient: string;
   program: string;
-  dateEnrolled: string;
+  dateEnrolled: Date;
   dateCompleted: null;
   location: string;
   outcome: string;
