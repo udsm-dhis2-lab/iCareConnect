@@ -290,7 +290,7 @@ public class ICareDao extends BaseDAO<Item> {
 		query.setParameter("orderId", prescription.getOrderId());
 		query.executeUpdate();
 		return prescription;
-
+		
 	}
 	
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
@@ -805,6 +805,14 @@ public class ICareDao extends BaseDAO<Item> {
 		String queryStr = "SELECT distinct v FROM Visit v INNER JOIN v.encounters e INNER JOIN e.orders o INNER JOIN o.orderType ot WHERE ot.name='Bed Order' AND v.stopDatetime IS NULL";
 		Query query = session.createQuery(queryStr);
 		
+		return query.list();
+	}
+
+	public List<Visit> getOpenVisitForDeceasedPatients(){
+		DbSession session = getSession();
+		String queryStr = "SELECT distinct v FROM Visit v INNER JOIN v.encounters e INNER JOIN e.orders o INNER JOIN o.orderType ot WHERE ot.name='Cabinet Order' AND v.stopDatetime IS NULL";
+		Query query = session.createQuery(queryStr);
+
 		return query.list();
 	}
 	

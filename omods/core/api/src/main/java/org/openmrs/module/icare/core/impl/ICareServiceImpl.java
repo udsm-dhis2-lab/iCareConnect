@@ -25,6 +25,7 @@ import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
 import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.dao.*;
+import org.openmrs.module.icare.core.models.EncounterPatientProgram;
 import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
@@ -72,6 +73,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	EncounterPatientStateDAO encounterPatientStateDAO;
 	
+	EncounterPatientProgramDAO encounterPatientProgramDAO;
+	
 	UserService userService;
 	
 	/**
@@ -99,6 +102,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	public void setEncounterPatientStateDAO(EncounterPatientStateDAO encounterPatientStateDAO) {
 		this.encounterPatientStateDAO = encounterPatientStateDAO;
+	}
+	
+	public void setEncounterPatientProgramDAO(EncounterPatientProgramDAO encounterPatientProgramDAO) {
+		this.encounterPatientProgramDAO = encounterPatientProgramDAO;
 	}
 	
 	/**
@@ -526,7 +533,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public List<PatientProgram> getPatientProgram(String programUuid, String patientUuid, Integer startIndex, Integer limit)
+	public List<PatientProgram> getPatientProgram(String programUuid, String patientUuid, Integer startIndex, Integer limit, Boolean includeDeadPatients)
 	        throws Exception {
 		Program program = null;
 		if (programUuid != null) {
@@ -545,7 +552,21 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			
 		}
 		// TODO: ADD SUPPORT FOR THE API TO ACCOMODATE THE REMAINING PARAMETERS
-		return Context.getProgramWorkflowService().getPatientPrograms(patient, program, null, null, null, null, false);
+		List<PatientProgram> patientPrograms = Context.getProgramWorkflowService().getPatientPrograms(patient, program, null, null, null, null, false);
+
+		List<PatientProgram> existingPatientPrograms = new ArrayList<>();
+		for(PatientProgram patientProgram : patientPrograms){
+			if(!patientProgram.getPatient().getPerson().getDead()){
+				existingPatientPrograms.add(patientProgram);
+			}
+		}
+		if(includeDeadPatients){
+			return  patientPrograms;
+		}
+		else{
+			return existingPatientPrograms;
+		}
+
 	}
 	
 	@Override
@@ -556,6 +577,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public List<Encounter> getEncountersByPatientState(String patientStateUuid) {
 		return encounterPatientStateDAO.getEncountersByPatientState(patientStateUuid);
+	}
+	
+	@Override
+	public EncounterPatientProgram saveEncounterPatientProgram(EncounterPatientProgram encounterPatientProgram) {
+		return encounterPatientProgramDAO.save(encounterPatientProgram);
 	}
 	
 	@Override

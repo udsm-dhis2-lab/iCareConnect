@@ -49,6 +49,11 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
+                <property name="encounterPatientProgramDAO">
+                    <bean class="org.openmrs.module.icare.core.dao.EncounterPatientProgramDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
             </bean>
         </property>
         <property name="preInterceptors">
@@ -362,6 +367,18 @@
 
                 <property name="supplierDAO">
                     <bean class="org.openmrs.module.icare.store.dao.SupplierDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="encounterPatientStateDAO">
+                    <bean class="org.openmrs.module.icare.store.dao.EncounterPatientStateDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="encounterPatientProgramDAO">
+                    <bean class="org.openmrs.module.icare.store.dao.EncounterPatientProgramDAO">
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
