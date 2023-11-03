@@ -195,9 +195,9 @@ export class CaptureFormDataModalComponent implements OnInit {
       ],
     };
     this.causeOfDeathNonCoded =
-      this.formData["37cf2f9d-4e73-46c1-aa60-7088f61b8d85"].value;
+      this.formData["37cf2f9d-4e73-46c1-aa60-7088f61b8d85"]?.value;
     this.causeOfDeath =
-      this.formData["b61962e7-7972-4945-baf9-75074d531cb9"].value;
+      this.formData["b61962e7-7972-4945-baf9-75074d531cb9"]?.value;
 
     // console.log('OBS', obs);
     // console.log('location', location);
@@ -217,16 +217,21 @@ export class CaptureFormDataModalComponent implements OnInit {
       let patient = {
         ...this.patient,
         person: {
+          deathDate: new Date(),
           dead: true,
-          causeOfDeath: this.causeOfDeath ? this.causeOfDeath : "",
+          causeOfDeath: this.causeOfDeath ? this.causeOfDeath : null,
           causeOfDeathNonCoded: this.causeOfDeath
-            ? ""
+            ? null
             : this.causeOfDeathNonCoded,
         },
       };
-      this.registrationService.updatePatient(patient, this.patient?.uuid);
+      this.registrationService
+        .updatePatient(patient, this.patient?.uuid)
+        .subscribe((data) => {
+          return data;
+        });
     }
-    // this.dialogRef.close();
+    this.dialogRef.close();
   }
 
   onPrint(e: any) {
