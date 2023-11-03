@@ -39,7 +39,7 @@ import { SharedConfirmationComponent } from "src/app/shared/components/shared-co
 import { ProgramsService } from "src/app/shared/resources/programs/services/programs.service";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { ProgramEnrollment } from "src/app/modules/vertical-programs/models/programEnrollment.model";
-import { ProgramGetFull } from "src/app/shared/resources/openmrs";
+import { ProgramGet, ProgramGetFull } from "src/app/shared/resources/openmrs";
 
 @Component({
   selector: "app-visit",
@@ -122,6 +122,9 @@ export class VisitComponent implements OnInit {
   isVerticalProgram: boolean = false;
   verticalProgramUuid$: Observable<any>;
   selectedService$: Observable<any>;
+  selectedProgram: ProgramGetFull;
+  visible: boolean = false;
+  enrolledPrograms: ProgramGetFull[];
 
   constructor(
     private store: Store<AppState>,
@@ -133,6 +136,10 @@ export class VisitComponent implements OnInit {
     private programsService: ProgramsService,
     private systemSettingsService: SystemSettingsService
   ) {}
+
+  dismissAlert() {
+    this.visible = false;
+  }
 
   ngOnInit(): void {
     this.patientVisist$ = this.visitService
@@ -335,16 +342,42 @@ export class VisitComponent implements OnInit {
   }
 
   onGetSelectedProgram(selectedProgram: ProgramGetFull): void {
-    console.log(selectedProgram);
+    if (this.enrolledPrograms && selectedProgram) {
+      // this.enrolledPrograms.
+      this.visible =
+        this.enrolledPrograms.filter(
+          (program) => program.uuid === selectedProgram.uuid
+        ).length > 0;
+    } else {
+      this.selectedProgram = selectedProgram;
+    }
+    // console.log(selectedProgram);
   }
 
-  enrollToProgam(event, payload: ProgramEnrollment) {
-    this.programsService.newEnrollment(this.patientt.uuid, payload);
+  enrollToProgam(payload: ProgramEnrollment) {
+    payload = {
+      patient: this.patientDetails?.id,
+      program: this.selectedProgram?.uuid,
+      dateEnrolled: new Date(),
+      dateCompleted: null,
+      location: this.currentRoom,
+      outcome: null,
+    };
+
+    if (this.enrolledPrograms) {
+      this.visible = true;
+    } else {
+      this.programsService.newEnrollment(this.patientDetails?.id, payload);
+    }
   }
 
   searchRoom(event: Event) {
     event.stopPropagation();
     this.searchTerm = (event.target as HTMLInputElement).value;
+  }
+
+  getEnrollmentsByPatientUuid(patientUuid: string): Observable<any[]> {
+    return this.programsService.getEnrollmentsByPatient(patientUuid);
   }
 
   toggleAuthorizationNumberInputActive(event) {
@@ -387,7 +420,6 @@ export class VisitComponent implements OnInit {
   }
 
   setVisitTypeOption(option, verticalProgamUuid?, isEmergency?) {
-    // console.log('the hierarchy', this.visitsHierarchy2);
     this.isVerticalProgram = verticalProgamUuid === option?.uuid;
 
     const matchedServiceConfigs = (this.servicesConfigs.filter(
@@ -427,6 +459,14 @@ export class VisitComponent implements OnInit {
       visitType: { uuid: option.uuid, display: option.display },
     };
     this.currentVisitType = option;
+
+    this.getEnrollmentsByPatientUuid(this.patientDetails?.id).subscribe(
+      (response) => {
+        this.enrolledPrograms = response.map((program) => {
+          return program?.program;
+        });
+      }
+    );
   }
 
   get servicesAsPerVisitType() {
@@ -583,6 +623,7 @@ export class VisitComponent implements OnInit {
         id: service?.uuid,
       });
     }
+    // console.log("selectedService", service);
   }
 
   onCloseActiveVisit(e, activeVisit: any, key?: string) {

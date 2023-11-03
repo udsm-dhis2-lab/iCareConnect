@@ -35,8 +35,13 @@ export class ProgramsService {
     );
   }
 
-  getEnrollmentsByPatient(patientUuid: string): Observable<any> {
-    const url = `programenrollment?patient=${patientUuid}&v=full`;
+  getEnrollmentsByPatient(
+    patientUuid: string,
+    startIndex?: string,
+    limit?: string
+  ): Observable<any> {
+    // const url = `programenrollment?patient=${patientUuid}&v=full`;
+    const url = `icare/patientprogramenrollment?patient=${patientUuid}`;
     return this.httpClient.get(url).pipe(
       map((response: any) => {
         return response;
@@ -57,7 +62,7 @@ export class ProgramsService {
   }
 
   newEnrollment(patientId, payload) {
-    const url = `programenrollment/${patientId}/state`;
+    const url = `programenrollment/`;
 
     return this.httpClient.post(url, payload).pipe(
       map((response: any) => {
