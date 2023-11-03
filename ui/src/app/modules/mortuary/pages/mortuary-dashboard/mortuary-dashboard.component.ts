@@ -34,7 +34,7 @@ export class MortuaryDashboardComponent implements OnInit {
   patient$: Observable<any>;
   visit$: Observable<any>;
   forms$: Observable<any>;
-  showHistoryDetails: boolean = false;
+  showHistoryDetails: boolean = true;
   currentLocation$: Observable<any>;
   provider$: Observable<any>;
   constructor(
