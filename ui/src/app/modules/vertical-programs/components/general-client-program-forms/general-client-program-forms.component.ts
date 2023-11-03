@@ -70,6 +70,7 @@ export class GeneralClientProgramFormsComponent implements OnInit {
       encounterDatetime: new Date(),
       patient: this.patient?.patient?.uuid,
       location: this.currentLocation?.uuid,
+      form: form?.uuid,
       obs: Object.keys(this.formData)
         .map((key: string) => {
           return {
