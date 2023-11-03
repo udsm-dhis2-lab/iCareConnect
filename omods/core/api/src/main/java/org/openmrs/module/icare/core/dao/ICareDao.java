@@ -807,6 +807,14 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		return query.list();
 	}
+
+	public List<Visit> getOpenVisitForDeceasedPatients(){
+		DbSession session = getSession();
+		String queryStr = "SELECT distinct v FROM Visit v INNER JOIN v.encounters e INNER JOIN e.orders o INNER JOIN o.orderType ot WHERE ot.name='Cabinet Order' AND v.stopDatetime IS NULL";
+		Query query = session.createQuery(queryStr);
+
+		return query.list();
+	}
 	
 	public long countYearlyGeneratedMetadataCodes(String metadataType) {
 		DbSession session = this.getSession();
