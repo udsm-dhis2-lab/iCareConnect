@@ -238,13 +238,16 @@ export class VisitsService {
         })
       );
   }
-  getAdmittedPatientsVisitsByEncounterType(
+  getPatientsVisitsByEncounterType(
     encounterTypeUuid: string
   ): Observable<any[]> {
     return this.httpClient
-      .get(`icare/visit?encounterTypeUuid=${encounterTypeUuid}`)
+      .get(
+        `icare/visit?encounterTypeUuid=${encounterTypeUuid}&includeDeadPatients=true`
+      )
       .pipe(
         map((visitResults: any) => {
+          console;
           return visitResults?.results.map((result) => {
             return {
               ...result,
