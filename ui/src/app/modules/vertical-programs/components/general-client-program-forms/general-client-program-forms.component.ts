@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import { Location } from "src/app/core/models";
 import { CurrentUser } from "src/app/shared/models/current-user.models";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -9,10 +10,12 @@ import {
   LocationAttributeGetFull,
   WorkflowStateGetFull,
 } from "src/app/shared/resources/openmrs";
+import { ProgramsService } from "src/app/shared/resources/programs/services/programs.service";
 import { EncountersService } from "src/app/shared/services/encounters.service";
 import { loadCustomOpenMRSForms } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
+import { flatten, groupBy, orderBy, keyBy } from "lodash";
 
 @Component({
   selector: "app-general-client-program-forms",
@@ -32,9 +35,11 @@ export class GeneralClientProgramFormsComponent implements OnInit {
   isFormValid: boolean = false;
   saving: boolean = false;
   formData: any = {};
+  programEncounterDetails$: Observable<any>;
   constructor(
     private store: Store<AppState>,
-    private encountersService: EncountersService
+    private encountersService: EncountersService,
+    private programsService: ProgramsService
   ) {}
 
   ngOnInit(): void {
@@ -50,6 +55,7 @@ export class GeneralClientProgramFormsComponent implements OnInit {
     this.forms$ = this.store.select(
       getCustomOpenMRSFormsByIds(this.formsUuids)
     );
+    // this.getProgramEncounterDetails()
   }
 
   onFormUpdate(formValue: FormValue): void {
@@ -86,8 +92,62 @@ export class GeneralClientProgramFormsComponent implements OnInit {
       .createEncounter(encounter)
       .subscribe((response: any) => {
         if (response) {
-          this.saving = false;
+          const data = {
+            patientProgram: {
+              uuid: this.patientEnrollmentDetails?.uuid,
+            },
+            encounters: [
+              {
+                uuid: response?.uuid,
+              },
+            ],
+          };
+          this.programsService
+            .createEncounterProgram(data)
+            .subscribe((response: any) => {
+              if (response) {
+                this.getProgramEncounterDetails();
+                this.saving = false;
+              }
+            });
         }
       });
+  }
+
+  getProgramEncounterDetails(): void {
+    this.programEncounterDetails$ = this.programsService
+      .getProgramEncounterDetails(this.patientEnrollmentDetails?.uuid)
+      .pipe(
+        map((response: any[]) => {
+          const obs: any[] = flatten(
+            response?.map((encounter: any) => {
+              return encounter?.obs?.map((observation: any) => {
+                return {
+                  ...observation,
+                  encounter: encounter,
+                  conceptUuid: observation?.concept?.uuid,
+                };
+              });
+            })
+          );
+          const groupedObsByConcept: any = groupBy(obs, "conceptUuid");
+          const formattedObs = Object.keys(groupedObsByConcept).map((key) => {
+            return {
+              uuid: key,
+              history: orderBy(
+                groupedObsByConcept[key],
+                ["obsDatetime"],
+                ["asc"]
+              ),
+              latest: orderBy(
+                groupedObsByConcept[key],
+                ["obsDatetime"],
+                ["desc"]
+              )[0],
+            };
+          });
+          return keyBy(formattedObs, "uuid");
+        })
+      );
   }
 }

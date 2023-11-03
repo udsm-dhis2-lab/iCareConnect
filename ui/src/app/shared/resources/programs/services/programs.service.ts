@@ -95,9 +95,29 @@ export class ProgramsService {
     );
   }
 
+  createEncounterProgram(data: any): Observable<any> {
+    return this.httpClient.post(`icare/encounterpatientprogram`, data).pipe(
+      map((response: any) => {
+        return response;
+      }),
+      catchError((error: any) => of(error))
+    );
+  }
+
   getPatientStateEncounterDetails(patientStateUuid: string): Observable<any> {
     return this.httpClient
       .get(`icare/encounterpatientstate/${patientStateUuid}`)
+      .pipe(
+        map((response: any) => {
+          return response;
+        }),
+        catchError((error: any) => of(error))
+      );
+  }
+
+  getProgramEncounterDetails(enrollmentUuid: string): Observable<any> {
+    return this.httpClient
+      .get(`icare/encounterpatientprogram/${enrollmentUuid}`)
       .pipe(
         map((response: any) => {
           return response;

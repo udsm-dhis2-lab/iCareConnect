@@ -33,8 +33,7 @@ export class WorkflowStateComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // console.log("patientEnrollmentDetails", this.patientEnrollmentDetails);
-    this.updatedPatientEnrollmentDetails$ = of(this.patientEnrollmentDetails);
+    this.getPatientEnrollmentDetails();
     this.startDateField = new DateField({
       id: "startDate",
       key: "startDate",
@@ -57,6 +56,13 @@ export class WorkflowStateComponent implements OnInit {
     }
   }
 
+  getPatientEnrollmentDetails(): void {
+    this.updatedPatientEnrollmentDetails$ =
+      this.programsService.getPatientEnrollmentDetails(
+        this.patientEnrollmentDetails?.uuid
+      );
+  }
+
   onSettingPatientWorkflowState(event: Event): void {
     event.stopPropagation();
     this.saving = true;
@@ -74,10 +80,7 @@ export class WorkflowStateComponent implements OnInit {
       .subscribe((response: any) => {
         if (response) {
           this.patientWorkflowState = response;
-          this.updatedPatientEnrollmentDetails$ =
-            this.programsService.getPatientEnrollmentDetails(
-              this.patientEnrollmentDetails?.uuid
-            );
+          this.getPatientEnrollmentDetails();
           this.saving = false;
         }
       });

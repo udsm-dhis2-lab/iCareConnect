@@ -41,11 +41,11 @@ export class CaptureFormDataComponent implements OnInit {
       : of([]);
   }
 
-  onFormUpdate(data: FormValue) {
+  onFormUpdate(data: FormValue): void {
     this.formDataUpdate.emit(data);
   }
 
-  onToggleLegend(e, itemName) {
+  onToggleLegend(e: Event, itemName: string): void {
     e.stopPropagation();
     this.legendControl[itemName] = this.legendControl[itemName]
       ? !this.legendControl[itemName]

@@ -26,9 +26,11 @@
     <app-capture-form-data
       *ngIf="
         params?.formDetails &&
-        patientWorkflowState && params?.patientStateEncounterDetails
+        patientWorkflowState &&
+        params?.patientStateEncounterDetails
       "
       [form]="params?.formDetails"
+      [observations]="params?.patientStateEncounterDetails"
       (formDataUpdate)="onFormUpdate($event)"
     ></app-capture-form-data>
     <div class="mt-2 w-100 d-flex justify-content-end">
