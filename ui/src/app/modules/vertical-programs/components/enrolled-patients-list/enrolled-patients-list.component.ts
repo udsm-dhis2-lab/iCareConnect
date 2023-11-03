@@ -6,6 +6,7 @@ import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { go } from "src/app/store/actions";
 import { ProgramsService } from "src/app/shared/resources/programs/services/programs.service";
+import { ProgramGetFull } from "src/app/shared/resources/openmrs";
 
 @Component({
   selector: "app-enrolled-patients-list",
@@ -20,13 +21,33 @@ export class EnrolledPatientsListComponent implements OnInit {
   enrolledPatients$: Observable<any>;
   parameters: string[] = [];
   programsList: any[] = [];
+  selectedProgram: ProgramGetFull;
   constructor(
     private programsService: ProgramsService,
     private store: Store<AppState>
   ) {}
 
   ngOnInit(): void {
-    this.parameters = [...this.parameters, `program=${this.programs[0]?.uuid}`];
+    this.selectedProgram = this.programs[0];
+    this.parameters = [
+      ...this.parameters,
+      `program=${this.selectedProgram?.uuid}`,
+    ];
+    this.getEnrollments();
+  }
+
+  getSelectedProgram(event: Event, program: ProgramGetFull): void {
+    event.stopPropagation();
+    this.selectedProgram = program;
+    this.parameters = [
+      ...this.parameters,
+      `program=${this.selectedProgram?.uuid}`,
+    ];
+    this.getEnrollments();
+  }
+
+  onSearchClient(event: KeyboardEvent): void {
+    const searchingText: string = (event?.target as any)?.value;
     this.getEnrollments();
   }
 
@@ -40,7 +61,7 @@ export class EnrolledPatientsListComponent implements OnInit {
     moveItemInArray(this.programs, event.previousIndex, event.currentIndex);
   }
 
-  onViewPatient(patientEnrollment: any): void {
+  onViewPatientEnrollment(patientEnrollment: any): void {
     // console.log(patientEnrollment);
     this.store.dispatch(
       go({

@@ -40,6 +40,17 @@
         params?.provider
       "
     >
+      <div class="col-12">
+        <button
+          class="float-left ml-2"
+          mat-stroked-button
+          (click)="onBackToList($event, '/vertical_programs/patient-list')"
+          matTooltip="Back to List"
+        >
+          <mat-icon>arrow_back</mat-icon>
+          Back to Client List
+        </button>
+      </div>
       <div class="col-md-8 col-sm-12 col-sx-12">
         <mat-tab-group>
           <mat-tab
