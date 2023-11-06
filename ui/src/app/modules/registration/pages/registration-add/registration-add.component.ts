@@ -956,6 +956,7 @@ export class RegistrationAddComponent implements OnInit {
                             .open(StartVisitModelComponent, {
                               width: "85%",
                               data: { patient: patientResponse },
+                              disableClose: false,
                             })
                             .afterClosed()
                             .subscribe((visitDetails) => {

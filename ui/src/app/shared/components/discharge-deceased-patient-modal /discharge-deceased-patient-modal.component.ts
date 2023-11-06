@@ -29,8 +29,6 @@ export class DischargeDeceasedPatientModalComponent implements OnInit {
     private observationService: ObservationService
   ) {
     this.visitDetails = data;
-    console.log(this.visitDetails);
-    console.log("datar: ", this.visitDetails?.patient?.patient["uuid"]);
   }
 
   ngOnInit(): void {
