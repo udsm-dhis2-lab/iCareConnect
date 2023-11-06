@@ -42,14 +42,16 @@ export class MortuaryDashboardComponent implements OnInit {
   patient$: Observable<any>;
   visit$: Observable<any>;
   forms$: Observable<any>;
-  showHistoryDetails: boolean = true;
+  showHistoryDetails: boolean = false;
   currentLocation$: Observable<any>;
   provider$: Observable<any>;
   useSideBar: boolean = true;
   selectedForm: any;
-  showMortuaryNotesArea: boolean = true;
+  showMortuaryNotesArea: boolean = false;
   formDataDetails: any;
   saving: boolean = false;
+  showNextOfKins: boolean = true;
+  nextOfKinsData: any;
   constructor(
     private activatedRoute: ActivatedRoute,
     private store: Store<AppState>,
@@ -108,6 +110,7 @@ export class MortuaryDashboardComponent implements OnInit {
     event.stopPropagation();
     this.selectedForm = form;
     this.showMortuaryNotesArea = false;
+    this.showNextOfKins = false;
     this.showHistoryDetails = false;
     setTimeout(() => {
       this.showMortuaryNotesArea = true;
@@ -123,7 +126,7 @@ export class MortuaryDashboardComponent implements OnInit {
   ): void {
     event.stopPropagation();
     this.dialog.open(AssignCabinetModalComponent, {
-      minWidth: "50%",
+      minWidth: "70%",
       data: {
         patient,
         visit,
@@ -142,7 +145,7 @@ export class MortuaryDashboardComponent implements OnInit {
   ): void {
     event.stopPropagation();
     this.dialog.open(AssignCabinetModalComponent, {
-      minWidth: "50%",
+      minWidth: "70%",
       data: {
         patient,
         visit,
@@ -194,7 +197,14 @@ export class MortuaryDashboardComponent implements OnInit {
         },
       ],
       visit: visit?.uuid,
-      obs: [],
+      obs: Object.keys(this.formDataDetails?.data)?.map((key: string) => {
+        return {
+          obsDatetime: new Date(),
+          concept: key,
+          value: this.formDataDetails?.data[key]?.value,
+          person: patient?.patient?.person?.uuid,
+        };
+      }),
     };
     this.encounterService
       .createEncounter(encounter)
@@ -203,5 +213,22 @@ export class MortuaryDashboardComponent implements OnInit {
           this.saving = false;
         }
       });
+  }
+
+  onOpenNextOfKinsForm(event: Event): void {
+    event.stopPropagation();
+    this.showNextOfKins = true;
+    this.showHistoryDetails = false;
+    this.showMortuaryNotesArea = false;
+  }
+
+  onSaveNextOfKinDetails(event: Event, patient: any): void {
+    event.stopPropagation();
+    console.log(patient);
+  }
+
+  onGetNextOfKinsData(nextOfKinsData: any): void {
+    // console.log("next of kins details", nextOfKinsData);
+    this.nextOfKinsData = nextOfKinsData;
   }
 }
