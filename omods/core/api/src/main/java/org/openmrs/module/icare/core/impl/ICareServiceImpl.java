@@ -583,7 +583,12 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public EncounterPatientProgram saveEncounterPatientProgram(EncounterPatientProgram encounterPatientProgram) {
 		return encounterPatientProgramDAO.save(encounterPatientProgram);
 	}
-	
+
+	@Override
+	public List<Encounter> getEncountersByPatientProgram(String patientProgramUuid) {
+		return encounterPatientProgramDAO.getEncounterByPatientProgram(patientProgramUuid);
+	}
+
 	@Override
 	public Item getItemByConceptUuid(String uuid) {
 		return dao.getItemByConceptUuid(uuid);

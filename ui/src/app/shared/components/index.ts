@@ -124,6 +124,9 @@ import { SharedRenderReportDashboardComponent } from "./shared-render-report-das
 import { SharedDrugDosageInterpretationComponent } from "./shared-drug-dosage-interpretation/shared-drug-dosage-interpretation.component";
 import { SharedLocationBasedLogoComponent } from "./shared-location-based-logo/shared-location-based-logo.component";
 import { SharedPatientDischargeDetailsComponent } from "./shared-patient-discharge-details/shared-patient-discharge-details.component";
+import { DischargeDeceasedPatientModalComponent } from "./discharge-deceased-patient-modal /discharge-deceased-patient-modal.component";
+
+
 export const components: any[] = [
   PatientAddressComponent,
   PatientSearchComponent,
@@ -163,6 +166,7 @@ export const components: any[] = [
   PatientVisitHistoryModalComponent,
   PatientMedicationSummaryComponent,
   DischargePatientModalComponent,
+  DischargeDeceasedPatientModalComponent,
   CreatePatientBedOrderModalComponent,
   ProceduresHistorySummaryComponent,
   TransferPatientOutsideComponent,

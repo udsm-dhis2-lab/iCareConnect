@@ -26,6 +26,8 @@ import { formatLocationsPayLoad } from "src/app/core";
 import { getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { EncountersService } from "src/app/shared/services/encounters.service";
+import { DischargePatientModalComponent } from "src/app/shared/components/discharge-patient-modal/discharge-patient-modal.component";
+import { DischargeDeceasedPatientModalComponent } from "src/app/shared/components/discharge-deceased-patient-modal /discharge-deceased-patient-modal.component";
 
 @Component({
   selector: "app-mortuary-dashboard",
@@ -150,8 +152,18 @@ export class MortuaryDashboardComponent implements OnInit {
     });
   }
 
-  onDischarge(event: Event): void {
+  onDischarge(event: Event,visit, patient, provider): void {
+  
     event.stopPropagation();
+    this.dialog.open(DischargeDeceasedPatientModalComponent, {
+      minWidth: "30%",
+      data: {
+         visit,
+         provider,
+         patient
+        
+      },
+    });
   }
 
   onToggleVisibityIcons(event: Event): void {

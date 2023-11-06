@@ -34,7 +34,7 @@ public class ICareConfig {
 	public static final String CONSULTATION_ORDER_TYPE = "icare.consultation.orderType";
 	
 	public static final String BED_ORDER_TYPE = "icare.orderType.bed";
-
+	
 	public static final String CABINET_ORDER_TYPE = "icare.orderType.cabinet";
 	
 	public final static String REGISTRATION_FEE_CONCEPT = "icare.registration.feeConcept";
@@ -94,7 +94,7 @@ public class ICareConfig {
 	public static final String END_CONSULTATION_CONCEPT = "iCare.visits.settings.controlVisitsEndingStatuses.ConceptUuid";
 	
 	public static final String BED_ORDER_CONCEPT = "icare.billing.accomodationChargesConcept";
-
+	
 	public static final String CABINET_ORDER_CONCEPT = "icare.billing.cabinetChargesConcept";
 	
 	public static final String LAB_RESULT_APPROVAL_CONFIGURATION = "iCare.laboratory.resultApprovalConfiguration";
