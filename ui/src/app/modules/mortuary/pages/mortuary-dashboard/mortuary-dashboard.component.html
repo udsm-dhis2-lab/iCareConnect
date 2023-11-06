@@ -115,7 +115,7 @@
             Transfer cabinet
           </button>
           <button
-            (click)="onDischarge($event)"
+            (click)="onDischarge($event,params?.visit,params?.patient, params?.provider)"
             mat-stroked-button
             class="mr-2 float-right"
           >
