@@ -269,7 +269,6 @@ export class StockStatusListComponent implements OnInit {
   }
 
   onDownloadXLS(e: Event, param: any, facilityDetails: any, currentUser: any) {
-    console.log("the parama", this.currentLocation);
     let excelData = param.map((data) => {
       return {
         name: data?.display,
