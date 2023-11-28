@@ -279,7 +279,10 @@ export class StockStatusListComponent implements OnInit {
     });
 
     if (excelData) {
-      this.exportDataService.exportAsExcelFile(excelData, "masembo");
+      this.exportDataService.exportAsExcelFile(
+        excelData,
+        this.currentLocation?.display
+      );
     }
   }
 
