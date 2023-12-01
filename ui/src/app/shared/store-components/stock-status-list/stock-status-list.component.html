@@ -36,7 +36,7 @@
           > Receive New Item </button> -->
             <button
               [disabled]="!userPrivileges['STORE_ADD_NEW_STOCKABLE_ITEM']"
-              class="button-round ml-4"
+              class="button-round ml-2"
               color="primary"
               mat-stroked-button
               (click)="onShowReceivingForm($event)"
@@ -61,6 +61,7 @@
                 !params?.stocksList || params?.stocksList.length === 0
               "
               color="primary"
+              class="ml-2"
               mat-flat-button
               (click)="
                 onOpenConsumeModal(
@@ -78,7 +79,7 @@
             <button
               [disabled]="params?.stocksList?.length === 0"
               color="primary"
-              class="button-round ml-2"
+              class="ml-2"
               mat-stroked-button
               (click)="
                 onPrint(
@@ -90,6 +91,27 @@
               "
             >
               <mat-icon color="white">print</mat-icon> Print Items
+            </button>
+          </div>
+          <div class="float-right">
+            <button
+              [disabled]="params?.stocksList?.length === 0"
+              class="ml-2"
+              color="primary"
+              mat-stroked-button
+              (click)="
+                onDownloadXLS(
+                  $event,
+                  params?.stocksList,
+                  params?.facilityDetails,
+                  params?.currentUser
+                )
+              "
+            >
+              <mat-icon>
+                <img height="24px" src="assets/material/excel_white.png" />
+              </mat-icon>
+              Excel
             </button>
           </div>
         </div>

@@ -678,41 +678,43 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
       (visitData) => visitData.category === "OBSERVATIONS"
     );
     if (observationForm) {
-      frameDoc.document.write(`
-  <div>
-           <h5>${observationForm?.form}</h5>
+      this.visitHistory?.visitOrderedData?.forEach((visitData) => {
+        if (visitData?.category === "OBSERVATIONS") {
+          frameDoc.document.write(`
+          <div style="margin-top:2px">
+           <h5>${visitData?.form}</h5>
          </div>
          <table id="table">
            <thead>
-             <tr>
-              
-               <th>Values</th>
-               <th>Written By</th>
-             </tr>
+               <tr ><th colspan="2">
+            Values <span style="font-weight:normal;"> &nbsp; - &nbsp; <i>written on ${visitData?.date} ${visitData?.time}  By ${visitData?.provider}
+          </i></span>
+               </th></tr>
+             
            </thead>
            <tbody>`);
-    }
 
-    this.visitHistory?.visitOrderedData?.forEach((visitData) => {
-      if (visitData?.category === "OBSERVATIONS") {
-        if (visitData?.results?.length > 0) {
-          frameDoc.document.write(`<td>`);
-
-          visitData?.obs?.forEach((result) => {
-            frameDoc.document.write(` ${result?.concept?.display} - 
-            ${
-              result?.value?.display ? result?.value?.display : result?.value
-            }, &nbsp;&nbsp;
-            `);
-            frameDoc.document.write(`</td><td>
-             ${visitData?.provider} on 
-          ${visitData?.date} ${visitData?.time}
-                `);
+          visitData?.obs?.forEach((ob) => {
+            frameDoc.document.write(`<tr><td> ${ob?.concept?.display} </td><td> 
+            ${ob?.value?.display ? ob?.value?.display : ob?.value}
+              </td></tr>`);
           });
         }
-        frameDoc.document.write(`</td></tr>`);
-      }
-    });
+      });
+    }
+
+    // this.visitHistory?.visitOrderedData?.forEach((visitData) => {
+    //   if (visitData?.category === "OBSERVATIONS") {
+    //     frameDoc.document.write(`<tr`);
+
+    //     visitData?.obs?.forEach((ob) => {
+    //       frameDoc.document.write(`<tr><td> ${ob?.concept?.display} </td><td>
+    //         ${ob?.value?.display ? ob?.value?.display : ob?.value}
+    //         </td></tr>`);
+    //     });
+    //     frameDoc.document.write(`</tr>`);
+    //   }
+    // });
 
     frameDoc.document.write(`</tbody></table>`);
     if (this.visitHistory?.diagnoses?.PROVISIONAL?.length) {
