@@ -187,7 +187,6 @@
                   >
                     <td>
                       {{ count + 1 }}
-                      {{ drugParams?.currentVisit?.drugOrders | json }}
                     </td>
                     <td>
                       {{
@@ -200,6 +199,8 @@
                       {{
                         drugOrder?.drugOrder?.instructions
                           ? drugOrder?.drugOrder?.instructions
+                          : drugOrder?.instructions
+                          ? drugOrder?.instructions
                           : "No instructions written"
                       }}
                     </td>

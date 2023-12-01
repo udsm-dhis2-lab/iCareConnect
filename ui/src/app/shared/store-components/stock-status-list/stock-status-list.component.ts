@@ -17,6 +17,7 @@ import { getCurrentUserDetails } from "src/app/store/selectors/current-user.sele
 import { AddNewStockReceivedComponent } from "../../store-modals/add-new-stock-received/add-new-stock-received.component";
 import { ConsumeStockItemModalComponent } from "../../store-modals/consume-stock-item-modal/consume-stock-item-modal.component";
 import { sortBy } from "lodash";
+import { ExportDataService } from "src/app/core/services/export-data.service";
 @Component({
   selector: "app-stock-status-list",
   templateUrl: "./stock-status-list.component.html",
@@ -53,7 +54,8 @@ export class StockStatusListComponent implements OnInit {
     private stockService: StockService,
     private dialog: MatDialog,
     private systemSettingsService: SystemSettingsService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private exportDataService: ExportDataService
   ) {}
 
   ngOnInit(): void {
@@ -264,6 +266,24 @@ export class StockStatusListComponent implements OnInit {
           this.getStock();
         }
       });
+  }
+
+  onDownloadXLS(e: Event, param: any, facilityDetails: any, currentUser: any) {
+    let excelData = param.map((data) => {
+      return {
+        name: data?.display,
+        quantity: data?.quantity,
+        eligibleQuantity: data?.eligibleQuantity,
+        location: this.currentLocation?.display,
+      };
+    });
+
+    if (excelData) {
+      this.exportDataService.exportAsExcelFile(
+        excelData,
+        this.currentLocation?.display
+      );
+    }
   }
 
   onPrint(e: Event, param: any, facilityDetails: any, currentUser: any) {
