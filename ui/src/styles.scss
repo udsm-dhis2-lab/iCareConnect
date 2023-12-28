@@ -242,7 +242,7 @@ mat-dialog-container {
 
 .mat-typography {
   margin: 0 !important;
-  padding: 6px !important;
+  padding: 19px !important; //increase padding to allow user to see the patient demographic information's are shown and not hidden.
 }
 // For back to patient list
 .back-to-client-list button {

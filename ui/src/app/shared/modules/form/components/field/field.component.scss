@@ -25,27 +25,52 @@
 }
 
 ::ng-deep .mat-option {
-  word-wrap: break-word !important;
-  white-space: pre-line !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
-  text-overflow: ellipsis !important;
-  display: block !important;
-  line-height: 30px !important;
-  padding: 0 16px !important;
-  padding-top: 2rem !important;
-  padding-bottom: 2rem !important;
-  text-align: left !important;
-  text-decoration: none !important;
-  max-width: 100% !important;
-  position: relative !important;
-  cursor: pointer !important;
-  outline: none !important;
-  display: flex !important;
-  flex-direction: row !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-  align-items: center !important;
-  -webkit-tap-highlight-color: transparent !important;
+  // word-wrap: break-word !important;
+  // white-space: pre-line !important;
+  // border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
+  // text-overflow: ellipsis !important;
+  // display: block !important;
+  // line-height: 30px !important;
+  // padding: 0 16px !important;
+  // padding-top: 2rem !important;
+  // padding-bottom: 2rem !important;
+  // text-align: left !important;
+  // text-decoration: none !important;
+  // max-width: 100% !important;
+  // position: relative !important;
+  // cursor: pointer !important;
+  // outline: none !important;
+  // display: flex !important;
+  // flex-direction: row !important;
+  // max-width: 100% !important;
+  // box-sizing: border-box !important;
+  // align-items: center !important;
+  // -webkit-tap-highlight-color: transparent !important;
+  
+  /* Allow long words to break across lines: */
+word-wrap: break-word !important;
+white-space: pre-line !important;
+/* Remove text truncation: */
+text-overflow: initial !important;
+/* Ensure height accommodates content: */
+height: fit-content !important; /* Use standard fit-content for wider compatibility */
+/* Maintain appropriate spacing and alignment: */
+line-height: 1.5 !important; /* Adjust for readability */
+padding: 0.5rem 16px !important; /* Adjust as needed */
+align-items: center !important;
+/* Other relevant styles: */
+border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
+display: block !important;
+text-align: left !important;
+text-decoration: none !important;
+max-width: 100% !important;
+position: relative !important;
+outline: none !important;
+display: flex !important;
+flex-direction: row !important;
+box-sizing: border-box !important;
+-webkit-tap-highlight-color: transparent !important;
+
 }
 
 input[type="number"]::-webkit-inner-spin-button,
