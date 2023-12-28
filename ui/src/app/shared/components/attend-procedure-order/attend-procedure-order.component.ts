@@ -72,3 +72,7 @@ export class AttendProcedureOrderComponent implements OnInit {
     this.dialogRef.close(event);
   }
 }
+
+
+// the module does not attend to all diseases, seems there is bad connection/ linking 
+// in diseases in the procedure module
