@@ -128,7 +128,7 @@
           params?.visits &&
           params?.visits.length > 0 &&
           ((paymentTypeSelected &&
-            visit?.visit?.paymentType === paymentTypeSelected) ||
+            params?.visits[0]?.visit?.paymentType === paymentTypeSelected) ||
             !paymentTypeSelected)
         "
       >
