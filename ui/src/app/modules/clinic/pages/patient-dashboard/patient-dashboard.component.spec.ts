@@ -4,7 +4,7 @@ import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { AppState } from 'src/app/store/reducers';
 import { PatientDashboardComponent } from './patient-dashboard.component';
 import { storeDataMock } from 'src/test-mocks/store-data.mock';
-
+//describe PatientDashboardComponent//
 describe('PatientDashboardComponent', () => {
   let component: PatientDashboardComponent;
   let fixture: ComponentFixture<PatientDashboardComponent>;
@@ -16,7 +16,7 @@ describe('PatientDashboardComponent', () => {
       providers: [provideMockStore(storeDataMock)]
     }).compileComponents();
   }));
-
+//beforeEach//
   beforeEach(() => {
     fixture = TestBed.createComponent(PatientDashboardComponent);
     component = fixture.componentInstance;

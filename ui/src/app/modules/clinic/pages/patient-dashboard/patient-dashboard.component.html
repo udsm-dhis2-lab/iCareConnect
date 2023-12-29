@@ -19,6 +19,10 @@
     IPDRoundConceptUuid: IPDRoundConceptUuid$ | async
   } as params"
 >
+
+
+
+
   <app-shared-patient-dashboard
     *ngIf="
       params?.currentUser &&
@@ -83,4 +87,20 @@
       !params?.IPDRoundConceptUuid
     "
   ></mat-progress-bar>
+
+    <!-- <div
+    class="alert alert-danger mt-2"
+    role="alert"
+    *ngIf="params?.iCareGeneralConfigurations === ''"
+  >
+    Missing General iCare Metadata Configurations, Please set "iCare.GeneralMetadata.Configurations" or Contact IT
+  </div>
+
+  <div
+    class="alert alert-danger mt-2"
+    role="alert"
+    *ngIf="params?.iCareClinicConfigurations === ''"
+  >
+    Missing Icare Clinic Configurations. Please set "icare.clinic.configurations" or Contact IT
+  </div> -->
 </div>

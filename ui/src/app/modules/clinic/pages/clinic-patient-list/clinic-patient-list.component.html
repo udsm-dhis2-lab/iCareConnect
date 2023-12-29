@@ -20,6 +20,14 @@
     </button>
     <span class="ml-2">Patients</span>
   </mat-toolbar>
+
+ <!-- <div class="p-2" *ngIf="params?.settingCurrentLocationStatus">
+    <div class="w-100 text-center">
+      <mat-spinner></mat-spinner>
+    </div> -->
+
+
+
   <div *ngIf="!params?.settingCurrentLocationStatus">
     <div class="w-100 text-center">
       <!-- <div class="text-muted h6 mb-4">Search for a patient</div> -->
@@ -96,6 +104,7 @@
         </mat-tab>
         <mat-tab label="With Radiology Orders">
           <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
+            
 
           <ng-template matTabContent>
             <app-patient-list
@@ -105,12 +114,14 @@
               [itemsPerPage]="10"
               (selectPatient)="onSelectPatient($event)"
             ></app-patient-list>
+
           </ng-template>
           <!-- </div> -->
         </mat-tab>
         <mat-tab label="With Medications">
           <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
 
+            
           <ng-template matTabContent>
             <app-patient-list
               [shouldShowParentLocation]="true"
