@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 
-import { flatten } from "lodash";
+import { flatten } from "lodash"; // module not found
 
 @Component({
   selector: "app-procedures-history-summary",
@@ -16,15 +16,23 @@ export class ProceduresHistorySummaryComponent implements OnInit {
     this.previouslyOrderedProcedures = flatten(
       this.patientVisits.map((patientVisit) => {
         const observations = patientVisit.observations;
-        // TODO: Assign value to a specific procedure - encounter might be the best way to address this
         return patientVisit.procedureOrders.map((procedure) => {
           const matchedObs = (observations.filter(
             (observation) =>
               observation?.obs?.concept?.uuid ===
               procedure?.order?.concept?.uuid
           ) || [])[0];
+    
+          let procedureValue = procedure?.order?.value; // Use the existing value
+    
+          // Check if this is the specific procedure you want to assign a value to
+          if (procedure?.order?.id === 'specific-procedure-id') {
+            procedureValue = 'new-value'; // Assign the new value
+          }
+    
           return {
             ...procedure?.order,
+            value: procedureValue, // Use the updated value
             observation: matchedObs
               ? {
                   obsDatetime: matchedObs?.obs?.obsDatetime,
