@@ -29,16 +29,7 @@
         [selectedIndex]="selectedTab.value"
         (selectedIndexChange)="selectedTab.setValue($event)"
       >
-        <!-- <mat-tab label="All Active Patients">
-          <div class="p-2" *ngIf="selectedTab.value === 0">
-            <app-patient-list
-              [isTabularList]="true"
-              [itemsPerPage]="25"
-              [currentLocation]="(currentLocation$ | async)?.id"
-              (selectPatient)="onSelectPatient($event)"
-            ></app-patient-list>
-          </div>
-        </mat-tab> -->
+  
         <mat-tab label="Awaiting Consultation">
           <!-- <div class="p-2" *ngIf="selectedTab.value === 0"> -->
           <ng-template matTabContent>
@@ -79,9 +70,6 @@
             ></app-patient-list>
           </div>
         </mat-tab> -->
-        <!--
-          The piece of code below displays all patients with associated laboratory results
-        -->
         <mat-tab label="With Laboratory Tests">
           <div class="p-2" *ngIf="selectedTab.value === 2"> 
 
@@ -97,6 +85,8 @@
           </ng-template>
           </div>
         </mat-tab>
+
+
         <mat-tab label="With Radiology Orders">
           <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
 
@@ -137,6 +127,8 @@
             ></app-patient-list>
           </ng-template>
         </mat-tab>
+
+
         <mat-tab
           label="All Patients"
           *ngIf="
@@ -156,6 +148,8 @@
             ></app-patient-list>
           </ng-template>
         </mat-tab>
+
+        
         <mat-tab
           label="Every Patients History"
           *ngIf="
