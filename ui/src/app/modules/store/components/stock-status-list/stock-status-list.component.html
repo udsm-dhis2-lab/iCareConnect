@@ -159,9 +159,10 @@
                     <mat-icon>more_vert</mat-icon>
                   </button>
                   <mat-menu #menu="matMenu">
+                    <!-- disabled button if quantity is equal to zero -->
                     <button
                       mat-menu-item
-                      [disabled]="currentItemStock?.id === stock.id"
+                      [disabled]="currentItemStock?.id === stock.id  || currentItemStock?.quantity === 0"
                       color="primary"
                       (click)="onToggleCurrentStock($event, stock)"
                       (click)="menuTrigger.closeMenu()"
