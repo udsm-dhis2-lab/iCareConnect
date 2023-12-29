@@ -12,6 +12,8 @@ import { AppState } from "src/app/store/reducers";
 import { getGroupedObservationByConcept } from "src/app/store/selectors/observation.selectors";
 import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
 
+const SMALL_DIALOG_WIDTH = '25%';
+const LARGE_DIALOG_WIDTH = '65%';
 @Component({
   selector: "app-patient-procedures-summary",
   templateUrl: "./patient-procedures-summary.component.html",
@@ -47,6 +49,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
     private store: Store<AppState>
   ) {}
 
+  
   ngOnInit(): void {
     this.procedures$ = this.visitService.getActiveVisitProcedures(
       this.patientVisit.uuid,
@@ -146,7 +149,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
   onOpenAttendProcedure(event: Event, proceduredOrder): void {
     event.stopPropagation();
     this.dialog.open(AttendProcedureOrderComponent, {
-      width: "65%",
+      width: LARGE_DIALOG_WIDTH,
       height: "auto",
       data: {
         proceduredOrder,
@@ -157,10 +160,10 @@ export class PatientProceduresSummaryComponent implements OnInit {
   onDeleteProcedure(e: Event, procedure: any) {
     // e.stopPropagation();
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
-      width: "25%",
+      width: SMALL_DIALOG_WIDTH,
       data: {
-        modalTitle: `Delete ${procedure?.concept?.display}`,
-        modalMessage: `You are about to delete ${procedure?.concept?.display} for this patient, Click confirm to delete!`,
+        modalTitle: Delete ${procedure?.concept?.display},
+        modalMessage: You are about to delete ${procedure?.concept?.display} for this patient, Click confirm to delete!,
         showRemarksInput: true,
       },
       disableClose: false,
