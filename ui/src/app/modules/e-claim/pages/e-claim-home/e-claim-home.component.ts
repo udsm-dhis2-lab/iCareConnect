@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -22,10 +22,11 @@ import { AppState } from 'src/app/store/reducers';
   templateUrl: './e-claim-home.component.html',
   styleUrls: ['./e-claim-home.component.scss'],
 })
-export class EClaimHomeComponent implements OnInit {
+export class EClaimHomeComponent implements OnInit, AfterViewInit {
+  // Using explicit types for better readability
   visits$: Observable<Visit[]>;
-  visitColumns: any[];
-  dataSource: any;
+  visitColumns: { id: string; label: string }[];
+  dataSource: MatTableDataSource<Visit>;
   loadingData: boolean;
   loadedData: boolean = false;
   loadingDataError: string;
@@ -40,11 +41,13 @@ export class EClaimHomeComponent implements OnInit {
     private dialog: MatDialog
   ) {}
 
+  // Getter for displayed columns
   get displayedColumns(): string[] {
     return this.visitColumns.map((visitColumn) => visitColumn.id);
   }
 
   ngOnInit() {
+    // Initialize properties
     this.loadingData = true;
     this.visitColumns = [
       { id: 'index', label: '#' },
@@ -63,20 +66,24 @@ export class EClaimHomeComponent implements OnInit {
   }
 
   ngAfterViewInit() {
+    // Move the call to getAllActiveVisits here if it depends on asynchronous operations
     this.getAllActiveVisits();
   }
 
   getAllActiveVisits() {
+    // Fetch visits and handle the response
     this.loadedData = false;
     this.visitService.getAllVisits(null, null, true).subscribe(
       (visits) => {
-        this.dataSource = new MatTableDataSource(visits);
+        // Use MatTableDataSource directly with types
+        this.dataSource = new MatTableDataSource<Visit>(visits);
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
         this.loadingData = false;
         this.loadedData = true;
       },
       (error) => {
+        // Handle errors
         this.loadingData = false;
         this.loadedData = true;
         this.loadingDataError = error;
@@ -85,6 +92,7 @@ export class EClaimHomeComponent implements OnInit {
   }
 
   onSelectPatient(event: Event, patient: any) {
+    // Dispatch actions for selected patient
     event.stopPropagation();
     this.store.dispatch(updateCurrentPatient({ patient }));
     this.store.dispatch(
@@ -95,6 +103,7 @@ export class EClaimHomeComponent implements OnInit {
   }
 
   onBack(e: Event) {
+    // Navigate back
     e.stopPropagation();
     this.store.dispatch(go({ path: ['/'] }));
   }
