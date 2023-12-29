@@ -33,6 +33,7 @@ const routes: Routes = [
             (m) => m.SampleCollectionModule
           ),
       },
+      //adding filtering logic
       {
         path: "lab-investigation-home",
         loadChildren: () =>
@@ -75,6 +76,7 @@ const routes: Routes = [
             (m) => m.SampleResultsModule
           ),
       },
+      //adding filtering logic
       {
         path: "sample-storage",
         loadChildren: () =>
