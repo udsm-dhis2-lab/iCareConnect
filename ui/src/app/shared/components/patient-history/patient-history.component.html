@@ -1,3 +1,4 @@
+
 <div
   class="history"
   *ngIf="{
@@ -6,9 +7,7 @@
     generalPrescriptionOrderType: generalPrescriptionOrderType$ | async,
     prescriptionArrangementFields: prescriptionArrangementFields$ | async,
     specificDrugConceptUuid: specificDrugConceptUuid$ | async,
-    allForms: allForms$ | async,
-    facilityDetails: facilityDetails$ | async,
-    currentUser: currentUser$ | async
+    allForms: allForms$ | async
   } as params"
 >
   <div *ngIf="!params?.visits?.length && loadingData">
@@ -27,39 +26,32 @@
             <i>(On going visit)</i>
           </span>
         </ng-template>
-        <app-patient-history-data
-          [visit]="visit"
-          [forms]="params?.customForms"
-          [FacilityDetails]="params?.facilityDetails"
-          [currentUser]="params?.currentUser"
-          [generalPrescriptionOrderType]="params?.generalPrescriptionOrderType"
-          [prescriptionArrangementFields]="
-            params?.prescriptionArrangementFields
+        <app-patient-history-data 
+          [visit]="visit" 
+          [forms]="params?.customForms" 
+          [generalPrescriptionOrderType]=" 
+            params?.generalPrescriptionOrderType 
+          "
+          [prescriptionArrangementFields]=" 
+            params?.prescriptionArrangementFields 
           "
           [specificDrugConceptUuid]="params?.specificDrugConceptUuid"
         ></app-patient-history-data>
-      </mat-step>
-    </mat-vertical-stepper>
-    <!-- <div class="history overflow-auto">
-        <ng-container *ngFor="let visit of params?.visits">
-          <app-patient-history-data 
-            
-            [visit]="visit" 
-            [forms]="params?.customForms" 
-            [generalPrescriptionOrderType]="params?.generalPrescriptionOrderType"
-            [prescriptionArrangementFields]="params?.prescriptionArrangementFields"
-            [specificDrugConceptUuid]="params?.specificDrugConceptUuid"
-            ></app-patient-history-data>
-        </ng-container>
-      </div> -->
+      </mat-step> 
+    </mat-vertical-stepper> 
+    <!-- <div class="history overflow-auto"> 
+        <ng-container *ngFor="let visit of params?.visits">  
+          <app-patient-history-data   
+             
+            [visit]="visit"  
+            [forms]="params?.customForms"  
+            [generalPrescriptionOrderType]="params?.generalPrescriptionOrderType" 
+            [prescriptionArrangementFields]="params?.prescriptionArrangementFields" 
+            [specificDrugConceptUuid]="params?.specificDrugConceptUuid" 
+            ></app-patient-history-data> 
+        </ng-container> 
+      </div> --> 
+  </div> 
+  <div *ngIf="!params?.visits?.length && !loadingData"> 
+    <h4 class="text-center"> {{ patient?.person ? 'No visit data found for ' + patient?.person?.display : 'No visit data found for this patient' }}</h4>
   </div>
-  <div *ngIf="!params?.visits?.length && !loadingData">
-    <h4 class="text-center">
-      {{
-        patient?.person
-          ? "No visit data found for " + patient?.person?.display
-          : "No visit data found for this patient"
-      }}
-    </h4>
-  </div>
-</div>
