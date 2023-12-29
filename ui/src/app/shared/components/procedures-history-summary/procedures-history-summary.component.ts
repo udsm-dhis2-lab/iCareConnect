@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
 
-import { flatten } from "lodash";
-
+//import { flatten } from "lodash";
+//module not found
 @Component({
   selector: "app-procedures-history-summary",
   templateUrl: "./procedures-history-summary.component.html",
@@ -13,7 +13,7 @@ export class ProceduresHistorySummaryComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    this.previouslyOrderedProcedures = flatten(
+    //this.previouslyOrderedProcedures = flatten(
       this.patientVisits.map((patientVisit) => {
         const observations = patientVisit.observations;
         // TODO: Assign value to a specific procedure - encounter might be the best way to address this
@@ -35,7 +35,7 @@ export class ProceduresHistorySummaryComponent implements OnInit {
           };
         });
       }) || []
-    );
+    //);
     // console.log('allOrderedProcedures', this.previouslyOrderedProcedures);
   }
 }
