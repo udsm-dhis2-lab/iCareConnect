@@ -4,14 +4,9 @@ import { map, tap } from "rxjs/operators";
 import { VisitsService } from "../../resources/visits/services/visits.service";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
-import {
-  getAllForms,
-  getCustomOpenMRSFormsByIds,
-} from "src/app/store/selectors/form.selectors";
+import { getAllForms, getCustomOpenMRSFormsByIds } from "src/app/store/selectors/form.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { getParentLocation } from "src/app/store/selectors";
-import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 
 @Component({
   selector: "app-patient-history",
@@ -21,6 +16,7 @@ import { getCurrentUserDetails } from "src/app/store/selectors/current-user.sele
 export class PatientHistoryComponent implements OnInit {
   @Input() patient: any;
   @Input() location: any;
+ 
 
   visits$: Observable<any>;
   customForms$: Observable<any>;
@@ -30,28 +26,15 @@ export class PatientHistoryComponent implements OnInit {
   errors: any[] = [];
   allForms$: Observable<any>;
   loadingData: boolean = false;
-  facilityDetails$: Observable<any>;
-  currentUser$: Observable<{
-    userPrivileges: any;
-    links?: { rel?: string; uri?: string }[];
-    uuid?: string;
-    display?: string;
-    username?: string;
-    systemId?: string;
-    userProperties?: object;
-    person?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").PersonGetRef;
-    privileges?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").PrivilegeGetRef[];
-    roles?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").RoleGetRef[];
-    provider?: { uuid?: string; display?: string };
-  }>;
   constructor(
     private visitsService: VisitsService,
     private store: Store<AppState>,
     private systemSettingsService: SystemSettingsService
   ) {}
 
+
   ngOnInit(): void {
-    this.loadingData = true;
+    this.loadingData = true
     // if(this.location){
     //   this.customForms$ = this.store.select(
     //     getCustomOpenMRSFormsByIds(this.location?.forms || [])
@@ -60,8 +43,6 @@ export class PatientHistoryComponent implements OnInit {
     //   this.customForms$ = this.store.select(getAllForms);
     // }
     this.customForms$ = this.store.select(getAllForms);
-    this.facilityDetails$ = this.store.select(getParentLocation);
-    this.currentUser$ = this.store.select(getCurrentUserDetails);
     this.generalPrescriptionOrderType$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.orderType"
@@ -134,11 +115,12 @@ export class PatientHistoryComponent implements OnInit {
                   ];
                 });
               });
-              return {
-                visit: visit?.visit,
-                obs: obs,
-                orders: [
-                  ...visit?.visit?.encounters.map((encounter) => {
+
+              return { 
+                visit: visit?.visit, 
+                obs: obs, 
+                orders:[ 
+                 ...visit?.visit?.encounters.map((encounter) => {
                     return (encounter?.orders || []).map((order) => {
                       return {
                         ...order,

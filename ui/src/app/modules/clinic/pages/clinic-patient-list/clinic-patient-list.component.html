@@ -96,6 +96,7 @@
         </mat-tab>
         <mat-tab label="With Radiology Orders">
           <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
+            
 
           <ng-template matTabContent>
             <app-patient-list
@@ -105,12 +106,14 @@
               [itemsPerPage]="10"
               (selectPatient)="onSelectPatient($event)"
             ></app-patient-list>
+
           </ng-template>
           <!-- </div> -->
         </mat-tab>
         <mat-tab label="With Medications">
           <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
 
+            
           <ng-template matTabContent>
             <app-patient-list
               [shouldShowParentLocation]="true"
