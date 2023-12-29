@@ -338,62 +338,62 @@ export class VisitsService {
       parametersString += `&exclude=${excludedSampleCategories.join(",")}`;
     }
     //
-    // return (
-    //   locationUuids?.length > 0
-    //     ? zip(
-    //         ...locationUuids.map((locationUuid) => {
-    //           const locationParameter = `locationUuid=${locationUuid}`;
-    //           return this.httpClient.get(
-    //             `icare/visit?${locationParameter}${parametersString}&startIndex=${startIndex}&limit=${limit}`
-    //           );
-    //         })
-    //       )
-    //     : this.httpClient.get(
-    //         `icare/visit?${parametersString.replace(
-    //           "&",
-    //           ""
-    //         )}&startIndex=${startIndex}&limit=${limit}`
-    //       )
-    // ).pipe(
-    //   map((visitResponse: any) => {
-    //     const results =
-    //       locationUuids?.length > 0
-    //         ? flatten(visitResponse.map((visitData) => visitData?.results))
-    //         : visitResponse?.results;
-    //     // TODO: Softcode Insurance attribute value (Concept UUID) - 00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII
-    //     return (
-    //       (flatten(results) || [])
-    //         .map((visitResult: any) => {
-    //           const formattedResult = {
-    //             pager:
-    //               locationUuids?.length > 0
-    //                 ? visitResponse[0].links
-    //                 : visitResponse?.links,
-    //             ...visitResult,
-    //             paymentType:
-    //               (
-    //                 visitResult?.attributes.filter(
-    //                   (attribute) =>
-    //                     attribute &&
-    //                     attribute?.display &&
-    //                     attribute?.display ===
-    //                       "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
-    //                 ) || []
-    //               ).length > 0
-    //                 ? "Insurance"
-    //                 : "Cash",
-    //           };
-    //           return new Visit(formattedResult);
-    //         })
-    //         .filter((visit) =>
-    //           !onlyInsurance ? visit : visit?.paymentType === "Insurance"
-    //         ) || []
-    //     );
-    //   }),
-    //   catchError((error) => {
-    //     return of(error);
-    //   })
-    // );
+    return (
+      locationUuids?.length > 0
+        ? zip(
+            ...locationUuids.map((locationUuid) => {
+              const locationParameter = `locationUuid=${locationUuid}`;
+              return this.httpClient.get(
+                `icare/visit?${locationParameter}${parametersString}&startIndex=${startIndex}&limit=${limit}`
+              );
+            })
+          )
+        : this.httpClient.get(
+            `icare/visit?${parametersString.replace(
+              "&",
+              ""
+            )}&startIndex=${startIndex}&limit=${limit}`
+          )
+    ).pipe(
+      map((visitResponse: any) => {
+        const results =
+          locationUuids?.length > 0
+            ? flatten(visitResponse.map((visitData) => visitData?.results))
+            : visitResponse?.results;
+        // TODO: Softcode Insurance attribute value (Concept UUID) - 00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII
+        return (
+          (flatten(results) || [])
+            .map((visitResult: any) => {
+              const formattedResult = {
+                pager:
+                  locationUuids?.length > 0
+                    ? visitResponse[0].links
+                    : visitResponse?.links,
+                ...visitResult,
+                paymentType:
+                  (
+                    visitResult?.attributes.filter(
+                      (attribute) =>
+                        attribute &&
+                        attribute?.display &&
+                        attribute?.display ===
+                          "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
+                    ) || []
+                  ).length > 0
+                    ? "Insurance"
+                    : "Cash",
+              };
+              return new Visit(formattedResult);
+            })
+            .filter((visit) =>
+              !onlyInsurance ? visit : visit?.paymentType === "Insurance"
+            ) || []
+        );
+      }),
+      catchError((error) => {
+        return of(error);
+      })
+    );
     // }
     return (
       locationUuids?.length > 0
