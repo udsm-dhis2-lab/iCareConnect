@@ -36,20 +36,20 @@ export class LabResultsComponent implements OnInit {
     );
   }
 
-  changeTab(val): void {
+  changeTab(val: any): void {
     this.selectedTab.setValue(val);
   }
 
-  getResult(result, testOrder) {
+  getResult(result: any, testOrder: { orderNumber: string | number; }) {
     //console.log('resu', result);
     this.testResultsObject[testOrder.orderNumber] = result;
   }
 
-  saveResult(e, testOrder, sample) {
+  saveResult(e: { stopPropagation: () => void; }, testOrder: any, sample: any) {
     e.stopPropagation();
   }
 
-  onGetModalForResultsApproval(e, testOrder) {
+  onGetModalForResultsApproval(e: { stopPropagation: () => void; }, testOrder: { concept: { display: any; }; }) {
     e.stopPropagation();
     this.store.dispatch(
       loadConcept({
