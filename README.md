@@ -34,7 +34,7 @@ Copy the following and paste it to the file proxy-config.json
 ```bash
 {
   "/": {
-    "target":"https://icare.dhis2.udsm.ac.tz",
+    "target":"https://icare-student.dhis2.udsm.ac.tz",
     "secure": "false",
     "changeOrigin": "true"
   }
