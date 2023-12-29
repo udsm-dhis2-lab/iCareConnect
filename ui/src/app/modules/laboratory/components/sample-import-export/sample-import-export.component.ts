@@ -54,6 +54,8 @@ export class SampleImportExportComponent implements OnInit {
     private diagnosisService: DiagnosisService
   ) {}
 
+
+  //adding filtering logic
   ngOnInit(): void {
     this.exportTemplateDataReferences$ = this.systemSettingsService
       .getSystemSettingsMatchingAKey(`lis.icare.importExport.template.`)
@@ -100,6 +102,8 @@ export class SampleImportExportComponent implements OnInit {
         hdr = XLSX.utils.format_cell(cell);
         rowOneHeaders.push(hdr);
       }
+
+      //adding filtering logic
     }
     for (count = 0; count <= range.e.c; ++count) {
       var cellForRowTwo =
