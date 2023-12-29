@@ -57,10 +57,10 @@ export class CaptureLabResultsApprovalComponent implements OnInit {
   }
 
   onApprove(e, testOrder) {
-    // Prevent event propagation
+    // Prevent event propagation.
     e.stopPropagation();
 
-    // Log the function call with the testOrder parameter
+    // Log the function call with the testOrder parameter.
     console.log('onApprove function called with testOrder:', testOrder);
     
     this.store.dispatch(
