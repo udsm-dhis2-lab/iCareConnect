@@ -84,7 +84,7 @@ export class EClaimHomeComponent implements OnInit {
     );
   }
 
-  onSelectPatient(patient) {
+  onSelectPatient(event: Event, patient: any) {
     event.stopPropagation();
     this.store.dispatch(updateCurrentPatient({ patient }));
     this.store.dispatch(
