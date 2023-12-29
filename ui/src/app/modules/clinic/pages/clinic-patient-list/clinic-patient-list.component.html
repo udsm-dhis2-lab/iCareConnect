@@ -79,6 +79,10 @@
             ></app-patient-list>
           </div>
         </mat-tab> -->
+
+
+        <!-- TAB THAT ISSUE 231 ARISES FROM
+        The review was done by Mandy Nuhu and the implementation of this component was correct -->
         <mat-tab label="With Laboratory Tests">
           <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
 
@@ -94,6 +98,8 @@
           </ng-template>
           <!-- </div> -->
         </mat-tab>
+
+
         <mat-tab label="With Radiology Orders">
           <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
 
@@ -134,6 +140,8 @@
             ></app-patient-list>
           </ng-template>
         </mat-tab>
+
+
         <mat-tab
           label="All Patients"
           *ngIf="
@@ -153,6 +161,8 @@
             ></app-patient-list>
           </ng-template>
         </mat-tab>
+
+        
         <mat-tab
           label="Every Patients History"
           *ngIf="

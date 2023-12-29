@@ -78,6 +78,9 @@ export class PatientListComponent implements OnInit, OnChanges {
   ngOnChanges() {}
 
   ngOnInit() {
+    //THIS IS THE CODE FOR ISSUE 231 
+    //Review was done by Mandy Nuhu and the implementation is correct
+    //this section filters the users receive from the backend according to Category
     this.filters$ = this.systemSettingsService
       .getSystemSettingsMatchingAKey(
         "iCare.filters." + (this.filterCategory ? this.filterCategory : "")
