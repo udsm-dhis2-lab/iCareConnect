@@ -23,6 +23,8 @@ import {
   clearVisitsDatesParameters,
   setCurrentUserCurrentLocation,
   loadSystemSettings,
+  loadActiveVisits,
+  loadActiveVisitsWithLabOrders,
 } from "src/app/store/actions";
 import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
 import {
@@ -388,7 +390,6 @@ export class LaboratoryComponent implements OnInit {
 
     this.startDate = this.parameters?.startDate;
     this.endDate = this.parameters?.endDate;
-
     this.store.dispatch(setVisitsParameters({ parameters: this.parameters }));
   }
 
@@ -419,6 +420,7 @@ export class LaboratoryComponent implements OnInit {
       }, 200);
 
       // this.store.dispatch(loadActiveVisits({ parameters: this.parameters }));
+
 
       if (this.currentSubModule == "collection") {
         // console.log('here');
