@@ -7,6 +7,8 @@ import { ClinicPatientListComponent } from './clinic-patient-list.component';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { storeDataMock } from 'src/test-mocks/store-data.mock';
 import { AppState } from 'src/app/store/reducers';
+import { Route } from '@angular/router';
+import { NgModule } from '@angular/core';
 
 describe('ClinicPatientListComponent', () => {
   let component: ClinicPatientListComponent;
