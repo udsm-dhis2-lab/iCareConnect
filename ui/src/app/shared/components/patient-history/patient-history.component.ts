@@ -39,6 +39,11 @@ export class PatientHistoryComponent implements OnInit {
     username?: string;
     systemId?: string;
     userProperties?: object;
+    
+    // Switched from absolute to relative paths for improved codebase portability and maintainability.
+    // Absolute paths can be less flexible and may lead to issues when the project structure changes,
+    // while relative paths provide more adaptability as the codebase evolves.
+
     person?: import("../../resources/openmrs").PersonGetRef;
     privileges?: import("../../resources/openmrs").PrivilegeGetRef[];
     roles?: import("../../resources/openmrs").RoleGetRef[];
