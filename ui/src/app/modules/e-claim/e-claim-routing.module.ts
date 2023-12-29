@@ -5,12 +5,19 @@ import { SubmitEClaimComponent } from './pages/submit-e-claim/submit-e-claim.com
 
 const routes: Routes = [
   {
-    path: '',
+    path: 'home',
     component: EClaimHomeComponent,
+    data: { title: 'E-Claim Home' }, // Add a title for the route if needed
   },
   {
-    path: ':patientId/submit',
+    path: 'submit/:patientId',
     component: SubmitEClaimComponent,
+    data: { title: 'Submit E-Claim' }, // Add a title for the route if needed
+  },
+  {
+    path: '', // Redirect to home if no path provided
+    redirectTo: 'home',
+    pathMatch: 'full',
   },
 ];
 
