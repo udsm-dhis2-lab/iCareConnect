@@ -6,6 +6,7 @@ describe('CustomReportsComponent', () => {
   let component: CustomReportsComponent;
   let fixture: ComponentFixture<CustomReportsComponent>;
 
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ CustomReportsComponent ]
@@ -13,12 +14,14 @@ describe('CustomReportsComponent', () => {
     .compileComponents();
   });
 
+
   beforeEach(() => {
     fixture = TestBed.createComponent(CustomReportsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
+  
   it('should create', () => {
     expect(component).toBeTruthy();
   });

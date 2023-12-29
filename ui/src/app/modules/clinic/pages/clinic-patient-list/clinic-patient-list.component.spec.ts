@@ -8,10 +8,12 @@ import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { storeDataMock } from 'src/test-mocks/store-data.mock';
 import { AppState } from 'src/app/store/reducers';
 
+
 describe('ClinicPatientListComponent', () => {
   let component: ClinicPatientListComponent;
   let fixture: ComponentFixture<ClinicPatientListComponent>;
   let store: MockStore<AppState>;
+
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -20,6 +22,7 @@ describe('ClinicPatientListComponent', () => {
     }).compileComponents();
   }));
 
+  
   beforeEach(() => {
     fixture = TestBed.createComponent(ClinicPatientListComponent);
     component = fixture.componentInstance;

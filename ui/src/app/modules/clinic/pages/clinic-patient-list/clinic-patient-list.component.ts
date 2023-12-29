@@ -13,6 +13,7 @@ import {
 } from "src/app/store/selectors";
 import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.selectors";
 
+
 @Component({
   selector: "app-clinic-patient-list",
   templateUrl: "./clinic-patient-list.component.html",
