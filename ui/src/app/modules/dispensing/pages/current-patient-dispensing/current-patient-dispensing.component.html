@@ -14,7 +14,7 @@
     provider: provider$ | async
   } as params"
 >
-  <button mat-button color="light" (click)="onBack($event)">
+  <button mat-button color="light" [routerLink]="['/inpatient', 'inpatient-list']" (click)="onBack($event)">
     <mat-icon class="mr-2">arrow_back</mat-icon>
     <mat-label>Back To list</mat-label>
   </button>
