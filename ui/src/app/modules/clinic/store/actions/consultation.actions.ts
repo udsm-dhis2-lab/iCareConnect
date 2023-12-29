@@ -5,7 +5,7 @@ import { ErrorMessage } from 'src/app/shared/modules/openmrs-http-client/models/
 export const startConsultation = createAction(
   '[Consultation] Start consultation'
 );
-
+// Compare this snippet from src/app/modules/clinic/store/actions/consultation.actions.ts://
 export const startConsultationError = createAction(
   '[Consultation] Start consultation error',
   props<{ error: any }>()

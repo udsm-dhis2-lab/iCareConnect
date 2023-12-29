@@ -21,6 +21,8 @@
     [patientIdentifier]="patientIdentifier"
     [userPrivileges]="params?.userPrivileges"
   ></app-shared-patient-consultation>
+  <!-- <div *ngIf="errors">
+    <app-shared-error [errors]="errors"></app-shared-error> -->
 
   <mat-progress-bar
     mode="indeterminate"
@@ -30,5 +32,6 @@
       !params?.userPrivileges ||
       !params?.userPrivilegesSet
     "
+    
   ></mat-progress-bar>
 </div>
