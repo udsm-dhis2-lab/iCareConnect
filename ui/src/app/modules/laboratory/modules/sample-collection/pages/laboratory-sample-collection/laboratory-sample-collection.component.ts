@@ -106,7 +106,7 @@ export class LaboratorySampleCollectionComponent implements OnInit {
         const sampleDate = new Date(sample.date);
         const currentDate = new Date(); // Change to the actual current date if needed
         
-        // Example: Filter samples from the last 7 days
+        // Example: Filter samples from the last  7 days
         return sampleDate >= new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
       });
     })
