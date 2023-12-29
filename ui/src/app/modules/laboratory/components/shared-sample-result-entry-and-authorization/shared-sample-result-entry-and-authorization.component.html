@@ -1,21 +1,28 @@
 <p style="text-align: left; margin: 2px !important; font-size: 12px">
   <b>Tested by:</b>
-  {{
+  {
     ordersWithResults?.length > 0
       ? ordersWithResults[0]?.testAllocations[0]?.finalResult &&
         !ordersWithResults[0]?.testAllocations[0]?.finalResult?.groups
-        ? ordersWithResults[0]?.testAllocations[0]?.finalResult?.creator
-            ?.display
-        : ordersWithResults[0]?.testAllocations[0]?.finalResult &&
-          ordersWithResults[0]?.testAllocations[0]?.finalResult?.groups
-            ?.length > 0
-        ? ordersWithResults[0]?.testAllocations[0]?.finalResult?.groups[
+          ? ordersWithResults[0]?.testAllocations[0]?.finalResult?.creator?.isLabStaff
+            ? ordersWithResults[0]?.testAllocations[0]?.finalResult?.creator?.display
+            : "-"
+          : ordersWithResults[0]?.testAllocations[0]?.finalResult &&
             ordersWithResults[0]?.testAllocations[0]?.finalResult?.groups
-              ?.length - 1
-          ]?.results[0]?.creator?.display
-        : "-"
+              ?.length > 0
+            ? ordersWithResults[0]?.testAllocations[0]?.finalResult?.groups[
+                ordersWithResults[0]?.testAllocations[0]?.finalResult?.groups
+                  ?.length - 1
+              ]?.results[0]?.creator?.isLabStaff
+              ? ordersWithResults[0]?.testAllocations[0]?.finalResult?.groups[
+                  ordersWithResults[0]?.testAllocations[0]?.finalResult?.groups
+                    ?.length - 1
+                ]?.results[0]?.creator?.display
+              : "-"
+            : "-"
       : "-"
-  }}
+  }
+  
   <b>On:</b>
   {{
     ordersWithResults?.length > 0
