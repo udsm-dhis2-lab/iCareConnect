@@ -50,6 +50,7 @@ export class StockStatusListComponent implements OnInit {
   consumeLedgerUuid$: Observable<string>;
   facilityDetails$: Observable<any>;
   currentUser$: Observable<any>;
+  isButtonDisabled: boolean = false;
   constructor(
     private stockService: StockService,
     private dialog: MatDialog,
