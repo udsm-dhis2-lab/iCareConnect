@@ -51,13 +51,13 @@ export class IssuingComponent implements OnInit {
     private requisitionService: RequisitionService
   ) {
     store.dispatch(loadLocationsByTagName({ tagName: "Store" }));
-    // store.dispatch(loadIssuings());
+    //store.dispatch(loadIssuings());
   }
 
   ngOnInit() {
-    // this.issuingList$ = this.store.pipe(select(getAllIssuings));
-    // this.loadingIssuingList$ = this.store.pipe(select(getIssuingLoadingState));
-    // this.issuingList$ = this.store.pipe(select(getAllIssuings));
+   // this.issuingList$ = this.store.pipe(select(getAllIssuings));
+    //this.loadingIssuingList$ = this.store.pipe(select(getIssuingLoadingState));
+    //this.issuingList$ = this.store.pipe(select(getAllIssuings));
     this.getAllIssuing();
     // this.loadingIssuingList$ = this.store.pipe(select(getIssuingLoadingState));
     this.stores$ = this.store.pipe(select(getStoreLocations));
@@ -353,9 +353,9 @@ export class IssuingComponent implements OnInit {
     this.getAllIssuing();
   }
 
-  get selectedIssuesCount(): number {
-    return this.selectedItems ? Object.keys(this.selectedItems)?.length : 0;
-  }
+  // get selectedIssuesCount(): number {
+  //   return this.selectedItems ? Object.keys(this.selectedItems)?.length : 0;
+  // }
 
   onViewIssueItems(issueUuid: string) {
     if (this.viewIssueItems === issueUuid) {
