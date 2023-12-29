@@ -31,7 +31,8 @@ import {
 } from "src/app/store/selectors/visit.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
-
+import { Router } from '@angular/router';
+import { PreviousUrlService } from '/Users/mackbookpro/Desktop/031/UNI/Software Engineering/repos/iCareConnect/ui/src/app/core/services/previous-url.service';
 @Component({
   selector: "app-current-patient-dispensing",
   templateUrl: "./current-patient-dispensing.component.html",
@@ -62,7 +63,9 @@ export class CurrentPatientDispensingComponent implements OnInit {
     private dialog: MatDialog,
     private visitService: VisitsService,
     private store: Store<AppState>,
-    private drugOrderService: DrugOrdersService
+    private drugOrderService: DrugOrdersService,
+    private router: Router,
+    private previousUrlService: PreviousUrlService
   ) {}
 
   ngOnInit() {
@@ -164,7 +167,8 @@ export class CurrentPatientDispensingComponent implements OnInit {
 
   onBack(e: MouseEvent) {
     e.stopPropagation();
-    this.store.dispatch(go({ path: ["/dispensing"] }));
+    const previousUrl = this.previousUrlService.getPreviousUrl();
+    this.router.navigateByUrl(previousUrl);
   }
 
   onSelectAction(
