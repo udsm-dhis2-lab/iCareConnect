@@ -383,7 +383,6 @@ export class LaboratoryComponent implements OnInit {
 
     this.startDate = this.parameters?.startDate;
     this.endDate = this.parameters?.endDate;
-
     this.store.dispatch(setVisitsParameters({ parameters: this.parameters }));
   }
 
