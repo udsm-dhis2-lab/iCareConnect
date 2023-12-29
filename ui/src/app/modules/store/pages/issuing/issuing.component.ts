@@ -36,7 +36,7 @@ export class IssuingComponent implements OnInit {
   pageSize: number = 10;
   pageSizeOptions: number[] = [5, 10, 25, 50, 100];
   pager: any;
-  statuses: string[] = ["", "PENDING", "CANCELLED", "REJECTED", "ISSUED"];
+  statuses: string[] = ["", "PENDING", "CANCELLED", "ISSUED","REJECTED"];
   selectedStatus: string;
   viewIssueItems: string;
   loadingIssues: boolean;
@@ -348,6 +348,8 @@ export class IssuingComponent implements OnInit {
 
   onSelectStatus(e) {
     this.selectedStatus = e?.value;
+    // check the event object 
+    console.log(e);
     this.getAllIssuing();
   }
 
