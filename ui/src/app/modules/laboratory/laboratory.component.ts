@@ -417,6 +417,9 @@ export class LaboratoryComponent implements OnInit {
         this.store.dispatch(
           setVisitsParameters({ parameters: this.parameters })
         );
+        this.store.dispatch(
+          loadLabConfigurations({ periodParameters: this.parameters })
+        );
       }, 200);
 
       // this.store.dispatch(loadActiveVisits({ parameters: this.parameters }));
