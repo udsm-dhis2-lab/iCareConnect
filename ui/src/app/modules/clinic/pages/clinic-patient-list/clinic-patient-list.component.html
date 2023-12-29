@@ -29,16 +29,7 @@
         [selectedIndex]="selectedTab.value"
         (selectedIndexChange)="selectedTab.setValue($event)"
       >
-        <!-- <mat-tab label="All Active Patients">
-          <div class="p-2" *ngIf="selectedTab.value === 0">
-            <app-patient-list
-              [isTabularList]="true"
-              [itemsPerPage]="25"
-              [currentLocation]="(currentLocation$ | async)?.id"
-              (selectPatient)="onSelectPatient($event)"
-            ></app-patient-list>
-          </div>
-        </mat-tab> -->
+  
         <mat-tab label="Awaiting Consultation">
           <!-- <div class="p-2" *ngIf="selectedTab.value === 0"> -->
           <ng-template matTabContent>
@@ -67,18 +58,6 @@
           </ng-template>
           <!-- </div> -->
         </mat-tab>
-
-        <!-- <mat-tab label="Patient With Lab Orders Not Received at LAB">
-          <div class="p-2" *ngIf="selectedTab.value === 3">
-            <app-patient-list
-              [currentLocation]="(currentLocation$ | async)?.id"
-              [isTabularList]="true"
-              [itemsPerPage]="10"
-              [orderType]="'52a447d3-a64a-11e3-9aeb-50e549534c5e'"
-              (selectPatient)="onSelectPatient($event)"
-            ></app-patient-list>
-          </div>
-        </mat-tab> -->
 
 
         <!-- TAB THAT ISSUE 231 ARISES FROM

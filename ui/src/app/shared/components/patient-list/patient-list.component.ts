@@ -251,7 +251,6 @@ export class PatientListComponent implements OnInit, OnChanges {
   }
 
   getPaymentTypeSelected(event: any) {
-    // event.stopPropagation();
     this.paymentTypeSelected = "";
     setTimeout(() => {
       this.paymentTypeSelected =
