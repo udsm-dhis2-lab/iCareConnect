@@ -5,7 +5,7 @@ import { MatTableDataSource } from "@angular/material/table";
 import { sanitizePatientsVisitsForTabularPatientListing } from "../../helpers/sanitize-visits-list-for-patient-tabular-listing.helper";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { PatientLabResultsSummaryComponent } from "../patient-lab-results-summary/patient-lab-results-summary.component";
-//import { NavigationComponent } from './navigation-service';
+
 
 @Component({
   selector: "app-patients-tabular-list",
