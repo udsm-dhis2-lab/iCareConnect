@@ -125,12 +125,9 @@
         class="tabular-patient-list"
         *ngIf=
           "
-          isTabularList &&
-          params?.visits &&
-          params?.visits.length > 0 &&
-          ((paymentTypeSelected &&
-          params?.visits[0]?.visit?.paymentType === paymentTypeSelected) ||
-          !paymentTypeSelected)
+          isTabularList && params?.visits && params?.visits.length > 0
+          && ((paymentTypeSelected &&  params?.visits[0]?.visit?.paymentType
+           === paymentTypeSelected) || !paymentTypeSelected) 
           "
       >
         <app-patients-tabular-list
