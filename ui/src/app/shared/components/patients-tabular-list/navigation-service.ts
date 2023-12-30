@@ -13,7 +13,7 @@ class NavigationService {
   }
 }
 
-export class NavigationComponent {
+class NavigationComponent {
   constructor(private navigationService: NavigationService) {}
 
   getSelectedPatient(event, patientVisitDetails) {
@@ -23,7 +23,7 @@ export class NavigationComponent {
 }
 
 
-export class PatienResultComponent implements OnInit {
+class PatienResultComponent implements OnInit {
   constructor(private navigationService: NavigationService) {}
 
   ngOnInit() {
