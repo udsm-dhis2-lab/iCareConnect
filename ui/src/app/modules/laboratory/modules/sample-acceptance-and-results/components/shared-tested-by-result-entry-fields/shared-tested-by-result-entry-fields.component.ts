@@ -12,15 +12,21 @@ import { formatDateToYYMMDD } from "src/app/shared/services/visits.service";
 })
 export class SharedTestedByResultEntryFieldsComponent implements OnInit {
   @Input() order!: any;
+  @Input() isFormValid:boolean=false;
   testedByFormFields!: any;
+
   @Output() selectedTestedByFormFields: EventEmitter<any> =
     new EventEmitter<any>();
+
+
   testedBy!: any;
   testedDate!: any;
+  isShowInvalidDate:boolean = false;
 
   constructor() {}
 
   ngOnInit(): void {
+  
     this.order?.allocations?.forEach((allocation) => {
       const formattedAllocation: any = new SampleAllocation(
         allocation
@@ -76,6 +82,35 @@ export class SharedTestedByResultEntryFieldsComponent implements OnInit {
   }
 
   onFormUpdate(formValue: FormValue): void {
+    // collected date is on this.order.dateCreated
+    const collectedDate = new Date(this.order.dateCreated);
+    const reportingDate = Date.now();
+    const enteredDate = formValue.getValues()?.date?.value ? new Date(formValue.getValues().date.value) : null;
+  
+    const validateEnteredDate = ()=> {
+      if (!enteredDate || isNaN(enteredDate.getTime())) {
+        // If enteredDate is invalid or null
+        // this.isFormValid = false;
+        this.isShowInvalidDate=true;
+        
+
+      } else {
+        if (enteredDate >= collectedDate && enteredDate.getTime() <= reportingDate) {
+          // If enteredDate is within the range
+          // this.isFormValid = true;
+          this.isShowInvalidDate =false;
+        } else {
+          // If enteredDate is outside the range
+          // this.isFormValid = false;
+          this.isShowInvalidDate=true;
+        }
+      }
+    }
+    
+    validateEnteredDate(); // Call the function to perform validation
+  
+
+   
     this.selectedTestedByFormFields.emit({
       date: formValue.getValues()?.date?.value
         ? formatDateToYYMMDD(new Date(formValue.getValues()?.date?.value))
