@@ -14,6 +14,7 @@ export class SharedTestedByResultEntryFieldsComponent implements OnInit {
   @Input() order!: any;
   @Input() isFormValid:boolean=false;
   testedByFormFields!: any;
+  @Output() handleValidateForm: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @Output() selectedTestedByFormFields: EventEmitter<any> =
     new EventEmitter<any>();
@@ -90,18 +91,21 @@ export class SharedTestedByResultEntryFieldsComponent implements OnInit {
     const validateEnteredDate = ()=> {
       if (!enteredDate || isNaN(enteredDate.getTime())) {
         // If enteredDate is invalid or null
-        // this.isFormValid = false;
+        this.isFormValid = false;
+        this.handleValidateForm.emit(false);
         this.isShowInvalidDate=true;
         
 
       } else {
         if (enteredDate >= collectedDate && enteredDate.getTime() <= reportingDate) {
           // If enteredDate is within the range
-          // this.isFormValid = true;
+          this.isFormValid = true;
+          this.handleValidateForm.emit(true);
           this.isShowInvalidDate =false;
         } else {
           // If enteredDate is outside the range
-          // this.isFormValid = false;
+          this.isFormValid = false;
+          this.handleValidateForm.emit(false);
           this.isShowInvalidDate=true;
         }
       }

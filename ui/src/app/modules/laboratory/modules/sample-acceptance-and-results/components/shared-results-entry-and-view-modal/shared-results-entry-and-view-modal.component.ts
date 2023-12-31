@@ -174,7 +174,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         this.data?.sample?.uuid
       );
   }
-
+  handleValidateForm(state:boolean):void{
+    this.isFormValid = state;
+  }
   onClose(event: Event): void {
     event.stopPropagation();
     this.dialogRef.close(true);
