@@ -72,13 +72,15 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "icare-ui:build",
-            "proxyConfig": "proxy-config.json"
+            "browserTarget": "icare-ui:build"
           },
           "configurations": {
             "production": {
               "browserTarget": "icare-ui:build:production"
-            }
+            },
+            "development": {
+              "browserTarget": "icare-ui:build:development"
+            },
           }
         },
         "extract-i18n": {
