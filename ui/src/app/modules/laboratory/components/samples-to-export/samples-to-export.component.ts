@@ -77,7 +77,7 @@ export class SamplesToExportComponent implements OnInit {
     this.searchingEquipmentsField = new Dropdown({
       id: "instrument",
       key: "instrument",
-      label: "Search by Equipment",
+      label: "Search by Instrument/Method",
       searchControlType: "concept",
       searchTerm: "LIS_INSTRUMENT",
       conceptClass: "LIS instrument",

@@ -2,22 +2,32 @@
   *ngIf="{
     sampleAllocations: sampleAllocations$ | async,
     multipleResultsAttributeType: multipleResultsAttributeType$ | async,
+    calculatedValueExpressionAttributeType : calculatedValueExpressionAttributeType$ | async,
     visitDetails: visitDetails$ | async,
     providerDetails: providerDetails$ | async
   } as params"
 >
-  <mat-toolbar color="primary"
-    >Result entry & Review -
-    <span class="ml-4" *ngIf="!data?.LISConfigurations?.isLIS">
-      <span
-        >Patient:
-        {{ data?.sample?.patient?.givenName }}
-        {{ data?.sample?.patient?.midllename }}
-        {{ data?.sample?.patient?.familyName }} | </span
-      >Gender: <b>{{ data?.sample?.patient?.gender }}</b> | Age:
-      <b>{{ data?.sample?.patient?.age }} Yrs</b>
-    </span>
-    <span class="ml-2"> - {{ data?.sample?.label }} </span>
+  <mat-toolbar color="primary">
+    <div class="w-100 d-flex justify-content-between">
+      <div class="w-50 d-flex justify-content-left">
+        Result entry & Review
+        <span class="ml-4" *ngIf="!data?.LISConfigurations?.isLIS">
+          <span
+            >- Patient:
+            {{ data?.sample?.patient?.givenName }}
+            {{ data?.sample?.patient?.midllename }}
+            {{ data?.sample?.patient?.familyName }} | </span
+          >Gender: <b>{{ data?.sample?.patient?.gender }}</b> | Age:
+          <b>{{ data?.sample?.patient?.age }} Yrs</b>
+        </span>
+        <span class="ml-2"> - {{ data?.sample?.label }} </span>
+      </div>
+      <div class="w-50 d-flex justify-content-end">
+        <button mat-icon-button (click)="onClose($event)">
+          <mat-icon>clear</mat-icon>
+        </button>
+      </div>
+    </div>
   </mat-toolbar>
   <div class="p-3" style="z-index: 20">
     <mat-tab-group>
@@ -44,7 +54,7 @@
               </mat-radio-button>
             </mat-radio-group>
           </div>
-          <div style="max-height: 75vh; overflow: auto">
+          <div style="max-height: 60vh; overflow: auto">
             <div class="loading-overlay" *ngIf="saving">
               <div class="text-center">
                 <div>Saving ....</div>
@@ -84,6 +94,29 @@
                         >
                           <ng-container>
                             <div
+                              class="col-12"
+                              *ngIf="order?.allocations?.length >= 5"
+                            >
+                              <mat-form-field
+                                class="w-50 search-input"
+                                style="font-size: 0.9rem"
+                              >
+                                <mat-label>Search</mat-label>
+                                <mat-icon matPrefix>search</mat-icon
+                                ><input
+                                  type="text"
+                                  placeholder="Search"
+                                  matInput
+                                  autocomplete="off"
+                                  [(ngModel)]="
+                                    parametersSearchingText[
+                                      order?.concept?.uuid
+                                    ]
+                                  "
+                                />
+                              </mat-form-field>
+                            </div>
+                            <div
                               [ngClass]="{
                                 'col-12':
                                   !allocationData?.isSetMember ||
@@ -108,7 +141,13 @@
                               matTooltip="Double Click to view history"
                               [matTooltipPosition]="'above'"
                               class="entry-col"
-                              *ngFor="let allocationData of order?.allocations"
+                              *ngFor="
+                                let allocationData of order?.allocations
+                                  | filterAllocationsByName
+                                    : parametersSearchingText[
+                                        order?.concept?.uuid
+                                      ]
+                              "
                             >
                               <div
                                 class="w-100"
@@ -120,7 +159,7 @@
                                 "
                               >
                                 <app-test-parameter-entry
-                                  *ngIf="preferredName"
+                                  *ngIf="preferredName && ((calculatedParameters['allocationData?.parameter?.uuid'] && calculatedParameters['allocationData?.parameter?.uuid']?.render == true) || !calculatedParameters['allocationData?.parameter?.uuid'])"
                                   [parameterUuid]="
                                     allocationData?.parameter?.uuid
                                   "
@@ -132,7 +171,7 @@
                                     data?.actionType === 'review' &&
                                     !data?.LISConfigurations?.isLIS
                                   "
-                                  [finalResult]="allocationData?.finalResult"
+                                  [finalResult]="calculatedParameters['allocationData?.parameter?.uuid'] ?  calculatedParameters['allocationData?.parameter?.uuid']?.value: allocationData?.finalResult"
                                   [isLIS]="data?.LISConfigurations?.isLIS"
                                   [conceptNameType]="preferredName"
                                   (data)="
@@ -164,6 +203,27 @@
                               {{ header?.display }}
                             </div>
                             <div
+                              class="col-12"
+                              *ngIf="header?.allocations?.length >= 5"
+                            >
+                              <mat-form-field
+                                class="w-50 search-input"
+                                style="font-size: 0.9rem"
+                              >
+                                <mat-label>Search</mat-label>
+                                <mat-icon matPrefix>search</mat-icon
+                                ><input
+                                  type="text"
+                                  placeholder="Search"
+                                  matInput
+                                  autocomplete="off"
+                                  [(ngModel)]="
+                                    parametersSearchingText[header?.headerUuid]
+                                  "
+                                />
+                              </mat-form-field>
+                            </div>
+                            <div
                               [ngClass]="{
                                 'col-12':
                                   !allocationData?.isSetMember ||
@@ -188,7 +248,13 @@
                               matTooltip="Double Click to view history"
                               [matTooltipPosition]="'above'"
                               class="entry-col"
-                              *ngFor="let allocationData of header?.allocations"
+                              *ngFor="
+                                let allocationData of header?.allocations
+                                  | filterAllocationsByName
+                                    : parametersSearchingText[
+                                        header?.headerUuid
+                                      ]
+                              "
                             >
                               <div
                                 class="w-100"
@@ -200,7 +266,7 @@
                                 "
                               >
                                 <app-test-parameter-entry
-                                  *ngIf="preferredName"
+                                  *ngIf="preferredName && params.calculatedValueExpressionAttributeType"
                                   [parameterUuid]="
                                     allocationData?.parameter?.uuid
                                   "
@@ -213,6 +279,8 @@
                                     !data?.LISConfigurations?.isLIS
                                   "
                                   [finalResult]="allocationData?.finalResult"
+                                  [calculatedValueExpressionAttributeType] = "params.calculatedValueExpressionAttributeType"
+                                  (attributes) = "onGetAttributes($event, params.calculatedValueExpressionAttributeType,allocationData?.parameter?.uuid)"
                                   [isLIS]="data?.LISConfigurations?.isLIS"
                                   [conceptNameType]="preferredName"
                                   (data)="
@@ -242,6 +310,34 @@
                             {{
                               !order?.authorizationIsReady ? "Save" : "Amend"
                             }}
+                          </button>
+
+                          <button
+                            class="mt-2"
+                            *ngIf="
+                              data?.actionType !== 'authorization' &&
+                              order?.savedOnce &&
+                              !order?.authorizationIsReady
+                            "
+                            mat-flat-button
+                            color="warn"
+                            (click)="onDeleteResults($event, order)"
+                          >
+                            Delete
+                          </button>
+                          <button
+                            *ngIf="
+                              data?.actionType == 'authorization' &&
+                              order?.authorizationIsReady
+                            "
+                            [disabled]="!isFormValid"
+                            mat-flat-button
+                            color="primary"
+                            (click)="
+                              onSave($event, order, order?.authorizationIsReady)
+                            "
+                          >
+                            Amend
                           </button>
                         </div>
                         <div
@@ -310,6 +406,7 @@
                                 | filterAuthorizationStatuses: ''
                               )?.length === 0
                             "
+                            validateFormFields
                           >
                             Approved, but waiting another approval
                           </p>
@@ -334,14 +431,25 @@
                     </tr>
                     <tr>
                       <td colspan="100%">
-                        <app-shared-remarks-entry
-                          [order]="order"
-                          [disabled]="
-                            data?.actionType === 'review' &&
-                            !data?.LISConfigurations?.isLIS
-                          "
-                          (remarks)="onGetRemarks($event, order)"
-                        ></app-shared-remarks-entry>
+                        <div class="w-75 ml-2">
+                          <app-shared-tested-by-result-entry-fields
+                            [order]="order"
+                            (selectedTestedByFormFields)="
+                              onGetSelectedTestedBy($event, order)
+                            "
+                          >
+                          </app-shared-tested-by-result-entry-fields>
+                        </div>
+                        <div class="w-100">
+                          <app-shared-remarks-entry
+                            [order]="order"
+                            [disabled]="
+                              data?.actionType === 'review' &&
+                              !data?.LISConfigurations?.isLIS
+                            "
+                            (remarks)="onGetRemarks($event, order)"
+                          ></app-shared-remarks-entry>
+                        </div>
                       </td>
                     </tr>
                     <tr>
@@ -429,6 +537,34 @@
                           >
                             Save
                           </button>
+                          <button
+                            class="mt-2"
+                            *ngIf="
+                              data?.actionType !== 'authorization' &&
+                              order?.savedOnce &&
+                              !order?.authorizationIsReady
+                            "
+                            mat-flat-button
+                            color="warn"
+                            (click)="onDeleteResults($event, order)"
+                          >
+                            Delete
+                          </button>
+                          <button
+                            *ngIf="
+                              data?.actionType === 'authorization' &&
+                              order?.authorizationIsReady
+                            "
+                            [disabled]="
+                              relatedResults?.length == 0 &&
+                              multipleResults?.length === 0
+                            "
+                            mat-flat-button
+                            color="primary"
+                            (click)="onSaveRelatedResults($event, order)"
+                          >
+                            Amend
+                          </button>
                         </div>
                         <div
                           class="mt-4 d-flex justify-content-end"
@@ -470,6 +606,22 @@
                             {{ !shouldConfirm ? "Authorise" : "Confirm" }}
                           </button>
                         </div>
+                        <div
+                          *ngIf="
+                            data?.actionType === 'authorization' &&
+                            data?.LISConfigurations?.isLIS &&
+                            order?.finalResultsFedBy?.uuid ===
+                              data?.currentUser?.uuid &&
+                            (
+                              order?.authorizationStatuses
+                              | filterAuthorizationStatuses: ''
+                            )?.length === 0
+                          "
+                          class="alert alert-warning mt-2"
+                          role="alert"
+                        >
+                          You can not authorise results processed by you
+                        </div>
                         <div class="mt-2">
                           <p
                             *ngIf="
@@ -490,6 +642,30 @@
                               ></b
                             >
                           </p>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td colspan="100%">
+                        <div class="w-75 ml-2">
+                          <app-shared-tested-by-result-entry-fields
+                            [order]="order"
+                            (selectedTestedByFormFields)="
+                              onGetSelectedTestedBy($event, order)
+                            "
+                          >
+                          </app-shared-tested-by-result-entry-fields>
+                        </div>
+                        <div class="w-100">
+                          <app-shared-remarks-entry
+                            [order]="order"
+                            [disabled]="
+                              data?.actionType === 'review' &&
+                              !data?.LISConfigurations?.isLIS
+                            "
+                            (remarks)="onGetRemarks($event, order)"
+                          ></app-shared-remarks-entry>
                         </div>
                       </td>
                     </tr>
@@ -632,7 +808,6 @@
           ></app-related-results-history>
         </div>
       </div>
-      <div></div>
     </div>
   </div>
 </div>

@@ -23,8 +23,10 @@ export class TestParameterEntryComponent implements OnInit {
   @Input() finalResult: any;
   @Input() parametersRelationshipConceptSourceUuid: string;
   @Input() relatedResult: any;
+  @Input() calculatedValueExpressionAttributeType: any;
   testParameter$: Observable<ConceptGet>;
   @Output() data: EventEmitter<any> = new EventEmitter<any>();
+  @Output() attributes : EventEmitter<any> = new EventEmitter<any>();
   latestResult: any;
   errors: any[] = [];
   multipleResultsAttributeType$: Observable<string>;
@@ -116,7 +118,7 @@ export class TestParameterEntryComponent implements OnInit {
   }
 
   onGetFormData(data: any, parameter: any): void {
-    this.data.emit({
+    const resultPayload: any = {
       value: data,
       previousValue: this.latestResult?.value
         ? this.latestResult?.value
@@ -129,6 +131,11 @@ export class TestParameterEntryComponent implements OnInit {
         isText: parameter?.datatype?.name === "Text",
         isFile: parameter?.datatype?.name == "Complex",
       },
-    });
+    };
+    this.data.emit(resultPayload);
+  }
+
+  onGetAttributes(data: any, ) {
+    this.attributes.emit(data);
   }
 }

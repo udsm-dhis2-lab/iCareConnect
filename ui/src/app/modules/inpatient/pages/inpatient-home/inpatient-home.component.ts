@@ -119,7 +119,7 @@ export class InpatientHomeComponent implements OnInit {
     this.store.dispatch(go({ path: ["/"] }));
   }
 
-  onGetBedStatus(status, orderType) {
+  onGetBedStatus(status: any, orderType: any): void {
     this.dialog.open(OccupiedLocationStatusModalComponent, {
       minWidth: "20%",
       minHeight: "200px",

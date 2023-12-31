@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Observable, of, zip } from "rxjs";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { Api } from "src/app/shared/resources/openmrs";
-import { SampleObject, SampleIdentifier } from "../models";
+import { SampleObject, SampleIdentifier, LabSample } from "../models";
 
 import * as _ from "lodash";
 import {
@@ -481,6 +481,25 @@ export class SamplesService {
       map((response) => {
         return response;
       })
+    );
+  }
+
+  getFormattedSampleByUuid(
+    uuid: string,
+    departments: any[],
+    specimenSources: any[],
+    codedRejectedReasons: any[]
+  ): Observable<any> {
+    return this.httpClientService.get(`lab/sample/${uuid}`).pipe(
+      map((response) =>
+        new LabSample(
+          response,
+          departments,
+          specimenSources,
+          codedRejectedReasons
+        ).toJSon()
+      ),
+      catchError((error) => of(error))
     );
   }
 }

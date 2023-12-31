@@ -19,6 +19,7 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
   @Input() testRelationshipConceptSourceUuid: string;
   @Input() data: any;
   @Input() currentUser: any;
+  @Input() formUuidsReferencesForSampleReportDisplay!: any[];
 
   @ViewChild("report") pdfTable: ElementRef;
   collectionDateAndTimeUuids$: Observable<any>;
@@ -171,6 +172,7 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
         "html-td": {
           fontSize: "9",
           color: "#232323",
+          borderColor: ["#F00"],
         },
         "html-th": {
           fontSize: "9",

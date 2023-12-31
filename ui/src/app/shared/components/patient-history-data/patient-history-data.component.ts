@@ -6,6 +6,10 @@ import {
 } from "../../helpers/visits.helper";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { formatDateToString } from "../../helpers/format-date.helper";
+import {
+  getAgeInYearsMonthsDays,
+  getDateDifferenceYearsMonthsDays,
+} from "src/app/shared/helpers/date.helpers";
 
 @Component({
   selector: "app-patient-history-data",
@@ -322,10 +326,11 @@ export class PatientHistoryDataComponent implements OnInit {
                 font-size: .7em;
               }
               .footer {
-                margin-top:50px
+                margin-top:70px
                 right: 0px;
                 text-align: left;
-                float: right
+                float: right;
+                padding-right:40px;
               }
               .footer .userDetails .signature {
                 margin-top: 20px;
@@ -343,7 +348,7 @@ export class PatientHistoryDataComponent implements OnInit {
     let header = "";
     let subHeader = "";
 
-    this.FacilityDetails.attributes.map((attribute) => {
+    this.FacilityDetails?.attributes?.map((attribute) => {
       let attributeTypeName =
         attribute && attribute.attributeType
           ? attribute?.attributeType?.name.toLowerCase()
@@ -360,6 +365,17 @@ export class PatientHistoryDataComponent implements OnInit {
         identifier?.identifierType?.uuid ===
         "26742868-a38c-4e6a-ac1d-ae283c414c2e"
     )[0]?.identifier;
+
+    let patientAge = getAgeInYearsMonthsDays(
+      this.visit?.visit?.patient?.person?.birthdate
+    );
+    let patientPhone = this.visit?.visit?.patient?.person?.attributes
+      ?.filter(
+        (attribute) =>
+          attribute.uuid == "60003ddc-3e8e-49c6-a6d2-bdf82b5eb572" ||
+          attribute.uuid == "bc5022b6-6c53-4f3d-9433-734b91937a23"
+      )[0]
+      ?.display.split(" = ")[1];
 
     frameDoc.document.write(`
     
@@ -379,6 +395,8 @@ export class PatientHistoryDataComponent implements OnInit {
       this.FacilityDetails.stateProvince
     }</h3>
           <h3>${this.FacilityDetails.country}</h3>
+          <br /><br />
+          <h3>PATIENT HISTORY</h3>
         </div>
         <!--End Info-->
       </center>
@@ -392,6 +410,18 @@ export class PatientHistoryDataComponent implements OnInit {
           <p> 
               MRN : ${patientMRN}</br>
           </p>
+          <p>Gender : ${
+            this.visit?.visit?.patient?.person?.gender
+              ? this.visit?.visit?.patient?.person?.gender == "F"
+                ? "Female"
+                : "Male"
+              : ""
+          }</p>
+          <p>Age : ${patientAge?.years} <i>yrs,</i> ${
+      patientAge?.months
+    } <i>months, </i> ${patientAge?.days} <i>days</i> </p>
+    <p> Phone : ${patientPhone}</p>
+    <hr style="width:27%;text-align:left;margin-left:0;color:#ddd; opacity:0.5">
         </div>
       </div>
       
@@ -403,7 +433,7 @@ export class PatientHistoryDataComponent implements OnInit {
     ) {
       frameDoc.document
         .write(`<p>Visit started on : <i>${this.visitHistory?.visitStartDateTime?.date} at ${this.visitHistory?.visitStartDateTime?.time}</i></p> 
-     <p> Visit stopped on: <i>
+     <p>Visit stopped on: <i>
 ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopDateTime?.time}</i></p> <br>
 `);
     }
@@ -604,7 +634,7 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
       if (visitData?.category === "PROCEDURE_ORDER") {
         frameDoc.document.write(`
 <tr><td>
-      ${visitData?.order?.display}
+      ${visitData?.concept?.display}
       </td>
       <td>  ${visitData?.provider} on 
       ${visitData?.date} ${visitData?.time}
@@ -648,41 +678,43 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
       (visitData) => visitData.category === "OBSERVATIONS"
     );
     if (observationForm) {
-      frameDoc.document.write(`
-  <div>
-           <h5>${observationForm?.form}</h5>
+      this.visitHistory?.visitOrderedData?.forEach((visitData) => {
+        if (visitData?.category === "OBSERVATIONS") {
+          frameDoc.document.write(`
+          <div style="margin-top:2px">
+           <h5>${visitData?.form}</h5>
          </div>
          <table id="table">
            <thead>
-             <tr>
-              
-               <th>Values</th>
-               <th>Written By</th>
-             </tr>
+               <tr ><th colspan="2">
+            Values <span style="font-weight:normal;"> &nbsp; - &nbsp; <i>written on ${visitData?.date} ${visitData?.time}  By ${visitData?.provider}
+          </i></span>
+               </th></tr>
+             
            </thead>
            <tbody>`);
-    }
 
-    this.visitHistory?.visitOrderedData?.forEach((visitData) => {
-      if (visitData?.category === "OBSERVATIONS") {
-        if (visitData?.results?.length > 0) {
-          frameDoc.document.write(`<td>`);
-
-          visitData?.results?.forEach((result) => {
-            frameDoc.document.write(` ${result?.concept?.display} - 
-            ${
-              result?.value?.display ? result?.value?.display : result?.value
-            }, &nbsp;&nbsp;
-            `);
-            frameDoc.document.write(`</td><td>
-             ${visitData?.provider} on 
-          ${visitData?.date} ${visitData?.time}
-                `);
+          visitData?.obs?.forEach((ob) => {
+            frameDoc.document.write(`<tr><td> ${ob?.concept?.display} </td><td> 
+            ${ob?.value?.display ? ob?.value?.display : ob?.value}
+              </td></tr>`);
           });
         }
-        frameDoc.document.write(`</td></tr>`);
-      }
-    });
+      });
+    }
+
+    // this.visitHistory?.visitOrderedData?.forEach((visitData) => {
+    //   if (visitData?.category === "OBSERVATIONS") {
+    //     frameDoc.document.write(`<tr`);
+
+    //     visitData?.obs?.forEach((ob) => {
+    //       frameDoc.document.write(`<tr><td> ${ob?.concept?.display} </td><td>
+    //         ${ob?.value?.display ? ob?.value?.display : ob?.value}
+    //         </td></tr>`);
+    //     });
+    //     frameDoc.document.write(`</tr>`);
+    //   }
+    // });
 
     frameDoc.document.write(`</tbody></table>`);
     if (this.visitHistory?.diagnoses?.PROVISIONAL?.length) {

@@ -52,12 +52,15 @@ export class FieldComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     if (typeof this.field?.value === "object") {
-      this.value = (this.field?.value as any[])?.map((val) => {
-        return {
-          ...val,
-          value: val?.value ? val?.value : val?.uuid,
-        };
-      });
+      this.value =
+        this.field?.value && (this.field?.value as any)?.length > 0
+          ? (this.field?.value as any[])?.map((val) => {
+              return {
+                ...val,
+                value: val?.value ? val?.value : val?.uuid,
+              };
+            })
+          : null;
     }
     if (
       this.field?.searchTerm ||
@@ -206,6 +209,7 @@ export class FieldComponent implements AfterViewInit {
           ? "custom:(uuid,display,datatype,conceptClass,mappings)"
           : "custom:(uuid,display)",
     };
+    // console.log("field", field);
     this.members$ = this.formService.searchItem(
       parameters,
       this.field?.searchControlType,
@@ -214,7 +218,15 @@ export class FieldComponent implements AfterViewInit {
     );
   }
 
-  searchItemFromOptions(event, field): void {
+  onClearValue(event: any, field: any): void {
+    event.stopPropagation();
+    let objectToUpdate: any = {};
+    objectToUpdate[field?.key] = null;
+    this.form.patchValue(objectToUpdate);
+    this.fieldUpdate.emit(this.form);
+  }
+
+  searchItemFromOptions(event: any, field: any): void {
     const searchingText = event.target.value;
     this.members$ = of(
       field?.options?.filter(
@@ -223,17 +235,26 @@ export class FieldComponent implements AfterViewInit {
           -1
       ) || []
     );
+    let objectToUpdate: any = {};
+    if (!searchingText || searchingText?.length === 0) {
+      objectToUpdate[field?.key] = null;
+      this.form.patchValue(objectToUpdate);
+      this.fieldUpdate.emit(this.form);
+    }
   }
 
   getSelectedItemFromOption(event: Event, item: any, field: any): void {
     event.stopPropagation();
-    const value = item?.isDrug
-      ? item?.formattedKey
-      : item?.uuid
-      ? item?.uuid
-      : item?.id
-      ? item?.id
-      : item?.value;
+    const value =
+      field?.searchControlType == "person"
+        ? item?.display
+        : item?.isDrug
+        ? item?.formattedKey
+        : item?.uuid
+        ? item?.uuid
+        : item?.id
+        ? item?.id
+        : item?.value;
     let objectToUpdate = {};
     objectToUpdate[field?.key] =
       field?.searchControlType === "drugStock"
@@ -246,7 +267,7 @@ export class FieldComponent implements AfterViewInit {
     this.fieldUpdate.emit(this.form);
   }
 
-  getStockStatus(option) {
+  getStockStatus(option: any): any {
     const optionName = option?.display ? option?.display : option?.name;
     return optionName.includes("Available, Location") ? true : false;
   }

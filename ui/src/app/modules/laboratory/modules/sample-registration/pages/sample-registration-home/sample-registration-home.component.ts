@@ -1,9 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { AppState } from "src/app/store/reducers";
@@ -20,7 +19,7 @@ import { getLISConfigurations } from "src/app/store/selectors/lis-configurations
 })
 export class SampleRegistrationHomeComponent implements OnInit {
   provider$: Observable<any>;
-  LISConfigurations$: Observable<LISConfigurationsModel>;
+  LISConfigurations$: Observable<iCareConnectConfigurationsModel>;
   labSections$: Observable<ConceptGetFull[]>;
   specimenSources$: Observable<any[]>;
   personEmailAttributeTypeUuid$: Observable<string>;

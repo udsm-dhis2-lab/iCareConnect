@@ -1,15 +1,17 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatRadioChange } from "@angular/material/radio";
+import { MatTabChangeEvent } from "@angular/material/tabs";
 import { Store } from "@ngrx/store";
 import { Observable, of, zip } from "rxjs";
 import { catchError, map, take, tap, withLatestFrom } from "rxjs/operators";
+import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { LabSampleModel } from "src/app/modules/laboratory/resources/models";
-import { LISConfigurationsModel } from "src/app/modules/laboratory/resources/models/lis-configurations.model";
 import { RegistrationService } from "src/app/modules/registration/services/registration.services";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { DateTimeField } from "src/app/shared/modules/form/models/date-time-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
+import { Field } from "src/app/shared/modules/form/models/field.model";
 import { PhoneNumber } from "src/app/shared/modules/form/models/phone-number.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
@@ -17,6 +19,7 @@ import { ConceptsService } from "src/app/shared/resources/concepts/services/conc
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import {
+  go,
   loadConceptByUuid,
   loadLocationsByTagName,
   loadLocationsByTagNames,
@@ -33,7 +36,7 @@ import { getCurrentUserDetails } from "src/app/store/selectors/current-user.sele
 export class RegisterSampleComponent implements OnInit {
   @Input() currentUser: any;
   @Input() provider: any;
-  @Input() LISConfigurations: LISConfigurationsModel;
+  @Input() LISConfigurations: iCareConnectConfigurationsModel;
   @Input() labSections: ConceptGetFull[];
   @Input() fromMaintenance: boolean;
   @Input() specimenSources: ConceptGetFull[];
@@ -85,7 +88,9 @@ export class RegisterSampleComponent implements OnInit {
 
   importExportCategory: string = "CLINICAL";
   labTestRequestProgramStageId$: Observable<string>;
-
+  newClinicalFormFields: Field<any>[] = [];
+  newPersonlFormFields: Field<any>[] = [];
+  currentLocation: any;
   get maximumDate() {
     let maxDate = new Date();
     let maxMonth =
@@ -104,7 +109,7 @@ export class RegisterSampleComponent implements OnInit {
   hfrCodeAttributeUuid$: Observable<string>;
   sampleRegistrationCategories$: Observable<any>;
   specimenSourceConceptUuid$: Observable<string>;
-
+  specimenTypeConceptUuid: string = "f1945a2f-dc6a-43f8-b485-65c443593f0b"; // TODO: Softcode this using system settings
   constructor(
     private samplesService: SamplesService,
     private systemSettingsService: SystemSettingsService,
@@ -115,6 +120,17 @@ export class RegisterSampleComponent implements OnInit {
 
   ngOnInit(): void {
     // console.log(this.currentUser);
+    this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
+    try {
+      this.selectedTabGroup = localStorage.getItem(
+        "labSampleRegistrationModuleTab"
+      )
+        ? localStorage.getItem("labSampleRegistrationModuleTab")
+        : this.selectedTabGroup;
+    } catch (error) {
+      console.log(error);
+    }
+
     this.store.dispatch(
       loadLocationsByTagNames({ tagNames: ["Lab+Location"] })
     );
@@ -260,6 +276,16 @@ export class RegisterSampleComponent implements OnInit {
   setTabGroup(event: Event, group: string): void {
     event.stopPropagation();
     this.selectedTabGroup = group;
+    localStorage.setItem(
+      "labSampleRegistrationModuleTab",
+      this.selectedTabGroup
+    );
+    // this.store.dispatch(
+    //   go({
+    //     path: ["/laboratory/sample-registration"],
+    //     query: { queryParams: { tab: this.selectedTabGroup } },
+    //   })
+    // );
   }
 
   onReloadRegisterSample(eventData: any) {
@@ -360,6 +386,29 @@ export class RegisterSampleComponent implements OnInit {
         label: "Delivered By",
       }),
     };
+
+    this.newClinicalFormFields = [
+      new Dropdown({
+        id: "icd10",
+        key: "icd10",
+        label: "ICD 10",
+        options: [],
+        conceptClass: "Diagnosis",
+        shouldHaveLiveSearchForDropDownFields: true,
+      }),
+      new TextArea({
+        id: "notes",
+        key: "notes",
+        label: "Clinical Information / History",
+        type: "text",
+      }),
+      new Textbox({
+        id: "diagnosis",
+        key: "diagnosis",
+        label: "Diagnosis - Clinical",
+        type: "text",
+      }),
+    ];
     this.clinicalFormFields = {
       icd10: new Dropdown({
         id: "icd10",
@@ -382,6 +431,102 @@ export class RegisterSampleComponent implements OnInit {
         type: "text",
       }),
     };
+
+    this.newPersonlFormFields = [
+      new Textbox({
+        id: "firstName",
+        key: "firstName",
+        label: "First name",
+        required: true,
+        type: "text",
+      }),
+      new Textbox({
+        id: "middleName",
+        key: "middleName",
+        label: "Middle name",
+        type: "text",
+      }),
+      new Textbox({
+        id: "lastName",
+        key: "lastName",
+        label: "Last name",
+        required: true,
+        type: "text",
+      }),
+      new Dropdown({
+        id: "gender",
+        key: "gender",
+        label: "Gender",
+        required: false,
+        type: "text",
+        options: [
+          {
+            key: "Male",
+            label: "Male",
+            value: "M",
+          },
+          {
+            key: "Female",
+            label: "Female",
+            value: "F",
+          },
+        ],
+        shouldHaveLiveSearchForDropDownFields: false,
+      }),
+      new Dropdown({
+        id: "attribute-" + "47da17a9-a910-4382-8149-736de57dab18", // Referred from: TODO softcode this visit attribute type
+        key: "attribute-" + "47da17a9-a910-4382-8149-736de57dab18",
+        options: [],
+        label: "Facility Name",
+        shouldHaveLiveSearchForDropDownFields: true,
+        searchControlType: "healthFacility",
+        searchTerm: "Health Facility",
+        controlType: "location",
+      }),
+      new Textbox({
+        id: "age",
+        key: "age",
+        label: "Age",
+        required: false,
+        type: "number",
+        min: 0,
+        max: 150,
+      }),
+      new DateField({
+        id: "dob",
+        key: "dob",
+        label: "Date of birth",
+        required: true,
+        type: "date",
+        max: this.maximumDate,
+      }),
+      new PhoneNumber({
+        id: "mobileNumber",
+        key: "mobileNumber",
+        label: "Mobile number",
+        required: false,
+        type: "number",
+        min: 0,
+        placeholder: "Mobile number",
+        category: "phoneNumber",
+      }),
+      new Textbox({
+        id: "email",
+        key: "email",
+        label: "Email",
+        required: false,
+        type: "text",
+        placeholder: "Email",
+        category: "email",
+      }),
+      new TextArea({
+        id: "address",
+        key: "address",
+        label: "Address",
+        required: false,
+        type: "text",
+      }),
+    ];
     this.personFields = {
       firstName: new Textbox({
         id: "firstName",

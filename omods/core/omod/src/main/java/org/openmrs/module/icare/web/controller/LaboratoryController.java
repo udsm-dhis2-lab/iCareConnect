@@ -9,6 +9,7 @@ import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.laboratory.models.*;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
+import org.openmrs.module.icare.store.models.Requisition;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -296,18 +297,23 @@ public class LaboratoryController {
 		SampleStatus sampleStatus = SampleStatus.fromMap(sampleStatusMap);
 		SampleStatus savedSampleStatus = laboratoryService.updateSampleStatus(sampleStatus);
 		
-		List<Map<String, Object>> allocationsMapList = (List<Map<String, Object>>) sampleStatusWithAllocations
-		        .get("allocations");
+		List<Map<String, Object>> allocationsMapList = (List<Map<String, Object>>) sampleStatusWithAllocations.get("allocations");
 		
 		List<TestAllocation> allocationsToSave = new ArrayList<TestAllocation>();
+		List<Concept> unretiredConcepts = new ArrayList<>();
 		for (Map<String, Object> allocationMap : allocationsMapList) {
-			
-			TestAllocation testAllocation = TestAllocation.fromMap(allocationMap);
-			
-			allocationsToSave.add(testAllocation);
+			Concept concept = Context.getConceptService().getConceptByUuid(((Map)allocationMap.get("concept")).get("uuid").toString());
+
+			if(!concept.getRetired()) {
+				unretiredConcepts.add(concept);
+				TestAllocation testAllocation = TestAllocation.fromMap(allocationMap);
+				allocationsToSave.add(testAllocation);
+			}
 			
 		}
-		
+		if(unretiredConcepts.size() == 0){
+			throw new Exception("All sample allocations are retired");
+		}
 		List<TestAllocation> savedAllocations = laboratoryService.createAllocationsForSample(allocationsToSave);
 		
 		Map<String, Object> response = new HashMap<String, Object>();
@@ -416,7 +422,7 @@ public class LaboratoryController {
 			 for(Sample sample: samplesResponse) {
 				 if (sample.getSampleOrders().size() > 0) {
 					 for (SampleOrder order: sample.getSampleOrders()) {
-						 if (order.getTestAllocations().size() > 0) {
+						 if (order.getTestAllocations().size() > 0 && order.getOrder().getVoided() == false) {
 							 for (TestAllocation allocation: order.getTestAllocations()) {
 
 								 //Getting concept sets for parameter headers
@@ -440,7 +446,6 @@ public class LaboratoryController {
 		result.setCreator(Context.getAuthenticatedUser());
 		Result savedResults = laboratoryService.recordTestAllocationResults(result);
 		return savedResults.toMap();
-		
 	}
 	
 	@RequestMapping(value = "multipleresults", method = RequestMethod.POST)
@@ -454,7 +459,13 @@ public class LaboratoryController {
 		}
 		List<Map<String, Object>> savedResultsResponse = laboratoryService.saveMultipleResults(formattedResults);
 		return savedResultsResponse;
-
+	}
+	
+	@RequestMapping(value = "voidmultipleresults", method = RequestMethod.PUT)
+	@ResponseBody
+	public List<Map<String, Object>> voidMultipleResults(@RequestBody Map<String, Object> resultsToVoid) throws Exception {
+		List<Map<String, Object>> savedResultsResponse = laboratoryService.voidMultipleResults(resultsToVoid);
+		return savedResultsResponse;
 	}
 	
 	@RequestMapping(value = "resultsinstrument", method = RequestMethod.POST)
@@ -544,10 +555,10 @@ public class LaboratoryController {
 	@RequestMapping(value = "testtime", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getTestTimeConfigurations(
-	        @RequestParam(value = "concept", required = false) String conceptUuid) {
+	        @RequestParam(value = "concept", required = false) String conceptUuid, @RequestParam(required = false) String q) {
 		
 		if (conceptUuid == null) {
-			List<TestTimeConfig> testTimeConfigs = this.laboratoryService.getTestTimeConfigs();
+			List<TestTimeConfig> testTimeConfigs = this.laboratoryService.getTestTimeConfigs(q);
 			
 			List<Map<String, Object>> configsMapList = new ArrayList<Map<String, Object>>();
 			
@@ -568,6 +579,13 @@ public class LaboratoryController {
 			
 		}
 		
+	}
+	
+	@RequestMapping(value = "testtime/{testConfigUuid}", method = RequestMethod.DELETE)
+	@ResponseBody
+	public Map<String, Object> deletetestTimeConfiguration(@PathVariable("testConfigUuid") String testConfigUuid) {
+		TestTimeConfig testTimeConfig = laboratoryService.deleteTestTimeConfiguration(testConfigUuid);
+		return testTimeConfig.toMap();
 	}
 	
 	@RequestMapping(value = "testrange", method = RequestMethod.POST)

@@ -1,4 +1,12 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+} from "@angular/core";
 import { uniqBy, orderBy } from "lodash";
 import { Observable, of } from "rxjs";
 import {
@@ -10,6 +18,12 @@ import {
 import { LocationService } from "src/app/core/services";
 import { ReferenceTermsService } from "src/app/core/services/reference-terms.service";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
+import {
+  CdkDragDrop,
+  moveItemInArray,
+  transferArrayItem,
+} from "@angular/cdk/drag-drop";
+import { OpenMRSFormsService } from "../../resources/forms/services/openmrs-forms.services";
 
 @Component({
   selector: "app-multiple-items-selection",
@@ -34,12 +48,12 @@ export class MultipleItemsSelectionComponent implements OnInit, OnChanges {
   constructor(
     private conceptService: ConceptsService,
     private conceptReferenceService: ReferenceTermsService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private formsService: OpenMRSFormsService
   ) {}
 
   ngOnInit(): void {
-    this.currentSelectedItems =
-      this.selectedItems || [];
+    this.currentSelectedItems = this.selectedItems || [];
     if (
       this.itemType &&
       this.itemType === "concept" &&
@@ -87,6 +101,32 @@ export class MultipleItemsSelectionComponent implements OnInit, OnChanges {
             return response?.filter((item) => !item?.retired) || [];
           })
         );
+    }
+    if (this.itemType && this.itemType === "form") {
+      this.items$ =
+        this.items?.length > 0
+          ? of(
+              this.items?.map((item) => {
+                return {
+                  ...item,
+                  display:
+                    item?.display?.indexOf(":") > -1
+                      ? item?.display?.split(":")[1]
+                      : item?.display,
+                  name:
+                    item?.display?.indexOf(":") > -1
+                      ? item?.display?.split(":")[1]
+                      : item?.display,
+                };
+              })
+            )
+          : this.formsService
+              .getAllForms([
+                `startIndex=0`,
+                `limit=${this.pageSize}`,
+                `v=custom:(uuid,display,name)`,
+              ])
+              .pipe(map((response: any) => response?.results));
     } else {
       this.items$ = of(
         this.items.filter(
@@ -101,15 +141,14 @@ export class MultipleItemsSelectionComponent implements OnInit, OnChanges {
     }
   }
 
-ngOnChanges(): void {
-  this.currentSelectedItems =
-  this.selectedItems || [];
-}
+  ngOnChanges(): void {
+    this.currentSelectedItems = this.selectedItems || [];
+  }
 
   getSelectedItem(event: Event, item: any, items: any[]): void {
     event.stopPropagation();
-    this.currentSelectedItems = uniqBy([...this.selectedItems, item]);
-    this.items = this.items.filter(
+    this.currentSelectedItems = uniqBy([...(this.selectedItems || []), item]);
+    this.items = (this.items || [])?.filter(
       (metadataItem) =>
         (
           this.currentSelectedItems?.filter(
@@ -189,6 +228,22 @@ ngOnChanges(): void {
           })
         )
       );
+    } else if (itemType === "form") {
+      this.items$ = of(searchingText).pipe(
+        debounceTime(1000),
+        distinctUntilChanged(),
+        switchMap((term) =>
+          this.formsService
+            .getAllForms([
+              `q=${term}`,
+              `startIndex=0`,
+              `limit=${this.pageSize}`,
+              `v=custom:(uuid,display,name)`,
+            ])
+            .pipe(map((response: any) => response?.results))
+        )
+      );
+    } else {
     }
   }
 
@@ -204,5 +259,22 @@ ngOnChanges(): void {
     this.currentSelectedItems = [];
     this.items = [...this.items, ...items];
     this.getSelectedItems.emit(this.currentSelectedItems);
+  }
+
+  drop(event: CdkDragDrop<any[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+    }
   }
 }

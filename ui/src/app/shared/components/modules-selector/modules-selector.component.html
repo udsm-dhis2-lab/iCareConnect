@@ -1,5 +1,8 @@
-<div class="no-print">
-  <div class="w-100 menu-items-container" *ngIf="!lisConfigurations?.isLIS">
+<div class="no-print dont-print">
+  <div
+    class="w-100 menu-items-container"
+    *ngIf="!lisConfigurations?.isLIS && !lisConfigurations?.isPharmacy"
+  >
     <div class="menu-items">
       <div
         class="menu-item"
@@ -17,7 +20,7 @@
   <div>
     <mat-chip-list
       class="sub-menu-items mat-elevation-z1"
-      *ngIf="!lisConfigurations?.isLIS"
+      *ngIf="!lisConfigurations?.isLIS && !lisConfigurations?.isPharmacy"
     >
       <mat-chip
         (click)="onSetLocation($event, userLocation)"

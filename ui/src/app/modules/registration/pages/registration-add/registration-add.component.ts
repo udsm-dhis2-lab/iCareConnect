@@ -3,7 +3,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import {
-  getAgeInYearsMontthsDays,
+  getAgeInYearsMonthsDays,
   getDateDifferenceYearsMonthsDays,
 } from "src/app/shared/helpers/date.helpers";
 import {
@@ -274,7 +274,7 @@ export class RegistrationAddComponent implements OnInit {
 
     // let birthdate = new Date(this.patient?.dob);
     // let ageObject = getDateDifferenceYearsMonthsDays(birthdate, new Date());
-    let ageObject = getAgeInYearsMontthsDays(this.patient?.dob);
+    let ageObject = getAgeInYearsMonthsDays(this.patient?.dob);
 
     this.patient.age = {
       ...this.patient.age,
@@ -956,6 +956,7 @@ export class RegistrationAddComponent implements OnInit {
                             .open(StartVisitModelComponent, {
                               width: "85%",
                               data: { patient: patientResponse },
+                              disableClose: false,
                             })
                             .afterClosed()
                             .subscribe((visitDetails) => {

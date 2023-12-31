@@ -137,7 +137,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     this.searchingEquipmentsField = new Dropdown({
       id: "instrument",
       key: "instrument",
-      label: "Search by Equipment",
+      label: "Search by Instrument/Method",
       searchControlType: "concept",
       searchTerm: "LIS_INSTRUMENT",
       conceptClass: "LIS instrument",
@@ -356,6 +356,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
   onPrint(event: Event, sample: any): void {
     event.stopPropagation();
+    console.log("aaa: ",sample)
     this.selectedSampleDetails.emit(sample);
   }
 

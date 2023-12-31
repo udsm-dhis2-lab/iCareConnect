@@ -18,6 +18,9 @@ import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
+import org.openmrs.module.icare.core.models.EncounterPatientProgram;
+import org.openmrs.module.icare.core.models.EncounterPatientState;
+import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
@@ -69,6 +72,8 @@ public interface ICareService extends OpenmrsService {
 	
 	ItemPrice getItemPrice(Visit visit, Drug drug) throws ItemNotPayableException, ConfigurationException;
 	
+	List<ItemPrice> getItemPricesByConceptId(Integer Id);
+	
 	List<ItemPrice> getItemPrices();
 	
 	List<ItemPrice> getItemPrices(String paymentType, Integer limit, Integer startIndex);
@@ -104,7 +109,7 @@ public interface ICareService extends OpenmrsService {
 	        OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus, Integer limit,
 	        Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
 	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
-	        String sampleCategory, String exclude, Boolean includeInactive);
+	        String sampleCategory, String exclude, Boolean includeInactive, Boolean includeDeadPatients);
 	
 	List<Order> getOrdersByVisitAndOrderType(String visitUuid, String orderTypeUuid, Order.FulfillerStatus fulfillerStatus,
 	        Integer limit, Integer startIndex);
@@ -158,4 +163,27 @@ public interface ICareService extends OpenmrsService {
 	List<String> generateCode(String globalProperty, String metadataType, Integer count) throws Exception;
 	
 	OrderStatus saveOrderStatus(OrderStatus orderStatus);
+	
+	void updatePasswordHistory() throws Exception;
+	
+	PasswordHistory savePasswordHistory(User user, String newPassword) throws Exception;
+	
+	List<PasswordHistory> getUserPasswordHistory(String uuid);
+	
+	List<Role> getRoles(String q, Integer startIndex, Integer limit);
+	
+	List<Privilege> getPrivileges(String q, Integer startIndex, Integer limit);
+	
+	ProgramWorkflow saveProgramWorkflow(ProgramWorkflow programWorkflow);
+	
+	List<PatientProgram> getPatientProgram(String programUuid, String patientUuid, Integer startIndex, Integer limit,
+	        Boolean includeDeadPatients) throws Exception;
+	
+	EncounterPatientState saveEncounterPatientState(EncounterPatientState encounterPatientState);
+	
+	List<Encounter> getEncountersByPatientState(String patientStateUuid);
+	
+	EncounterPatientProgram saveEncounterPatientProgram(EncounterPatientProgram encounterPatientProgram);
+
+    List<Encounter> getEncountersByPatientProgram(String patientProgramUuid);
 }

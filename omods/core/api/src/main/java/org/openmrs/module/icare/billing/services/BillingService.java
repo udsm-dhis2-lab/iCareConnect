@@ -74,4 +74,6 @@ public interface BillingService extends OpenmrsService {
 	List<Invoice> getInvoicesByVisitUuid(String visit);
 	
 	Order createOrderForOngoingIPDPatients() throws Exception;
+	
+	Order createOrderForOngoingDeceasedPatients() throws Exception;
 }

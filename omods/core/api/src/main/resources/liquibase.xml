@@ -5276,5 +5276,190 @@
         </sql>
     </changeSet>
 
+    <changeSet id="create_password_history" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="password_history" /></not>
+        </preConditions>
+        <comment>Adding password_history table</comment>
+        <createTable tableName="password_history">
+            <column name="password_history_id" type="int" autoIncrement="true" >
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="user_id" type="int" />
+            <column name="password" type="varchar(128)"><constraints nullable="true" /></column>
+            <column name="change_date" type="DATETIME"><constraints nullable="false" /></column>
+        </createTable>
+        <addForeignKeyConstraint
+                constraintName="user_id"
+                baseTableName="password_history" baseColumnNames="user_id"
+                referencedTableName="users" referencedColumnNames="user_id" />
+    </changeSet>
+
+    <changeSet id="update_lb_test_result_add_column_tested_by" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_test_result
+            ADD COLUMN tested_by INT NULL AFTER creator,
+            ADD FOREIGN KEY(tested_by) REFERENCES users(user_id);
+        </sql>
+    </changeSet>
+    <changeSet id="update_lb_test_result_add_column_tested_date" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_test_result
+            ADD COLUMN date_tested DATETIME NULL AFTER tested_by;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_test_time_configuration" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_test_time_configuration
+            ADD CONSTRAINT concept_id UNIQUE (concept_id);
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_test_time_configuration_add_columns" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_test_time_configuration
+            ADD COLUMN referral_tat BIGINT NULL AFTER urgent_tat,
+            MODIFY COLUMN standard_tat BIGINT,
+            MODIFY COLUMN urgent_tat BIGINT,
+            ADD COLUMN config_type VARCHAR(20) NULL AFTER additional_request_time_limit;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_test_time_configuration_add_tat_column" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_test_time_configuration
+            ADD COLUMN routine_config_type VARCHAR(20) NULL AFTER config_type,
+            ADD COLUMN referral_config_type VARCHAR(20) NULL AFTER routine_config_type;
+        </sql>
+    </changeSet>
+
+    <changeSet id="update_lb_test_time_config_rename_config_type" author="dennis-kibahila" dbms="mysql">
+        <sql>
+            ALTER TABLE lb_test_time_configuration
+            CHANGE config_type urgent_config_type  VARCHAR(20);
+        </sql>
+    </changeSet>
+
+    <changeSet id="create_encounter_patient_state" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="encounter_patient_state"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs encounter_patient_state table</comment>
+        <createTable tableName="encounter_patient_state">
+            <column name="encounter_patient_state_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="encounter_patient_state_id_pk"/>
+            </column>
+            <column name="encounter_id" type="INTEGER"/>
+            <column name="patient_state_id" type="INTEGER"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="encounter_patient_state"
+                constraintName="encounter_state_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="encounter_patient_state"
+                constraintName="encounter_state_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="encounter_id"
+                baseTableName="encounter_patient_state"
+                constraintName="encounter_state_encounter_id_encounter_fk"
+                referencedColumnNames="encounter_id"
+                referencedTableName="encounter"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="patient_state_id"
+                baseTableName="encounter_patient_state"
+                constraintName="state_state_id_patient_state_fk"
+                referencedColumnNames="patient_state_id"
+                referencedTableName="patient_state"/>
+
+    </changeSet>
+
+    <changeSet id="create_encounter_patient_program" author="dennis-kibahila" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="encounter_patient_program"/>
+            </not>
+        </preConditions>
+        <comment>Creating openmrs encounter_patient_program table</comment>
+        <createTable tableName="encounter_patient_program">
+            <column name="encounter_patient_program_id" type="INTEGER" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="encounter_patient_program_id_pk"/>
+            </column>
+            <column name="encounter_id" type="INTEGER"/>
+            <column name="patient_program_id" type="INTEGER"/>
+            <column name="creator" type="INTEGER"/>
+            <column name="date_created" type="DATE">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="changed_by" type="INTEGER"/>
+            <column name="date_changed" type="DATE"/>
+            <column name="voided" type="BOOLEAN">
+                <constraints nullable="false"></constraints>
+            </column>
+            <column name="date_voided" type="DATE"/>
+            <column name="voided_by" type="INTEGER"/>
+            <column name="void_reason" type="TEXT"/>
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseColumnNames="changed_by"
+                baseTableName="encounter_patient_program"
+                constraintName="encounter_program_changed_by_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="creator"
+                baseTableName="encounter_patient_program"
+                constraintName="encounter_program_creator_users_user_id_fk"
+                referencedColumnNames="user_id"
+                referencedTableName="users"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="encounter_id"
+                baseTableName="encounter_patient_program"
+                constraintName="encounter_program_encounter_id_encounter_fk"
+                referencedColumnNames="encounter_id"
+                referencedTableName="encounter"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="patient_program_id"
+                baseTableName="encounter_patient_program"
+                constraintName="program_program_id_patient_program_fk"
+                referencedColumnNames="patient_program_id"
+                referencedTableName="patient_program"/>
+
+    </changeSet>
+
 
 </databaseChangeLog>
