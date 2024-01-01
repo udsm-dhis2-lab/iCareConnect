@@ -226,6 +226,9 @@ export class StockStatusListComponent implements OnInit {
     //   event.pageIndex - this.page >= 0 ? this.page + 1 : this.page - 1;
     this.page = this.page + (event?.pageIndex - event?.previousPageIndex);
     this.pageSize = Number(event?.pageSize);
+    console.log("page: ",this.page);
+    console.log("pagesize: ",this.pageSize);
+    console.log("pageIndex: ",event.pageIndex)
     this.getStock();
   }
 
