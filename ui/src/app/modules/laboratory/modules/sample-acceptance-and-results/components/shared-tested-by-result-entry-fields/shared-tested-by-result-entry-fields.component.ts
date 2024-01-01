@@ -15,6 +15,7 @@ export class SharedTestedByResultEntryFieldsComponent implements OnInit {
   // Input property to track the overall validity of the form
   @Input() isFormValid:boolean=false;
   testedByFormFields!: any;
+  // EventEmitter used to emit form validation state changes to the parent component
   @Output() handleValidateForm: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @Output() selectedTestedByFormFields: EventEmitter<any> =
