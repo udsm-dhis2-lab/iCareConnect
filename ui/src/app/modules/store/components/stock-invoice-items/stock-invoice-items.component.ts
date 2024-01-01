@@ -1,15 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { Observable } from "rxjs";
 import { map, tap } from "rxjs/operators";
-import { LocationService } from "src/app/core/services";
-import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { toISOStringFormat } from "src/app/shared/helpers/format-date.helper";
-import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { StockInvoicesService } from "src/app/shared/resources/store/services/stockInvoice.service";
-import { SupplierService } from "src/app/shared/resources/store/services/supplier.service";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { StockInvoiceFormDialogComponent } from "../../modals/stock-invoice-form-dialog/stock-invoice-form-dialog.component";
+
 @Component({
   selector: "app-stock-invoice-items",
   templateUrl: "./stock-invoice-items.component.html",
@@ -23,10 +21,17 @@ export class StockInvoiceItemsComponent implements OnInit {
   @Input() updateStockInvoice: any;
   @Output() reloadList: EventEmitter<any> = new EventEmitter();
 
+  // Paginator properties
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  pageSizeOptions: number[] = [5, 10, 15, 25, 50, 100, -1]; // -1 for 'All'
+  pageSize: number = 10;
+  pageIndex = 0;
+
   errors: any[];
   specificStockInvoice$: Observable<any>;
   unitsOfMeasurementSettings$: Observable<any>;
   loadingInvoice: boolean = false;
+
   constructor(
     private stockInvoicesService: StockInvoicesService,
     private dialog: MatDialog
@@ -46,6 +51,8 @@ export class StockInvoiceItemsComponent implements OnInit {
         })
       );
   }
+
+  
 
   onUpdateStockInvoiceItem(stockInvoiceItem, key: string) {
     if (!key) {
@@ -138,8 +145,17 @@ export class StockInvoiceItemsComponent implements OnInit {
               )
               .subscribe();
           }
-          this.reloadList.emit(this.stockInvoice);
         });
     }
   }
+
+  onPageChange(event: PageEvent): void {
+      this.pageSize = event.pageSize;
+      this.pageIndex = event.pageIndex;
+      // Another group member can implement this
+      // Requires a Reload your data based on the new page size and index
+      // Requires a Call method to fetch data with new page size and index
+      this.reloadList.emit(this.stockInvoice);
+  }
+
 }
