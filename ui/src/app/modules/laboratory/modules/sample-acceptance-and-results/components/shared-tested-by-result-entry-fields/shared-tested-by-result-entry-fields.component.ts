@@ -12,6 +12,7 @@ import { formatDateToYYMMDD } from "src/app/shared/services/visits.service";
 })
 export class SharedTestedByResultEntryFieldsComponent implements OnInit {
   @Input() order!: any;
+  // Input property to track the overall validity of the form
   @Input() isFormValid:boolean=false;
   testedByFormFields!: any;
   @Output() handleValidateForm: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -22,6 +23,8 @@ export class SharedTestedByResultEntryFieldsComponent implements OnInit {
 
   testedBy!: any;
   testedDate!: any;
+
+  // Flag to track whether the entered date is considered invalid
   isShowInvalidDate:boolean = false;
 
   constructor() {}
@@ -85,10 +88,16 @@ export class SharedTestedByResultEntryFieldsComponent implements OnInit {
   onFormUpdate(formValue: FormValue): void {
     // collected date is on this.order.dateCreated
     const collectedDate = new Date(this.order.dateCreated);
+    
+    // Get the current reporting date
     const reportingDate = Date.now();
+
+    // Get the entered date from the form values, if available
     const enteredDate = formValue.getValues()?.date?.value ? new Date(formValue.getValues().date.value) : null;
   
+    // Function to validate the entered date
     const validateEnteredDate = ()=> {
+      // Check if enteredDate is invalid or null
       if (!enteredDate || isNaN(enteredDate.getTime())) {
         // If enteredDate is invalid or null
         this.isFormValid = false;
@@ -97,6 +106,7 @@ export class SharedTestedByResultEntryFieldsComponent implements OnInit {
         
 
       } else {
+         // Check if enteredDate is within the range of collectedDate and reportingDate
         if (enteredDate >= collectedDate && enteredDate.getTime() <= reportingDate) {
           // If enteredDate is within the range
           this.isFormValid = true;
@@ -110,8 +120,8 @@ export class SharedTestedByResultEntryFieldsComponent implements OnInit {
         }
       }
     }
-    
-    validateEnteredDate(); // Call the function to perform validation
+     // Call the function to perform validation
+    validateEnteredDate();
   
 
    
