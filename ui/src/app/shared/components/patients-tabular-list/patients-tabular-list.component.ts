@@ -1,3 +1,4 @@
+//This is the particular file that has been causing errors
 import { EventEmitter, OnChanges, Output, ViewChild } from "@angular/core";
 import { Component, Input, OnInit } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
@@ -19,8 +20,7 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   @Input() itemsPerPage: number;
   @Input() page: number;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-  //@Output() patientVisitDetails: EventEmitter<any> = new EventEmitter<any>();
-  @Output() patientLaboratoryResults: EventEmitter<any> = new EventEmitter<any>();
+  @output() patientVisitDetails: EventEmitter<any> = new EventEmitter<any>();
   @Output() shouldLoadNewList: EventEmitter<boolean> = new EventEmitter<boolean>();
   currentPage: number = 0;
 
@@ -67,7 +67,7 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   getSelectedPatient(event, patientLaboratoryResults) {
     event.stopPropagation();
     //The below line fixes the bug that has been caused by the code line commented below it 
-    this.patientLaboratoryResults.emit(PatientLabResultsSummaryComponent);
+    this.patientVisitDetails.emit(PatientLabResultsSummaryComponent);
     //this.patientVisitDetails.emit(patientVIsitDetails);
   }
   
