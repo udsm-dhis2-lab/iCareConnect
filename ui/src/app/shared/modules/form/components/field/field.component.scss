@@ -51,7 +51,7 @@
 word-wrap: break-word !important;
 white-space: pre-line !important;
 /* Remove text truncation: */
-text-overflow: initial !important;
+text-overflow: initial !important;//intial property removes test truncation allowing text to be displayed  
 /* Ensure height accommodates content: */
 height: fit-content !important; /* Use standard fit-content for wider compatibility */
 /* Maintain appropriate spacing and alignment: */
