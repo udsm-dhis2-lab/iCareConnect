@@ -79,11 +79,19 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 
+/* The following CSS code uses ng-deep to penetrate and style elements deep within the component tree. */
+
+/* Targets elements with the class .disabled-form-selection-option using ng-deep. */
 ng-deep .disabled-form-selection-option,
+/* Targets elements with the class .disabled-form-selection-option directly. */
 .disabled-form-selection-option {
+  /* Overrides the cursor to not-allowed and gives it higher specificity using !important. */
   cursor: not-allowed !important;
+  /* Sets the text color to red for the disabled options. */
   color: red;
+  /* Adds a line-through decoration to the text with higher priority using !important. */
   text-decoration: line-through !important;
+}
 }
 
 .stock-out-item {
