@@ -53,7 +53,7 @@ white-space: pre-line !important;
 /* Remove text truncation: */
 text-overflow: initial !important;//intial property removes test truncation allowing text to be displayed  
 /* Ensure height accommodates content: */
-height: fit-content !important; /* Use standard fit-content for wider compatibility */
+height: fit-content !important; /* Use standard fit-content for wider compatibility and visuall spacing of diagnosis drop list*/
 /* Maintain appropriate spacing and alignment: */
 line-height: 1.5 !important; /* Adjust for readability */
 padding: 0.5rem 16px !important; /* Adjust as needed */
