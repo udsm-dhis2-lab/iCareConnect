@@ -24,7 +24,7 @@ export class ExemptionListComponent implements OnInit {
 
   ngOnInit() {
     this.criteriaResults$ = this.billingService.discountCriteriaConcept();
-    this.bills = this.bills.filter((bill) => {
+    this.bills = this.bills.reverse().filter((bill) => {
       if (bill?.items && bill?.items.length > 0) {
         this.showActionButtons.emit();
         return bill;

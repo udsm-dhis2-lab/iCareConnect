@@ -8,7 +8,7 @@ import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-cl
 import { provideMockStore } from '@ngrx/store/testing';
 
 describe('RegistrationPatientComponent', () => {
-  let component: RegistrationPatientComponent;
+  let component: RegistrationPatientComponent;ßßßßßß
   let fixture: ComponentFixture<RegistrationPatientComponent>;
 
   beforeEach(async () => {
@@ -47,16 +47,6 @@ describe('RegistrationPatientComponent', () => {
   });
 
   it('should create', () => {
-    // Mock new patient data
-    const newPatient = {
-      uuid: 'newPatientUUID',
-      display: 'New Patient',
-      // Other properties...
-    };
-
-    // Add the new patient to the beginning of the patient list
-    component.patients.unshift(newPatient);
-
     expect(component).toBeTruthy();
   });
 });
