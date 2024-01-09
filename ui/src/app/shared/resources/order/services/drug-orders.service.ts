@@ -590,4 +590,11 @@ export class DrugOrdersService {
       })
     );
   }
+
+  createDrugOrdersWithEncounter(encounterObject: any): Observable<any> {
+    return this.openmrsService.post("encounter", encounterObject).pipe(
+      map((response) => response),
+      catchError((error: any) => of(error))
+    );
+  }
 }
