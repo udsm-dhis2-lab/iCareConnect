@@ -63,11 +63,10 @@
     </ng-container>
     <ng-container *ngIf="isGenericForm">
       <app-form
-        [fields]="getFields"
+        [fields]="genericFormFields"
         [isFormHorizontal]="true"
         [isReport]="isReport"
         [formId]="form?.uuid"
-        [fieldsData]="observations"
         [formValidationRules]="formValidationRules"
         (formUpdate)="onFormUpdate($event)"
       ></app-form>

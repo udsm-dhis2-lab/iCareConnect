@@ -66,7 +66,19 @@ export class FormService {
     field?
   ): Observable<any[]> {
     // console.log("searchControlType", searchControlType);
-    if (parameters?.class === "Diagnosis") {
+    if (field?.conceptUuid) {
+      return from(
+        this.api.concept.getConcept(field?.conceptUuid, {
+          v: "custom:(uuid,display,setMembers:(uuid,display),answers:(uuid,display))",
+        })
+      ).pipe(
+        map((response: any) =>
+          response?.answers?.length > 0
+            ? response?.answers
+            : response?.setMembers
+        )
+      );
+    } else if (parameters?.class === "Diagnosis") {
       return from(this.api.concept.getAllConcepts(parameters)).pipe(
         map((response) => {
           return orderBy(

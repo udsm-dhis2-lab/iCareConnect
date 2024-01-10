@@ -2,7 +2,6 @@
   class="w-100"
   *ngIf="{
     customForm: customForm$ | async,
-    visitDetails: visitDetails$ | async,
     currentLocation: currentLocation$ | async
   } as params"
 >
@@ -16,94 +15,105 @@
           </div>
         </div>
       </div>
-      <mat-progress-bar
-        mode="indeterminate"
-        *ngIf="!params?.visitDetails || !params?.currentLocation"
-      ></mat-progress-bar>
-      <fieldset>
-        <legend>Drug/Non-drug</legend>
-        <div class="row">
-          <div class="col-12">
-            <table class="table table-striped table-bordered">
-              <tbody>
-                <tr *ngFor="let item of selectedItems; let count = index">
-                  <td style="width: 30px">
-                    {{ count + 1 }}
-                  </td>
-                  <td class="w-50">
-                    {{ item?.name }}
-                  </td>
-                  <td style="width: 30px">
-                    <app-form
-                      [fields]="[quantityFields[item?.itemUuid]]"
-                      (formUpdate)="onQuantityUpdate($event)"
-                    ></app-form>
-                  </td>
-                  <td></td>
-                  <td style="width: 30px">
-                    <button (click)="onRemove($event, item)" mat-icon-button>
-                      <mat-icon color="warn">delete</mat-icon>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="col-12 d-flex justify-content-left">
-            <div class="w-50">
-              <app-form
-                [fields]="[searchItemFormField]"
-                (formUpdate)="onSearchItemFormUpdate($event)"
-              ></app-form>
+      <ng-container *ngIf="!saving">
+        <mat-progress-bar
+          mode="indeterminate"
+          *ngIf="!params?.currentLocation"
+        ></mat-progress-bar>
+        <fieldset>
+          <legend>Drug/Non-drug</legend>
+          <div class="row">
+            <div class="col-12">
+              <table class="table table-striped table-bordered">
+                <tbody>
+                  <tr *ngFor="let item of selectedItems; let count = index">
+                    <td style="width: 30px">
+                      {{ count + 1 }}
+                    </td>
+                    <td class="w-50">
+                      {{ item?.name }}
+                    </td>
+                    <td *ngFor="let variable of prescriptionVariables">
+                      <app-form
+                        [fields]="[doseFields[variable?.key + item?.itemUuid]]"
+                        (formUpdate)="onFormDataUpdate($event)"
+                      ></app-form>
+                    </td>
+                    <td style="width: 30px">
+                      <app-form
+                        [fields]="[quantityFields[item?.itemUuid]]"
+                        (formUpdate)="onFormDataUpdate($event)"
+                      ></app-form>
+                    </td>
+                    <td style="width: 30px">
+                      <button (click)="onRemove($event, item)" mat-icon-button>
+                        <mat-icon color="warn">delete</mat-icon>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <div class="w-25">
-              <button
-                mat-icon-button
-                (click)="onAddToList($event, itemData)"
-                [disabled]="!itemData"
-              >
-                <mat-icon>add</mat-icon>
-              </button>
+            <div class="col-12 d-flex justify-content-left">
+              <div class="w-50">
+                <app-form
+                  [fields]="[searchItemFormField]"
+                  (formUpdate)="onSearchItemFormUpdate($event)"
+                ></app-form>
+              </div>
+              <div class="w-25">
+                <button
+                  mat-icon-button
+                  (click)="onAddToList($event, itemData)"
+                  [disabled]="!itemData"
+                >
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
             </div>
           </div>
+        </fieldset>
+
+        <app-capture-form-data
+          *ngIf="params?.customForm"
+          [form]="params?.customForm"
+          [isGenericForm]="true"
+          [isFormHorizontal]="true"
+          [formValidationRules]="[]"
+          (formDataUpdate)="onFormUpdate($event)"
+        ></app-capture-form-data>
+
+        <div class="d-flex justify-content-end">
+          <button
+            mat-flat-button
+            color="primary"
+            (click)="
+              onSave(
+                $event,
+                selectedItems,
+                params?.currentLocation,
+                params?.customForm
+              )
+            "
+            [disabled]="
+              selectedItems?.length === 0 ||
+              !params?.currentLocation ||
+              !params?.customForm
+            "
+          >
+            Save
+          </button>
         </div>
-      </fieldset>
-
-      <app-capture-form-data
-        *ngIf="params?.customForm"
-        [form]="params?.customForm"
-        [isGenericForm]="true"
-        [isFormHorizontal]="true"
-        [formValidationRules]="[]"
-        (formDataUpdate)="onFormUpdate($event)"
-      ></app-capture-form-data>
-
-      <div class="d-flex justify-content-end">
-        <button
-          mat-flat-button
-          color="primary"
-          (click)="
-            onSave(
-              $event,
-              selectedItems,
-              params?.visitDetails,
-              params?.currentLocation
-            )
-          "
-          [disabled]="
-            selectedItems?.length === 0 ||
-            !params?.visitDetails ||
-            !params?.currentLocation
-          "
-        >
-          Save
-        </button>
-      </div>
+      </ng-container>
     </div>
     <div class="col-lg-4 col-md-4 col-sm-12 col-sx-12">
+      <mat-progress-bar
+        mode="indeterminate"
+        *ngIf="!params?.customForm"
+      ></mat-progress-bar>
       <app-encounters-list
-        *ngIf="params?.visitDetails"
-        [visitDetails]="params?.visitDetails"
+        *ngIf="!saving && params?.customForm"
+        [customForm]="params?.customForm"
       ></app-encounters-list>
     </div>
   </div>
