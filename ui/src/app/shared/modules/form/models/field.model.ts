@@ -28,6 +28,7 @@ export class Field<T> {
   locationUuid?: string;
   multiple?: boolean;
   allowCustomDateTime?: boolean;
+  conceptUuid?: string;
 
   constructor(
     options: {
@@ -58,6 +59,7 @@ export class Field<T> {
       locationUuid?: string;
       multiple?: boolean;
       allowCustomDateTime?: boolean;
+      conceptUuid?: string;
     } = {}
   ) {
     this.value = options.value;
@@ -87,5 +89,6 @@ export class Field<T> {
     this.locationUuid = options?.locationUuid;
     this.multiple = options?.multiple;
     this.allowCustomDateTime = options?.allowCustomDateTime;
+    this.conceptUuid = options?.conceptUuid;
   }
 }

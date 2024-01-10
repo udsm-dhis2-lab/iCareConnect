@@ -65,7 +65,9 @@ export class FieldComponent implements AfterViewInit {
     if (
       this.field?.searchTerm ||
       this.field?.source ||
-      (this.field?.shouldHaveLiveSearchForDropDownFields && this.field?.value)
+      (this.field?.shouldHaveLiveSearchForDropDownFields &&
+        this.field?.value) ||
+      this.field?.conceptUuid
     ) {
       this.members$ = this.formService.searchItem(
         {

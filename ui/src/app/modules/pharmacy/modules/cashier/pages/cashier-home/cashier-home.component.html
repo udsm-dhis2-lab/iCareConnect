@@ -4,7 +4,10 @@
     currentUser: currentUser$ | async,
     pharmacyClientDetailsFormUuid: pharmacyClientDetailsFormUuid$ | async,
     visitUuid: visitUuid$ | async,
-    patientUuid: patientUuid$ | async
+    patientUuid: patientUuid$ | async,
+    encounterTypeUuid: encounterTypeUuid$ | async,
+    provider: provider$ | async,
+    prescriptionVariables: prescriptionVariables$ | async
   } as params"
 >
   <div
@@ -13,7 +16,10 @@
       !params?.currentUser ||
       !params?.pharmacyClientDetailsFormUuid ||
       !params?.visitUuid ||
-      !params?.patientUuid
+      !params?.patientUuid ||
+      !params?.encounterTypeUuid ||
+      !params?.provider ||
+      !params?.prescriptionVariables
     "
   >
     <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
@@ -24,7 +30,10 @@
       params?.currentUser &&
       params?.pharmacyClientDetailsFormUuid &&
       params?.visitUuid &&
-      params?.patientUuid
+      params?.patientUuid &&
+      params?.encounterTypeUuid &&
+      params?.provider &&
+      params?.prescriptionVariables
     "
   >
     <app-cashier-dashboard
@@ -32,7 +41,10 @@
       [currentLocation]="currentLocation"
       [visitUuid]="params?.visitUuid"
       [patientUuid]="params?.patientUuid"
+      [encounterTypeUuid]="params?.encounterTypeUuid"
       [formId]="params?.pharmacyClientDetailsFormUuid"
+      [provider]="params?.provider"
+      [prescriptionVariables]="params?.prescriptionVariables"
     ></app-cashier-dashboard>
   </div>
 </div>

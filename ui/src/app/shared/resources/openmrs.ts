@@ -12266,7 +12266,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getConcept: (
       uuid: string,
-      query?: { v?: "ref" | "default" | "full" | "custom" },
+      query?: { v?: "ref" | "default" | "full" | "custom" | string },
       params?: RequestParams
     ) =>
       this.request<ConceptGet, any>(

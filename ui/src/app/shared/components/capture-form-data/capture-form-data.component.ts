@@ -21,6 +21,7 @@ export class CaptureFormDataComponent implements OnInit {
   @Input() formValidationRules: any[];
   @Input() isFormHorizontal: boolean;
   observations$: Observable<any>;
+  genericFormFields: any[];
 
   @Output() formDataUpdate: EventEmitter<FormValue> =
     new EventEmitter<FormValue>();
@@ -39,6 +40,11 @@ export class CaptureFormDataComponent implements OnInit {
       : this.observations
       ? of(this.observations)
       : of([]);
+    if (this.isGenericForm) {
+      this.genericFormFields =
+        this.form?.formFields?.map((formField: any) => formField?.formField) ||
+        [];
+    }
   }
 
   onFormUpdate(data: FormValue): void {
