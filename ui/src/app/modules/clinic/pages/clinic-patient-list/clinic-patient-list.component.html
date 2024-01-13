@@ -75,16 +75,22 @@
           This piece of code below displays all patients with associated laboratory tests
         -->
         <mat-tab label="With Laboratory Tests">
+          <!--
+            The following line is a workaround to ensure that the tab content gets displayed after the tab selection.
+          -->
           <div class="p-2" *ngIf="selectedTab.value === 2"> 
 
           <ng-template matTabContent>
+            <!--
+              The part below suggests that the application has a reusable component specifically designed to display lists of patients, which is being reused here to show the patients with laboratory test,
+            -->
             <app-patient-list
               [currentLocation]="(currentLocation$ | async)?.id"
               [shouldShowParentLocation]="true"
               [orderType]="params?.labTestOrderType"
               [isTabularList]="true"
               [itemsPerPage]="10"
-              (selectPatient)="onSelectPatient($event)"
+              (selectPatient)="onSelectPatient($event)" 
             ></app-patient-list>
           </ng-template>
           </div>
