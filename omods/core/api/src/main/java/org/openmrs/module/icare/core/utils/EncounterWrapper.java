@@ -30,16 +30,15 @@ public class EncounterWrapper {
         List<Map<String, Object>> obs = new ArrayList<>();
         for(Obs observation: encounter.getAllObs()) {
             Map<String, Object> obsData = new HashMap<>();
-            String dataType = observation.getConcept().getDatatype().getName();
             Map<String, Object> conceptDetails = new HashMap<>();
             conceptDetails.put("display", observation.getConcept().getDisplayString());
             conceptDetails.put("uuid", observation.getConcept().getUuid());
             obsData.put("concept", conceptDetails);
-            if (dataType.equals("text")) {
+            if (observation.getValueText() != null) {
                 obsData.put("value", observation.getValueText());
             }
-            if (dataType.equals("coded")) {
-                obsData.put("value", observation.getValueCodedName().getName());
+            if (observation.getValueCoded().getDisplayString() != null) {
+                obsData.put("value", observation.getValueCoded().getDisplayString());
             }
             obs.add(obsData);
         }
