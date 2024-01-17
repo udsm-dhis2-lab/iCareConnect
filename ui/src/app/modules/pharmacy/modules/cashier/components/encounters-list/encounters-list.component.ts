@@ -11,6 +11,9 @@ import { keyBy } from "lodash";
 })
 export class EncountersListComponent implements OnInit {
   @Input() customForm: any;
+  @Input() encounterTypeUuid: string;
+  startIndex: number = 0;
+  limit: number = 10;
   encounters$: Observable<any>;
   encounters: any[];
   headersKeys: any[];
@@ -25,11 +28,21 @@ export class EncountersListComponent implements OnInit {
   ngOnInit(): void {
     this.headers = [...this.headers, ...this.customForm?.formFields];
     this.headersKeys = this.headers?.map((header: any) => header?.id);
+    this.loadEncounters();
+  }
+
+  loadEncounters(): void {
+    let params = {};
+    params["startIndex"] = this.startIndex;
+    params["limit"] = this.limit;
+    params["encounterTypeUuid"] = this.encounterTypeUuid;
+    // this.encounters$ = this.pharmacyService
+    //   .getEncounters({
+    //     q: "external",
+    //     v: "custom:(uuid,display,obs)",
+    //   })
     this.encounters$ = this.pharmacyService
-      .getEncounters({
-        q: "external",
-        v: "custom:(uuid,display,obs)",
-      })
+      .getEncountersByPagination(params)
       .pipe(
         map((response: any) => {
           return {
