@@ -7,7 +7,8 @@
     patientUuid: patientUuid$ | async,
     encounterTypeUuid: encounterTypeUuid$ | async,
     provider: provider$ | async,
-    prescriptionVariables: prescriptionVariables$ | async
+    prescriptionVariables: prescriptionVariables$ | async,
+    shouldShowDoseDetails: shouldShowDoseDetails$ | async
   } as params"
 >
   <div
@@ -19,7 +20,8 @@
       !params?.patientUuid ||
       !params?.encounterTypeUuid ||
       !params?.provider ||
-      !params?.prescriptionVariables
+      !params?.prescriptionVariables ||
+      !params?.shouldShowDoseDetails
     "
   >
     <mat-spinner color="primary" diameter="80" strokeWidth="4"></mat-spinner>
@@ -33,7 +35,8 @@
       params?.patientUuid &&
       params?.encounterTypeUuid &&
       params?.provider &&
-      params?.prescriptionVariables
+      params?.prescriptionVariables &&
+      params?.shouldShowDoseDetails
     "
   >
     <app-cashier-dashboard
@@ -45,6 +48,7 @@
       [formId]="params?.pharmacyClientDetailsFormUuid"
       [provider]="params?.provider"
       [prescriptionVariables]="params?.prescriptionVariables"
+      [shouldShowDoseDetails]="params?.shouldShowDoseDetails"
     ></app-cashier-dashboard>
   </div>
 </div>

@@ -1,8 +1,11 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
+import { ifError } from "assert";
 import { Observable, of, zip } from "rxjs";
+import { catchError, map } from "rxjs/operators";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { ObservationService } from "src/app/shared/resources/observation/services";
@@ -27,6 +30,7 @@ export class CashierDashboardComponent implements OnInit {
   @Input() encounterTypeUuid: string;
   @Input() provider: any;
   @Input() prescriptionVariables: any;
+  @Input() shouldShowDoseDetails: string;
   customForm$: Observable<any>;
   searchItemFormField: any;
   selectedItems: any[] = [];
@@ -43,6 +47,7 @@ export class CashierDashboardComponent implements OnInit {
   itemData: any;
   visitDetails$: Observable<any>;
   currentLocation$: Observable<any>;
+  errors: any[] = [];
 
   constructor(
     private store: Store<AppState>,
@@ -52,11 +57,13 @@ export class CashierDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.prescriptionVariables = Object.keys(this.prescriptionVariables).map(
-      (key: string) => {
-        return this.prescriptionVariables[key];
-      }
-    );
+    if (this.shouldShowDoseDetails == "true") {
+      this.prescriptionVariables = Object.keys(this.prescriptionVariables).map(
+        (key: string) => {
+          return this.prescriptionVariables[key];
+        }
+      );
+    }
     this.loadVisitDetails();
     this.store.dispatch(loadCustomOpenMRSForm({ formUuid: this.formId }));
     this.customForm$ = this.store.select(getCustomOpenMRSFormById(this.formId));
@@ -81,28 +88,37 @@ export class CashierDashboardComponent implements OnInit {
   }
 
   createDoseInfoFields(id?: string): void {
-    this.prescriptionVariables.forEach((variable: any) => {
-      this.doseFields[variable?.key + id] =
-        variable?.controlType === "textbox"
-          ? new Textbox({
-              id: variable?.key + (id ? id : ""),
-              key: variable?.key + (id ? id : ""),
-              label: variable?.name,
-              required: true,
-              type: variable?.type,
-              min: 0,
-            })
-          : new Dropdown({
-              id: variable?.key + (id ? id : ""),
-              key: variable?.key + (id ? id : ""),
-              label: variable?.name,
-              required: true,
-              searchControlType: "concept",
-              conceptClass: "Misc",
-              conceptUuid: variable?.uuid,
-              shouldHaveLiveSearchForDropDownFields: true,
-            });
-    });
+    if (this.shouldShowDoseDetails == "true") {
+      this.prescriptionVariables.forEach((variable: any) => {
+        this.doseFields[variable?.key + id] =
+          variable?.controlType === "textbox"
+            ? new Textbox({
+                id: variable?.key + (id ? id : ""),
+                key: variable?.key + (id ? id : ""),
+                label: variable?.name,
+                required: true,
+                type: variable?.type,
+                min: 0,
+              })
+            : new Dropdown({
+                id: variable?.key + (id ? id : ""),
+                key: variable?.key + (id ? id : ""),
+                label: variable?.name,
+                required: true,
+                searchControlType: "concept",
+                conceptClass: "Misc",
+                conceptUuid: variable?.uuid,
+                shouldHaveLiveSearchForDropDownFields: true,
+              });
+      });
+    } else {
+      this.doseFields["instructions" + id] = new TextArea({
+        id: "instructions" + (id ? id : ""),
+        key: "instructions" + (id ? id : ""),
+        label: "Instructions",
+        required: false,
+      });
+    }
   }
 
   createSearchItemFormField(): void {
@@ -184,7 +200,7 @@ export class CashierDashboardComponent implements OnInit {
     this.observationService
       .saveEncounterWithObsDetails(encounterObject)
       .subscribe((encounterResponse: any) => {
-        if (encounterResponse) {
+        if (encounterResponse && !encounterResponse?.error) {
           const prescriptionOrders = items.map((item: any) => {
             const prescriptionOrder = {
               encounter: encounterResponse?.uuid,
@@ -196,19 +212,49 @@ export class CashierDashboardComponent implements OnInit {
               type: "prescription",
               orderer: "2e3d7377-1b3e-48bd-ab59-5ac060649406",
               patient: this.patientUuid,
-              dose: this.formData["dose" + item?.itemUuid]?.value,
+              dose:
+                this.formData["dose" + item?.itemUuid] &&
+                this.formData["dose" + item?.itemUuid]?.value
+                  ? this.formData["dose" + item?.itemUuid]?.value
+                  : 1,
               orderReason: null,
-              instructions: "",
+              instructions:
+                this.formData["instructions" + item?.itemUuid] &&
+                this.formData["instructions" + item?.itemUuid]?.value
+                  ? this.formData["instructions" + item?.itemUuid]?.value
+                  : "",
               doseUnits: {
-                uuid: this.formData["doseUnits" + item?.itemUuid]?.value,
+                uuid:
+                  this.formData["doseUnits" + item?.itemUuid] &&
+                  this.formData["doseUnits" + item?.itemUuid]?.value
+                    ? this.formData["doseUnits" + item?.itemUuid]?.value
+                    : "d8448002-3243-456b-bbe9-fc95562cf1f9",
               },
-              route: { uuid: this.formData["route" + item?.itemUuid]?.value },
+              route: {
+                uuid:
+                  this.formData["route" + item?.itemUuid] &&
+                  this.formData["route" + item?.itemUuid]?.value
+                    ? this.formData["route" + item?.itemUuid]?.value
+                    : "d8448002-3243-456b-bbe9-fc95562cf1f9",
+              },
               frequency: {
-                uuid: this.formData["frequency" + item?.itemUuid]?.value,
+                uuid:
+                  this.formData["frequency" + item?.itemUuid] &&
+                  this.formData["frequency" + item?.itemUuid]?.value
+                    ? this.formData["frequency" + item?.itemUuid]?.value
+                    : "d8448002-3243-456b-bbe9-fc95562cf1f9",
               },
-              duration: this.formData["duration" + item?.itemUuid]?.value,
+              duration:
+                this.formData["duration" + item?.itemUuid] &&
+                this.formData["duration" + item?.itemUuid]?.value
+                  ? this.formData["duration" + item?.itemUuid]?.value
+                  : 2,
               durationUnits: {
-                uuid: this.formData["durationUnits" + item?.itemUuid]?.value,
+                uuid:
+                  this.formData["durationUnits" + item?.itemUuid] &&
+                  this.formData["durationUnits" + item?.itemUuid]?.value
+                    ? this.formData["durationUnits" + item?.itemUuid]?.value
+                    : "d8448002-3243-456b-bbe9-fc95562cf1f9",
               },
               careSetting: "Outpatient",
               quantity: this.formData["quantity" + item?.itemUuid]?.value,
@@ -223,9 +269,15 @@ export class CashierDashboardComponent implements OnInit {
           this.customForm$ = of(null);
           zip(
             ...prescriptionOrders?.map((prescriptionOrder: any) => {
-              return this.drugOrderService.saveDrugOrder(prescriptionOrder);
+              return this.drugOrderService
+                .saveDrugOrder(prescriptionOrder)
+                .pipe(
+                  map((response: any) => response),
+                  catchError((error: any) => of(error))
+                );
             })
           ).subscribe((responses: any) => {
+            // console.log("responses", responses);
             if (responses) {
               // DIspense all (TODO: improve api to accommodate direct dispensing)
               zip(
@@ -255,6 +307,22 @@ export class CashierDashboardComponent implements OnInit {
               });
             }
           });
+        } else {
+          this.saving = false;
+          this.errors =
+            encounterResponse?.error?.error?.fieldErrors &&
+            encounterResponse?.error?.error?.fieldErrors?.visit
+              ? encounterResponse?.error?.error?.fieldErrors?.visit?.map(
+                  (fieldError: any) => {
+                    return {
+                      error: {
+                        ...fieldError,
+                        error: fieldError?.message,
+                      },
+                    };
+                  }
+                ) || []
+              : [encounterResponse?.error];
         }
       });
   }
