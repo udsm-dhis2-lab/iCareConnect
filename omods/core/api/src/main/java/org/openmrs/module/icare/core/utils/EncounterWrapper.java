@@ -22,7 +22,10 @@ public class EncounterWrapper {
         List<Map<String, Object>> encounterProviders = new ArrayList<>();
         for(EncounterProvider encounterProvider: encounter.getEncounterProviders()) {
             Map<String, Object> encounterPr = new HashMap<>();
-            encounterPr.put("name", encounterProvider.getProvider().getName());
+            if (encounterProvider.getProvider() != null && encounterProvider.getProvider().getName() != null) {
+                encounterPr.put("name", encounterProvider.getProvider().getName());
+                encounterPr.put("uuid", encounterProvider.getUuid());
+            }
             encounterProviders.add(encounterPr);
         }
         encounterData.put("encounterProviders", encounterProviders);
@@ -41,7 +44,7 @@ public class EncounterWrapper {
             if (observation.getValueNumeric() != null) {
                 obsData.put("value", observation.getValueNumeric());
             }
-            if (observation.getValueCoded().getDisplayString() != null) {
+            if (observation.getValueCoded() != null && observation.getValueCoded().getDisplayString() != null) {
                 obsData.put("value", observation.getValueCoded().getDisplayString());
             }
             obs.add(obsData);
