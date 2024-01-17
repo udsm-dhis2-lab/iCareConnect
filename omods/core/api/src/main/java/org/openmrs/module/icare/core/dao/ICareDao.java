@@ -293,6 +293,22 @@ public class ICareDao extends BaseDAO<Item> {
 		
 	}
 	
+	public List<Encounter> getEncountersByEncounterType(String search, String encounterTypeUuid, Integer limit,
+	        Integer startIndex) {
+		Query query = null;
+		System.out.println(encounterTypeUuid);
+		DbSession session = this.getSession();
+		String queryString = "SELECT e FROM Encounter e LEFT JOIN e.encounterType et WHERE et.uuid =:encounterTypeUuid";
+		query = session.createQuery(queryString);
+		if (encounterTypeUuid != null) {
+			query.setParameter("encounterTypeUuid", encounterTypeUuid);
+		}
+		
+		query.setFirstResult(startIndex);
+		query.setMaxResults(limit);
+		return query.list();
+	}
+	
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
                                             String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
                                             Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
@@ -301,7 +317,6 @@ public class ICareDao extends BaseDAO<Item> {
 		//PatientIdentifier
 		Query query = null;
 		DbSession session = this.getSession();
-		new Patient();
 		
 		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p" + " LEFT JOIN p.names pname "
 		        + "LEFT JOIN p.identifiers pi INNER JOIN v.attributes va LEFT JOIN va.attributeType vat ";
@@ -345,8 +360,6 @@ public class ICareDao extends BaseDAO<Item> {
 
 		}
 
-
-		
 		if (search != null) {
 			queryStr += " AND (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search) OR lower(pname.givenName) LIKE lower(:search) OR lower(pname.middleName) LIKE lower(:search) OR lower(pname.familyName) LIKE lower(:search) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:search) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:search) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:search)  OR pi.identifier LIKE :search)";
 		}
@@ -438,7 +451,6 @@ public class ICareDao extends BaseDAO<Item> {
 		} else if (orderByDirection == VisitWrapper.OrderByDirection.DESC) {
 			queryStr += " DESC ";
 		}
-		System.out.println(queryStr);
 		query = session.createQuery(queryStr);
 		if (orderTypeUuid != null) {
 			query.setParameter("orderTypeUuid", orderTypeUuid);

@@ -184,6 +184,9 @@ public interface ICareService extends OpenmrsService {
 	List<Encounter> getEncountersByPatientState(String patientStateUuid);
 	
 	EncounterPatientProgram saveEncounterPatientProgram(EncounterPatientProgram encounterPatientProgram);
-
-    List<Encounter> getEncountersByPatientProgram(String patientProgramUuid);
+	
+	List<Encounter> getEncountersByPatientProgram(String patientProgramUuid);
+	
+	List<Encounter> getEncountersByEncounterType(String search, String encounterTypeUuid, Integer limit, Integer startIndex);
+	
 }
