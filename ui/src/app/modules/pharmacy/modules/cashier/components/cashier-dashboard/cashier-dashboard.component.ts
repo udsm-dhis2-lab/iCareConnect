@@ -116,6 +116,7 @@ export class CashierDashboardComponent implements OnInit {
         id: "instructions" + (id ? id : ""),
         key: "instructions" + (id ? id : ""),
         label: "Instructions",
+        rows: 1,
         required: false,
       });
     }
