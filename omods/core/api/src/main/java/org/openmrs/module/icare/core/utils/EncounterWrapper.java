@@ -37,6 +37,10 @@ public class EncounterWrapper {
             if (observation.getValueText() != null) {
                 obsData.put("value", observation.getValueText());
             }
+
+            if (observation.getValueNumeric() != null) {
+                obsData.put("value", observation.getValueNumeric());
+            }
             if (observation.getValueCoded().getDisplayString() != null) {
                 obsData.put("value", observation.getValueCoded().getDisplayString());
             }
