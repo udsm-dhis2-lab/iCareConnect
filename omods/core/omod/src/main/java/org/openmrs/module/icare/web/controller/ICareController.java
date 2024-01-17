@@ -27,6 +27,7 @@ import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.models.EncounterPatientProgram;
 import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
+import org.openmrs.module.icare.core.utils.EncounterWrapper;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
@@ -1200,7 +1201,7 @@ public class ICareController {
 		return encounterPatientProgramListMap;
 
 	}
-
+	
 	@RequestMapping(value = "encounterpatientprogram/{patientProgranUuid}",method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getEncountersByPatientProgram(@PathVariable("patientProgramUuid") String patientProgramUuid){
@@ -1281,5 +1282,29 @@ public class ICareController {
 		}
 		return encountersListMap;
 
+	}
+	
+	@RequestMapping(value = "encounters",method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getPendingVisit(@RequestParam(defaultValue = "100") Integer limit,
+											   @RequestParam(defaultValue = "0") Integer startIndex,
+											   @RequestParam(required = false) String encounterTypeUuid,
+											   @RequestParam(required = false) String q
+	) {
+
+		List<Encounter> encounters = iCareService.getEncountersByEncounterType(q, encounterTypeUuid, limit, startIndex);
+
+		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
+		for (Encounter encounter : encounters) {
+
+			Map<String, Object> sampleObject = (new EncounterWrapper(encounter)).toMap();
+
+			//add the sample after creating its object
+			responseSamplesObject.add(sampleObject);
+
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", responseSamplesObject);
+		return results;
 	}
 }

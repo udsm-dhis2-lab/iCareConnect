@@ -925,6 +925,17 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse response = handle(encounters);
 		List<Map<String, Object>> encountersMap = (new ObjectMapper()).readValue(response.getContentAsString(), List.class);
 		System.out.println(response.getContentAsString());
+	}
+	
+	@Test
+	public void testGetEncountersByEncounterType() throws Exception {
+		MockHttpServletRequest encounters = newGetRequest("icare/encounters", new Parameter("encounterTypeUuid",
+		        "787655eb-5345-11e8-9c7c-40b034c3cfer"));
+		MockHttpServletResponse response = handle(encounters);
+		Map<String, Object> encountersMap = (new ObjectMapper()).readValue(response.getContentAsString(), Map.class);
+		System.out.println(encountersMap.get("results"));
+		List<Map<String, Object>> results = (List) encountersMap.get("results");
+		assertThat("There is one encounter", results.size(), is(1));
 		
 	}
 }
