@@ -126,6 +126,7 @@
       <app-encounters-list
         *ngIf="!saving && params?.customForm"
         [customForm]="params?.customForm"
+        [encounterTypeUuid]="encounterTypeUuid"
       ></app-encounters-list>
     </div>
   </div>
