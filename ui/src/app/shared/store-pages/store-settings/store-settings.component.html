@@ -15,5 +15,13 @@
         <app-suppliers-list></app-suppliers-list>
       </ng-template>
     </mat-tab>
+
+    <mat-tab label="System settings">
+      <ng-template matTabContent>
+        <app-system-settings-list
+          [key]="'iCareConnect.pharmacy.'"
+        ></app-system-settings-list>
+      </ng-template>
+    </mat-tab>
   </mat-tab-group>
 </div>

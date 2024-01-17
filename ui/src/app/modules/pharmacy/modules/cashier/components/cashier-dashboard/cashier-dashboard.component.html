@@ -33,9 +33,19 @@
                     <td class="w-50">
                       {{ item?.name }}
                     </td>
-                    <td *ngFor="let variable of prescriptionVariables">
+                    <ng-container *ngIf="shouldShowDoseDetails === 'true'">
+                      <td *ngFor="let variable of prescriptionVariables">
+                        <app-form
+                          [fields]="[
+                            doseFields[variable?.key + item?.itemUuid]
+                          ]"
+                          (formUpdate)="onFormDataUpdate($event)"
+                        ></app-form>
+                      </td>
+                    </ng-container>
+                    <td *ngIf="shouldShowDoseDetails !== 'true'">
                       <app-form
-                        [fields]="[doseFields[variable?.key + item?.itemUuid]]"
+                        [fields]="[doseFields['instructions' + item?.itemUuid]]"
                         (formUpdate)="onFormDataUpdate($event)"
                       ></app-form>
                     </td>
@@ -82,8 +92,10 @@
           [formValidationRules]="[]"
           (formDataUpdate)="onFormUpdate($event)"
         ></app-capture-form-data>
-
-        <div class="d-flex justify-content-end">
+        <div class="w-100" *ngIf="errors && errors?.length > 0">
+          <app-shared-error [errors]="errors"></app-shared-error>
+        </div>
+        <div class="d-flex justify-content-end mt-2">
           <button
             mat-flat-button
             color="primary"

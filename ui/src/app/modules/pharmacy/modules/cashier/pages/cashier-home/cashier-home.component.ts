@@ -22,6 +22,7 @@ export class CashierHomeComponent implements OnInit {
   encounterTypeUuid$: Observable<string>;
   provider$: Observable<any>;
   prescriptionVariables$: Observable<any>;
+  shouldShowDoseDetails$: Observable<string>;
   constructor(
     private store: Store<AppState>,
     private systemSettingsService: SystemSettingsService
@@ -47,6 +48,10 @@ export class CashierHomeComponent implements OnInit {
     this.prescriptionVariables$ =
       this.systemSettingsService.getSystemSettingsByKey(
         `iCare.clinic.prescription.arrangement`
+      );
+    this.shouldShowDoseDetails$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        `iCareConnect.pharmacy.shouldShowDoseDetails`
       );
 
     this.currentLocation = localStorage.getItem(`currentLocation`)
