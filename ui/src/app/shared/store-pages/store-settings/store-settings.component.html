@@ -1,5 +1,32 @@
-<div class="store-settings">
+<div
+  class="store-settings"
+  *ngIf="{
+    mappingSource: mappingSource$ | async,
+    paymentCategories: paymentCategories$ | async
+  } as params"
+>
   <mat-tab-group>
+    <mat-tab label="Drugs">
+      <ng-template matTabContent>
+        <app-drugs-list></app-drugs-list>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Generic Drugs">
+      <ng-template matTabContent>
+        <app-generic-drugs-list></app-generic-drugs-list>
+      </ng-template> </mat-tab
+    ><mat-tab label="Units of measure">
+      <ng-template matTabContent>
+        <mat-progress-bar
+          mode="indeterminate"
+          *ngIf="!params?.mappingSource"
+        ></mat-progress-bar>
+        <app-units-of-measure-settings
+          *ngIf="params?.mappingSource"
+          [mappingSource]="params?.mappingSource"
+        ></app-units-of-measure-settings>
+      </ng-template>
+    </mat-tab>
     <mat-tab label="Ledgers">
       <ng-template matTabContent>
         <app-ledgers-list></app-ledgers-list>
@@ -15,12 +42,19 @@
         <app-suppliers-list></app-suppliers-list>
       </ng-template>
     </mat-tab>
-
     <mat-tab label="System settings">
       <ng-template matTabContent>
         <app-system-settings-list
           [key]="'iCareConnect.pharmacy.'"
         ></app-system-settings-list>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Price Lists">
+      <ng-template matTabContent>
+        <app-price-list-items-container
+          [paymentCategories]="params?.paymentCategories?.setMembers"
+          *ngIf="params?.paymentCategories"
+        ></app-price-list-items-container>
       </ng-template>
     </mat-tab>
   </mat-tab-group>
