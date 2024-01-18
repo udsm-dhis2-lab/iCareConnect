@@ -43,7 +43,7 @@
   </mat-dialog-content>
   <mat-dialog-actions align="end" class="m-0 mt-2 mr-4">
     <button mat-stroked-button [disabled]="true">Print receipt</button>
-    <button class="ml-2" mat-stroked-button (click)="onClose($event)">
+    <button class="ml-2" mat-flat-button color="warn" (click)="onClose($event)">
       Cancel
     </button>
     <button
@@ -52,7 +52,7 @@
       color="primary"
       (click)="onConfirm($event)"
     >
-      Confirm
+      Yes
     </button>
   </mat-dialog-actions>
 </ng-container>
