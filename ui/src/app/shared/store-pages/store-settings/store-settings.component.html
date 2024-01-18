@@ -49,12 +49,18 @@
         ></app-system-settings-list>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Price Lists">
+    <mat-tab label="Price list">
       <ng-template matTabContent>
         <app-price-list-items-container
           [paymentCategories]="params?.paymentCategories?.setMembers"
           *ngIf="params?.paymentCategories"
         ></app-price-list-items-container>
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab label="User management">
+      <ng-template matTabContent>
+        <app-store-user-management></app-store-user-management>
       </ng-template>
     </mat-tab>
   </mat-tab-group>
