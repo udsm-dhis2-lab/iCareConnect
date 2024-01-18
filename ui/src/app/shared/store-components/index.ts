@@ -24,6 +24,7 @@ import { AddAllToPaginator } from "./stock-status-list/add-All-To-Paginator.dire
 import { SupplierFormComponent } from "./supplier-form/supplier-form.component";
 import { SuppliersListComponent } from "./suppliers-list/suppliers-list.component";
 import { TotalizeStockUnitsQuantityComponent } from "./totalize-stock-units-quantity/totalize-stock-units-quantity.component";
+import { PriceListItemsContainerComponent } from "./price-list-items-container/price-list-items-container.component";
 
 // export const stockComponents: any[] = [
 export const sharedStoreComponents: any[] = [
@@ -53,4 +54,5 @@ export const sharedStoreComponents: any[] = [
   NearlyExpiredItemsComponent,
   InvoiceFiltersComponent,
   QuantityFormFieldComponent,
+  PriceListItemsContainerComponent,
 ];
