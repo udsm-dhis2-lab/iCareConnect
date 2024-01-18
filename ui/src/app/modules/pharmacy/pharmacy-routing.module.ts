@@ -5,6 +5,8 @@ import { StockComponent } from "src/app/shared/store-pages/stock/stock.component
 import { RequisitionPageComponent } from "src/app/shared/store-pages/requisition-page/requisition-page.component";
 import { IssuingPageComponent } from "src/app/shared/store-pages/issuing-page/issuing-page.component";
 import { StoreSettingsComponent } from "src/app/shared/store-pages/store-settings/store-settings.component";
+import { StoreReportsComponent } from "src/app/shared/store-pages/store-reports/store-reports.component";
+import { StoreRenderStandardReportComponent } from "src/app/shared/store-pages/store-render-standard-report/store-render-standard-report.component";
 const routes: Routes = [
   {
     path: "",
@@ -35,6 +37,14 @@ const routes: Routes = [
       {
         path: "issuing",
         component: IssuingPageComponent,
+      },
+      {
+        path: "reports",
+        component: StoreReportsComponent,
+      },
+      {
+        path: "reports/:id",
+        component: StoreRenderStandardReportComponent,
       },
       {
         path: "settings",

@@ -6,6 +6,8 @@ import { RequisitionReceiptComponent } from "./requisition-receipt/requisition-r
 import { RequisitionComponent } from "./requisition/requisition.component";
 import { StockComponent } from "./stock/stock.component";
 import { StoreHomeComponent } from "./store-home/store-home.component";
+import { StoreRenderStandardReportComponent } from "./store-render-standard-report/store-render-standard-report.component";
+import { StoreReportsComponent } from "./store-reports/store-reports.component";
 import { StoreSettingsComponent } from "./store-settings/store-settings.component";
 import { StoreTransactionComponent } from "./store-transaction/store-transaction.component";
 
@@ -20,4 +22,6 @@ export const sharedStorePages: any[] = [
   IssuingPageComponent,
   StoreSettingsComponent,
   RequisitionByStoreComponent,
+  StoreReportsComponent,
+  StoreRenderStandardReportComponent,
 ];
