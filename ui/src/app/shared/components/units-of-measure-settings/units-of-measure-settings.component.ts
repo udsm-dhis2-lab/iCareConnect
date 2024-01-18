@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ConceptGet, ConceptsourceGet } from "src/app/shared/resources/openmrs";
-import { ManageUnitOfMeasureModalComponent } from "../../modals/manage-unit-of-measure-modal/manage-unit-of-measure-modal.component";
+import { ManageUnitOfMeasureModalComponent } from "../../../modules/maintenance/modals/manage-unit-of-measure-modal/manage-unit-of-measure-modal.component";
 import { SharedConfirmationDialogComponent } from "src/app/shared/components/shared-confirmation-dialog/shared-confirmation-dialog.component";
 
 @Component({

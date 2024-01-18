@@ -128,6 +128,9 @@ import { DischargeDeceasedPatientModalComponent } from "./discharge-deceased-pat
 import { SharedNextOfKinsFormComponent } from "./shared-next-of-kins-form/shared-next-of-kins-form.component";
 import { SharedNextOfKinsFormDataComponent } from "./shared-next-of-kins-form-data/shared-next-of-kins-form-data.component";
 import { SystemSettingsListComponent } from "./system-settings-list/system-settings-list.component";
+import { DrugsListComponent } from "./drugs-list/drugs-list.component";
+import { GenericDrugsListComponent } from "./generic-drugs-list/generic-drugs-list.component";
+import { UnitsOfMeasureSettingsComponent } from "./units-of-measure-settings/units-of-measure-settings.component";
 
 export const components: any[] = [
   PatientAddressComponent,
@@ -260,6 +263,9 @@ export const components: any[] = [
   SharedNextOfKinsFormComponent,
   SharedNextOfKinsFormDataComponent,
   SystemSettingsListComponent,
+  DrugsListComponent,
+  GenericDrugsListComponent,
+  UnitsOfMeasureSettingsComponent,
 ];
 
 export const sharedEntryComponents: any[] = [

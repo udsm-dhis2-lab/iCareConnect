@@ -3,8 +3,8 @@ import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ConceptGet } from "src/app/shared/resources/openmrs";
-import { AddNewGenericDrugModalComponent } from "../../modals/add-new-generic-drug-modal/add-new-generic-drug-modal.component";
-import { DrugListModalComponent } from "../../modals/drug-list-modal/drug-list-modal.component";
+import { AddNewGenericDrugModalComponent } from "../../../modules/maintenance/modals/add-new-generic-drug-modal/add-new-generic-drug-modal.component";
+import { DrugListModalComponent } from "../../../modules/maintenance/modals/drug-list-modal/drug-list-modal.component";
 
 @Component({
   selector: "app-generic-drugs-list",

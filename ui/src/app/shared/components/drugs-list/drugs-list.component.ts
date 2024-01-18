@@ -5,7 +5,7 @@ import { Observable, zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { ExportDataService } from "src/app/core/services/export-data.service";
 import { DrugsService } from "src/app/shared/resources/drugs/services/drugs.service";
-import { ManageDrugModalComponent } from "../../modals/manage-drug-modal/manage-drug-modal.component";
+import { ManageDrugModalComponent } from "../../../modules/maintenance/modals/manage-drug-modal/manage-drug-modal.component";
 
 @Component({
   selector: "app-drugs-list",
