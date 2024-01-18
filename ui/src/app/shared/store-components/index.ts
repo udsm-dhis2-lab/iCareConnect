@@ -25,6 +25,9 @@ import { SupplierFormComponent } from "./supplier-form/supplier-form.component";
 import { SuppliersListComponent } from "./suppliers-list/suppliers-list.component";
 import { TotalizeStockUnitsQuantityComponent } from "./totalize-stock-units-quantity/totalize-stock-units-quantity.component";
 import { PriceListItemsContainerComponent } from "./price-list-items-container/price-list-items-container.component";
+import { StoreUserManagementComponent } from "./store-user-management/store-user-management.component";
+import { StoreUserManagementDashboardComponent } from "./store-user-management-dashboard/store-user-management-dashboard.component";
+import { StoreUsersListComponent } from "./store-users-list/store-users-list.component";
 
 // export const stockComponents: any[] = [
 export const sharedStoreComponents: any[] = [
@@ -55,4 +58,7 @@ export const sharedStoreComponents: any[] = [
   InvoiceFiltersComponent,
   QuantityFormFieldComponent,
   PriceListItemsContainerComponent,
+  StoreUserManagementComponent,
+  StoreUserManagementDashboardComponent,
+  StoreUsersListComponent,
 ];
