@@ -39,6 +39,7 @@ export class PatientHistoryComponent implements OnInit {
     username?: string;
     systemId?: string;
     userProperties?: object;
+    //return to default settings to resolve merge conflicts    
     person?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").PersonGetRef;
     privileges?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").PrivilegeGetRef[];
     roles?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").RoleGetRef[];
