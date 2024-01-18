@@ -17,7 +17,7 @@
       "
     >
       <div class="col-12 text-center mt-5 mb-2">
-        <p>Loading Lab Settings</p>
+        <p>Loading Settings</p>
       </div>
       <div class="col-12">
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
@@ -180,6 +180,27 @@
             }"
           >
             Issuing
+          </mat-chip>
+
+          <mat-chip
+            class="w-20"
+            *ngIf="params?.privileges"
+            (click)="changeRoute($event, 'reports')"
+            routerLinkActive="active-route"
+            [ngClass]="{
+              'active-route': currentRoutePath === 'reports',
+              'for-lis-chip': params?.iCareConnectConfigurations?.isPharmacy
+            }"
+            [ngStyle]="{
+              'border-radius': params?.iCareConnectConfigurations?.isPharmacy
+                ? '0 !important'
+                : '',
+              padding: params?.iCareConnectConfigurations?.isPharmacy
+                ? '12px !important'
+                : ''
+            }"
+          >
+            Reports
           </mat-chip>
           <mat-chip
             class="w-20"
