@@ -23,6 +23,8 @@ import {
   clearVisitsDatesParameters,
   setCurrentUserCurrentLocation,
   loadSystemSettings,
+  loadActiveVisits,
+  loadActiveVisitsWithLabOrders,
 } from "src/app/store/actions";
 import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
 import {
@@ -101,6 +103,7 @@ export class LaboratoryComponent implements OnInit {
       // console.log('this :: ', currentRoute instanceof NavigationEnd);
       if (currentRoute instanceof NavigationEnd) {
         // console.log(currentRoute);
+        //adding filtering logic
 
         if (currentRoute?.url?.includes("/sample-acceptance-and-results")) {
           this.enableDate(this.datesRangeDifference, this.showDate);
@@ -258,6 +261,8 @@ export class LaboratoryComponent implements OnInit {
 
     this.currentUser$ = this.store.select(getCurrentUserInfo);
 
+    //adding filtering logic
+
     // Set current location if not set
     // if (!JSON.parse(localStorage.getItem("currentLocation"))) {
     //   this.currentUser$.subscribe((response) => {
@@ -279,6 +284,8 @@ export class LaboratoryComponent implements OnInit {
     this.currentLocation$ = this.store.select(getCurrentLocation(false));
   }
 
+
+  //adding filtering logic
   setCurrentLab(location: any): void {
     this.currentLocation$ = of(null);
     if (location) {
@@ -302,6 +309,8 @@ export class LaboratoryComponent implements OnInit {
       }, 100);
     }
   }
+
+  //adding filtering logic
 
   toggleMenuItems(event: Event): void {
     event.stopPropagation();
@@ -381,7 +390,6 @@ export class LaboratoryComponent implements OnInit {
 
     this.startDate = this.parameters?.startDate;
     this.endDate = this.parameters?.endDate;
-
     this.store.dispatch(setVisitsParameters({ parameters: this.parameters }));
   }
 
@@ -409,9 +417,13 @@ export class LaboratoryComponent implements OnInit {
         this.store.dispatch(
           setVisitsParameters({ parameters: this.parameters })
         );
+        this.store.dispatch(
+          loadLabConfigurations({ periodParameters: this.parameters })
+        );
       }, 200);
 
       // this.store.dispatch(loadActiveVisits({ parameters: this.parameters }));
+
 
       if (this.currentSubModule == "collection") {
         // console.log('here');

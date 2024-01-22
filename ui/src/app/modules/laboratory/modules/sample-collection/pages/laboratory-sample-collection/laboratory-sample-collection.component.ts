@@ -5,6 +5,7 @@ import { select, Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import { LabOrder } from "src/app/shared/resources/visits/models/lab-order.model";
+import { map } from "rxjs/operators";
 import {
   getAllLabOrders,
   getAllPatientsVisitsReferences,
@@ -46,7 +47,7 @@ export class LaboratorySampleCollectionComponent implements OnInit {
   visitId: string;
   containers$: Observable<any>;
   countOfSamplesToCollect: number = 0;
-  datesParameters$: Observable<any>;
+  $: Observable<any>;
   visitReferences$: Observable<any>;
   sampledOrdersByVisit$: Observable<any[]>;
   constructor(
@@ -97,6 +98,19 @@ export class LaboratorySampleCollectionComponent implements OnInit {
     /**TODO: Filter samples collection for this patient */
     this.activeVisit$ = this.store.select(getActiveVisit);
     this.payments$ = this.store.select(getAllPayments);
+     // TODO: Adjust the date filtering logic based on your requirements
+  this.samplesCollected$ = this.store.select(getAllLabSamples).pipe(
+    map(samples => {
+      return samples.filter(sample => {
+        // Assuming there is a date property in your sample object
+        const sampleDate = new Date(sample.date);
+        const currentDate = new Date(); // Change to the actual current date if needed
+        
+        // Example: Filter samples from the last  7 days
+        return sampleDate >= new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+      });
+    })
+  );
   }
 
   onGetSamplesToCollect(count: number): void {
