@@ -15,7 +15,9 @@
     priceListDepartments: priceListDepartments$ | async
   } as params"
 >
-  <div class="d-flex justify-content-between mb-2">
+
+<!-- INITIAL CODE -->
+  <!-- <div class="d-flex justify-content-between mb-2">
     <div class="h4 font-weight-normal">Price List</div>
     <button
       mat-flat-button
@@ -33,7 +35,50 @@
       ></mat-spinner>
       <span>Add Item</span>
     </button>
-  </div>
+  </div> -->
+
+  <!-- MODIFIED CODE TO ADD DOWNLOAD AND UPLOAD BUTTONS -->
+    <div class="d-flex justify-content-between mb-2">
+      <!-- THE "PRICE LIST" HEADER -->
+      <div class="h4 font-weight-normal">Price List</div>
+
+      <!-- ADDED DIV FOR THE BUTTONS -->
+      <div class="d-flex justify-content-between" style="width: 360px;">
+
+                <!-- THE "DOWNLOAD EXCEL FOR PRICING ITEMS" BUTTON -->
+                <button mat-flat-button color="primary"
+                style="height: 40px; width: auto; justify-content: center;"
+                >Download List</button>
+                
+
+                <!-- THE "UPLOAD EXCEL FOR PRICING ITEMS" BUTTON -->
+                <button mat-flat-button color="primary"
+                style="height: 40px; width: auto; justify-content: center;"
+              >Upload Items</button>
+
+
+              <!-- THE "ADD ITEM" BUTTON WHICH EXISTED INITIALLY -->
+                <button
+                  mat-flat-button
+                  color="primary"
+                  [disabled]="addingPricingItem"
+                  style="height: 40px"
+                  (click)="onCreate($event, params?.pricingItems)"
+                >
+                  <mat-icon *ngIf="!addingPricingItem">add</mat-icon>
+                  <mat-spinner
+                    color="primary"
+                    *ngIf="addingPricingItem"
+                    [diameter]="20"
+                    style="display: inline-block !important; margin-right: 4px"
+                  ></mat-spinner>
+                  <span>Add Item</span>
+                </button>
+      </div>
+
+    </div>
+
+
 
   <div
     *ngIf="params?.priceListDepartments"
