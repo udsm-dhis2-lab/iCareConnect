@@ -18,6 +18,7 @@
   ></mat-progress-bar>
   <div *ngIf="params?.bedsByLocationDetails && params?.locationsIds">
     <mat-tab-group mat-align-tabs="start" dynamicHeight="true">
+     <!-- Miracle393 change from "Patients" to "Admitted Patients" as instructed in issue 194 image-->
       <mat-tab label="Admitted Patients">
         <mat-toolbar>
           <button
@@ -71,6 +72,27 @@
           [currentLocation]="currentLocation"
           (bedStatus)="onGetBedStatus($event, params?.orderType)"
         ></app-wards-list>
+      </mat-tab>
+
+     <!-- Miracle393 Adding Discharged patients tab-->
+      <mat-tab label="Discharged patients">
+        <mat-toolbar>
+          <button
+            mat-icon-button
+            (click)="onBack($event)"
+            matTooltip="Go to Home page"
+          >
+            <mat-icon>arrow_back</mat-icon>
+          <span class="ml-2">IPD visits</span>   
+        </button>
+        </mat-toolbar>
+        <div *ngIf="!params?.settingCurrentLocationStatus">
+          <div class="w-100 text-centered">
+            <!-- TODO: Softcode the order uuid -->
+            <!-- {{ locationsIds$ | async | json }} -->
+            
+          </div>
+        </div>
       </mat-tab>
     </mat-tab-group>
   </div>
