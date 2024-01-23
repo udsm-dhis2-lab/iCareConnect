@@ -5,6 +5,14 @@
     <title></title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- in angular and other single page web applications routing happens in the front-end 
+    Basically by loading index.html ,we are loading all the other pages too (if no lazy-load )
+    hence if index.html is cached,then every page is cached as well -->
+
+
+    <meta http-equiv="Cache-Control" content="no-cache, ,max-age = 0, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
   </head>
 
