@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { AppComponent } from "./app.component";
 import { CoreModule } from "./core";
-//import services to app.module.ts
+//Import services to app.module.ts
 import { BrowserModule } from "@angular/platform-browser";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { NoCacheInterceptor } from "./non_cache.inteceptor";
@@ -12,7 +12,7 @@ export const config: any = {
 
 @NgModule({
   declarations: [AppComponent],
-  //use the services imported
+  //Use the services imported
   imports: [
     BrowserModule, HttpClientModule,
     CoreModule.forRoot({
