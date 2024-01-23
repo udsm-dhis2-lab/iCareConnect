@@ -4,8 +4,8 @@
     ordersWithResults?.length > 0
       ? ordersWithResults[0]?.testAllocations[0]?.finalResult &&
         !ordersWithResults[0]?.testAllocations[0]?.finalResult?.groups
-        ? ordersWithResults[0]?.testAllocations[0]?.finalResult?.creator
-            ?.display
+        ? ordersWithResults[0]?.testAllocations[0]?.finalResult?.labStaffMember
+            ?.displayName  // Repalce 'labStaffMember.displayName' with the correct field representing  the laboratory staff member.
         : ordersWithResults[0]?.testAllocations[0]?.finalResult &&
           ordersWithResults[0]?.testAllocations[0]?.finalResult?.groups
             ?.length > 0
