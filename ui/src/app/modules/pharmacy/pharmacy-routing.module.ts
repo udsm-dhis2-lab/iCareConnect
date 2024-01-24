@@ -7,6 +7,7 @@ import { IssuingPageComponent } from "src/app/shared/store-pages/issuing-page/is
 import { StoreSettingsComponent } from "src/app/shared/store-pages/store-settings/store-settings.component";
 import { StoreReportsComponent } from "src/app/shared/store-pages/store-reports/store-reports.component";
 import { StoreRenderStandardReportComponent } from "src/app/shared/store-pages/store-render-standard-report/store-render-standard-report.component";
+import { StoresComponent } from "src/app/shared/store-pages/stores/stores.component";
 const routes: Routes = [
   {
     path: "",
@@ -28,7 +29,7 @@ const routes: Routes = [
       },
       {
         path: "stock",
-        component: StockComponent,
+        component: StoresComponent,
       },
       {
         path: "requisition",
