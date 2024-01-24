@@ -34,7 +34,7 @@ export class PharmacyComponent implements OnInit {
     private systemSettingsService: SystemSettingsService
   ) {
     this.iCareConnectConfigurations$ = this.store.select(getLISConfigurations);
-    this.currentLocation$ = this.store.select(getCurrentLocation(true));
+    this.currentLocation$ = this.store.select(getCurrentLocation());
   }
 
   ngOnInit(): void {
