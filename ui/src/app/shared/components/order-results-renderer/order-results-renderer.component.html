@@ -53,6 +53,12 @@
             </td>
             <td>
               {{ labTest?.concept?.display }}
+              <button
+                    (click)="onDeleteTest($event, labTest)"
+                  >
+                    <mat-icon>delete</mat-icon>
+                    <span>Delete</span>
+                  </button>
             </td>
             <td>
               <a (click)="toggleParametes($event, labTest)">
@@ -100,13 +106,6 @@
                   />
                   <span>More details</span>
                 </button>
-                <!-- <button
-                    mat-menu-item
-                    (click)="onDeleteTest($event, labTest)"
-                  >
-                    <mat-icon>delete</mat-icon>
-                    <span>Delete</span>
-                  </button> -->
               </mat-menu>
             </td>
           </tr>
@@ -226,13 +225,13 @@
                   />
                   <span>More details</span>
                 </button>
-                <!-- <button
+                <button
                     mat-menu-item
                     (click)="onDeleteTest($event, labTest)"
                   >
                     <mat-icon>delete</mat-icon>
                     <span>Delete</span>
-                  </button> -->
+                  </button> 
               </mat-menu>
             </td>
           </tr>
