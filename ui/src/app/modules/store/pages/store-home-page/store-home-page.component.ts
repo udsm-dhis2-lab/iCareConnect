@@ -76,6 +76,12 @@ export class StoreHomePageComponent implements OnInit {
         url: "settings",
         privilege: "STORE_SETTINGS",
       },
+      {
+        id: "binCard",
+        name: "Bin Card",
+        url: "bin-cards",
+        privilege: "STORE_SETTINGS",
+      },
     ];
     this.currentStorePage = this.storePages[0];
     this.privileges$ = this.store.select(getCurrentUserPrivileges);
