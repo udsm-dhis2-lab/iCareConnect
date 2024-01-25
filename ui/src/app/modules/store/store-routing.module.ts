@@ -11,6 +11,7 @@ import { StoreSettingsComponent } from "src/app/shared/store-pages/store-setting
 import { NearlyStockedOutItemsComponent } from "src/app/shared/store-components/nearly-stocked-out/nearly-stocked-out-items.component";
 import { NearlyExpiredItemsComponent } from "src/app/shared/store-components/nearly-expired/nearly-expired-items.component";
 import { StoreHomePageComponent } from "./pages/store-home-page/store-home-page.component";
+import {BinCardsComponent} from "../../shared/store-pages/bin-cards/bin-cards.component";
 
 const routes: Routes = [
   {
@@ -58,6 +59,10 @@ const routes: Routes = [
         path: "nearly-expired-items/:location",
         component: NearlyExpiredItemsComponent,
       },
+      {
+        path: "bin-cards",
+        component: BinCardsComponent
+      }
     ],
   },
 ];
