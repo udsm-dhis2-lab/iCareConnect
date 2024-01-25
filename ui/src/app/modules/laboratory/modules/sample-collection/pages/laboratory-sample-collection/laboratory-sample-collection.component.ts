@@ -43,6 +43,7 @@ export class LaboratorySampleCollectionComponent implements OnInit {
   activeVisit$: Observable<VisitObject>;
   currentPatient: Patient;
   payments$: Observable<any>;
+  datesParameters$: Observable<any>;
   patientId: string;
   visitId: string;
   containers$: Observable<any>;
@@ -72,7 +73,7 @@ export class LaboratorySampleCollectionComponent implements OnInit {
     this.labDepartments$ = this.sampleTypesService.getLabDepartments();
     // TODO: Find a better way to deal with sample containers
     this.containers$ = of([]);
-
+    
     this.datesParameters$ = this.store.select(getVisitsParameters);
     this.visitReferences$ = this.store.select(getAllPatientsVisitsReferences);
 
@@ -101,8 +102,9 @@ export class LaboratorySampleCollectionComponent implements OnInit {
      // TODO: Adjust the date filtering logic based on your requirements
   this.samplesCollected$ = this.store.select(getAllLabSamples).pipe(
     map(samples => {
-      return samples.filter(sample => {
+      return samples.filter(sample => { 
         // Assuming there is a date property in your sample object
+        //@ts-ignore
         const sampleDate = new Date(sample.date);
         const currentDate = new Date(); // Change to the actual current date if needed
         
