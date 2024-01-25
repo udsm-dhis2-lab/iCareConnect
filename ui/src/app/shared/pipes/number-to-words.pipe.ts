@@ -6,6 +6,7 @@ import * as numWords from 'num-words';
 })
 export class NumberToWordsPipe implements PipeTransform {
   transform(value: number): any {
-    return numWords(value);
+    // convert value to string
+    return value;
   }
 }
