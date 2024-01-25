@@ -1,29 +1,29 @@
-import { AddNewStockReceivedComponent } from "./add-new-stock-received/add-new-stock-received.component";
-import { ConfirmRequisitionsModalComponent } from "./confirm-requisitions-modal/confirm-requisitions-modal.component";
-import { ConsumeStockItemModalComponent } from "./consume-stock-item-modal/consume-stock-item-modal.component";
-import { IssuingFormComponent } from "./issuing-form/issuing-form.component";
-import { LedgerFormComponent } from "./ledger-form/ledger-form.component";
-import { ManageLedgerComponent } from "./manage-ledger/manage-ledger.component";
-import { ManageReOrderLevelModalComponent } from "./manage-re-order-level-modal/manage-re-order-level-modal.component";
-import { RequestCancelComponent } from "./request-cancel/request-cancel.component";
-import { RequisitionFormDialogComponent } from "./requisition-form-dialog/requisition-form-dialog.component";
-import { RequisitionFormComponent } from "./requisition-form/requisition-form.component";
-import { StockInvoiceFormDialogComponent } from "./stock-invoice-form-dialog/stock-invoice-form-dialog.component";
-import { StoreAddNewUserModalComponent } from "./store-add-new-user-modal/store-add-new-user-modal.component";
-import { StoreEditUserModalComponent } from "./store-edit-user-modal/store-edit-user-modal.component";
+import { IssuingPageComponent } from "./issuing-page/issuing-page.component";
+import { IssuingComponent } from "./issuing/issuing.component";
+import { RequisitionByStoreComponent } from "./requisition-by-store/requisition-by-store.component";
+import { RequisitionPageComponent } from "./requisition-page/requisition-page.component";
+import { RequisitionReceiptComponent } from "./requisition-receipt/requisition-receipt.component";
+import { RequisitionComponent } from "./requisition/requisition.component";
+import { StockComponent } from "./stock/stock.component";
+import { StoreHomeComponent } from "./store-home/store-home.component";
+import { StoreRenderStandardReportComponent } from "./store-render-standard-report/store-render-standard-report.component";
+import { StoreReportsComponent } from "./store-reports/store-reports.component";
+import { StoreSettingsComponent } from "./store-settings/store-settings.component";
+import { StoreTransactionComponent } from "./store-transaction/store-transaction.component";
+import {BinCardsComponent} from "./bin-cards/bin-cards.component";
 
-export const sharedStoreModals: any[] = [
-  LedgerFormComponent,
-  RequisitionFormComponent,
-  IssuingFormComponent,
-  RequestCancelComponent,
-  AddNewStockReceivedComponent,
-  ConfirmRequisitionsModalComponent,
-  ManageLedgerComponent,
-  ManageReOrderLevelModalComponent,
-  StockInvoiceFormDialogComponent,
-  RequisitionFormDialogComponent,
-  ConsumeStockItemModalComponent,
-  StoreAddNewUserModalComponent,
-  StoreEditUserModalComponent,
+export const sharedStorePages: any[] = [
+  StoreHomeComponent,
+  StockComponent,
+  RequisitionComponent,
+  IssuingComponent,
+  StoreTransactionComponent,
+  RequisitionReceiptComponent,
+  RequisitionPageComponent,
+  IssuingPageComponent,
+  StoreSettingsComponent,
+  RequisitionByStoreComponent,
+  StoreReportsComponent,
+  StoreRenderStandardReportComponent,
+  BinCardsComponent
 ];
