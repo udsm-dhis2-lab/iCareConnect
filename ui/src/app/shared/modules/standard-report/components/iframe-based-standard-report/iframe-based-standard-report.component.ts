@@ -11,7 +11,11 @@ export class IframeBasedStandardReportComponent
 {
   @Input() reportHtml: any;
   @Input() parameters: any;
-  
+  searchTerm: string = "";
+  constructor() {
+    this.searchTerm = "";
+  }
+
   ngOnInit(): void {}
  
 
@@ -19,6 +23,7 @@ export class IframeBasedStandardReportComponent
       
      
   
+
   ngAfterViewInit(): void {
     const iframe = document.createElement("iframe");
     iframe.style.border = "none";
