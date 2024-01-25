@@ -100,10 +100,18 @@
             {{ attribute?.attributeType?.display }}
           </div>
           <div
-            class="col-9"
+            class="col-6"
             *ngIf="attribute?.attributeType?.display == 'PaymentCategory'"
           >
-            {{ getConceptValue(attribute?.value) }}
+            {{ getConceptValue(attribute?.value) }} 
+          </div>
+
+          <div class="col-3" *ngIf="attribute?.attributeType?.display == 'PaymentCategory'">
+            <button mat-button [matMenuTriggerFor]="menu">Change Payment</button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item>Cash</button>
+              <button mat-menu-item>Insurance</button>
+            </mat-menu>
           </div>
         </div>
 
