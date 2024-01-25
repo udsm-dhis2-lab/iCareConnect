@@ -37,7 +37,7 @@ After understanding how the table is rendered the solution will be as followes:
 
 3. Create a function that filters based on the search term
 
-4. use the function on the evaluatedDataSetsReport function so as to filter all patients before the are created in a table.
+
 
 
 
