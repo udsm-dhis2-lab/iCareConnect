@@ -109,8 +109,8 @@
           <div class="col-3" *ngIf="attribute?.attributeType?.display == 'PaymentCategory'">
             <button mat-button [matMenuTriggerFor]="menu">Change Payment</button>
             <mat-menu #menu="matMenu">
-              <button mat-menu-item>Cash</button>
-              <button mat-menu-item>Insurance</button>
+              <button mat-menu-item (click)="handleMenuSelection('Cash')">Cash</button>
+              <button mat-menu-item (click)="handleMenuSelection('Insurance')">Insurance</button>
             </mat-menu>
           </div>
         </div>
