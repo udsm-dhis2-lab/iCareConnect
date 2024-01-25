@@ -49,7 +49,7 @@ export class EncountersListComponent implements OnInit {
             ...response,
             results: response?.results?.map((result: any, index: number) => {
               let data = {};
-              data["no"] = index + 1 + this.startIndex;
+              data["no"] = index + 1;
               // Object.keys();
               this.customForm?.formFields.forEach((field: any) => {
                 const observations = result.obs?.map((observation: any) => {
@@ -74,14 +74,5 @@ export class EncountersListComponent implements OnInit {
         this.encounters = encountersData?.results;
       }
     });
-  }
-
-  onGetList(event: Event, actionType: string): void {
-    event.stopPropagation();
-    this.startIndex =
-      actionType === "next"
-        ? this.startIndex + 1 + this.limit
-        : this.startIndex - this.limit - 1;
-    this.loadEncounters();
   }
 }

@@ -89,9 +89,9 @@ export class TransferWithinComponent implements OnInit {
     this.form$ = this.store.select(getCustomOpenMRSFormById(this.formUuid));
     this.transferStatus$ = this.store.select(getTransferStatusOfCurrentPatient);
     this.provider$ = this.store.select(getProviderDetails);
-    this.locations$ = this.store.select(
-      getLocationsByTagName(this.locationType)
-    );
+    this.locations$ = this.store.select(getLocationsByTagName, {
+      tagName: this.locationType,
+    });
     this.currentVisit$ = this.store.select(getActiveVisit);
     this.transferLoadingState$ = this.store.select(getTransferLoadingState);
     this.currentVisitServiceAttributeDetails$ = this.store.select(

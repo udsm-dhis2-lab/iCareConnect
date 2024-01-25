@@ -10,7 +10,7 @@ import { StoreRenderStandardReportComponent } from "./store-render-standard-repo
 import { StoreReportsComponent } from "./store-reports/store-reports.component";
 import { StoreSettingsComponent } from "./store-settings/store-settings.component";
 import { StoreTransactionComponent } from "./store-transaction/store-transaction.component";
-import { StoresComponent } from "./stores/stores.component";
+import {BinCardsComponent} from "./bin-cards/bin-cards.component";
 
 export const sharedStorePages: any[] = [
   StoreHomeComponent,
@@ -25,5 +25,5 @@ export const sharedStorePages: any[] = [
   RequisitionByStoreComponent,
   StoreReportsComponent,
   StoreRenderStandardReportComponent,
-  StoresComponent,
+  BinCardsComponent
 ];

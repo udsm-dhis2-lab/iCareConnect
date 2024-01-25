@@ -14,13 +14,15 @@
     <mat-tab label="Generic Drugs">
       <ng-template matTabContent>
         <app-generic-drugs-list></app-generic-drugs-list>
-      </ng-template> </mat-tab
-    ><mat-tab label="Units of measure">
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Units of measure">
       <ng-template matTabContent>
         <mat-progress-bar
           mode="indeterminate"
           *ngIf="!params?.mappingSource"
-        ></mat-progress-bar>
+        >
+     </mat-progress-bar>
         <app-units-of-measure-settings
           *ngIf="params?.mappingSource"
           [mappingSource]="params?.mappingSource"
@@ -49,18 +51,12 @@
         ></app-system-settings-list>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Price list">
+    <mat-tab label="Price Lists">
       <ng-template matTabContent>
         <app-price-list-items-container
           [paymentCategories]="params?.paymentCategories?.setMembers"
           *ngIf="params?.paymentCategories"
         ></app-price-list-items-container>
-      </ng-template>
-    </mat-tab>
-
-    <mat-tab label="User management">
-      <ng-template matTabContent>
-        <app-store-user-management></app-store-user-management>
       </ng-template>
     </mat-tab>
   </mat-tab-group>

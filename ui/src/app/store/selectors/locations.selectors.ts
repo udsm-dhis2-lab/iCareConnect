@@ -609,11 +609,14 @@ export const getAllCabinetsUnderCurrentLocation = createSelector(
   }
 );
 
-export const getLocationsByTagName = (tageName) =>
-  createSelector(getLocations, (locations: Location[]) =>
+export const getLocationsByTagName = createSelector(
+  getLocations,
+  (locations: Location[], props) =>
     _.filter(locations, (location) => {
-      if ((_.filter(location?.tags, { name: tageName }) || [])?.length > 0) {
+      if (
+        (_.filter(location?.tags, { name: props?.tagName }) || [])?.length > 0
+      ) {
         return location;
       }
     })
-  );
+);

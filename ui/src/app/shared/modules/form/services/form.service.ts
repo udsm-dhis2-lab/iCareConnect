@@ -345,7 +345,6 @@ export class FormService {
                     };
                   });
                 }
-
                 const groupedByItemUuid = groupBy(
                   formattedResponse?.map((batch) => {
                     return {
@@ -377,7 +376,7 @@ export class FormService {
                         totalQuantity.toLocaleString("en-US") +
                         ") ",
                       itemUuid,
-                      drug: groupedByItemUuid[itemUuid][0]?.drug,
+                      drug: groupedByItemUuid[itemUuid][0]?.item?.drug,
                       location: { uuid: field?.locationUuid },
                       value: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
                       batches: flatten(groupedByItemUuid[itemUuid]),

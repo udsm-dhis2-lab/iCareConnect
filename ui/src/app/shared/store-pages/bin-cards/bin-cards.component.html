@@ -1,1 +1,38 @@
-<p>bin-card-work</p>
+<div class="drugs-list-container" *ngIf="{ drugs: drugs$ | async } as params">
+    <mat-progress-bar
+            mode="indeterminate"
+            *ngIf="!params?.drugs"
+    ></mat-progress-bar>
+    <div class="drugs-list mt-2">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Items</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let bin of bins; let count = index">
+                <td>
+                    {{ count + 1 }}
+                </td>
+
+                <td>
+                    {{ bin.name }}
+                </td>
+                <td *ngIf="!conceptUuid">
+                    <!-- TODO: For actions on drug management -->
+
+                    <button mat-icon-button [matMenuTriggerFor]="menu">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #menu="matMenu">
+                        <button mat-menu-item (click)="onView($event, bin.data)">View</button>
+                    </mat-menu>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

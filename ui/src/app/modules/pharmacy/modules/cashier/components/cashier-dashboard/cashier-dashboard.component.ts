@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
+import { ifError } from "assert";
 import { Observable, of, zip } from "rxjs";
-import { catchError, map, tap } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
@@ -10,14 +11,10 @@ import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { ObservationService } from "src/app/shared/resources/observation/services";
 import { DrugOrdersService } from "src/app/shared/resources/order/services";
 import { VisitsService } from "src/app/shared/resources/visits/services";
-import { ItemPriceService } from "src/app/shared/services/item-price.service";
 import { loadCustomOpenMRSForm } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation } from "src/app/store/selectors";
 import { getCustomOpenMRSFormById } from "src/app/store/selectors/form.selectors";
-import { sum } from "lodash";
-import { MatDialog } from "@angular/material/dialog";
-import { PosConfirmSalesModalComponent } from "../../modals/pos-confirm-sales-modal/pos-confirm-sales-modal.component";
 
 @Component({
   selector: "app-cashier-dashboard",
@@ -51,15 +48,12 @@ export class CashierDashboardComponent implements OnInit {
   visitDetails$: Observable<any>;
   currentLocation$: Observable<any>;
   errors: any[] = [];
-  itemsPrices: any = {};
 
   constructor(
     private store: Store<AppState>,
     private drugOrderService: DrugOrdersService,
     private visitService: VisitsService,
-    private observationService: ObservationService,
-    private itemPricesService: ItemPriceService,
-    private dialog: MatDialog
+    private observationService: ObservationService
   ) {}
 
   ngOnInit(): void {
@@ -150,51 +144,11 @@ export class CashierDashboardComponent implements OnInit {
     this.itemData = formValues.getValues()?.item?.value;
   }
 
-  onFormDataUpdate(
-    formValue: FormValue,
-    itemUuid?: string,
-    drugUuid?: string
-  ): void {
+  onFormDataUpdate(formValue: FormValue): void {
     this.formData = {
       ...this.formData,
       ...formValue.getValues(),
     };
-    if (itemUuid && drugUuid) {
-      this.onChangeDrugQuantity(itemUuid, drugUuid);
-    }
-  }
-
-  onChangeDrugQuantity(itemUuid: string, drugUuid: string): void {
-    const pricePayload = {
-      visitUuid: this.visitUuid,
-      drugUuid: drugUuid,
-    };
-
-    this.itemsPrices[itemUuid] = {
-      ready: false,
-    };
-
-    this.itemPricesService
-      .getItemPrice(pricePayload)
-      .pipe(
-        tap((response: any) => {
-          if (response) {
-            this.itemsPrices[itemUuid] = {
-              ready: true,
-              price:
-                Number(this.formData["quantity" + itemUuid]?.value) *
-                response?.price,
-            };
-
-            this.itemsPrices["total"] = sum(
-              this.selectedItems?.map((item: any) => {
-                return this.itemsPrices[item?.itemUuid]?.price;
-              })
-            );
-          }
-        })
-      )
-      .subscribe();
   }
 
   onAddToList(event: Event, item: any): void {
@@ -210,192 +164,166 @@ export class CashierDashboardComponent implements OnInit {
     this.selectedItems = this.selectedItems?.filter(
       (item: any) => item?.name != itemToRemove?.name
     );
-
-    // Recalculatr total price
-    this.itemsPrices["total"] = sum(
-      this.selectedItems?.map((item: any) => {
-        return this.itemsPrices[item?.itemUuid]?.price;
-      })
-    );
   }
 
   onSave(event, items, currentLocation: any, customForm: any): void {
     event.stopPropagation();
-    this.dialog
-      .open(PosConfirmSalesModalComponent, {
-        minWidth: "30%",
-        data: {
-          items,
-          currentLocation,
-          customForm,
-          selectedItems: this.selectedItems,
-          itemsPrices: this.itemsPrices,
-        },
-      })
-      .afterClosed()
-      .subscribe((shouldSave: boolean) => {
-        if (shouldSave) {
-          this.saving = true;
-          /**1. Create encounter with obs
+    this.saving = true;
+    /**1. Create encounter with obs
        2. Save prescription order
        3 Dispense */
 
-          let encounterObject = {
-            patient: this.patientUuid,
-            encounterType: this.encounterTypeUuid,
-            location: this.currentLocation?.uuid,
-            encounterProviders: [
-              {
-                provider: this.provider?.uuid,
-                encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
+    let encounterObject = {
+      patient: this.patientUuid,
+      encounterType: this.encounterTypeUuid,
+      location: this.currentLocation?.uuid,
+      encounterProviders: [
+        {
+          provider: this.provider?.uuid,
+          encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
+        },
+      ],
+      visit: this.visitUuid,
+      obs:
+        (
+          Object.keys(this.obsFormData).map((key: string) => {
+            return {
+              concept: key,
+              value: this.obsFormData[key]?.value,
+            };
+          }) || []
+        ).filter((obs: any) => obs?.value) || [],
+      form: {
+        uuid: customForm?.uuid,
+      },
+    };
+
+    this.observationService
+      .saveEncounterWithObsDetails(encounterObject)
+      .subscribe((encounterResponse: any) => {
+        if (encounterResponse && !encounterResponse?.error) {
+          const prescriptionOrders = items.map((item: any) => {
+            const prescriptionOrder = {
+              encounter: encounterResponse?.uuid,
+              orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
+              concept: item?.drug?.concept?.uuid,
+              drug: item?.id,
+              action: "NEW",
+              urgency: "ROUTINE",
+              type: "prescription",
+              orderer: "2e3d7377-1b3e-48bd-ab59-5ac060649406",
+              patient: this.patientUuid,
+              dose:
+                this.formData["dose" + item?.itemUuid] &&
+                this.formData["dose" + item?.itemUuid]?.value
+                  ? this.formData["dose" + item?.itemUuid]?.value
+                  : 1,
+              orderReason: null,
+              instructions:
+                this.formData["instructions" + item?.itemUuid] &&
+                this.formData["instructions" + item?.itemUuid]?.value
+                  ? this.formData["instructions" + item?.itemUuid]?.value
+                  : "",
+              doseUnits: {
+                uuid:
+                  this.formData["doseUnits" + item?.itemUuid] &&
+                  this.formData["doseUnits" + item?.itemUuid]?.value
+                    ? this.formData["doseUnits" + item?.itemUuid]?.value
+                    : "d8448002-3243-456b-bbe9-fc95562cf1f9",
               },
-            ],
-            visit: this.visitUuid,
-            obs:
-              (
-                Object.keys(this.obsFormData).map((key: string) => {
-                  return {
-                    concept: key,
-                    value: this.obsFormData[key]?.value,
+              route: {
+                uuid:
+                  this.formData["route" + item?.itemUuid] &&
+                  this.formData["route" + item?.itemUuid]?.value
+                    ? this.formData["route" + item?.itemUuid]?.value
+                    : "d8448002-3243-456b-bbe9-fc95562cf1f9",
+              },
+              frequency: {
+                uuid:
+                  this.formData["frequency" + item?.itemUuid] &&
+                  this.formData["frequency" + item?.itemUuid]?.value
+                    ? this.formData["frequency" + item?.itemUuid]?.value
+                    : "d8448002-3243-456b-bbe9-fc95562cf1f9",
+              },
+              duration:
+                this.formData["duration" + item?.itemUuid] &&
+                this.formData["duration" + item?.itemUuid]?.value
+                  ? this.formData["duration" + item?.itemUuid]?.value
+                  : 2,
+              durationUnits: {
+                uuid:
+                  this.formData["durationUnits" + item?.itemUuid] &&
+                  this.formData["durationUnits" + item?.itemUuid]?.value
+                    ? this.formData["durationUnits" + item?.itemUuid]?.value
+                    : "d8448002-3243-456b-bbe9-fc95562cf1f9",
+              },
+              careSetting: "Outpatient",
+              quantity: this.formData["quantity" + item?.itemUuid]?.value,
+              quantityUnits: { uuid: "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" },
+              numRefills: 1,
+              status: "EMPTY",
+              remarks: "Control status",
+              previousOrder: null,
+            };
+            return prescriptionOrder;
+          });
+          this.customForm$ = of(null);
+          zip(
+            ...prescriptionOrders?.map((prescriptionOrder: any) => {
+              return this.drugOrderService
+                .saveDrugOrder(prescriptionOrder)
+                .pipe(
+                  map((response: any) => response),
+                  catchError((error: any) => of(error))
+                );
+            })
+          ).subscribe((responses: any) => {
+            // console.log("responses", responses);
+            if (responses) {
+              // DIspense all (TODO: improve api to accommodate direct dispensing)
+              zip(
+                ...responses.map((prescOrder: any) => {
+                  const dispendingDetails = {
+                    uuid: prescOrder?.uuid,
+                    location: currentLocation?.uuid,
+                    drug: {
+                      uuid: prescOrder?.drug?.uuid,
+                    },
+                    quantity: prescOrder?.quantity,
                   };
-                }) || []
-              ).filter((obs: any) => obs?.value) || [],
-            form: {
-              uuid: customForm?.uuid,
-            },
-          };
+                  return this.drugOrderService.dispenseOrderedDrugOrder(
+                    dispendingDetails
+                  );
+                })
+              ).subscribe((dispenseResponses: any) => {
+                if (dispenseResponses) {
+                  this.selectedItems = [];
+                  this.createSearchItemFormField();
 
-          this.observationService
-            .saveEncounterWithObsDetails(encounterObject)
-            .subscribe((encounterResponse: any) => {
-              if (encounterResponse && !encounterResponse?.error) {
-                const prescriptionOrders = items.map((item: any) => {
-                  const prescriptionOrder = {
-                    encounter: encounterResponse?.uuid,
-                    orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
-                    concept: item?.drug?.concept?.uuid,
-                    drug: item?.id,
-                    action: "NEW",
-                    urgency: "ROUTINE",
-                    type: "prescription",
-                    orderer: "2e3d7377-1b3e-48bd-ab59-5ac060649406",
-                    patient: this.patientUuid,
-                    dose:
-                      this.formData["dose" + item?.itemUuid] &&
-                      this.formData["dose" + item?.itemUuid]?.value
-                        ? this.formData["dose" + item?.itemUuid]?.value
-                        : 1,
-                    orderReason: null,
-                    instructions:
-                      this.formData["instructions" + item?.itemUuid] &&
-                      this.formData["instructions" + item?.itemUuid]?.value
-                        ? this.formData["instructions" + item?.itemUuid]?.value
-                        : "",
-                    doseUnits: {
-                      uuid:
-                        this.formData["doseUnits" + item?.itemUuid] &&
-                        this.formData["doseUnits" + item?.itemUuid]?.value
-                          ? this.formData["doseUnits" + item?.itemUuid]?.value
-                          : "d8448002-3243-456b-bbe9-fc95562cf1f9",
-                    },
-                    route: {
-                      uuid:
-                        this.formData["route" + item?.itemUuid] &&
-                        this.formData["route" + item?.itemUuid]?.value
-                          ? this.formData["route" + item?.itemUuid]?.value
-                          : "d8448002-3243-456b-bbe9-fc95562cf1f9",
-                    },
-                    frequency: {
-                      uuid:
-                        this.formData["frequency" + item?.itemUuid] &&
-                        this.formData["frequency" + item?.itemUuid]?.value
-                          ? this.formData["frequency" + item?.itemUuid]?.value
-                          : "d8448002-3243-456b-bbe9-fc95562cf1f9",
-                    },
-                    duration:
-                      this.formData["duration" + item?.itemUuid] &&
-                      this.formData["duration" + item?.itemUuid]?.value
-                        ? this.formData["duration" + item?.itemUuid]?.value
-                        : 2,
-                    durationUnits: {
-                      uuid:
-                        this.formData["durationUnits" + item?.itemUuid] &&
-                        this.formData["durationUnits" + item?.itemUuid]?.value
-                          ? this.formData["durationUnits" + item?.itemUuid]
-                              ?.value
-                          : "d8448002-3243-456b-bbe9-fc95562cf1f9",
-                    },
-                    careSetting: "Outpatient",
-                    quantity: this.formData["quantity" + item?.itemUuid]?.value,
-                    quantityUnits: {
-                      uuid: "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                    },
-                    numRefills: 1,
-                    status: "EMPTY",
-                    remarks: "Control status",
-                    previousOrder: null,
-                  };
-                  return prescriptionOrder;
-                });
-                this.customForm$ = of(null);
-                zip(
-                  ...prescriptionOrders?.map((prescriptionOrder: any) => {
-                    return this.drugOrderService
-                      .saveDrugOrder(prescriptionOrder)
-                      .pipe(
-                        map((response: any) => response),
-                        catchError((error: any) => of(error))
-                      );
-                  })
-                ).subscribe((responses: any) => {
-                  // console.log("responses", responses);
-                  if (responses) {
-                    // DIspense all (TODO: improve api to accommodate direct dispensing)
-                    zip(
-                      ...responses.map((prescOrder: any) => {
-                        const dispendingDetails = {
-                          uuid: prescOrder?.uuid,
-                          location: currentLocation?.uuid,
-                          drug: {
-                            uuid: prescOrder?.drug?.uuid,
-                          },
-                          quantity: prescOrder?.quantity,
-                        };
-                        return this.drugOrderService.dispenseOrderedDrugOrder(
-                          dispendingDetails
-                        );
-                      })
-                    ).subscribe((dispenseResponses: any) => {
-                      if (dispenseResponses) {
-                        this.selectedItems = [];
-                        this.createSearchItemFormField();
-
-                        this.customForm$ = this.store.select(
-                          getCustomOpenMRSFormById(this.formId)
-                        );
-                        this.saving = false;
-                      }
-                    });
+                  this.customForm$ = this.store.select(
+                    getCustomOpenMRSFormById(this.formId)
+                  );
+                  this.saving = false;
+                }
+              });
+            }
+          });
+        } else {
+          this.saving = false;
+          this.errors =
+            encounterResponse?.error?.error?.fieldErrors &&
+            encounterResponse?.error?.error?.fieldErrors?.visit
+              ? encounterResponse?.error?.error?.fieldErrors?.visit?.map(
+                  (fieldError: any) => {
+                    return {
+                      error: {
+                        ...fieldError,
+                        error: fieldError?.message,
+                      },
+                    };
                   }
-                });
-              } else {
-                this.saving = false;
-                this.errors =
-                  encounterResponse?.error?.error?.fieldErrors &&
-                  encounterResponse?.error?.error?.fieldErrors?.visit
-                    ? encounterResponse?.error?.error?.fieldErrors?.visit?.map(
-                        (fieldError: any) => {
-                          return {
-                            error: {
-                              ...fieldError,
-                              error: fieldError?.message,
-                            },
-                          };
-                        }
-                      ) || []
-                    : [encounterResponse?.error];
-              }
-            });
+                ) || []
+              : [encounterResponse?.error];
         }
       });
   }
