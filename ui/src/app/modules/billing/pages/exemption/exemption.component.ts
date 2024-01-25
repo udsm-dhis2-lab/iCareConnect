@@ -29,6 +29,7 @@ import {
 import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { ExemptionDenialComponent } from "../../components/exemption-denial/exemption-denial.component";
 import { ExemptionFullConfirmationComponent } from "../../components/exemption-full-confirmation/exemption-full-confirmation.component";
+import { ExemptionListComponent } from "../../components/exemption-list/exemption-list.component";
 import { BillItem } from "../../models/bill-item.model";
 import { BillObject } from "../../models/bill-object.model";
 import { Bill } from "../../models/bill.model";
@@ -75,7 +76,8 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
     private systemSettingsService: SystemSettingsService,
     private dialog: MatDialog,
     private encounterService: EncountersService,
-    private ordersService: OrdersService
+    private ordersService: OrdersService,
+    private ExemptionListComponent: ExemptionListComponent
   ) {}
 
   ngOnInit() {
@@ -149,6 +151,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
             }
           });
         },
+
       });
   }
 
