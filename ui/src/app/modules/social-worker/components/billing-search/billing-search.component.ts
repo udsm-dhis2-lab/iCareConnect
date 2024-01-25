@@ -1,3 +1,5 @@
+// billing-search.component.ts
+
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -16,6 +18,9 @@ export class BillingSearchComponent implements OnInit {
     {
       id: 1,
       date: '2020-09-12T00:00:00.000+0000',
+      name: 'Jane Doe',
+      age: 30,
+      isExempted: false,
       items: [
         {
           item: 'Consultation',
@@ -32,6 +37,9 @@ export class BillingSearchComponent implements OnInit {
     {
       id: 2,
       date: '2020-09-12T00:00:00.000+0000',
+      name: 'John Orlando',
+      age: 2,
+      isExempted: true,
       items: [
         {
           item: 'Ampicillin+Cloxacillin 250mg+250mg',
@@ -53,6 +61,9 @@ export class BillingSearchComponent implements OnInit {
     {
       id: 3,
       date: '2020-09-09T00:00:00.000+0000',
+      name: 'James John',
+      age: 93,
+      isExempted: true,
       items: [
         {
           item: 'Tramadol Hydrochloride 50mg',
@@ -85,13 +96,19 @@ export class BillingSearchComponent implements OnInit {
 
   viewPatient(patient) {
     this.showPatientDetails = true;
-    this.patientDetails = patient;
+    this.patientDetails = { ...patient, isExempted: this.checkExemptionStatus(patient) };
+  }
+
+  checkExemptionStatus(patient): boolean {
+    // Implement your exemption logic here
+    // Example: Check if the patient meets exemption criteria
+    return patient.age < 18 || patient.patientType === 'Elderly';
   }
 
   generateTotalCostsObject() {
-    _.each(this.bills, billToCalcCost => {
+    _.each(this.bills, (billToCalcCost) => {
       let cost = 0;
-      _.each(billToCalcCost['items'], item => {
+      _.each(billToCalcCost['items'], (item) => {
         cost = cost + (item['qty'] ? item['cost'] * item['qty'] : item['cost']);
       });
 
