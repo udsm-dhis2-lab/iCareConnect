@@ -96,23 +96,33 @@
         [showWarningOnly]="true"
       ></app-shared-drug-dosage-interpretation>
     </div>
-    <div class="d-flex justify-content-end">
-      <button
-        (click)="saveOrder($event, params?.conceptFields)"
-        mat-flat-button
-        [color]="savingError ? 'warn' : 'primary'"
-        [disabled]="savingOrder || !isFormValid"
-      >
-        <mat-icon *ngIf="savingError" class="mr-2">error</mat-icon>
-        <mat-spinner
-          color="primary"
-          *ngIf="savingOrder"
-          [diameter]="17"
-          class="order__spinner mr-2"
-        ></mat-spinner>
-        <span>{{ savingOrder ? "Saving..." : "Save" }}</span>
-      </button>
+
+    <div class="d-flex justify-content-between">
+      <!-- Left-aligned content -->
+      <div>
+        //here is the button that i want to add to allow the user to add prescription
+        <button (click)="saveOrder($event, params?.conceptFields)" mat-flat-button [color]="savingError ? 'warn' : 'primary'" [disabled]="savingOrder || !isFormValid"  _ngcontent-iwc-c398="" mat-flat-button="" color="primary" class="mat-focus-indicator mat-flat-button mat-button-base mat-primary" ng-reflect-color="primary">
+          <span class="mat-button-wrapper">
+            //adding the icon
+            <mat-icon _ngcontent-iwc-c398="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color" aria-hidden="true" data-mat-icon-type="font">add</mat-icon>
+            <span _ngcontent-iwc-c398="" class="ml-2">Add Consumables</span>
+          </span>
+
+          <span matripple="" class="mat-ripple mat-button-ripple" ng-reflect-disabled="false" ng-reflect-centered="false" ng-reflect-trigger="[object HTMLButtonElement]"></span>
+          <span class="mat-button-focus-overlay"></span>
+        </button>
+      </div>
+    
+      <!-- Right-aligned content -->
+      <div>
+        <button (click)="saveOrder($event, params?.conceptFields)" mat-flat-button [color]="savingError ? 'warn' : 'primary'" [disabled]="savingOrder || !isFormValid">
+          <mat-icon *ngIf="savingError" class="mr-2">error</mat-icon>
+          <mat-spinner color="primary" *ngIf="savingOrder" [diameter]="17" class="order__spinner mr-2"></mat-spinner>
+          <span>{{ savingOrder ? "Saving..." : "Save" }}</span>
+        </button>
+      </div>
     </div>
+    
     <!-- {{ selectedDrug | json }} -->
   </div>
 </div>
