@@ -17,7 +17,7 @@ import {
   PersonGetRef,
   PrivilegeGetRef,
   RoleGetRef
-} from "/src/app/shared/resources/openmrs";
+} from "src/app/shared/resources/openmrs";
 
 @Component({
   selector: "app-patient-history",
