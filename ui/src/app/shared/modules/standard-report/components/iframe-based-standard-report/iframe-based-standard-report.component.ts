@@ -17,12 +17,26 @@ export class IframeBasedStandardReportComponent
   }
 
   ngOnInit(): void {}
- 
+  searchReportData(event: any): void{
+    const iframe = document.getElementsByTagName("iframe")[0];
+    const term = event.target.value;
 
-
+      this.searchTerm = term;
+      const iframe_document = iframe.contentWindow.document;
+    const rows = iframe_document.querySelectorAll("tbody tr");
+    for(let i = 0; i < rows.length; i++){
+      const cells = rows[i].children;
+      const name_cell = cells[2];
+      if(!name_cell.textContent.toLowerCase().includes(this.searchTerm.toLowerCase())){
+        rows[i].setAttribute("style", "display: none;") 
+      }
+      else{
+        rows[i].removeAttribute("style")
+      }
       
-     
-  
+    }
+    
+  }
 
   ngAfterViewInit(): void {
     const iframe = document.createElement("iframe");
@@ -42,7 +56,10 @@ export class IframeBasedStandardReportComponent
         
         iframe.contentWindow["iReportsDimensions"] = this.parameters;
         iframe.contentWindow.document.close();
-       
+        iframe.onload = ()=>{
+         
+        // console.log(iframe.contentWindow.document.body, "iframe content")
+        }
       }
     }, 50);
   }
