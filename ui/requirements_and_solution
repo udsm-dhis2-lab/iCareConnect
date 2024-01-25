@@ -1,0 +1,43 @@
+Problem:
+
+There is no search functionality on the  rendered table containing malaria report of various patientfa-spin
+
+Solution:
+
+Add search functionality on the malaria report table to enable user to search for patients
+
+
+Components involved 
+- render-standard-report (app/shared/modules/standard-report/components/render-standard-report)
+
+- iframe-based-standard-report (app/shared/modules/standard-report/components/iframe-based-standard-report)
+
+
+render-standard-report is the main component that receives all the array of data to be rendered on the table.
+
+This is found on the render-standard-report.component.ts
+
+where the function evaluatedDataSetsReport receives response (array of list of patients) creates the table.
+
+This table is then given as input to component iframe-based-standard-report
+
+
+The component iframe-based-standard-report creates an iframe and then gives the innerHTML as the created table by the render-standard-report, Thus
+
+iframe.innerHTML = table created by render-standard-report which was passed as input to iframe-based-standard-report
+
+
+
+After understanding how the table is rendered the solution will be as followes:
+
+1. To create a search input at the top of the table and the suitable component to create the input field is on the render-standard-report component.
+
+
+2. Study the array of list of patients 
+
+3. Create a function that filters based on the search term
+
+4. use the function on the evaluatedDataSetsReport function so as to filter all patients before the are created in a table.
+
+
+

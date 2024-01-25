@@ -34,11 +34,14 @@ export class SharedRenderReportDashboardComponent implements OnInit {
     private exportDataService: ExportDataService,
     private store: Store<AppState>
   ) {}
+  
 
   ngOnInit(): void {
+    
     this.report$ = this.systemSettingsService.getSystemSettingsByUuid(
       this.reportId
     );
+   
     this.facilityDetails$ = this.store.select(getParentLocation).pipe(
       map((response) => {
         return {

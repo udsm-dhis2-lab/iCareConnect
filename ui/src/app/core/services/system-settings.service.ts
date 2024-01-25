@@ -27,6 +27,7 @@ export class SystemSettingsService {
   getSystemSettingsByKey(key: string): Observable<any> {
     return this.httpClient.get(`systemsetting?q=${key}&v=full`).pipe(
       map((response) => {
+        
         return response?.results && response?.results[0]
           ? response?.results[0]?.value.indexOf("{") === 0 ||
             response?.results[0]?.value.indexOf("[") === 0

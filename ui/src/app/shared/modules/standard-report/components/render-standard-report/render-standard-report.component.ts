@@ -15,6 +15,7 @@ export class RenderStandardReportComponent implements OnInit {
   constructor(private datasetReportService: DatasetReportsService) {}
 
   ngOnInit(): void {
+   
     if (
       !this.report?.renderAs ||
       (this.report?.renderAs && this.report?.renderAs != "iframe")
@@ -24,9 +25,11 @@ export class RenderStandardReportComponent implements OnInit {
           this.report?.queries?.map((query) => query?.uuid),
           this.parameters
         );
-
+        
       this.evaluatedDataSetsReport$.subscribe((response: any) => {
+       
         if (response) {
+        
           // TODO: Review the codes to avaoid too much looping
           response?.forEach((data) => {
             data?.rows?.forEach((row) => {
@@ -51,4 +54,5 @@ export class RenderStandardReportComponent implements OnInit {
       });
     }
   }
+ 
 }

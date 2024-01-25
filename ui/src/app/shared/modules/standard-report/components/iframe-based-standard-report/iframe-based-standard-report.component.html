@@ -1,1 +1,8 @@
-<div class="w-100 mt-2" id="html_id"></div>
+<div class="w-100 mt-2" id="html_id">
+    <!-- Search bar starts here-->
+   <mat-form-field class="w-25">
+    <mat-label>Search Filter</mat-label>
+    <input autocomplete="off"  type="text" matInput placeholder="Search for patient" (keyup)="searchReportData($event)" />  
+  </mat-form-field>
+  <!-- Search bar ends here -->
+</div>
