@@ -7,6 +7,7 @@ enum GenderType {
   F = "Female",
 }
 export class Patient {
+  orderType: string;
   // TODO: Need to find best way to type incoming patient
   constructor(private patient: any) {}
 

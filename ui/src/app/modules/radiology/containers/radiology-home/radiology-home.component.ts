@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Pipe, PipeTransform } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from "@angular/router";
 import { select, Store } from "@ngrx/store";
@@ -10,6 +10,28 @@ import { AppState } from "src/app/store/reducers";
 import { getSettingCurrentLocationStatus } from "src/app/store/selectors";
 import { getVisitLoadingState } from "src/app/store/selectors/visit.selectors";
 
+@Component({
+  selector: "app-radiology-home",
+  templateUrl: "./radiology-home.component.html",
+  styleUrls: ["./radiology-home.component.scss"],
+})
+
+
+
+
+// Define the filter pipe class
+@Pipe({
+  name: 'filter'
+})
+export class FilterPipe implements PipeTransform {
+
+  transform(patients: Patient[], orderType: string): Patient[] {
+    return patients.filter(patient => patient.orderType === orderType);
+  }
+
+}
+
+// Define the radiology home component class
 @Component({
   selector: "app-radiology-home",
   templateUrl: "./radiology-home.component.html",
