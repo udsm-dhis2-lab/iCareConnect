@@ -82,7 +82,7 @@
       </div>
     </div>
 
-    <!-- <table class="table">
+    <table class="table">
       <tr>
         <td>#</td>
         <td>Item</td>
@@ -132,67 +132,51 @@
           </div>
         </td>
         <td>
-          <div *ngIf="request.status !== 'RECEIVED'">
-            <div *ngIf="request.status !== 'ISSUED'">
-              <button
-                class="float-right"
-                mat-flat-button
-                color="warn"
-                *ngIf="request.status !== 'REJECTED'"
-                [disabled]="
-                  request?.crudOperationStatus?.status === 'CANCELLING'
-                "
-                (click)="onCancelRequisition($event, request?.id)"
-              >
-                <mat-spinner
-                  color="primary"
-                  *ngIf="request?.crudOperationStatus?.status === 'CANCELLING'"
-                  [diameter]="20"
-                  style="display: inline-block !important; margin-right: 4px"
-                ></mat-spinner>
-                Cancel Request
-              </button>
-            </div>
-
-            <div class="float-right" *ngIf="request.status === 'ISSUED'">
+            <div style="display: flex; gap: 8px; align-items: center;">
               <button
                 mat-flat-button
                 color="primary"
                 [disabled]="
-                  request?.crudOperationStatus?.status === 'CANCELLING'
+                  issue?.crudOperationStatus?.status === 'ISSUING' ||
+                  issue?.status === 'ISSUED' ||
+                  issue?.status === 'CANCELLED' ||
+                  !params?.currentStore
                 "
-                (click)="onReceiveRequisition($event, request)"
+                (click)="onIssue($event, issue, params?.currentStore)"
               >
                 <mat-spinner
                   color="primary"
-                  *ngIf="request?.crudOperationStatus?.status === 'CANCELLING'"
+                  *ngIf="issue?.crudOperationStatus?.status === 'ISSUING'"
                   [diameter]="20"
                   style="display: inline-block !important; margin-right: 4px"
                 ></mat-spinner>
-                Receive
+                Issue
               </button>
               <button
                 mat-flat-button
                 class="ml-2"
                 color="warn"
                 [disabled]="
-                  request?.crudOperationStatus?.status === 'REJECTING'
+                  issue?.crudOperationStatus?.status === 'REJECTING' ||
+                  issue?.status === 'ISSUED'
                 "
-                (click)="onRejectRequisition($event, request)"
+                (click)="onReject($event, issue)"
               >
                 <mat-spinner
                   color="primary"
-                  *ngIf="request?.crudOperationStatus?.status === 'REJECTING'"
+                  *ngIf="
+                    issue?.crudOperationStatus?.status === 'REJECTING' ||
+                    issue?.status === 'REJECTED'
+                  "
                   [diameter]="20"
                   style="display: inline-block !important; margin-right: 4px"
                 ></mat-spinner>
                 Reject
               </button>
             </div>
-          </div>
-        </td>
+          </td>  
       </tr>
-    </table> -->
+    </table>
     <div *ngIf="!showRequisitionForm">
       <mat-progress-bar
         mode="indeterminate"
