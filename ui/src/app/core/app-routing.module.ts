@@ -4,6 +4,7 @@ import { LandingComponent, LoginComponent } from "./containers";
 import { ModulesComponent } from "./containers/modules/modules.component";
 import { AuthGuard } from "./guards/auth-guard.guard";
 
+
 const routes: Routes = [
   {
     path: "",
