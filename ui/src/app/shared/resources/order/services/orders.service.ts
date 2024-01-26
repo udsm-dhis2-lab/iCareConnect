@@ -6,6 +6,7 @@ import { omit } from "lodash";
 import { Api, EncounterCreate, OrderGetFull } from "../../openmrs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { getDrugOrderPaymentStatus } from "../helpers/getDrugOrderPaymentStatus.helper";
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: "root",
@@ -13,8 +14,14 @@ import { getDrugOrderPaymentStatus } from "../helpers/getDrugOrderPaymentStatus.
 export class OrdersService {
   constructor(
     private openMRSHttpClient: OpenmrsHttpClientService,
-    private API: Api
+    private API: Api,
+    private http: HttpClient
   ) {}
+
+  getOrdersByPatient(patientId: string): Observable<any> {
+    const endpoint = this.API.patient.getPatient
+    return this.http.get(`${endpoint}/orders/patient/${patientId}`);
+  }
 
   getOrdersByUuids(orderUuids: any): Observable<any[]> {
     return zip(
