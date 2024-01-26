@@ -19,26 +19,43 @@ export class IframeBasedStandardReportComponent
   }
 
   ngOnInit(): void {}
-  searchReportData(event: any): void{
+  
+  // This function is responsible for searching and filtering data in a report displayed within an iframe.
+  searchReportData(event: any): void {
+    // Get the first iframe element in the document
     const iframe = document.getElementsByTagName("iframe")[0];
+
+    // Get the search term entered by the user
     const term = event.target.value;
 
-      this.searchTerm = term;
-      const iframe_document = iframe.contentWindow.document;
+    // Set the search term to the component property for reference
+    this.searchTerm = term;
+
+    // Access the document inside the iframe
+    const iframe_document = iframe.contentWindow.document;
+
+    // Find all rows containing data in the report
     const rows = iframe_document.querySelectorAll("tbody tr");
-    for(let i = 0; i < rows.length; i++){
+
+    // Iterate through each row to filter based on the search term
+    for (let i = 0; i < rows.length; i++) {
+      // Access the cells within each row
       const cells = rows[i].children;
+
+      // Get the cell containing the name data (assuming it's at index 2)
       const name_cell = cells[2];
-      if(!name_cell.textContent.toLowerCase().includes(this.searchTerm.toLowerCase())){
-        rows[i].setAttribute("style", "display: none;") 
+
+      // Check if the name cell content includes the search term (case insensitive)
+      if (!name_cell.textContent.toLowerCase().includes(this.searchTerm.toLowerCase())) {
+          // If the name cell content does not include the search term, hide the row
+          rows[i].setAttribute("style", "display: none;");
+        } else {
+          // If the name cell content includes the search term, show the row
+          rows[i].removeAttribute("style");
       }
-      else{
-        rows[i].removeAttribute("style")
-      }
-      
-    }
-    
   }
+}
+
 
   ngAfterViewInit(): void {
     const iframe = document.createElement("iframe");
