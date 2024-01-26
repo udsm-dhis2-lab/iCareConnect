@@ -332,3 +332,19 @@ mat-dialog-container {
   color: red;
   text-decoration: line-through !important;
 }
+//Media Queries for Specific Components
+@media only screen and (min-width: 768px) {
+  .large-screen-component {
+    // Utility Classes
+.text-uppercase {
+  text-transform: uppercase;
+}
+  .heading {
+  font-size: 24px;
+  font-weight: bold;
+}
+//Typography styles
+.sub-heading {
+  font-size: 18px;
+  font-weight: normal;
+}
