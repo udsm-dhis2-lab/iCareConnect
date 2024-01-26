@@ -332,3 +332,26 @@ mat-dialog-container {
   color: red;
   text-decoration: line-through !important;
 }
+/* You can add global styles to this file, and also import other style files */
+@import '~material-design-icons/iconfont/material-icons.css';
+@import '~bootstrap/scss/bootstrap';
+
+.mat-form-field-underline {
+  display: none !important;
+}
+
+.mat-form-field-flex {
+  border-radius: 4px 4px !important;
+  border: solid 1px rgba(0, 0, 0, 0.18) !important;
+  padding: 0.5em 0.275em 0.275em 0.575em !important;
+  background-color: #fff !important;
+}
+
+/* Ensure seamless interactivity across all screen sizes */
+@media only screen and (max-width: 640px) {
+  .centered-container,
+  .centered-container-patient-list {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
