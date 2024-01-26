@@ -199,8 +199,21 @@ export class GeneralDispensingFormComponent implements OnInit {
         });
     }
   }
+  async checkActivePrescription(patientId: string, drugId: string): Promise<boolean> {
+    const orders = await this.ordersService.getOrdersByPatient(patientId).toPromise();
+    const activeOrder = orders.find(order => order.drugUuid === drugId && order.status === 'active');
+    
+    if (activeOrder) {
+      const endDate = new Date(activeOrder.endDate);
+      if (new Date() < endDate) {
+        return true;
+      }
+    }
+  
+    return false;
+  }
 
-  saveOrder(e: any, conceptFields: any) {
+ async saveOrder(e: any, conceptFields: any) {
     if (!this.formValues?.drug?.value) {
       this.errors = [];
       setTimeout(() => {
