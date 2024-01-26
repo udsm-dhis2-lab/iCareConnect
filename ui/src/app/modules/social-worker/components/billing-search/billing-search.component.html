@@ -79,6 +79,8 @@
             </p>
           </div>
         </div>
+        <p *ngIf="patientDetails.isExempted">Exempted from billing</p>
+        <button (click)="closePatientDetails()">Close</button>
       </mat-card>
     </div>
 
