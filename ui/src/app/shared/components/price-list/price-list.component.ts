@@ -98,6 +98,7 @@ export class PriceListComponent implements OnInit, OnChanges {
     private snackBar: MatSnackBar
   ) {
     //PARAMETER
+    this.getData();
   }
 
   ngOnInit() {
@@ -352,6 +353,13 @@ export class PriceListComponent implements OnInit, OnChanges {
 
   //DOWNLOAD EXCELL FUNCTIONALITY
   //COLLIN"S CODE
+  getData() {
+    // Make an HTTP request to fetch data
+    this.http.get('http://localhost:4200/openmrs/ws/rest/v1/icare/item?limit=35&startIndex=0&type=DRUG')
+      .subscribe((response: any) => {
+      this.data = response.results;
+     });
+  }
 
   //NUHU'S CODE
 
