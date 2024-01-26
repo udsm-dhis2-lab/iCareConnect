@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, OnInit, ElementRef, ViewChild } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
@@ -19,6 +19,7 @@ import { StartVisitModelComponent } from "../../components/start-visit-model/sta
 import { VisitStatusConfirmationModelComponent } from "../../components/visit-status-confirmation-model/visit-status-confirmation-model.component";
 import { PatientService } from "src/app/shared/services/patient.service";
 import { clearActiveVisit } from "src/app/store/actions/visit.actions";
+import Chart from 'chart.js/auto';
 
 @Component({
   selector: "app-registration-home",
@@ -47,6 +48,7 @@ export class RegistrationHomeComponent implements OnInit {
   roomData: { name: string; activePatients: number }[];
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild('patientChart') patientChart: ElementRef;
   @ViewChild(MatSort) sort: MatSort;
   treatmentLocations$: Observable<any>;
   showCard: boolean;
@@ -237,5 +239,30 @@ export class RegistrationHomeComponent implements OnInit {
 
   onOpenConsole() {
     this.isExpanded = !this.isExpanded;
+  }
+
+  renderChart(params: any) {
+    const chartData = {
+      labels: ['Total Patients', 'Active Visits'],
+      datasets: [
+        {
+          data: [
+            params?.patientSummary?.allPatients || 0,
+            params?.patientSummary?.activeVisits || 0,
+          ],
+          backgroundColor: ['#063c0d', '#42abed'],
+        },
+      ],
+    };
+
+    const ctx = this.patientChart.nativeElement.getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: chartData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+      },
+    });
   }
 }
