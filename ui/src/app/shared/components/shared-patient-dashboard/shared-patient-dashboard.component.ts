@@ -565,4 +565,12 @@ export class SharedPatientDashboardComponent implements OnInit {
       inputElement.style.borderColor = 'red';
     }
   }
+
+  // method that give popup notification if vital is abnormal 
+  function showAbnormalVitalNotification(vitalName: string): void {
+  const message = `Abnormal ${vitalName} detected!`;
+
+  // Display a popup notification using window.alert
+  window.alert(message);
+}
 }
