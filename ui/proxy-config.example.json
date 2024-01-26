@@ -1,8 +1,7 @@
 {
   "/": {
-    "target": "https://icare.dhis2.udsm.ac.tz",
+    "target": "https://icare-student.dhis2.udsm.ac.tz",
     "secure": "false",
-    "auth": "admin:Admin123",
     "changeOrigin": "true"
   }
 }
