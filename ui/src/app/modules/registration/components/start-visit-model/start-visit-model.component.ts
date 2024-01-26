@@ -154,4 +154,11 @@ export class StartVisitModelComponent implements OnInit {
   selectChip(chip: string) {
     this.selectedChip = chip;
   }
+
+  setPaymentOptions(category: string, option: any): void {
+    //Endpoint goes here
+  this.visitDetails[category] = option;
+  this.selectedChip = option;
+    console.log(`Selected payment option for ${category}:`, option);
+  }
 }

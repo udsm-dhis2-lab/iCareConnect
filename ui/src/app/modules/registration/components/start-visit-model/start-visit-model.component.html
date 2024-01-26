@@ -161,8 +161,8 @@
 
           <p>Payment Type</p>
           <mat-chip-list>
-            <mat-chip [selected]="selectedChip === 'Cash'" (click)="selectChip('Cash')">Cash</mat-chip>
-            <mat-chip [selected]="selectedChip === 'Insurance'" (click)="selectChip('Insurance')">Insurance</mat-chip>
+            <mat-chip [selected]="selectedChip === 'Cash'" (click)="setPaymentOptions('Payment', 'Cash')" >Cash</mat-chip>
+            <mat-chip [selected]="selectedChip === 'Insurance'" (click)="setPaymentOptions('Payment', 'Insurance')">Insurance</mat-chip>
           </mat-chip-list>
           
          
