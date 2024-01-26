@@ -4,6 +4,7 @@ import {
   MatSnackBarHorizontalPosition,
   MatSnackBarVerticalPosition,
 } from '@angular/material/snack-bar';
+import { Subject } from "rxjs";
 
 export interface NotificationInterface {
   type: 'SUCCESS' | 'ERROR' | 'WARNING' | 'LOADING';
@@ -100,5 +101,12 @@ export class NotificationService {
       horizontalPosition: notification?.horizontalPosition,
       verticalPosition: notification?.verticalPosition,
     });
+  }
+  private notificationSubject = new Subject<string>();
+  //Observable string stream
+  notification$ = this.notificationSubject.asObservable();
+  //method to trigger notification
+  notify(message: string){
+    this.notificationSubject.next(message);
   }
 }
