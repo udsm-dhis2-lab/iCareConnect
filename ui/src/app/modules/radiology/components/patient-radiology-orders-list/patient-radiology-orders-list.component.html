@@ -62,13 +62,14 @@
             <div class="d-flex justify-content-left">
               <input
                 type="file"
+                multiple
                 style="border: none; background-color: transparent"
                 class="form-control"
                 name="file"
                 accept=".pdf"
                 id="file-selector-{{ order?.concept?.uuid }}"
                 (change)="fileSelection($event, order)"
-                multiple
+                
               />
 
               <button
