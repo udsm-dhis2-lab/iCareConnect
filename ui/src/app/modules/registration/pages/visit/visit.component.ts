@@ -76,9 +76,36 @@ export class VisitComponent implements OnInit {
   vertService: string;
   Rooms: string;
   Payment: string;
+  paymentOptions: any[] = []; // Array to store payment options
   editMode: boolean = false;
   disableEditingPayments: boolean = false;
   isEmergencyVisit: boolean = false;
+
+  // Assume the RegistrationService is injected
+  constructor(private registrationService: RegistrationService) {}
+
+  ngOnInit() {
+    // Call the method to retrieve payment options
+    this.loadPaymentOptions();
+  }
+
+  // Method to load payment options
+  loadPaymentOptions() {
+    this.registrationService.getPaymentOptionsHierarchy().subscribe((options: any[]) => {
+      this.paymentOptions = options;
+    });
+  }
+
+  // Additional methods and logic for handling payment options in your component
+  // ...
+
+  // Example method to handle payment selection
+  onPaymentSelection(paymentOption: any) {
+    this.Payment = paymentOption.name;
+    // Add additional logic as needed
+  }
+}
+
 
   existingVisitUuid: string;
 
