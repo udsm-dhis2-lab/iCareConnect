@@ -30,3 +30,4 @@ import { RegistrationSummaryCardsComponent } from './components/registration-sum
   imports: [CommonModule, RegistrationRoutingModule, SharedModule],
 })
 export class RegistrationModule {}
+

@@ -8,6 +8,7 @@ import { AuthService } from "./core/services/auth.service";
 import { loadDHIS2ReportsConfigs } from "./store/actions";
 import { AppState } from "./store/reducers";
 import { getIfNonLoginRoute } from "./store/selectors";
+import { Chart} from "chart.js/auto";
 
 @Component({
   selector: "app-root",

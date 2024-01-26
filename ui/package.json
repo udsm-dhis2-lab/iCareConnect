@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node --max-old-space-size=4092 ./node_modules/@angular/cli/bin/ng serve",
     "build": "ng build",
     "build:prod": "ng build --aot --configuration production",
     "test": "ng test",
@@ -44,6 +44,7 @@
     "@ngrx/store-devtools": "^12.2.0",
     "@tinymce/tinymce-angular": "^4.2.4",
     "bootstrap": "^4.5.3",
+    "chart.js": "^4.4.1",
     "cypress": "^6.8.0",
     "dexie": "^3.2.3",
     "file-saver": "^2.0.5",
@@ -105,3 +106,4 @@
     "nonGlobalStepDefinitions": true
   }
 }
+
