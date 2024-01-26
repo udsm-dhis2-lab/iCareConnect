@@ -213,7 +213,7 @@ export class GeneralDispensingFormComponent implements OnInit {
     return false;
   }
 
- async saveOrder(e: any, conceptFields: any) {
+ saveOrder(e: any, conceptFields: any) {
     if (!this.formValues?.drug?.value) {
       this.errors = [];
       setTimeout(() => {
