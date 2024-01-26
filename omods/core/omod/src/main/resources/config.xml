@@ -115,7 +115,7 @@
 	</privilege>
 	<privilege>
 		<name>CLINIC_DELETE_LABORATORY_INVESTIGATION</name>
-		<description>Access for the clinic module to delete laboratory investigation</description>
+		<description>Access for the clinic module to delete laboratoty investigation</description>
 	</privilege>
 	<privilege>
 		<name>CLINIC_ADD_RADIOLOGY_INVESTIGATION</name>
