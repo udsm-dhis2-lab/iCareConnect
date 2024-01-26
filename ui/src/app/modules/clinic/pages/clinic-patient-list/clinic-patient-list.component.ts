@@ -19,6 +19,19 @@ import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.s
   styleUrls: ["./clinic-patient-list.component.scss"],
 })
 export class ClinicPatientListComponent implements OnInit {
+  doctorsData: any[] = [
+    { name: 'Dr. Samwel Wilson', patients: [{ name: 'Selina Aman', time: '10:00 AM' }, { name: 'Imani Ayo', time: '11:30 AM' }] },
+    { name: 'Dr. Justo Ernest', patients: [{ name: 'Angel Mwakinyo', time: '09:15 AM' }, { name: 'Asagile Nyuki', time: '02:45 PM' }] },
+    { name: 'Dr. Bea', patients: [{ name: 'Ambilikile Kihono', time: '03:00 PM' }, { name: 'Asamoo Mwasapile', time: '04:30 PM' }] },
+    { name: 'Dr. Shedrack Ntandu', patients: [{ name: 'Asape Mwaipaja', time: '01:45 PM' }, { name: 'Musa Kitundu', time: '05:15 PM' }] },
+    { name: 'Dr. Magreth', patients: [{ name: 'Amannu J', time: '11:00 AM' }, { name: 'Ema Murumi', time: '02:00 PM' }] },
+   
+  ];
+
+  toggleHighlight(patient: any): void {
+    patient.highlighted = !patient.highlighted;
+  }
+
   currentLocation$: Observable<any>;
   selectedTab = new FormControl(0);
   settingCurrentLocationStatus$: Observable<boolean>;
