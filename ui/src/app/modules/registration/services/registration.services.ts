@@ -5,12 +5,13 @@ import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { Api } from "src/app/shared/resources/openmrs";
 import { head } from "lodash";
 import { Observable, of } from "rxjs";
+import { NotificationService } from "src/app/shared/services/notification.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class RegistrationService {
-  constructor(private httpClient: OpenmrsHttpClientService) {}
+  constructor(private httpClient: OpenmrsHttpClientService, private notificationService: NotificationService) {}
   createPerson(personPayload) {
     let url = "person";
 
@@ -25,6 +26,10 @@ export class RegistrationService {
         : this.updatePatient(patientPayload, patientUuid)
     ).pipe(
       map((response) => {
+        if (response && response.uuid){
+          //trigger a notification here
+          this.notificationService.notify('New patient registered');
+        }
         return response;
       }),
       catchError((error) => of(error))

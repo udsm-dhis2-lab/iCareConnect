@@ -332,3 +332,10 @@ mat-dialog-container {
   color: red;
   text-decoration: line-through !important;
 }
+
+.row {
+  display: flex;
+  flex-wrap: nowrap;
+  margin-right: -5px;
+  margin-left: -15px
+}
