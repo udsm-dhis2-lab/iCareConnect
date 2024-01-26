@@ -47,6 +47,7 @@ export class GeneralDispensingFormComponent implements OnInit {
 
   formValues: any = {};
   drugOrderData: any;
+  //this one controls the loading of the form when the  drug is selected
   savingOrder: boolean;
   savingOrderSuccess: boolean;
   savedOrder: DrugOrder;

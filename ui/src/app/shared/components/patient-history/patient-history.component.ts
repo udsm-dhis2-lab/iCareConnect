@@ -39,7 +39,10 @@ export class PatientHistoryComponent implements OnInit {
     username?: string;
     systemId?: string;
     userProperties?: object;
-   provider?: { uuid?: string; display?: string };
+    person?: import("../../../shared/resources/openmrs").PersonGetRef;
+    privileges?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").PrivilegeGetRef[];
+    roles?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").RoleGetRef[];
+    provider?: { uuid?: string; display?: string };
   }>;
   constructor(
     private visitsService: VisitsService,
