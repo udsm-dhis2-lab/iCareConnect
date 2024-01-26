@@ -39,9 +39,9 @@ export class PatientHistoryComponent implements OnInit {
     username?: string;
     systemId?: string;
     userProperties?: object;
-    person?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").PersonGetRef;
-    privileges?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").PrivilegeGetRef[];
-    roles?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").RoleGetRef[];
+    person?: import("../../../shared/resources/openmrs").PersonGetRef;
+    privileges?: import("../../../shared/resources/openmrs").PrivilegeGetRef[];
+    roles?: import("../../../shared/resources/openmrs").RoleGetRef[];
     provider?: { uuid?: string; display?: string };
   }>;
   constructor(
@@ -104,56 +104,56 @@ export class PatientHistoryComponent implements OnInit {
                 error: {
                   message:
                     "Generic Use Specific drug Concept config is missing, Set 'iCare.clinic.genericPrescription.specificDrugConceptUuid' or Contact IT (Close to continue)",
+                  },
+                  type: "warning",
                 },
-                type: "warning",
-              },
-            ];
-          }
-        })
-      );
-    this.visits$ = this.visitsService
-      .getAllPatientVisits(this.patient?.uuid, true)
-      .pipe(
-        map((response) => {
-          this.loadingData = false;
-          if (!response?.error) {
-            return response?.map((visit) => {
-              let obs = [];
-              visit?.visit?.encounters.forEach((encounter) => {
-                (encounter?.obs || []).forEach((observation) => {
-                  obs = [
-                    ...obs,
-                    {
-                      ...observation,
-                      encounterType: {
-                        uuid: encounter?.encounterType?.uuid,
-                        display: encounter?.encounterType?.display,
-                      },
-                      provider: encounter?.encounterProviders[0]?.provider,
-                    },
-                  ];
-                });
-              });
-              return {
-                visit: visit?.visit,
-                obs: obs,
-                orders: [
-                  ...visit?.visit?.encounters.map((encounter) => {
-                    return (encounter?.orders || []).map((order) => {
-                      return {
-                        ...order,
+              ];
+            }
+          })
+        );
+      this.visits$ = this.visitsService
+        .getAllPatientVisits(this.patient?.uuid, true)
+        .pipe(
+          map((response) => {
+            this.loadingData = false;
+            if (!response?.error) {
+              return response?.map((visit) => {
+                let obs = [];
+                visit?.visit?.encounters.forEach((encounter) => {
+                  (encounter?.obs || []).forEach((observation) => {
+                    obs = [
+                      ...obs,
+                      {
+                        ...observation,
                         encounterType: {
                           uuid: encounter?.encounterType?.uuid,
                           display: encounter?.encounterType?.display,
                         },
-                      };
-                    });
-                  }),
-                ].filter((order) => order.length),
-              };
-            });
-          }
-        })
-      );
+                        provider: encounter?.encounterProviders[0]?.provider,
+                      },
+                    ];
+                  });
+                });
+                return {
+                  visit: visit?.visit,
+                  obs: obs,
+                  orders: [
+                    ...visit?.visit?.encounters.map((encounter) => {
+                      return (encounter?.orders || []).map((order) => {
+                        return {
+                          ...order,
+                          encounterType: {
+                            uuid: encounter?.encounterType?.uuid,
+                            display: encounter?.encounterType?.display,
+                          },
+                        };
+                      });
+                    }),
+                  ].filter((order) => order.length),
+                };
+              });
+            }
+          })
+        );
+    }
   }
-}
