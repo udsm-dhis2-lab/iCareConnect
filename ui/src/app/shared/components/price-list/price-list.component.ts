@@ -45,6 +45,7 @@ import { PricingService } from "../../services/pricing.service";
 //IMPORTS FOR OUR FEATURES
 import * as XLSX from 'xlsx';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { HttpClient } from '@angular/common/http';
 
 
 
@@ -95,6 +96,7 @@ export class PriceListComponent implements OnInit, OnChanges {
     private pricingService: PricingService,
     private store: Store<AppState>,
   //CONSTRUCTORS FOR OUR FEATURES
+    private http: HttpClient,
     private snackBar: MatSnackBar
   ) {
     //PARAMETER
@@ -362,7 +364,42 @@ export class PriceListComponent implements OnInit, OnChanges {
   }
 
   //NUHU'S CODE
+  exportToExcel() {
+    const filteredData = this.data.map(item => ({
+      created: item.created,
+      display: item.display,
+      voided: item.voided,
+      stockable: item.stockable,
+      prices: item.prices.map(price => ({
+        paymentScheme: price.paymentScheme.display,
+        price: price.price
+      }))
+    }));
 
+    // Flatten the nested prices array using reduce
+    const flattenedData = filteredData.reduce((accumulator, item) => {
+      const prices = item.prices.map(price => ({
+        created: item.created,
+        display: item.display,
+        voided: item.voided,
+        stockable: item.stockable,
+        paymentScheme: price.paymentScheme,
+        price: price.price
+      }));
+
+      return [...accumulator, ...prices];
+    }, []);
+
+    // Create a worksheet
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(flattenedData);
+
+    // Create a workbook
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+    // Save the Excel file
+    XLSX.writeFile(wb, 'prices.xlsx');
+  }
 
 
 
