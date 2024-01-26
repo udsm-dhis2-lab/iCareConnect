@@ -555,4 +555,13 @@ export class SharedPatientDashboardComponent implements OnInit {
   reload(currentPatient: Patient) {
     this.store.dispatch(loadActiveVisit({ patientId: currentPatient?.id }));
   }
+
+  // method which change the input borders automatically to red for abnomal vitals and green otherwise
+  private static updateInputBorderColor(inputElement: HTMLInputElement, isValid: boolean): void {
+    if (isValid) {
+      inputElement.style.borderColor = 'green';
+    } else {
+      inputElement.style.borderColor = 'red';
+    }
+  }
 }
