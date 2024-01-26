@@ -78,10 +78,10 @@
                 [ngClass]="{
                   'selected-form':
                     (selectedForm &&
-                      !showHistoryDetails &&
+                      !showRoundDetails &&
                       selectedForm?.uuid === form?.uuid) ||
                     (!selectedForm &&
-                      !showHistoryDetails &&
+                      !showRoundDetails &&
                       dashboardParams?.forms[0] &&
                       dashboardParams?.forms[0]?.uuid === form?.uuid)
                 }"
@@ -90,6 +90,11 @@
               >
                 {{ form?.name }}
               </button>
+              <!-- <button mat-button (click)="onToggleVisibityIcons($event)">
+                <mat-icon *ngIf="showRoundDetails">visibility_off</mat-icon>
+                <mat-icon *ngIf="!showRoundDetails">visibility</mat-icon>
+                Visit Information
+              </button> -->
             </ng-container>
           </div>
 
@@ -97,24 +102,14 @@
             <div class="mr-2">
               <app-shared-bmi></app-shared-bmi>
             </div>
-            <button
-              *ngIf="!isInpatient"
-              class="mr-2"
-              (click)="onToggleVitalsSummary($event)"
-              [ngStyle]="{
-                'background-color':
-                  dashboardParams?.countOfVitalsElementsFilled === 0
-                    ? '#F00'
-                    : 'transparent',
-                color:
-                  dashboardParams?.countOfVitalsElementsFilled === 0
-                    ? '#FFF'
-                    : '#222'
-              }"
-              mat-stroked-button
-            >
-              View Vitals
-            </button>
+
+
+            <!-- ADDED CHANGES -->
+
+            <app-shared-patient-dashboard></app-shared-patient-dashboard>
+
+
+
             <div
               class="patient-vitals-mat-menu mat-elevation-z1"
               *ngIf="showVitalsSummary"
@@ -194,7 +189,6 @@
             </button>
             <button
               mat-stroked-button
-              [ngClass]="{ 'selected-form': showHistoryDetails }"
               (click)="onToggleVisibityIcons($event)"
               class="mr-2 float-right"
             >
@@ -382,11 +376,11 @@
                     <div class="w-100">
                       <div class="w-100 mt-2">
                         <!-- <app-shared-visit-history-summary
-                          *ngIf="showHistoryDetails"
+                          *ngIf="showRoundDetails"
                           [location]="dashboardParams?.currentLocation"
                           [activeVisit]="activeVisit"
                         ></app-shared-visit-history-summary> -->
-                        <div class="w-100" *ngIf="showHistoryDetails">
+                        <div class="w-100" *ngIf="showRoundDetails">
                           <mat-accordion>
                             <mat-expansion-panel
                               class="mb-2 border p-0"
@@ -417,7 +411,7 @@
                       dashboardParams.currentPatient &&
                       dashboardParams?.forms &&
                       dashboardParams?.forms?.length > 0 &&
-                      !showHistoryDetails
+                      !showRoundDetails
                     "
                     [clinicalObservations]="
                       dashboardParams?.observationsGroupedByConcept
@@ -427,20 +421,18 @@
                     [visit]="activeVisit"
                     [forms]="dashboardParams?.forms"
                     [shouldUseOwnFormSelection]="false"
-                    [clinicConfigurations]="clinicConfigurations"
                     [provider]="dashboardParams?.provider"
                     (updateConsultationOrder)="onUpdateConsultationOrder()"
                     [selectedForm]="
                       selectedForm ? selectedForm : dashboardParams?.forms[0]
                     "
-                    (currentFormDetails)="onGetCurrentFormDetails($event)"
-                    (saveObservations)="reload(dashboardParams?.currentPatient)"
+                    (saveObservations)="reload()"
                   >
                   </app-clinical-notes>
                   <app-patient-observations-chart
                     *ngIf="
                       isInpatient &&
-                      !showHistoryDetails &&
+                      !showRoundDetails &&
                       !dashboardParams.loadingForms &&
                       dashboardParams.currentPatient &&
                       dashboardParams?.forms &&
@@ -479,7 +471,7 @@
                   <app-ipd-forms
                     *ngIf="
                       isInpatient &&
-                      !showHistoryDetails &&
+                      !showRoundDetails &&
                       readyForClinicalNotes &&
                       !dashboardParams.loadingForms &&
                       dashboardParams.currentPatient &&
@@ -571,12 +563,7 @@
                       <mat-panel-title>Provisional Diagnoses </mat-panel-title>
                     </mat-expansion-panel-header>
                     <div
-                      *ngIf="
-                        dashboardParams?.formEntities['Visit Diagnoses'] &&
-                        ((currentFormDetails['PROVISIONAL'] &&
-                          currentFormDetails?.requiredFormsHasData) ||
-                          !currentFormDetails['PROVISIONAL'])
-                      "
+                      *ngIf="dashboardParams?.formEntities['Visit Diagnoses']"
                     >
                       <app-patient-diagnoses-summary
                         [isConfirmedDiagnosis]="false"
@@ -589,21 +576,9 @@
                         (updateConsultationOrder)="onUpdateConsultationOrder()"
                       ></app-patient-diagnoses-summary>
                     </div>
-                    <div
-                      class="alert alert-warning"
-                      role="alert"
-                      *ngIf="
-                        currentFormDetails['PROVISIONAL'] &&
-                        !currentFormDetails?.requiredFormsHasData
-                      "
-                    >
-                      Please fill data on
-                      <b>{{ currentFormDetails?.configs?.name }}</b> form to
-                      proceed
-                    </div>
                   </mat-expansion-panel>
                 </mat-accordion>
-                <ng-container *ngIf="tabsToShow?.length > 0">
+                <ng-container *ngIf="tabsToShow?.length">
                   <ng-container *ngFor="let tabToShow of tabsToShow">
                     <mat-accordion>
                       <mat-expansion-panel
@@ -629,10 +604,7 @@
                           <app-patient-investigations-and-procedures
                             *ngIf="
                               activeVisit &&
-                              dashboardParams?.formEntities['All orderables'] &&
-                              ((currentFormDetails[tabToShow] &&
-                                currentFormDetails?.requiredFormsHasData) ||
-                                !currentFormDetails[tabToShow])
+                              dashboardParams?.formEntities['All orderables']
                             "
                             [observations]="
                               dashboardParams?.observationsGroupedByConcept
@@ -657,18 +629,7 @@
                               onUpdateConsultationOrder()
                             "
                           ></app-patient-investigations-and-procedures>
-                          <div
-                            class="alert alert-warning"
-                            role="alert"
-                            *ngIf="
-                              currentFormDetails[tabToShow] &&
-                              !currentFormDetails?.requiredFormsHasData
-                            "
-                          >
-                            Please fill data on
-                            <b>{{ currentFormDetails?.configs?.name }}</b> form
-                            to proceed
-                          </div>
+
                           <mat-progress-bar
                             *ngIf="
                               dashboardParams?.loadingVisit ||
@@ -753,12 +714,7 @@
                       <mat-panel-title>Confirmed Diagnoses </mat-panel-title>
                     </mat-expansion-panel-header>
                     <div
-                      *ngIf="
-                        dashboardParams?.formEntities['Visit Diagnoses'] &&
-                        ((currentFormDetails['CONFIRMED_DIAGNOSIS'] &&
-                          currentFormDetails?.requiredFormsHasData) ||
-                          !currentFormDetails['CONFIRMED_DIAGNOSIS'])
-                      "
+                      *ngIf="dashboardParams?.formEntities['Visit Diagnoses']"
                     >
                       <app-patient-diagnoses-summary
                         [isConfirmedDiagnosis]="true"
@@ -773,18 +729,6 @@
                           onUpdateMedicationComponent()
                         "
                       ></app-patient-diagnoses-summary>
-                    </div>
-                    <div
-                      class="alert alert-warning"
-                      role="alert"
-                      *ngIf="
-                        currentFormDetails['CONFIRMED_DIAGNOSIS'] &&
-                        !currentFormDetails?.requiredFormsHasData
-                      "
-                    >
-                      Please fill data on
-                      <b>{{ currentFormDetails?.configs?.name }}</b> form to
-                      proceed
                     </div>
                     <mat-progress-bar
                       *ngIf="!dashboardParams?.formEntities['Visit Diagnoses']"
@@ -853,12 +797,11 @@
   </div>
   <mat-progress-bar
     *ngIf="
-      dashboardParams?.hasPatientHavePendingPaymentForTheCurrentVisitType &&
-      (dashboardParams?.loadingPaymentStatus ||
-        !dashboardParams?.encounterTypes ||
-        dashboardParams?.billLoadingState ||
-        !dashboardParams?.currentPatient ||
-        dashboardParams?.loadingForms)
+      dashboardParams?.loadingPaymentStatus ||
+      !dashboardParams?.encounterTypes ||
+      dashboardParams?.billLoadingState ||
+      !dashboardParams?.currentPatient ||
+      dashboardParams?.loadingForms
     "
     mode="indeterminate"
   >
