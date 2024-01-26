@@ -5,6 +5,8 @@ import { LocationSelectModalComponent } from "./location-select-modal/location-s
 import { MenuComponent } from "./menu/menu.component";
 import { PatientClinicalNotesSummaryComponent } from "./patient-clinical-notes-summary/patient-clinical-notes-summary.component";
 import { PatientListComponent } from "./patient-list/patient-list.component";
+import { PatientListNewComponent } from "./patient-list-new/patient-list-new.component";
+import { PatientsTabularListNewComponent } from "./patients-tabular-list-new/patients-tabular-list-new.component";
 import { PatientSidebarComponent } from "./patient-sidebar/patient-sidebar.component";
 import { PatientDiagnosesSummaryComponent } from "./patient-diagnoses-summary/patient-diagnoses-summary.component";
 import { AdmissionFormComponent } from "./admission-form/admission-form.component";
@@ -145,7 +147,9 @@ export const components: any[] = [
   PatientSidebarComponent,
   PatientDiagnosesSummaryComponent,
   AdmissionFormComponent,
+  PatientsTabularListNewComponent,
   TransferWithinComponent,
+  PatientListNewComponent,
   CaptureFormDataComponent,
   CaptureFormDataModalComponent,
   PatientsTabularListComponent,
