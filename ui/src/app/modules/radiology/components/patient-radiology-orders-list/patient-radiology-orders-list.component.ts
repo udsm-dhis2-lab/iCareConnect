@@ -7,6 +7,7 @@ import { addBillStatusToOrders } from "src/app/shared/helpers/add-bill-status-to
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 
+// now a person can add multiple  files in radiology
 @Component({
   selector: "app-patient-radiology-orders-list",
   templateUrl: "./patient-radiology-orders-list.component.html",
