@@ -1,16 +1,33 @@
-export function showPopup(patientName: string): void {
-    const popupContainer = document.createElement('div');
-    popupContainer.classList.add('popup-container');
+// app-capture-data.component.ts
 
-    const popupContent = document.createElement('div');
-    popupContent.classList.add('popup-content');
-    popupContent.innerHTML = 'Pulse on the new patient! <strong>${patientName}</strong>&apos s vitals are in! ✅';
+import { MatDialog } from '@angular/material/dialog';
+import { VitalSavePopupComponent } from 'src/app/shared/services/VitalPopupComponent.service';
+import { NotificationService } from "src/app/shared/services/notification.service";
 
-    popupContainer.appendChild(popupContent);
-    document.body.appendChild(popupContainer);
 
-    // Optional: Add a timeout to automatically close the popup after a certain duration
-    setTimeout(() => {
-        document.body.removeChild(popupContainer);
-    }, 5000); // Adjust the duration (in milliseconds) as needed
+export class AppCaptureDataComponent {
+  // ... (existing component code)
+
+  constructor(
+    private dialog: MatDialog,
+    private notificationService: NotificationService
+  ) {}
+
+  openSaveConfirmationPopup(): void {
+    const dialogRef = this.dialog.open(VitalSavePopupComponent, {
+      width: '400px', // Adjust the width according to your design
+      data: { patientName: params?.patient?.name || 'Unknown Patient' },
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      // Handle the result if needed
+    });
+
+    // If you prefer to use NotificationService:
+    this.notificationService.notify(
+      `${params?.patient?.name || 'Unknown Patient'}'s vitals are in! ✅`
+    );
+  }
+
+  // ... (existing component code)
 }

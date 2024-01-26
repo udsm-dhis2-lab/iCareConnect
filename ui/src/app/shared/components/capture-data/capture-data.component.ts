@@ -6,6 +6,9 @@ import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import { AppState } from "src/app/store/reducers";
+import { MatDialog } from '@angular/material/dialog';
+import { VitalSavePopupComponent } from 'src/app/shared/services/VitalPopupComponent.service';
+import { NotificationService } from "src/app/shared/services/notification.service";
 
 import * as _ from "lodash";
 import { getSavingObservationStatus } from "src/app/store/selectors/observation.selectors";
