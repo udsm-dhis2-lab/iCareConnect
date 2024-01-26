@@ -16,7 +16,8 @@ export class SubmitEClaimComponent implements OnInit {
   activeVisitDetails$: Observable<string>;
   constructor(
     private route: ActivatedRoute,
-    private visitService: VisitsService
+    private visitService: VisitsService,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit(): void {
@@ -27,5 +28,17 @@ export class SubmitEClaimComponent implements OnInit {
       false,
       false
     );
+  }
+
+ 
+  submitClaim() {
+    const activeVisitUuid = this.store.select(getActiveVisitUuid);
+    this.visitService.submitClaim(activeVisitUuid).subscribe(response => {
+      if (response.success) {
+        console.log('E-claim submitted  successfully');
+      } else {
+        console.error('Failed to submit e-claim');
+      }
+    });
   }
 }
