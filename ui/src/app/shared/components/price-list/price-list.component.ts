@@ -43,7 +43,7 @@ import { ItemPriceService } from "../../services/item-price.service";
 import { PricingService } from "../../services/pricing.service";
 
 //IMPORTS FOR OUR FEATURES
-
+import * as XLSX from 'xlsx';
 
 
 
