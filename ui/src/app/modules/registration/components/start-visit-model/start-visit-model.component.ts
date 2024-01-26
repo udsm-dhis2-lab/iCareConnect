@@ -149,4 +149,9 @@ export class StartVisitModelComponent implements OnInit {
         }
       });
   }
+  selectedChip: string = 'Cash';
+
+  selectChip(chip: string) {
+    this.selectedChip = chip;
+  }
 }
