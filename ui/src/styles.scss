@@ -356,3 +356,30 @@ mat-dialog-container {
     margin-right: 0;
   }
 }
+
+/* Optimizing system behavior to adapt seamlessly to different viewport dimensions */
+.search-input-card {
+  display: flex;
+  text-align: left;
+  align-items: center;
+  border-radius: 25px;
+
+  mat-icon {
+    line-height: 25px;
+    font-size: 18px;
+    color: rgba(0, 0, 0, 0.4) !important;
+  }
+}
+
+.search-input-card:hover {
+  box-shadow: 1px 0px 3px 0px rgba(0, 0, 0, 0.15);
+}
+
+.search-input {
+  border: none !important;
+  background-color: transparent;
+}
+
+.search-input:focus {
+  outline: none !important;
+}
