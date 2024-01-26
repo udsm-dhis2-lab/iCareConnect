@@ -83,14 +83,14 @@
           <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
 
           <ng-template matTabContent>
-            <app-patient-list
+            <app-patient-list-new
               [currentLocation]="(currentLocation$ | async)?.id"
               [shouldShowParentLocation]="true"
-              [orderType]="params?.labTestOrderType"
+              [orderType]="params?.consultationOrderType"
               [isTabularList]="true"
               [itemsPerPage]="10"
               (selectPatient)="onSelectPatient($event)"
-            ></app-patient-list>
+            ></app-patient-list-new>
           </ng-template>
           <!-- </div> -->
         </mat-tab>
