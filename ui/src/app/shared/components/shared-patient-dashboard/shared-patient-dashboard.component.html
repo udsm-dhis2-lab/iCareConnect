@@ -95,12 +95,7 @@
               <button
               *ngIf="!isInpatient"
               mat-stroked-button
-              (click)="
-                viewPatientHistory(
-                  $event,
-                  dashboardParams?.currentPatient?.patient?.uuid
-                )
-              "
+              (click)="viewPatientHistory($event, patientUuid)"
               class="mr-2 float-right"
             >
               <!-- this is the eye icon someone uncomment it -->

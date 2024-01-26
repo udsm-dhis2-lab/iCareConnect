@@ -327,6 +327,12 @@ export class SharedPatientDashboardComponent implements OnInit {
     this.showVitalsSummary = !this.showVitalsSummary;
   }
 
+  dashboardParams: any; // Declare the dashboardParams property
+
+  getpatientUuid() {
+    return this.dashboardParams?.currentPatient?.patient?.uuid;
+  }
+
   getSelectedForm(event: Event, form: any): void {
     this.readyForClinicalNotes = false;
     if (event) {
