@@ -167,7 +167,7 @@
          
           <div
                 class="col-md-6"
-                *ngIf="(editMode && disableEditingPayments)"
+                *ngIf="!(editMode && disableEditingPayments)"
               >
                 <p>Payment Category</p>
                 <mat-chip-list
