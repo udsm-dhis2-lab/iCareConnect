@@ -430,5 +430,14 @@
         [existingRequisition]="existingRequisition"
       ></app-new-requisition-form>
     </div>
+    <div class="d-flex justify-content-end mt-2 mr-2">
+      <button
+        color="primary"
+        mat-flat-button
+        (click)="issueAllSelected($event, selectedIssues)"
+      >
+        Request Drugs
+      </button>
+    </div>   
   </mat-card>
 </div>
