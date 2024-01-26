@@ -86,6 +86,10 @@ public class WorksheetDefinition extends BaseOpenmrsData implements java.io.Seri
 		if (worksheetDefinitionMap.get("additionalFields") != null) {
 			worksheetDefinition.setAdditionalFields(worksheetDefinitionMap.get("additionalFields").toString());
 		}
+
+				if (worksheetDefinitionMap.get("header_fields") != null) {
+			worksheetDefinition.setHeaderFields(worksheetDefinitionMap.get("header_fields").toString()); 	
+		
 		
 		Worksheet worksheet = new Worksheet();
 		worksheet.setUuid(((Map) worksheetDefinitionMap.get("worksheet")).get("uuid").toString());
