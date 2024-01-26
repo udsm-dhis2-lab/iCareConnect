@@ -35,7 +35,7 @@ export class SubmitEClaimComponent implements OnInit {
     const activeVisitUuid = this.store.select(getActiveVisitUuid);
     this.visitService.submitClaim(activeVisitUuid).subscribe(response => {
       if (response.success) {
-        console.log('E-claim submitted successfully');
+        console.log('E-claim submitted  successfully');
       } else {
         console.error('Failed to submit e-claim');
       }
