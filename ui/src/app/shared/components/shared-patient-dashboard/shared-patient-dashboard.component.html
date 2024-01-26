@@ -92,17 +92,19 @@
               </button>
               <!-- visit information button -->
               <button
-              *ngIf="!isInpatient"
-              mat-stroked-button
-              (click)="viewPatientHistory($event, patientUuid)"
-              class="mr-2 float-right"
+
+          
+                *ngIf="!isInpatient"
+                mat-stroked-button
+                (click)="viewPatientHistory($event, patientUuid)"
+                class="mr-2 float-right"
               >
-              <!-- this is the eye icon someone uncomment it -->
-              <mat-icon>visibility</mat-icon>
-              Visit Information
+                <mat-icon>visibility</mat-icon>
+                Visit Information
               </button>
-              <!-- end button addition -->
-              </ng-container>
+
+            </ng-container>
+
           </div>
 
           <div class="w-50 d-flex justify-content-end"
