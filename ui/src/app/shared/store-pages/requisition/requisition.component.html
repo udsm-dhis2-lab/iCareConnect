@@ -174,7 +174,17 @@
                 Reject
               </button>
             </div>
-          </td>  
+          </td> 
+        <td>
+            <section>
+              <mat-checkbox
+                color="primary"
+                [disabled]="issue?.status === 'ISSUED'"
+                [(ngModel)]="selectedIssuesItem[issue?.id]"
+                (ngModelChange)="getItemsSelection($event, issue)"
+              ></mat-checkbox>
+            </section>
+          </td> 
       </tr>
     </table>
     <div *ngIf="!showRequisitionForm">
