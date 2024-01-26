@@ -42,9 +42,7 @@ import { PricingItemInterface } from "../../../modules/maintenance/models/pricin
 import { ItemPriceService } from "../../services/item-price.service";
 import { PricingService } from "../../services/pricing.service";
 
-import { HttpClient } from '@angular/common/http';
-import * as XLSX from 'xlsx';
-import { MatSnackBar } from '@angular/material/snack-bar';
+//IMPORTS FOR OUR FEATURES
 
 
 
@@ -95,10 +93,9 @@ export class PriceListComponent implements OnInit, OnChanges {
     private itemPriceService: ItemPriceService,
     private pricingService: PricingService,
     private store: Store<AppState>,
-    private http: HttpClient,
-    private snackBar: MatSnackBar
+  //CONSTRUCTORS FOR OUR FEATURES
   ) {
-    this.getData();
+    //PARAMETER
   }
 
   ngOnInit() {
@@ -348,53 +345,14 @@ export class PriceListComponent implements OnInit, OnChanges {
   }
 
 
+
+  
+
   //DOWNLOAD EXCELL FUNCTIONALITY
   //COLLIN"S CODE
-  getData() {
-    // Make an HTTP request to fetch data
-    this.http.get('http://localhost:4200/openmrs/ws/rest/v1/icare/item?limit=35&startIndex=0&type=DRUG')
-      .subscribe((response: any) => {
-        this.data = response.results;
-      });
-  }
 
   //NUHU'S CODE
-  exportToExcel() {
-    const filteredData = this.data.map(item => ({
-      created: item.created,
-      display: item.display,
-      voided: item.voided,
-      stockable: item.stockable,
-      prices: item.prices.map(price => ({
-        paymentScheme: price.paymentScheme.display,
-        price: price.price
-      }))
-    }));
 
-    // Flatten the nested prices array using reduce
-    const flattenedData = filteredData.reduce((accumulator, item) => {
-      const prices = item.prices.map(price => ({
-        created: item.created,
-        display: item.display,
-        voided: item.voided,
-        stockable: item.stockable,
-        paymentScheme: price.paymentScheme,
-        price: price.price
-      }));
-
-      return [...accumulator, ...prices];
-    }, []);
-
-    // Create a worksheet
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(flattenedData);
-
-    // Create a workbook
-    const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-
-    // Save the Excel file
-    XLSX.writeFile(wb, 'prices.xlsx');
-  }
 
 
 
@@ -403,30 +361,9 @@ export class PriceListComponent implements OnInit, OnChanges {
 
   // UPLOAD EXCEL FUNCTIONALITY
   //NGATARA'S CODE
-  onFileChange(event: any): void {
-    const fileList: FileList = event.target.files;
-    if (fileList.length > 0) {
-      const file: File = fileList[0];
-      this.snackBar.open(`Selected file: ${file.name}`, 'Close', {
-        duration: 5000,
-      });
-    }
-  }
 
   //REUBEN'S CODE
-  uploadInProgress: boolean = false;
-  
-  UploadExcelFile(): void {
-    if (!this.uploadInProgress) {
-      this.uploadInProgress = true;
-      setTimeout(() => {
-        this.uploadInProgress = false;
-        this.snackBar.open('File uploaded successfully!', 'Close', {
-          duration: 5000,
-        });
-      }, 3000);
-    }
-  }
+
 
 
 }
