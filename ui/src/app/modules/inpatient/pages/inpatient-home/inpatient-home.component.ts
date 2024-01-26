@@ -28,6 +28,7 @@ import {
   getAllAdmittedPatientVisits,
   getVisitLoadingState,
 } from "src/app/store/selectors/visit.selectors";
+import {AdmissionStatus} from "../../../../shared/components/patient-list/patient-list.component";
 
 @Component({
   selector: "app-inpatient-home",
@@ -44,6 +45,8 @@ export class InpatientHomeComponent implements OnInit {
   orderType$: Observable<any>;
   settingCurrentLocationStatus$: Observable<boolean>;
   currentLocationUuid: string;
+
+  protected readonly AdmissionStatus = AdmissionStatus;
 
   constructor(
     private store: Store<AppState>,
