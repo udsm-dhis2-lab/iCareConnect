@@ -77,6 +77,7 @@ export class ExemptionHomeComponent implements OnInit {
         label: "Age",
       },
     ];
+
     this.tableConfig = new TableConfig({
       noDataLabel: "No bills at the moment",
     });
@@ -133,24 +134,53 @@ export class ExemptionHomeComponent implements OnInit {
       );
   }
 
+  // getExemptionVisits() {
+  //   //Get order type
+  //   this.orderType$ = this.systemSettingsService
+  //     .getSystemSettingsMatchingAKey("icare.billing.exemption.orderType")
+  //     .pipe(
+  //       tap((orderType) => {
+  //         return orderType[0];
+  //       }),
+  //       catchError((error) => {
+  //         console.log("Error occured while trying to get orderType: ", error);
+  //         return of(new MatTableDataSource([]));
+  //       })
+  //     );
+
+  //   this.orderType$.subscribe({
+  //     next: (orderType) => {
+  //       this.orderType = orderType[0];
+
+  //       this.getVisits(this.orderType).subscribe({
+  //         next: (visits) => {
+  //           this.visits$ = of(
+  //             new MatTableDataSource(visits.map((visit) => new VisitExt(visit)))
+  //           );
+  //           this.visitsLength = visits.length;
+  //         },
+  //       });
+  //     },
+  //   });
+    
+    
+  // }
   getExemptionVisits() {
-    //Get order type
+    // Get order type
     this.orderType$ = this.systemSettingsService
       .getSystemSettingsMatchingAKey("icare.billing.exemption.orderType")
       .pipe(
-        tap((orderType) => {
-          return orderType[0];
-        }),
+        tap((orderType) => orderType[0]),
         catchError((error) => {
-          console.log("Error occured while trying to get orderType: ", error);
-          return of(new MatTableDataSource([]));
+          console.log("Error occurred while trying to get orderType: ", error);
+          return of([]);
         })
       );
-
+  
     this.orderType$.subscribe({
       next: (orderType) => {
         this.orderType = orderType[0];
-
+  
         this.getVisits(this.orderType).subscribe({
           next: (visits) => {
             this.visits$ = of(
@@ -162,6 +192,7 @@ export class ExemptionHomeComponent implements OnInit {
       },
     });
   }
+  
 
   onSelectVisit(visit: any): void {
     this.store.dispatch(clearCurrentPatient());

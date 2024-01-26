@@ -10,16 +10,18 @@
     </mat-toolbar>
     <mat-progress-bar
       mode="indeterminate"
-      *ngIf="loading || !params?.exemptionOrderType"
+      *ngIf="loading || !params?.exemptionOrderType || !(orderType$ | async)"
     ></mat-progress-bar>
+   
     <!-- patient list -->
     <div class="mat-elevation-z1" *ngIf="visitsLength > 0">
       <app-table [columns]="billingColumns" [loading]="loadingVisits" [loadingDataError]="loadingVisitsError"
-        [tableConfig]="tableConfig" [data$]="visits$" (selectRow)="onSelectVisit($event)"></app-table>
+        [tableConfig]="tableConfig" [data]="visits$" (selectRow)="onSelectVisit($event)"></app-table>
     </div>
     <div class="no-exemptions" *ngIf="visitsLength == 0">
       <h4>
         No Exemption Requests at the moment
+
       </h4>
     </div>
   </div>
