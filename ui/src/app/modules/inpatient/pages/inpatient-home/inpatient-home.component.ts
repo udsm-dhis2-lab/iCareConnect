@@ -2,8 +2,8 @@ import { Component, Input, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from "@angular/router";
 import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
-import { take, takeLast } from "rxjs/operators";
+import {Observable, of} from "rxjs";
+import {catchError, take, takeLast, tap} from "rxjs/operators"; 
 import { Location } from "src/app/core/models";
 import { LocationService } from "src/app/core/services";
 import { OccupiedLocationStatusModalComponent } from "src/app/shared/components/occupied-location-status-modal/occupied-location-status-modal.component";
