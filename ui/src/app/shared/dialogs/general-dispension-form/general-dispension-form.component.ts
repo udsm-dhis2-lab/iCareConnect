@@ -200,7 +200,16 @@ export class GeneralDispensingFormComponent implements OnInit {
     }
   }
 
-  saveOrder(e: any, conceptFields: any) {
+
+ async saveOrder(e: any, conceptFields: any) {
+
+  const hasActivePrescription = await this.checkActivePrescription(this.currentPatient?.id, this.formValues?.drug?.value);
+
+  if (hasActivePrescription) {
+    this.errors = [...this.errors, { error: { message: 'Patient has an active prescription for this drug.' } }];
+    this.savingOrder = false;
+    return;
+  }
     if (!this.formValues?.drug?.value) {
       this.errors = [];
       setTimeout(() => {
