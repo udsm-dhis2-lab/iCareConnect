@@ -214,7 +214,6 @@ export class GeneralDispensingFormComponent implements OnInit {
   }
 
 async saveOrder(e: any, conceptFields: any) {
-
   const hasActivePrescription = await this.checkActivePrescription(this.currentPatient?.id, this.formValues?.drug?.value);
 
   if (hasActivePrescription) {
