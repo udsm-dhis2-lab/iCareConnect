@@ -21,6 +21,8 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   @Output() shouldLoadNewList: EventEmitter<boolean> =
     new EventEmitter<boolean>();
   currentPage: number = 0;
+    startDate:  any;
+        endDate : any;
 
   displayedColumns: string[] = [
     "position",
@@ -81,4 +83,38 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
         : this.page;
     this.shouldLoadNewList.emit({ ...visit, type, page: this.page });
   }
+
+   // assign start date and end date
+   assignStartDate(event) {
+    this.startDate = moment(event.target.value).format("MMMM Do YYYY");
+    console.log("start date", this.startDate);
+}
+
+assignEndDate(event) {
+    this.endDate = moment(event.target.value).format("MMMM Do YYYY");
+console.log("end date", this.endDate);
+}
+filterByDateRange() {
+console.log("filter by date range");
+const filteredVisits = this.visits.filter(
+    (visit) => {
+        const visitStartTime = visit.visitStartTime;
+        console.log("visitStartTime", visitStartTime);
+        return (
+            visitStartTime >= this.startDate &&
+            visitStartTime <= this.endDate
+        );
+    }
+);
+this.dataSource = new MatTableDataSource(
+    sanitizePatientsVisitsForTabularPatientListing(
+        filteredVisits,
+        this.shouldShowParentLocation,
+        this.paymentTypeSelected,
+        this.itemsPerPage,
+        this.page
+    )
+);
+this.dataSource.paginator = this.paginator;
+}
 }

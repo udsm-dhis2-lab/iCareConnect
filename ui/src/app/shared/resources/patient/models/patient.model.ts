@@ -41,6 +41,10 @@ export class Patient {
     return this.patient?.person?.preferredName?.familyName;
   }
 
+  get exempt(): boolean{
+    return this.patient?.exempt;
+  }
+
   get dob(): string {
     return this.patient?.person?.birthdate;
   }
