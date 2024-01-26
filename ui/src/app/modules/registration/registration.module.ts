@@ -29,4 +29,4 @@ import { RegistrationSummaryCardsComponent } from './components/registration-sum
   entryComponents: [...entryRegComponents],
   imports: [CommonModule, RegistrationRoutingModule, SharedModule],
 })
-export class RegistrationModule {}
+export class RegistrationModule {} 

@@ -5,6 +5,7 @@ import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { Api } from "src/app/shared/resources/openmrs";
 import { head } from "lodash";
 import { Observable, of } from "rxjs";
+import { NotificationService } from "src/app/shared/services/notification.service";
 
 @Injectable({
   providedIn: "root",
