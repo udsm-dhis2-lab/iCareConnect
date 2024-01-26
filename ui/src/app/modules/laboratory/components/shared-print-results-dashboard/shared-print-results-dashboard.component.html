@@ -65,7 +65,25 @@
           [samplesData]="department?.samples"
         ></app-shared-sample-orders>
       </div>
-
+      <div
+        style="
+          margin-top: 12px;
+          width: 100%;
+          margin-left: 16px;
+          margin-right: 16px;
+        "
+        *ngIf="
+          formUuidsReferencesForSampleReportDisplay &&
+          formUuidsReferencesForSampleReportDisplay.length > 0
+        "
+      >
+        <app-shared-lab-report-form-data
+          [formUuidsReferencesForSampleReportDisplay]="
+            formUuidsReferencesForSampleReportDisplay
+          "
+          [visit]="department?.samples[0]?.visit"
+        ></app-shared-lab-report-form-data>
+      </div>
       <div style="margin-top: 8px; width: 100%">
         <app-shared-sample-order-results
           [ordersWithResults]="department?.samples[0]?.ordersWithResults"
@@ -74,12 +92,11 @@
           "
         ></app-shared-sample-order-results>
       </div>
-      <div style="text-align: left" class="mt-2">
-        <app-shared-sample-result-entry-and-authorization
-          [ordersWithResults]="department?.samples[0]?.ordersWithResults"
-        ></app-shared-sample-result-entry-and-authorization>
-      </div>
     </div>
+
+    <p style="text-align: center" class="mt-2">
+      ....End of laboratory report....
+    </p>
   </div>
   <div class="d-flex justify-content-end mt-2">
     <button mat-flat-button color="primary" (click)="printPDF($event)">

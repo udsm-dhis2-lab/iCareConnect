@@ -3817,7 +3817,7 @@ export interface LocationAttributeGetFull {
   links?: { rel?: string; uri?: string }[];
   display?: string;
   uuid?: string;
-  attributeType?: string;
+  attributeType?: any;
   value?: string;
   voided?: boolean;
 }
@@ -8053,7 +8053,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
       query?: {
         limit?: number;
         startIndex?: number;
-        v?: "ref" | "default" | "full" | "custom";
+        v?: "ref" | "default" | "full" | "custom" | any;
         q?: string;
         username?: string;
       },
@@ -8082,7 +8082,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getUser: (
       uuid: string,
-      query?: { v?: "ref" | "default" | "full" | "custom" },
+      query?: { v?: "ref" | "default" | "full" | "custom" | any },
       params?: RequestParams
     ) =>
       this.request<UserGet, any>(
@@ -12266,7 +12266,7 @@ export class Api<SecurityDataType = any> extends HttpClient<SecurityDataType> {
      */
     getConcept: (
       uuid: string,
-      query?: { v?: "ref" | "default" | "full" | "custom" },
+      query?: { v?: "ref" | "default" | "full" | "custom" | string },
       params?: RequestParams
     ) =>
       this.request<ConceptGet, any>(

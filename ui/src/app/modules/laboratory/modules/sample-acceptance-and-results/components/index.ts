@@ -48,6 +48,8 @@ import { SampleToPrintResultsComponent } from "./sample-to-print-results/sample-
 import { ResultEntryByBatchHomeComponent } from "./result-entry-by-batch-home/result-entry-by-batch-home.component";
 import { SamplesForResultsReviewComponent } from "./samples-for-results-review/samples-for-results-review.component";
 import { AuthorizationAndResultEntryActionSummaryComponent } from "./authorization-and-result-entry-action-summary/authorization-and-result-entry-action-summary.component";
+import { SharedTestedByResultEntryFieldsComponent } from "./shared-tested-by-result-entry-fields/shared-tested-by-result-entry-fields.component";
+
 
 export const components: any[] = [
   PatientsByVisitsListComponent,
@@ -100,6 +102,7 @@ export const components: any[] = [
   ResultEntryByBatchHomeComponent,
   SamplesForResultsReviewComponent,
   AuthorizationAndResultEntryActionSummaryComponent,
+  SharedTestedByResultEntryFieldsComponent,
 ];
 
 export const sampleAcceptanceAndResultsModals: any[] = [

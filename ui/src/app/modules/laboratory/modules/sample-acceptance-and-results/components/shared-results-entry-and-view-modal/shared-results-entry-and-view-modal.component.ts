@@ -1,5 +1,9 @@
 import { Component, Inject, OnInit } from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialog,
+} from "@angular/material/dialog";
 import { Observable, of, zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
@@ -7,7 +11,7 @@ import { ConceptGet } from "src/app/shared/resources/openmrs";
 import { SampleAllocationObject } from "src/app/shared/resources/sample-allocations/models/allocation.model";
 import { SampleAllocationService } from "src/app/shared/resources/sample-allocations/services/sample-allocation.service";
 
-import { omit, groupBy, flatten, orderBy, isEqual } from "lodash";
+import { omit, groupBy, flatten, orderBy, isEqual, keyBy } from "lodash";
 import { HttpClient } from "@angular/common/http";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { VisitsService } from "src/app/shared/resources/visits/services";
@@ -17,6 +21,8 @@ import { getProviderDetails } from "src/app/store/selectors/current-user.selecto
 import { MatRadioChange } from "@angular/material/radio";
 import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 
 @Component({
   selector: "app-shared-results-entry-and-view-modal",
@@ -26,6 +32,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 export class SharedResultsEntryAndViewModalComponent implements OnInit {
   sampleAllocations$: Observable<any[]>;
   multipleResultsAttributeType$: Observable<any>;
+  calculatedValueExpressionAttributeType$: Observable<any>;
   errors: any[] = [];
   dataValues: any = {};
   saving: boolean = false;
@@ -46,6 +53,12 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   selectedParametersWithDefinedRelationship: any[];
   selectedInstruments: any = {};
   multipleResults: any = [];
+  selectedTestedByDetails: any = {};
+  parametersSearchingText: any = {};
+  attributes: any;
+  attributeTypeUuid: any;
+  calculatedParameters: any = {};
+
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -56,7 +69,8 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     private visitService: VisitsService,
     private store: Store<AppState>,
     private sampleService: SamplesService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -76,9 +90,26 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
           } else {
             this.errors = [...this.errors, response];
             return response;
+            console.log();
           }
         })
       );
+
+    this.calculatedValueExpressionAttributeType$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        `iCare.laboratory.settings.testParameters.calculateValueExpressionAttributeTypeUuid`
+      )
+      .pipe(
+        map((response) => {
+          if (response && !response?.error) {
+            return response;
+          } else {
+            this.errors = [...this.errors, response];
+            return response;
+          }
+        })
+      );
+
     this.getAllocations();
     this.visitDetails$ = this.visitService
       .getVisitDetailsByVisitUuid(this.data?.sample?.visit?.uuid, {
@@ -213,6 +244,16 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               status: "REMARKS",
               remarks: this.remarksData[order?.concept?.uuid],
             },
+            testedDate:
+              this.selectedTestedByDetails[order?.concept?.uuid] &&
+              this.selectedTestedByDetails[order?.concept?.uuid].date
+                ? this.selectedTestedByDetails[order?.concept?.uuid].date
+                : null,
+            testedBy:
+              this.selectedTestedByDetails[order?.concept?.uuid] &&
+              this.selectedTestedByDetails[order?.concept?.uuid]?.testedBy
+                ? this.selectedTestedByDetails[order?.concept?.uuid].testedBy
+                : null,
           },
         ];
       } else {
@@ -247,6 +288,16 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               status: "REMARKS",
               remarks: this.remarksData[order?.concept?.uuid],
             },
+            testedDate:
+              this.selectedTestedByDetails[order?.concept?.uuid] &&
+              this.selectedTestedByDetails[order?.concept?.uuid].date
+                ? this.selectedTestedByDetails[order?.concept?.uuid].date
+                : null,
+            testedBy:
+              this.selectedTestedByDetails[order?.concept?.uuid] &&
+              this.selectedTestedByDetails[order?.concept?.uuid]?.testedBy
+                ? this.selectedTestedByDetails[order?.concept?.uuid].testedBy
+                : null,
           },
         ];
       }
@@ -315,6 +366,28 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                               resultGroup: {
                                 uuid: resultsResponse[0]?.uuid,
                               },
+                              testedDate:
+                                this.selectedTestedByDetails[
+                                  order?.concept?.uuid
+                                ] &&
+                                this.selectedTestedByDetails[
+                                  order?.concept?.uuid
+                                ].date
+                                  ? this.selectedTestedByDetails[
+                                      order?.concept?.uuid
+                                    ].date
+                                  : null,
+                              testedBy:
+                                this.selectedTestedByDetails[
+                                  order?.concept?.uuid
+                                ] &&
+                                this.selectedTestedByDetails[
+                                  order?.concept?.uuid
+                                ]?.testedBy
+                                  ? this.selectedTestedByDetails[
+                                      order?.concept?.uuid
+                                    ].testedBy
+                                  : null,
                             },
                             [
                               "parent",
@@ -388,6 +461,17 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                   testResult: {
                     uuid: result?.uuid,
                   },
+                  testedDate:
+                    this.selectedTestedByDetails[order?.concept?.uuid] &&
+                    this.selectedTestedByDetails[order?.concept?.uuid].date
+                      ? this.selectedTestedByDetails[order?.concept?.uuid].date
+                      : null,
+                  testedBy:
+                    this.selectedTestedByDetails[order?.concept?.uuid] &&
+                    this.selectedTestedByDetails[order?.concept?.uuid]?.testedBy
+                      ? this.selectedTestedByDetails[order?.concept?.uuid]
+                          .testedBy
+                      : null,
                 };
               });
             }
@@ -431,6 +515,61 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
           }
         });
     }
+  }
+
+  onDeleteResults(event: Event, order: any): void {
+    event.stopPropagation();
+    // console.log(order);
+    this.dialog
+      .open(SharedConfirmationComponent, {
+        minWidth: "20%",
+        data: {
+          modalTitle: "Delete results",
+          modalMessage: `Are you sure you want to delete results?`,
+          showRemarksInput: true,
+          confirmationButtonText: "Delete",
+          type: "warn",
+          remarksFieldLabel: "Reason",
+        },
+      })
+      .afterClosed()
+      .subscribe((confirmed: any) => {
+        if (confirmed) {
+          const voidObject: any = {
+            results: flatten(
+              order?.finalResults?.map((result: any) => {
+                if (result?.uuid) {
+                  return {
+                    uuid: result?.uuid,
+                  };
+                } else {
+                  return flatten(
+                    result?.groups?.map((group: any) => {
+                      return flatten(
+                        group?.results?.map((result: any) => {
+                          return {
+                            uuid: result?.uuid,
+                          };
+                        })
+                      );
+                    })
+                  );
+                }
+              })
+            ),
+            sample: this.data?.sample?.uuid,
+            voided: true,
+            voidReason: confirmed?.remarks,
+          };
+          this.sampleAllocationService
+            .voidResults(voidObject)
+            .subscribe((response: any) => {
+              if (response) {
+                this.getAllocations();
+              }
+            });
+        }
+      });
   }
 
   onAuthorize(
@@ -614,12 +753,53 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     parameter: ConceptGet,
     allocation: SampleAllocationObject
   ): void {
-    // console.log(dataObject);
-    if (
-      (dataObject?.value && !dataObject?.previousValue) ||
-      (dataObject?.value &&
-        dataObject?.previousValue &&
-        dataObject?.value != dataObject?.previousValue)
+    if(this.calculatedParameters[parameter?.uuid])
+    this.calculateValue(parameter, dataObject);
+
+    if (dataObject?.value?.length === 0) {
+      this.dataValues = omit(this.dataValues, parameter?.uuid);
+    } else if (dataObject?.multipleResults) {
+      // console.log("JJDJDJDJD");
+      const prevValues =
+        orderBy(
+          dataObject?.previousValue?.map((prevValue: any) => {
+            return {
+              value: prevValue,
+            };
+          }),
+          ["value"],
+          ["asc"]
+        ) || [];
+      const valuesData = orderBy(dataObject?.value, ["value"], ["asc"]);
+      const keyedPrevValue: any = keyBy(prevValues, "value");
+      if (
+        prevValues?.length !== valuesData?.length ||
+        ((
+          valuesData?.filter(
+            (valueData: any) => keyedPrevValue[valueData?.value]
+          ) || []
+        )?.length !== prevValues?.length &&
+          valuesData?.length > 0)
+      ) {
+        this.dataValues[parameter?.uuid] = {
+          ...dataObject,
+          allocation: allocation,
+          parent: allocation?.order?.concept,
+          sample: allocation?.sample,
+          order: allocation?.order,
+        };
+      } else {
+        this.dataValues = omit(this.dataValues, parameter?.uuid);
+      }
+    } else if (
+      !dataObject?.multipleResults &&
+      ((dataObject?.value &&
+        (!dataObject?.previousValue ||
+          dataObject?.previousValue?.length === 0)) ||
+        (dataObject?.value &&
+          dataObject?.value?.length > 0 &&
+          dataObject?.previousValue &&
+          dataObject?.value != dataObject?.previousValue))
     ) {
       this.dataValues[parameter?.uuid] = {
         ...dataObject,
@@ -629,6 +809,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         order: allocation?.order,
       };
     } else if (
+      !dataObject?.multipleResults &&
       dataObject?.value &&
       dataObject?.previousValue &&
       dataObject?.value == dataObject?.previousValue
@@ -715,43 +896,45 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
 
   getFedResults(results: any, order: any): void {
     this.relatedResults = [];
-    // console.log("results", results);
     Object.keys(results)?.forEach((key) => {
-      // console.log(results[key]);
-      // if (results[key]?.multipleResults) {
-      //   console.log(results[key]);
-      // }
       if (
-        results[key]?.value &&
-        results[key]?.value?.length > 0 &&
-        results[key]?.value != results[key]?.previousValue
+        results[key]?.multipleResults &&
+        !isEqual(
+          orderBy(results[key]?.value, ["value"], ["asc"])?.map(
+            (dataValue) => dataValue?.value
+          ) || [],
+          orderBy(
+            results[key]?.previousValue?.map((val) => {
+              return {
+                val,
+              };
+            }),
+            ["val"],
+            ["asc"]
+          )?.map((dataValue) => dataValue?.val) || []
+        )
       ) {
-        if (
-          results[key]?.multipleResults &&
-          !isEqual(
-            orderBy(results[key]?.value, ["value"], ["asc"])?.map(
-              (dataValue) => dataValue?.value
-            ) || [],
-            orderBy(
-              results[key]?.previousValue?.map((val) => {
-                return {
-                  val,
-                };
-              }),
-              ["val"],
-              ["asc"]
-            )?.map((dataValue) => dataValue?.val) || []
-          )
-        ) {
-          // console.log("kkdkd", results[key]);
-          this.multipleResults = [
-            ...(this.multipleResults?.filter(
-              (result) =>
-                result?.allocation?.id !== results[key]?.allocation?.id
-            ) || []),
-            results[key],
-          ];
-        } else if (!results[key]?.multipleResults) {
+        this.multipleResults = [
+          ...(this.multipleResults?.filter(
+            (result) => result?.allocation?.id !== results[key]?.allocation?.id
+          ) || []),
+          results[key],
+        ];
+      } else if (!results[key]?.multipleResults) {
+        const changed: boolean =
+          results[key]?.value &&
+          results[key]?.previousValue?.length > 0 &&
+          (
+            results[key]?.previousValue?.filter(
+              (prevValue: any) => prevValue === results[key]?.value
+            ) || []
+          )?.length > 0
+            ? false
+            : results[key]?.previousValue?.length === 0 && !results[key]?.value
+            ? false
+            : true;
+
+        if (changed) {
           this.relatedResults = [
             ...this.relatedResults,
             {
@@ -791,6 +974,16 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                     remarks: this.remarksData[results[key]?.parameter?.uuid],
                   }
                 : null,
+              testedDate:
+                this.selectedTestedByDetails[order?.concept?.uuid] &&
+                this.selectedTestedByDetails[order?.concept?.uuid].date
+                  ? this.selectedTestedByDetails[order?.concept?.uuid].date
+                  : null,
+              testedBy:
+                this.selectedTestedByDetails[order?.concept?.uuid] &&
+                this.selectedTestedByDetails[order?.concept?.uuid]?.testedBy
+                  ? this.selectedTestedByDetails[order?.concept?.uuid].testedBy
+                  : null,
             },
           ];
         }
@@ -870,6 +1063,26 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                                 }
                               : null,
                           abnormal: false,
+                          testedDate:
+                            this.selectedTestedByDetails[
+                              order?.concept?.uuid
+                            ] &&
+                            this.selectedTestedByDetails[order?.concept?.uuid]
+                              .date
+                              ? this.selectedTestedByDetails[
+                                  order?.concept?.uuid
+                                ].date
+                              : null,
+                          testedBy:
+                            this.selectedTestedByDetails[
+                              order?.concept?.uuid
+                            ] &&
+                            this.selectedTestedByDetails[order?.concept?.uuid]
+                              ?.testedBy
+                              ? this.selectedTestedByDetails[
+                                  order?.concept?.uuid
+                                ].testedBy
+                              : null,
                           status: this.remarksData[
                             multipleResult?.allocation?.parameter?.uuid
                           ]
@@ -975,5 +1188,48 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
 
   onGetSelectedInstrument(instrument: any, order: any): void {
     this.selectedInstruments[order?.concept?.uuid] = instrument;
+  }
+
+  onGetSelectedTestedBy(testedByDetails: any, order: any): void {
+    if (testedByDetails?.date || testedByDetails?.testedBy) {
+      this.selectedTestedByDetails[order?.concept?.uuid] = testedByDetails;
+    }
+  }
+
+  onGetAttributes(data: any, calculatedValueExpressionAttributeType: string,parameterUuid: string) {
+    if (parameterUuid && data[0]?.parameter?.uuid) {
+      this.attributes = data;
+      this.calculatedParameters[data[0]?.parameter?.uuid] = {
+        render: false,
+        value: {},
+        attributes: data,
+        calculatedValueExpressionAttributeType,
+      };
+  
+      console.log("param2: ",this.calculatedParameters);
+    }
+  }
+
+  calculateValue(parameter: any, dataObject: any): void {
+
+    const regex = /{([^}]*)}/;
+    const expressionAttribute: any = (this.calculatedParameters[
+      parameter?.uuid
+    ]?.attributes?.filter(
+      (attribute: any) =>
+        attribute?.attributeTypeUuid ===
+        this.calculatedParameters[parameter?.uuid]
+          ?.calculatedValueExpressionAttributeType
+    ) || [])[0];
+
+    const match = expressionAttribute?.value.match(regex);
+    console.log("aa:",match[1]);
+    setTimeout(() => {
+      this.calculatedParameters[parameter?.uuid] = {
+        ...this.calculatedParameters[parameter?.uuid],
+        render: true,
+        value: {},
+      };
+    }, 20);
   }
 }

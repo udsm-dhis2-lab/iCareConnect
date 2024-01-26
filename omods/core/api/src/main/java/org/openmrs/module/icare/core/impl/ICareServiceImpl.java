@@ -24,7 +24,10 @@ import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
 import org.openmrs.module.icare.core.*;
-import org.openmrs.module.icare.core.dao.ICareDao;
+import org.openmrs.module.icare.core.dao.*;
+import org.openmrs.module.icare.core.models.EncounterPatientProgram;
+import org.openmrs.module.icare.core.models.EncounterPatientState;
+import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
@@ -60,6 +63,18 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	PatientDAO patientDAO;
 	
+	PasswordHistoryDAO passwordHistoryDAO;
+	
+	RoleDAO roleDAO;
+	
+	PrivilegeDAO privilegeDAO;
+	
+	ProgramWorkflowDAO programWorkflowDAO;
+	
+	EncounterPatientStateDAO encounterPatientStateDAO;
+	
+	EncounterPatientProgramDAO encounterPatientProgramDAO;
+	
 	UserService userService;
 	
 	/**
@@ -67,6 +82,30 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	 */
 	public void setDao(ICareDao dao) {
 		this.dao = dao;
+	}
+	
+	public void setPasswordHistoryDAO(PasswordHistoryDAO passwordHistoryDAO) {
+		this.passwordHistoryDAO = passwordHistoryDAO;
+	}
+	
+	public void setRoleDAO(RoleDAO roleDAO) {
+		this.roleDAO = roleDAO;
+	}
+	
+	public void setPrivilegeDAO(PrivilegeDAO privilegeDAO) {
+		this.privilegeDAO = privilegeDAO;
+	}
+	
+	public void setProgramWorkflowDAO(ProgramWorkflowDAO programWorkflowDAO) {
+		this.programWorkflowDAO = programWorkflowDAO;
+	}
+	
+	public void setEncounterPatientStateDAO(EncounterPatientStateDAO encounterPatientStateDAO) {
+		this.encounterPatientStateDAO = encounterPatientStateDAO;
+	}
+	
+	public void setEncounterPatientProgramDAO(EncounterPatientProgramDAO encounterPatientProgramDAO) {
+		this.encounterPatientProgramDAO = encounterPatientProgramDAO;
 	}
 	
 	/**
@@ -156,6 +195,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			throw new ItemNotPayableException("Payment Type has not been specified in the visit");
 		}
 		return dao.getItemPriceByDrugId(drug.getId(), paymentSchemeConcept.getId(), paymentTypeConcept.getId());
+	}
+	
+	@Override
+	public List<ItemPrice> getItemPricesByConceptId(Integer Id) {
+		return dao.getItemPricesByConceptId(Id);
 	}
 	
 	@Override
@@ -260,10 +304,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	        String locationUuid, OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus,
 	        Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
 	        String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
-	        String sampleCategory, String exclude, Boolean includeInactive) {
+	        String sampleCategory, String exclude, Boolean includeInactive, Boolean includeDeadPatients) {
 		return this.dao.getVisitsByOrderType(search, orderTypeUuid, encounterTypeUuid, locationUuid, prescriptionStatus,
 		    fulfillerStatus, limit, startIndex, orderBy, orderByDirection, attributeValueReference, paymentStatus,
-		    visitAttributeTypeUuid, sampleCategory, exclude, includeInactive);
+		    visitAttributeTypeUuid, sampleCategory, exclude, includeInactive, includeDeadPatients);
 	}
 	
 	@Override
@@ -430,6 +474,119 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		OrderStatus savedOrderStatus = Context.getService(StoreService.class).setDrugOrderStatus(
 		    orderStatus.getOrder().getUuid(), orderStatus.getStatus().toString(), orderStatus.getRemarks());
 		return savedOrderStatus;
+	}
+	
+	@Override
+	public void updatePasswordHistory() throws Exception {
+		List<User> users = Context.getUserService().getAllUsers();
+		List<User> usersInPasswordHistory = this.passwordHistoryDAO.getUsersInPasswordHistory();
+		PasswordHistory passwordHistory = new PasswordHistory();
+		Date date = new Date();
+		
+		for (User user : users) {
+			if (!(usersInPasswordHistory.contains(user))) {
+				passwordHistory.setUser(user);
+				passwordHistory.setChangedDate(date);
+				passwordHistory.setPassword("Password encryption");
+				this.passwordHistoryDAO.save(passwordHistory);
+				
+			}
+		}
+	}
+	
+	@Override
+	public PasswordHistory savePasswordHistory(User user, String newPassword) throws Exception {
+		Date date = new Date();
+		PasswordHistory passwordHistory = new PasswordHistory();
+		if (user != null) {
+			passwordHistory.setUser(user);
+		} else {
+			passwordHistory.setUser(Context.getAuthenticatedUser());
+		}
+		if (newPassword != null) {
+			passwordHistory.setPassword(newPassword);
+		}
+		passwordHistory.setChangedDate(date);
+		
+		return passwordHistoryDAO.save(passwordHistory);
+	}
+	
+	@Override
+	public List<PasswordHistory> getUserPasswordHistory(String uuid) {
+		
+		return passwordHistoryDAO.getUsersPasswordHistory(uuid);
+	}
+	
+	@Override
+	public List<Role> getRoles(String q, Integer startIndex, Integer limit) {
+		return roleDAO.getRoles(q, startIndex, limit);
+	}
+	
+	@Override
+	public List<Privilege> getPrivileges(String q, Integer startIndex, Integer limit) {
+		return privilegeDAO.getPrivileges(q, startIndex, limit);
+	}
+	
+	@Override
+	public ProgramWorkflow saveProgramWorkflow(ProgramWorkflow programWorkflow) {
+		return programWorkflowDAO.save(programWorkflow);
+	}
+	
+	@Override
+	public List<PatientProgram> getPatientProgram(String programUuid, String patientUuid, Integer startIndex, Integer limit, Boolean includeDeadPatients)
+	        throws Exception {
+		Program program = null;
+		if (programUuid != null) {
+			program = Context.getProgramWorkflowService().getProgramByUuid(programUuid);
+			if (program == null) {
+				throw new Exception("The program with the given Uuid does not exist");
+			}
+		}
+		
+		Patient patient = null;
+		if (patientUuid != null) {
+			patient = Context.getPatientService().getPatientByUuid(patientUuid);
+			if (patient == null) {
+				throw new Exception("The patient with the given Uuid does not exist");
+			}
+			
+		}
+		// TODO: ADD SUPPORT FOR THE API TO ACCOMODATE THE REMAINING PARAMETERS
+		List<PatientProgram> patientPrograms = Context.getProgramWorkflowService().getPatientPrograms(patient, program, null, null, null, null, false);
+
+		List<PatientProgram> existingPatientPrograms = new ArrayList<>();
+		for(PatientProgram patientProgram : patientPrograms){
+			if(!patientProgram.getPatient().getPerson().getDead()){
+				existingPatientPrograms.add(patientProgram);
+			}
+		}
+		if(includeDeadPatients){
+			return  patientPrograms;
+		}
+		else{
+			return existingPatientPrograms;
+		}
+
+	}
+	
+	@Override
+	public EncounterPatientState saveEncounterPatientState(EncounterPatientState encounterPatientState) {
+		return encounterPatientStateDAO.save(encounterPatientState);
+	}
+	
+	@Override
+	public List<Encounter> getEncountersByPatientState(String patientStateUuid) {
+		return encounterPatientStateDAO.getEncountersByPatientState(patientStateUuid);
+	}
+	
+	@Override
+	public EncounterPatientProgram saveEncounterPatientProgram(EncounterPatientProgram encounterPatientProgram) {
+		return encounterPatientProgramDAO.save(encounterPatientProgram);
+	}
+	
+	@Override
+	public List<Encounter> getEncountersByPatientProgram(String patientProgramUuid) {
+		return encounterPatientProgramDAO.getEncounterByPatientProgram(patientProgramUuid);
 	}
 	
 	@Override
@@ -921,4 +1078,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	//	public String voidOrder(String uuid, String voidReason) {
 	//		return dao.voidOrder(uuid, voidReason);
 	//	}
+	
+	@Override
+	public List<Encounter> getEncountersByEncounterType(String search, String encounterTypeUuid, Integer limit,
+	        Integer startIndex) {
+		return this.dao.getEncountersByEncounterType(search, encounterTypeUuid, limit, startIndex);
+	}
 }

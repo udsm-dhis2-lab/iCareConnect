@@ -59,6 +59,7 @@ export interface SampleAllocationObject {
   isSetMember?: boolean;
   instrument?: any;
   relatedTo?: any;
+  savedOnce?: boolean;
 }
 
 export class SampleAllocation {
@@ -161,6 +162,7 @@ export class SampleAllocation {
                   ...result?.creator,
                   display: result?.creator?.display?.split(" (")[0],
                 },
+                savedOnce: this.allocation?.results?.length === 1,
                 parameter: this.allocation?.parameter,
                 value: result?.valueBoolean
                   ? result?.valueBoolean
@@ -203,9 +205,7 @@ export class SampleAllocation {
             ) || [],
           authorizationStatuses: (
             this.allocation?.statuses?.filter(
-              (status) =>
-                status?.category === "RESULT_AUTHORIZATION" &&
-                status?.result?.uuid === finalResult?.uuid
+              (status) => status?.category === "RESULT_AUTHORIZATION"
             ) || []
           )?.map((authStatus) => {
             return {
@@ -226,10 +226,7 @@ export class SampleAllocation {
                   this.allocation?.statuses?.filter(
                     (status) =>
                       status?.category === "RESULT_AUTHORIZATION" &&
-                      status?.status == "AUTHORIZED" &&
-                      status?.result?.uuid ===
-                        orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
-                          ?.uuid
+                      status?.status == "AUTHORIZED"
                   ) || []
                 )?.length;
               return {
@@ -241,11 +238,7 @@ export class SampleAllocation {
                 ),
                 authorizationStatuses: (
                   this.allocation?.statuses?.filter(
-                    (status) =>
-                      status?.category === "RESULT_AUTHORIZATION" &&
-                      status?.result?.uuid ===
-                        orderBy(finalResult[key], ["dateCreated"], ["desc"])[0]
-                          ?.uuid
+                    (status) => status?.category === "RESULT_AUTHORIZATION"
                   ) || []
                 )?.map((authStatus) => {
                   return {
@@ -268,9 +261,7 @@ export class SampleAllocation {
             ) || [],
           authorizationStatuses: (
             this.allocation?.statuses?.filter(
-              (status) =>
-                status?.category === "RESULT_AUTHORIZATION" &&
-                status?.result?.uuid === finalResult?.uuid
+              (status) => status?.category === "RESULT_AUTHORIZATION"
             ) || []
           )?.map((authStatus) => {
             return {
@@ -293,9 +284,7 @@ export class SampleAllocation {
             ) || [],
           authorizationStatuses: (
             this.allocation?.statuses?.filter(
-              (status) =>
-                status?.category === "RESULT_AUTHORIZATION" &&
-                status?.result?.uuid === finalResult?.uuid
+              (status) => status?.category === "RESULT_AUTHORIZATION"
             ) || []
           )?.map((authStatus) => {
             return {
@@ -310,6 +299,10 @@ export class SampleAllocation {
             formattedFinalResultPart?.authorizationStatuses?.length > 0,
         }
       : null;
+  }
+
+  get savedOnce(): any {
+    return this.results?.length === 1 ? true : false;
   }
 
   get authorizationStatuses(): any[] {
@@ -369,6 +362,7 @@ export class SampleAllocation {
       instrument: this.instrument,
       testRelationshipConceptSourceUuid: this.testRelationshipConceptSourceUuid,
       relatedTo: this.parameter?.relatedTo,
+      savedOnce: this.savedOnce,
     };
   }
 }

@@ -35,6 +35,8 @@ public class ICareConfig {
 	
 	public static final String BED_ORDER_TYPE = "icare.orderType.bed";
 	
+	public static final String CABINET_ORDER_TYPE = "icare.orderType.cabinet";
+	
 	public final static String REGISTRATION_FEE_CONCEPT = "icare.registration.feeConcept";
 	
 	public final static String INSURANCE_ATTRIBUTE = "icare.billing.insuranceAttribute";
@@ -93,6 +95,8 @@ public class ICareConfig {
 	
 	public static final String BED_ORDER_CONCEPT = "icare.billing.accomodationChargesConcept";
 	
+	public static final String CABINET_ORDER_CONCEPT = "icare.billing.cabinetChargesConcept";
+	
 	public static final String LAB_RESULT_APPROVAL_CONFIGURATION = "iCare.laboratory.resultApprovalConfiguration";
 	
 	public static final String ITEM_EXPIRATION_NOTIFICATION_IN_DAYS = "iCare.store.item.expiration.nofication";
@@ -120,4 +124,6 @@ public class ICareConfig {
 	public static final String DRUG_FREQUENCY_EQUIVALENCE_CONCEPT_SOURCE = "icare.drugs.configuration.drugFrequencyEquivalence.conceptSourceUuid";
 	
 	public static final String DRUG_DURATION_UNITS_EQUIVALENCE_CONCEPT_SOURCE = "icare.drugs.configuration.drugDurationEquivalence.conceptSourceUuid";
+	
+	public static final String PASSWORD_EXPIRATION_TIME_IN_DAYS = "icare.user.password.expiration.time";
 }

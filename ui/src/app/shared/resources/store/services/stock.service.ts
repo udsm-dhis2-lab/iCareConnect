@@ -28,43 +28,43 @@ export class StockService {
   getAvailableStocks(
     locationUuid?: string,
     params?: { q?: string; limit?: number; startIndex?: number },
-    page?: number, pageSize?: number
+    page?: number,
+    pageSize?: number
   ): Observable<any | StockObject[]> {
     let queryParams = [];
 
-      if(page && !params?.q) {
-        queryParams = [...queryParams, `page=${page}`]
-      }
-      if(pageSize) {
-        queryParams = [...queryParams, `pageSize=${pageSize}`]
-      }
-      if(locationUuid) {
-        queryParams = [...queryParams, `locationUuid=${locationUuid}`]
-      }
-      if(params?.q) {
-        queryParams = [...queryParams, `q=${params?.q}`]
-      }
-      if(params?.q) {
-        queryParams = [...queryParams, `page=1`]
-      }
-    const args = `?${queryParams.join("&")}` ;
+    if (page && !params?.q) {
+      queryParams = [...queryParams, `page=${page}`];
+    }
+    if (pageSize) {
+      queryParams = [...queryParams, `pageSize=${pageSize}`];
+    }
+    if (locationUuid) {
+      queryParams = [...queryParams, `locationUuid=${locationUuid}`];
+    }
+    if (params?.q) {
+      queryParams = [...queryParams, `q=${params?.q}`];
+    }
+    if (params?.q) {
+      queryParams = [...queryParams, `page=1`];
+    }
+    const args = `?${queryParams.join("&")}`;
 
-    return this.httpClient
-      .get(
-        `store/stock${args}`
-      )?.pipe(map((response) => {
+    return this.httpClient.get(`store/stock${args}`)?.pipe(
+      map((response) => {
         const stockBatches: StockBatch[] = (response?.results || []).map(
           (stockItem) => new StockBatch(stockItem)
-        )
+        );
         const groupedStockBatches =
           StockBatch.getGroupedStockBatches(stockBatches);
         return {
           ...response,
           results: Object.keys(groupedStockBatches).map((stockItemKey) => {
             return new Stock(groupedStockBatches[stockItemKey]).toJson();
-          })
-        }
-      }));
+          }),
+        };
+      })
+    );
     // return this._getStocks("store/stock", locationUuid, params);
   }
 
@@ -116,13 +116,18 @@ export class StockService {
       .get(`store/pendingrequisition?item=${itemUuid}&location=${locationUuid}`)
       .pipe(
         map((response) => {
-          return response
+          return response;
         }),
         catchError((e) => of(e))
       );
   }
 
-  getStockOuts(locationUuid?: string, page?: number, pageSize?: number): Observable<any> {
+  getStockOuts(
+    locationUuid?: string,
+    params?: { q?: string },
+    page?: number,
+    pageSize?: number
+  ): Observable<any> {
     // const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
     // const pageSizeNumber =
     //   locationUuid && pageSize && page
@@ -137,26 +142,26 @@ export class StockService {
 
     let queryParams = [];
 
-      if(page) {
-        queryParams = [...queryParams, `page=${page}`]
-      }
-      if(pageSize) {
-        queryParams = [...queryParams, `pageSize=${pageSize}`]
-      }
-      if(locationUuid) {
-        queryParams = [...queryParams, `location=${locationUuid}`]
-      }
-      
-    const args = `?${queryParams.join("&")}` ;
+    if (page) {
+      queryParams = [...queryParams, `page=${page}`];
+    }
+    if (pageSize) {
+      queryParams = [...queryParams, `pageSize=${pageSize}`];
+    }
+    if (locationUuid) {
+      queryParams = [...queryParams, `location=${locationUuid}`];
+    }
+    if (params?.q) {
+      queryParams = [...queryParams, `q=${params?.q}`];
+    }
 
+    const args = `?${queryParams.join("&")}`;
 
-    return this.httpClient
-      .get(
-        `store/stockout${args}`
-      )?.pipe(map((response) => {
+    return this.httpClient.get(`store/stockout${args}`)?.pipe(
+      map((response) => {
         const stockBatches: StockBatch[] = (response?.results || []).map(
           (stockItem) => new StockBatch(stockItem)
-        )
+        );
         const groupedStockBatches =
           StockBatch.getGroupedStockBatches(stockBatches);
 
@@ -164,19 +169,25 @@ export class StockService {
           ...response,
           results: Object.keys(groupedStockBatches).map((stockItemKey) => {
             return new Stock(groupedStockBatches[stockItemKey]).toJson();
-          })
-        }
-      }))
+          }),
+        };
+      })
+    );
     return this._getStocks("store/stockout", locationUuid, null, true);
   }
-  getExpiredItems(locationUuid?: string, page?: number, pageSize?: number): Observable<any> {
+  getExpiredItems(
+    locationUuid?: string,
+    params?: { q?: string },
+    page?: number,
+    pageSize?: number
+  ): Observable<any> {
     // const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
     // const pageSizeNumber =
     //   locationUuid && pageSize && page
     //     ? `&pageSize=${pageSize}`
-    //     : pageSize && page 
+    //     : pageSize && page
     //     ? `&pageSize=${pageSize}`
-    //     : pageSize 
+    //     : pageSize
     //     ? `pageSize=${pageSize}` : ``;
     // const location =
     //   locationUuid ? `location=${locationUuid}` : '';
@@ -184,26 +195,26 @@ export class StockService {
 
     let queryParams = [];
 
-      if(page) {
-        queryParams = [...queryParams, `page=${page}`]
-      }
-      if(pageSize) {
-        queryParams = [...queryParams, `pageSize=${pageSize}`]
-      }
-      if(locationUuid) {
-        queryParams = [...queryParams, `location=${locationUuid}`]
-      }
-      
-    const args = `?${queryParams.join("&")}` ;
+    if (page) {
+      queryParams = [...queryParams, `page=${page}`];
+    }
+    if (pageSize) {
+      queryParams = [...queryParams, `pageSize=${pageSize}`];
+    }
+    if (locationUuid) {
+      queryParams = [...queryParams, `location=${locationUuid}`];
+    }
+    if (params?.q) {
+      queryParams = [...queryParams, `q=${params?.q}`];
+    }
 
+    const args = `?${queryParams.join("&")}`;
 
-    return this.httpClient
-      .get(
-        `store/expireditems${args}`
-      )?.pipe(map((response) => {
+    return this.httpClient.get(`store/expireditems${args}`)?.pipe(
+      map((response) => {
         const stockBatches: StockBatch[] = (response?.results || []).map(
           (stockItem) => new StockBatch(stockItem)
-        )
+        );
         const groupedStockBatches =
           StockBatch.getGroupedStockBatches(stockBatches);
 
@@ -211,19 +222,25 @@ export class StockService {
           ...response,
           results: Object.keys(groupedStockBatches).map((stockItemKey) => {
             return new Stock(groupedStockBatches[stockItemKey]).toJson();
-          })
-        }
-      }))
+          }),
+        };
+      })
+    );
   }
 
-  getNearlyStockedOutItems(locationUuid?: string, page?: number, pageSize?: number): Observable<any> {
+  getNearlyStockedOutItems(
+    locationUuid?: string,
+    params?: { q?: string },
+    page?: number,
+    pageSize?: number
+  ): Observable<any> {
     // const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
     // const pageSizeNumber =
     //   locationUuid && pageSize && page
     //     ? `&pageSize=${pageSize}`
-    //     : pageSize && page 
+    //     : pageSize && page
     //     ? `&pageSize=${pageSize}`
-    //     : pageSize 
+    //     : pageSize
     //     ? `pageSize=${pageSize}` : ``;
     // const location =
     //   locationUuid ? `location=${locationUuid}` : '';
@@ -231,26 +248,26 @@ export class StockService {
 
     let queryParams = [];
 
-      if(page) {
-        queryParams = [...queryParams, `page=${page}`]
-      }
-      if(pageSize) {
-        queryParams = [...queryParams, `pageSize=${pageSize}`]
-      }
-      if(locationUuid) {
-        queryParams = [...queryParams, `location=${locationUuid}`]
-      }
-      
-    const args = `?${queryParams.join("&")}` ;
+    if (page) {
+      queryParams = [...queryParams, `page=${page}`];
+    }
+    if (pageSize) {
+      queryParams = [...queryParams, `pageSize=${pageSize}`];
+    }
+    if (locationUuid) {
+      queryParams = [...queryParams, `location=${locationUuid}`];
+    }
+    if (params?.q) {
+      queryParams = [...queryParams, `q=${params?.q}`];
+    }
 
+    const args = `?${queryParams.join("&")}`;
 
-    return this.httpClient
-      .get(
-        `store/nearlystockoutitems${args}`
-      )?.pipe(map((response) => {
+    return this.httpClient.get(`store/nearlystockoutitems${args}`)?.pipe(
+      map((response) => {
         const stockBatches: StockBatch[] = (response?.results || []).map(
           (stockItem) => new StockBatch(stockItem)
-        )
+        );
         const groupedStockBatches =
           StockBatch.getGroupedStockBatches(stockBatches);
 
@@ -258,19 +275,25 @@ export class StockService {
           ...response,
           results: Object.keys(groupedStockBatches).map((stockItemKey) => {
             return new Stock(groupedStockBatches[stockItemKey]).toJson();
-          })
-        }
-      }))
+          }),
+        };
+      })
+    );
   }
-  
-  getNearlyExpiredItems(locationUuid?: string, page?: number, pageSize?: number): Observable<any> {
+
+  getNearlyExpiredItems(
+    locationUuid?: string,
+    params?: { q?: string },
+    page?: number,
+    pageSize?: number
+  ): Observable<any> {
     // const pageNumber = locationUuid && page ? `&page=${page}` : page ? `page=${page}` : ``;
     // const pageSizeNumber =
     //   locationUuid && pageSize && page
     //     ? `&pageSize=${pageSize}`
-    //     : pageSize && page 
+    //     : pageSize && page
     //     ? `&pageSize=${pageSize}`
-    //     : pageSize 
+    //     : pageSize
     //     ? `pageSize=${pageSize}` : ``;
     // const location =
     //   locationUuid ? `location=${locationUuid}` : '';
@@ -278,26 +301,26 @@ export class StockService {
 
     let queryParams = [];
 
-      if(page) {
-        queryParams = [...queryParams, `page=${page}`]
-      }
-      if(pageSize) {
-        queryParams = [...queryParams, `pageSize=${pageSize}`]
-      }
-      if(locationUuid) {
-        queryParams = [...queryParams, `location=${locationUuid}`]
-      }
-      
-    const args = `?${queryParams.join("&")}` ;
+    if (page) {
+      queryParams = [...queryParams, `page=${page}`];
+    }
+    if (pageSize) {
+      queryParams = [...queryParams, `pageSize=${pageSize}`];
+    }
+    if (locationUuid) {
+      queryParams = [...queryParams, `location=${locationUuid}`];
+    }
+    if (params?.q) {
+      queryParams = [...queryParams, `q=${params?.q}`];
+    }
 
+    const args = `?${queryParams.join("&")}`;
 
-    return this.httpClient
-      .get(
-        `store/nearlyexpireditems${args}`
-      )?.pipe(map((response) => {
+    return this.httpClient.get(`store/nearlyexpireditems${args}`)?.pipe(
+      map((response) => {
         const stockBatches: StockBatch[] = (response?.results || []).map(
           (stockItem) => new StockBatch(stockItem)
-        )
+        );
         const groupedStockBatches =
           StockBatch.getGroupedStockBatches(stockBatches);
 
@@ -305,9 +328,10 @@ export class StockService {
           ...response,
           results: Object.keys(groupedStockBatches).map((stockItemKey) => {
             return new Stock(groupedStockBatches[stockItemKey]).toJson();
-          })
-        }
-      }))
+          }),
+        };
+      })
+    );
   }
 
   saveStockLedger(ledgerInput: LedgerInput): Observable<any> {

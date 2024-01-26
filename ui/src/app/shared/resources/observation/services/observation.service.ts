@@ -53,12 +53,15 @@ export class ObservationService {
           )
       : this.httpClient.post(`encounter`, data).pipe(
           map((response) => response),
-          catchError((error) => error)
+          catchError((error) => of(error))
         );
   }
 
   saveEncounterWithObsDetails(data): Observable<any> {
-    return this.httpClient.post("encounter", omit(data, "fileObs"));
+    return this.httpClient.post("encounter", omit(data, "fileObs")).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
   }
 
   saveObsDetailsForFiles(data): Observable<any> {

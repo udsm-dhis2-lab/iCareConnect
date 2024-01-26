@@ -23,6 +23,37 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
+                <property name="passwordHistoryDAO">
+                    <bean class="org.openmrs.module.icare.core.dao.PasswordHistoryDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+                <property name="roleDAO">
+                    <bean class="org.openmrs.module.icare.core.dao.RoleDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="privilegeDAO">
+                    <bean class="org.openmrs.module.icare.core.dao.PrivilegeDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+                <property name="programWorkflowDAO">
+                    <bean class="org.openmrs.module.icare.core.dao.ProgramWorkflowDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+                <property name="encounterPatientStateDAO">
+                    <bean class="org.openmrs.module.icare.core.dao.EncounterPatientStateDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+                <property name="encounterPatientProgramDAO">
+                    <bean class="org.openmrs.module.icare.core.dao.EncounterPatientProgramDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
             </bean>
         </property>
         <property name="preInterceptors">
@@ -336,6 +367,18 @@
 
                 <property name="supplierDAO">
                     <bean class="org.openmrs.module.icare.store.dao.SupplierDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="encounterPatientStateDAO">
+                    <bean class="org.openmrs.module.icare.store.dao.EncounterPatientStateDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="encounterPatientProgramDAO">
+                    <bean class="org.openmrs.module.icare.store.dao.EncounterPatientProgramDAO">
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>

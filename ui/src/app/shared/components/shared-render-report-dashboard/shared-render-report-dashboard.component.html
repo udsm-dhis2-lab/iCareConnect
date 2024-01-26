@@ -11,7 +11,7 @@
   ></mat-progress-bar>
   <div class="w-100" *ngIf="params?.report">
     <div class="w-100 d-flex justify-content-between">
-      <div class="w-50 justify-content-left">
+      <div class="w-50 justify-content-left dont-print">
         <button
           mat-flat-button
           matTooltip="Go to list"
@@ -52,7 +52,7 @@
         </mat-form-field>
       </div>
     </div>
-    <div class="w-100 d-flex justify-content-end mt-1 mb-2">
+    <div class="w-100 d-flex justify-content-end mt-1 mb-2 dont-print">
       <!-- <button
           (click)="onDownloadCSV($event)"
           mat-stroked-button
@@ -102,13 +102,16 @@
       <div class="row">
         <div class="col-12">
           <div class="w-100 text-center">
+            <h4 style="text-align: center">
+              <b>
+                {{ params?.facilityDetails?.display }}
+              </b>
+            </h4>
             <img [src]="params?.facilityDetails?.logo" height="90" />
           </div>
           <h4 style="text-align: center">
             <b>
-              {{ params?.facilityDetails?.display }}
-              <br />
-              <span> {{ params?.facilityDetails?.description }}<br /> </span>
+              <span> {{ params?.facilityDetails?.description }} </span><br />
               <small>
                 <span
                   *ngIf="
@@ -116,9 +119,12 @@
                     params?.facilityDetails?.postalCode
                   "
                 >
-                  P.O BOX: {{ params?.facilityDetails?.postalCode }}
+                  P.O BOX {{ params?.facilityDetails?.postalCode }}
                 </span></small
               ><br />
+              <span>{{ params?.FacilityDetails?.stateProvince }}</span
+              ><br />
+              <span> {{ params?.FacilityDetails?.country }} </span>
             </b>
           </h4>
         </div>

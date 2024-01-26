@@ -80,3 +80,15 @@ ng-deep .disabled-form-selection-option,
   max-width: 50px;
   min-width: 50px;
 }
+
+::ng-deep .mat-form-field-wrapper {
+  padding-bottom: 0 !important;
+}
+
+::ng-deep .mat-form-field-infix {
+  display: block;
+  position: relative;
+  flex: auto;
+  min-width: 80px !important;
+  width: auto !important;
+}

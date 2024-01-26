@@ -426,6 +426,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			throw new Exception("Concept with id '" + result.getConcept().getUuid() + "' does not exist");
 		}
 		
+		if (result.getTestedBy() != null) {
+			User testedBy = Context.getUserService().getUserByUuid(result.getTestedBy().getUuid());
+			result.setTestedBy(testedBy);
+		}
+		
 		result.setConcept(concept);
 		
 		TestAllocation testAllocation = this.testAllocationDAO.findByUuid(result.getTestAllocation().getUuid());
@@ -507,6 +512,59 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		for (Result result: results) {
 
 			Result response = this.recordTestAllocationResults(result);
+            /*
+			End of save status via results
+			* */
+//			TODO: Add support to accommodate new status on the allocation response
+			resultResponses.add(response.toMap());
+		}
+		return  resultResponses;
+	}
+	
+	@Override
+	public Result deleteTestAllocationResults(Result result) throws Exception {
+		return null;
+	}
+	
+	@Override
+	public Result updateTestAllocationResults(Result result) throws Exception {
+		Result response = this.resultDAO.update(result);
+		return response;
+	}
+	
+	@Override
+	public Result voidTestAllocationResults(Result result) throws Exception {
+		Result response = this.resultDAO.update(result);
+		return response;
+	}
+	
+	public List<Map<String, Object>> voidMultipleResults(Map<String, Object> resultsToVoid) throws Exception {
+		List<Map<String, Object>> resultResponses = new ArrayList<>();
+		for (Map<String, Object> result: (List<Map<String, Object>>) resultsToVoid.get("results")) {
+			Result resultData = resultDAO.findByUuid(result.get("uuid").toString());
+			resultData.setVoidReason(resultsToVoid.get("voidReason").toString());
+			resultData.setVoided((Boolean) resultsToVoid.get("voided"));
+			Result response = this.voidTestAllocationResults(resultData);
+			// retire corresponding sample status for results
+			String sampleUuid = resultsToVoid.get("sample").toString();
+			Sample sample = sampleDAO.findByUuid(sampleUuid);
+			for (SampleStatus sampleStatus: sample.getSampleStatuses()) {
+				if (sampleStatus.getCategory().equals("HAS_RESULTS")) {
+					sampleStatus.setRetired(true);
+					SampleStatus statusUpdateResponse = sampleStatusDAO.update(sampleStatus);
+
+					SampleStatus newSampleStatus = new SampleStatus();
+					newSampleStatus.setSample(sample);
+					newSampleStatus.setCategory("RESULTS_DELETED");
+					newSampleStatus.setStatus("DELETED RESULTS");
+					newSampleStatus.setRemarks("Auto saved status");
+					User user = Context.getAuthenticatedUser();
+					newSampleStatus.setUser(user);
+					Date date = new Date();
+					newSampleStatus.setTimestamp(date);
+					SampleStatus newStatusResponse = sampleStatusDAO.save(newSampleStatus);
+				}
+			}
             /*
 			End of save status via results
 			* */
@@ -959,8 +1017,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
-	public List<TestTimeConfig> getTestTimeConfigs() {
-		return IteratorUtils.toList(this.testTimeConfigDAO.findAll().iterator());
+	public List<TestTimeConfig> getTestTimeConfigs(String q) {
+		//return IteratorUtils.toList(this.testTimeConfigDAO.findAll().iterator());
+		return this.testTimeConfigDAO.getConfig(q);
 	}
 	
 	@Override
@@ -1034,7 +1093,6 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		testOrderLocation.setLocation(location);
 		testOrderLocation.setUser(user);
 		testOrderLocation.setDateTime(date);
-		System.out.println(testOrderLocation.toMap());
 		
 		testOrderLocationDAO.save(testOrderLocation);
 		
@@ -1092,7 +1150,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			for (Sample sample : batchSample.getSamples()) {
 				List<WorksheetSample> worksheetSamples = this.worksheetSampleDAO
 				        .getWorksheetSampleBySample(sample.getUuid());
-				if (worksheetSamples.get(0) != null) {
+				if (worksheetSamples.size() > 0) {
 					sample.setWorksheetSample(worksheetSamples.get(0));
 				}
 			}
@@ -1195,6 +1253,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public AssociatedField updateAssociatedField(String associatedFieldUuid, AssociatedField associatedField) {
 		return associatedFieldDAO.updateAssociatedField(associatedFieldUuid, associatedField);
+	}
+	
+	@Override
+	public TestTimeConfig deleteTestTimeConfiguration(String testConfigUuid) {
+		return testTimeConfigDAO.deleteTestConfig(testConfigUuid);
 	}
 	
 	public BatchSet addBatchSet(BatchSet batchSet) {

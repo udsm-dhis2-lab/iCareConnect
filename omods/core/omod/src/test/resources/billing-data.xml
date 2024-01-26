@@ -263,15 +263,18 @@
     <!-- Encounters -->
     <encounter_type encounter_type_id="2" name="Admission"  creator="1"
                     retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfer"/>
+    <encounter_type encounter_type_id="21" name="External pharmacy encounter"  creator="1"
+                    retired="false" date_created="2024-01-10 00:00:00" uuid="787655eb-5345-11e8-9c7c-40b034c3cfer"/>
 
     <encounter encounter_id="100" patient_id="1000" uuid="444395c-dd07-488d-8fd7-a748c9570000" visit_id="10" encounter_datetime="2020-10-14 00:00:00" date_created="2020-10-14 00:00:00" voided="false"/>
 
     <encounter encounter_id="101" patient_id="2000" uuid="444395c-dd07-488d-8fd7-a748c9570022" visit_id="10" encounter_datetime="2020-10-14 00:00:00" date_created="2020-10-14 00:00:00" voided="false"/>
 
-    <encounter encounter_id="200" patient_id="2000" uuid="444395c-dd07-488d-8fd7-a748c9570001" visit_id="20" encounter_datetime="2020-10-15 00:00:00" date_created="2020-10-15 00:00:00" voided="false"/>
+    <encounter encounter_id="200"  patient_id="2000" uuid="444395c-dd07-488d-8fd7-a748c9570001" visit_id="20" encounter_datetime="2020-10-15 00:00:00" date_created="2020-10-15 00:00:00" voided="false"/>
 
     <encounter encounter_id="300" patient_id="2000" encounter_type="2" uuid="444395c-dd07-488d-8fd7-a748c9570003" visit_id="20" encounter_datetime="2020-10-15 00:00:00" date_created="2020-10-15 00:00:00" voided="false"/>
 
+    <encounter encounter_id="400" patient_id="2000" encounter_type="21" uuid="114395c-dd07-488d-8fd7-a748c9570003" visit_id="20" encounter_datetime="2020-10-15 00:00:00" date_created="2020-10-15 00:00:00" voided="false"/>
 
     <encounter_type encounter_type_id="1" name="Registration"  creator="1"
                     retired="false" date_created="2020-12-27 00:00:00" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfee"/>
@@ -328,4 +331,22 @@
 
     <audit_log audit_log_id="1" type="org.openmrs.module.icare.laboratory.models.Sample" action="CREATED" date_created="2023-04-18 09:51:57.0" user_id="400" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c631" />
     <audit_log audit_log_id="2" type="org.openmrs.module.icare.laboratory.models.Sample" action="UPDATED" date_created="2023-04-18 09:51:57.0" user_id="300" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c630"/>
+
+    <password_history password_history_id="1" user_id="400" password="iCARE110-TEST-OSDH-9beb-d30dcfc0ceee" change_date="2023-04-18 09:51:57.0" />
+
+    <role role="Role 1" description="This is role 1" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c999"/>
+    <role role="Role 2" description="This is role 2" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c991"/>
+
+    <privilege privilege="priv 1" description="This is priv 1" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c999"/>
+    <privilege privilege="priv 2" description="This is prv 2" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c991"/>
+
+    <program program_id="1" concept_id="1006" outcomes_concept_id="1006" name="Antenatal" retired="0" description="Antenatal" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c992" creator="1" date_created="2023-04-18 09:51:57.0" />
+
+    <program_workflow program_workflow_id="1" program_id="1" concept_id="1006" retired="0" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c992" creator="1" date_created="2023-04-18 09:51:57.0" />
+
+    <program_workflow_state program_workflow_state_id="1" concept_id="1006" initial="0" terminal="0"  retired="0" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c992" creator="1" date_created="2023-04-18 09:51:57.0" />
+
+    <patient_state patient_state_id="1" patient_program_id="1" state="1" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c992" start_date="2023-04-18 09:51:57.0" creator="1" date_created="2023-04-18 09:51:57.0" />
+
+    <encounter_patient_state encounter_patient_state_id="1" encounter_id="300" patient_state_id="1"  voided="0"  uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c992" creator="1" date_created="2023-04-18 09:51:57.0" />
 </dataset>

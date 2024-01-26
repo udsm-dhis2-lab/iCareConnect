@@ -2,7 +2,6 @@ package org.openmrs.module.icare.web.controller;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -12,26 +11,15 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.laboratory.dao.TestOrderLocationDAO;
-import org.openmrs.module.icare.laboratory.models.Sample;
-import org.openmrs.module.icare.laboratory.models.TestOrderLocation;
-import org.openmrs.module.icare.laboratory.models.WorkloadSummary;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
-import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import java.io.IOException;
-import java.security.spec.ECField;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -579,7 +567,20 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		List<Map<String, Object>> resultsObject = (new ObjectMapper()).readValue(handle.getContentAsString(),
 		    ArrayList.class);
-		System.out.println(resultsObject);
+	}
+	
+	@Test
+	public void testVoidMultipleResults() throws Exception {
+		//Given
+		String dto = this.readFile("dto/results-void.json");
+		
+		Map<String, Object> resultsToVoid = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest newPutRequest = newPutRequest("lab/voidmultipleresults", resultsToVoid);
+		MockHttpServletResponse updateHandle = handle(newPutRequest);
+		
+		List<Map<String, Object>> updateResponse = (new ObjectMapper()).readValue(updateHandle.getContentAsString(),
+		    ArrayList.class);
+		assertThat("Count of voided results", updateResponse.size(), is(1));
 	}
 	
 	@Test

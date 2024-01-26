@@ -16,7 +16,9 @@ import { FilterItemsBySelectionsPipe } from "./pipes/filter-items-by-selections.
 import { HttpClientModule } from "@angular/common/http";
 import { SearchTestDetailsPipe } from "./pipes/search-test-details.pipe";
 import { FormatLabelCharCountDisplayPipe } from "./pipes/format-label-char-count-display.pipe";
-import { SearchItemPipe } from "./pipes/search-item.pipe";
+import { sharedStoreModals } from "./store-modals";
+import { sharedStorePages } from "./store-pages";
+import { sharedStoreComponents } from "./store-components";
 @NgModule({
   imports: [CommonModule, ...materialModules, ...modules],
   exports: [
@@ -25,13 +27,23 @@ import { SearchItemPipe } from "./pipes/search-item.pipe";
     ...materialModules,
     ...modules,
     ...components,
+    ...sharedStorePages,
+    ...sharedStoreComponents,
+    ...sharedStoreModals,
     ...sharedPipes,
     ...sharedDialogs,
     HttpClientModule,
   ],
-  entryComponents: [...sharedEntryComponents, ...sharedDialogs],
+  entryComponents: [
+    ...sharedEntryComponents,
+    ...sharedDialogs,
+    ...sharedStoreModals,
+  ],
   declarations: [
     ...components,
+    ...sharedStorePages,
+    ...sharedStoreComponents,
+    ...sharedStoreModals,
     ...sharedDialogs,
     ...sharedPipes,
     FilterFormsByServiceProvidedPipe,

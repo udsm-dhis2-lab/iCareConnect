@@ -54,6 +54,15 @@ export class VisitsService {
             ...encounter?.obs.map((observation) => {
               return {
                 ...observation,
+                value: !observation?.value?.uuid
+                  ? observation?.value
+                  : {
+                      ...observation?.value,
+                      display:
+                        observation?.value?.display?.indexOf(":") > -1
+                          ? observation?.value?.display.split(":")[1]
+                          : observation?.value?.display,
+                    },
                 encounterProvider: {
                   ...encounterProvider?.provider,
                   name:
@@ -229,13 +238,16 @@ export class VisitsService {
         })
       );
   }
-  getAdmittedPatientsVisitsByEncounterType(
+  getPatientsVisitsByEncounterType(
     encounterTypeUuid: string
   ): Observable<any[]> {
     return this.httpClient
-      .get(`icare/visit?encounterTypeUuid=${encounterTypeUuid}`)
+      .get(
+        `icare/visit?encounterTypeUuid=${encounterTypeUuid}&includeDeadPatients=true`
+      )
       .pipe(
         map((visitResults: any) => {
+          console;
           return visitResults?.results.map((result) => {
             return {
               ...result,
@@ -294,7 +306,8 @@ export class VisitsService {
     filterBy?: string,
     encounterType?: string,
     sampleCategory?: string,
-    excludedSampleCategories?: string[]
+    excludedSampleCategories?: string[],
+    includeDeadPatients?: boolean
   ): Observable<any> {
     const locationUuids: any = isArray(location)
       ? location
@@ -336,6 +349,9 @@ export class VisitsService {
 
     if (excludedSampleCategories && excludedSampleCategories?.length > 0) {
       parametersString += `&exclude=${excludedSampleCategories.join(",")}`;
+    }
+    if (includeDeadPatients && includeDeadPatients === true) {
+      parametersString += `&includeDeadPatients=true`;
     }
     //
     return (

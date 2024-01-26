@@ -9,31 +9,34 @@ import { SampleAllocation } from "src/app/shared/resources/sample-allocations/mo
 export class SharedSampleResultEntryAndAuthorizationComponent
   implements OnInit
 {
-  @Input() ordersWithResults: any;
+  @Input() orderWithResults: any;
   instrument: any;
+  ordersWithResults: any[] = [];
   constructor() {}
 
   ngOnInit(): void {
-    this.ordersWithResults = this.ordersWithResults?.map((orderWithResult) => {
-      return {
-        ...orderWithResult,
-        testAllocations: (
-          orderWithResult?.testAllocations?.filter(
-            (testAllocation) => testAllocation?.results?.length > 0
-          ) || []
-        )?.map((testAllocation) => {
-          const formattedAllocation = new SampleAllocation(
-            testAllocation
-          ).toJson();
-          // console.log(formattedAllocation);
-          if (formattedAllocation?.instrument) {
-            this.instrument = formattedAllocation?.instrument;
-            // console.log(this.instrument);
-          }
-          return formattedAllocation;
-        }),
-      };
-    });
+    this.ordersWithResults = [this.orderWithResults]?.map(
+      (orderWithResult: any) => {
+        return {
+          ...orderWithResult,
+          testAllocations: (
+            orderWithResult?.testAllocations?.filter(
+              (testAllocation) => testAllocation?.results?.length > 0
+            ) || []
+          )?.map((testAllocation) => {
+            const formattedAllocation = new SampleAllocation(
+              testAllocation
+            ).toJson();
+            // console.log(formattedAllocation);
+            if (formattedAllocation?.instrument) {
+              this.instrument = formattedAllocation?.instrument;
+              // console.log(this.instrument);
+            }
+            return formattedAllocation;
+          }),
+        };
+      }
+    );
 
     // console.log("orderWithResults", this.ordersWithResults);
   }

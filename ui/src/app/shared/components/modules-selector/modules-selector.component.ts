@@ -42,7 +42,6 @@ export class ModulesSelectorComponent implements OnInit {
               )?.length > 0
           ) || [])[0]
         : null;
-
     const storedLocation =
       localStorage.getItem("currentLocation") == "undefined" ||
       !localStorage.getItem("currentLocation")
@@ -203,6 +202,9 @@ export class ModulesSelectorComponent implements OnInit {
                 (this.currentModule?.app?.path === "/laboratory" &&
                 this.lisConfigurations?.isLIS
                   ? "/dashboard-lab"
+                  : this.currentModule?.app?.path === "/pharmacy" &&
+                    this.lisConfigurations?.isPharmacy
+                  ? "/home"
                   : "") +
                 (this.currentModule?.app?.considerLocationRoute
                   ? "/" + this.currentLocation?.uuid

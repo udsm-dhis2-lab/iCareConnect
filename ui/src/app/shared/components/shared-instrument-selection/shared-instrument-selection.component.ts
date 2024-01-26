@@ -26,7 +26,7 @@ export class SharedInstrumentSelectionComponent implements OnInit {
     this.instrumentFormField = new Dropdown({
       id: "instrument",
       key: "instrument",
-      label: "Instrument used",
+      label: "Instrument/method used",
       value: this.instrument?.uuid,
       options: [],
       conceptClass: "LIS instrument",

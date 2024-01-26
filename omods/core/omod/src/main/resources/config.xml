@@ -27,6 +27,10 @@
 		<point>org.openmrs.api.OrderService</point>
 		<class>org.openmrs.module.icare.billing.aop.OrderBillAdvisor</class>
 	</advice>
+	<advice>
+		<point>org.openmrs.api.UserService</point>
+		<class>org.openmrs.module.icare.core.aop.PasswordChangeAdvisor</class>
+	</advice>
 	<globalProperty>
 		<property>icare.billing.serviceAttribute</property>
 		<defaultValue>SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE</defaultValue>

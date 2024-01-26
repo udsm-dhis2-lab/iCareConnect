@@ -65,7 +65,20 @@ export class FormService {
     filteringItems?,
     field?
   ): Observable<any[]> {
-    if (parameters?.class === "Diagnosis") {
+    // console.log("searchControlType", searchControlType);
+    if (field?.conceptUuid) {
+      return from(
+        this.api.concept.getConcept(field?.conceptUuid, {
+          v: "custom:(uuid,display,setMembers:(uuid,display),answers:(uuid,display))",
+        })
+      ).pipe(
+        map((response: any) =>
+          response?.answers?.length > 0
+            ? response?.answers
+            : response?.setMembers
+        )
+      );
+    } else if (parameters?.class === "Diagnosis") {
       return from(this.api.concept.getAllConcepts(parameters)).pipe(
         map((response) => {
           return orderBy(
@@ -150,11 +163,35 @@ export class FormService {
         })
       );
     } else if (searchControlType === "user") {
-      return from(this.api.user.getAllUsers({ q: parameters?.q })).pipe(
-        map((response) => {
-          return response?.results || [];
-        })
-      );
+      const v: string =
+        "custom:(uuid,username,person:(uuid,display))".toString();
+      if (parameters?.value) {
+        return from(
+          this.api.user.getUser(parameters?.value, {
+            v,
+          })
+        ).pipe(
+          map((user: any) => [
+            {
+              ...user,
+              display: user?.person?.display,
+              name: user?.person?.display,
+            },
+          ])
+        );
+      } else {
+        return from(this.api.user.getAllUsers({ q: parameters?.q, v })).pipe(
+          map((response) => {
+            return (response?.results || [])?.map((user: any) => {
+              return {
+                ...user,
+                display: user?.person?.display,
+                name: user?.person?.display,
+              };
+            });
+          })
+        );
+      }
     } else if (searchControlType === "location") {
       return from(
         this.api.location.getAllLocations({
@@ -308,11 +345,13 @@ export class FormService {
                     };
                   });
                 }
+
                 const groupedByItemUuid = groupBy(
                   formattedResponse?.map((batch) => {
                     return {
                       ...batch,
                       itemUuid: batch?.item?.uuid,
+                      drug: batch?.item?.drug,
                     };
                   }),
                   "itemUuid"
@@ -338,6 +377,7 @@ export class FormService {
                         totalQuantity.toLocaleString("en-US") +
                         ") ",
                       itemUuid,
+                      drug: groupedByItemUuid[itemUuid][0]?.drug,
                       location: { uuid: field?.locationUuid },
                       value: groupedByItemUuid[itemUuid][0]?.item?.drug?.uuid,
                       batches: flatten(groupedByItemUuid[itemUuid]),
@@ -462,7 +502,7 @@ export class FormService {
      * TODO:Dynamicall construct the fields
      */
     const fields =
-      "?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,mappings:(uuid,conceptReferenceTerm:(uuid,display,conceptSource:(uuid))),hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,mappings:(uuid,conceptReferenceTerm:(uuid,display,conceptSource:(uuid))),hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,mappings:(uuid,conceptReferenceTerm:(uuid,display,conceptSource:(uuid))),conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))";
+      "?v=custom:(uuid,display,name,encounterType,formFields:(uuid,display,fieldNumber,required,retired,fieldPart,maxOccurs,pageNumber,minOccurs,field:(uuid,display,concept:(uuid,display,conceptClass,datatype,hiNormal,mappings:(uuid,conceptReferenceTerm:(uuid,display,code,conceptSource:(uuid))),hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,setMembers:(uuid,display,conceptClass,datatype,hiNormal,mappings:(uuid,conceptReferenceTerm:(uuid,display,code,conceptSource:(uuid))),hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers,setMembers:(uuid,display,mappings:(uuid,conceptReferenceTerm:(uuid,display,code,conceptSource:(uuid))),conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)),answers:(uuid,display,conceptClass,datatype,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units,numeric,descriptions,allowDecimal,displayPrecision,answers)))))";
     return zip(
       this.httpClient.get("form/" + uuid + fields),
       this.systemSettingsService.getSystemSettingsByKey(

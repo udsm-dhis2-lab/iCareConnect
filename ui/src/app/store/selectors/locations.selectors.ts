@@ -11,7 +11,7 @@ import {
 
 const getLocationsState = createSelector(
   getRootState,
-  (state: AppState) => state.locations
+  (state: AppState) => state?.locations
 );
 
 export const getLocationsLoadingError = createSelector(
@@ -417,7 +417,8 @@ export const getAllLocationsUnderWardAsFlatArray = createSelector(
       currentLocation.attributes?.length > 0
         ? (currentLocation?.attributes?.filter(
             (attribute) =>
-              attribute?.attributeType?.display === "Patients per bed"
+              attribute?.attributeType?.display === "Patients per bed" ||
+              attribute?.attributeType?.display === "Clients per location"
           ) || [])[0]
         : null;
 
@@ -437,6 +438,53 @@ export const getAllLocationsUnderWardAsFlatArray = createSelector(
         )?.length > 0,
       patientsPerBed: patientPerBedAttribute
         ? parseInt(patientPerBedAttribute?.value)
+        : 1,
+    };
+    return _.uniq([
+      currentLocation?.uuid,
+      ...flattenList([formattedLocation])
+        .map((item) => item.id)
+        ?.filter((uuid) => uuid),
+    ]);
+  }
+);
+
+export const getAllLocationsMortuaryAsFlatArray = createSelector(
+  getLocations,
+  (locations: Location[], props) => {
+    let currentLocation = (locations.filter(
+      (location: any) => location?.uuid === props?.id && !location?.retired
+    ) || [])[0];
+    if (!currentLocation) {
+      return [];
+    }
+
+    const patientPerCabinetAttribute =
+      currentLocation &&
+      currentLocation.attributes &&
+      currentLocation.attributes?.length > 0
+        ? (currentLocation?.attributes?.filter(
+            (attribute) =>
+              attribute?.attributeType?.display === "Clients per location"
+          ) || [])[0]
+        : null;
+
+    const formattedLocation = {
+      ...currentLocation,
+      childMembers: getChildLocationMembers(
+        currentLocation?.childLocations,
+        locations
+      ),
+      isBed:
+        currentLocation &&
+        currentLocation?.tags &&
+        (
+          currentLocation?.tags?.filter(
+            (tag) => tag?.display === "Mortuary Location"
+          ) || []
+        )?.length > 0,
+      bodiesPerCabinet: patientPerCabinetAttribute
+        ? parseInt(patientPerCabinetAttribute?.value)
         : 1,
     };
     return _.uniq([
@@ -503,16 +551,48 @@ export const getAllBedsUnderCurrentWard = createSelector(
         )?.length > 0,
     };
     return formattedLocation;
-    // const beds = getBedsUnderCurrentLocation(locations, props?.id);
-
-    // return _.uniq([
-    //   ..._.map(getBedsUnderCurrentLocation(locations, props?.id), (bed) => {
-    //     return bed?.uuid;
-    //   }),
-    //   props?.id,
-    // ]);
   }
 );
+
+export const getAllCabinetsDetailsUnderCurrentLocation = (
+  currentLocationUuid
+) =>
+  createSelector(
+    getLocations,
+    getLocationEntities,
+    (locations: Location[], locationEntities) => {
+      let currentLocation = (locations.filter(
+        (location) => location?.uuid === currentLocationUuid
+      ) || [])[0];
+      console.log(currentLocation);
+      if (!currentLocation) {
+        return {};
+      }
+      const formattedLocation = {
+        ...currentLocation,
+        childMembers: getChildLocationMembers(
+          (
+            currentLocation?.childLocations?.filter(
+              (location: any) => !location?.retired
+            ) || []
+          ).map((childLocation) => {
+            // console.log("CHILD", locationEntities[childLocation?.uuid]);
+            return locationEntities[childLocation?.uuid];
+          }),
+          locations
+        ),
+        isBed:
+          currentLocation &&
+          currentLocation?.tags &&
+          (
+            currentLocation?.tags?.filter(
+              (tag) => tag?.display === "Cabinet Location"
+            ) || []
+          )?.length > 0,
+      };
+      return formattedLocation;
+    }
+  );
 
 export const getAllCabinetsUnderCurrentLocation = createSelector(
   getLocations,
@@ -529,14 +609,11 @@ export const getAllCabinetsUnderCurrentLocation = createSelector(
   }
 );
 
-export const getLocationsByTagName = createSelector(
-  getLocations,
-  (locations: Location[], props) =>
+export const getLocationsByTagName = (tageName) =>
+  createSelector(getLocations, (locations: Location[]) =>
     _.filter(locations, (location) => {
-      if (
-        (_.filter(location?.tags, { name: props?.tagName }) || [])?.length > 0
-      ) {
+      if ((_.filter(location?.tags, { name: tageName }) || [])?.length > 0) {
         return location;
       }
     })
-);
+  );

@@ -682,4 +682,54 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		return newOrder;
 		
 	}
+	
+	public Order createOrderForOngoingDeceasedPatients() throws Exception {
+		
+		Order newOrder = new Order();
+		OrderService orderService = Context.getService(OrderService.class);
+		
+		List<Visit> visits = dao.getOpenVisitForDeceasedPatients();
+		System.out.println(visits.size());
+		
+		for (Visit visit : visits) {
+			Order order = new Order();
+			System.out.println(visit.getId());
+			AdministrationService administrationService = Context.getService(AdministrationService.class);
+			
+			String cabinetOrderTypeUUID = administrationService.getGlobalProperty(ICareConfig.CABINET_ORDER_TYPE);
+			if (cabinetOrderTypeUUID == null) {
+				throw new ConfigurationException("Cabinet Order Type is not configured. Please check "
+				        + ICareConfig.CABINET_ORDER_TYPE + ".");
+			}
+			String cabinetOrderConceptUUID = administrationService.getGlobalProperty(ICareConfig.BED_ORDER_CONCEPT);
+			if (cabinetOrderConceptUUID == null) {
+				throw new ConfigurationException("Bed Order Concept is not configured. Please check "
+				        + ICareConfig.CABINET_ORDER_CONCEPT + ".");
+			}
+			
+			OrderType cabinetOrderOrderType = Context.getOrderService().getOrderTypeByUuid(cabinetOrderTypeUUID);
+			
+			Provider provider = Context.getProviderService().getProvider(1);
+			
+			Concept concept = Context.getConceptService().getConceptByUuid(cabinetOrderConceptUUID);
+			System.out.println(concept.getUuid());
+			
+			order.setPatient(visit.getPatient());
+			order.setAction(Order.Action.NEW);
+			order.setCareSetting(orderService.getCareSettingByName("Deceasedpatient"));
+			order.setOrderType(cabinetOrderOrderType);
+			order.setConcept(concept);
+			order.setOrderer(provider);
+			order.setEncounter((Encounter) visit.getEncounters().toArray()[0]);
+			OrderContext orderContext = new OrderContext();
+			orderContext.setCareSetting(orderService.getCareSetting(1));
+			System.out.println(orderContext);
+			System.out.println(order);
+			
+			newOrder = orderService.saveOrder(order, orderContext);
+			
+		}
+		return newOrder;
+		
+	}
 }
