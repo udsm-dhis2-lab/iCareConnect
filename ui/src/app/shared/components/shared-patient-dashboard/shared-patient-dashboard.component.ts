@@ -573,4 +573,21 @@ export class SharedPatientDashboardComponent implements OnInit {
   // Display a popup notification using window.alert
   window.alert(message);
 }
+
+// Function to show a notification if patient's vital is within accepted range
+function showVitalNotification(patientName: string, vitalValue: number, acceptedRange: [number, number]): void {
+    const [minRange, maxRange] = acceptedRange;
+
+    if (vitalValue >= minRange && vitalValue <= maxRange) {
+        const notificationOptions: NotificationOptions = {
+            body: `${patientName}'s vital is within the accepted range (${minRange} - ${maxRange}).`,
+        };
+
+        if (Notification.permission === 'granted') {
+            new Notification('Vital Notification', notificationOptions);
+        } else {
+            console.warn('Notification permission not granted.');
+        }
+    }
+}
 }
