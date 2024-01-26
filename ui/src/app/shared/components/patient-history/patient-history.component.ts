@@ -39,9 +39,9 @@ export class PatientHistoryComponent implements OnInit {
     username?: string;
     systemId?: string;
     userProperties?: object;
-    person?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").PersonGetRef;
-    privileges?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").PrivilegeGetRef[];
-    roles?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").RoleGetRef[];
+    // person?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").PersonGetRef;
+    // privileges?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").PrivilegeGetRef[];
+    // roles?: import("/home/masembo/Project/DHIS2/NEW ICARE/icare/ui/src/app/shared/resources/openmrs").RoleGetRef[];
     provider?: { uuid?: string; display?: string };
   }>;
   constructor(
@@ -151,9 +151,11 @@ export class PatientHistoryComponent implements OnInit {
                   }),
                 ].filter((order) => order.length),
               };
+         
             });
           }
         })
-      );
+      );     console.log(`This is visits datan${this.visits$}`);
   }
+  
 }

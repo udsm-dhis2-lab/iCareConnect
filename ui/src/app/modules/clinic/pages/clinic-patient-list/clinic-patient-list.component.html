@@ -55,7 +55,7 @@
         <mat-tab label="Attended">
           <!-- <div class="p-2" *ngIf="selectedTab.value === 1"> -->
           <ng-template matTabContent>
-            <app-patient-list
+            <!-- <app-patient-list
               [isTabularList]="true"
               [itemsPerPage]="10"
               [currentLocation]="(currentLocation$ | async)?.id"
@@ -63,7 +63,67 @@
               [orderStatus]="'RECEIVED'"
               [currentLocation]="(currentLocation$ | async)?.id"
               (selectPatient)="onSelectPatient($event)"
-            ></app-patient-list>
+            ></app-patient-list> -->
+            <app-doctor-patient-data>
+              <!-- doctor-table.component.html -->
+
+                    <!-- <table>
+                      <thead>
+                        <tr>
+                          <th>Doctor's Name</th>
+                          <th>Total Patients (10)</th>
+                          <th>Patients Attended</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let doctor of doctorsData">
+                          <td>{{ doctor.name }}</td>
+                          <td>{{ doctor.patients.length }}</td>
+                          <td>
+                            <ul>
+                              <li style="list-style-type: none;" *ngFor="let patient of doctor.patients">
+                                {{ patient.name }} - {{ patient.time }}
+                              </li>
+                            </ul>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table> -->
+
+                    <!-- doctor-table.component.html -->
+
+<!-- doctor-table.component.html -->
+
+<table>
+  <thead>
+    <tr>
+      <th>Doctor's Name</th>
+      <th>Total Patients (10)</th>
+      <th>Patients Attended</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let doctor of doctorsData">
+      <td>{{ doctor.name }}</td>
+      <td>{{ doctor.patients.length }}</td>
+      <td>
+        <ul style="list-style-type: none; padding: 0;">
+          <li *ngFor="let patient of doctor.patients" (click)="toggleHighlight(patient)">
+            <div style="display: flex; justify-content: space-around; margin-bottom: 4px;" [ngClass]="{'highlighted': patient.highlighted}">
+              <span>{{ patient.name }}</span>
+              <span>{{ patient.time }}</span>
+            </div>
+          </li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+            </app-doctor-patient-data>
           </ng-template>
           <!-- </div> -->
         </mat-tab>

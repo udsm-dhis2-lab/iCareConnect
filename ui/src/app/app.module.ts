@@ -1,12 +1,13 @@
 import { NgModule } from "@angular/core";
 import { AppComponent } from "./app.component";
 import { CoreModule } from "./core";
+import { DoctorPatientDataComponent } from "./shared/components/doctor-patient-data/doctor-patient-data.component";
 export const config: any = {
   sizeUnit: "Octet",
 };
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, DoctorPatientDataComponent],
   imports: [
     CoreModule.forRoot({
       namespace: "icare",
