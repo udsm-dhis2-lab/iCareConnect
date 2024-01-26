@@ -194,18 +194,18 @@ export class RegistrationPatientComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.store.select(getCurrentPatientState).subscribe((response) => {
-      this.patientt = new patientObj(response);
+  this.store.select(getCurrentPatientState).subscribe((response) => {
+    this.patientt = new patientObj(response);
+    // Check if the patient has had a previous visit
+    this.registrationService.hasPreviousVisit(this.patientt.uuid).subscribe((hasPreviousVisit) => {
+      // Set the disablePatientTypeField based on the result
+      this.disablePatientTypeField = hasPreviousVisit;
     });
+  });
 
-    this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
+  
+}
 
-    // this.store.select(getCurrentLocation(false)).subscribe((res) => {
-    //   this.currentLocation = res;
-    // });
-
-    // this.formatServices(this.visitsHierarchy);
-  }
 
   formatServices(servicesArray) {
     _.each(servicesArray, (service) => {
