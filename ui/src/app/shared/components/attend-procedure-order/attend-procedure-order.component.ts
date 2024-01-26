@@ -30,7 +30,7 @@ export class AttendProcedureOrderComponent implements OnInit {
   savingObservations$: Observable<boolean>;
   billLoadingState$: Observable<boolean>;
   currentBills$: Observable<any>;
-  doesPatientHasPendingPaymentForTheCurrentVisitType$: Observable<boolean>;
+  doesPatientHasPendingPaymentForTheCurrentVisitType$: Observable<any>;
   provider$: Observable<ProviderGet>;
   visit$: Observable<any>;
   patient$: Observable<any>;
