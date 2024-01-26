@@ -124,6 +124,35 @@ export class SharedSamplesVerificationIntegratedComponent implements OnInit {
         })
       );
   }
+  onDispense(
+      event: Event,
+      resultsStageId: string,
+      labRequestStageId: string
+    ): void {
+      event.stopPropagation();
+      this.verify = true;
+      this.clientDetails$ = this.otherClientLevelSystemsService
+        .getClientsFromOtherSystems({
+          identifier: this.data?.mrn,
+          identifierReference: this.searchCriteria,
+          labTestRequestProgramStageId: this.labTestRequestProgramStageId,
+        })
+        .pipe(
+          map((response) => {
+            if (response) {
+              this.trackedEntityInstancesWithoutLabRequest = response?.filter(
+                (trackedEntityInstance) =>
+                  (
+                    trackedEntityInstance?.events?.filter(
+                      (event) => event?.programStage === labRequestStageId
+                    ) || []
+                  )?.length === 0
+              );
+              return this.trackedEntityInstancesWithoutLabRequest;
+            }
+          })
+        );
+    }
 
   onUpdateForm(formValue: FormValue): void {
     const values = formValue.getValues();

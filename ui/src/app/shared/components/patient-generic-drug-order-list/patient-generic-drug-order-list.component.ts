@@ -248,6 +248,39 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
       this.loadPatientVisit.emit();
     });
   }
+  onDispense(
+      order: any,
+      specificDrugConceptUuid: any,
+      prescriptionArrangementFields: any
+    ) {
+      const dialog = this.dialog.open(DispensingFormComponent, {
+        width: "100%",
+        disableClose: true,
+        data: {
+          drugOrder: order,
+          patient: this.visit?.visit?.patient,
+          visit: this.visit,
+          location: this.currentLocation,
+          encounterUuid: this.encounterUuid,
+          drugInstructions: arrangeDrugDetails(
+            order,
+            specificDrugConceptUuid,
+            prescriptionArrangementFields
+          )?.description,
+          fromDispensing: true,
+          showAddButton: false,
+          useGenericPrescription: this.useGenericPrescription,
+        },
+      });
+
+      dialog.afterClosed().subscribe(() => {
+        // this.store.dispatch(
+        //   loadActiveVisit({ patientId: this.visit?.visit?.patient?.uuid })
+        // );
+        this.loadPatientVisit.emit();
+      });
+    }
+
 
   onPrintPrescriptions(
     event: Event,

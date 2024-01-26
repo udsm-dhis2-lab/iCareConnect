@@ -73,5 +73,13 @@
         CurrentUser: params?.currentUser
       })
     "
+    (Smsdisplay)="
+      onSmsdisplay($event, {
+        CurrentPatient: currentPatient,
+        FacilityDetails: params?.facilityDetails,
+        Logo: params?.logo,
+        CurrentUser: params?.currentUser
+      })
+    "
   ></app-table>
 </div>

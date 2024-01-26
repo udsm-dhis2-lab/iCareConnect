@@ -78,6 +78,7 @@
     "cypress-cucumber-preprocessor": "^4.0.0",
     "cypress-multi-reporters": "^1.4.0",
     "cz-conventional-changelog": "^3.3.0",
+    "hint": "^7.1.10",
     "husky": "^4.3.0",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",
