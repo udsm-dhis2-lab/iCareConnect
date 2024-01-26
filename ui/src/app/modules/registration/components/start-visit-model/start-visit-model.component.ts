@@ -7,6 +7,8 @@ import { map, tap } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { VisitsService } from "src/app/shared/resources/visits/services";
+import { RegistrationService } from "../../services/registration.services";
+
 import {
   go,
   loadCurrentPatient,
@@ -47,9 +49,16 @@ export class StartVisitModelComponent implements OnInit {
   startingVisit: boolean = false;
   errors: any[];
 
+  // added by mrshanas
+  editMode: boolean = false;
+  disableEditingPayment: boolean = false;
+  visitsHierarchy2: any;
+  visitDetails: any = {};
+
   constructor(
     private store: Store<AppState>,
     private visitService: VisitsService,
+    private registrationService: RegistrationService,
     private systemSettingsService: SystemSettingsService,
     private dialogRef: MatDialogRef<StartVisitModelComponent>,
     @Inject(MAT_DIALOG_DATA) data
@@ -82,6 +91,15 @@ export class StartVisitModelComponent implements OnInit {
       );
     this.currentVisitLoadedState$ = this.store.select(getVisitLoadedState);
     this.currentPatientVisit$ = this.store.select(getActiveVisit);
+
+    this.registrationService
+    .getServicesConceptHierarchy()
+    .subscribe((response) => {
+      this.visitsHierarchy2 =
+        response["results"] && response["results"].length > 0
+          ? response["results"][0]["setMembers"]
+          : [];
+    });
   }
 
   onVisitUpdate(visitDetails: any): void {
