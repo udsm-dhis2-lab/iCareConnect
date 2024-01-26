@@ -100,29 +100,15 @@
     <div class="d-flex justify-content-between">
       <!-- Left-aligned content -->
       <div>
-        <!--here is the button that i want to add to allow the user to add prescription and save the order in the current prescription as it was required-->
-        <!-- Button for adding consumables -->
-<button
-(click)="saveOrder($event, params?.conceptFields)"
-mat-flat-button
-color="primary" [disabled]="savingOrder || !isFormValid" 
-class="mat-focus-indicator mat-flat-button mat-button-base mat-primary"
->
-<!-- Content within the button -->
-<span class="mat-button-wrapper">
-  <!-- Icon for the button -->
-  <mat-icon role="img" class="mat-icon notranslate material-icons mat-icon-no-color" aria-hidden="true" data-mat-icon-type="font">add</mat-icon>
-  <!-- Text beside the icon -->
-  <span class="ml-2">Add Consumables</span>
-</span>
-
-<!-- Ripple effect for the button -->
-<span matripple="" class="mat-ripple mat-button-ripple"></span>
-<!-- Focus overlay for the button -->
-<span class="mat-button-focus-overlay"></span>
-</button>
-<!-- End of button -->
-
+        <button (click)="saveOrder($event, params?.conceptFields)" mat-flat-button [color]="savingError ? 'warn' : 'primary'" [disabled]="savingOrder || !isFormValid"  _ngcontent-iwc-c398="" mat-flat-button="" color="primary" class="mat-focus-indicator mat-flat-button mat-button-base mat-primary" ng-reflect-color="primary">
+          <span class="mat-button-wrapper">
+            <mat-icon _ngcontent-iwc-c398="" role="img" class="mat-icon notranslate material-icons mat-icon-no-color" aria-hidden="true" data-mat-icon-type="font">add</mat-icon>
+            <span _ngcontent-iwc-c398="" class="ml-2">Add Consumables</span>
+          </span>
+          <span matripple="" class="mat-ripple mat-button-ripple" ng-reflect-disabled="false" ng-reflect-centered="false" ng-reflect-trigger="[object HTMLButtonElement]"></span>
+          <span class="mat-button-focus-overlay"></span>
+        </button>
+      </div>
     
       <!-- Right-aligned content -->
       <div>
