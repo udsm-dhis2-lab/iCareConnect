@@ -62,7 +62,8 @@
         <div
           class="row mt-3"
           *ngIf="
-            params?.showPatientType && params?.showPatientType?.value === 'true'
+            params?.showPatientType && params?.showPatientType?.value === 'true' &&
+            !disablePatientTypeSelection
           "
         >
           <div class="col-sm-3">
@@ -80,7 +81,7 @@
                     getPatientType($event.value, params?.occupationInfo)
                   "
                   placeholder="Select Patient Type"
-                  [disabled]="addingPatient && !patientAdded"
+                  [disabled]="editMode || disablePatientTypeSelection || (addingPatient && !patientAdded)"
                 >
                   <mat-option
                     [value]="option?.display"

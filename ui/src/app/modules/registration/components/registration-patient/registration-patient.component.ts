@@ -4,10 +4,10 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute, Router } from "@angular/router";
 import { select, Store } from "@ngrx/store";
 import * as _ from "lodash";
-import { Observable } from "rxjs";
+import { Observable } from "";
 import { patientObj } from "src/app/shared/models/patient";
 import { VisitsService } from "src/app/shared/resources/visits/services";
-import {
+import { map } from "rxjs";
   getCurrentPatient,
   getCurrentPatientState,
 } from "src/app/store/selectors/current-patient.selectors";
@@ -156,6 +156,7 @@ export class RegistrationPatientComponent implements OnInit {
     Cash: ["Normal", "Fast"],
     Insurance: ["NHIF", "AAR", "STRATERGIES"],
   };
+  disablePatientTypeSelection: boolean;
 
   setOptions(option) {
     this.visitDetails = {
@@ -200,12 +201,19 @@ export class RegistrationPatientComponent implements OnInit {
 
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
 
-    // this.store.select(getCurrentLocation(false)).subscribe((res) => {
-    //   this.currentLocation = res;
-    // });
-
-    // this.formatServices(this.visitsHierarchy);
+    this.checkPreviousVisit();
   }
+
+  checkPreviousVisit() {
+    const hasPreviousVisit = this.hasPreviousVisit();
+    this.disablePatientTypeSelection = hasPreviousVisit;
+  }
+
+  hasPreviousVisit(): boolean {
+  return this.store.select('hasPreviousVisitFlag').pipe(
+    map(flag => !!flag) // Convert the flag to a boolean
+  );
+}
 
   formatServices(servicesArray) {
     _.each(servicesArray, (service) => {
