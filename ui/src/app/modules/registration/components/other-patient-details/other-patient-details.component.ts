@@ -11,15 +11,22 @@ export class OtherPatientDetailsComponent implements OnInit {
   @Input() patient: any;
   patientVisit$: Observable<any>;
   ID: string;
+  phoneNumber: string;
   constructor(private visitService: VisitsService) {}
 
   ngOnInit(): void {
-    // TODO: Softcode ID reference
     this.ID = (this.patient?.person?.attributes?.filter(
       (attribute) => attribute?.attributeType?.display === "ID"
     ) || [])[0]?.value;
     this.patientVisit$ = this.visitService.getLastPatientVisit(
       this.patient?.uuid
     );
+    this.fetchPhoneNumber();
+  }
+
+  fetchPhoneNumber(): void {
+    this.phoneNumber = this.patient?.person?.attributes?.filter(
+      (attribute) => attribute?.attributeType?.display === "Phone Number"
+    )[0]?.value;
   }
 }
