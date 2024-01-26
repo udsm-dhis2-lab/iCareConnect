@@ -44,6 +44,7 @@ import { PricingService } from "../../services/pricing.service";
 
 //IMPORTS FOR OUR FEATURES
 import * as XLSX from 'xlsx';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 
@@ -94,6 +95,7 @@ export class PriceListComponent implements OnInit, OnChanges {
     private pricingService: PricingService,
     private store: Store<AppState>,
   //CONSTRUCTORS FOR OUR FEATURES
+    private snackBar: MatSnackBar
   ) {
     //PARAMETER
   }
@@ -365,15 +367,27 @@ export class PriceListComponent implements OnInit, OnChanges {
     const fileList: FileList = event.target.files;
     if (fileList.length > 0) {
       const file: File = fileList[0];
-      this.snackBar.open(Selected file: ${file.name}, 'Close', {
+      this.snackBar.open(`Selected file: ${file.name}`, 'Close', {
         duration: 5000,
       });
     }
   }
 
   //REUBEN'S CODE
+  uploadInProgress: boolean = false;
 
 
+  UploadExcelFile(): void {
+    if (!this.uploadInProgress) {
+      this.uploadInProgress = true;
+      setTimeout(() => {
+        this.uploadInProgress = false;
+        this.snackBar.open('File uploaded successfully!', 'Close', {
+          duration: 5000,
+        });
+      }, 3000);
+    }
+  }
 
 }
 
