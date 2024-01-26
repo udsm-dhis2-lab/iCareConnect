@@ -90,6 +90,25 @@
               >
                 {{ form?.name }}
               </button>
+
+              <!-- visit information button -->
+              <button
+              *ngIf="!isInpatient"
+              mat-stroked-button
+              (click)="
+                viewPatientHistory(
+                  $event,
+                  dashboardParams?.currentPatient?.patient?.uuid
+                )
+              "
+              class="mr-2 float-right"
+            >
+              <!-- this is the eye icon someone uncomment it -->
+              <mat-icon>visibility</mat-icon>
+              Visit Information
+            </button>
+            <!-- end button addition -->
+
             </ng-container>
           </div>
 
@@ -198,17 +217,6 @@
               (click)="onToggleVisibityIcons($event)"
               class="mr-2 float-right"
             >
-              <!-- <button
-              *ngIf="!isInpatient"
-              mat-stroked-button
-              (click)="
-                viewPatientHistory(
-                  $event,
-                  dashboardParams?.currentPatient?.patient?.uuid
-                )
-              "
-              class="mr-2 float-right"
-            > -->
               History
             </button>
             <button
