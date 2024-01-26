@@ -64,23 +64,23 @@ export class StockStatusListComponent implements OnInit {
     this.consumeLedgerUuid$ = this.systemSettingsService.getSystemSettingsByKey(
       `icare.store.settings.consumeLedger.ledgerTypeUuid`
     );
-    this.consumeLedgerUuid$.subscribe((response: any) => {
-      if (response?.error) {
-        this.errors = [...this.errors, response];
-      } else if (response === "none") {
-        this.errors = [
-          ...this.errors,
-          {
-            error: {
-              error:
-                "icare.store.settings.consumeLedger.ledgerTypeUuid does not exist, contact IT",
-              message:
-                "icare.store.settings.consumeLedger.ledgerTypeUuid does not exist, contact IT",
-            },
-          },
-        ];
-      }
-    });
+    // this.consumeLedgerUuid$.subscribe((response: any) => {
+    //   if (response?.error) {
+    //     this.errors = [...this.errors, response];
+    //   } else if (response === "none") {
+    //     this.errors = [
+    //       ...this.errors,
+    //       {
+    //         error: {
+    //           error:
+    //             "icare.store.settings.consumeLedger.ledgerTypeUuid does not exist, contact IT",
+    //           message:
+    //             "icare.store.settings.consumeLedger.ledgerTypeUuid does not exist, contact IT",
+    //         },
+    //       },
+    //     ];
+    //   }
+    // });
     this.getStock();
   }
 
