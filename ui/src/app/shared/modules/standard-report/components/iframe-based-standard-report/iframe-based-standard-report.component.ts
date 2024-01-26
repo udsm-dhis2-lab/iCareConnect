@@ -11,7 +11,9 @@ export class IframeBasedStandardReportComponent
 {
   @Input() reportHtml: any;
   @Input() parameters: any;
+  // Declare a property "searchTerm" of type string and initialize it with an empty string
   searchTerm: string = "";
+  // initialize searchTerm in the constructor with empty string
   constructor() {
     this.searchTerm = "";
   }
