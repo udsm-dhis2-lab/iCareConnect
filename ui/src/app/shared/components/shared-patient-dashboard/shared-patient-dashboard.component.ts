@@ -79,6 +79,7 @@ import { BillingService } from "src/app/modules/billing/services/billing.service
 import { map, map as rxMap } from "rxjs/operators";
 import { keyBy, orderBy } from "lodash";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
+// changed the color of the "View Vitals" button to red if it is abnoraml and green otherwise
 
 @Component({
   selector: "app-shared-patient-dashboard",
