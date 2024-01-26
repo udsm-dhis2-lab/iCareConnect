@@ -361,6 +361,15 @@ export class PriceListComponent implements OnInit, OnChanges {
 
   // UPLOAD EXCEL FUNCTIONALITY
   //NGATARA'S CODE
+  onFileChange(event: any): void {
+    const fileList: FileList = event.target.files;
+    if (fileList.length > 0) {
+      const file: File = fileList[0];
+      this.snackBar.open(Selected file: ${file.name}, 'Close', {
+        duration: 5000,
+      });
+    }
+  }
 
   //REUBEN'S CODE
 
