@@ -39,6 +39,7 @@ export class PatientHistoryComponent implements OnInit {
     username?: string;
     systemId?: string;
     userProperties?: object;
+    //Changes made here
     person?: import("src/app/shared/resources/openmrs").PersonGetRef;
     privileges?: import("src/app/shared/resources/openmrs").PrivilegeGetRef[];
     roles?: import("src/app/shared/resources/openmrs").RoleGetRef[];
