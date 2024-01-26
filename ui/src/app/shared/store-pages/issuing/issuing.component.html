@@ -39,7 +39,7 @@
       </mat-form-field>
     </div>
 
-    <!-- <div style="height: 60vh; overflow: auto">
+    <div style="height: 60vh; overflow: auto">
       <table class="table">
         <tr>
           <td>#</td>
@@ -47,9 +47,9 @@
           <td>Quantity Requested</td>
           <td>Quantity Issued</td>
           <td>Requesting Store</td>
-          <td>Status</td> -->
-    <!-- <td>Requester's Status</td> -->
-    <!-- <td>Requested Date</td>
+          <td>Status</td>
+          <td>Requester's Status</td>
+          <td>Requested Date</td>
           <td>Actions</td>
         </tr>
 
@@ -75,68 +75,70 @@
           <td>{{ issue?.requestingLocation?.name }}</td>
           <td>
             <span class="text-warning">{{ issue?.status }}</span>
-          </td> -->
-    <!-- <td>
+          </td>
+          <td>
             <div class="text-warning">Waiting</div>
-          </td> -->
-    <!-- <td>
+          </td>
+          <td>
             {{ issue?.requestDate | date: "medium" }}
           </td>
           <td>
-            <button
-              mat-flat-button
-              color="primary"
-              [disabled]="
-                issue?.crudOperationStatus?.status === 'ISSUING' ||
-                issue?.status === 'ISSUED' ||
-                issue?.status === 'CANCELLED' ||
-                !params?.currentStore
-              "
-              (click)="onIssue($event, issue, params?.currentStore)"
-            >
-              <mat-spinner
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button
+                mat-flat-button
                 color="primary"
-                *ngIf="issue?.crudOperationStatus?.status === 'ISSUING'"
-                [diameter]="20"
-                style="display: inline-block !important; margin-right: 4px"
-              ></mat-spinner>
-              Issue
-            </button>
-            <button
-              mat-flat-button
-              class="ml-2"
-              color="warn"
-              [disabled]="
-                issue?.crudOperationStatus?.status === 'REJECTING' ||
-                issue?.status === 'ISSUED'
-              "
-              (click)="onReject($event, issue)"
-            >
-              <mat-spinner
-                color="primary"
-                *ngIf="
-                  issue?.crudOperationStatus?.status === 'REJECTING' ||
-                  issue?.status === 'REJECTED'
+                [disabled]="
+                  issue?.crudOperationStatus?.status === 'ISSUING' ||
+                  issue?.status === 'ISSUED' ||
+                  issue?.status === 'CANCELLED' ||
+                  !params?.currentStore
                 "
-                [diameter]="20"
-                style="display: inline-block !important; margin-right: 4px"
-              ></mat-spinner>
-              Reject
-            </button>
-          </td>
+                (click)="onIssue($event, issue, params?.currentStore)"
+              >
+                <mat-spinner
+                  color="primary"
+                  *ngIf="issue?.crudOperationStatus?.status === 'ISSUING'"
+                  [diameter]="20"
+                  style="display: inline-block !important; margin-right: 4px"
+                ></mat-spinner>
+                Issue
+              </button>
+              <button
+                mat-flat-button
+                class="ml-2"
+                color="warn"
+                [disabled]="
+                  issue?.crudOperationStatus?.status === 'REJECTING' ||
+                  issue?.status === 'ISSUED'
+                "
+                (click)="onReject($event, issue)"
+              >
+                <mat-spinner
+                  color="primary"
+                  *ngIf="
+                    issue?.crudOperationStatus?.status === 'REJECTING' ||
+                    issue?.status === 'REJECTED'
+                  "
+                  [diameter]="20"
+                  style="display: inline-block !important; margin-right: 4px"
+                ></mat-spinner>
+                Reject
+              </button>
+            </div>
+          </td>          
           <td>
             <section>
               <mat-checkbox
                 color="primary"
                 [disabled]="issue?.status === 'ISSUED'"
-                (change)="getSelection($event, issue)"
-                [checked]="selectedIssues[issue?.id]"
+                [(ngModel)]="selectedIssuesItem[issue?.id]"
+                (ngModelChange)="getItemsSelection($event, issue)"
               ></mat-checkbox>
             </section>
-          </td>
+          </td>          
         </tr>
       </table>
-    </div> -->
+    </div>
     <div *ngIf="!params?.issuingList?.length && loadingIssues">
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
@@ -231,7 +233,6 @@
                     >visibility</mat-icon
                   >
                 </a>
-                <!--
                   <ng-container *ngIf="issue?.requisitionStatuses[issue?.requisitionStatuses?.length - 1]?.status === 'PENDING'">
                        <a 
                       class="anchor-button ml-4" 
@@ -248,7 +249,7 @@
                           <mat-icon>clear</mat-icon>
                       </a>
                     
-                  </ng-container> -->
+                  </ng-container>
               </div>
             </div>
           </div>
@@ -287,7 +288,7 @@
       </mat-accordion>
     </ng-container>
 
-    <!-- <div *ngIf="params?.issuingList?.length && currentLocation">
+    <div *ngIf="params?.issuingList?.length && currentLocation">
       <app-issuing-stock-by-store
         [issuingStock]="params?.issuingList"
         [currentStore]="currentLocation"
@@ -296,7 +297,7 @@
         (selectionChange)="getSelection($event)"
       >
       </app-issuing-stock-by-store>
-    </div> -->
+    </div>
     <div
       *ngIf="!params?.issuingList?.length && currentLocation && !loadingIssues"
     >
@@ -308,16 +309,15 @@
         </tbody>
       </table>
     </div>
-    <!-- 
     <div class="d-flex justify-content-end mt-2 mr-2">
       <button
         color="primary"
         mat-flat-button
         (click)="issueAllSelected($event, selectedIssues)"
-        [disabled]="selectedIssuesCount == 0"
+        [disabled]="checkedIssues === 0"
       >
         Issue selected items
       </button>
-    </div> -->
+    </div>    
   </mat-card>
 </div>
