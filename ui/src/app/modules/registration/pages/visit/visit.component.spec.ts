@@ -1,20 +1,25 @@
-/* tslint:disable:no-unused-variable */
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { DebugElement, NO_ERRORS_SCHEMA } from '@angular/core';
+// ...
 
-import { VisitComponent } from './visit.component';
-import { MockState, provideMockStore } from '@ngrx/store/testing';
-import { AppState } from 'src/app/store/reducers';
-import { storeDataMock } from 'src/test-mocks/store-data.mock';
-import {
-  matDialogProviderMock,
-  matSnackBarProviderMock,
-} from 'src/test-mocks/material.mocks';
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
-import { RegistrationService } from '../../services/registration.services';
-import { of } from 'rxjs';
-import { RouterTestingModule } from '@angular/router/testing';
+class RegistrMock {
+  getVisitTypes() {
+    return of([{}]);
+  }
+
+  getServicesConceptHierarchy() {
+    return of([{}]);
+  }
+
+  getPaymentOptionsHierarchy() {
+    return of([{}]);
+  }
+
+  // Add a method for getting insurance options
+  getInsuranceOptions() {
+    return of([{}]);
+  }
+}
+
+// ...
 
 describe('VisitComponent', () => {
   let component: VisitComponent;
@@ -31,6 +36,11 @@ describe('VisitComponent', () => {
     }
 
     getPaymentOptionsHierarchy() {
+      return of([{}]);
+    }
+
+    // Add a method for getting insurance options
+    getInsuranceOptions() {
       return of([{}]);
     }
   }
@@ -61,5 +71,19 @@ describe('VisitComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should retrieve insurance options', () => {
+    // Assuming the component uses the insurance service
+    const insuranceService = TestBed.inject(RegistrationService) as RegistrMock;
+    
+    // Your assertions related to insurance options
+    let insuranceOptions: any[];
+    insuranceService.getInsuranceOptions().subscribe(options => {
+      insuranceOptions = options;
+    });
+
+    expect(insuranceOptions).toBeDefined();
+    // Add more assertions as needed
   });
 });
