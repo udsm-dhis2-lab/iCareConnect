@@ -137,7 +137,7 @@ export class ExemptionHomeComponent implements OnInit {
   // getExemptionVisits() {
   //   //Get order type
   //   this.orderType$ = this.systemSettingsService
-  //     .getSystemSettingsMatchingAKey("icare.billing.exemption.orderType")
+  //     .getSystemSettingsMatchingAKey("icare.billing.exemption.orderType")//from billing get patients with exemption
   //     .pipe(
   //       tap((orderType) => {
   //         return orderType[0];
