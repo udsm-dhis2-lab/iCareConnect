@@ -147,6 +147,10 @@ export class RegistrationPatientComponent implements OnInit {
       ],
     },
   ];
+// Add a new function to get visit details
+  getVisitDetails(): any {
+    return this.visitDetails;
+  }
 
   visitDetails: any = {};
 
