@@ -6,6 +6,7 @@ import { omit } from "lodash";
 import { Api, EncounterCreate, OrderGetFull } from "../../openmrs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { getDrugOrderPaymentStatus } from "../helpers/getDrugOrderPaymentStatus.helper";
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: "root",
@@ -13,14 +14,20 @@ import { getDrugOrderPaymentStatus } from "../helpers/getDrugOrderPaymentStatus.
 export class OrdersService {
   constructor(
     private openMRSHttpClient: OpenmrsHttpClientService,
-    private API: Api
+    private API: Api,
+    private http: HttpClient
   ) {}
+
+  getOrdersByPatient(patientId: string): Observable<any> {
+    const endpoint = this.API.patient.getPatient
+    return this.http.get(${endpoint}/orders/patient/${patientId});
+  }
 
   getOrdersByUuids(orderUuids: any): Observable<any[]> {
     return zip(
       ...orderUuids.map((orderUuid) => {
         return this.openMRSHttpClient.get(
-          `order/${orderUuid}?v=custom:(uuid,orderNumber,encounter,concept:(uuid,display,setMembers:(uuid,display)))`
+          order/${orderUuid}?v=custom:(uuid,orderNumber,encounter,concept:(uuid,display,setMembers:(uuid,display)))
         );
       })
     ).pipe(
@@ -41,7 +48,7 @@ export class OrdersService {
     return zip(
       ...ordersToUpdate.map((order) =>
         this.openMRSHttpClient
-          .post(`encounter/${order?.encounter}`, {
+          .post(encounter/${order?.encounter}, {
             uuid: order?.encounter,
             orders: [order],
           })
@@ -59,7 +66,7 @@ export class OrdersService {
   }
 
   updateOrderStatus(order): Observable<any> {
-    return this.openMRSHttpClient.put(`order/${order?.uuid}`, order).pipe(
+    return this.openMRSHttpClient.put(order/${order?.uuid}, order).pipe(
       map((response) => {
         return {
           ...order,
@@ -72,7 +79,7 @@ export class OrdersService {
 
   getOrdersByVisitAndOrderType({ visit, orderType }): Observable<any> {
     return this.openMRSHttpClient
-      .get(`icare/order?visitUuid=${visit}&orderTypeUuid=${orderType}`)
+      .get(icare/order?visitUuid=${visit}&orderTypeUuid=${orderType})
       .pipe(
         map((response) => {
           return response?.results.map((orderDetails) => {
@@ -87,7 +94,7 @@ export class OrdersService {
   }
 
   deleteOrder(uuid): Observable<any> {
-    return this.openMRSHttpClient.delete(`order/${uuid}`);
+    return this.openMRSHttpClient.delete(order/${uuid});
   }
 
   voidOrderWithReason(order: {
@@ -97,7 +104,7 @@ export class OrdersService {
     const voidReason =
       order?.voidReason.length > 0 ? order?.voidReason : "No reason";
     return this.openMRSHttpClient
-      .post(`icare/voidorder`, {
+      .post(icare/voidorder, {
         uuid: order?.uuid,
         voidReason: voidReason,
       })
@@ -112,7 +119,7 @@ export class OrdersService {
   }
 
   createOrdersViaCreatingEncounter(encounter): Observable<any> {
-    return this.openMRSHttpClient.post(`encounter`, encounter).pipe(
+    return this.openMRSHttpClient.post(encounter, encounter).pipe(
       map((response) => response),
       catchError((error) => of(error))
     );
@@ -127,7 +134,7 @@ export class OrdersService {
         return zip(
           ...obs.map((ob) => {
             this.openMRSHttpClient
-              .post(`encounter/${response?.uuid}`, {
+              .post(encounter/${response?.uuid}, {
                 uuid: response?.uuid,
                 obs: [ob],
               })
@@ -156,7 +163,7 @@ export class OrdersService {
         return formattedOrder;
       }),
     };
-    return this.openMRSHttpClient.post(`encounter/${encounterUuid}`, data).pipe(
+    return this.openMRSHttpClient.post(encounter/${encounterUuid}, data).pipe(
       map((response) => {
         return response;
       }),
