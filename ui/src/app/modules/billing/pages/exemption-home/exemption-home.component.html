@@ -15,6 +15,7 @@
    
     <!-- patient list -->
     <div class="mat-elevation-z1" *ngIf="visitsLength > 0">
+      <!--get patient information-->
       <app-table [columns]="billingColumns" [loading]="loadingVisits" [loadingDataError]="loadingVisitsError"
         [tableConfig]="tableConfig" [data]="visits$" (selectRow)="onSelectVisit($event)"></app-table>
     </div>
