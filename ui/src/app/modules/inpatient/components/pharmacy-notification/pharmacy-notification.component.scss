@@ -1,0 +1,81 @@
+// Base styles for all notifications
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    animation: fade-in 0.5s ease-in-out;
+  
+    // Mixins for different types
+    @mixin type-info {
+      background-color: #f0f8ff;
+      color: #2196f3;
+    }
+  
+    @mixin type-success {
+      background-color: #d4edda;
+      color: #15803d;
+    }
+  
+    @mixin type-warning {
+      background-color: #fffcf5;
+      color: #ff9800;
+    }
+  
+    @mixin type-error {
+      background-color: #f8d7da;
+      color: #c0392b;
+    }
+  
+    &.type-info {
+      @include type-info;
+    }
+  
+    &.type-success {
+      @include type-success;
+    }
+  
+    &.type-warning {
+      @include type-warning;
+    }
+  
+    &.type-error {
+      @include type-error;
+    }
+  
+    &__icon {
+      display: inline-block;
+      font-size: 20px;
+      margin-right: 10px;
+    }
+  
+    &__title {
+      font-weight: bold;
+    }
+  
+    &__message {
+      line-height: 1.5;
+    }
+  
+    &__close {
+      cursor: pointer;
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 16px;
+    }
+  
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+  
+  // Animation definitions
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
