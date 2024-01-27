@@ -38,11 +38,19 @@
       </td>
     </ng-container>
     <ng-container matColumnDef="location">
-      <th mat-header-cell *matHeaderCellDef>Doctor's Room / Ward</th>
+      <th mat-header-cell *matHeaderCellDef>Result Status</th>
       <td mat-cell *matCellDef="let element">
-        {{ element.location }}
+        Out
       </td>
     </ng-container>
+    <!-- result status (change) -->
+    <ng-container matColumnDef="result">
+      <th mat-header-cell *matHeaderCellDef>Result Status</th>
+      <td mat-cell *matCellDef="let element">
+        Out
+      </td>
+    </ng-container>
+    <!-- end -->
     <ng-container matColumnDef="paymentType">
       <th mat-header-cell *matHeaderCellDef>Payment Type</th>
       <td mat-cell *matCellDef="let element">
