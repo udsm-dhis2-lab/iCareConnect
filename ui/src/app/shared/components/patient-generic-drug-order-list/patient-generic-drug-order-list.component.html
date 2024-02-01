@@ -87,6 +87,12 @@
     mode="indeterminate"
     class="mb-3"
   ></mat-progress-bar>
+  <div class="d-flex justify-content-between p-3"> 
+  <button color="primary" class="mr-4 float-right">
+    SMS
+  </button>
+  </div>
+  <mat-divider class="mt-0"></mat-divider>
   <app-patient-medication-summary
     *ngIf="!actionOptions"
     [patientVisit]="visit"
@@ -101,6 +107,7 @@
         <th>Date & Time</th>
         <th>Care setting</th>
         <th></th>
+        <th>Dispense</th>
       </tr>
     </thead>
     <tbody *ngIf="params?.specificDrugConceptUuid">
