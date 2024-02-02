@@ -294,6 +294,7 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
                   this.createOrUpdateVisit(visitObject).subscribe(
                     (visitResponse: any) => {
                       if (visitResponse) {
+                        console.log("visitResponse", visitResponse);
                         // Create encounter with orders
                         this.errors = [];
                         zip(
@@ -305,6 +306,7 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
                                 ])
                                 .pipe(
                                   map((response: any) => {
+                                    console.log("depa", response);
                                     return {
                                       testOrder: testOrderConceptUuid,
                                       department: (response?.filter(
@@ -535,7 +537,7 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
                                                         sampleStatusResponses: any[]
                                                       ) => {
                                                         console.log(
-                                                          "sampleStatusResponses",
+                                                          "sampleStatusResponses saving",
                                                           sampleStatusResponses
                                                         );
                                                       }
