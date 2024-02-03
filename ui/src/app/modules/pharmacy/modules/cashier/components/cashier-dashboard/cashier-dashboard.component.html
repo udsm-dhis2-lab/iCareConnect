@@ -21,135 +21,34 @@
           *ngIf="!params?.currentLocation"
         ></mat-progress-bar>
         <mat-card>
-          <fieldset>
-            <legend>Drug/Non-drug</legend>
-            <div class="row">
-              <div class="w-100 d-flex justify-content-left">
-                <div class="w-75">
-                  <app-form
-                    [fields]="[searchItemFormField]"
-                    (formUpdate)="onSearchItemFormUpdate($event)"
-                  ></app-form>
-                </div>
-                <div class="w-25">
-                  <button
-                    mat-icon-button
-                    (click)="onAddToList($event, itemData)"
-                    [disabled]="!itemData"
-                    style="
-                      margin-left: 8px;
-                      border: solid 1px #22222247;
-                      margin-top: 8px;
-                      border-radius: 4px;
-                    "
-                  >
-                    <mat-icon>add</mat-icon>
-                  </button>
-                </div>
+          <!-- <fieldset>
+            <legend>Drug/Non-drug</legend> -->
+          <div class="row">
+            <div class="col-12 d-flex justify-content-left">
+              <div class="w-75">
+                <app-form
+                  [fields]="[searchItemFormField]"
+                  (formUpdate)="onSearchItemFormUpdate($event)"
+                ></app-form>
               </div>
-
-              <div class="col-12" style="overflow: auto">
-                <table class="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th>SN</th>
-                      <th>Item</th>
-                      <ng-container *ngIf="shouldShowDoseDetails === 'true'">
-                        <th [attr.colspan]="prescriptionVariables?.length">
-                          Dose details
-                        </th>
-                      </ng-container>
-                      <th *ngIf="shouldShowDoseDetails !== 'true'">
-                        Instructions
-                      </th>
-                      <th style="width: 30px">Quantity</th>
-                      <th>Price</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <ng-container
-                      *ngIf="selectedItems && selectedItems?.length > 0"
-                    >
-                      <tr *ngFor="let item of selectedItems; let count = index">
-                        <td style="width: 30px">
-                          {{ count + 1 }}
-                        </td>
-                        <td class="w-50">
-                          {{ item?.name }}
-                        </td>
-                        <ng-container *ngIf="shouldShowDoseDetails === 'true'">
-                          <td *ngFor="let variable of prescriptionVariables">
-                            <app-form
-                              [fields]="[
-                                doseFields[variable?.key + item?.itemUuid]
-                              ]"
-                              (formUpdate)="onFormDataUpdate($event)"
-                            ></app-form>
-                          </td>
-                        </ng-container>
-                        <td *ngIf="shouldShowDoseDetails !== 'true'">
-                          <app-form
-                            [fields]="[
-                              doseFields['instructions' + item?.itemUuid]
-                            ]"
-                            (formUpdate)="onFormDataUpdate($event)"
-                          ></app-form>
-                        </td>
-                        <td style="width: 30px">
-                          <app-form
-                            [fields]="[quantityFields[item?.itemUuid]]"
-                            (formUpdate)="
-                              onFormDataUpdate(
-                                $event,
-                                item?.itemUuid,
-                                item?.drug?.uuid
-                              )
-                            "
-                          ></app-form>
-                        </td>
-                        <td>
-                          {{
-                            itemsPrices[item?.itemUuid]?.ready
-                              ? itemsPrices[item?.itemUuid]?.price
-                              : "-"
-                          }}
-                        </td>
-                        <td style="width: 30px">
-                          <button
-                            (click)="onRemove($event, item)"
-                            mat-icon-button
-                          >
-                            <mat-icon color="warn">delete</mat-icon>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <ng-container *ngIf="shouldShowDoseDetails === 'true'">
-                          <td
-                            style="text-align: right"
-                            [attr.colspan]="prescriptionVariables?.length + 3"
-                          >
-                            Total Price
-                          </td>
-                        </ng-container>
-
-                        <ng-container *ngIf="shouldShowDoseDetails !== 'true'">
-                          <td colspan="4" style="text-align: right">
-                            Total Price
-                          </td>
-                        </ng-container>
-                        <td>
-                          {{ itemsPrices["total"] }}
-                        </td>
-                        <td></td>
-                      </tr>
-                    </ng-container>
-                  </tbody>
-                </table>
+              <div class="w-25">
+                <button
+                  mat-icon-button
+                  (click)="onAddToList($event, itemData)"
+                  [disabled]="!itemData"
+                  style="
+                    margin-left: 8px;
+                    border: solid 1px #22222247;
+                    margin-top: 8px;
+                    border-radius: 4px;
+                  "
+                >
+                  <mat-icon>add</mat-icon>
+                </button>
               </div>
             </div>
-          </fieldset>
+          </div>
+          <!-- </fieldset> -->
 
           <app-capture-form-data
             *ngIf="params?.customForm"
@@ -162,26 +61,130 @@
           <div class="w-100" *ngIf="errors && errors?.length > 0">
             <app-shared-error [errors]="errors"></app-shared-error>
           </div>
-          <div class="d-flex justify-content-end mt-2">
-            <button
-              mat-flat-button
-              color="primary"
-              (click)="
-                onSave(
-                  $event,
-                  selectedItems,
-                  params?.currentLocation,
-                  params?.customForm
-                )
-              "
-              [disabled]="
-                selectedItems?.length === 0 ||
-                !params?.currentLocation ||
-                !params?.customForm
-              "
-            >
-              Save
-            </button>
+
+          <div class="row">
+            <div class="col-12" style="overflow: auto">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>SN</th>
+                    <th>Item</th>
+                    <ng-container *ngIf="shouldShowDoseDetails === 'true'">
+                      <th [attr.colspan]="prescriptionVariables?.length">
+                        Dose details
+                      </th>
+                    </ng-container>
+                    <th *ngIf="shouldShowDoseDetails !== 'true'">
+                      Instructions
+                    </th>
+                    <th style="width: 30px">Quantity</th>
+                    <th>Price</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container
+                    *ngIf="selectedItems && selectedItems?.length > 0"
+                  >
+                    <tr *ngFor="let item of selectedItems; let count = index">
+                      <td style="width: 30px">
+                        {{ count + 1 }}
+                      </td>
+                      <td class="w-50">
+                        {{ item?.name }}
+                      </td>
+                      <ng-container *ngIf="shouldShowDoseDetails === 'true'">
+                        <td *ngFor="let variable of prescriptionVariables">
+                          <app-form
+                            [fields]="[
+                              doseFields[variable?.key + item?.itemUuid]
+                            ]"
+                            (formUpdate)="onFormDataUpdate($event)"
+                          ></app-form>
+                        </td>
+                      </ng-container>
+                      <td *ngIf="shouldShowDoseDetails !== 'true'">
+                        <app-form
+                          [fields]="[
+                            doseFields['instructions' + item?.itemUuid]
+                          ]"
+                          (formUpdate)="onFormDataUpdate($event)"
+                        ></app-form>
+                      </td>
+                      <td style="width: 30px">
+                        <app-form
+                          [fields]="[quantityFields[item?.itemUuid]]"
+                          (formUpdate)="
+                            onFormDataUpdate(
+                              $event,
+                              item?.itemUuid,
+                              item?.drug?.uuid
+                            )
+                          "
+                        ></app-form>
+                      </td>
+                      <td>
+                        {{
+                          itemsPrices[item?.itemUuid]?.ready
+                            ? itemsPrices[item?.itemUuid]?.price
+                            : "-"
+                        }}
+                      </td>
+                      <td style="width: 30px">
+                        <button
+                          (click)="onRemove($event, item)"
+                          mat-icon-button
+                        >
+                          <mat-icon color="warn">delete</mat-icon>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <ng-container *ngIf="shouldShowDoseDetails === 'true'">
+                        <td
+                          style="text-align: right"
+                          [attr.colspan]="prescriptionVariables?.length + 3"
+                        >
+                          Total Price
+                        </td>
+                      </ng-container>
+
+                      <ng-container *ngIf="shouldShowDoseDetails !== 'true'">
+                        <td colspan="4" style="text-align: right">
+                          Total Price
+                        </td>
+                      </ng-container>
+                      <td>
+                        {{ itemsPrices["total"] }}
+                      </td>
+                      <td></td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end mt-2">
+              <button
+                mat-flat-button
+                color="primary"
+                (click)="
+                  onSave(
+                    $event,
+                    selectedItems,
+                    params?.currentLocation,
+                    params?.customForm
+                  )
+                "
+                [disabled]="
+                  selectedItems?.length === 0 ||
+                  !params?.currentLocation ||
+                  !params?.customForm
+                "
+              >
+                Save
+              </button>
+            </div>
           </div>
         </mat-card>
       </ng-container>
