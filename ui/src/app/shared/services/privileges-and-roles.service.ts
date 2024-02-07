@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { from, Observable, of } from "rxjs";
 import { catchError, map } from "rxjs/operators";
-import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service';
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import {
   Api,
   PrivilegeCreate,
@@ -16,23 +16,28 @@ import {
   providedIn: "root",
 })
 export class PrivilegesAndRolesService {
-  roleToSave: any = {}
+  roleToSave: any = {};
   constructor(private api: Api, private httpClient: OpenmrsHttpClientService) {}
 
   getPrivileges(parameters: any): Observable<PrivilegeGetFull[]> {
-    if(parameters?.q === undefined || parameters?.q === '' || parameters?.q === null){
+    if (
+      parameters?.q === undefined ||
+      parameters?.q === "" ||
+      parameters?.q === null
+    ) {
       return from(this.api.privilege.getAllPrivileges(parameters)).pipe(
         map((response) => response?.results),
         catchError((error) => of(error))
       );
-    }else{
+    } else {
       return this.httpClient
-      .get(`icare/privileges?q=${parameters.q}`)
-      .pipe(
-        map(response =>response),
-        catchError((error) => of(error))
-      );
-
+        .get(
+          `icare/privileges?q=${parameters.q}&startIndex=${parameters?.startIndex}&limit=${parameters?.limit}`
+        )
+        .pipe(
+          map((response) => response),
+          catchError((error) => of(error))
+        );
     }
   }
 
@@ -53,17 +58,19 @@ export class PrivilegesAndRolesService {
   }
 
   getRoles(parameters: any): Observable<RoleGetFull[]> {
-    if(parameters?.q === undefined || parameters?.q === '' || parameters?.q === null){
+    if (
+      parameters?.q === undefined ||
+      parameters?.q === "" ||
+      parameters?.q === null
+    ) {
       return from(this.api.role.getAllRoles(parameters)).pipe(
         map((response) => response?.results),
         catchError((error) => of(error))
       );
-    } else{
-      return this.httpClient
-      .get(`icare/roles?q=${parameters.q}`)
-      .pipe(
-        map(response => response),
-        catchError((error)=>of(error))
+    } else {
+      return this.httpClient.get(`icare/roles?q=${parameters.q}`).pipe(
+        map((response) => response),
+        catchError((error) => of(error))
       );
     }
   }
@@ -81,9 +88,8 @@ export class PrivilegesAndRolesService {
       description: role?.description,
       name: role?.name,
       privileges: role?.privileges,
-      inheritedRoles: role?.inheritedRoles
-
-    }
+      inheritedRoles: role?.inheritedRoles,
+    };
     return (
       role?.uuid
         ? from(this.api.role.updateRole(role?.uuid, role))
