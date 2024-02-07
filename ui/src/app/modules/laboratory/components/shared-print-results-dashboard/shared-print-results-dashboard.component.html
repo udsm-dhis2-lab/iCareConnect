@@ -60,21 +60,12 @@
         [clinicalDataUuids]="params?.clinicalDataUuids"
       ></app-shared-sample-information>
 
-      <div style="margin-top: 8px; width: 100%">
-        <app-shared-sample-orders
-          [samplesData]="department?.samples"
-        ></app-shared-sample-orders>
-      </div>
       <div
         style="
-          margin-top: 12px;
           width: 100%;
+          margin-top: 16px;
           padding: 16px;
           border: solid 1px #eee;
-        "
-        *ngIf="
-          formUuidsReferencesForSampleReportDisplay &&
-          formUuidsReferencesForSampleReportDisplay.length > 0
         "
       >
         <table
@@ -84,12 +75,25 @@
           <tbody style="width: 100%">
             <tr style="width: 100%">
               <td colspan="3">
-                <app-shared-lab-report-form-data
-                  [formUuidsReferencesForSampleReportDisplay]="
-                    formUuidsReferencesForSampleReportDisplay
+                <div style="margin-top: 4px; width: 100%">
+                  <app-shared-sample-orders
+                    [samplesData]="department?.samples"
+                  ></app-shared-sample-orders>
+                </div>
+                <div
+                  style="width: 100%; margin-top: 16px"
+                  *ngIf="
+                    formUuidsReferencesForSampleReportDisplay &&
+                    formUuidsReferencesForSampleReportDisplay.length > 0
                   "
-                  [visit]="department?.samples[0]?.visit"
-                ></app-shared-lab-report-form-data>
+                >
+                  <app-shared-lab-report-form-data
+                    [formUuidsReferencesForSampleReportDisplay]="
+                      formUuidsReferencesForSampleReportDisplay
+                    "
+                    [visit]="department?.samples[0]?.visit"
+                  ></app-shared-lab-report-form-data>
+                </div>
               </td>
             </tr>
           </tbody>

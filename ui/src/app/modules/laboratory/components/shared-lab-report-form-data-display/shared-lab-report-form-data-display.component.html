@@ -7,8 +7,8 @@
           encounter?.keyedObs[formField?.field?.concept?.uuid]
         "
       >
-        <p style="text-align: left">
-          {{ formField?.field?.display }} :
+        <p style="text-align: left; font-weight: 600">
+          <b> {{ formField?.field?.display }} : </b>
           <b>
             {{
               !encounter?.keyedObs[formField?.field?.concept?.uuid]
@@ -36,7 +36,9 @@
       <ng-container *ngIf="formField?.field?.concept?.setMembers?.length > 0">
         <ng-container *ngIf="formField?.atLeastOnFormFieldSetMemberHasData">
           <div class="w-100" style="text-align: left">
-            <p style="text-align: left">{{ formField?.field?.display }} :</p>
+            <p style="text-align: left">
+              <b> {{ formField?.field?.display }} : </b>
+            </p>
           </div>
           <div class="w-100">
             <table class="table" style="border: 0">
