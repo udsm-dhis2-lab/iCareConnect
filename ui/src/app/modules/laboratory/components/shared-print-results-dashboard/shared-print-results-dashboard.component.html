@@ -69,20 +69,31 @@
         style="
           margin-top: 12px;
           width: 100%;
-          margin-left: 16px;
-          margin-right: 16px;
+          padding: 16px;
+          border: solid 1px #eee;
         "
         *ngIf="
           formUuidsReferencesForSampleReportDisplay &&
           formUuidsReferencesForSampleReportDisplay.length > 0
         "
       >
-        <app-shared-lab-report-form-data
-          [formUuidsReferencesForSampleReportDisplay]="
-            formUuidsReferencesForSampleReportDisplay
-          "
-          [visit]="department?.samples[0]?.visit"
-        ></app-shared-lab-report-form-data>
+        <table
+          style="width: 100%; border: 0"
+          data-pdfmake="{'widths':[200,157,130]}"
+        >
+          <tbody style="width: 100%">
+            <tr style="width: 100%">
+              <td colspan="3">
+                <app-shared-lab-report-form-data
+                  [formUuidsReferencesForSampleReportDisplay]="
+                    formUuidsReferencesForSampleReportDisplay
+                  "
+                  [visit]="department?.samples[0]?.visit"
+                ></app-shared-lab-report-form-data>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div style="margin-top: 8px; width: 100%">
         <app-shared-sample-order-results
