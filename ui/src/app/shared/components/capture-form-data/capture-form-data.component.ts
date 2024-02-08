@@ -4,6 +4,7 @@ import { FormValue } from "../../modules/form/models/form-value.model";
 import { Patient } from "../../resources/patient/models/patient.model";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { VisitsService } from "../../resources/visits/services";
+import { groupBy } from "lodash";
 
 @Component({
   selector: "app-capture-form-data",
@@ -30,6 +31,11 @@ export class CaptureFormDataComponent implements OnInit {
   constructor(private visitService: VisitsService) {}
 
   ngOnInit(): void {
+    this.form = {
+      ...this.form,
+      formattedFormFields: groupBy(this.form?.formFields, "fieldPart"),
+    };
+    console.log("FORM", this.form);
     this.observations$ = this.visit
       ? this.visitService.getVisitObservationsByVisitUuid({
           uuid: this.visit?.uuid,
