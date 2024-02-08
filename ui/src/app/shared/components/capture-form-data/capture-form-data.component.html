@@ -17,6 +17,7 @@
           <ng-container *ngFor="let formField of fields">
             <!-- {{ formField | json }} -->
             <fieldset
+              style="padding: 8px !important"
               *ngIf="
                 !formField?.formField &&
                 formField?.setMembers &&
