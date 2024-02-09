@@ -268,16 +268,15 @@
             </tr>
           </ng-container>
         </ng-container>
-        <ng-container 
-            *ngIf="
-            (
-              orderWithResults?.testAllocations
-            )?.length > 0
-          "
-        >
-        <p></p>
-        <p style="text-align: left;"><b>Remarks: </b> {{orderWithResults?.testAllocations?.[0]?.statuses?.[0]?.category === "RESULT_REMARKS" ? orderWithResults?.testAllocations?.[0]?.statuses?.[0]?.remarks : "" }}</p>
-
+        <ng-container *ngIf="orderWithResults?.testAllocations?.length > 0">
+          <tr>
+            <td colspan="5">
+              <p style="text-align: left">
+                <b>Remarks: </b>
+                {{orderWithResults?.testAllocations?.[0]?.statuses?.[0]?.category === "RESULT_REMARKS" ? orderWithResults?.testAllocations?.[0]?.statuses?.[0]?.remarks : "" }}
+              </p>
+            </td>
+          </tr>
         </ng-container>
         <ng-container
           *ngIf="

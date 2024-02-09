@@ -21,33 +21,71 @@
           *ngIf="!params?.currentLocation"
         ></mat-progress-bar>
         <mat-card>
-          <fieldset>
-            <legend>Drug/Non-drug</legend>
-            <div class="row">
-              <div
-                class="col-12"
-                style="overflow: auto"
-                *ngIf="selectedItems && selectedItems?.length > 0"
-              >
-                <table class="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th>SN</th>
-                      <th>Item</th>
-                      <ng-container *ngIf="shouldShowDoseDetails === 'true'">
-                        <th [attr.colspan]="prescriptionVariables?.length">
-                          Dose details
-                        </th>
-                      </ng-container>
-                      <th *ngIf="shouldShowDoseDetails !== 'true'">
-                        Instructions
+          <!-- <fieldset>
+            <legend>Drug/Non-drug</legend> -->
+          <div class="row">
+            <div class="col-12 d-flex justify-content-left">
+              <div class="w-75">
+                <app-form
+                  [fields]="[searchItemFormField]"
+                  (formUpdate)="onSearchItemFormUpdate($event)"
+                ></app-form>
+              </div>
+              <div class="w-25">
+                <button
+                  mat-icon-button
+                  (click)="onAddToList($event, itemData)"
+                  [disabled]="!itemData"
+                  style="
+                    margin-left: 8px;
+                    border: solid 1px #22222247;
+                    margin-top: 8px;
+                    border-radius: 4px;
+                  "
+                >
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- </fieldset> -->
+
+          <app-capture-form-data
+            *ngIf="params?.customForm"
+            [form]="params?.customForm"
+            [isGenericForm]="true"
+            [isFormHorizontal]="true"
+            [formValidationRules]="[]"
+            (formDataUpdate)="onFormUpdate($event)"
+          ></app-capture-form-data>
+          <div class="w-100" *ngIf="errors && errors?.length > 0">
+            <app-shared-error [errors]="errors"></app-shared-error>
+          </div>
+
+          <div class="row">
+            <div class="col-12" style="overflow: auto">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>SN</th>
+                    <th>Item</th>
+                    <ng-container *ngIf="shouldShowDoseDetails === 'true'">
+                      <th [attr.colspan]="prescriptionVariables?.length">
+                        Dose details
                       </th>
-                      <th style="width: 30px">Quantity</th>
-                      <th>Price</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                    </ng-container>
+                    <th *ngIf="shouldShowDoseDetails !== 'true'">
+                      Instructions
+                    </th>
+                    <th style="width: 30px">Quantity</th>
+                    <th>Price</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container
+                    *ngIf="selectedItems && selectedItems?.length > 0"
+                  >
                     <tr *ngFor="let item of selectedItems; let count = index">
                       <td style="width: 30px">
                         {{ count + 1 }}
@@ -121,66 +159,32 @@
                       </td>
                       <td></td>
                     </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div class="w-100 d-flex justify-content-left">
-                <div class="w-75">
-                  <app-form
-                    [fields]="[searchItemFormField]"
-                    (formUpdate)="onSearchItemFormUpdate($event)"
-                  ></app-form>
-                </div>
-                <div class="w-25">
-                  <button
-                    mat-icon-button
-                    (click)="onAddToList($event, itemData)"
-                    [disabled]="!itemData"
-                    style="
-                      margin-left: 8px;
-                      border: solid 1px #22222247;
-                      margin-top: 8px;
-                      border-radius: 4px;
-                    "
-                  >
-                    <mat-icon>add</mat-icon>
-                  </button>
-                </div>
-              </div>
+                  </ng-container>
+                </tbody>
+              </table>
             </div>
-          </fieldset>
 
-          <app-capture-form-data
-            *ngIf="params?.customForm"
-            [form]="params?.customForm"
-            [isGenericForm]="true"
-            [isFormHorizontal]="true"
-            [formValidationRules]="[]"
-            (formDataUpdate)="onFormUpdate($event)"
-          ></app-capture-form-data>
-          <div class="w-100" *ngIf="errors && errors?.length > 0">
-            <app-shared-error [errors]="errors"></app-shared-error>
-          </div>
-          <div class="d-flex justify-content-end mt-2">
-            <button
-              mat-flat-button
-              color="primary"
-              (click)="
-                onSave(
-                  $event,
-                  selectedItems,
-                  params?.currentLocation,
-                  params?.customForm
-                )
-              "
-              [disabled]="
-                selectedItems?.length === 0 ||
-                !params?.currentLocation ||
-                !params?.customForm
-              "
-            >
-              Save
-            </button>
+            <div class="col-12 d-flex justify-content-end mt-2">
+              <button
+                mat-flat-button
+                color="primary"
+                (click)="
+                  onSave(
+                    $event,
+                    selectedItems,
+                    params?.currentLocation,
+                    params?.customForm
+                  )
+                "
+                [disabled]="
+                  selectedItems?.length === 0 ||
+                  !params?.currentLocation ||
+                  !params?.customForm
+                "
+              >
+                Save
+              </button>
+            </div>
           </div>
         </mat-card>
       </ng-container>
