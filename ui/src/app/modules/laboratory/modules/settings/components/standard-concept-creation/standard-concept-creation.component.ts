@@ -71,6 +71,7 @@ export class StandardConceptCreationComponent implements OnInit {
   errors: any[];
   attributesValues: any[] = [];
   interpretations: any[] = [];
+  showList: boolean = true;
   constructor(
     private conceptService: ConceptsService,
     private billableItemService: BillableItemsService,
@@ -611,5 +612,10 @@ export class StandardConceptCreationComponent implements OnInit {
           });
         }
       });
+  }
+
+  toggleItemsList(event: Event): void {
+    event.stopPropagation();
+    this.showList = !this.showList;
   }
 }

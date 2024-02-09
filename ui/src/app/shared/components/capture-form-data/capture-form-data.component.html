@@ -1,5 +1,5 @@
 <div *ngIf="{ observations: observations$ | async } as params">
-  <ng-container *ngIf="(isLIS || isGenericForm) && form?.groupedFields">
+  <ng-container *ngIf="isGenericForm || form?.groupedFields">
     <!-- {{ form?.groupedFields | json }} -->
     <ng-container *ngIf="!isGenericForm">
       <ng-container *ngFor="let fields of form?.groupedFields">
@@ -17,6 +17,7 @@
           <ng-container *ngFor="let formField of fields">
             <!-- {{ formField | json }} -->
             <fieldset
+              style="padding: 8px !important"
               *ngIf="
                 !formField?.formField &&
                 formField?.setMembers &&
@@ -47,7 +48,7 @@
                     [fields]="formField?.formFields"
                     [isFormHorizontal]="true"
                     [isReport]="isReport"
-                    [colClass]="'col-4'"
+                    [colClass]="isLIS ? 'col-4' : null"
                     [formId]="form?.uuid"
                     [formValidationRules]="formValidationRules"
                     [fieldsData]="observations"
@@ -72,7 +73,7 @@
       ></app-form>
     </ng-container>
   </ng-container>
-  <ng-container *ngIf="!isLIS && !isGenericForm">
+  <!-- <ng-container *ngIf="!isLIS && !isGenericForm">
     <div *ngFor="let formField of form?.formFields">
       <div
         *ngIf="
@@ -143,7 +144,6 @@
               member?.options?.length > 0
             "
           >
-            <!-- {{ member | json }} -->
             <app-form
               [fields]="[member]"
               [isFormHorizontal]="true"
@@ -204,7 +204,6 @@
                 class="form-under-field-set"
                 *ngFor="let subMember of member?.setMembers"
               >
-                <!-- {{ subMember | json }} -->
                 <app-form
                   *ngIf="subMember?.formField && !subMember?.formFields"
                   [fields]="[subMember?.formField]"
@@ -221,5 +220,5 @@
         </div>
       </fieldset>
     </div>
-  </ng-container>
+  </ng-container> -->
 </div>

@@ -20,7 +20,11 @@ export class PharmacyDashboardHomeComponent implements OnInit {
       Number(today.split("-")[1]) - 1,
       Number(today.split("-")[2]) - this.datesRangeDifference
     );
-    this.endDate = new Date();
+    this.endDate = new Date(
+      Number(today.split("-")[0]),
+      Number(today.split("-")[1]),
+      Number(today.split("-")[2]) + 1
+    );
     this.datesParameters = {
       startDate: formatDateToYYMMDD(new Date(this.startDate)),
       endDate: formatDateToYYMMDD(new Date(this.endDate)),

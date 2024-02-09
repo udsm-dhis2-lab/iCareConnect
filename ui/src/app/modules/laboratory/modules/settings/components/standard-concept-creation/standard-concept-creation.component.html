@@ -7,10 +7,27 @@
   } as params"
 >
   <div
-    class="col-lg-8 col-md-8 col-sx-12 col-sm-12"
+    class="col-sx-12 col-sm-12"
+    [ngClass]="{
+      'col-lg-8 col-md-8': showList,
+      'col-lg-12 col-md-12': !showList
+    }"
     style="border-right: solid 1px #eee"
   >
-    <div class="h5">New {{ itemTypeName }}</div>
+    <div class="row">
+      <div class="col-8">
+        <div class="h5">New {{ itemTypeName }}</div>
+      </div>
+      <div class="col-4 d-flex justify-content-end">
+        <button
+          [title]="showList ? 'Hide list' : 'Show list'"
+          (click)="toggleItemsList($event)"
+          mat-icon-button
+        >
+          <mat-icon>menu</mat-icon>
+        </button>
+      </div>
+    </div>
     <hr />
     <div class="loading-overlay" *ngIf="saving">
       <div class="text-center">
@@ -150,7 +167,7 @@
       </button>
     </div>
   </div>
-  <div class="col-lg-4 col-md-4 col-sx-12 col-sm-12">
+  <div class="col-lg-4 col-md-4 col-sx-12 col-sm-12" *ngIf="showList">
     <div class="h5" *ngIf="itemTypeName">{{ itemTypeName }}s</div>
     <app-standard-concepts-list
       *ngIf="!saving"
