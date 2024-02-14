@@ -78,6 +78,9 @@
           "configurations": {
             "production": {
               "browserTarget": "icare-ui:build:production"
+            },
+            "development": {
+              "browserTarget": "icare-ui:build:development"
             }
           }
         },
