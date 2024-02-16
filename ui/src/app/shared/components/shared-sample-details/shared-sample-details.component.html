@@ -61,10 +61,10 @@
           </div>
         </div>
       </div>
-      <div class="w-100">
+      <div class="row d-flex">
         <ng-container *ngFor="let encounter of params?.encounterInformation">
           <div
-            class="w-100"
+            class="col-md-6 col-sm-12 col-sx-12"
             *ngFor="let formField of encounter?.form?.formFields"
           >
             <ng-container
@@ -101,7 +101,7 @@
             <ng-container
               *ngIf="formField?.field?.concept?.setMembers?.length > 0"
             >
-              {{ formField?.field?.display }} :
+              <b> {{ formField?.field?.display }} : </b>
               <div
                 class="w-100 ml-4 mr-4"
                 *ngFor="
