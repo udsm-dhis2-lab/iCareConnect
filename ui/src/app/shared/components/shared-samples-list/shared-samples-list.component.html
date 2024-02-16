@@ -434,6 +434,7 @@
                       class="ml-2"
                       mat-flat-button
                       color="primary"
+                      [disabled]="!sample?.hasResults"
                       (click)="onPrint($event, sample)"
                     >
                       Print
@@ -445,6 +446,7 @@
                   >
                     <button
                       mat-flat-button
+                      [disabled]="!sample?.hasResults"
                       color="primary"
                       (click)="onPrint($event, sample)"
                     >
@@ -817,9 +819,10 @@
                                     >
                                       <span *ngIf="tabType !== 'authorization'">
                                         {{
-                                          (sample?.ordersWithResults?.length ===
-                                          0 || sample?.ordersWithResults?.length ===
-                                          null )
+                                          sample?.ordersWithResults?.length ===
+                                            0 ||
+                                          sample?.ordersWithResults?.length ===
+                                            null
                                             ? "Results entry"
                                             : "Edit Results"
                                         }}
@@ -832,6 +835,7 @@
                                       class="ml-2"
                                       mat-flat-button
                                       color="primary"
+                                      [disabled]="!sample?.hasResults"
                                       (click)="onPrint($event, sample)"
                                     >
                                       Print
@@ -844,6 +848,7 @@
                                     <button
                                       mat-flat-button
                                       color="primary"
+                                      [disabled]="!sample?.hasResults"
                                       (click)="onPrint($event, sample)"
                                     >
                                       Print
