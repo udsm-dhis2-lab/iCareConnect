@@ -163,6 +163,7 @@ export class FormService {
         })
       );
     } else if (searchControlType === "user") {
+      // console.log("parameter", parameters);
       const v: string =
         "custom:(uuid,username,person:(uuid,display))".toString();
       if (parameters?.value) {

@@ -35,7 +35,6 @@ export class CaptureFormDataComponent implements OnInit {
       ...this.form,
       formattedFormFields: groupBy(this.form?.formFields, "fieldPart"),
     };
-    console.log("FORM", this.form);
     this.observations$ = this.visit
       ? this.visitService.getVisitObservationsByVisitUuid({
           uuid: this.visit?.uuid,
