@@ -84,7 +84,7 @@ export function getSanitizedFormObject(
               conceptSourceUuid && mapping?.conceptReferenceTerm?.code == "USER"
         ) || []
       )?.length > 0
-        ? "person"
+        ? "user"
         : "concept",
     shouldHaveLiveSearchForDropDownFields:
       isDiagnosis ||

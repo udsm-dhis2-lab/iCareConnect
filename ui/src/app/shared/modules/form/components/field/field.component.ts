@@ -211,7 +211,6 @@ export class FieldComponent implements AfterViewInit {
           ? "custom:(uuid,display,datatype,conceptClass,mappings)"
           : "custom:(uuid,display)",
     };
-    // console.log("field", field);
     this.members$ = this.formService.searchItem(
       parameters,
       this.field?.searchControlType,
