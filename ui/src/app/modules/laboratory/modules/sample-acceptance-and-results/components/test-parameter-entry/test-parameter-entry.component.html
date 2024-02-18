@@ -20,9 +20,11 @@
       errors?.length === 0
     "
     [parameter]="params?.testParameter"
-    [calculatedValueExpressionAttributeType]="calculatedValueExpressionAttributeType"
+    [calculatedValueExpressionAttributeType]="
+      calculatedValueExpressionAttributeType
+    "
     [allocation]="allocation"
-    (attributes) = "onGetAttributes($event)"
+    (attributes)="onGetAttributes($event)"
     [disabled]="disabled"
     [isLIS]="isLIS"
     [conceptNameType]="conceptNameType"

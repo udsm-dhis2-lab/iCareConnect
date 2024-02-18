@@ -39,3 +39,5 @@ export * from "./lab-orders-billing-info.selector";
 export * from "./consultation.selectors";
 
 export * from "./selected-system-settings.selectors";
+
+export * from "./datavalues.selectors";

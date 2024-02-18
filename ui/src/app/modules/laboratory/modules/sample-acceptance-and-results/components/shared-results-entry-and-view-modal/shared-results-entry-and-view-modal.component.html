@@ -2,9 +2,11 @@
   *ngIf="{
     sampleAllocations: sampleAllocations$ | async,
     multipleResultsAttributeType: multipleResultsAttributeType$ | async,
-    calculatedValueExpressionAttributeType : calculatedValueExpressionAttributeType$ | async,
+    calculatedValueExpressionAttributeType:
+      calculatedValueExpressionAttributeType$ | async,
     visitDetails: visitDetails$ | async,
-    providerDetails: providerDetails$ | async
+    providerDetails: providerDetails$ | async,
+    dataValuesEntities: dataValuesEntities$ | async
   } as params"
 >
   <mat-toolbar color="primary">
@@ -159,7 +161,18 @@
                                 "
                               >
                                 <app-test-parameter-entry
-                                  *ngIf="preferredName && ((calculatedParameters['allocationData?.parameter?.uuid'] && calculatedParameters['allocationData?.parameter?.uuid']?.render == true) || !calculatedParameters['allocationData?.parameter?.uuid'])"
+                                  *ngIf="
+                                    preferredName &&
+                                    ((calculatedParameters[
+                                      'allocationData?.parameter?.uuid'
+                                    ] &&
+                                      calculatedParameters[
+                                        'allocationData?.parameter?.uuid'
+                                      ]?.render == true) ||
+                                      !calculatedParameters[
+                                        'allocationData?.parameter?.uuid'
+                                      ])
+                                  "
                                   [parameterUuid]="
                                     allocationData?.parameter?.uuid
                                   "
@@ -171,14 +184,24 @@
                                     data?.actionType === 'review' &&
                                     !data?.LISConfigurations?.isLIS
                                   "
-                                  [finalResult]="calculatedParameters['allocationData?.parameter?.uuid'] ?  calculatedParameters['allocationData?.parameter?.uuid']?.value: allocationData?.finalResult"
+                                  [finalResult]="
+                                    calculatedParameters[
+                                      'allocationData?.parameter?.uuid'
+                                    ]
+                                      ? calculatedParameters[
+                                          'allocationData?.parameter?.uuid'
+                                        ]?.value
+                                      : allocationData?.finalResult
+                                  "
                                   [isLIS]="data?.LISConfigurations?.isLIS"
                                   [conceptNameType]="preferredName"
                                   (data)="
                                     onGetFieldData(
                                       $event,
                                       allocationData?.parameter,
-                                      allocationData
+                                      allocationData,
+                                      params?.calculatedValueExpressionAttributeType,
+                                      params?.dataValuesEntities
                                     )
                                   "
                                 ></app-test-parameter-entry>
@@ -266,7 +289,10 @@
                                 "
                               >
                                 <app-test-parameter-entry
-                                  *ngIf="preferredName && params.calculatedValueExpressionAttributeType"
+                                  *ngIf="
+                                    preferredName &&
+                                    params.calculatedValueExpressionAttributeType
+                                  "
                                   [parameterUuid]="
                                     allocationData?.parameter?.uuid
                                   "
@@ -279,15 +305,18 @@
                                     !data?.LISConfigurations?.isLIS
                                   "
                                   [finalResult]="allocationData?.finalResult"
-                                  [calculatedValueExpressionAttributeType] = "params.calculatedValueExpressionAttributeType"
-                                  (attributes) = "onGetAttributes($event, params.calculatedValueExpressionAttributeType,allocationData?.parameter?.uuid)"
+                                  [calculatedValueExpressionAttributeType]="
+                                    params.calculatedValueExpressionAttributeType
+                                  "
                                   [isLIS]="data?.LISConfigurations?.isLIS"
                                   [conceptNameType]="preferredName"
                                   (data)="
                                     onGetFieldData(
                                       $event,
                                       allocationData?.parameter,
-                                      allocationData
+                                      allocationData,
+                                      params?.calculatedValueExpressionAttributeType,
+                                      params?.dataValuesEntities
                                     )
                                   "
                                 ></app-test-parameter-entry>

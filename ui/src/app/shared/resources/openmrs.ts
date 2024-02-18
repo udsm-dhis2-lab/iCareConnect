@@ -3294,6 +3294,7 @@ export interface ConceptGetFull {
   name?: any;
   names?: any[];
   set?: boolean;
+  attributes?: any[];
 }
 
 export interface ConceptCreate {
