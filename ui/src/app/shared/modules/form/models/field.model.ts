@@ -29,6 +29,8 @@ export class Field<T> {
   multiple?: boolean;
   allowCustomDateTime?: boolean;
   conceptUuid?: string;
+  isAutoCalculated?: boolean;
+  autoCalculationAttribute?: any;
 
   constructor(
     options: {
@@ -60,6 +62,8 @@ export class Field<T> {
       multiple?: boolean;
       allowCustomDateTime?: boolean;
       conceptUuid?: string;
+      isAutoCalculated?: boolean;
+      autoCalculationAttribute?: any;
     } = {}
   ) {
     this.value = options.value;
@@ -90,5 +94,7 @@ export class Field<T> {
     this.multiple = options?.multiple;
     this.allowCustomDateTime = options?.allowCustomDateTime;
     this.conceptUuid = options?.conceptUuid;
+    this.isAutoCalculated = options?.isAutoCalculated;
+    this.autoCalculationAttribute = options?.autoCalculationAttribute;
   }
 }

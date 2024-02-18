@@ -11,11 +11,14 @@ import {
 import { FormGroup } from "@angular/forms";
 import { Field } from "../../models/field.model";
 import { FieldControlService } from "../../services";
-import { find } from "lodash";
-import { FieldData, FieldsData } from "../../models/fields-data.model";
+import { FieldsData } from "../../models/fields-data.model";
 import { FormValue } from "../../models/form-value.model";
 import { FieldComponent } from "../field/field.component";
 import { validateFormFields } from "../../helpers/validate-form-fields.helper";
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+import { Observable } from "rxjs";
+import { calculateFieldValueFromCalculationExpression } from "../../../../../core/helpers/autocalculation.helper";
 
 @Component({
   selector: "app-form",
@@ -33,6 +36,7 @@ export class FormComponent implements OnInit {
   @Input() shouldDisable: boolean;
   @Input() isReport: boolean;
   @Input() colClass: string;
+  @Input() dependedFields: string[];
 
   @Output() formUpdate: EventEmitter<any> = new EventEmitter<any>();
   @Output() enterKeyPressedFields: EventEmitter<any> = new EventEmitter<any>();
@@ -49,24 +53,31 @@ export class FormComponent implements OnInit {
   @ViewChild(FieldComponent, { static: false })
   fieldComponent: FieldComponent;
   validationIssues: any = {};
+  dataValueEntities$: Observable<any>;
 
-  constructor(private fieldControlService: FieldControlService) {}
+  constructor(
+    private fieldControlService: FieldControlService,
+    private store: Store<AppState>
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     this.shouldDisable = this.isReport ? true : this.shouldDisable;
-    this.form = this.fieldControlService.toFormGroup(
-      this.fields,
-      this.fieldsData
-    );
     this.values = this.form.getRawValue();
-    // console.log("formValidationRules", this.formValidationRules);
     this.validationIssues = validateFormFields(
       this.formValidationRules,
       this.values
     );
+
+    this.form = this.fieldControlService.toFormGroup(
+      this.fields,
+      this.fieldsData
+    );
+
+    // console.log("formValidationRules", this.formValidationRules);
   }
 
   ngOnInit(): void {
+    // console.log("FIELDS data", this.fieldsData);
     this.form = this.fieldControlService.toFormGroup(
       this.fields,
       this.fieldsData
@@ -79,7 +90,7 @@ export class FormComponent implements OnInit {
 
   onFieldUpdate(form: FormGroup): void {
     if (!this.showSaveButton && form) {
-      this.values = form.getRawValue();
+      this.values = this.form.getRawValue();
 
       this.validationIssues = validateFormFields(
         this.formValidationRules,

@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from "@angular/core";
+import { Component, Inject, OnInit, ViewChild } from "@angular/core";
 import {
   MatDialogRef,
   MAT_DIALOG_DATA,
@@ -7,7 +7,7 @@ import {
 import { Observable, of, zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { ConceptGet } from "src/app/shared/resources/openmrs";
+import { ConceptGet, ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { SampleAllocationObject } from "src/app/shared/resources/sample-allocations/models/allocation.model";
 import { SampleAllocationService } from "src/app/shared/resources/sample-allocations/services/sample-allocation.service";
 
@@ -23,6 +23,10 @@ import { SamplesService } from "src/app/modules/laboratory/resources/services/sa
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
+import { TestParameterEntryComponent } from "../test-parameter-entry/test-parameter-entry.component";
+import { calculateFieldValueFromCalculationExpression } from "src/app/core/helpers/autocalculation.helper";
+import { getDataValuesEntities } from "src/app/store/selectors";
+import { upsertEnteredDataValues } from "src/app/store/actions";
 
 @Component({
   selector: "app-shared-results-entry-and-view-modal",
@@ -58,7 +62,10 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   attributes: any;
   attributeTypeUuid: any;
   calculatedParameters: any = {};
+  dataValuesEntities$: Observable<any>;
 
+  @ViewChild(TestParameterEntryComponent)
+  testParameterEntryComponent!: TestParameterEntryComponent;
   constructor(
     private dialogRef: MatDialogRef<SharedResultsEntryAndViewModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -111,6 +118,8 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
       );
 
     this.getAllocations();
+
+    this.dataValuesEntities$ = this.store.select(getDataValuesEntities);
     this.visitDetails$ = this.visitService
       .getVisitDetailsByVisitUuid(this.data?.sample?.visit?.uuid, {
         v: "custom:(encounters:(uuid,display,obs,orders,encounterDatetime,encounterType,location))",
@@ -440,6 +449,55 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
       });
     }
     this.saveFilesAsObservations(this.files, order);
+    if (Object.keys(this.calculatedParameters).length > 0) {
+      data = [
+        ...data,
+        ...Object.keys(this.calculatedParameters).map((key: string) => {
+          return {
+            concept: {
+              uuid: key,
+            },
+            testAllocation: {
+              uuid: data[0]?.testAllocation?.uuid,
+            },
+            valueNumeric: this.calculatedParameters[key]?.parameter?.isNumeric
+              ? this.calculatedParameters[key]?.calculatedValue
+              : null,
+            valueText: this.calculatedParameters[key]?.parameter?.isText
+              ? this.calculatedParameters[key]?.calculatedValue
+              : null,
+
+            valueCoded: this.calculatedParameters[key]?.parameter?.isCoded
+              ? {
+                  uuid: this.calculatedParameters[key]?.calculatedValue,
+                }
+              : null,
+            abnormal: false,
+            instrument:
+              order && this.selectedInstruments[order?.concept?.uuid]
+                ? {
+                    uuid: this.selectedInstruments[order?.concept?.uuid],
+                  }
+                : null,
+            status: {
+              category: "RESULT_REMARKS",
+              status: "REMARKS",
+              remarks: this.remarksData[order?.concept?.uuid],
+            },
+            testedDate:
+              this.selectedTestedByDetails[order?.concept?.uuid] &&
+              this.selectedTestedByDetails[order?.concept?.uuid].date
+                ? this.selectedTestedByDetails[order?.concept?.uuid].date
+                : null,
+            testedBy:
+              this.selectedTestedByDetails[order?.concept?.uuid] &&
+              this.selectedTestedByDetails[order?.concept?.uuid]?.testedBy
+                ? this.selectedTestedByDetails[order?.concept?.uuid].testedBy
+                : null,
+          };
+        }),
+      ];
+    }
     if (data?.length > 0) {
       this.sampleAllocationService
         .saveResultsViaAllocations(data)
@@ -750,11 +808,48 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
 
   onGetFieldData(
     dataObject: any,
-    parameter: ConceptGet,
-    allocation: SampleAllocationObject
+    parameter: ConceptGetFull,
+    allocation: SampleAllocationObject,
+    calculatedValueExpressionAttributeType?: string,
+    dataValuesEntities?: any
   ): void {
-    if(this.calculatedParameters[parameter?.uuid])
-    this.calculateValue(parameter, dataObject);
+    this.dataValuesEntities$ = this.store.select(getDataValuesEntities);
+    let newDataValuesEntitiesData = Object.keys(dataValuesEntities).map(
+      (key: string) => {
+        if (key !== parameter?.uuid) {
+          return dataValuesEntities[key];
+        } else {
+          return {
+            id: key,
+            value: dataObject?.value,
+          };
+        }
+      }
+    );
+    this.store.dispatch(
+      upsertEnteredDataValues({
+        dataValues: [
+          {
+            id: parameter?.uuid,
+            value: dataObject?.value,
+          },
+        ],
+      })
+    );
+    const formattedParameter = dataObject?.parameter;
+    const expressionAttribute = (formattedParameter?.attributes?.filter(
+      (attribute: any) =>
+        !attribute?.voided &&
+        attribute?.attributeType?.uuid ===
+          calculatedValueExpressionAttributeType
+    ) || [])[0];
+    if (expressionAttribute) {
+      this.calculatedParameters[formattedParameter?.uuid] = {
+        parameter: formattedParameter,
+        expressionAttribute,
+      };
+    }
+    this.calculateValue(keyBy(newDataValuesEntitiesData, "id"));
 
     if (dataObject?.value?.length === 0) {
       this.dataValues = omit(this.dataValues, parameter?.uuid);
@@ -1196,40 +1291,28 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     }
   }
 
-  onGetAttributes(data: any, calculatedValueExpressionAttributeType: string,parameterUuid: string) {
-    if (parameterUuid && data[0]?.parameter?.uuid) {
-      this.attributes = data;
-      this.calculatedParameters[data[0]?.parameter?.uuid] = {
-        render: false,
-        value: {},
-        attributes: data,
-        calculatedValueExpressionAttributeType,
+  calculateValue(dataObject: any): void {
+    let fieldValues = [];
+    Object.keys(this.calculatedParameters).forEach((parameterUuid: string) => {
+      const expressionAttribute =
+        this.calculatedParameters[parameterUuid]?.expressionAttribute;
+
+      const value = calculateFieldValueFromCalculationExpression(
+        dataObject,
+        expressionAttribute
+      );
+      fieldValues = [
+        ...fieldValues,
+        {
+          id: parameterUuid,
+          value,
+        },
+      ];
+      this.calculatedParameters[parameterUuid] = {
+        ...this.calculatedParameters[parameterUuid],
+        calculatedValue: value,
       };
-  
-      console.log("param2: ",this.calculatedParameters);
-    }
-  }
-
-  calculateValue(parameter: any, dataObject: any): void {
-
-    const regex = /{([^}]*)}/;
-    const expressionAttribute: any = (this.calculatedParameters[
-      parameter?.uuid
-    ]?.attributes?.filter(
-      (attribute: any) =>
-        attribute?.attributeTypeUuid ===
-        this.calculatedParameters[parameter?.uuid]
-          ?.calculatedValueExpressionAttributeType
-    ) || [])[0];
-
-    const match = expressionAttribute?.value.match(regex);
-    console.log("aa:",match[1]);
-    setTimeout(() => {
-      this.calculatedParameters[parameter?.uuid] = {
-        ...this.calculatedParameters[parameter?.uuid],
-        render: true,
-        value: {},
-      };
-    }, 20);
+      this.testParameterEntryComponent.setFieldValue(fieldValues);
+    });
   }
 }

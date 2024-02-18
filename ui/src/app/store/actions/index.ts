@@ -24,3 +24,4 @@ export * from "./test-by-sample-type.actions";
 export * from "./consultation.actions";
 export * from "./lis-configurations.actions";
 export * from "./selected-system-settings.actions";
+export * from "./datavalues.actions";
