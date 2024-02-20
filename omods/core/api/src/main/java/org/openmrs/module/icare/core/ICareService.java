@@ -13,6 +13,7 @@ import org.openmrs.*;
 import org.openmrs.annotation.Authorized;
 import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
+import org.openmrs.module.icare.auditlog.AuditLog;
 import org.openmrs.module.icare.billing.ItemNotPayableException;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
@@ -189,4 +190,5 @@ public interface ICareService extends OpenmrsService {
 	
 	List<Encounter> getEncountersByEncounterType(String search, String encounterTypeUuid, Integer limit, Integer startIndex);
 	
+	void saveAuditLog(AuditLog auditLog);
 }

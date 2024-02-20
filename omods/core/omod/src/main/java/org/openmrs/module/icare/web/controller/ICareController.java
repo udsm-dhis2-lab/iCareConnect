@@ -18,6 +18,7 @@ import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.auditlog.AuditLog;
 import org.openmrs.module.icare.auditlog.api.AuditLogService;
+import org.openmrs.module.icare.auditlog.api.db.AuditLogDAO;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.BillingService;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.Session;
 import javax.naming.ConfigurationException;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
@@ -53,7 +55,7 @@ import java.util.*;
  */
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/icare")
-public class ICareController {
+public class ICareController implements UserSessionListener {
 	
 	@Autowired
 	ICareService iCareService;
@@ -1306,5 +1308,25 @@ public class ICareController {
 		Map<String, Object> results = new HashMap<>();
 		results.put("results", responseSamplesObject);
 		return results;
+	}
+	
+	@Override
+	@Transactional
+	public void loggedInOrOut(User user, Event event, Status status) {
+		
+		if (event == Event.LOGIN) {
+			// User logged in successfully
+			System.out.println("User " + user.getUsername() + " logged in at " + new Date() + " and status " + event);
+			AuditLog auditLog = new AuditLog(User.class, "LOGGED IN", user, new Date());
+			iCareService.saveAuditLog(auditLog);
+			// Log the event or perform other actions
+		} else if (event == Event.LOGOUT) {
+			// User logged out successfully
+			System.out.println("User " + user.getUsername() + " logged out at " + new Date() + " and event " + event);
+			AuditLog auditLog = new AuditLog(User.class, "LOGGED OUT", user, new Date());
+			iCareService.saveAuditLog(auditLog);
+			
+		}
+		
 	}
 }

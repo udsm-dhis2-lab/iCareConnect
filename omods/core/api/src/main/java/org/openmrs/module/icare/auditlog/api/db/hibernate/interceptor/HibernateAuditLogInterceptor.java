@@ -318,34 +318,35 @@ public class HibernateAuditLogInterceptor extends EmptyInterceptor {
 	        String[] propertyNames, Type[] types) {
 		//System.out.println("tr7:");
 		if (InterceptorUtil.isAudited(entity.getClass())) {
-			if (entityCollectionsMap.get().peek().get(entity) == null) {
-				//This is the first time we are trying to find collection elements for this object
-				if (log.isDebugEnabled()) {
-					log.debug("Finding collections for object:" + entity.getClass() + " #" + id);
-				}
-				
-				for (int i = 0; i < propertyNames.length; i++) {
-					if (types[i].isCollectionType()) {
-						Object coll = currentState[i];
-						//For now ignore maps because still cant imagine a logical case where the
-						//keys or values are Persistent objects that can't exist on their own
-						if (coll != null && Collection.class.isAssignableFrom(coll.getClass())) {
-							Collection<?> collection = (Collection<?>) coll;
-							if (!collection.isEmpty()) {
-								if (entityCollectionsMap.get().peek().get(entity) == null) {
-									entityCollectionsMap.get().peek().put(entity, new ArrayList<Collection<?>>());
-								}
-								if (!AuditLogUtil.getCollectionPersister(propertyNames[i], entity.getClass(), null)
-								        .isManyToMany()) {
-									entityCollectionsMap.get().peek().get(entity).add(collection);
-								}
-							}
-						} //else {
-						  //TODO handle maps too because hibernate treats maps to be of CollectionType
-						  //}
-					}
-				}
-			}
+			
+			//			if (entityCollectionsMap.get().peek().get(entity) == null) {
+			//				//This is the first time we are trying to find collection elements for this object
+			//				if (log.isDebugEnabled()) {
+			//					log.debug("Finding collections for object:" + entity.getClass() + " #" + id);
+			//				}
+			//
+			//				for (int i = 0; i < propertyNames.length; i++) {
+			//					if (types[i].isCollectionType()) {
+			//						Object coll = currentState[i];
+			//						//For now ignore maps because still cant imagine a logical case where the
+			//						//keys or values are Persistent objects that can't exist on their own
+			//						if (coll != null && Collection.class.isAssignableFrom(coll.getClass())) {
+			//							Collection<?> collection = (Collection<?>) coll;
+			//							if (!collection.isEmpty()) {
+			//								if (entityCollectionsMap.get().peek().get(entity) == null) {
+			//									entityCollectionsMap.get().peek().put(entity, new ArrayList<Collection<?>>());
+			//								}
+			//								if (!AuditLogUtil.getCollectionPersister(propertyNames[i], entity.getClass(), null)
+			//								        .isManyToMany()) {
+			//									entityCollectionsMap.get().peek().get(entity).add(collection);
+			//								}
+			//							}
+			//						} //else {
+			//						  //TODO handle maps too because hibernate treats maps to be of CollectionType
+			//						  //}
+			//					}
+			//				}
+			//			}
 		}
 		
 		return super.findDirty(entity, id, currentState, previousState, propertyNames, types);

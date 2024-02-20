@@ -2,14 +2,17 @@ package org.openmrs.module.icare.auditlog;
 
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.*;
+import org.openmrs.module.icare.core.JSONConverter;
+
 import javax.persistence.*;
+import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.sql.Blob;
 import java.util.*;
 
 @Entity
 @Table(name = "audit_log")
-public class AuditLog implements Serializable {
+public class AuditLog implements Serializable, JSONConverter {
 	
 	private static final long serialVersionUID = 1L;
 	
