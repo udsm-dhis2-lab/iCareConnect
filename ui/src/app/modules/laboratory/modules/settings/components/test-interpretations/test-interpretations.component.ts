@@ -70,7 +70,6 @@ export class TestInterpretationsComponent implements OnInit {
       { ...currentInterpretation, id: this.interpretations?.length + 1 },
     ];
     this.createInterpretationsFields();
-
     this.definedInterpretations.emit(this.interpretations);
   }
 
