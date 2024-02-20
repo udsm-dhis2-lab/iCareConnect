@@ -16,6 +16,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.db.PatientDAO;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.icare.ICareConfig;
+import org.openmrs.module.icare.auditlog.AuditLog;
 import org.openmrs.module.icare.billing.ItemNotPayableException;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
@@ -73,6 +74,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	EncounterPatientStateDAO encounterPatientStateDAO;
 	
+	AuditLogDAO auditLogDAO;
+	
 	EncounterPatientProgramDAO encounterPatientProgramDAO;
 	
 	UserService userService;
@@ -106,6 +109,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	public void setEncounterPatientProgramDAO(EncounterPatientProgramDAO encounterPatientProgramDAO) {
 		this.encounterPatientProgramDAO = encounterPatientProgramDAO;
+	}
+	
+	public void setAuditLogDAO(AuditLogDAO auditLogDAO) {
+		this.auditLogDAO = auditLogDAO;
 	}
 	
 	/**
@@ -1083,5 +1090,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public List<Encounter> getEncountersByEncounterType(String search, String encounterTypeUuid, Integer limit,
 	        Integer startIndex) {
 		return this.dao.getEncountersByEncounterType(search, encounterTypeUuid, limit, startIndex);
+	}
+	
+	@Override
+	public void saveAuditLog(AuditLog auditLog) {
+		this.auditLogDAO.save(auditLog);
 	}
 }

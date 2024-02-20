@@ -33,6 +33,11 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
+                <property name="auditLogDAO">
+                    <bean class="org.openmrs.module.icare.core.dao.AuditLogDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
 
                 <property name="privilegeDAO">
                     <bean class="org.openmrs.module.icare.core.dao.PrivilegeDAO">
