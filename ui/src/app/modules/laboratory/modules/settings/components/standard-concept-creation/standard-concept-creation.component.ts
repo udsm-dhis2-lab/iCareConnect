@@ -242,6 +242,7 @@ export class StandardConceptCreationComponent implements OnInit {
     event.stopPropagation();
     this.createBasicConceptFields();
     this.editingSet = true;
+    this.conceptBeingEdited = null;
     setTimeout(() => {
       this.editingSet = false;
       this.conceptUuid = null;
@@ -568,6 +569,7 @@ export class StandardConceptCreationComponent implements OnInit {
                             .subscribe((conceptNameResponse) => {
                               if (conceptNameResponse) {
                                 this.saving = false;
+                                this.conceptBeingEdited = null;
                                 this.conceptUuid = null;
                                 this.savingMessage =
                                   "Successfully created " + conceptName;
@@ -593,6 +595,7 @@ export class StandardConceptCreationComponent implements OnInit {
                   .subscribe((conceptNameResponse) => {
                     if (conceptNameResponse) {
                       this.saving = false;
+                      this.conceptBeingEdited = null;
                       this.alertType = "success";
                       this.savingMessage =
                         "Successfully created " + conceptName;
