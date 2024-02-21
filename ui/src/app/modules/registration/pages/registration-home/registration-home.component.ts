@@ -21,6 +21,7 @@ import { PatientService } from "src/app/shared/services/patient.service";
 import { clearActiveVisit } from "src/app/store/actions/visit.actions";
 import Chart from 'chart.js/auto';
 
+
 @Component({
   selector: "app-registration-home",
   templateUrl: "./registration-home.component.html",
@@ -178,7 +179,6 @@ export class RegistrationHomeComponent implements OnInit {
         data: {
           patient: { ...patient["patient"], id: patient["patient"]["uuid"] },
         },
-        disableClose: false,
       })
       .afterClosed()
       .subscribe((visitDetails) => {
@@ -241,6 +241,7 @@ export class RegistrationHomeComponent implements OnInit {
     this.isExpanded = !this.isExpanded;
   }
 
+
   renderChart(params: any) {
     const chartData = {
       labels: ['Total Patients', 'Active Visits'],
@@ -263,6 +264,7 @@ export class RegistrationHomeComponent implements OnInit {
         responsive: true,
         maintainAspectRatio: false,
       },
-    });
-  }
+    });
+  }
+
 }
