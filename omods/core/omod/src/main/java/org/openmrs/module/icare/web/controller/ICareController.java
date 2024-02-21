@@ -55,7 +55,7 @@ import java.util.*;
  */
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/icare")
-public class ICareController implements UserSessionListener {
+public class ICareController {
 	
 	@Autowired
 	ICareService iCareService;
@@ -1308,25 +1308,5 @@ public class ICareController implements UserSessionListener {
 		Map<String, Object> results = new HashMap<>();
 		results.put("results", responseSamplesObject);
 		return results;
-	}
-	
-	@Override
-	@Transactional
-	public void loggedInOrOut(User user, Event event, Status status) {
-		
-		if (event == Event.LOGIN) {
-			// User logged in successfully
-			System.out.println("User " + user.getUsername() + " logged in at " + new Date() + " and status " + event);
-			AuditLog auditLog = new AuditLog(User.class, "LOGGED IN", user, new Date());
-			iCareService.saveAuditLog(auditLog);
-			// Log the event or perform other actions
-		} else if (event == Event.LOGOUT) {
-			// User logged out successfully
-			System.out.println("User " + user.getUsername() + " logged out at " + new Date() + " and event " + event);
-			AuditLog auditLog = new AuditLog(User.class, "LOGGED OUT", user, new Date());
-			iCareService.saveAuditLog(auditLog);
-			
-		}
-		
 	}
 }
