@@ -27,17 +27,18 @@
 
           <span class="ml-2"
             >Total Patients:
-            <span style="color: #42abed; font-weight: bold">{
+            <span style="color: #063c0d; font-weight: bold">{{
               params?.patientSummary?.allPatients
-            }</span></span
+            }}</span></span
           >
           &nbsp;&nbsp; | &nbsp;&nbsp;
-          <span class="ml-2"
+          <!--<span class="ml-2"
             >Active Visit:
             <span style="color: #42abed; font-weight: bold">{{
               params?.patientSummary?.activeVisits
             }}</span>
-          </span>
+            </span> -->
+          <canvas #patientChart width="400" height="400"></canvas>
 
           <span class="toolbar-spacer"></span>
 
@@ -98,39 +99,5 @@
         </div>
       </div>
     </div>
-  </div>
- 
-
-  <div>
-    <div *ngIf="{ patientSummary: patientSummary$ | async } as params">
-      <div class="centered-container-patient-list">
-        
-        <div class="row mt-4 w-100 mb-4">
-          <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
-            <div class="graph-container">
-              <app-active-patients-graph></app-active-patients-graph>
-            </div>
-          </div>
-          <div class="col-lg-6 col-md-6 col-sx-12 col-sm-12">
-            </div>
-        </div>
-  
-        </div>
-    </div>
-  </div>
-  
-  <!doctype html>
-  <html lang="en">
-    <head>
-      <title>Chart.js example</title>
-    </head>
-    <body>
-      <!-- <div style="width: 500px;"><canvas id="dimensions"></canvas></div><br/> -->
-      <div style="width: 800px;"><canvas id="acquisitions"></canvas></div>
-  
-      <!-- <script type="module" src="dimensions.js"></script> -->
-      <script type="module" src="acquisitions.js"></script>
-    </body>
-  </html>
-   <canvas #patientChart width="400" height="400"></canvas>
+  </div>
 </div>
