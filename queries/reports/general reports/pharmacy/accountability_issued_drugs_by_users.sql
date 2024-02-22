@@ -1,5 +1,4 @@
-SELECT SUM(issue_item.quantity) as "QUANTITY", d.name as "DRUG", l.name as "ISSUED STORE",
-pn.given_name as "FIRST NAME",pn.family_name as "LAST NAME"
+SELECT d.name as "DRUG", l.name as "ISSUED STORE",pn.given_name as "FIRSTNAME",pn.family_name as "LASTNAME", SUM(issue_item.quantity) as "QUANTITY"
 	FROM st_issue issue 
 	LEFT JOIN st_issue_item issue_item ON issue.issue_id = issue_item.issue_id
 	LEFT JOIN item item ON item.item_id = issue_item.item_id
