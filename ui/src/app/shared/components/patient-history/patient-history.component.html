@@ -2,8 +2,7 @@
 <div
   class="history"
   *ngIf="{
-    visits: visits$ | async,
-    customForms: customForms$ | async,
+	@@ -6,9 +7,7 @@
     generalPrescriptionOrderType: generalPrescriptionOrderType$ | async,
     prescriptionArrangementFields: prescriptionArrangementFields$ | async,
     specificDrugConceptUuid: specificDrugConceptUuid$ | async,
@@ -55,3 +54,4 @@
   <div *ngIf="!params?.visits?.length && !loadingData"> 
     <h4 class="text-center"> {{ patient?.person ? 'No visit data found for ' + patient?.person?.display : 'No visit data found for this patient' }}</h4>
   </div>
+  
