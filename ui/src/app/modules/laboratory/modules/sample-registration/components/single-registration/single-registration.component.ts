@@ -1725,7 +1725,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
           results?.sampleData?.orders?.forEach((order) => {
             tests = [
               ...tests,
-              order?.order?.shortName?.split("TEST_ORDERS:")?.join(""),
+              order?.order?.shortName?.replace("TEST_ORDERS:")?.join(""),
             ];
           });
           // let message = this.barcodeSettings?.barcode?.split("{{SampleID}}").join(results?.sampleData?.label);
