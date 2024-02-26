@@ -630,6 +630,16 @@ export class IssuingComponent implements OnInit {
       });
   }
 
+selectedIssuesItem: { [index: number]: boolean } = {};
+
+// ...
+
+getItemsSelection(event: any, issue: any) {
+  this.selectedIssuesItem[issue?.id] = event.checked;
+  let checkedIssues = Object.values(this.selectedIssuesItem).filter(value => value).length;
+}
+
+
   // onIssue(e: any, issue?: IssuingObject, currentStore?: LocationGet): void {
   //   issue = issue ? issue : e?.issue;
   //   currentStore = currentStore ? currentStore : e?.currentStore;
