@@ -27,17 +27,18 @@
 
           <span class="ml-2"
             >Total Patients:
-            <span style="color: #42abed; font-weight: bold">{{
+            <span style="color: #063c0d; font-weight: bold">{{
               params?.patientSummary?.allPatients
             }}</span></span
           >
           &nbsp;&nbsp; | &nbsp;&nbsp;
-          <span class="ml-2"
+          <!--<span class="ml-2"
             >Active Visit:
             <span style="color: #42abed; font-weight: bold">{{
               params?.patientSummary?.activeVisits
-            }}</span></span
-          >
+            }}</span>
+            </span> -->
+          <canvas #patientChart width="400" height="400"></canvas>
 
           <span class="toolbar-spacer"></span>
 
@@ -98,5 +99,5 @@
         </div>
       </div>
     </div>
-  </div>
+  </div>
 </div>

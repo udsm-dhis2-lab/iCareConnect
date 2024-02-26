@@ -1834,3 +1834,5 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     return char.length == 1 ? "0" + char : char;
   }
 }
+
+
