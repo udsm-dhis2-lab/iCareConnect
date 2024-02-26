@@ -12,15 +12,26 @@ import { formatDateToYYMMDD } from "src/app/shared/services/visits.service";
 })
 export class SharedTestedByResultEntryFieldsComponent implements OnInit {
   @Input() order!: any;
+  // Input property to track the overall validity of the form
+  @Input() isFormValid:boolean=false;
   testedByFormFields!: any;
+  // EventEmitter used to emit form validation state changes to the parent component
+  @Output() handleValidateForm: EventEmitter<boolean> = new EventEmitter<boolean>();
+
   @Output() selectedTestedByFormFields: EventEmitter<any> =
     new EventEmitter<any>();
+
+
   testedBy!: any;
   testedDate!: any;
+
+  // Flag to track whether the entered date is considered invalid
+  isShowInvalidDate:boolean = false;
 
   constructor() {}
 
   ngOnInit(): void {
+  
     this.order?.allocations?.forEach((allocation) => {
       const formattedAllocation: any = new SampleAllocation(
         allocation
@@ -76,6 +87,45 @@ export class SharedTestedByResultEntryFieldsComponent implements OnInit {
   }
 
   onFormUpdate(formValue: FormValue): void {
+    // collected date is on this.order.dateCreated
+    const collectedDate = new Date(this.order.dateCreated);
+    
+    // Get the current reporting date
+    const reportingDate = Date.now();
+
+    // Get the entered date from the form values, if available
+    const enteredDate = formValue.getValues()?.date?.value ? new Date(formValue.getValues().date.value) : null;
+  
+    // Function to validate the entered date
+    const validateEnteredDate = ()=> {
+      // Check if enteredDate is invalid or null
+      if (!enteredDate || isNaN(enteredDate.getTime())) {
+        // If enteredDate is invalid or null
+        this.isFormValid = false;
+        this.handleValidateForm.emit(false);
+        this.isShowInvalidDate=true;
+        
+
+      } else {
+         // Check if enteredDate is within the range of collectedDate and reportingDate
+        if (enteredDate >= collectedDate && enteredDate.getTime() <= reportingDate) {
+          // If enteredDate is within the range
+          this.isFormValid = true;
+          this.handleValidateForm.emit(true);
+          this.isShowInvalidDate =false;
+        } else {
+          // If enteredDate is outside the range
+          this.isFormValid = false;
+          this.handleValidateForm.emit(false);
+          this.isShowInvalidDate=true;
+        }
+      }
+    }
+     // Call the function to perform validation
+    validateEnteredDate();
+  
+
+   
     this.selectedTestedByFormFields.emit({
       date: formValue.getValues()?.date?.value
         ? formatDateToYYMMDD(new Date(formValue.getValues()?.date?.value))

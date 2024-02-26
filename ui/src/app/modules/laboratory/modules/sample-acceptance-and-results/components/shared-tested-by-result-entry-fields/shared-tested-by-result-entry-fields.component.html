@@ -1,5 +1,8 @@
+<p *ngIf="isShowInvalidDate" >Invalid Date!!!</p>
 <app-form
   [fields]="testedByFormFields"
   [isFormHorizontal]="true"
   (formUpdate)="onFormUpdate($event)"
-></app-form>
+>
+
+</app-form>

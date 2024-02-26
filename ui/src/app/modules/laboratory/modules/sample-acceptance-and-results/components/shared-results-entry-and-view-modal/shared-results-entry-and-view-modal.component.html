@@ -463,6 +463,8 @@
                         <div class="w-75 ml-2">
                           <app-shared-tested-by-result-entry-fields
                             [order]="order"
+                            [isFormValid]="isFormValid"
+                            (handleValidateForm)="handleValidateForm($event)"
                             (selectedTestedByFormFields)="
                               onGetSelectedTestedBy($event, order)
                             "

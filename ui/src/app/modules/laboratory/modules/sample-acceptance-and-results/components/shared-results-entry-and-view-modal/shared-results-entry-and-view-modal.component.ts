@@ -81,6 +81,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+  
     this.preferredName = this.data?.LISConfigurations?.isLIS
       ? "SHORT"
       : "FULLY_SPECIFIED";
@@ -182,7 +183,14 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         this.data?.sample?.uuid
       );
   }
-
+  // Function to handle form validation state
+// Parameters:
+// - state: A boolean indicating the validation state of the form
+// Returns: void
+  handleValidateForm(state:boolean):void{
+      // Update the isFormValid property with the provided validation state
+    this.isFormValid = state;
+  }
   onClose(event: Event): void {
     event.stopPropagation();
     this.dialogRef.close(true);
