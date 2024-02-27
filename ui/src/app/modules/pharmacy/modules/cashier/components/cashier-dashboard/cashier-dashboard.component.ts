@@ -63,6 +63,7 @@ export class CashierDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log("provider", this.provider);
     if (this.shouldShowDoseDetails == "true") {
       this.prescriptionVariables = Object.keys(this.prescriptionVariables).map(
         (key: string) => {
@@ -290,7 +291,7 @@ export class CashierDashboardComponent implements OnInit {
                     action: "NEW",
                     urgency: "ROUTINE",
                     type: "prescription",
-                    orderer: "2e3d7377-1b3e-48bd-ab59-5ac060649406",
+                    orderer: this.provider?.uuid,
                     patient: this.patientUuid,
                     dose:
                       this.formData["dose" + item?.itemUuid] &&
