@@ -141,8 +141,8 @@ export class CashierDashboardComponent implements OnInit {
       shouldHaveLiveSearchForDropDownFields: true,
       searchControlType: "drugStock",
       locationUuid: this.currentLocation?.uuid,
-      placeholder: "Search stockable item",
-      label: "Search stockable item",
+      placeholder: "Search item",
+      label: "Search item",
     });
   }
 
@@ -203,6 +203,10 @@ export class CashierDashboardComponent implements OnInit {
 
   onAddToList(event: Event, item: any): void {
     event.stopPropagation();
+    this.itemsPrices[item?.itemUuid] = {
+      ready: false,
+    };
+    console.log("itemsPrices", this.itemsPrices);
     this.selectedItems = [...this.selectedItems, item];
     this.createQuantityField(item?.itemUuid);
     this.createDoseInfoFields(item?.itemUuid);

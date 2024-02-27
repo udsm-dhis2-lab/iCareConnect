@@ -62,7 +62,7 @@ export class FormComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     this.shouldDisable = this.isReport ? true : this.shouldDisable;
-    this.values = this.form.getRawValue();
+    this.values = this.form ? this.form.getRawValue() : null;
     this.validationIssues = validateFormFields(
       this.formValidationRules,
       this.values
@@ -90,7 +90,7 @@ export class FormComponent implements OnInit {
 
   onFieldUpdate(form: FormGroup): void {
     if (!this.showSaveButton && form) {
-      this.values = this.form.getRawValue();
+      this.values = this.form ? this.form.getRawValue() : null;
 
       this.validationIssues = validateFormFields(
         this.formValidationRules,
