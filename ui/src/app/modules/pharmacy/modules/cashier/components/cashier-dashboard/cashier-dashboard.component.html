@@ -23,18 +23,23 @@
         <mat-card>
           <!-- <fieldset>
             <legend>Drug/Non-drug</legend> -->
-          <div class="row d-flex justify-content-left">
+          <div class="row mb-2 d-flex justify-content-left">
             <div class="col-11">
               <app-form
                 [fields]="[searchItemFormField]"
                 (formUpdate)="onSearchItemFormUpdate($event)"
               ></app-form>
+              <mat-error
+                style="margin: -8px 8px 0 8px"
+                *ngIf="itemData?.quantity === 0"
+                >Item {{ itemData?.name }} is out of stock</mat-error
+              >
             </div>
             <div class="col-1">
               <button
                 mat-icon-button
                 (click)="onAddToList($event, itemData)"
-                [disabled]="!itemData"
+                [disabled]="!itemData || itemData?.quantity === 0"
                 style="
                   margin-left: 8px;
                   border: solid 1px #22222247;
@@ -90,11 +95,14 @@
                       <td style="width: 30px">
                         {{ count + 1 }}
                       </td>
-                      <td class="w-50">
+                      <td>
                         {{ item?.name }}
                       </td>
                       <ng-container *ngIf="shouldShowDoseDetails === 'true'">
-                        <td *ngFor="let variable of prescriptionVariables">
+                        <td
+                          style="min-width: 100px"
+                          *ngFor="let variable of prescriptionVariables"
+                        >
                           <app-form
                             [fields]="[
                               doseFields[variable?.key + item?.itemUuid]
@@ -125,7 +133,7 @@
                       </td>
                       <td>
                         {{
-                          itemsPrices[item?.itemUuid]?.ready
+                          itemsPrices && itemsPrices[item?.itemUuid]?.ready
                             ? itemsPrices[item?.itemUuid]?.price
                             : "-"
                         }}
