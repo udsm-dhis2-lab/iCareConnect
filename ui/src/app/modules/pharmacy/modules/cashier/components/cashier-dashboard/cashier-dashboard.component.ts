@@ -71,8 +71,12 @@ export class CashierDashboardComponent implements OnInit {
       );
     }
     this.loadVisitDetails();
-    this.store.dispatch(loadCustomOpenMRSForm({ formUuid: this.formId }));
-    this.customForm$ = this.store.select(getCustomOpenMRSFormById(this.formId));
+    if (this.formId) {
+      this.store.dispatch(loadCustomOpenMRSForm({ formUuid: this.formId }));
+      this.customForm$ = this.store.select(
+        getCustomOpenMRSFormById(this.formId)
+      );
+    }
     this.currentLocation$ = this.store.select(getCurrentLocation());
     this.createSearchItemFormField();
   }

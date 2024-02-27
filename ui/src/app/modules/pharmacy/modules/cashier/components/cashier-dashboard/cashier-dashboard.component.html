@@ -23,41 +23,41 @@
         <mat-card>
           <!-- <fieldset>
             <legend>Drug/Non-drug</legend> -->
-          <div class="row">
-            <div class="col-12 d-flex justify-content-left">
-              <div class="w-75">
-                <app-form
-                  [fields]="[searchItemFormField]"
-                  (formUpdate)="onSearchItemFormUpdate($event)"
-                ></app-form>
-              </div>
-              <div class="w-25">
-                <button
-                  mat-icon-button
-                  (click)="onAddToList($event, itemData)"
-                  [disabled]="!itemData"
-                  style="
-                    margin-left: 8px;
-                    border: solid 1px #22222247;
-                    margin-top: 8px;
-                    border-radius: 4px;
-                  "
-                >
-                  <mat-icon>add</mat-icon>
-                </button>
-              </div>
+          <div class="row d-flex justify-content-left">
+            <div class="col-11">
+              <app-form
+                [fields]="[searchItemFormField]"
+                (formUpdate)="onSearchItemFormUpdate($event)"
+              ></app-form>
+            </div>
+            <div class="col-1">
+              <button
+                mat-icon-button
+                (click)="onAddToList($event, itemData)"
+                [disabled]="!itemData"
+                style="
+                  margin-left: 8px;
+                  border: solid 1px #22222247;
+                  margin-top: 8px;
+                  border-radius: 4px;
+                "
+              >
+                <mat-icon>add</mat-icon>
+              </button>
             </div>
           </div>
           <!-- </fieldset> -->
 
-          <app-capture-form-data
-            *ngIf="params?.customForm"
-            [form]="params?.customForm"
-            [isGenericForm]="true"
-            [isFormHorizontal]="true"
-            [formValidationRules]="[]"
-            (formDataUpdate)="onFormUpdate($event)"
-          ></app-capture-form-data>
+          <ng-container *ngIf="formId">
+            <app-capture-form-data
+              *ngIf="params?.customForm"
+              [form]="params?.customForm"
+              [isGenericForm]="true"
+              [isFormHorizontal]="true"
+              [formValidationRules]="[]"
+              (formDataUpdate)="onFormUpdate($event)"
+            ></app-capture-form-data>
+          </ng-container>
           <div class="w-100" *ngIf="errors && errors?.length > 0">
             <app-shared-error [errors]="errors"></app-shared-error>
           </div>
@@ -190,15 +190,12 @@
       </ng-container>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-12 col-sx-12">
-      <mat-progress-bar
-        mode="indeterminate"
-        *ngIf="!params?.customForm"
-      ></mat-progress-bar>
+      <div class="h5">Common sold items</div>
       <mat-card *ngIf="!saving && params?.customForm">
-        <app-encounters-list
+        <!-- <app-encounters-list
           [customForm]="params?.customForm"
           [encounterTypeUuid]="encounterTypeUuid"
-        ></app-encounters-list>
+        ></app-encounters-list> -->
       </mat-card>
     </div>
   </div>
