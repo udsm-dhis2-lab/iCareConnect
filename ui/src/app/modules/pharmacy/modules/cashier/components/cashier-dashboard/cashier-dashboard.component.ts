@@ -259,18 +259,22 @@ export class CashierDashboardComponent implements OnInit {
               },
             ],
             visit: this.visitUuid,
-            obs:
-              (
-                Object.keys(this.obsFormData).map((key: string) => {
-                  return {
-                    concept: key,
-                    value: this.obsFormData[key]?.value,
-                  };
-                }) || []
-              ).filter((obs: any) => obs?.value) || [],
-            form: {
-              uuid: customForm?.uuid,
-            },
+            obs: this.obsFormData
+              ? (
+                  Object.keys(this.obsFormData).map((key: string) => {
+                    return {
+                      concept: key,
+                      value: this.obsFormData[key]?.value,
+                    };
+                  }) || []
+                ).filter((obs: any) => obs?.value) || []
+              : [],
+            form:
+              this.formId && customForm
+                ? {
+                    uuid: customForm?.uuid,
+                  }
+                : null,
           };
 
           this.observationService
@@ -346,6 +350,8 @@ export class CashierDashboardComponent implements OnInit {
                   return prescriptionOrder;
                 });
                 this.customForm$ = of(null);
+
+                this.currentLocation$ = of(null);
                 zip(
                   ...prescriptionOrders?.map((prescriptionOrder: any) => {
                     return this.drugOrderService
@@ -376,11 +382,11 @@ export class CashierDashboardComponent implements OnInit {
                     ).subscribe((dispenseResponses: any) => {
                       if (dispenseResponses) {
                         this.selectedItems = [];
-                        this.createSearchItemFormField();
 
-                        this.customForm$ = this.store.select(
-                          getCustomOpenMRSFormById(this.formId)
+                        this.currentLocation$ = this.store.select(
+                          getCurrentLocation()
                         );
+                        this.createSearchItemFormField();
                         this.saving = false;
                       }
                     });
