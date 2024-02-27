@@ -197,6 +197,7 @@ export class SampleInBatchRegistrationComponent
     if (localStorage.getItem("batch") && localStorage.getItem("batchSample")) {
       this.dialog
         .open(SharedConfirmationComponent, {
+          minWidth: "40%",
           data: {
             modalTitle: `Last Batch Instance (${localStorage.getItem(
               "batchSampleCode"

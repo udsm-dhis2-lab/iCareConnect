@@ -234,7 +234,7 @@ export class SampleAcceptanceComponent implements OnInit {
   accept(e, sample, providerDetails) {
     e.stopPropagation();
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
-      width: "25%",
+      minWidth: "25%",
       data: {
         modalTitle: `Accept Sample`,
         modalMessage: `Please, provide results compromization remarks if any upon accepting this sample. Click confirm to accept the sample!`,

@@ -39,7 +39,7 @@ export class SharedSystemSettingsListComponent implements OnInit {
     event.stopPropagation();
     this.dialog
       .open(ManageSystemSettingComponent, {
-        width: "40%",
+        minWidth: "40%",
         data: {
           ...(!isNew ? data : {}),
           key: this.key,

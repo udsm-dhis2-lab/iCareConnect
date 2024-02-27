@@ -157,7 +157,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
   onDeleteProcedure(e: Event, procedure: any) {
     // e.stopPropagation();
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
-      width: "25%",
+      minWidth: "25%",
       data: {
         modalTitle: `Delete ${procedure?.concept?.display}`,
         modalMessage: `You are about to delete ${procedure?.concept?.display} for this patient, Click confirm to delete!`,

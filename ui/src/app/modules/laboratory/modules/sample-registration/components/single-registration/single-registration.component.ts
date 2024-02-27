@@ -660,7 +660,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
       // Then user should define the lab
     }
     let confirmationDialogue = this.dialog.open(SharedConfirmationComponent, {
-      width: "25%",
+      minWidth: "25%",
       data: {
         modalTitle: forRejection ? `Save to reject sample` : `Save sample`,
         modalMessage: forRejection

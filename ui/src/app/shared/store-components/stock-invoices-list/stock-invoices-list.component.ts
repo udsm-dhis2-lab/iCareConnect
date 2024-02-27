@@ -99,7 +99,7 @@ export class StockInvoicesListComponent implements OnInit {
   onReceiveStockInvoiceItems(stockInvoice) {
     this.dialog
       .open(SharedConfirmationComponent, {
-        width: "25%",
+        minWidth: "25%",
         data: {
           modalTitle: "Are you sure to receive all items in this invoice?",
           modalMessage:
@@ -142,7 +142,7 @@ export class StockInvoicesListComponent implements OnInit {
   onDeleteStockInvoice(stockInvoice) {
     this.dialog
       .open(SharedConfirmationComponent, {
-        width: "25%",
+        minWidth: "25%",
         data: {
           modalTitle: "Are you sure to delete this stock invoice?",
           modalMessage:

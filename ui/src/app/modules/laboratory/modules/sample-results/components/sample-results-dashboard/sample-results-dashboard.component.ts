@@ -101,7 +101,7 @@ export class SampleResultsDashboardComponent implements OnInit {
           (this.externalSystemPayload
             ? this.dialog
                 .open(SharedConfirmationComponent, {
-                  width: "30%",
+                  minWidth: "30%",
                   data: {
                     modalTitle: `Send results for ${this.selectedSample?.label}`,
                     modalMessage: `Are you sure to send data to Pima COVID?`,
@@ -197,7 +197,7 @@ export class SampleResultsDashboardComponent implements OnInit {
   onUpdateStatus(event: Event, sample: any, key: string): void {
     event.stopPropagation();
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
-      width: "25%",
+      minWidth: "25%",
       data: {
         modalTitle: `${key} sample results`,
         modalMessage: `Are you sure to ${key} results of ${sample?.label} for external use?`,

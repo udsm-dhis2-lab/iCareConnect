@@ -312,7 +312,7 @@ export class IssuingComponent implements OnInit {
     });
     this.dialog
       .open(SharedConfirmationComponent, {
-        width: "20%",
+        minWidth: "20%",
         data: {
           modalTitle: `Multiple Items Rejection`,
           modalMessage: `Are you sure you want to reject all selected items?`,

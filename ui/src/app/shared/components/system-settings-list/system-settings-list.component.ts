@@ -3,6 +3,8 @@ import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { ManageSystemSettingComponent } from "../../dialogs/manage-system-setting/manage-system-setting.component";
+import { SharedConfirmationDialogComponent } from "../shared-confirmation-dialog/shared-confirmation-dialog.component";
+import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
 
 @Component({
   selector: "app-system-settings-list",
@@ -38,7 +40,7 @@ export class SystemSettingsListComponent implements OnInit {
     event.stopPropagation();
     this.dialog
       .open(ManageSystemSettingComponent, {
-        width: "40%",
+        minWidth: "40%",
         data: {
           ...(!isNew ? data : {}),
           key: this.key,
@@ -63,19 +65,36 @@ export class SystemSettingsListComponent implements OnInit {
       });
   }
 
-  onDelete(event: Event, systemSettingUid: string): void {
+  onDelete(event: Event, systemSetting: any): void {
     event.stopPropagation();
-    this.saving = true;
-    this.systemSettingsService
-      .deleteSystemSettingByUuid(systemSettingUid)
-      .subscribe((response) => {
-        if (response && !response?.error) {
-          this.error = null;
-          this.saving = false;
-          this.getSystemSettings();
-        } else if (response && response?.error) {
-          this.saving = false;
-          this.error = response?.error;
+    console.log(systemSetting);
+    this.dialog
+      .open(SharedConfirmationDialogComponent, {
+        minWidth: "30%",
+        data: {
+          header: `<b style="margin-botton: 16px;">Delete system setting</b>`,
+          message: `Are you sure to delete system setting at ${systemSetting?.property}`,
+          color: "warn",
+        },
+        disableClose: false,
+        panelClass: "custom-dialog-container",
+      })
+      .afterClosed()
+      .subscribe((confirmed?: boolean) => {
+        if (confirmed) {
+          this.saving = true;
+          this.systemSettingsService
+            .deleteSystemSettingByUuid(systemSetting?.uuid)
+            .subscribe((response) => {
+              if (response && !response?.error) {
+                this.error = null;
+                this.saving = false;
+                this.getSystemSettings();
+              } else if (response && response?.error) {
+                this.saving = false;
+                this.error = response?.error;
+              }
+            });
         }
       });
   }
