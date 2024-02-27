@@ -65,7 +65,7 @@ export class StockInvoiceItemsComponent implements OnInit {
     if (key === "receive") {
       this.dialog
         .open(SharedConfirmationComponent, {
-          width: "25%",
+          minWidth: "25%",
           data: {
             modalTitle: "Are you sure to receive this Item",
             modalMessage:
@@ -106,7 +106,7 @@ export class StockInvoiceItemsComponent implements OnInit {
     if (key === "delete") {
       this.dialog
         .open(SharedConfirmationComponent, {
-          width: "25%",
+          minWidth: "25%",
           data: {
             modalTitle: "Are you sure to delete this Item",
             modalMessage:

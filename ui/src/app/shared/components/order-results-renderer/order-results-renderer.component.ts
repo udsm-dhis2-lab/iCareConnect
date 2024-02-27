@@ -183,7 +183,7 @@ export class OrderResultsRendererComponent implements OnInit {
     e.stopPropagation();
     // this.store.dispatch(deleteLabOrder({ uuid: labOrder?.uuid }));
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
-      width: "25%",
+      minWidth: "25%",
       data: {
         modalTitle: `Delete ${labOrder?.concept?.display}`,
         modalMessage: `You are about to delete ${labOrder?.concept?.display} for this patient, Click confirm to delete!`,

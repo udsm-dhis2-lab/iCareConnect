@@ -164,7 +164,7 @@ export class PatientRadiologySummaryComponent implements OnInit {
   onDeleteOrder(e: Event, order: any) {
     // e.stopPropagation();
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
-      width: "25%",
+      minWidth: "25%",
       data: {
         modalTitle: `Delete ${order?.concept?.display}`,
         modalMessage: `You are about to delete ${order?.concept?.display} for this patient, Click confirm to delete!`,

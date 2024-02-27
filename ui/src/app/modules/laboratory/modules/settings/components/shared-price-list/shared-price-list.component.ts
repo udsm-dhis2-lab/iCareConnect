@@ -138,7 +138,7 @@ export class SharedPriceListComponent implements OnInit {
   onCreate(e, pricingItems: PricingItemInterface[]): void {
     e.stopPropagation();
     const dialog = this.dialog.open(ManageItemPriceComponent, {
-      width: "50%",
+      minWidth: "50%",
       panelClass: "custom-dialog-container",
       data: { pricingItems },
     });

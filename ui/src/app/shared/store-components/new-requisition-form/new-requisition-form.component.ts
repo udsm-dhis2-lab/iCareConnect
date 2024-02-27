@@ -121,7 +121,7 @@ export class NewRequisitionFormComponent implements OnInit {
       );
       this.dialog
         .open(SharedConfirmationComponent, {
-          width: "25%",
+          minWidth: "25%",
           data: {
             modalTitle: `Continue with last request (${availableRequisition?.code})`,
             modalMessage: `Do you want to continue with the last request with number ${availableRequisition?.code}`,
@@ -386,11 +386,12 @@ export class NewRequisitionFormComponent implements OnInit {
           this.itemUuid,
           this.currentStore?.uuid
         );
-      
-      this.itemRequisitionStatus$ = this.stockService.getRequisitionStatusOfAnItem(
-        this.itemUuid,
-        this.currentStore?.uuid
-      );
+
+      this.itemRequisitionStatus$ =
+        this.stockService.getRequisitionStatusOfAnItem(
+          this.itemUuid,
+          this.currentStore?.uuid
+        );
     }
   }
 

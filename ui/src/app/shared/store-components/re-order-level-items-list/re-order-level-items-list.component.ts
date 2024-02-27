@@ -39,7 +39,7 @@ export class ReOrderLevelItemsListComponent implements OnInit {
     event.stopPropagation();
     this.dialog
       .open(ManageReOrderLevelModalComponent, {
-        width: "30%",
+        minWidth: "30%",
       })
       .afterClosed()
       .subscribe((shouldLoadData) => {
@@ -53,7 +53,7 @@ export class ReOrderLevelItemsListComponent implements OnInit {
     e?.stopPropagation();
     this.dialog
       .open(ManageReOrderLevelModalComponent, {
-        width: "30%",
+        minWidth: "30%",
         data: {
           reOrderLevel: reOrderLevel,
         },
@@ -69,7 +69,7 @@ export class ReOrderLevelItemsListComponent implements OnInit {
     e?.stopPropagation();
     this.dialog
       .open(SharedConfirmationComponent, {
-        width: "30%",
+        minWidth: "30%",
         data: {
           modalTitle: `Delete Reorder level`,
           modalMessage: `Are you sure to delete re-order level for ${reOrderLevel?.item?.display}`,

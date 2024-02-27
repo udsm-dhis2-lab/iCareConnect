@@ -29,7 +29,7 @@ export class LedgersListComponent implements OnInit {
     event.stopPropagation();
     this.dialog
       .open(ManageLedgerComponent, {
-        width: "30%",
+        minWidth: "30%",
       })
       .afterClosed()
       .subscribe((shouldLoadLegderTypes) => {

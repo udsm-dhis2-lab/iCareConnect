@@ -636,7 +636,7 @@ export class VisitComponent implements OnInit {
     e.stopPropagation();
     this.dialog
       .open(SharedConfirmationComponent, {
-        width: "20%",
+        minWidth: "20%",
         data: {
           modalTitle:
             key === "close" ? `Close This Visit` : "Delete this Visit",

@@ -45,7 +45,7 @@ export class SuppliersListComponent implements OnInit {
     e?.stopPropagation();
     this.dialog
       .open(SupplierFormComponent, {
-        width: "40%",
+        minWidth: "40%",
         panelClass: "custom-dialog-container",
         data: {
           locations: locations,
@@ -61,7 +61,7 @@ export class SuppliersListComponent implements OnInit {
     e?.stopPropagation();
     this.dialog
       .open(SupplierFormComponent, {
-        width: "40%",
+        minWidth: "40%",
         data: {
           supplier: supplier,
           locations: locations,
@@ -76,7 +76,7 @@ export class SuppliersListComponent implements OnInit {
   onDeleteSupplier(e: any, supplier: any) {
     this.dialog
       .open(SharedConfirmationComponent, {
-        width: "25%",
+        minWidth: "25%",
         data: {
           modalTitle: "Are you sure to delete this supplier?",
           modalMessage:

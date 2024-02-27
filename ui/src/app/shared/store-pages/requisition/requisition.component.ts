@@ -248,7 +248,7 @@ export class RequisitionComponent implements OnInit {
     e?.stopPropagation();
     this.dialog
       .open(SharedConfirmationComponent, {
-        width: "25%",
+        minWidth: "25%",
         data: {
           modalTitle: "Are you sure to delete this Requisition",
           modalMessage:
@@ -295,7 +295,7 @@ export class RequisitionComponent implements OnInit {
     });
     this.dialog
       .open(SharedConfirmationComponent, {
-        width: "40%",
+        minWidth: "40%",
         data: {
           modalTitle: "Confirm Multiple Receive",
           modalMessage: "Are you sure you want to receive all selected items?",
@@ -340,7 +340,7 @@ export class RequisitionComponent implements OnInit {
   onRejectItem(e: any) {
     this.dialog
       .open(SharedConfirmationComponent, {
-        width: "40%",
+        minWidth: "40%",
         data: {
           modalTitle: "Confirm Issue Rejection",
           modalMessage: "Are you sure you want to reject this item?",
@@ -374,7 +374,7 @@ export class RequisitionComponent implements OnInit {
   rejectAllSelected(e: Event) {
     this.dialog
       .open(SharedConfirmationComponent, {
-        width: "40%",
+        minWidth: "40%",
         data: {
           modalTitle: "Confirm Issues Rejection",
           modalMessage:

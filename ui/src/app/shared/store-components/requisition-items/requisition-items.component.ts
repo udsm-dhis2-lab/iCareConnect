@@ -83,7 +83,7 @@ export class RequisitionItemsComponent implements OnInit {
     if (key === "delete") {
       this.dialog
         .open(SharedConfirmationComponent, {
-          width: "25%",
+          minWidth: "25%",
           data: {
             modalTitle: "Are you sure to delete this Item",
             modalMessage:
@@ -118,7 +118,7 @@ export class RequisitionItemsComponent implements OnInit {
   onDeleteRequsitionItem(requisitionItemUuid: string) {
     this.dialog
       .open(SharedConfirmationComponent, {
-        width: "25%",
+        minWidth: "25%",
         data: {
           modalTitle: "Are you sure to delete this Item",
           modalMessage:
