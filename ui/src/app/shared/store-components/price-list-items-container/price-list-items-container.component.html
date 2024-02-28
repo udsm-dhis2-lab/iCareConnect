@@ -6,6 +6,7 @@
   <app-price-list
     [paymentTypes]="params?.paymentTypes"
     [departmentId]="currentDepartmentId"
+    [hideDepartmentsSelection]="hideDepartmentsSelection"
     *ngIf="params?.paymentTypes && params?.paymentTypes.length > 0"
   ></app-price-list>
   <div

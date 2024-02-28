@@ -40,7 +40,6 @@ import { ItemPriceInterface } from "../../../modules/maintenance/models/item-pri
 import { PricingItemInterface } from "../../../modules/maintenance/models/pricing-item.model";
 import { ItemPriceService } from "../../services/item-price.service";
 import { PricingService } from "../../services/pricing.service";
-
 @Component({
   selector: "app-price-list",
   templateUrl: "./price-list.component.html",
@@ -49,6 +48,7 @@ import { PricingService } from "../../services/pricing.service";
 export class PriceListComponent implements OnInit, OnChanges {
   @Input() paymentTypes: PaymentTypeInterface[];
   @Input() departmentId: string;
+  @Input() hideDepartmentsSelection: boolean;
   currentDepartmentId: string;
   priceList: any[];
   priceList$: Observable<any[]>;
@@ -88,6 +88,8 @@ export class PriceListComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.currentDepartmentId = this.departmentId;
+    this.isDrug = this.currentDepartmentId == "Drug" ? true : false;
+
     this.loadData();
     this.priceListDepartments$ =
       this.itemPriceService.getDepartmentsByMappingSearchQuery("PRICE_LIST");
@@ -316,6 +318,7 @@ export class PriceListComponent implements OnInit, OnChanges {
             startIndex: this.currentPage,
             searchTerm: this.itemSearchTerm !== "" ? this.itemSearchTerm : null,
             conceptSet: departmentId,
+            isDrug: this.isDrug,
           },
         })
       );
