@@ -13,6 +13,7 @@ import { getAllPaymentTypes } from "src/app/store/selectors/payment-type.selecto
 export class PriceListItemsContainerComponent implements OnInit {
   @Input() paymentCategories: any[];
   @Input() departmentId: string;
+  @Input() hideDepartmentsSelection: boolean;
   currentDepartmentId: string;
   paymentTypes$: Observable<any[]>;
   constructor(private store: Store<AppState>) {}

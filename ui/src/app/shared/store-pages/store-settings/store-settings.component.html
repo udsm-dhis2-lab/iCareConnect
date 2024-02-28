@@ -2,7 +2,8 @@
   class="store-settings"
   *ngIf="{
     mappingSource: mappingSource$ | async,
-    paymentCategories: paymentCategories$ | async
+    paymentCategories: paymentCategories$ | async,
+    platformProductConfigs: platformProductConfigs$ | async
   } as params"
 >
   <mat-tab-group>
@@ -51,9 +52,19 @@
     </mat-tab>
     <mat-tab label="Price list">
       <ng-template matTabContent>
+        <mat-progress-bar
+          mode="indeterminate"
+          *ngIf="!params?.platformProductConfigs"
+        ></mat-progress-bar>
         <app-price-list-items-container
           [paymentCategories]="params?.paymentCategories?.setMembers"
           *ngIf="params?.paymentCategories"
+          [departmentId]="
+            params?.platformProductConfigs?.isPharmacy ? 'Drug' : null
+          "
+          [hideDepartmentsSelection]="
+            params?.platformProductConfigs?.isPharmacy ? true : false
+          "
         ></app-price-list-items-container>
       </ng-template>
     </mat-tab>

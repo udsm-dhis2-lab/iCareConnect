@@ -5,6 +5,7 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 import { loadConceptByUuid } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getConceptById } from "src/app/store/selectors";
+import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 
 @Component({
   selector: "app-store-settings",
@@ -14,6 +15,7 @@ import { getConceptById } from "src/app/store/selectors";
 export class StoreSettingsComponent implements OnInit {
   mappingSource$: Observable<any>;
   paymentCategories$: Observable<any>;
+  platformProductConfigs$: Observable<any>;
   constructor(
     private systemSettingsService: SystemSettingsService,
     private store: Store<AppState>
@@ -23,6 +25,10 @@ export class StoreSettingsComponent implements OnInit {
     this.mappingSource$ = this.systemSettingsService.getSystemSettingsByKey(
       `iCare.store.mappings.items.unitOfMeasure.mappingSource`
     );
+    /**
+     * TODO: rename this lis config to be platform product config
+     */
+    this.platformProductConfigs$ = this.store.select(getLISConfigurations);
     this.store.dispatch(
       loadConceptByUuid({
         uuid: "c95c1065-bcea-4a35-aee0-ca62906ec8e2",
