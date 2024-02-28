@@ -157,7 +157,7 @@ export class DrugOrdersService {
     location?: string,
     provider?: string
   ): Observable<any> {
-    console.log(order);
+    // console.log(order);
     // return of(null);
     return this.openmrsService.post("icare/prescription", order);
     return this.getDrugOrderEncounter(
