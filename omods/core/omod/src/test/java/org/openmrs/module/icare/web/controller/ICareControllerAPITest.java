@@ -942,7 +942,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testGetCommonlyOrderedItems() throws Exception {
 		MockHttpServletRequest drugs = newGetRequest("icare/commonlyordereditems", new Parameter("locationUuid",
-						"44939999-d333-fff2-9bff-61d11117c22e"));
+		        "44939999-d333-fff2-9bff-61d11117c22e"));
 		MockHttpServletResponse response = handle(drugs);
 		Map<String, Object> drugsMap = (new ObjectMapper()).readValue(response.getContentAsString(), Map.class);
 		List<Map<String, Object>> results = (List) drugsMap.get("results");
