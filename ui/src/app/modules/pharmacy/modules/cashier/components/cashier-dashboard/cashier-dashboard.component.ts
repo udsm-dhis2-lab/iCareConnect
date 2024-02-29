@@ -421,6 +421,7 @@ export class CashierDashboardComponent implements OnInit {
   onSelectDrug(selectedDrug: any): void {
     this.onAddToList(null, {
       ...selectedDrug,
+      id: selectedDrug?.drug?.uuid,
       itemUuid: selectedDrug?.drug?.uuid,
       name: selectedDrug?.drug?.display,
       quantity: selectedDrug?.drug?.quantity,

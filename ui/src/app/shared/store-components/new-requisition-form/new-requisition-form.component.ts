@@ -276,7 +276,7 @@ export class NewRequisitionFormComponent implements OnInit {
             setTimeout(() => {
               this.requisition = storedRequisition;
               this.requisitionFields = reserveRequisitionFields;
-            }, 100);
+            }, 50);
           }
         });
     } else {
