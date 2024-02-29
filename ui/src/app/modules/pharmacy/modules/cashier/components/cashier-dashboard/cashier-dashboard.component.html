@@ -199,9 +199,10 @@
     </div>
     <div class="col-lg-3 col-md-3 col-sm-12 col-sx-12">
       <mat-card *ngIf="!saving">
-        <div class="h5">Common sold items</div>
+        <div class="h5">Commonly sold items</div>
         <app-commonly-ordered-items
           [currentLocation]="currentLocation"
+          (selectedDrug)="onSelectDrug($event)"
         ></app-commonly-ordered-items>
       </mat-card>
     </div>

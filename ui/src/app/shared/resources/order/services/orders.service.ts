@@ -3,9 +3,10 @@ import { from, Observable, of, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "../../../modules/openmrs-http-client/services/openmrs-http-client.service";
 import { omit } from "lodash";
-import { Api, EncounterCreate, OrderGetFull } from "../../openmrs";
+import { Api, OrderGetFull } from "../../openmrs";
 import { HttpErrorResponse } from "@angular/common/http";
 import { getDrugOrderPaymentStatus } from "../helpers/getDrugOrderPaymentStatus.helper";
+import { sum } from "lodash";
 
 @Injectable({
   providedIn: "root",
@@ -186,7 +187,25 @@ export class OrdersService {
     return this.openMRSHttpClient
       .get(`icare/commonlyordereditems?${parameters.join("&")}`)
       .pipe(
-        map((response) => response?.results),
+        map((response) =>
+          response?.results?.map((result: any) => {
+            return {
+              ...result,
+              drug: {
+                ...result?.drug,
+                quantity: sum(
+                  result?.drug?.stock?.map((stock: any) => {
+                    if (stock?.expiryDate > new Date().getTime()) {
+                      return stock?.quantity;
+                    } else {
+                      return 0;
+                    }
+                  })
+                ),
+              },
+            };
+          })
+        ),
         catchError((error) => of(error))
       );
   }

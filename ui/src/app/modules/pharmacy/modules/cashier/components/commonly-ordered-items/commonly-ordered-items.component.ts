@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { Observable } from "rxjs";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 
@@ -9,12 +9,12 @@ import { OrdersService } from "src/app/shared/resources/order/services/orders.se
 })
 export class CommonlyOrderedItemsComponent implements OnInit {
   @Input() currentLocation: any;
+  @Output() selectedDrug: EventEmitter<any> = new EventEmitter<any>();
   commonlyOrderedItems$: Observable<any[]>;
   parameters: string[] = [];
   constructor(private ordersService: OrdersService) {}
 
   ngOnInit(): void {
-    console.log(this.currentLocation);
     this.parameters = [
       ...this.parameters,
       "locationUuid=" + this.currentLocation?.uuid,
@@ -22,5 +22,10 @@ export class CommonlyOrderedItemsComponent implements OnInit {
     this.commonlyOrderedItems$ = this.ordersService.getCommonlyOrderedItems(
       this.parameters
     );
+  }
+
+  onSelectDrug(event: Event, selectedDrug: any): void {
+    event.stopPropagation();
+    if (selectedDrug?.drug?.quantity > 0) this.selectedDrug.emit(selectedDrug);
   }
 }

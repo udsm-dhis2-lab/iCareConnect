@@ -63,7 +63,6 @@ export class CashierDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("provider", this.provider);
     if (this.shouldShowDoseDetails == "true") {
       this.prescriptionVariables = Object.keys(this.prescriptionVariables).map(
         (key: string) => {
@@ -203,11 +202,12 @@ export class CashierDashboardComponent implements OnInit {
   }
 
   onAddToList(event: Event, item: any): void {
-    event.stopPropagation();
+    if (event) {
+      event.stopPropagation();
+    }
     this.itemsPrices[item?.itemUuid] = {
       ready: false,
     };
-    console.log("itemsPrices", this.itemsPrices);
     this.selectedItems = [...this.selectedItems, item];
     this.createQuantityField(item?.itemUuid);
     this.createDoseInfoFields(item?.itemUuid);
@@ -413,5 +413,14 @@ export class CashierDashboardComponent implements OnInit {
             });
         }
       });
+  }
+
+  onSelectDrug(selectedDrug: any): void {
+    this.onAddToList(null, {
+      ...selectedDrug,
+      itemUuid: selectedDrug?.drug?.uuid,
+      name: selectedDrug?.drug?.display,
+      quantity: selectedDrug?.drug?.quantity,
+    });
   }
 }
