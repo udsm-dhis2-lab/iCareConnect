@@ -62,13 +62,13 @@
                   uuid="8xxab323-5ab0-11e8-b607-880027ie4415" />
 
     <!-- items -->
-    <item item_id="123" uuid="8o00d43570-8y37-11f3-1234-08002007777" concept_id="1100" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
+    <item item_id="123" drug_id="1" uuid="8o00d43570-8y37-11f3-1234-08002007777" concept_id="1100" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
 
     <!-- item with null stock -->
-    <item item_id="124" uuid="8777d43571-yy77-11ff-2244-08002007777" concept_id="1000" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
+    <item item_id="124" drug_id="2" uuid="8777d43571-yy77-11ff-2244-08002007777" concept_id="1000" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
 
     <!-- item with no stock -->
-    <item item_id="125" uuid="8777d43571-yy77-11ff-2244-08002007677" concept_id="1000" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
+    <item item_id="125" drug_id="3" uuid="8777d43571-yy77-11ff-2244-08002007677" concept_id="1000" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
 
     <!-- item with zero stock -->
     <item item_id="127" uuid="8777d43571-yy77-11ff-2244-08002007647" concept_id="1110" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
@@ -130,5 +130,10 @@
 
     <st_requisition_status requisition_status_id="3" remarks="PENDING STOCK" status="5" creator="1" date_created="2022-11-30 00:00:00" uuid="8800zx3570-8z37-11ff-2234-01102007815" voided="0" requisition_id="3"/>
 
+    <drug drug_id="1" concept_id="10"  creator="1" date_created="2023-10-21" retired="0" uuid="3cfcf118-931c-46f7-8ff6-7b876f0d4202"/>
+
+    <drug drug_id="2" concept_id="12"  creator="1" date_created="2023-10-21" retired="0" uuid="05ec820a-d297-44e3-be6e-698531d9dd3f"/>
+
+    <drug drug_id="3" concept_id="14"  creator="1" date_created="2023-10-21" retired="0" uuid="7e2323fa-0fa0-461f-9b59-6765997d849e"/>
 
 </dataset>

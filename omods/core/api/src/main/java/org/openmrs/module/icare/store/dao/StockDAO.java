@@ -94,8 +94,9 @@ public class StockDAO extends BaseDAO<Stock> {
 	
 	public List<Stock> getStockByDrugAndLocation(String drugUuid, String locationUuid) {
 		DbSession session = this.getSession();
+		new Item();
 		String queryStr = "SELECT st FROM Stock st \n"
-		        + "WHERE st.item = (SELECT it FROM Item it WHERE it.drug = (SELECT d FROM drug d WHERE d.uuid=:drugUuid)) "
+		        + "WHERE st.item = (SELECT it FROM Item it WHERE it.drug = (SELECT d FROM Drug d WHERE d.uuid=:drugUuid)) "
 		        + "AND st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)\n"
 		        + "AND st.item.stockable = true";
 		

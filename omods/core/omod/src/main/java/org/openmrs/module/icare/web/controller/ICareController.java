@@ -1337,7 +1337,8 @@ public class ICareController {
 			drugData.put("concept", concept);
 			List<Map<String, Object>> stockList = new ArrayList<>();
 			if (locationUuid != null) {
-				List<Stock> drugStocks = Context.getService(StoreService.class).getStockByDrugAndLocation(drugDetails.getUuid(),locationUuid);
+				System.out.println(locationUuid);
+				List<Stock> drugStocks = storeService.getStockByDrugAndLocation(drugDetails.getUuid(),locationUuid);
 				for(Stock stock: drugStocks) {
 					stockList.add(stock.toMap());
 				}
