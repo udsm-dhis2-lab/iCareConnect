@@ -26,7 +26,10 @@ export class EncountersListComponent implements OnInit {
   constructor(private pharmacyService: PharmacyService) {}
 
   ngOnInit(): void {
-    this.headers = [...this.headers, ...this.customForm?.formFields];
+    this.headers = [
+      ...this.headers,
+      ...(this.customForm ? this.customForm?.formFields : []),
+    ];
     this.headersKeys = this.headers?.map((header: any) => header?.id);
     this.loadEncounters();
   }
@@ -51,19 +54,21 @@ export class EncountersListComponent implements OnInit {
               let data = {};
               data["no"] = index + 1 + this.startIndex;
               // Object.keys();
-              this.customForm?.formFields.forEach((field: any) => {
-                const observations = result.obs?.map((observation: any) => {
-                  return {
-                    ...observation,
-                    key: observation?.concept?.uuid,
-                  };
-                });
-                data[field?.id] =
-                  keyBy(observations, "key")[field?.id] &&
-                  keyBy(observations, "key")[field?.id]?.value
-                    ? keyBy(observations, "key")[field?.id]?.value
-                    : "-";
-              });
+              this.customForm
+                ? this.customForm?.formFields.forEach((field: any) => {
+                    const observations = result.obs?.map((observation: any) => {
+                      return {
+                        ...observation,
+                        key: observation?.concept?.uuid,
+                      };
+                    });
+                    data[field?.id] =
+                      keyBy(observations, "key")[field?.id] &&
+                      keyBy(observations, "key")[field?.id]?.value
+                        ? keyBy(observations, "key")[field?.id]?.value
+                        : "-";
+                  })
+                : null;
               return data;
             }),
           };
