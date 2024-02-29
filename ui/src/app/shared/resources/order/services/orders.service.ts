@@ -181,4 +181,13 @@ export class OrdersService {
       catchError((error) => of(error))
     );
   }
+
+  getCommonlyOrderedItems(parameters?: string[]): Observable<any> {
+    return this.openMRSHttpClient
+      .get(`icare/commonlyordereditems?${parameters.join("&")}`)
+      .pipe(
+        map((response) => response?.results),
+        catchError((error) => of(error))
+      );
+  }
 }

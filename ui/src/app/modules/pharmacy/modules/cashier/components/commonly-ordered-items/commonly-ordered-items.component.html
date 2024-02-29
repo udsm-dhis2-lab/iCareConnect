@@ -1,0 +1,21 @@
+<div *ngIf="{ commonlyOrderedItems: commonlyOrderedItems$ | async } as params">
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="params?.commonlyOrderedItems"
+  ></mat-progress-bar>
+  <table class="table">
+    <tbody>
+      <tr
+        *ngFor="
+          let orderedItem of params?.commonlyOrderedItems;
+          let count = index
+        "
+      >
+        <td>
+          {{ count + 1 }}
+        </td>
+        <td>{{ orderedItem?.drug?.name }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
