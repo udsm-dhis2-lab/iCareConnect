@@ -938,4 +938,13 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertThat("There is one encounter", results.size(), is(1));
 		
 	}
+	
+	@Test
+	public void testGetCommonlyOrderedItems() throws Exception {
+		MockHttpServletRequest drugs = newGetRequest("icare/commonlyordereditems");
+		MockHttpServletResponse response = handle(drugs);
+		Map<String, Object> drugsMap = (new ObjectMapper()).readValue(response.getContentAsString(), Map.class);
+		List<Map<String, Object>> results = (List) drugsMap.get("results");
+		assertThat("Count of drugs ordered", results.size(), is(3));
+	}
 }

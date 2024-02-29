@@ -25,6 +25,7 @@ import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
 import org.openmrs.module.icare.core.*;
+import org.openmrs.module.icare.core.models.CommonlyOrderedDrugs;
 import org.openmrs.module.icare.core.models.EncounterPatientProgram;
 import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
@@ -32,6 +33,7 @@ import org.openmrs.module.icare.core.utils.EncounterWrapper;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
+import org.openmrs.module.icare.store.models.Stock;
 import org.openmrs.module.icare.store.services.StoreService;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -376,7 +378,8 @@ public class ICareController {
                                                 @RequestParam(defaultValue = "0") Integer startIndex,
                                                 @RequestParam String orderTypeUuid,
                                                 @RequestParam String visitUuid,
-                                                @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus, @RequestParam(required = false) boolean includeInactiv) {
+                                                @RequestParam(required = false) Order.FulfillerStatus fulfillerStatus,
+												@RequestParam(required = false) boolean includeInActive) {
 
         List<Order> orders = iCareService.getOrdersByVisitAndOrderType(visitUuid, orderTypeUuid, fulfillerStatus, limit, startIndex);
 
@@ -1303,7 +1306,46 @@ public class ICareController {
 
 			//add the sample after creating its object
 			responseSamplesObject.add(sampleObject);
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", responseSamplesObject);
+		return results;
+	}
+	
+	@RequestMapping(value = "commonlyordereditems", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getOrdersByVisit(@RequestParam(required = false) String orderTypeUuid,
+												@RequestParam(required = false) String visitUuid,
+												@RequestParam(required = false) String locationUuid,
+												@RequestParam(defaultValue = "10") Integer limit,
+												@RequestParam(defaultValue = "0") Integer startIndex) {
 
+		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
+		List<Object[]> drugs = iCareService.getCommonlyOrderedItems(visitUuid, orderTypeUuid, limit, startIndex);
+		for (Object[] drug: drugs) {
+			Drug drugDetails = (Drug) drug[0];
+			Object count = drug[1];
+
+			Map<String, Object> returnObj = new HashMap<>();
+			Map<String, Object> drugData = new HashMap<>();
+			drugData.put("uuid", drugDetails.getUuid());
+			drugData.put("display", drugDetails.getDisplayName());
+
+			Map<String, Object> concept = new HashMap<>();
+			concept.put("uuid", drugDetails.getConcept().getUuid());
+			concept.put("display", drugDetails.getConcept().getDisplayString());
+			drugData.put("concept", concept);
+			List<Map<String, Object>> stockList = new ArrayList<>();
+			if (locationUuid != null) {
+				List<Stock> drugStocks = Context.getService(StoreService.class).getStockByDrugAndLocation(drugDetails.getUuid(),locationUuid);
+				for(Stock stock: drugStocks) {
+					stockList.add(stock.toMap());
+				}
+			}
+			drugData.put("stock", stockList);
+			returnObj.put("drug", drugData);
+			returnObj.put("count",count);
+			responseSamplesObject.add(returnObj);
 		}
 		Map<String, Object> results = new HashMap<>();
 		results.put("results", responseSamplesObject);

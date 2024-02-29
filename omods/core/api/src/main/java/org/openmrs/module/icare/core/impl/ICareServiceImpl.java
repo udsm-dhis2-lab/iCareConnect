@@ -26,6 +26,7 @@ import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
 import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.dao.*;
+import org.openmrs.module.icare.core.models.CommonlyOrderedDrugs;
 import org.openmrs.module.icare.core.models.EncounterPatientProgram;
 import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
@@ -321,6 +322,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public List<Order> getOrdersByVisitAndOrderType(String visitUuid, String orderTypeUuid,
 	        Order.FulfillerStatus fulfillerStatus, Integer limit, Integer startIndex) {
 		return this.dao.getOrdersByVisitAndOrderType(visitUuid, orderTypeUuid, fulfillerStatus, limit, startIndex);
+	}
+	
+	@Override
+	public List<Object[]> getCommonlyOrderedItems(String visitUuid, String orderTypeUuid, Integer limit, Integer startIndex) {
+		return this.dao.getCommonlyOrderedItems(visitUuid, orderTypeUuid, limit, startIndex);
 	}
 	
 	@Override
