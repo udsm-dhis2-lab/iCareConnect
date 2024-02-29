@@ -50,12 +50,13 @@
               <span
                 class="text-warning text-left for-warning"
                 *ngIf="
-                  (values[field?.key] &&
+                  values &&
+                  ((values[field?.key] &&
                     field?.min &&
                     values[field?.key] < field?.min) ||
-                  (values[field?.key] &&
-                    field?.max &&
-                    values[field?.key] > field?.max)
+                    (values[field?.key] &&
+                      field?.max &&
+                      values[field?.key] > field?.max))
                 "
               >
                 Abnormal
