@@ -279,7 +279,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       }, 10);
 
       this.unitPrice = (
-        parseFloat(this.formValues?.packPrice?.value) / Number(unit)
+        parseFloat(this.formValues?.packPrice?.value || 0) / Number(unit)
       ).toFixed(2);
       this.amount = undefined;
       if (

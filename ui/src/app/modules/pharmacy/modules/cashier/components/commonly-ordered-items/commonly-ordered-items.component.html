@@ -1,7 +1,7 @@
 <div *ngIf="{ commonlyOrderedItems: commonlyOrderedItems$ | async } as params">
   <mat-progress-bar
     mode="indeterminate"
-    *ngIf="params?.commonlyOrderedItems"
+    *ngIf="!params?.commonlyOrderedItems"
   ></mat-progress-bar>
   <table class="table">
     <tbody>
@@ -10,11 +10,21 @@
           let orderedItem of params?.commonlyOrderedItems;
           let count = index
         "
+        (click)="onSelectDrug($event, orderedItem)"
+        [class]="{
+          'out-of-stock': orderedItem?.drug?.quantity === 0,
+          'has-tock': orderedItem?.drug?.quantity > 0
+        }"
       >
         <td>
           {{ count + 1 }}
         </td>
-        <td>{{ orderedItem?.drug?.name }}</td>
+        <td>
+          {{ orderedItem?.drug?.display }}
+          <span *ngIf="orderedItem?.drug?.quantity"
+            >({{ orderedItem?.drug?.quantity }})</span
+          >
+        </td>
       </tr>
     </tbody>
   </table>
