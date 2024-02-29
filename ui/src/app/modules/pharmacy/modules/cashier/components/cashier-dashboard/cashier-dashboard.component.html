@@ -198,12 +198,11 @@
       </ng-container>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-12 col-sx-12">
-      <div class="h5">Common sold items</div>
-      <mat-card *ngIf="!saving && params?.customForm">
-        <!-- <app-encounters-list
-          [customForm]="params?.customForm"
-          [encounterTypeUuid]="encounterTypeUuid"
-        ></app-encounters-list> -->
+      <mat-card *ngIf="!saving">
+        <div class="h5">Common sold items</div>
+        <app-commonly-ordered-items
+          [currentLocation]="currentLocation"
+        ></app-commonly-ordered-items>
       </mat-card>
     </div>
   </div>
