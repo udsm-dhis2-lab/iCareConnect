@@ -349,4 +349,23 @@
     <patient_state patient_state_id="1" patient_program_id="1" state="1" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c992" start_date="2023-04-18 09:51:57.0" creator="1" date_created="2023-04-18 09:51:57.0" />
 
     <encounter_patient_state encounter_patient_state_id="1" encounter_id="300" patient_state_id="1"  voided="0"  uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c992" creator="1" date_created="2023-04-18 09:51:57.0" />
+
+<!--    <st_stock stock_id="10" item_id="123" batch="batch-xyz" expiry_date="2040-12-08 00:00:00" location_id="200" quantity="100"/>-->
+
+    <!-- items -->
+<!--    <item item_id="123" drug_id="111" uuid="8o00d43570-8y37-11f3-1234-08002007777" concept_id="1100" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>-->
+
+    <!-- item with null stock -->
+<!--    <item item_id="124" drug_id="211" uuid="8777d43571-yy77-11ff-2244-08002007777" concept_id="1000" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>-->
+
+    <!-- item with no stock -->
+<!--    <item item_id="125" drug_id="3" uuid="8777d43571-yy77-11ff-2244-08002007677" concept_id="1000" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>-->
+
+
+<!--    <drug drug_id="111" name="One drug" combination="1" concept_id="10"  creator="1" date_created="2023-10-21" retired="0" uuid="3cfcf118-931c-46f7-8ff6-7b876f0d4202"/>-->
+
+<!--    <drug drug_id="211" name="Two drug" combination="2" concept_id="12"  creator="1" date_created="2023-10-21" retired="0" uuid="05ec820a-d297-44e3-be6e-698531d9dd3f"/>-->
+
+    <location location_id="200" name="store A" creator="1" date_created="2017-02-27 12:47:30" retired="false" uuid="44939999-d333-fff2-9bff-61d11117c22e" />
+
 </dataset>
