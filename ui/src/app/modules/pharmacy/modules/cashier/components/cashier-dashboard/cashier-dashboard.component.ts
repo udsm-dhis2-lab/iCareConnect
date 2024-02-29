@@ -15,7 +15,7 @@ import { loadCustomOpenMRSForm } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation } from "src/app/store/selectors";
 import { getCustomOpenMRSFormById } from "src/app/store/selectors/form.selectors";
-import { sum } from "lodash";
+import { sum, keyBy } from "lodash";
 import { MatDialog } from "@angular/material/dialog";
 import { PosConfirmSalesModalComponent } from "../../modals/pos-confirm-sales-modal/pos-confirm-sales-modal.component";
 
@@ -205,13 +205,16 @@ export class CashierDashboardComponent implements OnInit {
     if (event) {
       event.stopPropagation();
     }
-    this.itemsPrices[item?.itemUuid] = {
-      ready: false,
-    };
-    this.selectedItems = [...this.selectedItems, item];
-    this.createQuantityField(item?.itemUuid);
-    this.createDoseInfoFields(item?.itemUuid);
-    this.createSearchItemFormField();
+
+    if (!keyBy(this.selectedItems, "itemUuid")[item?.itemUuid]) {
+      this.itemsPrices[item?.itemUuid] = {
+        ready: false,
+      };
+      this.selectedItems = [...this.selectedItems, item];
+      this.createQuantityField(item?.itemUuid);
+      this.createDoseInfoFields(item?.itemUuid);
+      this.createSearchItemFormField();
+    }
   }
 
   onRemove(event: Event, itemToRemove: any): void {
