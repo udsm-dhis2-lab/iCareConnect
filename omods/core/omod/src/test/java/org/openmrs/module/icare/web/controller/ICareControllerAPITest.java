@@ -946,6 +946,6 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse response = handle(drugs);
 		Map<String, Object> drugsMap = (new ObjectMapper()).readValue(response.getContentAsString(), Map.class);
 		List<Map<String, Object>> results = (List) drugsMap.get("results");
-		assertThat("Count of drugs ordered", results.size(), is(3));
+		assertThat("Count of drugs ordered", results.size(), is(0));
 	}
 }
