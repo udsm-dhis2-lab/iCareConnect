@@ -31,6 +31,7 @@ export class CaptureFormDataComponent implements OnInit {
   constructor(private visitService: VisitsService) {}
 
   ngOnInit(): void {
+    console.log(this.form);
     this.form = {
       ...this.form,
       formattedFormFields: groupBy(this.form?.formFields, "fieldPart"),
