@@ -1,5 +1,5 @@
 <div *ngIf="{ observations: observations$ | async } as params">
-  <ng-container *ngIf="isGenericForm || form?.groupedFields">
+  <ng-container *ngIf="isGenericForm || isLIS">
     <!-- {{ form?.groupedFields | json }} -->
     <ng-container *ngIf="!isGenericForm">
       <ng-container *ngFor="let fields of form?.groupedFields">
@@ -73,7 +73,7 @@
       ></app-form>
     </ng-container>
   </ng-container>
-  <!-- <ng-container *ngIf="!isLIS && !isGenericForm">
+  <ng-container *ngIf="!isLIS && !isGenericForm">
     <div *ngFor="let formField of form?.formFields">
       <div
         *ngIf="
@@ -220,5 +220,5 @@
         </div>
       </fieldset>
     </div>
-  </ng-container> -->
+  </ng-container>
 </div>

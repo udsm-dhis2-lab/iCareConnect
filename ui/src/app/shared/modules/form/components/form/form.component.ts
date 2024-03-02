@@ -62,11 +62,13 @@ export class FormComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges): void {
     this.shouldDisable = this.isReport ? true : this.shouldDisable;
-    this.values = this.form ? this.form.getRawValue() : null;
-    this.validationIssues = validateFormFields(
-      this.formValidationRules,
-      this.values
-    );
+    this.values = this.form?.getRawValue();
+    if (this.values) {
+      this.validationIssues = validateFormFields(
+        this.formValidationRules,
+        this.values
+      );
+    }
 
     this.form = this.fieldControlService.toFormGroup(
       this.fields,
@@ -90,12 +92,14 @@ export class FormComponent implements OnInit {
 
   onFieldUpdate(form: FormGroup): void {
     if (!this.showSaveButton && form) {
-      this.values = this.form ? this.form.getRawValue() : null;
+      this.values = this.form?.getRawValue();
 
-      this.validationIssues = validateFormFields(
-        this.formValidationRules,
-        this.values
-      );
+      if (this.values) {
+        this.validationIssues = validateFormFields(
+          this.formValidationRules,
+          this.values
+        );
+      }
       this.formUpdate.emit(
         new FormValue(this.form, this.fields, null, this.formId)
       );
@@ -119,7 +123,7 @@ export class FormComponent implements OnInit {
   }
 
   isFormInValid() {
-    return this.form.invalid;
+    return this.form?.invalid;
   }
 
   patchFormValueValue(objectToUpdate: any): void {

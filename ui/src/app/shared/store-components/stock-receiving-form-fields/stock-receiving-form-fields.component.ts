@@ -244,8 +244,6 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     //   }
     // }
 
-    console.log("CHECK");
-
     // Improve reference the code (mappings)
     this.selectedItem = this.formValues?.item?.value;
     this.unitOfMeasure = this.formValues?.unit?.value
