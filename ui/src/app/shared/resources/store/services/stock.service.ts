@@ -49,9 +49,8 @@ export class StockService {
       queryParams = [...queryParams, `page=1`];
     }
     const args = `?${queryParams.join("&")}`;
-
     return this.httpClient.get(`store/stock${args}`)?.pipe(
-      map((response) => {
+      map((response,index) => {
         const stockBatches: StockBatch[] = (response?.results || []).map(
           (stockItem) => new StockBatch(stockItem)
         );
