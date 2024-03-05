@@ -115,6 +115,7 @@ export class StockStatusListComponent implements OnInit {
 
   getStock(): void {
     if (!this.isStockOutPage && !this.status) {
+      console.log("inside is here --------------------------------->");
       this.stocksList$ = this.stockService
         .getAvailableStocks(
           this.currentLocation?.uuid,
@@ -238,7 +239,11 @@ export class StockStatusListComponent implements OnInit {
     // this.page =
     //   event.pageIndex - this.page >= 0 ? this.page + 1 : this.page - 1;
     this.page = this.page + (event?.pageIndex - event?.previousPageIndex);
+    console.log("page before --------------------------------->",this.page );
+    console.log("pagesize before --------------------------------->", this.pageSize);
     this.pageSize = Number(event?.pageSize);
+    console.log("pagenation --------------------------------->",this.page );
+    console.log("pagesize --------------------------------->", this.pageSize );
     this.getStock();
   }
 
