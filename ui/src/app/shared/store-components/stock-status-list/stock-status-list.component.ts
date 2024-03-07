@@ -115,7 +115,6 @@ export class StockStatusListComponent implements OnInit {
 
   getStock(): void {
     if (!this.isStockOutPage && !this.status) {
-      console.log("inside is here --------------------------------->");
       this.stocksList$ = this.stockService
         .getAvailableStocks(
           this.currentLocation?.uuid,
