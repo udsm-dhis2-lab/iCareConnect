@@ -335,16 +335,17 @@ export class StockService {
 
   saveStockLedger(ledgerInput: LedgerInput): Observable<any> {
     const storeLedger = Stock.createLedger(ledgerInput);
-
     if (!storeLedger) {
       return throwError({
         message: "Incorrect parameters supplied",
       });
     }
-
     return this.httpClient.post("store/ledger", storeLedger).pipe(
-      map((response) => new StockBatch(response)),
-      catchError((error) => of(error))
+      map((response) => {
+        new StockBatch(response)}),
+        catchError((error) => {
+          return of(error);
+        }),
     );
   }
 
