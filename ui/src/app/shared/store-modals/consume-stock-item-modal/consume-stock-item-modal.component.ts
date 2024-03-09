@@ -21,6 +21,9 @@ export class ConsumeStockItemModalComponent implements OnInit {
   saving: boolean = false;
   searchItemField: any;
   currentItemStock: any;
+  expiredDate:any;
+  itemUuids:any;
+  batchNumber:string;
   constructor(
     private dialogRef: MatDialogRef<ConsumeStockItemModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -28,6 +31,7 @@ export class ConsumeStockItemModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log("data ............................................",this.data)
     this.currentItemStock = this.data?.currentItemStock;
     if (!this.currentItemStock) {
       this.searchItemField = new Dropdown({
@@ -44,16 +48,51 @@ export class ConsumeStockItemModalComponent implements OnInit {
     this.createQuantityAndRemarksFields();
   }
 
+  // onGetSelectedItem(formValue: FormValue): void {
+  //   this.currentItemStock = formValue.getValues()?.stockItem?.value;
+  //   // console.log("currentItemStock", this.currentItemStock);
+  //   console.log("searched item ---------------------->",this.currentItemStock)
+  //   if (this.currentItemStock?.batches) {
+  //     this.formFields = null;
+  //     setTimeout(() => {
+  //       this.createQuantityAndRemarksFields();
+  //     }, 50);
+  //   }
+  // }
   onGetSelectedItem(formValue: FormValue): void {
     this.currentItemStock = formValue.getValues()?.stockItem?.value;
-    // console.log("currentItemStock", this.currentItemStock);
-    if (this.currentItemStock?.batches) {
-      this.formFields = null;
-      setTimeout(() => {
-        this.createQuantityAndRemarksFields();
-      }, 50);
+    console.log("searched item ---------------------->", this.currentItemStock);
+
+    if (this.currentItemStock?.batches && this.currentItemStock.batches.length > 0) {
+      //capture expiredate from the body
+        const expiryDates = this.currentItemStock.batches
+            .filter(batch => batch.expiryDate)
+            .map(batch => batch.expiryDate);
+        //capturing batch number
+            const batchnumber = this.currentItemStock.batches
+            .filter(batch => batch.batch)
+            .map(batch => batch.batch);
+        //capturing itemUuid
+        const itemUuid  = this.currentItemStock.batches
+            .filter(batch => batch.itemUuid)
+            .map(batch => batch.itemUuid);
+
+            this.itemUuids = itemUuid[0];
+            this.expiredDate = expiryDates[0];
+            this.batchNumber = batchnumber[0];
+
+        console.log("itemUuid:", itemUuid[0]);
+        console.log("Expiry Dates:", expiryDates[0]);
+        console.log("batch number:", batchnumber[0]);
+        this.formFields = null;
+
+        setTimeout(() => {
+            this.createQuantityAndRemarksFields();
+        }, 50);
     }
-  }
+}
+
+
 
   createQuantityAndRemarksFields(): void {
     this.formFields = [
@@ -104,13 +143,14 @@ export class ConsumeStockItemModalComponent implements OnInit {
     zip(
       ...batchesToDeduct.map((batch) => {
         const ledgerInput: LedgerInput = {
-          itemUuid: this.data?.currentItemStock?.id,
-          ledgerTypeUuid: this.data?.ledger?.id,
+          // itemUuid: this.data?.currentItemStock?.id,
+          itemUuid: this.itemUuids,
+          ledgerTypeUuid: this.data && this.data?.ledger?.id,
           locationUuid: this.currentItemStock?.location?.uuid,
           quantity: this.quantity,
           buyingPrice: 0,
-          batchNo: batch?.batchNo,
-          expiryDate: batch?.expiryDate,
+          batchNo: this.batchNumber,
+          expiryDate: this.expiredDate,
           remarks: this.remarks,
         };
         // console.log(ledgerInput);

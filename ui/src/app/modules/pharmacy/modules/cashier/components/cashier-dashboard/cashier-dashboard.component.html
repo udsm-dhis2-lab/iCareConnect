@@ -89,9 +89,10 @@
                 </thead>
                 <tbody>
                   <ng-container
-                    *ngIf="selectedItems && selectedItems?.length > 0"
+                    *ngIf="selectedItems && selectedItems?.length > 0 "
                   >
                     <tr *ngFor="let item of selectedItems; let count = index">
+                    <ng-container *ngIf="item?.name">
                       <td style="width: 30px">
                         {{ count + 1 }}
                       </td>
@@ -146,7 +147,8 @@
                           <mat-icon color="warn">delete</mat-icon>
                         </button>
                       </td>
-                    </tr>
+                   
+                    </ng-container> </tr>
                     <tr>
                       <ng-container *ngIf="shouldShowDoseDetails === 'true'">
                         <td
@@ -190,7 +192,7 @@
                   itemsPrices['total'] === 0
                 "
               >
-                Save
+                Save 
               </button>
             </div>
           </div>
