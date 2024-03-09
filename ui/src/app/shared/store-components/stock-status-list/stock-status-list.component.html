@@ -131,14 +131,16 @@
         </div>
       </div>
       <div class="overflow-x-auto">
+        <!-- header -->
         <table class="table border-bottom table-fit">
+
           <tr>
             <th style="width: 5%; word-wrap: initial">#</th>
             <th style="width: 40%; word-wrap: break-word">Item</th>
             <th style="width: 10%">Available Quantity</th>
             <th style="width: 10%">Expired Quantity</th>
             <th style="width: 10%">Eligible Quantity</th>
-            <th style="width: 10%"># of Batches</th>
+            <th style="width: 10%"># of Batches </th>
             <th style="width: 12%">
               <span class="float-right">Actions</span>
             </th>
@@ -155,7 +157,6 @@
               <div class="w-100 d-flex justify-content-center">No data</div>
             </td>
           </tr>
-
           <ng-container>
             <tr
               *ngFor="let stock of params?.stocksList; let stockIndex = index"
