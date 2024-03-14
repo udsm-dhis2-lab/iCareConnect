@@ -151,7 +151,7 @@
             <td colspan="2">
               <app-form
                 [fields]="[diagnosisField]"
-                [isFormHorizontal]="true"
+                [isFormHorizontal]="false"
                 (formUpdate)="onFormUpdate($event, 'diagnosis')"
               >
               </app-form>
@@ -159,7 +159,7 @@
             <td>
               <app-form
                 [fields]="[diagnosisRankField]"
-                [isFormHorizontal]="true"
+                [isFormHorizontal]="false"
                 (formUpdate)="onFormUpdate($event, 'rank')"
               >
               </app-form>
