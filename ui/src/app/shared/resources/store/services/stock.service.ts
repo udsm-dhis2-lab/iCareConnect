@@ -49,9 +49,8 @@ export class StockService {
       queryParams = [...queryParams, `page=1`];
     }
     const args = `?${queryParams.join("&")}`;
-
     return this.httpClient.get(`store/stock${args}`)?.pipe(
-      map((response) => {
+      map((response,index) => {
         const stockBatches: StockBatch[] = (response?.results || []).map(
           (stockItem) => new StockBatch(stockItem)
         );
@@ -336,16 +335,17 @@ export class StockService {
 
   saveStockLedger(ledgerInput: LedgerInput): Observable<any> {
     const storeLedger = Stock.createLedger(ledgerInput);
-
     if (!storeLedger) {
       return throwError({
         message: "Incorrect parameters supplied",
       });
     }
-
     return this.httpClient.post("store/ledger", storeLedger).pipe(
-      map((response) => new StockBatch(response)),
-      catchError((error) => of(error))
+      map((response) => {
+        new StockBatch(response)}),
+        catchError((error) => {
+          return of(error);
+        }),
     );
   }
 

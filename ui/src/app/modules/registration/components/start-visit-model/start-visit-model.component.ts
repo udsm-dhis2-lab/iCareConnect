@@ -54,6 +54,7 @@ export class StartVisitModelComponent implements OnInit {
     private dialogRef: MatDialogRef<StartVisitModelComponent>,
     @Inject(MAT_DIALOG_DATA) data
   ) {
+    console.log("patience details ------------------------------->",data?.patient);
     this.patient = data?.patient;
     this.patient?.person?.attributes?.map((attribute) => {
       if (
@@ -72,6 +73,7 @@ export class StartVisitModelComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log("visitService data load console --------------------------------",this.visitService);
     this.treatmentLocations$ = this.store.select(getAllTreatmentLocations);
     this.visitTypes$ = this.visitService.getVisitsTypes();
     this.servicesConfigs$ =
