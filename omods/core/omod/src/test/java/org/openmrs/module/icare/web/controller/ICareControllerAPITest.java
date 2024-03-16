@@ -947,5 +947,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> drugsMap = (new ObjectMapper()).readValue(response.getContentAsString(), Map.class);
 		List<Map<String, Object>> results = (List) drugsMap.get("results");
 		assertThat("Count of drugs ordered", results.size(), is(0));
+
+//		TODO: Add test for normal orders
 	}
 }

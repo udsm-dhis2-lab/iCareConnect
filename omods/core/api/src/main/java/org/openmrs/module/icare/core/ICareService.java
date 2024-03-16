@@ -116,7 +116,7 @@ public interface ICareService extends OpenmrsService {
 	List<Order> getOrdersByVisitAndOrderType(String visitUuid, String orderTypeUuid, Order.FulfillerStatus fulfillerStatus,
 	        Integer limit, Integer startIndex);
 	
-	List<Object[]> getCommonlyOrderedItems(String visitUuid, String orderTypeUuid, Integer limit, Integer startIndex);
+	List<Object[]> getCommonlyOrderedItems(String visitUuid, String orderTypeUuid, Integer limit, Integer startIndex, Boolean isDrug);
 	
 	Message sendMessage(Message message) throws MalformedURLException, IOException, Exception;
 	
