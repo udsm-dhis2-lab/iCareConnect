@@ -55,22 +55,21 @@
     <div class="requisition-form">
       <table class="table w-100">
         <tbody>
-          <tr>
-            <td *ngIf="!existingRequisitionItem">
+          <tr class="customtable-width" >
+            <td *ngIf="!existingRequisitionItem" > 
               <app-form
                 [fields]="targetStoreField"
                 (formUpdate)="onUpdateForm($event)"
               ></app-form>
             </td>
-            <td>
+            <td class="custom-width">
               <mat-progress-bar
                 mode="indeterminate"
                 *ngIf="!requisitionFields?.length"
               ></mat-progress-bar>
               <app-form
                 *ngIf="requisitionFields?.length"
-                [fields]="requisitionFields"
-                [isFormHorizontal]="true"
+                [fields]="requisitionFields"  
                 (formUpdate)="onUpdateForm($event)"
               ></app-form>
               <span class="mt-2 text-small" *ngIf="existingRequisitionItem">
@@ -110,6 +109,7 @@
                 </b>
               </p>
             </td>
+            <!-- Quantity field -->
             <td>
               <app-quantity-form-field
                 *ngIf="showQuantityField && params?.stockStatusForSelectedStore"
@@ -120,6 +120,7 @@
                 (quantity)="onGetQuantity($event)"
               ></app-quantity-form-field>
             </td>
+            <!-- add button -->
             <td>
               <button
                 *ngIf="!existingRequisitionItem"
@@ -135,7 +136,7 @@
                 "
                 style="height: 45px"
               >
-                Add
+                Add 
               </button>
               <button
                 *ngIf="existingRequisitionItem"

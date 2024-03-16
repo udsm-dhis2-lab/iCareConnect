@@ -10,6 +10,8 @@ import { LedgerInput } from "src/app/shared/resources/store/models/ledger-input.
 import { LedgerTypeObject } from "src/app/shared/resources/store/models/ledger-type.model";
 import { StockBatch } from "src/app/shared/resources/store/models/stock-batch.model";
 import { StockObject } from "src/app/shared/resources/store/models/stock.model";
+import { LedgerTypeService } from "../../resources/store/services/ledger-type.service";
+import { Observable } from "rxjs";
 
 @Component({
   selector: "app-ledger-form",
@@ -20,7 +22,10 @@ export class LedgerFormComponent implements OnInit {
   ledgerFormValue: FormValue;
   ledgerFormFields: Field<string>[];
   isFormValid: boolean = false;
+  ledgerTypes$: Observable<LedgerTypeObject[]>;
+  ledgerTypes: any;
   constructor(
+    private ledgerTypesService: LedgerTypeService,
     private dialogRef: MatDialogRef<LedgerFormComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: {
@@ -49,79 +54,93 @@ export class LedgerFormComponent implements OnInit {
     return `BatchNo: ${stockBatch.batchNo}, Expiry: ${stockBatch.remainingDays}, Quantity: ${stockBatch.quantity}`;
   }
 
+  // ngOnInit() {
+   
+  //   this.getLedgerTypes();
+
+    
+  // }
   ngOnInit() {
-    const ledgerTypes = (this.data?.ledgerTypes || []).filter((ledgerType) => {
-      switch (this.data?.operation) {
-        case "ADD":
-          return ledgerType.operation === "+";
-        case "DEDUCT":
-          return ledgerType.operation === "-";
-        default:
-          return true;
-      }
+    this.getLedgerTypes().then(() => {
+      const stockBatch = this.data?.stockBatch;
+
+      this.ledgerFormFields = [
+        new Dropdown({
+          id: "ledgerType",
+          key: "ledgerType",
+          label: "LedgerType",
+          required: true,
+          options: this.ledgerTypes.map((ledgerType) => ({
+            key: ledgerType.id,
+            label: ledgerType.name,
+            value: ledgerType.id,
+          })),
+        }),
+        new Textbox({
+          id: "batchNo",
+          key: "batchNo",
+          label: "Batch",
+          type: "text",
+          required: !stockBatch ? true : false,
+          value: stockBatch?.batchNo,
+          hidden: stockBatch !== undefined,
+        }),
+        new Textbox({
+          id: "quantity",
+          key: "quantity",
+          required: true,
+          label: `Quantity${
+            this.data?.operation === "DEDUCT"
+              ? "(max: " + stockBatch.quantity + ")"
+              : ""
+          }`,
+          type: "number",
+          min: 0,
+          max:
+            this.data?.operation === "DEDUCT" ? stockBatch.quantity : undefined,
+        }),
+        new Textbox({
+          id: "buyingPrice",
+          key: "buyingPrice",
+          label: "Buying Price",
+          type: "number",
+          value: stockBatch ? "0" : "",
+          hidden: stockBatch !== undefined,
+        }),
+        new DateField({
+          id: "expiryDate",
+          key: "expiryDate",
+          label: "Expiry Date",
+          required: !stockBatch ? true : false,
+          value: stockBatch?.expiryDate,
+          hidden: stockBatch !== undefined,
+        }),
+        new TextArea({
+          id: "remarks",
+          key: "remarks",
+          label: "Remarks",
+          type: "textarea",
+        }),
+      ];
     });
-
-    const stockBatch = this.data?.stockBatch;
-
-    this.ledgerFormFields = [
-      new Dropdown({
-        id: "ledgerType",
-        key: "ledgerType",
-        label: "LedgerType",
-        required: true,
-        options: ledgerTypes.map((ledgerType) => ({
-          key: ledgerType.id,
-          label: ledgerType.name,
-          value: ledgerType.id,
-        })),
-      }),
-      new Textbox({
-        id: "batchNo",
-        key: "batchNo",
-        label: "Batch",
-        type: "text",
-        required: !stockBatch ? true : false,
-        value: stockBatch?.batchNo,
-        hidden: stockBatch !== undefined,
-      }),
-      new Textbox({
-        id: "quantity",
-        key: "quantity",
-        required: true,
-        label: `Quantity${
-          this.data?.operation === "DEDUCT"
-            ? "(max: " + stockBatch.quantity + ")"
-            : ""
-        }`,
-        type: "number",
-        min: 0,
-        max:
-          this.data?.operation === "DEDUCT" ? stockBatch.quantity : undefined,
-      }),
-      new Textbox({
-        id: "buyingPrice",
-        key: "buyingPrice",
-        label: "Buying Price",
-        type: "number",
-        value: stockBatch ? "0" : "",
-        hidden: stockBatch !== undefined,
-      }),
-      new DateField({
-        id: "expiryDate",
-        key: "expiryDate",
-        label: "Expiry Date",
-        required: !stockBatch ? true : false,
-        value: stockBatch?.expiryDate,
-        hidden: stockBatch !== undefined,
-      }),
-      new TextArea({
-        id: "remarks",
-        key: "remarks",
-        label: "Remarks",
-        type: "textarea",
-      }),
-    ];
   }
+
+  getLedgerTypes(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      this.ledgerTypesService.getLedgerTypes().subscribe(
+        (ledgerTypes: LedgerTypeObject[]) => {
+          this.ledgerTypes = ledgerTypes;
+          console.log("ledgerTypes test------------------->", this.ledgerTypes);
+          resolve();
+        },
+        (error) => {
+          console.error("Error fetching ledger types", error);
+          reject();
+        }
+      );
+    });
+  }
+  
 
   onCancel(e: Event) {
     e.stopPropagation();
@@ -138,7 +157,8 @@ export class LedgerFormComponent implements OnInit {
       : false;
   }
 
-  onSaveLedger(e: Event): void {
+  onSaveLedger(e: Event,ledgerType:any): void {
+    console.log("test ledger type------------------>",ledgerType)
     e.stopPropagation();
     const formValues = this.ledgerFormValue.getValues();
     const ledgerInput: LedgerInput = {
