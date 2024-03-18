@@ -511,10 +511,17 @@ public class ICareDao extends BaseDAO<Item> {
 		
 	}
 	
-	public List<Object[]> getCommonlyOrderedItems(String visitUuid, String orderTypeUuid, Integer limit, Integer startIndex) {
+	public List<Object[]> getCommonlyOrderedItems(String visitUuid, String orderTypeUuid, Integer limit, Integer startIndex, Boolean isDrug) {
 		DbSession session = this.getSession();
-		new Prescription();
-		String queryStr = "SELECT distinct pres.drug AS drug, COUNT(pres.orderId) AS count FROM Prescription pres GROUP BY pres.drug ORDER BY COUNT(pres.orderId)  DESC";
+		String queryStr = "";
+		if (isDrug == null || isDrug == true) {
+			queryStr = "SELECT distinct pres.drug AS drug, COUNT(pres.orderId) AS count FROM Prescription pres " +
+					"GROUP BY pres.drug ORDER BY COUNT(pres.orderId)  DESC";
+		} else {
+			queryStr = "SELECT distinct order, COUNT(order.orderId) AS count FROM Order order " +
+					"GROUP BY order.concept ORDER BY COUNT(order.orderId) DESC";
+		}
+
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);

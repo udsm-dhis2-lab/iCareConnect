@@ -1318,38 +1318,56 @@ public class ICareController {
 												@RequestParam(required = false) String visitUuid,
 												@RequestParam(required = false) String locationUuid,
 												@RequestParam(defaultValue = "10") Integer limit,
-												@RequestParam(defaultValue = "0") Integer startIndex) {
+												@RequestParam(defaultValue = "0") Integer startIndex,
+												@RequestParam(required = false) Boolean isDrug) {
 
-		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
-		List<Object[]> drugs = iCareService.getCommonlyOrderedItems(visitUuid, orderTypeUuid, limit, startIndex);
-		for (Object[] drug: drugs) {
-			Drug drugDetails = (Drug) drug[0];
-			Object count = drug[1];
+		List<Map<String, Object>> commonlyUsedItems = new ArrayList<>();
+		List<Object[]> orderedItems = iCareService.getCommonlyOrderedItems(visitUuid, orderTypeUuid, limit, startIndex, isDrug);
+		for (Object[] orderedItemsRowInfo: orderedItems) {
+			Integer count = (Integer) orderedItemsRowInfo[1];
+			Drug drugDetails = new Drug();
+			Concept orderedItemConcept = new Concept();
+			if (isDrug == null || isDrug == true) {
+				drugDetails = (Drug) orderedItemsRowInfo[0];
+			} else {
+				orderedItemConcept = (Concept)  orderedItemsRowInfo[0];
+			}
 
 			Map<String, Object> returnObj = new HashMap<>();
-			Map<String, Object> drugData = new HashMap<>();
-			drugData.put("uuid", drugDetails.getUuid());
-			drugData.put("display", drugDetails.getDisplayName());
+			Map<String, Object> orderedItemData = new HashMap<>();
+			if (isDrug == null || isDrug == true) {
+				orderedItemData.put("uuid", drugDetails.getUuid());
+				orderedItemData.put("display", drugDetails.getDisplayName());
+			} else {
+				orderedItemData.put("uuid", orderedItemConcept.getUuid());
+				orderedItemData.put("display", orderedItemConcept.getDisplayString());
+			}
 
 			Map<String, Object> concept = new HashMap<>();
-			concept.put("uuid", drugDetails.getConcept().getUuid());
-			concept.put("display", drugDetails.getConcept().getDisplayString());
-			drugData.put("concept", concept);
+			if (isDrug == null || isDrug == true) {
+				concept.put("uuid", drugDetails.getConcept().getUuid());
+				concept.put("display", drugDetails.getConcept().getDisplayString());
+				orderedItemData.put("concept", concept);
+			}
 			List<Map<String, Object>> stockList = new ArrayList<>();
 			if (locationUuid != null) {
-				System.out.println(locationUuid);
-				List<Stock> drugStocks = storeService.getStockByDrugAndLocation(drugDetails.getUuid(),locationUuid);
-				for(Stock stock: drugStocks) {
+				List<Stock> stockStatus;
+				if (isDrug == null || isDrug == true) {
+					stockStatus = storeService.getStockByDrugAndLocation(drugDetails.getUuid(),locationUuid);
+				} else {
+					stockStatus = storeService.getStockByDrugAndLocation(orderedItemConcept.getUuid(),locationUuid);
+				}
+				for(Stock stock: stockStatus) {
 					stockList.add(stock.toMap());
 				}
 			}
-			drugData.put("stock", stockList);
-			returnObj.put("drug", drugData);
+			orderedItemData.put("stock", stockList);
+			returnObj.put("drug", orderedItemData);
 			returnObj.put("count",count);
-			responseSamplesObject.add(returnObj);
+			commonlyUsedItems.add(returnObj);
 		}
 		Map<String, Object> results = new HashMap<>();
-		results.put("results", responseSamplesObject);
+		results.put("results", commonlyUsedItems);
 		return results;
 	}
 }
