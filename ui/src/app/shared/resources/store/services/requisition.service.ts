@@ -186,6 +186,7 @@ export class RequisitionService {
   }
 
   createIssueItemStatus(issueItem: any): Observable<any> {
+    console.log("itemIssue body....................................................",issueItem)
     return this.httpClient
       .post(`store/issueitemstatus/`, issueItem)
       .pipe(
@@ -194,7 +195,7 @@ export class RequisitionService {
         }),
         catchError((error) => error)
       );
-  }
+   }
 
   receiveRequisition(
     requisitionObject: RequisitionObject

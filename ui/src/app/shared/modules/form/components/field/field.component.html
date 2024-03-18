@@ -54,24 +54,25 @@
     <!-- End of File upload for default complex -->
 
     <!-- textbox -->
-    <input
-      *ngSwitchCase="'textbox'"
-      [formControlName]="field?.key"
-      [id]="field?.key"
-      [min]="field?.type === 'number' ? 0 : null"
-      [max]="field?.max"
-      [disabled]="shouldDisable || field?.disabled"
-      [placeholder]="field?.placeholder"
-      class="{{ fieldClass || 'field-input' }}"
-      [type]="field?.type"
-      [required]="field?.required"
-      matInput
-      autocomplete="off"
-      (keyup)="onFieldUpdate($event)"
-      (keydown)="onListenKeyEvent($event)"
-    />
+       <input
+           *ngSwitchCase="'textbox'"
+           [formControlName]="field?.key"
+            [id]="field?.key"
+            [min]="field?.type === 'number' ? 0 : null"
+            [max]="field?.max"
+            [disabled]="shouldDisable || field?.disabled"
+            [placeholder]="field?.placeholder"
+            class="{{ fieldClass || 'field-input' }}"
+            [type]="field?.type"
+            [pattern]="field?.type === 'number' && '[0-9]+([.][0-9]+)?'"
+            [required]="field?.required"
+            matInput
+            autocomplete="off"
+            (input)="onInput($event)"
+            (blur)="onBlur($event)"
+        />
     <!-- end of textbox -->
-
+    <!-- [type]="field?.type" -->
     <!-- dropdown -->
 
     <ng-container *ngIf="!field?.multiple">

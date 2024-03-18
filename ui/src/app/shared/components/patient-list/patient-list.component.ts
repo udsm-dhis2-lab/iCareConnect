@@ -249,6 +249,7 @@ export class PatientListComponent implements OnInit, OnChanges {
     this.store.dispatch(clearBillItems());
     this.store.dispatch(clearActiveVisit());
     this.selectPatient.emit({ ...visit?.patient, visitUuid: visit?.uuid });
+    
   }
 
   togglePatientTypeList(type) {

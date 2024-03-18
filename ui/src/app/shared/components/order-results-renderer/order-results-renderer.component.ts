@@ -101,7 +101,7 @@ export class OrderResultsRendererComponent implements OnInit {
     this.showParameters[labTest?.uuid] = this.showParameters[labTest?.uuid]
       ? null
       : labTest;
-      console.log("after table click toggle ----------------------------",this.showParameters[labTest?.uuid]);
+      // console.log("after table click toggle ----------------------------",this.showParameters[labTest?.uuid]);
       console.log("also visit ---------------------------------------->",this.visit);
   }
 
