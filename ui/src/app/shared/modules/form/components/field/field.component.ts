@@ -148,18 +148,29 @@ export class FieldComponent implements AfterViewInit {
   get fieldId(): string {
     return this.field?.id;
   }
-
   onFieldUpdate(event?: KeyboardEvent): void {
     this.fieldUpdate.emit(this.form);
   }
-
-  onListenKeyEvent(event?: KeyboardEvent): void {
+  
+  onListenKeyEvent(event: KeyboardEvent): void {
+    if (
+      event.key === 'Backspace' ||
+      event.key === 'ArrowLeft' ||
+      event.key === 'ArrowRight' ||
+      event.key === 'Delete'
+    ) {
+      return;
+    }
+  
+    if (event.key.match(/[a-zA-Z]/) || (event.key.match(/[^0-9]/) && event.key !== '.')) {
+      event.preventDefault();
+    }
+  
     if (event && event.code === "Enter") {
       this.enterKeyPressedFields.emit(this.field?.key);
-    } else {
     }
   }
-
+  
   fileChangeEvent(event, field): void {
     let objectToUpdate = {};
     objectToUpdate[field?.key] = event.target.files[0];
@@ -281,3 +292,10 @@ export class FieldComponent implements AfterViewInit {
       : undefined;
   }
 }
+// onListenKeyEvent(event?: KeyboardEvent): void {
+  //   if (event && event.code === "Enter") {
+  //     this.enterKeyPressedFields.emit(this.field?.key);
+  //   } else {
+  //     // You can add any additional handling here if needed
+  //   }
+  // }
