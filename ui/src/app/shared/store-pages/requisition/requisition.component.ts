@@ -358,11 +358,11 @@ export class RequisitionComponent implements OnInit {
             status: "REJECTED",
             remarks: rejection?.remarks || "",
           };
-
           this.requisitionService
             .createIssueItemStatus(issueItemRejectedObject)
             .subscribe((response) => {
               // Add support to catch error
+              console.log("response....................................................",response)
               if (response) {
                 this.getAllRequisitions();
               }
