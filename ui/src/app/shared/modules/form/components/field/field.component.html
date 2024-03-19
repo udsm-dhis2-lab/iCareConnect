@@ -63,14 +63,14 @@
         [disabled]="shouldDisable || field?.disabled"
         [placeholder]="field?.placeholder"
         class="{{ fieldClass || 'field-input' }}"
-        type="text"
+        [type]="field?.type === 'number' ? 'text' : field?.type"
         pattern ="[0-9]*\.?[0-9]*"
         [required]="field?.required"
         matInput
         step="any"
         autocomplete="off"
         (keyup)="onFieldUpdate($event)"
-        (keydown)="onListenKeyEvent($event)"
+        (keydown)="onListenKeyEvent($event,field?.type)"
     />
     <!-- <input
     *ngSwitchCase="'textbox'"

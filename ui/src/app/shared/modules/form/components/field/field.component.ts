@@ -152,23 +152,30 @@ export class FieldComponent implements AfterViewInit {
     this.fieldUpdate.emit(this.form);
   }
   
-  onListenKeyEvent(event: KeyboardEvent): void {
-    if (
-      event.key === 'Backspace' ||
-      event.key === 'ArrowLeft' ||
-      event.key === 'ArrowRight' ||
-      event.key === 'Delete'
-    ) {
-      return;
-    }
-  
-    if (event.key.match(/[a-zA-Z]/) || (event.key.match(/[^0-9]/) && event.key !== '.')) {
-      event.preventDefault();
-    }
-  
-    if (event && event.code === "Enter") {
-      this.enterKeyPressedFields.emit(this.field?.key);
-    }
+  onListenKeyEvent(event: KeyboardEvent,fieldtype:any): void {
+     if(fieldtype === "number"){
+      if (
+        event.key === 'Backspace' ||
+        event.key === 'ArrowLeft' ||
+        event.key === 'ArrowRight' ||
+        event.key === 'Delete'
+      ) {
+        return;
+      }
+    
+      if (event.key.match(/[a-zA-Z]/) || (event.key.match(/[^0-9]/) && event.key !== '.')) {
+        event.preventDefault();
+      }
+    
+      if (event && event.code === "Enter") {
+        this.enterKeyPressedFields.emit(this.field?.key);
+      }
+     }else{
+      if (event && event.code === "Enter") {
+        this.enterKeyPressedFields.emit(this.field?.key);
+      }
+     }
+    
   }
   
   fileChangeEvent(event, field): void {
