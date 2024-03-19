@@ -174,7 +174,7 @@ export class SharedPatientDashboardComponent implements OnInit {
           obs?.concept?.uuid === this.visitEndingControlStatusesConceptUuid
       ) || [])[0]?.valueObject;
     }
-    console.log("Active visit are .............................................",this.activeVisit);
+    // console.log("Active visit are .............................................",this.activeVisit);
 
     this.onStartConsultation(this.activeVisit);
     this.store.dispatch(loadOrderTypes());
