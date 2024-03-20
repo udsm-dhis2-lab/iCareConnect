@@ -140,7 +140,7 @@ export class RequisitionItemsComponent implements OnInit {
   onRejectItem(e: Event, item: any) {
     e.stopPropagation();
     this.rejectItem.emit({ event: e, item: item });
-    console.log("reject details ................................................................",item);
+    // console.log("reject details ................................................................",item);
   }
 
   onReceiveItem(e: Event, item: any) {
