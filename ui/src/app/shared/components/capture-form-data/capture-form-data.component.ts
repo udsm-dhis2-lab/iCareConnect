@@ -58,6 +58,7 @@ export class CaptureFormDataComponent implements OnInit {
   }
 
   onToggleLegend(e: Event, itemName: string): void {
+    
     e.stopPropagation();
     this.legendControl[itemName] = this.legendControl[itemName]
       ? !this.legendControl[itemName]

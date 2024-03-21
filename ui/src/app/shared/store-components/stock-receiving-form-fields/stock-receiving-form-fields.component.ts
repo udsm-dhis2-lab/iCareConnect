@@ -165,12 +165,14 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       label: "Order Quantity",
       value: this.stockInvoiceItem ? this.stockInvoiceItem?.orderQuantity : "",
     });
+
     this.mfgBatchNumberField = new Textbox({
       id: "mfgBatchNumber",
       key: "mfgBatchNumber",
       label: "Mfg Batch Number",
       value: this.stockInvoiceItem ? this.stockInvoiceItem?.batchNo : "",
     });
+    
     this.expiryDateField = new DateField({
       id: "expiryDate",
       key: "expiryDate",
