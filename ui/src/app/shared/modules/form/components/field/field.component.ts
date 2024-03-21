@@ -101,21 +101,40 @@ export class FieldComponent implements AfterViewInit {
     return this.form?.controls[this.field.id]?.valid;
   }
 
+  // get issueWithTheDataField(): string {
+  //   const message = this.form?.controls[this.field.id]?.valid
+  //     ? null
+  //     : !this.form?.controls[this.field.id]?.valid &&
+  //       this.form.controls[this.field.id]?.errors?.minlength
+  //     ? `${this.field?.label} has not reached required number of characters`
+  //     : !this.form?.controls[this.field.id]?.valid &&
+  //       this.form.controls[this.field.id]?.errors?.maxlength
+  //     ? `${this.field?.label} has exceeded required number of characters`
+  //     : !this.form?.controls[this.field.id]?.valid
+  //     ? `${this.field?.label} is required`
+  //     : "";
+  //   return message;
+  // }
+
   get issueWithTheDataField(): string {
-    const message = this.form?.controls[this.field.id]?.valid
-      ? null
-      : !this.form?.controls[this.field.id]?.valid &&
-        this.form.controls[this.field.id]?.errors?.minlength
-      ? `${this.field?.label} has not reached required number of characters`
-      : !this.form?.controls[this.field.id]?.valid &&
-        this.form.controls[this.field.id]?.errors?.maxlength
-      ? `${this.field?.label} has exceeded required number of characters`
-      : !this.form?.controls[this.field.id]?.valid
-      ? `${this.field?.label} is required`
-      : "";
+    const fieldValue = this.form?.controls[this.field.id]?.value;
+    // Check if the field is required
+    const isRequired = this.field.required && (fieldValue === null || fieldValue === '');
+    // Check for custom error messages based on field validity and errors
+    const message =
+      !this.form?.controls[this.field.id]?.valid && isRequired
+        ? `${this.field?.label} is required`
+        : !this.form?.controls[this.field.id]?.valid &&
+          this.form.controls[this.field.id]?.errors?.minlength
+        ? `${this.field?.label} has not reached the required length`
+        : !this.form?.controls[this.field.id]?.valid &&
+          this.form.controls[this.field.id]?.errors?.maxlength
+        ? `${this.field?.label} has exceeded the required length`
+        : '';
+  
     return message;
   }
-
+  
   get hasMinimunLengthIssue(): boolean {
     return this.form.controls[this.field.id]?.errors?.minlength;
   }
