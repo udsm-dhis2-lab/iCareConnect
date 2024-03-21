@@ -69,4 +69,7 @@ export class CaptureFormDataComponent implements OnInit {
       this.form?.formFields?.map((formField: any) => formField?.formField) || []
     );
   }
+
+
+  
 }
