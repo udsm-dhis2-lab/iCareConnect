@@ -288,8 +288,6 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         Number(this.formValues?.orderQuantity?.value) &&
         this.formValues?.packPrice?.value
     ) {
-        console.log("imefika ndani.....................", this.formValues?.packPrice?.value);
-        console.log("imefika ndani.....................", this.formValues?.orderQuantity?.value);
         
         // Calculate amount synchronously without setTimeout
         this.amount = (
@@ -297,7 +295,6 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             parseFloat(this.formValues?.orderQuantity?.value)
         ).toFixed(2);
         
-        console.log("after calculation .....................", this.amount);
     }
     
       // if (
