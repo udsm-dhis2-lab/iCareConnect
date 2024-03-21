@@ -18,7 +18,7 @@ import java.util.Map;
 @Entity
 @Table(name = "st_requisition_status")
 public class RequisitionStatus extends BaseOpenmrsData implements java.io.Serializable {
-	
+
 	@Id
 	@GeneratedValue()
 	@Column(name = "requisition_status_id", unique = true, nullable = false)

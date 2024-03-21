@@ -423,6 +423,8 @@ export class StockReceivingFormFieldsComponent implements OnInit {
           setTimeout(() => {
             this.setFields();
           }, 10);
+          // reload form to re get fields
+          // this.reloadForm.emit();
         });
     } else {
       const invoicesObject = [
@@ -470,7 +472,6 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         },
       ];
       this.reloadFields = true;
-
       this.stockInvoicesService
         .createStockInvoices(invoicesObject)
         .subscribe((response: any) => {
@@ -479,12 +480,14 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             this.loadInvoices.emit(response);
           }
           this.itemFields = [];
+          this.reloadFields = true;
           setTimeout(() => {
             this.setFields();
             this.reloadFields = false;
             this.amount = undefined;
             this.reloadItemFields(true);
           }, 10);
+          this.reloadForm.emit();
         });
     }
   }
@@ -504,7 +507,6 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         },
       ],
     };
-
     this.stockInvoicesService
       .updateStockInvoice(this.stockInvoice?.uuid, invoice)
       .pipe(
