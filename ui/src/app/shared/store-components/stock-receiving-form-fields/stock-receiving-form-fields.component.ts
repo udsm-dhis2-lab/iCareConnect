@@ -272,27 +272,48 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         this.formValues?.orderQuantity?.value * unit === this.batchQuantity
           ? this.batchQuantity
           : undefined;
-      setTimeout(() => {
-        this.batchQuantity =
-          Number(this.formValues?.orderQuantity?.value) * unit;
-        this.batchQuantityField.value = this.batchQuantity.toString();
-      }, 10);
 
+          //note setTimeout
+          this.batchQuantity =
+          Number(this.formValues?.orderQuantity?.value) * unit;
+        this.batchQuantityField.value = this.batchQuantity.toString()
+  
       this.unitPrice = (
         parseFloat(this.formValues?.packPrice?.value || 0) / Number(unit)
       ).toFixed(2);
+      // console.log("unit .....................", this.unitPrice);
+      
       this.amount = undefined;
       if (
         Number(this.formValues?.orderQuantity?.value) &&
         this.formValues?.packPrice?.value
-      ) {
-        setTimeout(() => {
-          this.amount = (
+    ) {
+        console.log("imefika ndani.....................", this.formValues?.packPrice?.value);
+        console.log("imefika ndani.....................", this.formValues?.orderQuantity?.value);
+        
+        // Calculate amount synchronously without setTimeout
+        this.amount = (
             parseFloat(this.formValues?.packPrice?.value) *
             parseFloat(this.formValues?.orderQuantity?.value)
-          ).toFixed(2);
-        }, 10);
-      }
+        ).toFixed(2);
+        
+        console.log("after calculation .....................", this.amount);
+    }
+    
+      // if (
+      //   Number(this.formValues?.orderQuantity?.value) &&
+      //   this.formValues?.packPrice?.value
+      // ) {
+      //   console.log("imefika ndani.....................",this.formValues?.packPrice?.value);
+      //   console.log("imefika ndani.....................",this.formValues?.orderQuantity?.value);
+      //   setTimeout(() => {
+      //     this.amount = (
+      //       parseFloat(this.formValues?.packPrice?.value) *
+      //       parseFloat(this.formValues?.orderQuantity?.value)
+      //     ).toFixed(2);
+      //     console.log("after calculation .....................",this.amount);
+      //   }, 10);
+      // }
     }
 
     this.validForm =
@@ -423,8 +444,6 @@ export class StockReceivingFormFieldsComponent implements OnInit {
           setTimeout(() => {
             this.setFields();
           }, 10);
-          // reload form to re get fields
-          // this.reloadForm.emit();
         });
     } else {
       const invoicesObject = [
@@ -472,22 +491,27 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         },
       ];
       this.reloadFields = true;
+
       this.stockInvoicesService
         .createStockInvoices(invoicesObject)
         .subscribe((response: any) => {
           if (!response?.error) {
+            console.log("error.................................")
             this.stockInvoice = response;
             this.loadInvoices.emit(response);
           }
+          console.log("success response .................................",response)
           this.itemFields = [];
-          this.reloadFields = true;
-          setTimeout(() => {
-            this.setFields();
-            this.reloadFields = false;
-            this.amount = undefined;
-            this.reloadItemFields(true);
-          }, 10);
-          this.reloadForm.emit();
+          this.setFields();
+          this.reloadFields = false;
+          this.amount = undefined;
+          this.reloadItemFields(true);
+          // setTimeout(() => {
+          //   this.setFields();
+          //   this.reloadFields = false;
+          //   this.amount = undefined;
+          //   this.reloadItemFields(true);
+          // }, 10);
         });
     }
   }
@@ -507,6 +531,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         },
       ],
     };
+
     this.stockInvoicesService
       .updateStockInvoice(this.stockInvoice?.uuid, invoice)
       .pipe(
