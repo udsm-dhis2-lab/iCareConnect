@@ -58,6 +58,7 @@ export class CaptureFormDataComponent implements OnInit {
   }
 
   onToggleLegend(e: Event, itemName: string): void {
+    
     e.stopPropagation();
     this.legendControl[itemName] = this.legendControl[itemName]
       ? !this.legendControl[itemName]
@@ -69,7 +70,4 @@ export class CaptureFormDataComponent implements OnInit {
       this.form?.formFields?.map((formField: any) => formField?.formField) || []
     );
   }
-
-
-  
 }
