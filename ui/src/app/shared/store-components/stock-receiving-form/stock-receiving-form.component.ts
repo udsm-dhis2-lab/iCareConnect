@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { Observable, of } from "rxjs";
+import { delay, map } from "rxjs/operators";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 
 @Component({
@@ -38,15 +38,31 @@ export class StockReceivingFormComponent implements OnInit {
         })
       );
   }
-
   loadInvoices(invoice) {
     this.loadingInvoice = true;
     this.stockInvoice = undefined;
-    setTimeout(() => {
-      this.stockInvoice = this.existingStockInvoice || invoice;
-      this.loadingInvoice = false;
-    }, 2);
+
+    // Simulate asynchronous delay with delay operator
+    console.log("this.loadingInvoice.........................................",this.loadingInvoice);
+    console.log("this.stockInvoice.........................................",this.stockInvoice);
+    console.log("Invoice.........................................",invoice);
+    
+    this.stockInvoice = this.existingStockInvoice || invoice;
+    this.loadingInvoice = false;
   }
+
+  // loadInvoices(invoice) {
+  //   this.loadingInvoice = true;
+  //   this.stockInvoice = undefined;
+
+    
+  //   this.stockInvoice = this.existingStockInvoice || invoice;
+  //     this.loadingInvoice = false;
+  //   setTimeout(() => {
+  //     this.stockInvoice = this.existingStockInvoice || invoice;
+  //     this.loadingInvoice = false;
+  //   }, 200);
+  // }
   onCloseDialog() {
     this.closeDialog.emit();
   }
