@@ -38,31 +38,32 @@ export class StockReceivingFormComponent implements OnInit {
         })
       );
   }
-  loadInvoices(invoice) {
-    this.loadingInvoice = true;
-    this.stockInvoice = undefined;
-
-    // Simulate asynchronous delay with delay operator
-    console.log("this.loadingInvoice.........................................",this.loadingInvoice);
-    console.log("this.stockInvoice.........................................",this.stockInvoice);
-    console.log("Invoice.........................................",invoice);
-    
-    this.stockInvoice = this.existingStockInvoice || invoice;
-    this.loadingInvoice = false;
-  }
-
   // loadInvoices(invoice) {
   //   this.loadingInvoice = true;
   //   this.stockInvoice = undefined;
 
+  //   // Simulate asynchronous delay with delay operator
+  //   console.log("this.loadingInvoice.........................................",this.loadingInvoice);
+  //   console.log("this.stockInvoice.........................................",this.stockInvoice);
+  //   console.log("Invoice.........................................",invoice);
     
   //   this.stockInvoice = this.existingStockInvoice || invoice;
-  //     this.loadingInvoice = false;
-  //   setTimeout(() => {
-  //     this.stockInvoice = this.existingStockInvoice || invoice;
-  //     this.loadingInvoice = false;
-  //   }, 200);
+  //   this.loadingInvoice = false;
   // }
+
+  loadInvoices(invoice) {
+    this.loadingInvoice = true;
+    this.stockInvoice = undefined;
+
+    
+    this.stockInvoice = this.existingStockInvoice || invoice;
+      this.loadingInvoice = false;
+    setTimeout(() => {
+      this.stockInvoice = this.existingStockInvoice || invoice;
+      this.loadingInvoice = false;
+    }, 200);
+  }
+  
   onCloseDialog() {
     this.closeDialog.emit();
   }
