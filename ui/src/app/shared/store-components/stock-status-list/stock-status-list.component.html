@@ -137,9 +137,13 @@
           <tr>
             <th style="width: 5%; word-wrap: initial">#</th>
             <th style="width: 40%; word-wrap: break-word">Item</th>
-            <th style="width: 10%">Available Quantity</th>
+            <ng-container *ngIf="status !== 'STOCKOUT' && status !== 'EXPIRED'">
+              <th style="width: 10%">Available Quantity</th>
+            </ng-container>
             <th style="width: 10%">Expired Quantity</th>
-            <th style="width: 10%">Eligible Quantity</th>
+            <ng-container *ngIf="status !== 'EXPIRED'">
+              <th style="width: 10%">Eligible Quantity</th>
+            </ng-container>
             <th style="width: 10%"># of Batches </th>
             <th style="width: 12%">
               <span class="float-right">Actions</span>
@@ -166,9 +170,10 @@
             >
               <td>{{ stockIndex + 1 + (page - 1) * pageSize }}</td>
               <td style="word-wrap: break-word">{{ stock?.name }}</td>
-              <td>{{ stock?.quantity }}</td>
-              <td>{{ stock?.quantity - stock?.eligibleQuantity }}</td>
-              <td>
+              <td *ngIf="status !== 'STOCKOUT' && status !== 'EXPIRED'" >{{ stock?.quantity }}</td>
+              
+              <td >{{ stock?.quantity - stock?.eligibleQuantity }}</td>
+              <td *ngIf="status !== 'EXPIRED'">
                 <b>
                   {{ stock?.eligibleQuantity }}
                 </b>

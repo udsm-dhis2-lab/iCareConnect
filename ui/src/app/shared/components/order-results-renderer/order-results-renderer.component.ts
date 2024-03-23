@@ -102,7 +102,7 @@ export class OrderResultsRendererComponent implements OnInit {
       ? null
       : labTest;
       // console.log("after table click toggle ----------------------------",this.showParameters[labTest?.uuid]);
-      console.log("also visit ---------------------------------------->",this.visit);
+      // console.log("also visit ---------------------------------------->",this.visit);
   }
 
   setCurrentOrderedItemForOtherDetailsView(event: Event, labTest) {
