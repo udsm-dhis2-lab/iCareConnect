@@ -31,12 +31,14 @@ export class ManageUnitOfMeasureModalComponent implements OnInit {
         id: "name",
         key: "name",
         label: "Name",
+        type: "text",
         required: true,
       }),
       new Textbox({
         id: "description",
         key: "description",
         label: "Description",
+        type: "text",
         required: true,
       }),
       new Textbox({
