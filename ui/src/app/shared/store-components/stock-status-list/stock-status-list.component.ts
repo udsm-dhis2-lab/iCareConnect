@@ -61,7 +61,7 @@ export class StockStatusListComponent implements OnInit {
   ngOnInit(): void {
     this.facilityDetails$ = this.store.select(getParentLocation);
     this.currentUser$ = this.store.select(getCurrentUserDetails);
-
+     console.log("trace is status---------------------",this.status)
     this.consumeLedgerUuid$ = this.systemSettingsService.getSystemSettingsByKey(
       `icare.store.settings.consumeLedger.ledgerTypeUuid`
     );

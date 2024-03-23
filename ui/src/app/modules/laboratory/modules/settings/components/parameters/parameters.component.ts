@@ -120,13 +120,15 @@ export class ParametersComponent implements OnInit {
   onFormUpdateForSource(formValue: FormValue): void {
     const values = formValue.getValues();
     this.selectedCodingSource = null;
-    setTimeout(() => {
-      this.selectedCodingSource = values["source"]?.value;
-    }, 100);
+    // console.log(values["source"]);
+    // setTimeout(() => {
+    //   this.selectedCodingSource = values["source"]?.value;
+    // }, 100);
 
     this.conceptReferenceService
       .getReferenceTermsBySource(values["source"]?.value)
       .subscribe((response) => {
+        // console.log("RES", response);
         this.codedOptions = response.map((referenceTerm) => {
           return {
             value: referenceTerm?.uuid,
@@ -135,6 +137,7 @@ export class ParametersComponent implements OnInit {
             name: referenceTerm?.display,
           };
         });
+        this.selectedCodingSource = values["source"]?.value;
         // this.createCodeField(this.codedOptions, null, values["source"]?.value);
       });
   }
