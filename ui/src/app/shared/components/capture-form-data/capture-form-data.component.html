@@ -161,16 +161,18 @@
               member?.setMembers?.length == 0
             "
           >
+        
             <app-form
               [fields]="[member?.formField]"
               [dataType]="member?.dataType"
-              [isFormHorizontal]="true"
+              [isFormHorizontal]="false"
               [isReport]="isReport"
               [formId]="form?.uuid"
               [fieldsData]="observations"
               (formUpdate)="onFormUpdate($event)"
             >
             </app-form>
+    
           </div>
           <div
             *ngIf="
