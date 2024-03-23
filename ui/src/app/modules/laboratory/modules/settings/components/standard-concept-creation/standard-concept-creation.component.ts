@@ -234,7 +234,6 @@ export class StandardConceptCreationComponent implements OnInit {
   }
 
   onGetInterpretations(interpretations: any[]): void {
-    console.log("interpretations", interpretations);
     this.interpretations = interpretations;
   }
 

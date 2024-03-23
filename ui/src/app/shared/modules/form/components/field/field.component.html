@@ -54,23 +54,23 @@
     <!-- End of File upload for default complex -->
 
     <!-- textbox -->
-      <input
-        *ngSwitchCase="'textbox'"
-        [formControlName]="field?.key"
-        [id]="field?.key"
-        [min]="field?.type === 'number' ? 0 : null"
-        [max]="field?.max"
-        [disabled]="shouldDisable || field?.disabled"
-        [placeholder]="field?.placeholder"
-        class="{{ fieldClass || 'field-input' }}"
-        type="text"
-        pattern ="[0-9]*\.?[0-9]*"
-        [required]="field?.required"
-        matInput
-        step="any"
-        autocomplete="off"
-        (keyup)="onFieldUpdate($event)"
-        (keydown)="onListenKeyEvent($event)"
+    <input
+      *ngSwitchCase="'textbox'"
+      [formControlName]="field?.key"
+      [id]="field?.key"
+      [min]="field?.type === 'number' ? 0 : null"
+      [max]="field?.max"
+      [disabled]="shouldDisable || field?.disabled"
+      [placeholder]="field?.placeholder"
+      class="{{ fieldClass || 'field-input' }}"
+      [type]="field?.type === 'number' ? 'text' : field?.type"
+      [pattern]="field?.type === 'number' ? '[0-9]*\.?[0-9]*' : ''"
+      [required]="field?.required"
+      matInput
+      step="any"
+      autocomplete="off"
+      (keyup)="onFieldUpdate($event)"
+      (keydown)="onListenKeyEvent($event, field?.type)"
     />
     <!-- <input
     *ngSwitchCase="'textbox'"
@@ -89,7 +89,7 @@
     (keyup)="onFieldUpdate($event)"
     (keydown)="onListenKeyEvent($event)"
 /> -->
-    
+
     <!-- end of textbox -->
 
     <!-- (input)="onInput($event)"
