@@ -30,7 +30,27 @@ describe('RegistrationAddComponent', () => {
       ],
     }).compileComponents();
   });
+ ngOnInit() {
+    if (this.editMode && this.hasPreviousVisit()) {
+      this.disablePatientTypeSelection = true;
+    } else {
+      this.disablePatientTypeSelection = false;
+    }
+  }
 
+  private hasPreviousVisit(): boolean {
+    return this.params?.patients?.length > 0;
+  }
+
+  public getPatientType(value: string, occupationInfo: any): void {
+    if (this.editMode && this.hasPreviousVisit()) {
+      console.log('Cannot change patient type for an existing patient with previous visits.');
+      this.patient['patientType'] = this.previousPatientType;
+    } else {
+
+      this.previousPatientType = this.patient['patientType'];
+    }
+  }
   beforeEach(() => {
     fixture = TestBed.createComponent(RegistrationAddComponent);
     component = fixture.componentInstance;
