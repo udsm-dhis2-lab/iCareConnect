@@ -17,7 +17,7 @@ export class FieldControlService {
           ? fieldsData[field.id]
           : null;
       if (field?.key) {
-        new FormControl(
+        group[field.key] = new FormControl(
           {
             value:
               (!fieldData?.value?.uuid
@@ -28,7 +28,7 @@ export class FieldControlService {
             disabled: field?.disabled,
           },
           [
-            Validators.required ? Validators.required : null,
+            field?.required ? Validators.required : null,
             field?.controlType === "phoneNumber"
               ? Validators.minLength(10)
               : null,

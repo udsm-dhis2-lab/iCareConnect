@@ -241,14 +241,6 @@
     <mat-error *ngIf="issueWithTheDataField">
       {{ issueWithTheDataField }}
     </mat-error>
-    <mat-error *ngIf="form.get(field?.key)?.errors">
-      <span *ngIf="form.get(field?.key)?.errors?.required">
-        {{ field?.label }} is required
-      </span>
-      <span *ngIf="form.get(field?.key)?.errors?.pattern">
-        {{ field?.label }} is not valid
-      </span>
-    </mat-error>
   </mat-form-field>
 </div>
 
