@@ -88,7 +88,12 @@ export class CaptureDataComponent implements OnInit {
       encounter: this.currentVitalsEncounterUuid,
       groupMembers: undefined,
       voided: false,
-      value: valueForObs[Object.keys(valueForObs)[0]]["value"],
+      value:
+        Object.keys(valueForObs)?.length > 0 &&
+        Object.keys(valueForObs)[0] &&
+        valueForObs[Object.keys(valueForObs)[0]]
+          ? valueForObs[Object.keys(valueForObs)[0]]?.value
+          : null,
       status: "PRELIMINARY",
     };
   }
