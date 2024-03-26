@@ -12,6 +12,7 @@ import { off } from "process";
   providedIn: "root",
 })
 export class StockService {
+  storedSize: number;
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
   getAllStocks(locationUuid?: string): Observable<StockObject[]> {
@@ -31,13 +32,15 @@ export class StockService {
     page?: number,
     pageSize?: number
   ): Observable<any | StockObject[]> {
+    //store pagenumber data
+    this.storedSize = pageSize;
     let queryParams = [];
 
     if (page && !params?.q) {
       queryParams = [...queryParams, `page=${page}`];
     }
     if (pageSize) {
-      queryParams = [...queryParams, `pageSize=${pageSize}`];
+      queryParams = [...queryParams, `pageSize=${pageSize*5}`];
     }
     if (locationUuid) {
       queryParams = [...queryParams, `locationUuid=${locationUuid}`];
@@ -56,10 +59,20 @@ export class StockService {
         );
         const groupedStockBatches =
           StockBatch.getGroupedStockBatches(stockBatches);
+
+          //below code will be replaced after api to ammended now i created logic to accomodate the request from user
+          // start ---->
+          // Get the keys of the object and pick only requested item per page with grouped batch
+           const requesteditemperpage = Object.keys(groupedStockBatches).slice(0, this.storedSize);
+           const requesteditemperpagelogic = requesteditemperpage.reduce((obj, key) => {
+            obj[key] = groupedStockBatches[key];
+            return obj;
+           }, {});
+         // end ---->
         return {
           ...response,
-          results: Object.keys(groupedStockBatches).map((stockItemKey) => {
-            return new Stock(groupedStockBatches[stockItemKey]).toJson();
+          results: Object.keys(requesteditemperpagelogic).map((stockItemKey) => {
+            return new Stock(requesteditemperpagelogic[stockItemKey]).toJson();
           }),
         };
       })
@@ -145,7 +158,7 @@ export class StockService {
       queryParams = [...queryParams, `page=${page}`];
     }
     if (pageSize) {
-      queryParams = [...queryParams, `pageSize=${pageSize}`];
+      queryParams = [...queryParams, `pageSize=${pageSize*5}`];
     }
     if (locationUuid) {
       queryParams = [...queryParams, `location=${locationUuid}`];
@@ -163,16 +176,25 @@ export class StockService {
         );
         const groupedStockBatches =
           StockBatch.getGroupedStockBatches(stockBatches);
+          //below code will be replaced after api to ammended now i created logic to accomodate the request from user
+          // start ---->
+          // Get the keys of the object and pick only requested item per page with grouped batch
+          const requesteditemperpage = Object.keys(groupedStockBatches).slice(0, this.storedSize);
+          const requesteditemperpagelogic = requesteditemperpage.reduce((obj, key) => {
+           obj[key] = groupedStockBatches[key];
+           return obj;
+          }, {});
+        // end ---->
 
         return {
           ...response,
-          results: Object.keys(groupedStockBatches).map((stockItemKey) => {
-            return new Stock(groupedStockBatches[stockItemKey]).toJson();
+          results: Object.keys(requesteditemperpagelogic).map((stockItemKey) => {
+            return new Stock(requesteditemperpagelogic[stockItemKey]).toJson();
           }),
         };
       })
     );
-    return this._getStocks("store/stockout", locationUuid, null, true);
+    // return this._getStocks("store/stockout", locationUuid, null, true);
   }
   getExpiredItems(
     locationUuid?: string,
@@ -198,7 +220,7 @@ export class StockService {
       queryParams = [...queryParams, `page=${page}`];
     }
     if (pageSize) {
-      queryParams = [...queryParams, `pageSize=${pageSize}`];
+      queryParams = [...queryParams, `pageSize=${pageSize*5}`];
     }
     if (locationUuid) {
       queryParams = [...queryParams, `location=${locationUuid}`];
@@ -216,11 +238,19 @@ export class StockService {
         );
         const groupedStockBatches =
           StockBatch.getGroupedStockBatches(stockBatches);
-
+          //below code will be replaced after api to ammended now i created logic to accomodate the request from user
+          // start ---->
+          // Get the keys of the object and pick only requested item per page with grouped batch
+          const requesteditemperpage = Object.keys(groupedStockBatches).slice(0, this.storedSize);
+          const requesteditemperpagelogic = requesteditemperpage.reduce((obj, key) => {
+           obj[key] = groupedStockBatches[key];
+           return obj;
+          }, {});
+        // end ---->
         return {
           ...response,
-          results: Object.keys(groupedStockBatches).map((stockItemKey) => {
-            return new Stock(groupedStockBatches[stockItemKey]).toJson();
+          results: Object.keys(requesteditemperpagelogic).map((stockItemKey) => {
+            return new Stock(requesteditemperpagelogic[stockItemKey]).toJson();
           }),
         };
       })
@@ -251,7 +281,7 @@ export class StockService {
       queryParams = [...queryParams, `page=${page}`];
     }
     if (pageSize) {
-      queryParams = [...queryParams, `pageSize=${pageSize}`];
+      queryParams = [...queryParams, `pageSize=${pageSize*5}`];
     }
     if (locationUuid) {
       queryParams = [...queryParams, `location=${locationUuid}`];
