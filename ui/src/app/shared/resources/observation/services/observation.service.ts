@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { from, Observable, of, zip } from "rxjs";
-import { catchError, map } from "rxjs/operators";
+import { catchError, map, tap } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { Api, ObsCreate, ObsGetFull, ObsUpdate } from "../../openmrs";
 import { Observation } from "../models/observation.model";
@@ -40,22 +40,48 @@ export class ObservationService {
       })
     );
   }
-
+  
   saveObservationsViaEncounter(data): Observable<any> {
-    return data?.encounterUuid
-      ? this.httpClient
-          .post("encounter/" + data?.encounterUuid, {
-            obs: data["obs"],
-          })
-          .pipe(
-            map((response) => response),
-            catchError((error) => error)
-          )
-      : this.httpClient.post(`encounter`, data).pipe(
-          map((response) => response),
-          catchError((error) => of(error))
-        );
-  }
+    const endpoint = data?.encounterType ? `encounter/${data.encounterType}` : 'encounter';
+    
+    return this.httpClient.post(endpoint, data).pipe(
+        tap((response) => {
+            // console.log("Response................................................:", response);
+            return response;
+        }),
+        catchError((error) => {
+            throw error;
+        })
+    );
+}
+
+  // saveObservationsViaEncounter(data): Observable<any> {
+  //   return data?.encounterType
+  //     ? this.httpClient
+  //         .post("encounter/" + data?.encounterType, data)
+  //         .pipe(
+  //           map((response) => {
+  //             return response
+  //           }),
+  //           catchError((error) => {
+  //             console.log("error --------------------------",error)
+  //             return error
+  //           })
+  //         )
+  //     : this.httpClient.post(`encounter`, data).pipe(
+  //         map((response) => {
+  //           return response
+          
+  //         }),
+  //         catchError((error) => {
+  //           return of(error)
+  //         })
+  //       );
+  // }
+  // i removed this object on data sent seems body was wrong accoding to  creating encounter api
+        // {
+          // obs: data["obs"],
+        // }
 
   saveEncounterWithObsDetails(data): Observable<any> {
     return this.httpClient.post("encounter", omit(data, "fileObs")).pipe(
