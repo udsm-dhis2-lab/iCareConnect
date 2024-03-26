@@ -61,7 +61,7 @@ export class StockStatusListComponent implements OnInit {
   ngOnInit(): void {
     this.facilityDetails$ = this.store.select(getParentLocation);
     this.currentUser$ = this.store.select(getCurrentUserDetails);
-     console.log("trace is status---------------------",this.status)
+    //  console.log("trace is status---------------------",this.status)
     this.consumeLedgerUuid$ = this.systemSettingsService.getSystemSettingsByKey(
       `icare.store.settings.consumeLedger.ledgerTypeUuid`
     );
@@ -238,10 +238,7 @@ export class StockStatusListComponent implements OnInit {
     // this.page =
     //   event.pageIndex - this.page >= 0 ? this.page + 1 : this.page - 1;
     this.page = this.page + (event?.pageIndex - event?.previousPageIndex);
-    console.log("page before --------------------------------->",this.page );
-    console.log("pagesize before --------------------------------->", this.pageSize);
     this.pageSize = Number(event?.pageSize);
-    console.log("pagenation --------------------------------->",this.page );
     console.log("pagesize --------------------------------->", this.pageSize );
     this.getStock();
   }
