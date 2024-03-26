@@ -69,8 +69,8 @@
             <label for="pat`ient-type">Patient Type</label>
           </div>
           <div class="col-sm-9">
-            <div class="d-flex mt-1">
-              <mat-form-field appearance="fill">
+            <div class="w-100 d-flex mt-1">
+              <mat-form-field class="w-50" appearance="fill">
                 <mat-label>Select Patient Type</mat-label>
                 <mat-select
                   id="patientType"
@@ -91,8 +91,8 @@
                 </mat-select>
               </mat-form-field>
             </div>
-            <div class="d-flex mt-1">
-              <mat-form-field appearance="fill" class="w-75">
+            <div class="w-100 d-flex mt-1">
+              <mat-form-field appearance="fill" class="w-100 mr-2">
                 <mat-label>Select Identification</mat-label>
                 <mat-select
                   placeholder="Select Identification"
@@ -107,7 +107,7 @@
                   >
                 </mat-select>
               </mat-form-field>
-              <mat-form-field appearance="fill" class="w-100 ml-4">
+              <mat-form-field appearance="fill" class="w-100">
                 <mat-label>{{ selectedIdentifierType?.name }}</mat-label>
                 <input
                   matInput

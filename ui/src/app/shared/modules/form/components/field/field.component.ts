@@ -131,6 +131,8 @@ export class FieldComponent implements AfterViewInit {
         : !this.form?.controls[this.field.id]?.valid &&
           this.form.controls[this.field.id]?.errors?.maxlength
         ? `${this.field?.label} has exceeded the required length`
+        : this.form.get(this.field?.key)?.errors?.pattern
+        ? `${this.field?.label} is invalid`
         : "";
 
     return message;
