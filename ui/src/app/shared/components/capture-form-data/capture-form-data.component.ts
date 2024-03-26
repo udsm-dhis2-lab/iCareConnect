@@ -31,7 +31,6 @@ export class CaptureFormDataComponent implements OnInit {
   constructor(private visitService: VisitsService) {}
 
   ngOnInit(): void {
-    console.log(this.form);
     this.form = {
       ...this.form,
       formattedFormFields: groupBy(this.form?.formFields, "fieldPart"),
@@ -58,7 +57,6 @@ export class CaptureFormDataComponent implements OnInit {
   }
 
   onToggleLegend(e: Event, itemName: string): void {
-    
     e.stopPropagation();
     this.legendControl[itemName] = this.legendControl[itemName]
       ? !this.legendControl[itemName]

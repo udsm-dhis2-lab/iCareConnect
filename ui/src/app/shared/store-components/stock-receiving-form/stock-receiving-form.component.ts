@@ -55,16 +55,18 @@ export class StockReceivingFormComponent implements OnInit {
     this.loadingInvoice = true;
     this.stockInvoice = undefined;
 
-    
     this.stockInvoice = this.existingStockInvoice || invoice;
       this.loadingInvoice = false;
-    setTimeout(() => {
+    
+    setTimeout(( ) => {
       this.stockInvoice = this.existingStockInvoice || invoice;
       this.loadingInvoice = false;
     }, 200);
+
   }
-  
+
   onCloseDialog() {
     this.closeDialog.emit();
   }
 }
+

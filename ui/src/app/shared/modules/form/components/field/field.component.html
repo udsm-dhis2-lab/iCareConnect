@@ -64,7 +64,6 @@
       [placeholder]="field?.placeholder"
       class="{{ fieldClass || 'field-input' }}"
       [type]="field?.type === 'number' ? 'text' : field?.type"
-      [pattern]="field?.type === 'number' ? '[0-9]*\.?[0-9]*' : ''"
       [required]="field?.required"
       matInput
       step="any"
@@ -239,7 +238,6 @@
       (keyup)="onFieldUpdate()"
     ></textarea>
     <!-- end of text area field -->
-
     <mat-error *ngIf="issueWithTheDataField">
       {{ issueWithTheDataField }}
     </mat-error>
