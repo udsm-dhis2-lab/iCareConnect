@@ -103,7 +103,11 @@
           </mat-chip>
           <mat-chip
             class="w-20"
-            *ngIf="params?.privileges"
+            *ngIf="
+              params?.privileges &&
+              params?.currentLocation &&
+              !params?.currentLocation?.isMainStore
+            "
             (click)="changeRoute($event, 'cashier')"
             routerLinkActive="active-route"
             [ngClass]="{
