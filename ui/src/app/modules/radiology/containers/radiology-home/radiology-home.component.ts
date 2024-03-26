@@ -19,6 +19,9 @@ export class RadiologyHomeComponent implements OnInit {
   loadingVisit$: Observable<boolean>;
   isPatientListTabular: boolean;
   settingCurrentLocationStatus$: Observable<boolean>;
+  // Add the following lines to declare separate arrays for ultrasound and x-ray patients
+ultrasoundPatients: Patient[];
+xRayPatients: Patient[];
 
   constructor(
     private store: Store<AppState>,
@@ -36,6 +39,10 @@ export class RadiologyHomeComponent implements OnInit {
       ? false
       : true;
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
+    // Inside the ngOnInit() method, initialize the patient lists
+this.ultrasoundPatients = [];
+this.xRayPatients = [];
+
   }
 
   onSearchPatient(e: Event) {
@@ -46,10 +53,15 @@ export class RadiologyHomeComponent implements OnInit {
     patientListDialog
       .afterClosed()
       .subscribe((response: { action: string; patient: Patient }) => {
-        if (response?.action === "PATIENT_SELECT") {
-          this.store.dispatch(addCurrentPatient({ patient: response.patient }));
-        }
-      });
+         // Modify the onSearchPatient() method to categorize patients based on the type of examination
+if (response?.action === "PATIENT_SELECT") {
+  if (response.patient.examType === "ultrasound") {
+    this.ultrasoundPatients.push(response.patient);
+  } else if (response.patient.examType === "x-ray") {
+    this.xRayPatients.push(response.patient);
+  }
+  this.store.dispatch(addCurrentPatient({ patient: response.patient }));
+
   }
 
   onSelectPatient(patient: any, e?: Event): void {
