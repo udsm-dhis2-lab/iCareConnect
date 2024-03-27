@@ -70,7 +70,7 @@ export class RolesListComponent implements OnInit {
       },
     });
 
-    console.log("role: ",role);
+    // console.log("role: ",role);
   }
 
   onRetire(event: Event, privilege: PrivilegeGetFull): void {}

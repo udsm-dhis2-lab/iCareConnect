@@ -26,8 +26,8 @@ export class WorklistComponent implements OnInit {
   selectedDepartment: string;
   searchingText: string;
   excludeAllocations: boolean = true;
-  excludedSampleCategories : string[] = ['HAS_RESULTS', 'REJECTED'];
-  tabType : string = "sample-tracking";
+  excludedSampleCategories: string[] = ["HAS_RESULTS", "REJECTED"];
+  tabType: string = "sample-tracking";
   page: number = 1;
   pageCount: number = 100;
 
@@ -63,11 +63,11 @@ export class WorklistComponent implements OnInit {
         },
         acceptedBy
       );
-    this.samplesAcceptedByMe$.subscribe((res) => console.log(res));
+    this.samplesAcceptedByMe$.subscribe((res) => {});
   }
 
   onToggleViewSampleDetails(event: Event, sample: any): void {
     event.stopPropagation();
-    console.log(sample);
+    // console.log(sample);
   }
 }

@@ -222,7 +222,7 @@ export class MortuaryDashboardComponent implements OnInit {
 
   onSaveNextOfKinDetails(event: Event, patient: any): void {
     event.stopPropagation();
-    console.log(patient);
+    // console.log(patient);
   }
 
   onGetNextOfKinsData(nextOfKinsData: any): void {

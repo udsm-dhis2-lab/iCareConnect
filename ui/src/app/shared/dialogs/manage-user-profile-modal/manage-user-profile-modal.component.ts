@@ -32,7 +32,7 @@ export class ManageUserProfileModalComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.data);
+    // console.log(this.data);
     this.currentUser$ = this.store.select(getCurrentUserDetails);
     this.systemKey = "pimaCOVID";
   }

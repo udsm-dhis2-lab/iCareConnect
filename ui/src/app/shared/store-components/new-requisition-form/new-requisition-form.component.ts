@@ -240,7 +240,7 @@ export class NewRequisitionFormComponent implements OnInit {
       .createRequest(this.requisitionObject)
       .subscribe((response) => {
         if (response) {
-          console.log("==> Response: ", response);
+          // console.log("==> Response: ", response);
         }
       });
   }

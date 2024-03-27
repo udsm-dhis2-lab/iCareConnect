@@ -133,7 +133,6 @@
       <div class="overflow-x-auto">
         <!-- header -->
         <table class="table border-bottom table-fit">
-
           <tr>
             <th style="width: 5%; word-wrap: initial">#</th>
             <th style="width: 40%; word-wrap: break-word">Item</th>
@@ -171,7 +170,6 @@
               <td>{{ stockIndex + 1 + (page - 1) * pageSize }}</td>
               <td style="word-wrap: break-word">{{ stock?.name }}</td>
               <td *ngIf="status !== 'STOCKOUT' && status !== 'EXPIRED'" >{{ stock?.quantity }}</td>
-              
               <td >{{ stock?.quantity - stock?.eligibleQuantity }}</td>
               <td *ngIf="status !== 'EXPIRED'">
                 <b>

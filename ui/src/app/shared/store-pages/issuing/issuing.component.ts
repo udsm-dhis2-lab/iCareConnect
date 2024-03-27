@@ -393,8 +393,6 @@ export class IssuingComponent implements OnInit {
       )
       .subscribe((response) => {
         itemsToPrint = response.items;
-
-        console.log("Items", itemsToPrint);
         let contents: string;
         let printingDate = formatDateToString(new Date());
         let issueDate = formatDateToString(new Date(issue?.created));

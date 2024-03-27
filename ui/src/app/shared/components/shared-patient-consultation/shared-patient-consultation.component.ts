@@ -133,7 +133,7 @@ export class SharedPatientConsultationComponent implements OnInit {
   }
 
   onOpenForm(formName): void {
-    console.log(formName);
+    // console.log(formName);
   }
 
   onSaveObservations(observations: ObsCreate[], patient): void {

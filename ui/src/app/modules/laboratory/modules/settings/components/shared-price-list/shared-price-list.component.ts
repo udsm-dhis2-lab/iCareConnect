@@ -86,7 +86,7 @@ export class SharedPriceListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log(this.paymentTypes);
+    // console.log(this.paymentTypes);
     this.currentDepartmentId = this.departmentId;
     this.loadData();
     this.priceListDepartments$ =

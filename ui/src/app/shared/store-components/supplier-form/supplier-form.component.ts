@@ -1,8 +1,5 @@
 import { Component, Inject, OnInit } from "@angular/core";
-import {
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-} from "@angular/material/dialog";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { map } from "rxjs/operators";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -28,7 +25,6 @@ export class SupplierFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("==> Data: ", this.data)
     this.setFields();
   }
 
@@ -50,15 +46,17 @@ export class SupplierFormComponent implements OnInit {
         id: "supplierLocation",
         key: "supplierLocation",
         label: "Supplier's Location",
-        value: this.data?.supplier?.location ? this.data?.supplier?.location?.uuid : null,
+        value: this.data?.supplier?.location
+          ? this.data?.supplier?.location?.uuid
+          : null,
         options: this.data?.locations?.map((location) => {
           return {
             key: location?.uuid,
             value: location?.uuid,
-            label: location?.display
-          }
-        })
-      })
+            label: location?.display,
+          };
+        }),
+      }),
     ];
   }
 
@@ -72,7 +70,7 @@ export class SupplierFormComponent implements OnInit {
       name: this.formValues?.supplierName?.value,
       description: this.formValues?.supplierDescription?.value,
       location: {
-        uuid: this.formValues?.supplierLocation?.value
+        uuid: this.formValues?.supplierLocation?.value,
       },
     };
     this.supplierService
@@ -94,8 +92,8 @@ export class SupplierFormComponent implements OnInit {
       name: this.formValues?.supplierName?.value,
       description: this.formValues?.supplierDescription?.value,
       location: {
-        uuid: this.formValues?.supplierLocation?.value
-      }
+        uuid: this.formValues?.supplierLocation?.value,
+      },
     };
     this.supplierService
       .updateSupplier(this.data?.supplier?.uuid, supplierObject)
