@@ -362,7 +362,6 @@ export class RequisitionComponent implements OnInit {
             .createIssueItemStatus(issueItemRejectedObject)
             .subscribe((response) => {
               // Add support to catch error
-              console.log("response....................................................",response)
               if (response) {
                 this.getAllRequisitions();
               }

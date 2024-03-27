@@ -193,6 +193,6 @@ export class ResultEntryFormComponent implements OnInit {
   }
 
   createFormFields(parameterValue): void {
-    console.log(parameterValue);
+    // console.log(parameterValue);
   }
 }

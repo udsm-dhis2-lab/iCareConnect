@@ -161,8 +161,6 @@ export class ObservationEffects {
             status: "PRELIMINARY",
           };
         });
-
-        console.log("obsData", obsData);
         return this.observationService.saveObsDetailsForFiles(obsData).pipe(
           switchMap((observationResults: any) => {
             this.notificationService.show(

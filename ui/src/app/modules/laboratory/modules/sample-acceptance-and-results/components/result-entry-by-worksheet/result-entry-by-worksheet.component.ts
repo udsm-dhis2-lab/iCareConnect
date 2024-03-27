@@ -330,7 +330,7 @@ export class ResultEntryByWorksheetComponent implements OnInit {
                             this.sampleService
                               .saveSampleStatuses([status])
                               .subscribe((response) => {
-                                console.log("response", response);
+                                // console.log("response", response);
                               });
                           }
                           setTimeout(() => {

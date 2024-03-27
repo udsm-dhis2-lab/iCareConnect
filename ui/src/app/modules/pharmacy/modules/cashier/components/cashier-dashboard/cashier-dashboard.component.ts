@@ -96,8 +96,8 @@ export class CashierDashboardComponent implements OnInit {
       min: 0,
     });
   }
-  checkValue(){
-    console.log("selectedItems && " ,this.selectedItems)
+  checkValue() {
+    // console.log("selectedItems && " ,this.selectedItems)
   }
 
   createDoseInfoFields(id?: string): void {

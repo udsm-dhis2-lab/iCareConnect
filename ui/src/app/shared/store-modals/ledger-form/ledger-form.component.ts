@@ -55,10 +55,9 @@ export class LedgerFormComponent implements OnInit {
   }
 
   // ngOnInit() {
-   
+
   //   this.getLedgerTypes();
 
-    
   // }
   ngOnInit() {
     this.getLedgerTypes().then(() => {
@@ -130,7 +129,7 @@ export class LedgerFormComponent implements OnInit {
       this.ledgerTypesService.getLedgerTypes().subscribe(
         (ledgerTypes: LedgerTypeObject[]) => {
           this.ledgerTypes = ledgerTypes;
-          console.log("ledgerTypes test------------------->", this.ledgerTypes);
+          // console.log("ledgerTypes test------------------->", this.ledgerTypes);
           resolve();
         },
         (error) => {
@@ -140,7 +139,6 @@ export class LedgerFormComponent implements OnInit {
       );
     });
   }
-  
 
   onCancel(e: Event) {
     e.stopPropagation();
@@ -157,8 +155,8 @@ export class LedgerFormComponent implements OnInit {
       : false;
   }
 
-  onSaveLedger(e: Event,ledgerType:any): void {
-    console.log("test ledger type------------------>",ledgerType)
+  onSaveLedger(e: Event, ledgerType: any): void {
+    // console.log("test ledger type------------------>", ledgerType);
     e.stopPropagation();
     const formValues = this.ledgerFormValue.getValues();
     const ledgerInput: LedgerInput = {

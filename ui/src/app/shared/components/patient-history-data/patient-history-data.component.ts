@@ -246,8 +246,8 @@ export class PatientHistoryDataComponent implements OnInit {
   }
 
   onPrint(e: any, visitData: any): void {
-    console.log("Patient visit", this.visit);
-    console.log("Patient History", this.visitHistory);
+    // console.log("Patient visit", this.visit);
+    // console.log("Patient History", this.visitHistory);
     let contents: string;
 
     const frame1: any = document.createElement("iframe");

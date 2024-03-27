@@ -40,20 +40,22 @@ export class ObservationService {
       })
     );
   }
-  
+
   saveObservationsViaEncounter(data): Observable<any> {
-    const endpoint = data?.encounterType ? `encounter/${data.encounterType}` : 'encounter';
-    
+    const endpoint = data?.encounterType
+      ? `encounter/${data.encounterType}`
+      : "encounter";
+
     return this.httpClient.post(endpoint, data).pipe(
-        tap((response) => {
-            // console.log("Response................................................:", response);
-            return response;
-        }),
-        catchError((error) => {
-            throw error;
-        })
+      tap((response) => {
+        // console.log("Response................................................:", response);
+        return response;
+      }),
+      catchError((error) => {
+        throw error;
+      })
     );
-}
+  }
 
   // saveObservationsViaEncounter(data): Observable<any> {
   //   return data?.encounterType
@@ -71,7 +73,7 @@ export class ObservationService {
   //     : this.httpClient.post(`encounter`, data).pipe(
   //         map((response) => {
   //           return response
-          
+
   //         }),
   //         catchError((error) => {
   //           return of(error)
@@ -79,9 +81,9 @@ export class ObservationService {
   //       );
   // }
   // i removed this object on data sent seems body was wrong accoding to  creating encounter api
-        // {
-          // obs: data["obs"],
-        // }
+  // {
+  // obs: data["obs"],
+  // }
 
   saveEncounterWithObsDetails(data): Observable<any> {
     return this.httpClient.post("encounter", omit(data, "fileObs")).pipe(
@@ -102,7 +104,7 @@ export class ObservationService {
           .post(` ../../../openmrs/ws/rest/v1/obs`, formData)
           .pipe(
             map((response) => {
-              console.log("FILEresponse", response);
+              // console.log("FILEresponse", response);
               return response;
             })
           );
