@@ -62,16 +62,16 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("specimenTypeConceptUuid::", this.specimenTypeConceptUuid);
-    console.log(this.keyedBatchFields);
-    console.log(
-      "referFromFacilityVisitAttribute",
-      this.referFromFacilityVisitAttribute
-    );
-    console.log(
-      "existingBatchFieldsInformations",
-      this.existingBatchFieldsInformations
-    );
+    // console.log("specimenTypeConceptUuid::", this.specimenTypeConceptUuid);
+    // console.log(this.keyedBatchFields);
+    // console.log(
+    //   "referFromFacilityVisitAttribute",
+    //   this.referFromFacilityVisitAttribute
+    // );
+    // console.log(
+    //   "existingBatchFieldsInformations",
+    //   this.existingBatchFieldsInformations
+    // );
     this.testOrderField = [
       ...(this.existingBatchFieldsInformations?.fixedFields?.filter(
         (fixedField: any) => fixedField?.id === "testorders"
@@ -123,7 +123,7 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
         (dyField: any) => dyField?.id && dyField?.id !== "testorders"
       ) || [];
     // console.log(this.fieldsNotSetOnBatch);
-    console.log(this.dynamicFields);
+    // console.log(this.dynamicFields);
     this.fieldsWithData = uniqBy(
       [
         ...(this.existingBatchFieldsInformations?.fixedFields || []),
@@ -132,7 +132,7 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
       ],
       "id"
     )?.filter((field: any) => field?.value);
-    console.log("fieldsWithData", this.fieldsWithData);
+    // console.log("fieldsWithData", this.fieldsWithData);
   }
 
   onFormUpdate(formValue: FormValue): void {
@@ -140,7 +140,7 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
       ...this.formData,
       ...formValue.getValues(),
     };
-    console.log(this.formData);
+    // console.log(this.formData);
 
     // Add support to search patients using either names, file number or any unique reference
     this.fedDynamicFieldsData.emit(this.formData);
@@ -156,11 +156,11 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
     this.addingSample = true;
     this.getIdentifierGenerationDetails().subscribe((responses: any[]) => {
       if (responses) {
-        console.log(responses);
+        // console.log(responses);
         const patientIdentifierTypes = responses[0];
         this.getIdentifierData().subscribe((identifierResponse: any) => {
           if (identifierResponse) {
-            console.log("response", identifierResponse);
+            // console.log("response", identifierResponse);
             // Formulate person data
             this.formData["mrn"] = {
               value: identifierResponse[0],
@@ -294,7 +294,7 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
                   this.createOrUpdateVisit(visitObject).subscribe(
                     (visitResponse: any) => {
                       if (visitResponse) {
-                        console.log("visitResponse", visitResponse);
+                        // console.log("visitResponse", visitResponse);
                         // Create encounter with orders
                         this.errors = [];
                         zip(
@@ -306,7 +306,7 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
                                 ])
                                 .pipe(
                                   map((response: any) => {
-                                    console.log("depa", response);
+                                    // console.log("depa", response);
                                     return {
                                       testOrder: testOrderConceptUuid,
                                       department: (response?.filter(
@@ -433,14 +433,14 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
                                       }),
                                       "conceptUuid"
                                     );
-                                    console.log(
-                                      "keyedOrdersByConceptUuid",
-                                      keyedOrdersByConceptUuid
-                                    );
-                                    console.log(
-                                      "grouped test orders",
-                                      testOrdersGroupedByDepartments
-                                    );
+                                    // console.log(
+                                    //   "keyedOrdersByConceptUuid",
+                                    //   keyedOrdersByConceptUuid
+                                    // );
+                                    // console.log(
+                                    //   "grouped test orders",
+                                    //   testOrdersGroupedByDepartments
+                                    // );
                                     Object.keys(
                                       testOrdersGroupedByDepartments
                                     )?.map((department: string) => {
@@ -487,10 +487,10 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
                                               .createLabSample(sample)
                                               .subscribe(
                                                 (sampleResponse: any) => {
-                                                  console.log(
-                                                    "sampleResponse",
-                                                    sampleResponse
-                                                  );
+                                                  // console.log(
+                                                  //   "sampleResponse",
+                                                  //   sampleResponse
+                                                  // );
                                                   if (sampleResponse) {
                                                     this.addingSample = false;
                                                     let statuses: any = [];
@@ -536,10 +536,10 @@ export class SharedSampleRegistrationViaBatchComponent implements OnInit {
                                                       (
                                                         sampleStatusResponses: any[]
                                                       ) => {
-                                                        console.log(
-                                                          "sampleStatusResponses saving",
-                                                          sampleStatusResponses
-                                                        );
+                                                        // console.log(
+                                                        //   "sampleStatusResponses saving",
+                                                        //   sampleStatusResponses
+                                                        // );
                                                       }
                                                     );
                                                   }

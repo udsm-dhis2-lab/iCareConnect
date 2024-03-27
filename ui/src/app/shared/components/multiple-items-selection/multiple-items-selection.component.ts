@@ -53,7 +53,7 @@ export class MultipleItemsSelectionComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.source);
+    // console.log(this.source);
     this.currentSelectedItems = this.selectedItems || [];
     if (
       this.itemType &&
@@ -89,7 +89,7 @@ export class MultipleItemsSelectionComponent implements OnInit, OnChanges {
               })
               .pipe(map((response: any) => response?.results));
     } else if (this.itemType === "conceptReferenceTerm") {
-      console.log(":NDANI");
+      // console.log(":NDANI");
       this.items$ = this.conceptReferenceService
         .getConceptReferenceTermsByParameters({
           q: "",

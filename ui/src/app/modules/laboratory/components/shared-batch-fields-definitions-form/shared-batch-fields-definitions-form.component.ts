@@ -52,7 +52,7 @@ export class SharedBatchFieldsDefinitionsFormComponent implements OnInit {
     if (this.selectedTestOrdersValues) {
       this.showTestOrderSelection = true;
     }
-    console.log("selectedTestOrdersValues", this.selectedTestOrdersValues);
+    // console.log("selectedTestOrdersValues", this.selectedTestOrdersValues);
     this.store.dispatch(
       loadCustomOpenMRSForms({
         formUuids: this.formUuids,
