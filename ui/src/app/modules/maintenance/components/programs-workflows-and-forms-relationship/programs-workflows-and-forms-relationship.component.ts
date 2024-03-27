@@ -131,7 +131,7 @@ export class ProgramsWorkflowsAndFormsRelationshipComponent implements OnInit {
   }
 
   onGetSelectedItems(selectedItems: any[]): void {
-    console.log(selectedItems);
+    // console.log(selectedItems);
     this.selectedForms = selectedItems;
   }
 

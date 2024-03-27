@@ -244,7 +244,7 @@ export class SampleImportExportComponent implements OnInit {
     let payload = [];
     for (let index in dataRows) {
       const data = dataRows[index];
-      console.log(data);
+      // console.log(data);
       let patient = {};
       let person = {};
       let personNames = {};
@@ -666,7 +666,7 @@ export class SampleImportExportComponent implements OnInit {
       // 4. Create diagnosis if any
       // 5. Create sample
       // 6. Create sample statuses
-      console.log("sample", sample);
+      // console.log("sample", sample);
       await this.patientService
         .createPatient(patient)
         .toPromise()
@@ -727,7 +727,7 @@ export class SampleImportExportComponent implements OnInit {
     exportTemplateDataReferences: any[],
     name?: string
   ): void {
-    console.log(tableId);
+    // console.log(tableId);
     this.onDownloadTemplate(event, tableId, name);
   }
 
@@ -846,7 +846,7 @@ export class SampleImportExportComponent implements OnInit {
       .toPromise()
       .then((diagnosisResponse) => {
         if (diagnosisResponse) {
-          console.log("diagnosisResponse", diagnosisResponse);
+          // console.log("diagnosisResponse", diagnosisResponse);
         }
       });
   }

@@ -67,7 +67,7 @@ export class SystemSettingsListComponent implements OnInit {
 
   onDelete(event: Event, systemSetting: any): void {
     event.stopPropagation();
-    console.log(systemSetting);
+    // console.log(systemSetting);
     this.dialog
       .open(SharedConfirmationDialogComponent, {
         minWidth: "30%",

@@ -248,7 +248,7 @@ export class RegistrationPatientComponent implements OnInit {
       };
 
       this.visitService.createVisit(visitPayload).subscribe((res) => {
-        console.log("didi i create a visit? :: ", res);
+        // console.log("didi i create a visit? :: ", res);
       });
     } else {
       this.openSnackBar("Error: location is not set", null);

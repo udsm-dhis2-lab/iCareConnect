@@ -35,7 +35,7 @@ export class ManageDrugModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.dialogData);
+    // console.log(this.dialogData);
     this.createGenericDrugField(this.dialogData);
     this.createDrugsFormField(this.dialogData);
   }
@@ -97,7 +97,7 @@ export class ManageDrugModalComponent implements OnInit {
         combination: false,
         description: this.formData?.description?.value,
       };
-      console.log("data", data);
+      // console.log("data", data);
       (this.dialogData?.uuid
         ? this.drugService.updateDrug(drug?.uuid, { uuid: drug?.uuid, ...data })
         : this.drugService.createDrug(data)

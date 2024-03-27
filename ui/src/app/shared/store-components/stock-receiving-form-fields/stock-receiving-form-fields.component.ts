@@ -172,7 +172,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       label: "Mfg Batch Number",
       value: this.stockInvoiceItem ? this.stockInvoiceItem?.batchNo : "",
     });
-    
+
     this.expiryDateField = new DateField({
       id: "expiryDate",
       key: "expiryDate",
@@ -275,30 +275,27 @@ export class StockReceivingFormFieldsComponent implements OnInit {
           ? this.batchQuantity
           : undefined;
 
-          //note setTimeout
-          this.batchQuantity =
-          Number(this.formValues?.orderQuantity?.value) * unit;
-        this.batchQuantityField.value = this.batchQuantity.toString()
-  
+      //note setTimeout
+      this.batchQuantity = Number(this.formValues?.orderQuantity?.value) * unit;
+      this.batchQuantityField.value = this.batchQuantity.toString();
+
       this.unitPrice = (
         parseFloat(this.formValues?.packPrice?.value || 0) / Number(unit)
       ).toFixed(2);
       // console.log("unit .....................", this.unitPrice);
-      
+
       this.amount = undefined;
       if (
         Number(this.formValues?.orderQuantity?.value) &&
         this.formValues?.packPrice?.value
-    ) {
-        
+      ) {
         // Calculate amount synchronously without setTimeout
         this.amount = (
-            parseFloat(this.formValues?.packPrice?.value) *
-            parseFloat(this.formValues?.orderQuantity?.value)
+          parseFloat(this.formValues?.packPrice?.value) *
+          parseFloat(this.formValues?.orderQuantity?.value)
         ).toFixed(2);
-        
-    }
-    
+      }
+
       // if (
       //   Number(this.formValues?.orderQuantity?.value) &&
       //   this.formValues?.packPrice?.value
@@ -495,11 +492,11 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         .createStockInvoices(invoicesObject)
         .subscribe((response: any) => {
           if (!response?.error) {
-            console.log("error.................................")
+            // console.log("error.................................")
             this.stockInvoice = response;
             this.loadInvoices.emit(response);
           }
-          console.log("success response .................................",response)
+          // console.log("success response .................................",response)
           this.itemFields = [];
           this.setFields();
           this.reloadFields = false;
