@@ -37,6 +37,7 @@ export class SharedConceptCreateComponent implements OnInit {
   @Input() conceptSources: any[];
   @Input() multipleSelectionCompHeight: string;
   @Input() conceptData: any;
+  @Input() showCodesSection: boolean;
   basicConceptFields: any[];
   dataTypeField: any;
   unitsField: any;

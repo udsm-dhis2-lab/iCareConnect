@@ -15,8 +15,35 @@
     <mat-tab label="Generic Drugs">
       <ng-template matTabContent>
         <app-generic-drugs-list></app-generic-drugs-list>
-      </ng-template> </mat-tab
-    ><mat-tab label="Units of measure">
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Non-Drugs">
+      <ng-template matTabContent>
+        <div class="p-3 mt-2">
+          <div class="h5">Non drug items</div>
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
+              <div class="h6">New</div>
+              <app-shared-concept-create
+                [conceptClass]="'Non Drug'"
+                [dataType]="'8d4a4c94-c2cc-11de-8d13-0010c6dffd0f'"
+                [isSet]="false"
+                [showCodesSection]="false"
+                [itemTypeName]="'Non-drug'"
+                [saveOnTheComponent]="true"
+              ></app-shared-concept-create>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12 col-sx-12">
+              <div class="h6">List of non-drugs</div>
+              <app-standard-concepts-list
+                [conceptClass]="'Non Drug'"
+              ></app-standard-concepts-list>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Units of measure">
       <ng-template matTabContent>
         <mat-progress-bar
           mode="indeterminate"

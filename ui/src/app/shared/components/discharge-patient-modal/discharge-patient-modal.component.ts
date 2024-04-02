@@ -115,7 +115,7 @@ export class DischargePatientModalComponent implements OnInit {
     const data = {
       encounterDatetime: this.visitDetails?.admissionEncounter?.encounterDatetime,
       patient : this.visitDetails?.patient?.uuid,
-      encounterType:  this.visitDetails?.admissionEncounter?.encounterType?.id,
+      encounterUuid: this.visitDetails?.admissionEncounter?.uuid,
       location: this.visitDetails?.location?.uuid,
       encounterProviders:[
         {
@@ -124,17 +124,21 @@ export class DischargePatientModalComponent implements OnInit {
         }
       ],
       visit: this.visitDetails?.uuid,
-      obs: (
-        Object.keys(this.observationData)?.map((key: string) => {
+      obs: ( Object.keys(this.observationData)?.map((key: string) => {
+        const observation = this.observationData[key];
+        if (observation && observation.value) {
           return {
             person: this.visitDetails?.patient?.uuid,
             concept: key,
             obsDatetime: new Date(),
-            form: this.dischargeFormUuid,
-            value: this.observationData[key]?.value,
+            // form: this.dischargeFormUuid,
+            value: observation.value,
           };
-        }) || []
-      )?.filter((observation: any) => observation?.value),
+        } else {
+          return null; 
+        }
+      }).filter((observation: any) => observation)
+      ),
       form: this.dischargeFormUuid,
       orders:[],
     };
@@ -148,33 +152,6 @@ export class DischargePatientModalComponent implements OnInit {
         }
       });
   }
- // onSaveDischargeSummary(event: Event): void {
-  //   event.stopPropagation();
-  //   const data = {
-  //     encounterUuid: this.visitDetails?.admissionEncounter?.uuid,
-  //     obs: (
-  //       Object.keys(this.observationData)?.map((key: string) => {
-  //         return {
-  //           person: this.visitDetails?.patient?.uuid,
-  //           concept: key,
-  //           obsDatetime: new Date(),
-  //           form: this.dischargeFormUuid,
-  //           value: this.observationData[key]?.value,
-  //         };
-  //       }) || []
-  //     )?.filter((observation: any) => observation?.value),
-  //   };
-  //   console.log("data summary discharge ......................",data)
-  //   this.savingData = true;
-  //   this.observationService
-  //     .saveObservationsViaEncounter(data)
-  //     .subscribe((response: any) => {
-  //       if (response) {
-  //         this.getVisit();
-  //         this.savingData = false;
-  //       }
-  //     });
-  // }
   onPrint(event: Event, parentLocation: any, activeVisit: any): void {
     event.stopPropagation();
     this.diagnoses = getAllDiagnosesFromVisitDetails(activeVisit);
@@ -472,3 +449,31 @@ export class DischargePatientModalComponent implements OnInit {
     this.showInvoiceDetails = !this.showInvoiceDetails;
   }
 }
+
+ // onSaveDischargeSummary(event: Event): void {
+  //   event.stopPropagation();
+  //   const data = {
+  //     encounterUuid: this.visitDetails?.admissionEncounter?.uuid,
+  //     obs: (
+  //       Object.keys(this.observationData)?.map((key: string) => {
+  //         return {
+  //           person: this.visitDetails?.patient?.uuid,
+  //           concept: key,
+  //           obsDatetime: new Date(),
+  //           form: this.dischargeFormUuid,
+  //           value: this.observationData[key]?.value,
+  //         };
+  //       }) || []
+  //     )?.filter((observation: any) => observation?.value),
+  //   };
+  //   console.log("data summary discharge ......................",data)
+  //   this.savingData = true;
+  //   this.observationService
+  //     .saveObservationsViaEncounter(data)
+  //     .subscribe((response: any) => {
+  //       if (response) {
+  //         this.getVisit();
+  //         this.savingData = false;
+  //       }
+  //     });
+  // }
