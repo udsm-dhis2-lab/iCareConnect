@@ -78,7 +78,7 @@ export class ManageSystemSettingComponent implements OnInit {
           : new Textbox({
               id: "value",
               key: "value",
-              required: true,
+              required: false,
               value: this.dialogData?.value ? this.dialogData?.value : null,
               placeholder: "Value",
               label: "Value",
