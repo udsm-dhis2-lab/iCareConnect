@@ -315,7 +315,7 @@ export class PriceListComponent implements OnInit, OnChanges {
         loadPricingItems({
           filterInfo: {
             limit: 25,
-            startIndex: this.currentPage,
+            startIndex: 0,
             searchTerm: this.itemSearchTerm !== "" ? this.itemSearchTerm : null,
             conceptSet: departmentId,
             isDrug: this.isDrug,
