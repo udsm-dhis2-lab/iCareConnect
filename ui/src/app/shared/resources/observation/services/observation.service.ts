@@ -42,13 +42,14 @@ export class ObservationService {
   }
 
   saveObservationsViaEncounter(data): Observable<any> {
-    const endpoint = data?.encounterType
-      ? `encounter/${data.encounterType}`
+    const endpoint = data?.encounterUuid
+      ? `encounter/${data.encounterUuid}`
       : "encounter";
 
-    return this.httpClient.post(endpoint, data).pipe(
+    return this.httpClient.post(endpoint, data?.encounterUuid ? {
+      obs: data["obs"],
+      } : data).pipe(
       tap((response) => {
-        // console.log("Response................................................:", response);
         return response;
       }),
       catchError((error) => {

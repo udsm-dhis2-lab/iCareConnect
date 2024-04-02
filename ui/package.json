@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "NODE_OPTIONS=--max-old-space-size=4072 ng serve",
+    "start": "ng serve",
     "build": "ng build",
     "build:prod": "ng build --aot --configuration production",
     "test": "ng test",
