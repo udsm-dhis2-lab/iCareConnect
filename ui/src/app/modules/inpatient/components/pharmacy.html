@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+    <title>Pharmacist Notification</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <style>
+        .notification {
+            background-color: #f2f2f2;
+            border: 2px solid #4CAF50;
+            color: black;
+            padding: 10px;
+            margin: 10px;
+            width: 300px;
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body ng-controller="NotificationController">
+    
+    <div class="notification" ng-show="prescriptionNotification">
+        New prescription for <strong>{{newPrescription.patientName}}</strong>!
+    </div>
+
+    <script>
+        angular.module('myApp', [])
+        .controller('NotificationController', function($scope) {
+            $scope.prescriptionNotification = false;
+            
+            // Simulate receiving new prescription
+            $scope.newPrescription = {
+                patientName: "John Doe",
+                prescriptionNumber: "123456"
+            };
+            
+            // Function to show notification
+            $scope.showNotification = function() {
+                $scope.prescriptionNotification = true;
+                setTimeout(function() {
+                    $scope.$apply(function() {
+                        $scope.prescriptionNotification = false;
+                    });
+                }, 5000); // Hide notification after 5 seconds
+            };
+
+            // Call showNotification function when new prescription is received
+            // This could be triggered by an API call or other event
+            $scope.showNotification();
+        });
+    </script>
+</body>
+</html>
