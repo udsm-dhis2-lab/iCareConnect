@@ -43,6 +43,7 @@
     "@ngrx/store": "^12.5.1",
     "@ngrx/store-devtools": "^12.2.0",
     "@tinymce/tinymce-angular": "^4.2.4",
+    "angular-gtag": "^1.0.4",
     "bootstrap": "^4.5.3",
     "cypress": "^6.8.0",
     "dexie": "^3.2.3",
