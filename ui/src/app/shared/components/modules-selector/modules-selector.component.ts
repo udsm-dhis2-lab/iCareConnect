@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Location } from "src/app/core/models";
-
+import { Angulartics2GoogleAnalytics ,Angulartics2} from 'angulartics2';
 import { flatten, uniqBy, orderBy } from "lodash";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
@@ -23,7 +23,7 @@ export class ModulesSelectorComponent implements OnInit {
   currentModule: any;
   @Input() currentLocation: any;
   userLocationsForTheCurrentModule: Location[];
-  constructor(private store: Store<AppState>) {}
+  constructor(private store: Store<AppState>,private angulartics2GoogleAnalytics: Angulartics2GoogleAnalytics,private angulartics2: Angulartics2) {}
 
   ngOnInit(): void {
     const storedNavigationDetails =
@@ -222,6 +222,7 @@ export class ModulesSelectorComponent implements OnInit {
   }
 
   onSelectModuleLocation(event: Event, module: any): void {
+    // module?.app?.name
     event.stopPropagation();
     this.currentModule = module;
     this.userLocationsForTheCurrentModule =
@@ -254,6 +255,23 @@ export class ModulesSelectorComponent implements OnInit {
       })
     );
     this.locationStatusControl();
+    this.trackActionModule(module)
+  }
+  trackActionModule(module:any) {
+    // Extract module name from the URL
+    const domain = window.location.hostname;
+    const appName = domain.split('.')[1];
+    console.log("tracking analytics -------------------------------------------")
+    // Send data to Google Analytics 
+    this.angulartics2.eventTrack.next({
+      action: 'actionModule',
+      properties: {
+        category: 'ModuleAction',
+        label: 'Icare-Analytics',
+        moduleName: module?.app?.name,
+        appName: appName
+      }
+    });
   }
 
   onSetLocation(event: Event, location): void {
