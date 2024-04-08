@@ -257,22 +257,28 @@ export class ModulesSelectorComponent implements OnInit {
     this.locationStatusControl();
     this.trackActionModule(module)
   }
-  trackActionModule(module:any) {
-    // Extract module name from the URL
+  trackActionModule(module: any) {
+    // Extract client name from the URL
     const domain = window.location.hostname;
-    const appName = domain.split('.')[1];
-    console.log("tracking analytics -------------------------------------------")
+    const clientName = domain.split('.')[1];
+    
     // Send data to Google Analytics 
-    this.angulartics2.eventTrack.next({
-      action: 'actionModule',
-      properties: {
-        category: 'ModuleAction',
-        label: 'Icare-Analytics',
-        moduleName: module?.app?.name,
-        appName: appName
-      }
-    });
+    try {
+      this.angulartics2.eventTrack.next({
+        action: 'actionModule',
+        properties: {
+          category: 'ModuleAction',
+          label: 'Icare-Analytics',
+          moduleName: module?.app?.name,
+          client: clientName
+        }
+      });
+      console.log("Analytics data has been successfully sent.");
+    } catch (error) {
+      console.error("Error sending analytics data:", error);
+    }
   }
+  
 
   onSetLocation(event: Event, location): void {
     event.stopPropagation();
