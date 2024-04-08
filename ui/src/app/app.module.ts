@@ -1,8 +1,10 @@
 import { NgModule } from "@angular/core";
 import { AppComponent } from "./app.component";
 import { CoreModule } from "./core";
-import { GtagModule } from "angular-gtag";
 import { BrowserModule } from "@angular/platform-browser";
+import { Angulartics2Module } from 'angulartics2';
+import { Angulartics2GoogleAnalytics } from 'angulartics2';
+
 export const config: any = {
   sizeUnit: "Octet",
 };
@@ -18,7 +20,7 @@ export const config: any = {
       },
     }),
     BrowserModule,
-    GtagModule.forRoot({ trackingId: 'UA-YOUR_TRACKING_ID', trackPageviews: true }),
+    Angulartics2Module.forRoot(),
   ],
   providers: [],
   bootstrap: [AppComponent],
