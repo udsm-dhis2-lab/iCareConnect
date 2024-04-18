@@ -2,7 +2,6 @@ import { PatientProfileComponent } from "./patient-profile/patient-profile.compo
 import { PatientSearchComponent } from "./patient-search/patient-search.component";
 import { DrugOrderComponent } from "./drug-order/drug-order.component";
 import { LocationSelectModalComponent } from "./location-select-modal/location-select-modal.component";
-import { MenuComponent } from "./menu/menu.component";
 import { PatientClinicalNotesSummaryComponent } from "./patient-clinical-notes-summary/patient-clinical-notes-summary.component";
 import { PatientListComponent } from "./patient-list/patient-list.component";
 import { PatientSidebarComponent } from "./patient-sidebar/patient-sidebar.component";
@@ -44,7 +43,6 @@ import { DrugOrderFormComponent } from "./drug-order-form/drug-order-form.compon
 import { ChangePasswordComponent } from "./change-password/change-password.component";
 import { SharedConceptDisplayComponent } from "./shared-concept-display/shared-concept-display.component";
 import { PatientVisitAttributesDetailsComponent } from "./patient-visit-attributes-details/patient-visit-attributes-details.component";
-import { ModulesSelectorComponent } from "./modules-selector/modules-selector.component";
 import { OrderResultsRendererComponent } from "./order-results-renderer/order-results-renderer.component";
 import { LabResultDisplayComponent } from "./lab-result-display/lab-result-display.component";
 import { PatientPreviousPrescriptionsComponent } from "./patient-previous-prescriptions/patient-previous-prescriptions.component";
@@ -139,7 +137,6 @@ export const components: any[] = [
   PatientProfileComponent,
   DrugOrderComponent,
   LocationSelectModalComponent,
-  MenuComponent,
   PatientClinicalNotesSummaryComponent,
   PatientListComponent,
   PatientVisitListComponent,
@@ -182,7 +179,6 @@ export const components: any[] = [
   ChangePasswordComponent,
   SharedConceptDisplayComponent,
   PatientVisitAttributesDetailsComponent,
-  ModulesSelectorComponent,
   OrderResultsRendererComponent,
   LabResultDisplayComponent,
   PatientPreviousPrescriptionsComponent,
