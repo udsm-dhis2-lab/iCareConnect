@@ -27,14 +27,14 @@ import { UserGet } from "src/app/shared/resources/openmrs";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { LocationSelectModalComponent } from "src/app/shared/components/location-select-modal/location-select-modal.component";
 import { showSearchPatientOnMenu } from "src/app/store/selectors/ui.selectors";
-import { ChangePasswordComponent } from "../change-password/change-password.component";
+import { ChangePasswordComponent } from "../../../shared/components/change-password/change-password.component";
 import { AuthService } from "src/app/core/services/auth.service";
 import { initiateEncounterType } from "src/app/store/actions/encounter-type.actions";
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { OpenmrsHttpClientService } from "../../modules/openmrs-http-client/services/openmrs-http-client.service";
+import { OpenmrsHttpClientService } from "../../../shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { catchError, map } from "rxjs/operators";
-import { ManageUserProfileModalComponent } from "../../dialogs/manage-user-profile-modal/manage-user-profile-modal.component";
+import { ManageUserProfileModalComponent } from "../../../shared/dialogs/manage-user-profile-modal/manage-user-profile-modal.component";
 import { SystemUsersService } from "src/app/core/services/system-users.service";
 import { LabEditUserModalComponent } from "src/app/modules/laboratory/modules/settings/components/lab-edit-user-modal/lab-edit-user-modal.component";
 
