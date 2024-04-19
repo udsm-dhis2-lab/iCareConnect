@@ -1,23 +1,25 @@
-import { Inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
+
+declare var gtag: Function;
 
 @Injectable({
   providedIn: 'root'
 })
 export class GoogleAnalyticsService {
 
-  constructor(@Inject('window') private window: Window & { dataLayer: any[] }) {}
-
-  sendData(moduleName: string, eventName: string, additionalData?: any) {
+  sendAnalytics(moduleName: string ,eventAction: string, page:string) {
     const clientName = this.extractClientNameFromDomain(window.location.href);
-    const data = {
-      event: eventName,
-      moduleName: moduleName,
-      clientName: clientName,
-      ...additionalData
-    };
-    this.window.dataLayer.push(data);
-  }
+    // console.log("module -->",moduleName);
+    // console.log("eventAction -->",eventAction);
+    // console.log("page -->",page);
+    // console.log("clientName -->",clientName);
 
+    gtag('event', eventAction, {
+      'page': page,
+      'module_name': moduleName,
+      'client_name': clientName
+    });
+  }
   private extractClientNameFromDomain(url: string): string {
     try {
       const parsedUrl = new URL(url); 

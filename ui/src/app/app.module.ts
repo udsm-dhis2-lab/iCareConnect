@@ -19,7 +19,10 @@ export const config: any = {
     }),
     BrowserModule,
   ],
-  providers: [GoogleAnalyticsService],
+  providers: [
+    GoogleAnalyticsService,
+    { provide: 'window', useValue: window }
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
