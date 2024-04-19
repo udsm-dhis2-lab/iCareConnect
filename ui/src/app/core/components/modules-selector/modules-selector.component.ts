@@ -9,6 +9,7 @@ import {
   updateCurrentLocationStatus,
 } from "src/app/store/actions";
 import { ICARE_APPS } from "src/app/core/containers/modules/modules.constants";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-modules-selector",
@@ -22,7 +23,10 @@ export class ModulesSelectorComponent implements OnInit {
   currentModule: any;
   @Input() currentLocation: any;
   userLocationsForTheCurrentModule: Location[];
-  constructor(private store: Store<AppState>) {}
+  constructor(
+    private store: Store<AppState>,
+    private googleAnalyticsService: GoogleAnalyticsService
+  ) {}
 
   ngOnInit(): void {
     const storedNavigationDetails =
@@ -254,9 +258,12 @@ export class ModulesSelectorComponent implements OnInit {
       })
     );
     this.locationStatusControl();
+    this.trackActionForAnalytics(module);
   }
-  
-  
+  trackActionForAnalytics(module: any) {
+    // Send data to Google Analytics
+    this.googleAnalyticsService.sendAnalytics(module?.app?.name,`${module?.app?.name}: Open`,module?.app?.name)
+  }
 
   onSetLocation(event: Event, location): void {
     event.stopPropagation();
