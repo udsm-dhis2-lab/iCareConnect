@@ -357,7 +357,24 @@
                 referencedTableName="item"
                 referencedColumnNames="item_id"/>
     </changeSet>
-
+    <changeSet id="add_columns_to_bl_item_price" author="josephat-mwakyusa" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="payable_payment_mode_id" tableName="bl_item_price"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bl_item_price" >
+            <column name="payable_payment_mode_id" type="INTEGER">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+        <addForeignKeyConstraint
+                baseColumnNames="payable_payment_mode_id"
+                baseTableName="bl_item_price"
+                constraintName="bl_item_price_payable_payment_mode_id_concept_id"
+                referencedColumnNames="concept_id"
+                referencedTableName="concept"/>
+    </changeSet>
     <changeSet id="create_bl_invoice_item_payment" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
