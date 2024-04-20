@@ -8,7 +8,6 @@ import { AuthService } from "./core/services/auth.service";
 import { loadDHIS2ReportsConfigs } from "./store/actions";
 import { AppState } from "./store/reducers";
 import { getIfNonLoginRoute } from "./store/selectors";
-import { Angulartics2GoogleAnalytics } from 'angulartics2';
 
 @Component({
   selector: "app-root",
@@ -25,10 +24,7 @@ export class AppComponent implements OnInit {
     private dialog: MatDialog,
     private auth: AuthService,
     private route: ActivatedRoute,
-    angulartics2GoogleAnalytics: Angulartics2GoogleAnalytics,
-  ) {
-    angulartics2GoogleAnalytics.startTracking();
-  }
+  ) {}
 
   ngOnInit(): void {
     this.monitorSession();
