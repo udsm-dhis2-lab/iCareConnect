@@ -2,8 +2,7 @@ import { NgModule } from "@angular/core";
 import { AppComponent } from "./app.component";
 import { CoreModule } from "./core";
 import { BrowserModule } from "@angular/platform-browser";
-import { Angulartics2Module } from "angulartics2";
-
+import { GoogleAnalyticsService } from "./google-analytics.service";
 export const config: any = {
   sizeUnit: "Octet",
 };
@@ -19,9 +18,11 @@ export const config: any = {
       },
     }),
     BrowserModule,
-    Angulartics2Module.forRoot({ developerMode: false }),
   ],
-  providers: [],
+  providers: [
+    GoogleAnalyticsService,
+    { provide: 'window', useValue: window }
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
