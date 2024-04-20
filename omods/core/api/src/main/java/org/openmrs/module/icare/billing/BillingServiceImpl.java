@@ -148,7 +148,11 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 				InvoiceItem invoiceItem = getTopUpInvoiceItem(orderMetaData);
 				if (invoiceItem != null && invoiceItem.getQuantity() != 0 && invoiceItem.getPrice() != 0) {
 					Invoice invoice = new Invoice();
-					invoice.setPaymentMode(paymentModeConcept);
+					if (orderMetaData.getItemPrice().getPayablePaymentMode() != null) {
+						invoice.setPaymentMode(orderMetaData.getItemPrice().getPayablePaymentMode());
+					} else {
+						invoice.setPaymentMode(paymentModeConcept);
+					}
 					invoice.setVisit(orderMetaData.getOrder().getEncounter().getVisit());
 					invoiceItem.setInvoice(invoice);
 					List<InvoiceItem> invoiceItems = new ArrayList<InvoiceItem>();

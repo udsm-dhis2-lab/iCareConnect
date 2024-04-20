@@ -249,7 +249,14 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		if (paymentType == null) {
 			throw new APIException("Payment Type does not exist");
 		}
+		
 		itemPrice.setPaymentType(paymentType);
+		if (itemPrice.getPayable() != null && itemPrice.getPayablePaymentMode() == null) {
+			throw new APIException("Payment mode for payable not provided");
+		} else {
+			Concept payablePaymentMode = conceptService.getConceptByUuid(itemPrice.getPayablePaymentMode().getUuid());
+			itemPrice.setPayablePaymentMode(payablePaymentMode);
+		}
 		return dao.saveItemPrice(itemPrice);
 	}
 	
