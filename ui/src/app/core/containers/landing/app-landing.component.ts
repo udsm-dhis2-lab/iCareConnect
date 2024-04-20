@@ -24,7 +24,6 @@ export class LandingComponent implements OnInit {
     const navigationDetails = JSON.parse(
       localStorage.getItem("navigationDetails")
     );
-
     const isNavigationDetailsAvailable =
       !navigationDetails || !navigationDetails?.path[0] ? false : true;
 
