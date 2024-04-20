@@ -267,6 +267,7 @@ export class SamplesEffects {
               // console.log("allSamples", allSamples);
               let samples = [];
               let samplesToCollect = [];
+              // console.log("action.paidItems", action.paidItems);
               // TODO: Add a way to handle emergency visit and IPD through configurations
               _.forEach(allSamples, (sample) => {
                 if (sample.hasOwnProperty("id")) {
