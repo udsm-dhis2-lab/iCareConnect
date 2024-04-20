@@ -474,7 +474,7 @@ export class VisitComponent implements OnInit {
         });
       }
     );
-    console.log("patient id", this.patientDetails?.id);
+    // console.log("patient id", this.patientDetails?.id);
   }
 
   get servicesAsPerVisitType() {
