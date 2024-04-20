@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Location } from "src/app/core/models";
-import { Angulartics2GoogleAnalytics ,Angulartics2} from 'angulartics2';
 import { flatten, uniqBy, orderBy } from "lodash";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
@@ -10,6 +9,7 @@ import {
   updateCurrentLocationStatus,
 } from "src/app/store/actions";
 import { ICARE_APPS } from "src/app/core/containers/modules/modules.constants";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-modules-selector",
@@ -23,7 +23,10 @@ export class ModulesSelectorComponent implements OnInit {
   currentModule: any;
   @Input() currentLocation: any;
   userLocationsForTheCurrentModule: Location[];
-  constructor(private store: Store<AppState>,private angulartics2GoogleAnalytics: Angulartics2GoogleAnalytics,private angulartics2: Angulartics2) {}
+  constructor(
+    private store: Store<AppState>,
+    private googleAnalyticsService: GoogleAnalyticsService
+  ) {}
 
   ngOnInit(): void {
     const storedNavigationDetails =
@@ -255,30 +258,12 @@ export class ModulesSelectorComponent implements OnInit {
       })
     );
     this.locationStatusControl();
-    this.trackActionModule(module)
+    this.trackActionForAnalytics(module);
   }
-  trackActionModule(module: any) {
-    // Extract client name from the URL
-    const domain = window.location.hostname;
-    const clientName = domain.split('.')[1];
-    
-    // Send data to Google Analytics 
-    try {
-      this.angulartics2.eventTrack.next({
-        action: 'actionModule',
-        properties: {
-          category: 'ModuleAction',
-          label: 'Icare-Analytics',
-          moduleName: module?.app?.name,
-          client: clientName
-        }
-      });
-      console.log("Analytics data has been successfully sent.");
-    } catch (error) {
-      console.error("Error sending analytics data:", error);
-    }
+  trackActionForAnalytics(module: any) {
+    // Send data to Google Analytics
+    this.googleAnalyticsService.sendAnalytics(module?.app?.name,`${module?.app?.name}: Open`,module?.app?.name)
   }
-  
 
   onSetLocation(event: Event, location): void {
     event.stopPropagation();
