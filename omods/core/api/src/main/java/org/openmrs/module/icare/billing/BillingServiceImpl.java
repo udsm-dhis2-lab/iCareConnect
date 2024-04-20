@@ -147,7 +147,6 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 				paymentModeConcept = Context.getConceptService().getConceptByName("Insurance");
 				InvoiceItem invoiceItem = getTopUpInvoiceItem(orderMetaData);
 				if (invoiceItem != null && invoiceItem.getQuantity() != 0 && invoiceItem.getPrice() != 0) {
-					
 					Invoice invoice = new Invoice();
 					if (orderMetaData.getItemPrice().getPayablePaymentMode() != null) {
 						invoice.setPaymentMode(orderMetaData.getItemPrice().getPayablePaymentMode());
