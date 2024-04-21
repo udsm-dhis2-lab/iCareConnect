@@ -7,8 +7,7 @@ import { components } from "./components";
 import { modals } from "./modals";
 
 @NgModule({
-  declarations: [...pages, ...components, ...modals],
-  entryComponents: [...modals],
-  imports: [CommonModule, CashierRoutingModule, SharedModule],
+    declarations: [...pages, ...components, ...modals],
+    imports: [CommonModule, CashierRoutingModule, SharedModule]
 })
 export class CashierModule {}
