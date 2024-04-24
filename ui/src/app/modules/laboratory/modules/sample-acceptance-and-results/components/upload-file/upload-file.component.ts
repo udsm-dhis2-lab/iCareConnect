@@ -99,7 +99,12 @@ export class UploadFileComponent implements OnInit {
     // Closure to capture the file information.
     reader.onload = (function (theFile) {
       return function (e) {
-        var binaryData = e.target.result;
+        //BEFORE
+        //var binaryData = e.target.result;
+
+        //AFTER
+        let binaryData = e.target.result as string;
+
         //Converting Binary Data to base 64
         base64FileString = window.btoa(binaryData);
       };
