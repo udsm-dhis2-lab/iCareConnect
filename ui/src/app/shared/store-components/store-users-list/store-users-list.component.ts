@@ -7,9 +7,9 @@ import {
   ViewChild,
 } from "@angular/core";
 import { CaptureSignatureComponent } from "../../components/capture-signature/capture-signature.component";
-import { MatTableDataSource } from "@angular/material/table";
-import { MatDialog } from "@angular/material/dialog";
-import { MatPaginator } from "@angular/material/paginator";
+import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatLegacyPaginator as MatPaginator } from "@angular/material/legacy-paginator";
 
 @Component({
   selector: "app-store-users-list",

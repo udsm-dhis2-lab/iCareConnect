@@ -10,7 +10,7 @@ import {
 } from '../../store/selectors/samples.selectors';
 import { Observable, of } from 'rxjs';
 import { UserGetFull } from 'src/app/shared/resources/openmrs';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ResultsAndSignOffsModalComponent } from '../results-and-sign-offs-modal/results-and-sign-offs-modal.component';
 import { loadConcept } from 'src/app/store/actions';
 

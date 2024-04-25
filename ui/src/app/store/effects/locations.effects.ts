@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { Actions, createEffect, ofType, OnInitEffects } from "@ngrx/effects";
 import { ROUTER_NAVIGATED } from "@ngrx/router-store";
 import { Action, select, Store } from "@ngrx/store";

@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
-import { MatRadioChange } from "@angular/material/radio";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { map, take } from "rxjs/operators";
@@ -41,7 +41,7 @@ import { SharedResultsEntryAndViewModalComponent } from "../shared-results-entry
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { groupBy } from "lodash";
 import { LabSample } from "src/app/modules/laboratory/resources/models";
-import { MatTabChangeEvent } from "@angular/material/tabs";
+import { MatLegacyTabChangeEvent as MatTabChangeEvent } from "@angular/material/legacy-tabs";
 
 @Component({
   selector: "app-sample-acceptance",

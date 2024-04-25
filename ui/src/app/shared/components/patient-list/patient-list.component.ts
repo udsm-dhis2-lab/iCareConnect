@@ -23,7 +23,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { clearBills } from "src/app/store/actions/bill.actions";
 import { clearBillItems } from "src/app/store/actions/bill-item.actions";
 import { PatientListDialogComponent } from "../../dialogs";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { addCurrentPatient, go } from "src/app/store/actions";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 

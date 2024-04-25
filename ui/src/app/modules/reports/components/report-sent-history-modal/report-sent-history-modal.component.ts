@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { MatDialogRef } from "@angular/material/dialog";
+import { MatLegacyDialogRef as MatDialogRef } from "@angular/material/legacy-dialog";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { AppState } from "src/app/store/reducers";

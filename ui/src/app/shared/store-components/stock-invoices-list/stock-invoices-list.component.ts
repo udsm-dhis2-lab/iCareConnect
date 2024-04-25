@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { Observable } from "rxjs";
 import { map, tap } from "rxjs/operators";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";

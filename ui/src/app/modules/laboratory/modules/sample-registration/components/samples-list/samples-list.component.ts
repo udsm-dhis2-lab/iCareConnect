@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
 import { FormControl } from "@angular/forms";
-import { MatSelectChange } from "@angular/material/select";
+import { MatLegacySelectChange as MatSelectChange } from "@angular/material/legacy-select";
 import { from, fromEvent, Observable, of, Subject, Subscription } from "rxjs";
 import {
   debounceTime,

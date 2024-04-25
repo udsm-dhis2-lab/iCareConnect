@@ -11,13 +11,13 @@ import {
   UntypedFormGroup,
   Validators,
 } from "@angular/forms";
-import { MatTable, MatTableDataSource } from "@angular/material/table";
+import { MatLegacyTable as MatTable, MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import { RoleCreate } from "../../resources/openmrs";
 import { Observable } from "rxjs";
 import { SystemUsersService } from "src/app/core/services/system-users.service";
 import { Router } from "@angular/router";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { MatLegacySnackBar as MatSnackBar } from "@angular/material/legacy-snack-bar";
+import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogRef as MatDialogRef } from "@angular/material/legacy-dialog";
 import { LocationService } from "src/app/core/services";
 import * as moment from "moment";
 import { processDateFromMaterialInput } from "../../helpers/utils.helpers";

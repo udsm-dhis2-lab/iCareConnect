@@ -6,7 +6,7 @@ import { ConceptsService } from "src/app/shared/resources/concepts/services/conc
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 
 import { keyBy } from "lodash";
-import { MatRadioChange } from "@angular/material/radio";
+import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
 
 @Component({
   selector: "app-multiple-tests-selection",

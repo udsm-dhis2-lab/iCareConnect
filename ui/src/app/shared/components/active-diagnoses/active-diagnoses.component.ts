@@ -10,7 +10,7 @@ import { Patient } from 'src/app/shared/resources/patient/models/patient.model';
 import { updateDiagnosis } from 'src/app/store/actions/diagnosis.actions';
 import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
 import { AddDiagnosisModalComponent } from '../add-diagnosis-modal/add-diagnosis-modal.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { DeleteDiagnosisModalComponent } from '../delete-diagnosis-modal/delete-diagnosis-modal.component';
 
 @Component({

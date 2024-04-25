@@ -11,7 +11,7 @@ import {
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
-import { MatTabChangeEvent } from "@angular/material/tabs";
+import { MatLegacyTabChangeEvent as MatTabChangeEvent } from "@angular/material/legacy-tabs";
 import { go } from "src/app/store/actions";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 

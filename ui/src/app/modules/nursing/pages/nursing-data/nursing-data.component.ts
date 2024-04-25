@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { select, Store } from "@ngrx/store";
 import { map } from "lodash";
 import { Observable, of } from "rxjs";
@@ -49,7 +49,7 @@ import {
   getActiveVisit,
   getActiveVisitDeathStatus,
 } from "src/app/store/selectors/visit.selectors";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatLegacySnackBar as MatSnackBar } from "@angular/material/legacy-snack-bar";
 
 @Component({
   selector: "app-nursing-data",

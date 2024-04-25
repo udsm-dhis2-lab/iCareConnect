@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import {
-  MatSnackBar,
-  MatSnackBarHorizontalPosition,
-  MatSnackBarVerticalPosition,
-} from '@angular/material/snack-bar';
+  MatLegacySnackBar as MatSnackBar,
+  MatLegacySnackBarHorizontalPosition as MatSnackBarHorizontalPosition,
+  MatLegacySnackBarVerticalPosition as MatSnackBarVerticalPosition,
+} from '@angular/material/legacy-snack-bar';
 
 export interface NotificationInterface {
   type: 'SUCCESS' | 'ERROR' | 'WARNING' | 'LOADING';

@@ -11,7 +11,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { EffectsModule } from "@ngrx/effects";
 import {
-  DefaultRouterStateSerializer,
+  MinimalRouterStateSerializer,
   RouterStateSerializer,
   StoreRouterConnectingModule,
 } from "@ngrx/router-store";
@@ -51,7 +51,7 @@ export function initializeDb(indexDbServiceConfig: IndexDbServiceConfig) {
         StoreModule.forRoot(reducers, { metaReducers }),
         EffectsModule.forRoot(effects),
         StoreRouterConnectingModule.forRoot({
-            serializer: DefaultRouterStateSerializer,
+            serializer: MinimalRouterStateSerializer,
         }),
         !environment.production ? StoreDevtoolsModule.instrument() : [],
     ],

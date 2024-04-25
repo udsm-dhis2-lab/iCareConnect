@@ -1,9 +1,9 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import {
-  MatDialog,
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-} from "@angular/material/dialog";
+  MatLegacyDialog as MatDialog,
+  MatLegacyDialogRef as MatDialogRef,
+  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
+} from "@angular/material/legacy-dialog";
 import { Store } from "@ngrx/store";
 import { forkJoin, Observable, of, zip } from "rxjs";
 import * as _ from "lodash";
@@ -35,7 +35,7 @@ import { VisitsService } from "src/app/shared/resources/visits/services";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { MatTabChangeEvent } from "@angular/material/tabs";
+import { MatLegacyTabChangeEvent as MatTabChangeEvent } from "@angular/material/legacy-tabs";
 import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
 
 @Component({

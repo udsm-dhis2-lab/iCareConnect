@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { MatSelectChange } from "@angular/material/select";
+import { MatLegacySelectChange as MatSelectChange } from "@angular/material/legacy-select";
 import { Observable } from "rxjs";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { ConceptGetFull } from "../../resources/openmrs";

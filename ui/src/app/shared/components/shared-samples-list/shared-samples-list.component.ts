@@ -6,10 +6,10 @@ import {
   OnInit,
   Output,
 } from "@angular/core";
-import { MatCheckboxChange } from "@angular/material/checkbox";
-import { MatRadioChange } from "@angular/material/radio";
-import { MatSelectChange } from "@angular/material/select";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyCheckboxChange as MatCheckboxChange } from "@angular/material/legacy-checkbox";
+import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
+import { MatLegacySelectChange as MatSelectChange } from "@angular/material/legacy-select";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { Store } from "@ngrx/store";
 import { omit, keyBy } from "lodash";
 import { Observable, of } from "rxjs";

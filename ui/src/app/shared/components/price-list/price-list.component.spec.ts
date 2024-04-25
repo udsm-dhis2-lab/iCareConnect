@@ -5,7 +5,7 @@ import { DebugElement, NO_ERRORS_SCHEMA } from "@angular/core";
 
 import { PriceListComponent } from "./price-list.component";
 import { matDialogProviderMock } from "src/test-mocks/material.mocks";
-import { MatMenuModule } from "@angular/material/menu";
+import { MatLegacyMenuModule as MatMenuModule } from "@angular/material/legacy-menu";
 import { ItemPriceService } from "../../../modules/maintenance/services/item-price.service";
 import { of } from "rxjs";
 import { MockStore, provideMockStore } from "@ngrx/store/testing";

@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoginHelpComponent } from './login-help.component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { materialModules } from 'src/app/shared/material-modules';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatLegacyDialogModule as MatDialogModule, MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
 import { matDialogRefMock } from 'src/test-mocks/material.mocks';
 
 describe('LoginHelpComponent', () => {

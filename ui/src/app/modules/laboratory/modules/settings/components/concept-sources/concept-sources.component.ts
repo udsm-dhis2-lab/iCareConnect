@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { MatRadioChange } from "@angular/material/radio";
+import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
 import { Observable } from "rxjs";
 import { ConceptSourcesService } from "src/app/core/services/concept-sources.service";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";

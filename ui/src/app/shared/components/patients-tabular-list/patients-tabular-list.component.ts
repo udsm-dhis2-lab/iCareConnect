@@ -1,7 +1,7 @@
 import { EventEmitter, OnChanges, Output, ViewChild } from "@angular/core";
 import { Component, Input, OnInit } from "@angular/core";
-import { MatPaginator } from "@angular/material/paginator";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatLegacyPaginator as MatPaginator } from "@angular/material/legacy-paginator";
+import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import { sanitizePatientsVisitsForTabularPatientListing } from "../../helpers/sanitize-visits-list-for-patient-tabular-listing.helper";
 import { Visit } from "../../resources/visits/models/visit.model";
 

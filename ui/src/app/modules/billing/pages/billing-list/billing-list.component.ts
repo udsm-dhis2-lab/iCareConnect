@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import { Router } from "@angular/router";
 import { Store } from "@ngrx/store";
 import { Observable, of } from "rxjs";

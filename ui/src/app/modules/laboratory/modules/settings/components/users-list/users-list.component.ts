@@ -6,9 +6,9 @@ import {
   EventEmitter,
   Input,
 } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
-import { MatPaginator } from "@angular/material/paginator";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatLegacyPaginator as MatPaginator } from "@angular/material/legacy-paginator";
+import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import { CaptureSignatureComponent } from "src/app/shared/components/capture-signature/capture-signature.component";
 
 @Component({

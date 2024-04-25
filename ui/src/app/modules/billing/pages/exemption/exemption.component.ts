@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterContentInit } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import { ActivatedRoute, Router } from "@angular/router";
 import { select, Store } from "@ngrx/store";
 import * as _ from "lodash";

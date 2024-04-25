@@ -9,7 +9,7 @@ import {
   getCustomOpenMRSFormsByIds,
 } from "src/app/store/selectors/form.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from "@angular/material/legacy-dialog";
 import { getParentLocation } from "src/app/store/selectors";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import {

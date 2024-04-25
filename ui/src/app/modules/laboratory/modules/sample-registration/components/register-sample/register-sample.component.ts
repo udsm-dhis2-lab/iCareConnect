@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { MatRadioChange } from "@angular/material/radio";
-import { MatTabChangeEvent } from "@angular/material/tabs";
+import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
+import { MatLegacyTabChangeEvent as MatTabChangeEvent } from "@angular/material/legacy-tabs";
 import { Store } from "@ngrx/store";
 import { Observable, of, zip } from "rxjs";
 import { catchError, map, take, tap, withLatestFrom } from "rxjs/operators";

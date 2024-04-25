@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MatButtonToggleChange } from "@angular/material/button-toggle";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { Store } from "@ngrx/store";
 import * as _ from "lodash";
 import * as Highcharts from "highcharts";
@@ -26,7 +26,7 @@ import { generateSelectionOptions } from "src/app/shared/helpers/patient.helper"
 import { ExportService } from "src/app/shared/services/export.service";
 import { map } from "rxjs/operators";
 import { ExportDataService } from "src/app/core/services/export-data.service";
-import { MatSelectChange } from "@angular/material/select";
+import { MatLegacySelectChange as MatSelectChange } from "@angular/material/legacy-select";
 import { Router } from "@angular/router";
 import { go } from "src/app/store/actions";
 

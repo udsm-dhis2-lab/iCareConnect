@@ -16,7 +16,7 @@ import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation } from "src/app/store/selectors";
 import { getCustomOpenMRSFormById } from "src/app/store/selectors/form.selectors";
 import { sum, keyBy } from "lodash";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { PosConfirmSalesModalComponent } from "../../modals/pos-confirm-sales-modal/pos-confirm-sales-modal.component";
 
 @Component({

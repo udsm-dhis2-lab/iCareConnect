@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
+import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { Observable } from "rxjs";
 import { SharedConfirmationDialogComponent } from "src/app/shared/components/shared-confirmation-dialog/shared-confirmation-dialog.component";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";

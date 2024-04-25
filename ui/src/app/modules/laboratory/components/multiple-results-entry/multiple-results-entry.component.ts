@@ -7,7 +7,7 @@ import {
   EventEmitter,
 } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
-import { MatSelect, MatSelectChange } from "@angular/material/select";
+import { MatLegacySelect as MatSelect, MatLegacySelectChange as MatSelectChange } from "@angular/material/legacy-select";
 
 import { ReplaySubject, Subject } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";

@@ -5,7 +5,7 @@ import { Textbox } from "../../../form/models/text-box.model";
 import { TextArea } from "../../../form/models/text-area.model";
 import { FormValue } from "../../../form/models/form-value.model";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { MatCheckboxChange } from "@angular/material/checkbox";
+import { MatLegacyCheckboxChange as MatCheckboxChange } from "@angular/material/legacy-checkbox";
 
 @Component({
   selector: "lib-manage-standard-report",

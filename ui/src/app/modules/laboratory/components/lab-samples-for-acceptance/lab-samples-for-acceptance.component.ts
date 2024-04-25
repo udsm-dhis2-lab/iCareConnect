@@ -10,7 +10,7 @@ import {
 } from '../../store/selectors/samples.selectors';
 import { Observable } from 'rxjs';
 import { loadAllLabSamples, setSampleStatus } from '../../store/actions';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { SampleRejectionReasonComponent } from '../sample-rejection-reason/sample-rejection-reason.component';
 import { ProviderGet, UserGetFull } from 'src/app/shared/resources/openmrs';
 

@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { SampleTrackingModalComponent } from '../sample-tracking-modal/sample-tracking-modal.component';
 import { AppState } from 'src/app/store/reducers';
 import { groupLabOrdersBySpecimenSources } from 'src/app/shared/helpers/sample-types.helper';

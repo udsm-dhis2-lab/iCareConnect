@@ -7,7 +7,7 @@ import {
   matDialogDataMock
 } from 'src/test-mocks/material.mocks';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { MatTextareaAutosize } from '@angular/material/input';
+import { MatLegacyTextareaAutosize as MatTextareaAutosize } from '@angular/material/legacy-input';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 
 describe('SampleRejectionReasonComponent', () => {

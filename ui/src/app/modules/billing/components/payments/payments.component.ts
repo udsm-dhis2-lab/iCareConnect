@@ -3,7 +3,7 @@ import { PaymentItem } from "../../models/payment-item.model";
 import { PaymentObject } from "../../models/payment-object.model";
 import { Payment } from "../../models/payment.model";
 import { flatten, each } from "lodash";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 
 @Component({
   selector: "app-payments",
