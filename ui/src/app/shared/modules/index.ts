@@ -1,4 +1,5 @@
-import { NgxBarcodeModule } from "ngx-barcode";
+// import { NgxBarcodeModule } from "ngx-barcode";
+import { NgxBarcode6Module } from "ngx-barcode6";
 import { NgxMatSelectSearchModule } from "ngx-mat-select-search";
 import { NgxPrintModule } from "ngx-print";
 import { FormModule } from "./form/form.module";
@@ -12,12 +13,13 @@ import { NgxStandardReportsModule } from "./standard-report/standard-report.modu
 export const modules: any[] = [
   NgxOpenmrsHttpclientServiceModule,
   FormModule,
-  NgxBarcodeModule,
-  NgxOpenmrsLocationTreeModule,
-  NgxPrintModule,
-  NgxStandardReportsModule,
-  MatSelectSearchModule,
-  NgxMatSelectSearchModule,
-  NgxPeriodFilterModule,
-  NgxMultipleItemsFilterModule,
+  // NgxBarcodeModule,
+   NgxBarcode6Module,
+   NgxOpenmrsLocationTreeModule,
+   NgxPrintModule,
+   NgxStandardReportsModule,
+   MatSelectSearchModule,
+   NgxMatSelectSearchModule,
+   NgxPeriodFilterModule,
+   NgxMultipleItemsFilterModule,
 ];
