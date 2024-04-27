@@ -1,9 +1,9 @@
 import { Component, Inject, OnInit, ViewChild } from "@angular/core";
 import {
-  MatLegacyDialogRef as MatDialogRef,
-  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
-  MatLegacyDialog as MatDialog,
-} from "@angular/material/legacy-dialog";
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialog,
+} from "@angular/material/dialog";
 import { Observable, of, zip } from "rxjs";
 import { map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
@@ -18,9 +18,9 @@ import { VisitsService } from "src/app/shared/resources/visits/services";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
-import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
+import { MatRadioChange } from "@angular/material/radio";
 import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
-import { MatLegacySnackBar as MatSnackBar } from "@angular/material/legacy-snack-bar";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { TestParameterEntryComponent } from "../test-parameter-entry/test-parameter-entry.component";

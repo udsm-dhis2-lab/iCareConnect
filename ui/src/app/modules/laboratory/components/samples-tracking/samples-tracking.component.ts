@@ -4,7 +4,7 @@ import { AppState } from "src/app/store/reducers";
 import { Observable } from "rxjs";
 import { SampleObject } from "../../resources/models";
 import { getLabSamplesGroupedBymrNo } from "../../store/selectors/samples.selectors";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { TrackedSampleModalComponent } from "../../components/tracked-sample-modal/tracked-sample-modal.component";
 import { loadAllLabSamples } from "../../store/actions";
 

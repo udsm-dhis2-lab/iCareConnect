@@ -8,7 +8,7 @@ import { sum } from "lodash";
 import { DrugOrdersService } from "src/app/shared/resources/order/services";
 import { DrugOrder } from "src/app/shared/resources/order/models";
 import { keyBy, omit } from "lodash";
-import { MatLegacyCheckboxChange as MatCheckboxChange } from "@angular/material/legacy-checkbox";
+import { MatCheckboxChange } from "@angular/material/checkbox";
 
 @Component({
   selector: "app-drugs-list-to-send-for-billing",

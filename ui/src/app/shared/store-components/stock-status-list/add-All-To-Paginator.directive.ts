@@ -1,5 +1,5 @@
 import { Directive, ElementRef } from "@angular/core";
-import { MatLegacyPaginator as MatPaginator } from "@angular/material/legacy-paginator";
+import { MatPaginator } from "@angular/material/paginator";
 
 const allValue = 999999;
 const allValueLabel = "All"; // or inject i18n service in directive constructor

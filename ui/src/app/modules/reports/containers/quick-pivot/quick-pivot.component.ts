@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 import Pivot from 'quick-pivot';
 import { PivotLayoutModelComponent } from '../../components/pivot-layout-model/pivot-layout-model.component';
 import { find } from 'lodash';

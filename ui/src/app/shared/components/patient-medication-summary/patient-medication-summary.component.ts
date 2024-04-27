@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { Observable, of, zip } from "rxjs";
 import { map, tap } from "rxjs/operators";

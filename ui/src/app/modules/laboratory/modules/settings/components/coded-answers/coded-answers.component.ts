@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
+import { MatRadioChange } from "@angular/material/radio";
 import { Observable } from "rxjs";
 import { ConceptSourcesService } from "src/app/core/services/concept-sources.service";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -10,7 +10,7 @@ import {
   ConceptGetFull,
 } from "src/app/shared/resources/openmrs";
 import { omit } from "lodash";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { SharedConfirmationDialogComponent } from "src/app/shared/components/shared-confirmation-dialog/shared-confirmation-dialog.component";
 
 @Component({

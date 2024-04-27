@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from "@angular/core";
 import * as _ from "lodash";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { Observable, of, zip } from "rxjs";

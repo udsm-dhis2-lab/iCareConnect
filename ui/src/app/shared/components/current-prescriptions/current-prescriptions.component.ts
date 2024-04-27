@@ -7,7 +7,7 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 import { map, tap } from "rxjs/operators";
 import { Observable } from "rxjs";
 import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { getGenericDrugPrescriptionsFromVisit } from "../../helpers/visits.helper";
 
 @Component({

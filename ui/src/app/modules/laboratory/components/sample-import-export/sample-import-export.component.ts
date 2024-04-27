@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { UntypedFormGroup } from "@angular/forms";
-import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
+import { MatRadioChange } from "@angular/material/radio";
 import { formulateHeadersFromExportTemplateReferences } from "../../resources/helpers/import-export.helper";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";

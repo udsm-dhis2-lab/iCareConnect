@@ -26,7 +26,7 @@ import { LocationGet } from "src/app/shared/resources/openmrs";
 import { getCurrentLocation } from "src/app/store/selectors";
 import { catchError, map } from "rxjs/operators";
 import { getAllObservations } from "src/app/store/selectors/observation.selectors";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { DischargePatientModalComponent } from "src/app/shared/components/discharge-patient-modal/discharge-patient-modal.component";
 import { addBillStatusOnBedOrders } from "src/app/modules/inpatient/helpers/sanitize-bed-orders.helper";
 import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";

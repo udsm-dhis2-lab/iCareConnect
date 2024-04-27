@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { Observable } from "rxjs";
 import { PrivilegeGetFull, RoleGet } from "../../resources/openmrs";
 import { PrivilegesAndRolesService } from "../../services/privileges-and-roles.service";

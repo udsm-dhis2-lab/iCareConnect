@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { flatten, keyBy, groupBy } from "lodash";
 import { ManageReportModalComponent } from "../../modals/manage-report-modal/manage-report-modal.component";
 import { ReportAccessAndConfisSettingsModalComponent } from "../../modals/report-access-and-confis-settings-modal/report-access-and-confis-settings-modal.component";

@@ -6,9 +6,9 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { groupBy, flatten, omit, orderBy } from "lodash";
 import { SampleAllocationService } from "src/app/shared/resources/sample-allocations/services/sample-allocation.service";
 import { SamplesService } from "src/app/shared/services/samples.service";
-import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
-import { MatLegacyCheckboxChange as MatCheckboxChange } from "@angular/material/legacy-checkbox";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatRadioChange } from "@angular/material/radio";
+import { MatCheckboxChange } from "@angular/material/checkbox";
+import { MatDialog } from "@angular/material/dialog";
 import { AdditionalFieldsModalComponent } from "src/app/modules/laboratory/modals/additional-fields-modal/additional-fields-modal.component";
 
 @Component({

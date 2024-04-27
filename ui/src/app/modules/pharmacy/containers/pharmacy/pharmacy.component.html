@@ -54,7 +54,7 @@
             : ''
         }"
       >
-        <mat-chip-list
+        <mat-chip-listbox
           class="w-100"
           cdkDropListOrientation="{{
             params?.iCareConnectConfigurations &&
@@ -81,7 +81,7 @@
               <em>({{ params?.currentUser?.username }})</em>
             </p>
           </div>
-          <mat-chip
+          <mat-chip-option
             class="w-20"
             *ngIf="params?.privileges"
             (click)="changeRoute($event, 'home')"
@@ -100,8 +100,8 @@
             }"
           >
             Dashboard
-          </mat-chip>
-          <mat-chip
+          </mat-chip-option>
+          <mat-chip-option
             class="w-20"
             *ngIf="
               params?.privileges &&
@@ -124,8 +124,8 @@
             }"
           >
             Dispensing
-          </mat-chip>
-          <mat-chip
+          </mat-chip-option>
+          <mat-chip-option
             class="w-20"
             *ngIf="params?.privileges"
             (click)="changeRoute($event, 'stock')"
@@ -144,8 +144,8 @@
             }"
           >
             Stock
-          </mat-chip>
-          <mat-chip
+          </mat-chip-option>
+          <mat-chip-option
             class="w-20"
             *ngIf="params?.privileges"
             (click)="changeRoute($event, 'requisition')"
@@ -164,8 +164,8 @@
             }"
           >
             Request
-          </mat-chip>
-          <mat-chip
+          </mat-chip-option>
+          <mat-chip-option
             class="w-20"
             *ngIf="params?.privileges"
             (click)="changeRoute($event, 'issuing')"
@@ -184,9 +184,9 @@
             }"
           >
             Issuing
-          </mat-chip>
+          </mat-chip-option>
 
-          <mat-chip
+          <mat-chip-option
             class="w-20"
             *ngIf="params?.privileges"
             (click)="changeRoute($event, 'reports')"
@@ -205,8 +205,8 @@
             }"
           >
             Reports
-          </mat-chip>
-          <mat-chip
+          </mat-chip-option>
+          <mat-chip-option
             class="w-20"
             *ngIf="params?.privileges"
             (click)="changeRoute($event, 'settings')"
@@ -225,8 +225,8 @@
             }"
           >
             Settings
-          </mat-chip>
-        </mat-chip-list>
+          </mat-chip-option>
+        </mat-chip-listbox>
       </div>
       <div
         [ngClass]="{

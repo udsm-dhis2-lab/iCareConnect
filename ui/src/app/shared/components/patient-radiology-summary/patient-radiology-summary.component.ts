@@ -6,7 +6,7 @@ import { Visit } from "../../resources/visits/models/visit.model";
 import { VisitsService } from "../../resources/visits/services";
 import { flatten, orderBy, uniqBy } from "lodash";
 import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { SharedPdfPreviewComponent } from "../../dialogs/shared-pdf-preview/shared-pdf-preview.component";
 
 @Component({

@@ -7,7 +7,7 @@ import { ConceptsService } from "src/app/shared/resources/concepts/services/conc
 import { Api } from "src/app/shared/resources/openmrs";
 import { flatten, omit } from "lodash";
 import { catchError, map } from "rxjs/operators";
-import { MatLegacySnackBar as MatSnackBar } from "@angular/material/legacy-snack-bar";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: "app-test-order-parameters-relationship",

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
-import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
+import { MatDialog } from "@angular/material/dialog";
+import { MatRadioChange } from "@angular/material/radio";
 import { Store } from "@ngrx/store";
 import { Observable, of } from "rxjs";
 import { SamplesService } from "src/app/shared/services/samples.service";

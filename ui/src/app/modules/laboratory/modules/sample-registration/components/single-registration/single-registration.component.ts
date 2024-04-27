@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, Input, OnInit } from "@angular/core";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
-import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
+import { MatDialog } from "@angular/material/dialog";
+import { MatRadioChange } from "@angular/material/radio";
 import { Observable, of, zip } from "rxjs";
 import {
   EQA_PERSON_DATA,

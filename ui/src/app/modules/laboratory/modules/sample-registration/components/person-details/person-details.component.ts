@@ -8,7 +8,7 @@ import {
   ViewChild,
   ViewChildren,
 } from "@angular/core";
-import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
+import { MatRadioChange } from "@angular/material/radio";
 import { RegistrationService } from "src/app/modules/registration/services/registration.services";
 import { FieldComponent } from "src/app/shared/modules/form/components/field/field.component";
 import { FormComponent } from "src/app/shared/modules/form/components/form/form.component";

@@ -65,6 +65,7 @@
 
       <!-- active visit section -->
       <mat-card
+        appearance="outlined"
         class="col-12"
         *ngIf="
           params?.activeVisit && !params?.activeVisit?.stopDate && !editMode
@@ -262,8 +263,8 @@
               </div>
               <div class="col-md-12">
                 <label>Visit type</label>
-                <mat-chip-list aria-label="Visit types" *ngIf="visitTypes">
-                  <mat-chip
+                <mat-chip-listbox aria-label="Visit types" *ngIf="visitTypes">
+                  <mat-chip-option
                     *ngFor="let visitType of applicableVisitTypes"
                     (click)="
                       setVisitTypeOption(
@@ -276,9 +277,9 @@
                       visitType.uuid == currentVisitType?.uuid ? 'primary' : ''
                     }}"
                     [selected]="visitType.uuid == currentVisitType?.uuid"
-                    >{{ visitType.display }}</mat-chip
+                    >{{ visitType.display }}</mat-chip-option
                   >
-                </mat-chip-list>
+                </mat-chip-listbox>
 
                 <div
                   class="mt-3"
@@ -290,8 +291,8 @@
                   ></mat-progress-bar>
                   <div *ngIf="servicesConcepts">
                     <label>Service</label>
-                    <mat-chip-list aria-label="Visit services">
-                      <mat-chip
+                    <mat-chip-listbox aria-label="Visit services">
+                      <mat-chip-option
                         *ngFor="let service of servicesConcepts['setMembers']"
                         (click)="setService(service)"
                         color="{{
@@ -300,9 +301,9 @@
                             : ''
                         }}"
                         [selected]="service?.uuid == currentVisitService?.uuid"
-                        >{{ service?.display }}</mat-chip
+                        >{{ service?.display }}</mat-chip-option
                       >
-                    </mat-chip-list>
+                    </mat-chip-listbox>
                   </div>
                 </div>
 
@@ -361,7 +362,7 @@
                         (keyup)="searchRoom($event)"
                       />
                     </mat-form-field> -->
-                    <mat-chip-list
+                    <mat-chip-listbox
                       aria-label="Locations"
                       *ngIf="
                         (
@@ -371,7 +372,7 @@
                         ).length > 0
                       "
                     >
-                      <mat-chip
+                      <mat-chip-option
                         *ngFor="
                           let room of treatmentLocations
                             | filterBy: searchTerm:'name'
@@ -387,8 +388,8 @@
                           *ngIf="patientsByLocation[room.id] as patientsLoaded"
                           >{{ patientsLoaded }}</span
                         >
-                      </mat-chip>
-                    </mat-chip-list>
+                      </mat-chip-option>
+                    </mat-chip-listbox>
                     <p
                       class="text-left text-danger"
                       *ngIf="missingBillingConceptError"
@@ -471,8 +472,8 @@
                       />
                     </mat-form-field> -->
 
-                    <mat-chip-list aria-label="Locations">
-                      <mat-chip
+                    <mat-chip-listbox aria-label="Locations">
+                      <mat-chip-option
                         *ngFor="
                           let room of treatmentLocations
                             | filterBy: searchTerm:'name'
@@ -488,8 +489,8 @@
                           *ngIf="patientsByLocation[room.id] as patientsLoaded"
                           >{{ patientsLoaded }}</span
                         >
-                      </mat-chip>
-                    </mat-chip-list>
+                      </mat-chip-option>
+                    </mat-chip-listbox>
                   </div>
                   <div
                     class="text-left"
@@ -549,14 +550,14 @@
                 *ngIf="!(editMode && disableEditingPayments)"
               >
                 <p>Payment Category</p>
-                <mat-chip-list
+                <mat-chip-listbox
                   aria-label="Payment categories"
                   *ngIf="
                     params?.paymentsCategories &&
                     params?.paymentsCategories['results'][0]['setMembers']
                   "
                 >
-                  <mat-chip
+                  <mat-chip-option
                     *ngFor="
                       let option of params?.paymentsCategories['results'][0][
                         'setMembers'
@@ -571,9 +572,9 @@
                     [selected]="
                       option?.display == visitDetails?.Payment?.display
                     "
-                    >{{ option.display }}</mat-chip
+                    >{{ option.display }}</mat-chip-option
                   >
-                </mat-chip-list>
+                </mat-chip-listbox>
               </div>
 
               <div
@@ -585,20 +586,20 @@
                 >
                   Insurance type
                 </label>
-                <mat-chip-list
+                <mat-chip-listbox
                   aria-label="Payments"
                   *ngIf="visitDetails['Payment']['display'] == 'Insurance'"
                 >
-                  <mat-chip
+                  <mat-chip-option
                     *ngFor="let option of currentPaymentCategory['setMembers']"
                     (click)="setInsuranceTypeOption(option)"
                     color="{{
                       option == visitDetails['Insurance'] ? 'primary' : ''
                     }}"
                     [selected]="option == visitDetails['Insurance']"
-                    >{{ option?.display }}</mat-chip
+                    >{{ option?.display }}</mat-chip-option
                   >
-                </mat-chip-list>
+                </mat-chip-listbox>
 
                 <mat-progress-bar
                   mode="indeterminate"
@@ -611,8 +612,8 @@
                       visitDetails['Insurance']?.display !== 'NHIF')
                   "
                  -->
-                <mat-chip-list *ngIf="visitDetails['Insurance']?.display">
-                  <mat-chip
+                <mat-chip-listbox *ngIf="visitDetails['Insurance']?.display">
+                  <mat-chip-option
                     class="mt-3"
                     (click)="setInsuranceScheme(scheme)"
                     color="{{
@@ -630,8 +631,8 @@
                         ? scheme?.shortNameDetails?.name
                         : scheme?.display
                     }}
-                  </mat-chip>
-                </mat-chip-list>
+                  </mat-chip-option>
+                </mat-chip-listbox>
                 <div
                   class="mt-2"
                   *ngIf="
@@ -705,11 +706,11 @@
                   Track Scheme
                 </p>
 
-                <mat-chip-list
+                <mat-chip-listbox
                   aria-label="Payments"
                   *ngIf="visitDetails['Payment']['display'] == 'Cash'"
                 >
-                  <mat-chip
+                  <mat-chip-option
                     *ngFor="let option of currentPaymentCategory['setMembers']"
                     (click)="setPaymentOptions('Cash', option)"
                     color="{{
@@ -718,9 +719,9 @@
                         : ''
                     }}"
                     [selected]="option?.uuid == visitDetails['Cash']?.uuid"
-                    >{{ option?.display }}</mat-chip
+                    >{{ option?.display }}</mat-chip-option
                   >
-                </mat-chip-list>
+                </mat-chip-listbox>
               </div>
             </div>
           </div>

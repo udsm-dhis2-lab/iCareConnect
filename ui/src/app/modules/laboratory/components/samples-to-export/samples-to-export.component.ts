@@ -5,7 +5,7 @@ import { SamplesService } from "src/app/shared/services/samples.service";
 import { orderBy } from "lodash";
 import { formulateHeadersFromExportTemplateReferences } from "../../resources/helpers/import-export.helper";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
-import { MatLegacySelectChange as MatSelectChange } from "@angular/material/legacy-select";
+import { MatSelectChange } from "@angular/material/select";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { LocationService } from "src/app/core/services";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";

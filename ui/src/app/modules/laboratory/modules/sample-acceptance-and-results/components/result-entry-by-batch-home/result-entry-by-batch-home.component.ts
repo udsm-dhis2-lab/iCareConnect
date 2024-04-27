@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { MatLegacyRadioChange as MatRadioChange } from "@angular/material/legacy-radio";
+import { MatRadioChange } from "@angular/material/radio";
 import { keyBy, groupBy, flatten } from "lodash";
 import { Observable } from "rxjs";
 import { map, tap } from "rxjs/operators";

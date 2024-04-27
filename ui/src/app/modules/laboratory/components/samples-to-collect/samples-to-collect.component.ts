@@ -25,7 +25,7 @@ import { collectSample } from "src/app/store/actions";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { BarCodeModalComponent } from "../../../../shared/dialogs/bar-code-modal/bar-code-modal.component";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { LabOrdersService } from "../../resources/services/lab-orders.service";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 
