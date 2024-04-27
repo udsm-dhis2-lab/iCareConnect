@@ -58,8 +58,9 @@ export class UsersListComponent implements OnInit {
       limit: this.pageCount,
       q: this.searchingText,
     });
+    
   }
-
+  
   getRecord(event: Event, user: any): void {
     this.edit.emit(user);
   }

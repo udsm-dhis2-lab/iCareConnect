@@ -17,7 +17,7 @@ export class SystemUsersService {
   constructor(private httpClient: OpenmrsHttpClientService) {}
 
   getUsers(params): Observable<any[]> {
-    const url = `user?startIndex=${params?.startIndex}&limit=${params?.limit}&v=full&q=${params?.q}`;
+    const url = `user?startIndex=${params?.startIndex}&limit=${params?.limit}&v=custom:(uuid,display,username,person)&q=${params?.q}`;
     return this.httpClient.get(url).pipe(
       map((response) => response?.results),
       catchError((error) => of(error))
