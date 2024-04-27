@@ -60,7 +60,7 @@
     "ngrx-store-freeze": "^0.2.4",
     "ngx-barcode": "^0.3.0",
     "ngx-barcode6": "^1.0.24",
-    "ngx-mat-select-search": "^6.0.0",
+    "ngx-mat-select-search": "^7.0.5",
     "ngx-print": "^1.5.1",
     "num-words": "^1.2.2",
     "pdfmake": "^0.2.7",
