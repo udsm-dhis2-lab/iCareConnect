@@ -26,6 +26,7 @@ import { PatientListDialogComponent } from "../../dialogs";
 import { MatDialog } from "@angular/material/dialog";
 import { addCurrentPatient, go } from "src/app/store/actions";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-patient-list",
@@ -73,7 +74,8 @@ export class PatientListComponent implements OnInit, OnChanges {
     private route: ActivatedRoute,
     private router: Router,
     private dialog: MatDialog,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnChanges() {}
@@ -249,7 +251,12 @@ export class PatientListComponent implements OnInit, OnChanges {
     this.store.dispatch(clearBillItems());
     this.store.dispatch(clearActiveVisit());
     this.selectPatient.emit({ ...visit?.patient, visitUuid: visit?.uuid });
+    this.trackActionForAnalytics(`Active Patient Search: View`)
     
+  }
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Registration',eventname,'Registration')
   }
 
   togglePatientTypeList(type) {
@@ -295,6 +302,7 @@ export class PatientListComponent implements OnInit, OnChanges {
           );
         }
       });
+      
   }
 
   filterPatientList(event: any) {
