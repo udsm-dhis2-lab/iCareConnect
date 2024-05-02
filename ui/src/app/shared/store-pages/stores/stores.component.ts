@@ -30,10 +30,6 @@ export class StoresComponent implements OnInit {
         this.store.select(getCurrentLocation()).subscribe((response: any) => {
           this.currentStoreLocation = response;
         });
-        // this.currentStoreLocation = storeLocations[0];
-        // this.store.dispatch(
-        //   setCurrentUserCurrentLocation({ location: this.currentStoreLocation })
-        // );
       }
     });
   }
