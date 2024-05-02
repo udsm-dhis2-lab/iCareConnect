@@ -251,8 +251,9 @@ export class PatientListComponent implements OnInit, OnChanges {
     this.store.dispatch(clearBillItems());
     this.store.dispatch(clearActiveVisit());
     this.selectPatient.emit({ ...visit?.patient, visitUuid: visit?.uuid });
-    this.trackActionForAnalytics(`Active Patient Search: View`)
-    
+
+      // this.trackActionForAnalytics(`Active Patient Search: View`)
+  
   }
   trackActionForAnalytics(eventname: any) {
     // Send data to Google Analytics
@@ -304,7 +305,6 @@ export class PatientListComponent implements OnInit, OnChanges {
       });
       
   }
-
   filterPatientList(event: any) {
     this.loadingPatients = true;
 
