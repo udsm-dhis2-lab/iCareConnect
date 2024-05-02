@@ -3,6 +3,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from "@angular/router";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { PatientListDialogComponent } from "src/app/shared/dialogs";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import {
@@ -27,7 +28,8 @@ export class NursingHomeComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {
     this.store.dispatch(loadRolesDetails());
   }
@@ -69,7 +71,21 @@ export class NursingHomeComponent implements OnInit {
         query: { queryParams: { patient: patient?.patient?.uuid } },
       })
     );
+
+      this.trackActionForAnalytics(`Nursing Search: View`);
+ 
+    
   }
+
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+    this.googleAnalyticsService.sendAnalytics(
+      "Nursing",
+      eventname,
+      "Nursing"
+    );
+  }
+
 
   onBack(e: Event) {
     e.stopPropagation();

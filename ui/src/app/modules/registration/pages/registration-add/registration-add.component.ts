@@ -45,6 +45,7 @@ import { map, tap } from "rxjs/operators";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { PatientService } from "src/app/shared/resources/patient/services/patients.service";
 import { Field } from "src/app/shared/modules/form/models/field.model";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 @Component({
   selector: "app-registration-add",
   templateUrl: "./registration-add.component.html",
@@ -123,7 +124,8 @@ export class RegistrationAddComponent implements OnInit {
     private systemSettingsService: SystemSettingsService,
     private identifierService: IdentifiersService,
     private conceptService: ConceptsService,
-    private patientService: PatientService
+    private patientService: PatientService,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   get mandatoryFieldsMissing(): boolean {
@@ -863,6 +865,7 @@ export class RegistrationAddComponent implements OnInit {
             .subscribe(
               (updatePatientResponse) => {
                 if (!updatePatientResponse?.error) {
+                  this.trackActionForAnalytics(`Save Registration: Edit`);
                   this.notificationService.show(
                     new Notification({
                       message: "Patient details updated succesfully",
@@ -997,6 +1000,17 @@ export class RegistrationAddComponent implements OnInit {
         this.openSnackBar("Error: location is not set", null);
       }
     }
+
+    this.trackActionForAnalytics(`Save Registration: Save`);
+  }
+
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+    this.googleAnalyticsService.sendAnalytics(
+      "Registration",
+      eventname,
+      "Registration"
+    );
   }
 
   openSnackBar(message: string, action: string) {
