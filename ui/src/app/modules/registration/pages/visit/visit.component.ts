@@ -41,6 +41,7 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 import { ProgramEnrollment } from "src/app/modules/vertical-programs/models/programEnrollment.model";
 import { ProgramGet, ProgramGetFull } from "src/app/shared/resources/openmrs";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-visit",
@@ -136,7 +137,8 @@ export class VisitComponent implements OnInit {
     private visitService: VisitsService,
     private programsService: ProgramsService,
     private systemSettingsService: SystemSettingsService,
-    private conceptsService: ConceptsService
+    private conceptsService: ConceptsService,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   dismissAlert() {
@@ -342,6 +344,17 @@ export class VisitComponent implements OnInit {
     this.store.dispatch(clearActiveVisit());
     this.startVisitEvent.emit();
     this.dialog.closeAll();
+
+    this.trackActionForAnalytics(`Start Visit: Start`);
+  }
+
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+    this.googleAnalyticsService.sendAnalytics(
+      "Registration",
+      eventname,
+      "Registration"
+    );
   }
 
   onGetSelectedProgram(selectedProgram: ProgramGetFull): void {
