@@ -64,14 +64,17 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
       ? this.store.select(getAllDiagnoses)
       : of(getAllDiagnosesFromVisitDetails(this.patientVisit));
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
-    // this.surveillanceDiagnosesConfigurations$ = this.systemSettingsService.getSystemSettingsByKey("");
+    this.surveillanceDiagnosesConfigurations$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.surveillance.settings.immediate.diagnoses"
+      );
   }
 
   onFormUpdate(formValues: FormValue, type): void {
     this.formValuesData = { ...this.formValuesData, ...formValues.getValues() };
   }
 
-  addDiagnosis(e: Event): void {
+  addDiagnosis(e: Event, surveillanceDiagnosesConfigurations: any): void {
     e.stopPropagation();
     this.diagnosisField = null;
     this.diagnosisRankField = null;
