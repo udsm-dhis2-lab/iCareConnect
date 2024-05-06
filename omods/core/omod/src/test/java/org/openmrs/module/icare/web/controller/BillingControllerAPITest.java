@@ -283,7 +283,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	//@Ignore
 	public void testDViewingPayments() throws Exception {
-		
+			
 		//Given
 		PatientService patientService = Context.getService(PatientService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
