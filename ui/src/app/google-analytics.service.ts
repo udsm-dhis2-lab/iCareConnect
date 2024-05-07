@@ -9,10 +9,10 @@ export class GoogleAnalyticsService {
 
   sendAnalytics(moduleName: string ,eventAction: string, page:string) {
     const clientName = this.extractClientNameFromDomain(window.location.href);
-    // console.log("module -->",moduleName);
-    // console.log("eventAction -->",eventAction);
-    // console.log("page -->",page);
-    // console.log("clientName -->",clientName);
+    console.log("module -->",moduleName);
+    console.log("eventAction -->",eventAction);
+    console.log("page -->",page);
+    console.log("clientName -->",clientName);
 
     gtag('event', eventAction, {
       'page': page,
