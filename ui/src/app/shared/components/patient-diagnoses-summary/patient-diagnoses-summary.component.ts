@@ -115,11 +115,9 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
         currentDiagnosisUuid: null,
       })
     );
-    this.updateMedicationComponent.emit();
-    this.updateConsultationOrder.emit();
-  
-    // Check if the diagnosis is one of the surveillance diseases
-    const surveillanceDiseases = [
+
+     // Check if the diagnosis is one of the surveillance diseases
+     const surveillanceDiseases = [
       "Cholera(A009)",
       "Diarrhea with Blood (Dysentery)(K580)",
       "Dengue Fever(A90)",
@@ -132,6 +130,10 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
       console.log("Sharing demographic information of the patient");
       // Add code here to share the demographic information
     }
+    this.updateMedicationComponent.emit();
+    this.updateConsultationOrder.emit();
+  
+   
   }
 
   onEdit(e: Event, diagnosisData, currentDiagnosisUuid) {
