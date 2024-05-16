@@ -121,7 +121,7 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
     "Diarrhea with Blood (Dysentery)(K580)",
     "Dengue Fever(A90)",
     "Ebola or Marburg Virus Diseases(A984)",
-    "Yellow fever",
+    "Yellow fever(959)",
     "Small Pox(B03)"
   ];
   if (surveillanceDiseases.includes(this.diagnosesData.diagnosis)) {
