@@ -120,7 +120,7 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
     "Cholera",
     "Diarrhea with Blood (Dysentery)",
     "Dengue Fever",
-    "Ebola or Marburg Virus Diseases",
+    "Ebola or Marburg Virus Diseases ",
     "Yellow fever",
     "Small Pox"
   ];
