@@ -117,12 +117,12 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
     );
      // Check if the diagnosis is one of the surveillance diseases
   const surveillanceDiseases = [
-    "Cholera",
-    "Diarrhea with Blood (Dysentery)",
-    "Dengue Fever",
-    "Ebola or Marburg Virus Diseases",
-    "Yellow fever",
-    "Small Pox"
+    "Cholera(A009)",
+    "Diarrhea with Blood (Dysentery)(K580)",
+    "Dengue Fever(A90)",
+    "Ebola or Marburg Virus Diseases(A984)",
+    "Yellow fever(959)",
+    "Small Pox(B03)"
   ];
   if (surveillanceDiseases.includes(this.diagnosesData.diagnosis)) {
     // Share the demographic information of the patient
