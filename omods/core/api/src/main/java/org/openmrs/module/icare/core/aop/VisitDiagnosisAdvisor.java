@@ -90,7 +90,6 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 							capturedEventData.put("surname",diagnosis.getPatient().getFamilyName().toString());
 							capturedEventData.put("diagnosis", diagnosisName);
 							AdministrationService adminService = Context.getService(AdministrationService.class);
-							GlobalProperty globalProperty2 = new GlobalProperty();
 							String mappings = adminService.getGlobalProperty(ICareConfig.SURVEILLANCE_SINGLE_EVENT_PROGRAM_MAPPINGS);
 							Map<String, Object> event = new HashMap<>();
 							event.put("orgUnit", dhis2EventWrapper.getHFRCode());
@@ -104,16 +103,9 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 							List<Map<String, Object>> events = new ArrayList<>();
 							events.add(event);
 							eventsPayload.put("events", events);
-							globalProperty2.setProperty("icare.testingadvice.works.eventData");
-							globalProperty2.setPropertyValue(new JSONObject(eventsPayload).toString());
-							adminService.saveGlobalProperty(globalProperty2);
 
 							ICareService iCareService = Context.getService(ICareService.class);
 							String response = iCareService.pushEventWithoutRegistrationDataToDHIS2Instance(new JSONObject(eventsPayload).toString());
-							GlobalProperty globalProperty = new GlobalProperty();
-							globalProperty.setProperty("icare.testingadvice.works.eventData.response");
-							globalProperty.setPropertyValue(new JSONObject(response).toString());
-							adminService.saveGlobalProperty(globalProperty);
 						}
 					}
 				}

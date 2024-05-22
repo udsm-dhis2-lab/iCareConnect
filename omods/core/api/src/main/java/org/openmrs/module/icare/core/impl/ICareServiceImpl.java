@@ -1113,7 +1113,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			String instance = administrationService.getGlobalProperty("dhis2.instance");
 			String username = administrationService.getGlobalProperty("dhis2.username");
 			String password = administrationService.getGlobalProperty("dhis2.password");
-			
+			// TODO: Use configs to access the API below (Remove hardcoded URL)
 			URL url = new URL(instance.concat("/api/tracker?async=false&orgUnitIdScheme=CODE&dataElementIdScheme=CODE"));
 			
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
