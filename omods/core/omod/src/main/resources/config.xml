@@ -134,7 +134,21 @@
 			List of immediate coded diagnoses
 		</description>
 	</globalProperty>
-
+	<globalProperty>
+		<property>iCare.location.general.systemSettings.formsAttributeTypeUuid</property>
+		<defaultValue>2c266002-2848-4d2b-bf1f-8b59d81e3f29</defaultValue>
+		<description>
+			For location attributes containing form references/uuids
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.visits.types.verticalProgram.uuid</property>
+		<defaultValue>2msir5eb-5ww5-11e8-5555-40b034c3cfee</defaultValue>
+		<description>
+			For vertical program visit type reference
+		</description>
+	</globalProperty>
+	iCare.visits.types.verticalProgram.uuid
 	
 	<!-- Internationalization -->
 	<!-- All message codes should start with @MODULE_ID@.* -->
