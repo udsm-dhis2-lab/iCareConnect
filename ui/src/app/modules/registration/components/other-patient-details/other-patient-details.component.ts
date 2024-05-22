@@ -60,7 +60,7 @@ export class OtherPatientDetailsComponent implements OnInit {
           .filter((id) => id !== null)
           .map((id) => parseInt(id, 10));
         const largestInsuranceID = validInsuranceIDs[0];
-        this.NewID = largestInsuranceID.toString();
+        this.NewID = largestInsuranceID?.toString();
 
         // console.log("Largest Insurance ID ---------------------------------------===:", largestInsuranceID);
 
