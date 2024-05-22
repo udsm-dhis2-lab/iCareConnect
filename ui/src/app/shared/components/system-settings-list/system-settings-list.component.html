@@ -52,7 +52,7 @@
                 (click)="openModal($event, systemSetting)"
                 class="system-setting-value"
               >
-                {{ systemSetting?.value }}
+                {{ systemSetting?.value | json }}
               </div>
             </td>
             <td>
