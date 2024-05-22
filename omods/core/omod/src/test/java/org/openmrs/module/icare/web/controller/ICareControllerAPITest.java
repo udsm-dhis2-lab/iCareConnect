@@ -241,7 +241,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	//@Ignore("Already testing using advice")
+	//	@Ignore("Already testing using advice")
 	public void testVisitCreation() throws Exception {
 		
 		//Given
@@ -375,6 +375,22 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
+	//	@Ignore(value = "Changed to Advice")
+	public void testVisitDiagnosisCreation() throws Exception {
+		
+		//Given
+		Map<String, Object> result = getResourceDTOMap("diagnosis-dto");
+		System.out.println(result);
+		//When
+		MockHttpServletRequest newGetRequest = newPostRequest("icare/patientdiagnoses", result);
+		MockHttpServletResponse handle = handle(newGetRequest);
+		
+		//Then
+		Diagnosis diagnosis = (new ObjectMapper()).readValue(handle.getContentAsString(), Diagnosis.class);
+		assertThat("Should create diagnosis", diagnosis != null);
+	}
+	
+	@Test
 	//@Ignore(value = "Changed to Advice")
 	public void testDrugOrderRevision() throws Exception {
 		//Given
@@ -488,8 +504,6 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		handle = handle(newGetRequest);
 		
 		orderResult = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
-		System.out.println("orderResult");
-		System.out.println(orderResult);
 		assertThat("Should return one visit", ((List) orderResult.get("results")).size() == 1);
 		
 		newGetRequest = newGetRequest("icare/visit", new Parameter("orderTypeUuid", "2msir5eb-5345-11e8-9922-40b034c3cfee"),

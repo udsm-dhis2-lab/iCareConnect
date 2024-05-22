@@ -79,7 +79,11 @@ export class ManageSystemSettingComponent implements OnInit {
               id: "value",
               key: "value",
               required: false,
-              value: this.dialogData?.value ? this.dialogData?.value : null,
+              value: this.dialogData?.value
+                ? typeof this.dialogData?.value === "object"
+                  ? JSON.stringify(this.dialogData?.value)
+                  : this.dialogData?.value
+                : null,
               placeholder: "Value",
               label: "Value",
             }),
