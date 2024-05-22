@@ -16,6 +16,7 @@ import { identifyConceptsFromFormattedForm } from "../../helpers/identify-concep
 import { indexOf, keyBy, orderBy } from "lodash";
 
 import * as moment from "moment";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-clinical-notes",
@@ -55,7 +56,8 @@ export class ClinicalNotesComponent implements OnInit {
   useFilledObsData: boolean = true;
   constructor(
     private store: Store<AppState>,
-    private observationService: ObservationService
+    private observationService: ObservationService,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -238,11 +240,12 @@ export class ClinicalNotesComponent implements OnInit {
       )?.length > 0;
   }
 
-  onConfirm(e: Event, visit: any): void {
+  onConfirm(e: Event, visit: any,form:any): void {
     e.stopPropagation();
     this.updateConsultationOrder.emit();
     let obs = getObservationsFromForm(
       this.formData[this.currentCustomForm?.id],
+
       this.patient?.personUuid,
       this.location?.id,
       this.visit?.encounterUuid
@@ -274,6 +277,9 @@ export class ClinicalNotesComponent implements OnInit {
         if (res) {
           this.saveObservations.emit();
         }
+
+  this.trackActionForAnalytics(`${this.currentCustomForm?.name}: Save`);
+        
       });
     // this.saveObservations.emit(
     //   getObservationsFromForm(
@@ -288,6 +294,16 @@ export class ClinicalNotesComponent implements OnInit {
     //   )
     // );
   }
+
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+    this.googleAnalyticsService.sendAnalytics(
+      "Clinic",
+      eventname,
+      "Clinic"
+    );
+  }
+  
 
   onClear(event: Event, form: any): void {
     event.stopPropagation();
