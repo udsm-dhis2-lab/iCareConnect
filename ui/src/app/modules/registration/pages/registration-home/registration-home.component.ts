@@ -172,7 +172,9 @@ export class RegistrationHomeComponent implements OnInit {
       e.stopPropagation();
     }
     this.store.dispatch(clearActiveVisit());
-    this.trackActionForAnalytics(`Search: View`);
+  
+      this.trackActionForAnalytics(`Registration Search: View`);
+   
     this.store.dispatch(
       addCurrentPatient({
         patient: { ...patient["patient"], id: patient["patient"]["uuid"] },
@@ -214,6 +216,7 @@ export class RegistrationHomeComponent implements OnInit {
           setTimeout(() => {
             this.loadingData = false;
           }, 100);
+        
         }
       });
   }
