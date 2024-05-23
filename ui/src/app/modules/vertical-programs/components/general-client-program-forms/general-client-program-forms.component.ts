@@ -56,7 +56,10 @@ export class GeneralClientProgramFormsComponent implements OnInit {
     this.forms$ = this.store.select(
       getCustomOpenMRSFormsByIds(this.formsUuids)
     );
-    // this.getProgramEncounterDetails()
+    console.log("patientEnrollmentDetails::", this.patientEnrollmentDetails);
+    if (this.patientEnrollmentDetails?.uuid) {
+      this.getProgramEncounterDetails();
+    }
   }
 
   onFormUpdate(formValue: FormValue): void {
