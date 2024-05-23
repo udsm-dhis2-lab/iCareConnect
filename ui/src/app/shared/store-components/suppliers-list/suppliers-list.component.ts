@@ -6,6 +6,7 @@ import { LocationService } from "src/app/core/services";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { SupplierService } from "src/app/shared/resources/store/services/supplier.service";
 import { SupplierFormComponent } from "../supplier-form/supplier-form.component";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-suppliers-list",
@@ -20,7 +21,8 @@ export class SuppliersListComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     private supplierService: SupplierService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -55,7 +57,15 @@ export class SuppliersListComponent implements OnInit {
       .subscribe((response) => {
         this.ngOnInit();
       });
+
+      this.trackActionForAnalytics(`Add New Supplier: Open`);
   }
+
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
+  }
+
 
   onUpdateSupplier(e: any, supplier: any, locations?: any[]) {
     e?.stopPropagation();

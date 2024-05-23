@@ -1,4 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { MatTabChangeEvent } from "@angular/material/tabs";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-shared-privileges-and-roles-management",
@@ -7,7 +9,18 @@ import { Component, Input, OnInit } from "@angular/core";
 })
 export class SharedPrivilegesAndRolesManagementComponent implements OnInit {
   @Input() currentUser: any;
-  constructor() {}
+  constructor( private googleAnalyticsService: GoogleAnalyticsService
+    
+  ) {}
 
   ngOnInit(): void {}
+
+  onTabChanged(event: MatTabChangeEvent): void {
+    this.trackActionForAnalytics(`${event.tab.textLabel}: Open`);
+  }
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
+  }
+
 }

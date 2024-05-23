@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { map } from "rxjs/operators";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
@@ -21,6 +22,7 @@ export class SupplierFormComponent implements OnInit {
   constructor(
     private dialog: MatDialogRef<SupplierFormComponent>,
     private supplierService: SupplierService,
+    private googleAnalyticsService: GoogleAnalyticsService,
     @Inject(MAT_DIALOG_DATA) public data
   ) {}
 
@@ -78,12 +80,20 @@ export class SupplierFormComponent implements OnInit {
       .pipe(
         map((response) => {
           if (!response?.error) {
+
+            this.trackActionForAnalytics('Add Suppliers: Save');
+
             this.dialog.close();
             return response;
           }
         })
       )
       .subscribe();
+  }
+
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
   }
 
   onUpdateSupplier(e: any) {
