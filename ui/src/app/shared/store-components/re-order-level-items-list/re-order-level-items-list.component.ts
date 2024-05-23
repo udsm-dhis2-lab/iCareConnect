@@ -5,6 +5,7 @@ import { map, tap } from "rxjs/operators";
 import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
 import { ReOrderLevelService } from "src/app/shared/resources/store/services/re-order-level.service";
 import { ManageReOrderLevelModalComponent } from "../../store-modals/manage-re-order-level-modal/manage-re-order-level-modal.component";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-re-order-level-items-list",
@@ -15,7 +16,8 @@ export class ReOrderLevelItemsListComponent implements OnInit {
   reOrderLevelsList$: Observable<any>;
   constructor(
     private reOrderLevelService: ReOrderLevelService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -47,6 +49,13 @@ export class ReOrderLevelItemsListComponent implements OnInit {
           this.getReOrderLevels();
         }
       });
+
+      this.trackActionForAnalytics(`Add Re-orders Levels: Open`);
+  }
+
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
   }
 
   onUpdate(e: any, reOrderLevel: any) {
