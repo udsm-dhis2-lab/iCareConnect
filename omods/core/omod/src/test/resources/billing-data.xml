@@ -368,4 +368,5 @@
 
     <location location_id="200" name="store A" creator="1" date_created="2017-02-27 12:47:30" retired="false" uuid="44939999-d333-fff2-9bff-61d11117c22e" />
 
+<!--    <conditions condition_id="1"  condition_coded="" condition_non_coded="Testing diagnosis" condition_coded_name="500" date_created="2017-02-27 12:47:30" clinical_status="1" voided="0" creator="1" patient_id="1000"/>-->
 </dataset>

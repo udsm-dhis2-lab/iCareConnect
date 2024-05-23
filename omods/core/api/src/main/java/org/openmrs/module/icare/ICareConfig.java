@@ -126,4 +126,15 @@ public class ICareConfig {
 	public static final String DRUG_DURATION_UNITS_EQUIVALENCE_CONCEPT_SOURCE = "icare.drugs.configuration.drugDurationEquivalence.conceptSourceUuid";
 	
 	public static final String PASSWORD_EXPIRATION_TIME_IN_DAYS = "icare.user.password.expiration.time";
+	
+	public static final String SURVEILLANCE_CAPTURE_DIAGNOSIS_DATA = "iCare.surveillance.settings.captureDiagnosisData";
+	
+	public static final String SURVEILLANCE_DIAGNOSES_CODES_REFERENCE = "iCare.surveillance.settings.immediate.diagnoses";
+	
+	public static final String SURVEILLANCE_EVENT_PROGRAM = "iCare.surveillance.settings.eventProgram.uuid";
+	
+	public static final String SURVEILLANCE_SINGLE_EVENT_PROGRAM_STAGE = "iCare.surveillance.settings.eventProgramStage.uuid";
+	
+	public static final String SURVEILLANCE_SINGLE_EVENT_PROGRAM_MAPPINGS = "iCare.surveillance.settings.eventProgramMappings";
+	
 }

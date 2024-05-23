@@ -31,6 +31,10 @@
 		<point>org.openmrs.api.UserService</point>
 		<class>org.openmrs.module.icare.core.aop.PasswordChangeAdvisor</class>
 	</advice>
+	<advice>
+		<point>org.openmrs.api.DiagnosisService</point>
+		<class>org.openmrs.module.icare.core.aop.VisitDiagnosisAdvisor</class>
+	</advice>
 	<globalProperty>
 		<property>icare.billing.serviceAttribute</property>
 		<defaultValue>SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE</defaultValue>
@@ -95,6 +99,56 @@
 			UUID for the Insurance Authorization Attribute.
 		</description>
 	</globalProperty>
+	<globalProperty>
+		<property>iCare.surveillance.settings.eventProgramMappings</property>
+		<defaultValue></defaultValue>
+		<description>
+			Surveillance mappings
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.surveillance.settings.eventProgram.uuid</property>
+		<defaultValue></defaultValue>
+		<description>
+			Surveillance Program
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.surveillance.settings.eventProgramStage.uuid</property>
+		<defaultValue></defaultValue>
+		<description>
+			Surveillance program stage
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.surveillance.settings.captureDiagnosisData</property>
+		<defaultValue>false</defaultValue>
+		<description>
+			Check for should capture immediate diagnoses when doctor prescribe
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.surveillance.settings.immediate.diagnoses</property>
+		<defaultValue>["A00"]</defaultValue>
+		<description>
+			List of immediate coded diagnoses
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.location.general.systemSettings.formsAttributeTypeUuid</property>
+		<defaultValue>2c266002-2848-4d2b-bf1f-8b59d81e3f29</defaultValue>
+		<description>
+			For location attributes containing form references/uuids
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.visits.types.verticalProgram.uuid</property>
+		<defaultValue>2msir5eb-5ww5-11e8-5555-40b034c3cfee</defaultValue>
+		<description>
+			For vertical program visit type reference
+		</description>
+	</globalProperty>
+	iCare.visits.types.verticalProgram.uuid
 	
 	<!-- Internationalization -->
 	<!-- All message codes should start with @MODULE_ID@.* -->
