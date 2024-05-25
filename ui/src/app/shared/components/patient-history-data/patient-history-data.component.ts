@@ -243,6 +243,8 @@ export class PatientHistoryDataComponent implements OnInit {
       this.specificDrugConceptUuid,
       this.prescriptionArrangementFields
     );
+    console.log("visitHistory?.visitOrderedData ..........................");
+    console.log(this.visitHistory?.visitOrderedData);
   }
 
   onPrint(e: any, visitData: any): void {
