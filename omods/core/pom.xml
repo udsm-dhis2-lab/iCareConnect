@@ -58,9 +58,19 @@
 	<repositories>
 		<repository>
 			<id>openmrs-repo</id>
-			<name>OpenMRS Nexus Repository</name>
-			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+			<url>https://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
+<!--		<repository>-->
+<!--			<id>openmrs-repo</id>-->
+<!--			<name>OpenMRS Nexus Repository</name>-->
+<!--			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/public</url>-->
+<!--		</repository>-->
 		<repository>
 			<id>central</id>
 			<name>Maven Repository Switchboard</name>
