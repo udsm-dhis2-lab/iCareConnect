@@ -1,7 +1,9 @@
 package org.openmrs.module.icare.billing.services.payment.gepg;
 
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.Collections;
 
 @Service
@@ -54,14 +56,15 @@ public class GEPGService {
 		RestTemplate restTemplate = new RestTemplate();
 	
 		// Generate signature
-		String signature = "";
+		String signature = "H1L8loLjkPsQ2BVueqcVX/KVYH7F7kym1TJ448Pi0jye2ACidAikTVwBJb9UYvW7XaLlftTD3m4/dDuvi5mRoemIjO6rizuwI1TWoWst9b1P8BpthKObnofVKwPVKnD6v2GLpfbXwtoiRSuajvkiyJnSCrqsQvtmBmL8ACV3pls5eesYxppsszXEtV/VfilMePOJhfGsIma64baM7sJ8q7LHyujjWT3094Df5oYZEbMDXOPjykCm63vjsEdrrT0A+vz+N7LblmTdHBhtHar52OJmbpNZkbVq/0ZsL1IbX0Wc7SrlU6cWaNuOt0CRJ3bqNnSe8RlO746zkUJtXerYdg==";
 	
 		// Add authentication headers
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.set("Authorization", "Bearer " + apiKey);
 		headers.set("Signature", signature);
-	
+	   System.out.println("request payload here .........................");
+       System.out.println(request);
 		// Create HTTP entity with payload and headers
 		HttpEntity<BillSubmissionRequest> entity = new HttpEntity<>(request, headers);
 	
