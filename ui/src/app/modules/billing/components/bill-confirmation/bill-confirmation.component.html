@@ -89,6 +89,18 @@
       {{ generatingControlNumber ? "Generating..." : "Get Control number" }}
     </button>
     <button
+    *ngIf="params?.gepgConceptField && data?.paymentType?.code === 'GePG'"
+      data-test="generate-control-number-button"
+      [disabled]="false"
+      class = "mr-4"
+      mat-flat-button
+      color=""
+      (click)="onGepgConfirmation($event)"
+      cdkFocusInitial
+    >
+      Print <mat-icon>print</mat-icon>
+    </button>
+    <!-- <button
       *ngIf="params?.gepgConceptField && data?.paymentType?.code === 'GePG'"
       data-test="generate-control-number-button"
       [disabled]="!controlNumber"
@@ -99,7 +111,7 @@
       cdkFocusInitial
     >
       Confirm Payment
-    </button>
+    </button> -->
     
     <app-print-button *ngIf="!params?.gepgConceptField && data?.paymentType?.code === 'GePG' && controlNumber" [iconName]="'print'" [toolTipText]="'Click to print control number'" [showText]="'Print Control Number'"
       [classesList]="['float-right', 'button', 'mr-5']"
