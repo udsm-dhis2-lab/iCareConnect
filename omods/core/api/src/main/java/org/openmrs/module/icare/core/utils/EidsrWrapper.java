@@ -47,7 +47,6 @@ public class EidsrWrapper {
                         caseData.put(mappingObject.getString("valueKey"), mappingObject.getString("defaultValue"));
                     }
                 }
-
             }
             casesData.add(caseData);
             data.put("cases", casesData);
