@@ -2,7 +2,6 @@ package org.openmrs.module.icare.web.controller;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -13,45 +12,44 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class GepgBillingControllerTest {
+	
+	@Mock
+	private GEPGService gepgService;
+	
+	@InjectMocks
+	private GepgBillingController controller;
+	
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+	}
+   
 
-    @Mock
-    private GEPGService gepgService;
-
-    @InjectMocks
-    private GepgBillingController controller;
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this); 
-    }
-
-    @Test
+	
+	  @Test
     public void testSubmitBill_withValidUuid_returnsSuccess() {
-        // Arrange
         Map<String, String> payload = new HashMap<>();
         payload.put("uuid", "7a4fc84b-ae30-4cf1-b43a-59d102b6898e");
 
         BillSubmissionRequest request = new BillSubmissionRequest();
         when(gepgService.createBillSubmissionRequest("7a4fc84b-ae30-4cf1-b43a-59d102b6898e")).thenReturn(request);
         when(gepgService.submitBillRequest(request)).thenReturn("Success");
-
-        // Act
+       
         String response = controller.submitBill(payload);
-
-        // Assert
+        
         assertEquals("Success", response);
 
-        // Verify that the methods were called with the correct parameters
         verify(gepgService).createBillSubmissionRequest("7a4fc84b-ae30-4cf1-b43a-59d102b6898e");
         verify(gepgService).submitBillRequest(request);
     }
-
-    @Test
+	
+	@Test
     public void testSubmitBill_withEmptyUuid_returnsErrorMessage() {
-        // Arrange
         Map<String, String> payload = new HashMap<>();
         payload.put("uuid", "");
 
@@ -65,8 +63,8 @@ public class GepgBillingControllerTest {
         verify(gepgService, never()).createBillSubmissionRequest(anyString());
         verify(gepgService, never()).submitBillRequest(any(BillSubmissionRequest.class));
     }
-
-    @Test
+	
+	@Test
     public void testSubmitBill_withNullUuid_returnsErrorMessage() {
         // Arrange
         Map<String, String> payload = new HashMap<>();
