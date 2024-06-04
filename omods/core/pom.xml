@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.openmrs.maven.parents</groupId>
-        <artifactId>maven-parent-openmrs-module</artifactId>
-        <version>1.1.1</version>
+    <groupId>org.openmrs.maven.parents</groupId>
+    <artifactId>maven-parent-openmrs-module</artifactId>
+    <version>1.1.0</version>
     </parent>
 
 	<groupId>com.icare.module</groupId>
@@ -93,4 +93,5 @@
         <openmrsPlatformVersion>2.2.0</openmrsPlatformVersion>
 		<wsrestVersion>2.17</wsrestVersion>
     </properties>
+	
 </project>
