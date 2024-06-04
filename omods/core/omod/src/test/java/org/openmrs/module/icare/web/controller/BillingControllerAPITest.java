@@ -12,9 +12,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.openmrs.ConceptComplex;
-import org.openmrs.Patient;
-import org.openmrs.Visit;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.*;
@@ -283,7 +280,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	//@Ignore
 	public void testDViewingPayments() throws Exception {
-			
+		
 		//Given
 		PatientService patientService = Context.getService(PatientService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
