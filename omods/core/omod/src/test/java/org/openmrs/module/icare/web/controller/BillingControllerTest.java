@@ -61,7 +61,7 @@ public class BillingControllerTest {
 	@Test
 	//@DisplayName("Creating an invoice")
 	public void testFetchingPatientPayments() {
-
+		
 		//Given
 		when(billingService.getPatientPayments("")).thenReturn(new ArrayList<Payment>());
 		

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -11,6 +12,7 @@
     <packaging>jar</packaging>
     <name>ICare OMOD</name>
     <description>Omod submodule for ICare</description>
+
     <dependencies>
         <dependency>
             <groupId>com.icare.module</groupId>
@@ -23,12 +25,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.fasterxml.jackson.core</groupId>-->
-<!--            <artifactId>jackson-databind</artifactId>-->
-<!--            <version>2.11.2</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -69,8 +65,8 @@
         <dependency>
             <groupId>org.openmrs.module</groupId>
             <artifactId>webservices.rest-omod-common</artifactId>
+            <version>2.17</version>
         </dependency>
-
         <dependency>
             <groupId>org.openmrs.api</groupId>
             <artifactId>openmrs-api</artifactId>
@@ -96,12 +92,42 @@
             <version>6.0.18</version>
             <scope>test</scope>
         </dependency>
+       
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>4.1.4.RELEASE</version>
-            <scope>test</scope>
-        </dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-web</artifactId>
+    <version>4.1.4.RELEASE</version>
+    <scope>test</scope>
+     </dependency>
+         <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <version>1.5.22.RELEASE</version> 
+    </dependency>
+<dependency>
+    <groupId>com.googlecode.maven-java-formatter-plugin</groupId>
+    <artifactId>maven-java-formatter-plugin</artifactId>
+    <version>0.4</version>
+</dependency>
+
+    <!-- Spring Web dependency -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-web</artifactId>
+        <version>5.3.9</version> <!-- Make sure to use the version compatible with your Spring setup -->
+    </dependency>
+    <!-- Spring Web MVC dependency -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>5.3.9</version>
+    </dependency>
+<dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <scope>test</scope>
+    </dependency>
+
     </dependencies>
 
     <build>
@@ -111,20 +137,29 @@
             <plugin>
                 <groupId>org.openmrs.maven.plugins</groupId>
                 <artifactId>maven-openmrs-plugin</artifactId>
+                <version>1.0.1</version> 
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.2</version> 
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version> 
                 <configuration>
-                    <source>7</source>
-                    <target>7</target>
+                    <source>8</source> 
+                    <target>8</target>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>openmrs-repo</id>
+            <url>https://mavenrepo.openmrs.org/nexus/content/repositories/public</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>
