@@ -8,14 +8,17 @@ import java.util.Collections;
 
 @Service
 public class GEPGService {
-
-    public BillSubmissionRequest createBillSubmissionRequest(String uuid) {
-        System.out.println("Generating Bill Submission request...");
-
+	
+	public  BillSubmissionRequest createBillSubmissionRequest(String uuid) {
+        System.out.println("Received UUID on Submission Request: " + uuid);
+        System.out.println("Generating Bill Submission request.........................");
+    
+        // Create and populate BillHdr
         BillHdr billHdr = new BillHdr();
         billHdr.setSpCode("SP111");
         billHdr.setRtrRespFlg("true");
-
+    
+        // Create and populate BillTrxInf
         BillTrxInf billTrxInf = new BillTrxInf();
         billTrxInf.setBillId("123456222");
         billTrxInf.setSubSpCode("7001");
@@ -35,22 +38,26 @@ public class GEPGService {
         billTrxInf.setBillEqvAmt("30000");
         billTrxInf.setRemFlag("false");
         billTrxInf.setBillPayOpt("3");
-
+    
+        // Create and populate BillItems
         BillItems billItems = new BillItems();
         billItems.getBillItem().add(new BillItem("FRRR40", "N", "30000", "30000", "0", "140313"));
         billItems.getBillItem().add(new BillItem("11", "N", "5000", "5000", "0.0", "140371"));
-
+    
+        // Set BillItems to BillTrxInf
         billTrxInf.setBillItems(billItems);
-
-        BillSubmissionRequest request = new BillSubmissionRequest();
-        request.setBillHdr(billHdr);
-        request.setBillTrxInf(billTrxInf);
-
-        System.out.println("Generated BillSubmissionRequest: " + request);
-        return request;
+    
+        // Create and populate BillSubmissionRequest
+        BillSubmissionRequest billRequest = new BillSubmissionRequest();
+        billRequest.setBillHdr(billHdr);
+        billRequest.setBillTrxInf(billTrxInf);
+    
+        System.out.println("BillSubmissionRequest created in mock: " + billRequest);
+        return billRequest;
     }
-
-    public String submitBillRequest(BillSubmissionRequest request) {
+    
+	
+	public String submitBillRequest(BillSubmissionRequest request) {
         String apiUrl = "https://api-testengine.udsm.ac.tz/index.php?r=api/service";
         String apiKey = ""; 
         String secretKey = ""; 
