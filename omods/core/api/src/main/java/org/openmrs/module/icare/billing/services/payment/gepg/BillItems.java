@@ -1,24 +1,23 @@
 package org.openmrs.module.icare.billing.services.payment.gepg;
 
 import java.util.ArrayList;
+import java.util.List;
 
-class BillItems {
-    ArrayList<BillItem> BillItem = new ArrayList<>();
+public class BillItems {
+    private List<BillItem> BillItem = new ArrayList<>();
 
-    // Getter Methods
-    public ArrayList<BillItem> getBillItem() {
+    // Getter Method
+    public List<BillItem> getBillItem() {
         return BillItem;
     }
 
-    // Setter Methods
-    public void setBillItem(ArrayList<BillItem> billItem) {
-        this.BillItem = billItem;
+    // Setter Method
+    public void setBillItem(List<BillItem> BillItem) {
+        this.BillItem = BillItem;
     }
 
     @Override
     public String toString() {
-        return "BillItems{" +
-                "BillItem=" + BillItem +
-                '}';
+        return "BillItems{" + "BillItem=" + BillItem + '}';
     }
 }
