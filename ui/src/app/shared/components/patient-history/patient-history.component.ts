@@ -1,12 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Inject,
-  Input,
-  OnInit,
-  Output,
-  ViewChild,
-} from "@angular/core";
+import { Component, EventEmitter, Inject, Input, OnInit, Output, ViewChild } from "@angular/core";
 import { Observable } from "rxjs";
 import { map, switchMap, tap } from "rxjs/operators";
 import { VisitsService } from "../../resources/visits/services/visits.service";
@@ -20,10 +12,7 @@ import {
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { getParentLocation } from "src/app/store/selectors";
-import {
-  getCurrentUserDetails,
-  getProviderDetails,
-} from "src/app/store/selectors/current-user.selectors";
+import { getCurrentUserDetails, getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 import {
   PersonGetRef,
   PrivilegeGetRef,
@@ -35,6 +24,7 @@ import { ICARE_CONFIG } from "../../resources/config";
 import { PatientHistoryDataComponent } from "../patient-history-data/patient-history-data.component";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { ObservationService } from "../../resources/observation/services";
+
 
 @Component({
   selector: "app-patient-history",
@@ -67,6 +57,7 @@ export class PatientHistoryComponent implements OnInit {
     username?: string;
     systemId?: string;
     userProperties?: object;
+    
 
     // person?: PersonGetRef;
     // privileges?: PrivilegeGetRef[];
@@ -74,21 +65,24 @@ export class PatientHistoryComponent implements OnInit {
     provider?: { uuid?: string; display?: string };
   }>;
   provider$: Observable<any>;
-
+  
+  
   doctorsIPDRoundForm$: Observable<any>;
   constructor(
     private visitsService: VisitsService,
     private store: Store<AppState>,
     private systemSettingsService: SystemSettingsService,
     private observationService: ObservationService
-  ) {}
+
+  ) { }
 
   ngOnInit(): void {
-    console.log(this.patient);
+    console.log(this.patient)
     this.loadData();
   }
 
-  private loadData(): void {
+
+  private loadData(): void{
     this.loadingData = true;
     this.customForms$ = this.store.select(getAllForms);
     this.facilityDetails$ = this.store.select(getParentLocation);
@@ -188,60 +182,59 @@ export class PatientHistoryComponent implements OnInit {
         })
       );
 
-    this.getIPDRoundDoctorsForm();
+      this.getIPDRoundDoctorsForm(); 
+    
   }
 
   getIPDRoundDoctorsForm(): void {
     this.systemSettingsService
-      .getSystemSettingsByKey("iCare.forms.doctorsIPDRound.uuid")
-      .subscribe((doctorsIPDRoundFormUuid: string) => {
-        if (doctorsIPDRoundFormUuid) {
-          this.store.dispatch(
-            loadCustomOpenMRSForm({ formUuid: doctorsIPDRoundFormUuid })
-          );
-          this.doctorsIPDRoundForm$ = this.store.select(
-            getCustomOpenMRSFormById(doctorsIPDRoundFormUuid)
-          );
-        }
-      });
+    .getSystemSettingsByKey('iCare.forms.doctorsIPDRound.uuid').subscribe((doctorsIPDRoundFormUuid: string) => {
+      if (doctorsIPDRoundFormUuid) {
+        this.store.dispatch(loadCustomOpenMRSForm({formUuid: doctorsIPDRoundFormUuid}));
+        this.doctorsIPDRoundForm$ = this.store.select(getCustomOpenMRSFormById(doctorsIPDRoundFormUuid));
+      }
+    })
   }
 
   onDoctorsIPDRoundCommentsFormUpdate(formValue: FormValue): void {
-    console.log(formValue.getValues());
-    this.formData = formValue.getValues();
+    console.log(formValue.getValues())
+    this.formData = formValue.getValues(); 
   }
 
-  onSave(event: Event, form: any, provider: any, visit: any): void {
-    event.stopPropagation();
-    const obs = Object.keys(this.formData).map((key: string) => {
-      return {
-        concept: key,
-        value: this.formData[key]?.value,
-      };
-    });
-    let encounterObject = {
-      patient: this.patient?.uuid,
-      encounterType: form?.encounterType?.uuid,
-      location: this.location?.uuid,
-      encounterProviders: [
-        {
-          provider: provider?.uuid,
-          encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
-        },
-      ],
-      visit: visit?.uuid,
-      obs: obs,
-      form: {
-        uuid: form?.uuid,
+onSave(event: Event, form: any, provider: any, visit: any): void {
+  event.stopPropagation();
+  const obs = Object.keys(this.formData).map((key: string) => {
+    return {
+      concept: key,
+      value: this.formData[key]?.value
+    }
+  })
+  let encounterObject = {
+    patient: this.patient?.uuid,
+    encounterType: form?.encounterType?.uuid,
+    location: this.location?.uuid,
+    encounterProviders: [
+      {
+        provider: provider?.uuid,
+        encounterRole: ICARE_CONFIG?.encounterRole?.uuid,
       },
-    };
+    ],
+    visit: visit?.uuid,
+    obs: obs,
+    form: {
+      uuid: form?.uuid,
+    },
+  };
 
-    this.observationService
+  this.observationService
       .saveEncounterWithObsDetails(encounterObject)
       .subscribe((res) => {
         if (res) {
           this.loadData();
         }
-      });
-  }
+})
+
+}
+
+
 }
