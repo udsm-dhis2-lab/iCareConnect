@@ -1,16 +1,15 @@
 package org.openmrs.module.icare.web.controller;
 
 import org.openmrs.module.icare.billing.services.payment.gepg.GEPGService;
-import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.openmrs.module.icare.billing.services.payment.gepg.BillSubmissionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/" + RestConstants.VERSION_1 + "/gepg")
+@RequestMapping("/api/gepg")
 public class GepgBillingController {
 	
 	@Autowired
@@ -23,13 +22,20 @@ public class GepgBillingController {
 		if (uuid == null || uuid.isEmpty()) {
 			return "UUID is required";
 		}
-		System.out.println("sent payload ..........................."+payload);
-		BillSubmissionRequest billSubmissionRequest = new BillSubmissionRequest();
-		billSubmissionRequest.createBillSubmissionRequest(uuid);
-		System.out.println("Generated BillSubmissionRequest: " + billSubmissionRequest.createBillSubmissionRequest(uuid));
+		System.out.println("sent payload ..........................." + payload);
 		
-		String response = gepgbillService.submitBillRequest(billSubmissionRequest);
+		String jsonPayload = null;
 		
-		return response;
+		try {
+            BillSubmissionRequest billRequest = BillSubmissionRequest.createBillSubmissionRequest(uuid);
+            jsonPayload = billRequest.toJson();
+            System.out.println(jsonPayload);
+			System.out.println("Generated BillSubmissionRequest: " + jsonPayload);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+			return "Error generating JSON payload";
+        }
+		
+		return jsonPayload;
 	}
 }
