@@ -4,20 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BillItems {
-    private List<BillItem> BillItem = new ArrayList<>();
+    private List<BillItem> billItem = new ArrayList<>();
 
-    // Getter Method
+    // Getters and setters
     public List<BillItem> getBillItem() {
-        return BillItem;
+        return billItem;
     }
 
-    // Setter Method
-    public void setBillItem(List<BillItem> BillItem) {
-        this.BillItem = BillItem;
-    }
-
-    @Override
-    public String toString() {
-        return "BillItems{" + "BillItem=" + BillItem + '}';
+    public void setBillItem(List<BillItem> billItem) {
+        this.billItem = billItem;
     }
 }
