@@ -37,14 +37,7 @@ public class GepgBillingControllerTest {
         String response = controller.submitBill(payload);
         // assertEquals("Success", response);
 
-        // BillSubmissionRequest request = new BillSubmissionRequest();
-        // // Mock the service methods
-        // when(gepgService.createBillSubmissionRequest("7a4fc84b-ae30-4cf1-b43a-59d102b6898e")).thenReturn(request);
-        // when(gepgService.submitBillRequest(request)).thenReturn("Success");
-
-        // // Verify interactions
-        // verify(gepgService, times(1)).createBillSubmissionRequest("7a4fc84b-ae30-4cf1-b43a-59d102b6898e");
-        // verify(gepgService, times(1)).submitBillRequest(request);
+    
     }
 	
 	@Test
