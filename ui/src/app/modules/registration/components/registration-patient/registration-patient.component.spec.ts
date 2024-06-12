@@ -8,7 +8,7 @@ import { OpenmrsHttpClientService } from 'src/app/shared/modules/openmrs-http-cl
 import { provideMockStore } from '@ngrx/store/testing';
 
 describe('RegistrationPatientComponent', () => {
-  let component: RegistrationPatientComponent;
+  let component: RegistrationPatientComponent;ßßßßßß
   let fixture: ComponentFixture<RegistrationPatientComponent>;
 
   beforeEach(async () => {
