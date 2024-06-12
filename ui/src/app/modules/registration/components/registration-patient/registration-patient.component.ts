@@ -7,7 +7,7 @@ import * as _ from "lodash";
 import { Observable } from "rxjs";
 import { patientObj } from "src/app/shared/models/patient";
 import { VisitsService } from "src/app/shared/resources/visits/services";
-import {
+import {map} from "src/app/shared/resources/visits/services";
   getCurrentPatient,
   getCurrentPatientState,
 } from "src/app/store/selectors/current-patient.selectors";
