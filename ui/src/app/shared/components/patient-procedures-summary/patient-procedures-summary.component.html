@@ -47,6 +47,22 @@
             </td>
             <td>
               {{ procedure?.dateActivated | date: "medium" }}
+              <button
+                  [disabled]="
+                    params?.observationsKeyedByConcepts &&
+                    params?.observationsKeyedByConcepts[
+                      procedure?.concept?.uuid + '-' + procedure?.uuid
+                    ] &&
+                    params?.observationsKeyedByConcepts[
+                      procedure?.concept?.uuid + '-' + procedure?.uuid
+                    ]?.latest?.valueObject?.display === 'True'
+                  "
+                  (click)="onDeleteProcedure($event, procedure)"
+                >
+                  <mat-icon>delete</mat-icon>
+                  <span>Delete</span>
+                </button>
+
             </td>
             <td>
               <span
@@ -99,24 +115,8 @@
               >
                 <mat-icon>more_vert</mat-icon>
               </button>
-              <mat-menu #menu="matMenu">
-                <button
-                  [disabled]="
-                    params?.observationsKeyedByConcepts &&
-                    params?.observationsKeyedByConcepts[
-                      procedure?.concept?.uuid + '-' + procedure?.uuid
-                    ] &&
-                    params?.observationsKeyedByConcepts[
-                      procedure?.concept?.uuid + '-' + procedure?.uuid
-                    ]?.latest?.valueObject?.display === 'True'
-                  "
-                  mat-menu-item
-                  (click)="onDeleteProcedure($event, procedure)"
-                >
-                  <mat-icon>delete</mat-icon>
-                  <span>Delete</span>
-                </button>
-              </mat-menu>
+             <mat-menu #menu="matMenu">
+             </mat-menu> 
             </td>
           </tr>
         </ng-container>
