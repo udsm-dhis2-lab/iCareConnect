@@ -228,6 +228,28 @@
                     (confirmPayment)="onConfirmBillPayment($event)"
                   >
                   </app-quotations>
+                   <div class="row mt-3">
+                    <div class="col-12">
+                      <div *ngIf="patientBillingDetails.pendingPayments.length > 0">
+                        <app-print-button
+                          [iconName]="'print'"
+                          [toolTipText]="'Click to print invoice'"
+                          [showText]="'Print This Invoice'"
+                          [classesList]="['float-right', 'button', 'mr-5']"
+                          [ElementToBePrinted]="{
+                            Bill: patientBillingDetails.pendingPayments,
+                            CurrentPatient: params?.currentPatient,
+                            FacilityDetails: params?.facilityDetails,
+                            Logo: params?.logo
+                          }"
+                          [currentPatient]="params?.currentPatient"
+                          [facilityDetails]="params?.facilityDetails"
+                          [logo]="params?.logo"
+                          (print)="onPrint($event)"
+                        ></app-print-button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </mat-tab>
 
