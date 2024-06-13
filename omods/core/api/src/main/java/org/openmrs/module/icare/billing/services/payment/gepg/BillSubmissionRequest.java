@@ -2,10 +2,24 @@ package org.openmrs.module.icare.billing.services.payment.gepg;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.openmrs.module.icare.billing.models.Invoice;
+import org.openmrs.module.icare.billing.services.BillingService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BillSubmissionRequest {
 	
+	@Autowired
+	BillingService billingService;
 	@JsonProperty("SystemAuth")
 	private SystemAuth systemAuth;
 	
@@ -48,10 +62,18 @@ public class BillSubmissionRequest {
 	}
 	
 	// Utility method to create BillSubmissionRequest
-	public static BillSubmissionRequest createBillSubmissionRequest(String uuid) {
-		System.out.println("Received UUID on Submission Request: " + uuid);
-		System.out.println("Generating Bill Submission request.........................");
-		
+	public BillSubmissionRequest createGepgPayloadRequest(String uuid, List<Map<String, String>> selectedBills, Integer totalBill) {
+
+        System.out.println("Received UUID on Submission Request: " + uuid + selectedBills + totalBill);
+		if (uuid != null) {
+			List<Invoice> invoices = billingService.getPatientsInvoices(uuid);
+		List<Map<String, Object>> invoiceMaps = new ArrayList<Map<String, Object>>();
+		for (Invoice invoice : invoices) {
+			invoiceMaps.add(invoice.toMap());
+		}
+		  System.out.println("client invoice ----------------------->"+ invoiceMaps);
+		}
+
 		// Create and populate BillHdr
 		BillHdr billHdr = new BillHdr();
 		billHdr.setSpCode("SP111");
@@ -68,7 +90,10 @@ public class BillSubmissionRequest {
 		billTrxInf.setPyrId("40");
 		billTrxInf.setPyrName("PATRICK PASCHAL");
 		billTrxInf.setBillDesc("Application Fees Payment");
-		billTrxInf.setBillGenDt("2018-05-10T07:09:34");
+		LocalDateTime now = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+		String formattedNow = now.format(formatter);
+		billTrxInf.setBillGenDt(formattedNow);
 		billTrxInf.setBillGenBy("40");
 		billTrxInf.setBillApprBy("PATRICK PASCHAL");
 		billTrxInf.setPyrCellNum("0767454012");
@@ -102,8 +127,8 @@ public class BillSubmissionRequest {
 		BillSubmissionRequest billRequest = new BillSubmissionRequest();
 		billRequest.setSystemAuth(systemAuth);
 		billRequest.setRequestData(requestData);
-		
-		System.out.println("billRequest Payload: " + billRequest);
 		return billRequest;
+
 	}
+
 }
