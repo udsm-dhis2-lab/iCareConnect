@@ -7,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class GEPGService {
 
-    public String submitBillRequest(String jsonPayload) {
+    public String submitGepgRequest(String jsonPayload) {
 		System.out.println("on submit here ....................");
         String apiUrl = "https://api-testengine.udsm.ac.tz/index.php?r=api/service";
         String apiKey = ""; 
