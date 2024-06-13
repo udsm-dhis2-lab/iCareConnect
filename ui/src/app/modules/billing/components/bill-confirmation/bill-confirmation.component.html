@@ -100,7 +100,7 @@
     >
       Print <mat-icon>print</mat-icon>
     </button>
-    <!-- <button
+    <button
       *ngIf="params?.gepgConceptField && data?.paymentType?.code === 'GePG'"
       data-test="generate-control-number-button"
       [disabled]="!controlNumber"
@@ -111,7 +111,7 @@
       cdkFocusInitial
     >
       Confirm Payment
-    </button> -->
+    </button>
     
     <app-print-button *ngIf="!params?.gepgConceptField && data?.paymentType?.code === 'GePG' && controlNumber" [iconName]="'print'" [toolTipText]="'Click to print control number'" [showText]="'Print Control Number'"
       [classesList]="['float-right', 'button', 'mr-5']"
