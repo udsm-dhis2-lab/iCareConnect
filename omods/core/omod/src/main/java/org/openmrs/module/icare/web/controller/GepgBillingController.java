@@ -38,7 +38,7 @@ public class GepgBillingController {
             // Call the non-static method on the instance
             jsonPayload = billRequest.toJson();
             System.out.println("Generated BillSubmissionRequest: " + jsonPayload);
-            response = gepgbillService.submitBillRequest(jsonPayload);
+            response = gepgbillService.submitGepgRequest(jsonPayload);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
 			return "Error generating JSON payload";
