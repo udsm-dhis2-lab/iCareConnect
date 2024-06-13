@@ -35,7 +35,6 @@ export class BillConfirmationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.requestControlNumber(this.data?.billItems);
     this.gepgConceptField$ = this.conceptService.getConceptDetailsByUuid(
       this.data?.gepgConceptUuid
     );
@@ -48,6 +47,13 @@ export class BillConfirmationComponent implements OnInit {
         ? this.data?.logo?.results[0]?.value
         : null;
 
+    const gepgrequestpayload = {
+      selectedbills: this.data.billItems.map((item: any) => ({ bill: item.bill })),
+      uuid: this.data.currentPatient.patient.uuid,
+      totalBill: this.data.totalPayableBill
+    };
+  
+    console.log("Formatted payload:", gepgrequestpayload);
     this.currentUser = this.store.select(getCurrentUserDetails).subscribe({
       next: (currentUser) => {
         return currentUser;
@@ -62,58 +68,7 @@ export class BillConfirmationComponent implements OnInit {
   get controlNumberValue(): string {
     return `GEPG_MNL: ${this.controlNumber}`;
   }
-  requestControlNumber(items: any): void {
-    console.log(items); 
-    const currentDate = new Date().toISOString()
-    // Mapping the received items to the payload
-    const payload = {
-      "SystemAuth": {
-          "SystemCode": "90019",
-          "ServiceCode": "1001",
-          "Signature":"",
-      },
-      "RequestData": {
-          "RequestId": "6474647FD8484909",
-          "BillHdr": {
-              "SpCode": "SP111",
-              "RtrRespFlg": "true"
-          },
-          "BillTrxInf": {
-              "BillId": "123456222",
-              "SubSpCode": "7001",
-              "SpSysId": "LHGSE001",
-              "BillAmt": "30000",
-              "MiscAmt": "0",
-              "BillExprDt": "2018-08-08T07:09:34",
-              "PyrId": "40",
-              "PyrName": "PATRICK PASCHAL",
-              "BillDesc": "Application Fees Payment",
-              "BillGenDt": currentDate, 
-              "BillGenBy": "40",
-              "BillApprBy": "PATRICK PASCHAL",
-              "PyrCellNum": "0767454012",
-              "PyrEmail": "patrickkalu199@gmail.com",
-              "Ccy": "TZS",
-              "BillEqvAmt": "30000",
-              "RemFlag": "false",
-              "BillPayOpt": "3",
-              "BillItems": {
-                  "BillItem": items.map((item: any) => ({
-                      "BillItemRef": item.billItem.item.concept.uuid,
-                      "UseItemRefOnPay": "N",
-                      "BillItemAmt": item.billItem.price.toString(),
-                      "BillItemEqvAmt": item.billItem.price.toString(),
-                      "BillItemMiscAmt": "0",
-                      "GfsCode": "140313"
-                  }))
-              }
-          }
-      }
-  };
-
-
-    console.log(payload); 
-}
+ 
 
 
   onFormUpdate(formValues: FormValue): void {
