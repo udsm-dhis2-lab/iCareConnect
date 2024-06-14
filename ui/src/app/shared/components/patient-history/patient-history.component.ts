@@ -239,6 +239,9 @@ export class PatientHistoryComponent implements OnInit {
     this.observationService
       .saveEncounterWithObsDetails(encounterObject)
       .subscribe((res) => {
+        //console.log(encounterObject.obs[0].value);
+        console.log(encounterObject);
+
         if (res) {
           this.loadData();
         }

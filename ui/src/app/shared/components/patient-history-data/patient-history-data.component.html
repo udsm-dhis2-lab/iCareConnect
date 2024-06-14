@@ -649,13 +649,23 @@
       </p>
     </li>
     <li
-      class="event"
+      class="mini-event"
       [attr.data-date]="[visitHistory?.visitStartDateTime?.date]"
     >
       <p>
         <strong> Started new visit </strong>
         <i *ngIf="visitHistory?.visitStartDateTime?.time" class="text-small">
           at {{ visitHistory?.visitStartDateTime?.time }}
+        </i>
+      </p>
+    </li>
+
+    <hr />
+    <li class="mini-event">
+      <p>
+        <strong> Comment </strong> <br />
+        <i class="text-small">
+          {{ ipdRoundComments }}
         </i>
       </p>
     </li>

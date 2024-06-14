@@ -295,20 +295,1053 @@ export class PrintResultsModalComponent implements OnInit {
     this.currentDepartmentSamples = samplesGroupedByDepartment;
   }
 
-  onPrint(e, samplesGroupedByDepartment, providerDetails): void {
-    e.stopPropagation();
+  // onPrint(
+  //   e: Event,
+  //   samplesGroupedByDepartment: any,
+  //   providerDetails: any
+  // ): void {
+  //   e.stopPropagation();
 
-    // const doc = new jsPDF();
-    // doc.text('MRN: ' + this.samples['samples'][0]['mrNo'], 20, 20);
-    // _.each(this.samples['samples'], (sample) => {
-    //   _.ech(sample?.orders, (order, index) => {
-    //     doc.text(order?.orderNumber, 40, 40);
-    //     doc.text(order?.concept?.display, 40, 40);
-    //     doc.text(order?.result, 40, 40);
-    //     doc.text(order?.remarks, 40, 40);
-    //   });
-    // });
-    // doc.save('results_for' + this.samples['samples'][0]['mrNo'] + '.pdf');
+  //   const data = samplesGroupedByDepartment?.samples?.map((sample) => {
+  //     return {
+  //       sample: {
+  //         uuid: sample?.uuid,
+  //       },
+  //       user: {
+  //         uuid: localStorage.getItem("userUuid"),
+  //       },
+  //       remarks: "PRINTED",
+  //       category: "PRINT",
+  //       status: "PRINTED",
+  //     };
+  //   });
+
+  //   this.store.dispatch(
+  //     setSampleStatuses({
+  //       statuses: data,
+  //       details: {
+  //         ...samplesGroupedByDepartment,
+  //         printedBy: {
+  //           uuid: providerDetails?.uuid,
+  //           name: providerDetails?.display,
+  //           display: providerDetails?.display,
+  //         },
+  //       },
+  //     })
+  //   );
+
+  //   setTimeout(() => {
+  //     const elementId = samplesGroupedByDepartment?.departmentName;
+  //     const contents = document.getElementById(elementId)?.innerHTML;
+  //     if (!contents) return;
+
+  //     const iframe: HTMLIFrameElement = document.createElement("iframe");
+  //     iframe.name = "frame3";
+  //     iframe.style.position = "absolute";
+  //     iframe.style.width = "0px";
+  //     iframe.style.height = "0px";
+  //     iframe.style.border = "none";
+  //     iframe.style.top = "-10000px";
+  //     document.body.appendChild(iframe);
+
+  //     const frameDoc = iframe.contentWindow?.document ?? iframe.contentDocument;
+  //     if (!frameDoc) return;
+
+  //     const styleTags = Array.from(
+  //       document.querySelectorAll('style, link[rel="stylesheet"]')
+  //     );
+  //     const clonedStyles = styleTags.map((style) => style.outerHTML).join("\n");
+
+  //     frameDoc.open();
+  //     frameDoc.write(`
+  //       <html>
+  //         <head>
+  //           ${clonedStyles}
+  //           <style>
+  //             button {
+  //               display: none;
+  //             }
+  //             .mat-expansion-panel-body {
+  //               font-size: 0.2rem !important;
+  //             }
+  //             .content table, .providers-details {
+  //               font-size: 0.8rem !important;
+  //             }
+  //             .row-alternated {
+  //               background-color: #f2f2f2;
+  //             }
+  //             th, td {
+  //               text-align: left;
+  //               vertical-align: middle;
+  //               padding: 8px;
+  //               border-bottom: 1px solid #ddd;
+  //               white-space: nowrap;
+  //             }
+  //             th {
+  //               padding: 10px;
+  //               border: 1px solid #ddd;
+  //             }
+  //             .table th, .table td {
+  //               vertical-align: middle;
+  //             }
+  //             .col-md-6, .col-md-3, .col-md-1 {
+  //               display: inline-block;
+  //             }
+  //             .col-md-6 {
+  //               width: 50%;
+  //             }
+  //             .col-md-3 {
+  //               width: 25%;
+  //             }
+  //             .col-md-1 {
+  //               width: 8.33%;
+  //             }
+  //             .table-header {
+  //               display: flex;
+  //               justify-content: space-between;
+  //             }
+  //             .table-header .column {
+  //               flex: 1;
+  //               text-align: center;
+  //             }
+  //             .table-row {
+  //               display: flex;
+  //               justify-content: space-between;
+  //             }
+  //             .table-row .column {
+  //               flex: 1;
+  //               text-align: left;
+  //             }
+  //           </style>
+  //         </head>
+  //         <body>
+  //           <div class="content">
+  //             ${contents}
+  //           </div>
+  //         </body>
+  //       </html>
+  //     `);
+
+  //     frameDoc.close();
+
+  //     setTimeout(() => {
+  //       if (iframe.contentWindow) {
+  //         iframe.contentWindow.focus();
+  //         iframe.contentWindow.print();
+  //         document.body.removeChild(iframe);
+  //       }
+  //     }, 500);
+  //   }, 500);
+  // }
+
+  // onPrint(
+  //   e: Event,
+  //   samplesGroupedByDepartment: any,
+  //   providerDetails: any
+  // ): void {
+  //   e.stopPropagation();
+
+  //   const data = samplesGroupedByDepartment?.samples?.map((sample) => {
+  //     return {
+  //       sample: {
+  //         uuid: sample?.uuid,
+  //       },
+  //       user: {
+  //         uuid: localStorage.getItem("userUuid"),
+  //       },
+  //       remarks: "PRINTED",
+  //       category: "PRINT",
+  //       status: "PRINTED",
+  //     };
+  //   });
+
+  //   this.store.dispatch(
+  //     setSampleStatuses({
+  //       statuses: data,
+  //       details: {
+  //         ...samplesGroupedByDepartment,
+  //         printedBy: {
+  //           uuid: providerDetails?.uuid,
+  //           name: providerDetails?.display,
+  //           display: providerDetails?.display,
+  //         },
+  //       },
+  //     })
+  //   );
+
+  //   setTimeout(() => {
+  //     const elementId = samplesGroupedByDepartment?.departmentName;
+  //     const contents = document.getElementById(elementId)?.innerHTML;
+  //     if (!contents) return;
+
+  //     const iframe: HTMLIFrameElement = document.createElement("iframe");
+  //     iframe.name = "frame3";
+  //     iframe.style.position = "absolute";
+  //     iframe.style.width = "0px";
+  //     iframe.style.height = "0px";
+  //     iframe.style.border = "none";
+  //     iframe.style.top = "-10000px";
+  //     document.body.appendChild(iframe);
+
+  //     const frameDoc = iframe.contentWindow?.document ?? iframe.contentDocument;
+  //     if (!frameDoc) return;
+
+  //     const styleTags = Array.from(
+  //       document.querySelectorAll('style, link[rel="stylesheet"]')
+  //     );
+  //     const clonedStyles = styleTags.map((style) => style.outerHTML).join("\n");
+
+  //     frameDoc.open();
+
+  //     frameDoc.write(`
+  //   <html>
+  //           <head>
+  //               ${clonedStyles}
+  //               <style>
+  //                   button {
+  //                       display: none;
+  //                   }
+  //                   .mat-expansion-panel-body {
+  //                       font-size: 0.2rem !important;
+  //                   }
+  //                   .content table, .providers-details {
+  //                       font-size: 0.8rem !important;
+  //                   }
+  //                   .row-alternated {
+  //                       background-color: #f2f2f2;
+  //                   }
+  //                   .col-md-6, .col-md-3, .col-md-1 {
+  //                       display: block; /* Adjust column display for print */
+  //                       width: auto;
+  //                       padding: 5px;
+  //                       box-sizing: border-box;
+  //                   }
+  //                   .col-md-6 {
+  //                       flex: 1; /* 50% */
+  //                   }
+  //                   .col-md-3 {
+  //                       flex: 0.5; /* 25% */
+  //                   }
+  //                   .col-md-1 {
+  //                       flex: 0.1667; /* 8.33% */
+  //                   }
+  //                   .table-header {
+  //                       display: block;
+  //                       text-align: center;
+  //                   }
+  //                   .table-header .column {
+  //                       text-align: center;
+  //                   }
+  //                   .table-row {
+  //                       display: block;
+  //                       page-break-inside: avoid; /* Prevent page breaks within rows */
+  //                   }
+  //                   .table-row .column {
+  //                       text-align: left;
+  //                   }
+  //                   td {
+  //                       position: relative;
+  //                       max-width: 100%;
+  //                   }
+  //               </style>
+  //           </head>
+  //           <body>
+  //               <div class="content">
+  //                   ${contents}
+  //               </div>
+  //           </body>
+  //           </html>
+  //     `);
+
+  //     frameDoc.close();
+
+  //     setTimeout(() => {
+  //       if (iframe.contentWindow) {
+  //         iframe.contentWindow.focus();
+  //         iframe.contentWindow.print();
+  //         document.body.removeChild(iframe);
+  //       }
+  //     }, 500);
+  //   }, 500);
+  // }
+
+  // onPrint(
+  //   e: Event,
+  //   samplesGroupedByDepartment: any,
+  //   providerDetails: any
+  // ): void {
+  //   e.stopPropagation();
+
+  //   const data = samplesGroupedByDepartment?.samples?.map((sample) => {
+  //     return {
+  //       sample: {
+  //         uuid: sample?.uuid,
+  //       },
+  //       user: {
+  //         uuid: localStorage.getItem("userUuid"),
+  //       },
+  //       remarks: "PRINTED",
+  //       category: "PRINT",
+  //       status: "PRINTED",
+  //     };
+  //   });
+
+  //   this.store.dispatch(
+  //     setSampleStatuses({
+  //       statuses: data,
+  //       details: {
+  //         ...samplesGroupedByDepartment,
+  //         printedBy: {
+  //           uuid: providerDetails?.uuid,
+  //           name: providerDetails?.display,
+  //           display: providerDetails?.display,
+  //         },
+  //       },
+  //     })
+  //   );
+
+  //   setTimeout(() => {
+  //     const elementId = samplesGroupedByDepartment?.departmentName;
+  //     const contents = document.getElementById(elementId)?.innerHTML;
+  //     if (!contents) return;
+
+  //     const iframe: HTMLIFrameElement = document.createElement("iframe");
+  //     iframe.name = "frame3";
+  //     iframe.style.position = "absolute";
+  //     iframe.style.width = "0px";
+  //     iframe.style.height = "0px";
+  //     iframe.style.border = "none";
+  //     iframe.style.top = "-10000px";
+  //     document.body.appendChild(iframe);
+
+  //     const frameDoc = iframe.contentWindow?.document ?? iframe.contentDocument;
+  //     if (!frameDoc) return;
+
+  //     const styleTags = Array.from(
+  //       document.querySelectorAll('style, link[rel="stylesheet"]')
+  //     );
+  //     const clonedStyles = styleTags.map((style) => style.outerHTML).join("\n");
+
+  //     frameDoc.open();
+
+  //     frameDoc.write(`
+  //   <html>
+  //           <head>
+  //               ${clonedStyles}
+  //               <style>
+  //                   button {
+  //                       display: none;
+  //                   }
+  //                   .mat-expansion-panel-body {
+  //                       font-size: 0.2rem !important;
+  //                   }
+  //                   .content table, .providers-details {
+  //                       font-size: 0.8rem !important;
+  //                       width: 100%;
+  //                       border-collapse: collapse;
+  //                   }
+  //                   th, td {
+  //                       border: 1px solid #ddd;
+  //                       padding: 8px;
+  //                       text-align: left;
+  //                   }
+  //                   th {
+  //                       background-color: #f4f4f4;
+  //                       font-weight: bold;
+  //                   }
+  //                   .row-alternated {
+  //                       background-color: #f2f2f2;
+  //                   }
+  //                   .col-md-6, .col-md-3, .col-md-1 {
+  //                       display: block; /* Adjust column display for print */
+  //                       width: auto;
+  //                       padding: 5px;
+  //                       box-sizing: border-box;
+  //                   }
+  //                   .col-md-6 {
+  //                       flex: 1; /* 50% */
+  //                   }
+  //                   .col-md-3 {
+  //                       flex: 0.5; /* 25% */
+  //                   }
+  //                   .col-md-1 {
+  //                       flex: 0.1667; /* 8.33% */
+  //                   }
+  //                   .table-header {
+  //                       display: block;
+  //                       text-align: center;
+  //                   }
+  //                   .table-header .column {
+  //                       text-align: center;
+  //                   }
+  //                   .table-row {
+  //                       display: block;
+  //                       page-break-inside: avoid; /* Prevent page breaks within rows */
+  //                   }
+  //                   .table-row .column {
+  //                       text-align: left;
+  //                   }
+  //                   td {
+  //                       position: relative;
+  //                       max-width: 100%;
+  //                   }
+  //               </style>
+  //           </head>
+  //           <body>
+  //               <div class="content">
+  //                   ${contents}
+  //               </div>
+  //           </body>
+  //           </html>
+  //     `);
+
+  //     frameDoc.close();
+
+  //     setTimeout(() => {
+  //       if (iframe.contentWindow) {
+  //         iframe.contentWindow.focus();
+  //         iframe.contentWindow.print();
+  //         document.body.removeChild(iframe);
+  //       }
+  //     }, 500);
+  //   }, 500);
+  // }
+
+  // onPrint(
+  //   e: Event,
+  //   samplesGroupedByDepartment: any,
+  //   providerDetails: any
+  // ): void {
+  //   e.stopPropagation();
+
+  //   const data = samplesGroupedByDepartment?.samples?.map((sample) => {
+  //     return {
+  //       sample: {
+  //         uuid: sample?.uuid,
+  //       },
+  //       user: {
+  //         uuid: localStorage.getItem("userUuid"),
+  //       },
+  //       remarks: "PRINTED",
+  //       category: "PRINT",
+  //       status: "PRINTED",
+  //     };
+  //   });
+
+  //   this.store.dispatch(
+  //     setSampleStatuses({
+  //       statuses: data,
+  //       details: {
+  //         ...samplesGroupedByDepartment,
+  //         printedBy: {
+  //           uuid: providerDetails?.uuid,
+  //           name: providerDetails?.display,
+  //           display: providerDetails?.display,
+  //         },
+  //       },
+  //     })
+  //   );
+
+  //   setTimeout(() => {
+  //     const elementId = samplesGroupedByDepartment?.departmentName;
+  //     const contents = document.getElementById(elementId)?.innerHTML;
+  //     if (!contents) return;
+
+  //     const iframe: HTMLIFrameElement = document.createElement("iframe");
+  //     iframe.name = "frame3";
+  //     iframe.style.position = "absolute";
+  //     iframe.style.width = "0px";
+  //     iframe.style.height = "0px";
+  //     iframe.style.border = "none";
+  //     iframe.style.top = "-10000px";
+  //     document.body.appendChild(iframe);
+
+  //     const frameDoc = iframe.contentWindow?.document ?? iframe.contentDocument;
+  //     if (!frameDoc) return;
+
+  //     const styleTags = Array.from(
+  //       document.querySelectorAll('style, link[rel="stylesheet"]')
+  //     );
+  //     const clonedStyles = styleTags.map((style) => style.outerHTML).join("\n");
+
+  //     frameDoc.open();
+
+  //     frameDoc.write(`
+  //       <html>
+  //         <head>
+  //           ${clonedStyles}
+  //           <style>
+  //             button {
+  //               display: none;
+  //             }
+  //             .mat-expansion-panel-body {
+  //               font-size: 0.2rem !important;
+  //             }
+  //             .content table, .providers-details {
+  //               font-size: 0.8rem !important;
+  //               width: 100%;
+  //               border-collapse: collapse;
+  //             }
+  //             th, td {
+  //               border: 1px solid #ddd;
+  //               padding: 8px;
+  //               text-align: left;
+  //             }
+  //             th {
+  //               background-color: #f4f4f4;
+  //               font-weight: bold;
+  //             }
+  //             .row-alternated {
+  //               background-color: #f2f2f2;
+  //             }
+  //             .col-md-6, .col-md-3, .col-md-1 {
+  //               display: inline-block;
+  //               padding: 5px;
+  //               box-sizing: border-box;
+  //             }
+  //             .col-md-6 {
+  //               width: 50%;
+  //             }
+  //             .col-md-3 {
+  //               width: 25%;
+  //             }
+  //             .col-md-1 {
+  //               width: 8.33%;
+  //             }
+  //             .table-header {
+  //               display: flex;
+  //               justify-content: space-between;
+  //               text-align: center;
+  //             }
+  //             .table-row {
+  //               display: flex;
+  //               justify-content: space-between;
+  //               page-break-inside: avoid; /* Prevent page breaks within rows */
+  //             }
+  //             td {
+  //               position: relative;
+  //               max-width: 100%;
+  //               text-align: left;
+  //             }
+  //             td::before {
+  //               content: attr(data-tooltip);
+  //               position: absolute;
+  //               left: 0;
+  //               bottom: 100%;
+  //               background: #333;
+  //               color: #fff;
+  //               padding: 5px;
+  //               border-radius: 3px;
+  //               white-space: nowrap;
+  //               opacity: 0;
+  //               visibility: hidden;
+  //               transition: opacity 0.2s;
+  //             }
+  //             td:hover::before {
+  //               opacity: 1;
+  //               visibility: visible;
+  //             }
+  //           </style>
+  //         </head>
+  //         <body>
+  //           <div class="content">
+  //             ${contents}
+  //           </div>
+  //         </body>
+  //       </html>
+  //     `);
+
+  //     frameDoc.close();
+
+  //     setTimeout(() => {
+  //       if (iframe.contentWindow) {
+  //         iframe.contentWindow.focus();
+  //         iframe.contentWindow.print();
+  //         document.body.removeChild(iframe);
+  //       }
+  //     }, 500);
+  //   }, 500);
+  // }
+
+  // onPrint(
+  //   e: Event,
+  //   samplesGroupedByDepartment: any,
+  //   providerDetails: any
+  // ): void {
+  //   e.stopPropagation();
+
+  //   const data = samplesGroupedByDepartment?.samples?.map((sample) => {
+  //     return {
+  //       sample: {
+  //         uuid: sample?.uuid,
+  //       },
+  //       user: {
+  //         uuid: localStorage.getItem("userUuid"),
+  //       },
+  //       remarks: "PRINTED",
+  //       category: "PRINT",
+  //       status: "PRINTED",
+  //     };
+  //   });
+
+  //   this.store.dispatch(
+  //     setSampleStatuses({
+  //       statuses: data,
+  //       details: {
+  //         ...samplesGroupedByDepartment,
+  //         printedBy: {
+  //           uuid: providerDetails?.uuid,
+  //           name: providerDetails?.display,
+  //           display: providerDetails?.display,
+  //         },
+  //       },
+  //     })
+  //   );
+
+  //   setTimeout(() => {
+  //     const elementId = samplesGroupedByDepartment?.departmentName;
+  //     const contents = document.getElementById(elementId)?.innerHTML;
+  //     if (!contents) return;
+
+  //     const iframe: HTMLIFrameElement = document.createElement("iframe");
+  //     iframe.name = "frame3";
+  //     iframe.style.position = "absolute";
+  //     iframe.style.width = "0px";
+  //     iframe.style.height = "0px";
+  //     iframe.style.border = "none";
+  //     iframe.style.top = "-10000px";
+  //     document.body.appendChild(iframe);
+
+  //     const frameDoc = iframe.contentWindow?.document ?? iframe.contentDocument;
+  //     if (!frameDoc) return;
+
+  //     const styleTags = Array.from(
+  //       document.querySelectorAll('style, link[rel="stylesheet"]')
+  //     );
+  //     const clonedStyles = styleTags.map((style) => style.outerHTML).join("\n");
+
+  //     frameDoc.open();
+
+  //     frameDoc.write(`
+  //       <html>
+  //         <head>
+  //           ${clonedStyles}
+  //           <style>
+  //             button {
+  //               display: none;
+  //             }
+  //             .mat-expansion-panel-body {
+  //               font-size: 0.2rem !important;
+  //             }
+  //             .content table, .providers-details {
+  //               font-size: 0.8rem !important;
+  //               width: 100%;
+  //               border-collapse: collapse;
+  //             }
+  //             th, td {
+  //               padding: 8px;
+  //               text-align: left;
+  //             }
+  //             th {
+  //               background-color: #f4f4f4;
+  //               font-weight: bold;
+  //             }
+  //             .row-alternated {
+  //               background-color: #f2f2f2;
+  //             }
+  //             .col-md-6, .col-md-3, .col-md-1 {
+  //               display: table-cell;
+  //               padding: 5px;
+  //               box-sizing: border-box;
+  //             }
+  //             .col-md-6 {
+  //               width: 50%;
+  //               text-align: left;
+  //             }
+  //             .col-md-3 {
+  //               width: 25%;
+  //               text-align: left;
+  //             }
+  //             .col-md-1 {
+  //               width: 8.33%;
+  //               text-align: left;
+  //             }
+  //             .table-header {
+  //               display: table-header-group;
+  //               text-align: center;
+  //             }
+  //             .table-row {
+  //               display: table-row;
+  //               page-break-inside: avoid;
+  //             }
+  //             td {
+  //               position: relative;
+  //               max-width: 100%;
+  //               text-align: left;
+  //             }
+  //             td::before {
+  //               content: attr(data-tooltip);
+  //               position: absolute;
+  //               left: 0;
+  //               bottom: 100%;
+  //               background: #333;
+  //               color: #fff;
+  //               padding: 5px;
+  //               border-radius: 3px;
+  //               white-space: nowrap;
+  //               opacity: 0;
+  //               visibility: hidden;
+  //               transition: opacity 0.2s;
+  //             }
+  //             td:hover::before {
+  //               opacity: 1;
+  //               visibility: visible;
+  //             }
+  //           </style>
+  //         </head>
+  //         <body>
+  //           <div class="content">
+  //             ${contents}
+  //           </div>
+  //         </body>
+  //       </html>
+  //     `);
+
+  //     frameDoc.close();
+
+  //     setTimeout(() => {
+  //       if (iframe.contentWindow) {
+  //         iframe.contentWindow.focus();
+  //         iframe.contentWindow.print();
+  //         document.body.removeChild(iframe);
+  //       }
+  //     }, 500);
+  //   }, 500);
+  // }
+
+  // onPrint(
+  //   e: Event,
+  //   samplesGroupedByDepartment: any,
+  //   providerDetails: any
+  // ): void {
+  //   e.stopPropagation();
+
+  //   const data = samplesGroupedByDepartment?.samples?.map((sample) => {
+  //     return {
+  //       sample: {
+  //         uuid: sample?.uuid,
+  //       },
+  //       user: {
+  //         uuid: localStorage.getItem("userUuid"),
+  //       },
+  //       remarks: "PRINTED",
+  //       category: "PRINT",
+  //       status: "PRINTED",
+  //     };
+  //   });
+
+  //   this.store.dispatch(
+  //     setSampleStatuses({
+  //       statuses: data,
+  //       details: {
+  //         ...samplesGroupedByDepartment,
+  //         printedBy: {
+  //           uuid: providerDetails?.uuid,
+  //           name: providerDetails?.display,
+  //           display: providerDetails?.display,
+  //         },
+  //       },
+  //     })
+  //   );
+
+  //   setTimeout(() => {
+  //     const elementId = samplesGroupedByDepartment?.departmentName;
+  //     const contents = document.getElementById(elementId)?.innerHTML;
+  //     if (!contents) return;
+
+  //     const iframe: HTMLIFrameElement = document.createElement("iframe");
+  //     iframe.name = "frame3";
+  //     iframe.style.position = "absolute";
+  //     iframe.style.width = "0px";
+  //     iframe.style.height = "0px";
+  //     iframe.style.border = "none";
+  //     iframe.style.top = "-10000px";
+  //     document.body.appendChild(iframe);
+
+  //     const frameDoc = iframe.contentWindow?.document ?? iframe.contentDocument;
+  //     if (!frameDoc) return;
+
+  //     const styleTags = Array.from(
+  //       document.querySelectorAll('style, link[rel="stylesheet"]')
+  //     );
+  //     const clonedStyles = styleTags.map((style) => style.outerHTML).join("\n");
+
+  //     frameDoc.open();
+
+  //     frameDoc.write(`
+  //       <html>
+  //         <head>
+  //           ${clonedStyles}
+  //           <style>
+  //             button {
+  //               display: none;
+  //             }
+  //             .mat-expansion-panel-body {
+  //               font-size: 0.2rem !important;
+  //             }
+  //             .content table, .providers-details {
+  //               font-size: 0.8rem !important;
+  //               width: 100%;
+  //               border-collapse: collapse;
+  //             }
+  //             th, td {
+  //               border: 1px solid #ddd;
+  //               padding: 8px;
+  //               text-align: left;
+  //             }
+  //             th {
+  //               background-color: #f4f4f4;
+  //               font-weight: bold;
+  //             }
+  //             .row-alternated {
+  //               background-color: #f2f2f2;
+  //             }
+  //             .table-header {
+  //               text-align: center;
+  //             }
+  //             .table-row {
+  //               page-break-inside: avoid;
+  //             }
+  //             .col-md-6, .col-md-3, .col-md-1 {
+  //               padding: 5px;
+  //               box-sizing: border-box;
+  //             }
+  //             .col-md-6 {
+  //               width: 50%;
+  //             }
+  //             .col-md-3 {
+  //               width: 25%;
+  //             }
+  //             .col-md-1 {
+  //               width: 8.33%;
+  //             }
+  //             .col-md-6, .col-md-3, .col-md-1 {
+  //               display: table-cell;
+  //               text-align: left;
+  //             }
+  //             .table-header {
+  //               display: table-header-group;
+  //             }
+  //             td {
+  //               position: relative;
+  //               max-width: 100%;
+  //               text-align: left;
+  //             }
+  //             td::before {
+  //               content: attr(data-tooltip);
+  //               position: absolute;
+  //               left: 0;
+  //               bottom: 100%;
+  //               background: #333;
+  //               color: #fff;
+  //               padding: 5px;
+  //               border-radius: 3px;
+  //               white-space: nowrap;
+  //               opacity: 0;
+  //               visibility: hidden;
+  //               transition: opacity 0.2s;
+  //             }
+  //             td:hover::before {
+  //               opacity: 1;
+  //               visibility: visible;
+  //             }
+  //           </style>
+  //         </head>
+  //         <body>
+  //           <div class="content">
+  //             ${contents}
+  //           </div>
+  //         </body>
+  //       </html>
+  //     `);
+
+  //     frameDoc.close();
+
+  //     setTimeout(() => {
+  //       if (iframe.contentWindow) {
+  //         iframe.contentWindow.focus();
+  //         iframe.contentWindow.print();
+  //         document.body.removeChild(iframe);
+  //       }
+  //     }, 500);
+  //   }, 500);
+  // }
+
+  // onPrint(
+  //   e: Event,
+  //   samplesGroupedByDepartment: any,
+  //   providerDetails: any
+  // ): void {
+  //   e.stopPropagation();
+
+  //   const data = samplesGroupedByDepartment?.samples?.map((sample) => {
+  //     return {
+  //       sample: {
+  //         uuid: sample?.uuid,
+  //       },
+  //       user: {
+  //         uuid: localStorage.getItem("userUuid"),
+  //       },
+  //       remarks: "PRINTED",
+  //       category: "PRINT",
+  //       status: "PRINTED",
+  //     };
+  //   });
+
+  //   this.store.dispatch(
+  //     setSampleStatuses({
+  //       statuses: data,
+  //       details: {
+  //         ...samplesGroupedByDepartment,
+  //         printedBy: {
+  //           uuid: providerDetails?.uuid,
+  //           name: providerDetails?.display,
+  //           display: providerDetails?.display,
+  //         },
+  //       },
+  //     })
+  //   );
+
+  //   setTimeout(() => {
+  //     const elementId = samplesGroupedByDepartment?.departmentName;
+  //     const contents = document.getElementById(elementId)?.innerHTML;
+  //     if (!contents) return;
+
+  //     const iframe: HTMLIFrameElement = document.createElement("iframe");
+  //     iframe.name = "frame3";
+  //     iframe.style.position = "absolute";
+  //     iframe.style.width = "0px";
+  //     iframe.style.height = "0px";
+  //     iframe.style.border = "none";
+  //     iframe.style.top = "-10000px";
+  //     document.body.appendChild(iframe);
+
+  //     const frameDoc = iframe.contentWindow?.document ?? iframe.contentDocument;
+  //     if (!frameDoc) return;
+
+  //     const styleTags = Array.from(
+  //       document.querySelectorAll('style, link[rel="stylesheet"]')
+  //     );
+  //     const clonedStyles = styleTags.map((style) => style.outerHTML).join("\n");
+
+  //     frameDoc.open();
+
+  //     frameDoc.write(`
+  //     <html>
+  //       <head>
+  //         ${clonedStyles}
+  //         <style>
+  //           button {
+  //             display: none;
+  //           }
+  //           .mat-expansion-panel-body {
+  //             font-size: 0.2rem !important;
+  //           }
+  //           .content table, .providers-details {
+  //             font-size: 0.8rem !important;
+  //             width: 100%;
+  //             border-collapse: collapse;
+  //           }
+  //           th, td {
+  //             border: 1px solid #ddd;
+  //             padding: 10px; /* Increased padding */
+  //             text-align: left;
+  //             vertical-align: middle;
+  //           }
+  //           th {
+  //             background-color: #f4f4f4;
+  //             font-weight: bold;
+  //           }
+  //           .row-alternated {
+  //             background-color: #f2f2f2;
+  //           }
+  //           .table-header {
+  //             text-align: center;
+  //           }
+  //           .table-row {
+  //             page-break-inside: avoid;
+  //           }
+  //           .col-md-5, .col-md-3,.col-md-2, .col-md-1 {
+  //             padding: 4px;
+  //             box-sizing: border-box;
+  //           }
+  //           .col-md-5 {
+  //             width: 41%;
+  //           }
+  //           .col-md-3 {
+  //             width: 21%;
+  //           }
+  //           .col-md-2 {
+  //             width: 21%;
+  //           }
+  //           .col-md-1 {
+  //             width: 8%;
+  //           }
+
+  //           .table-header {
+  //             display: table-header-group;
+  //           }
+  //           td {
+  //             position: relative;
+  //             max-width: 100%;
+  //             text-align: left;
+  //           }
+  //           td::before {
+  //             content: attr(data-tooltip);
+  //             position: absolute;
+  //             left: 0;
+  //             bottom: 100%;
+  //             background: #333;
+  //             color: #fff;
+  //             padding: 5px;
+  //             border-radius: 3px;
+  //             white-space: nowrap;
+  //             opacity: 0;
+  //             visibility: hidden;
+  //             transition: opacity 0.2s;
+  //           }
+  //           td:hover::before {
+  //             opacity: 1;
+  //             visibility: visible;
+  //           }
+  //         </style>
+  //       </head>
+  //       <body>
+  //         <div class="content">
+  //           ${contents}
+  //         </div>
+  //       </body>
+  //     </html>
+  //   `);
+
+  //     frameDoc.close();
+
+  //     setTimeout(() => {
+  //       if (iframe.contentWindow) {
+  //         iframe.contentWindow.focus();
+  //         iframe.contentWindow.print();
+  //         document.body.removeChild(iframe);
+  //       }
+  //     }, 500);
+  //   }, 500);
+  // }
+
+  onPrint(
+    e: Event,
+    samplesGroupedByDepartment: any,
+    providerDetails: any
+  ): void {
+    e.stopPropagation();
 
     const data = samplesGroupedByDepartment?.samples?.map((sample) => {
       return {
@@ -323,11 +1356,12 @@ export class PrintResultsModalComponent implements OnInit {
         status: "PRINTED",
       };
     });
+
     this.store.dispatch(
       setSampleStatuses({
         statuses: data,
         details: {
-          ...sample,
+          ...samplesGroupedByDepartment,
           printedBy: {
             uuid: providerDetails?.uuid,
             name: providerDetails?.display,
@@ -338,57 +1372,125 @@ export class PrintResultsModalComponent implements OnInit {
     );
 
     setTimeout(() => {
-      var contents = document.getElementById(
-        samplesGroupedByDepartment?.departmentName
-      ).innerHTML;
-      const iframe: any = document.createElement("iframe");
+      const elementId = samplesGroupedByDepartment?.departmentName;
+      const contents = document.getElementById(elementId)?.innerHTML;
+      if (!contents) return;
+
+      const iframe: HTMLIFrameElement = document.createElement("iframe");
       iframe.name = "frame3";
       iframe.style.position = "absolute";
-      iframe.style.width = "100%";
-      iframe.style.top = "-1000000px";
+      iframe.style.width = "0px";
+      iframe.style.height = "0px";
+      iframe.style.border = "none";
+      iframe.style.top = "-10000px";
       document.body.appendChild(iframe);
-      var frameDoc = iframe.contentWindow
-        ? iframe.contentWindow
-        : iframe.contentDocument.document
-        ? iframe.contentDocument.document
-        : iframe.contentDocument;
-      frameDoc.document.open();
-      frameDoc.document.write(
-        `
-          <html>
-            <head> 
-              <style>
+
+      const frameDoc = iframe.contentWindow?.document ?? iframe.contentDocument;
+      if (!frameDoc) return;
+
+      const styleTags = Array.from(
+        document.querySelectorAll('style, link[rel="stylesheet"]')
+      );
+      const clonedStyles = styleTags.map((style) => style.outerHTML).join("\n");
+
+      frameDoc.open();
+
+      frameDoc.write(`
+        <html>
+          <head>
+            ${clonedStyles}
+            <style>
               button {
-                display:none;
-              } 
+                display: none;
+              }
               .mat-expansion-panel-body {
                 font-size: 0.2rem !important;
               }
-              .content table,.providers-details {
+              .content table, .providers-details {
                 font-size: 0.8rem !important;
+                width: 100%;
+                border-collapse: collapse;
+              }
+              th, td {
+                padding: 10px;
+                text-align: left;
+                vertical-align: middle;
+              }
+              th {
+                background-color: #f4f4f4;
+                font-weight: bold;
               }
               .row-alternated {
                 background-color: #f2f2f2;
               }
-              
-            </style>`
-      );
-      frameDoc.document.write("</head><body>");
-      frameDoc.document.write(`
-          <div class="content">
-           ${contents}
-          </div>
+              .table-header {
+                text-align: center;
+              }
+              .table-row {
+                page-break-inside: avoid;
+              }
+              .col-md-5, .col-md-3, .col-md-2, .col-md-1 {
+                padding: 5px;
+                box-sizing: border-box;
+              }
+              .col-md-5 {
+                width: 41%;
+              }
+              .col-md-3 {
+                width: 21%;
+              }
+              .col-md-2 {
+                width: 21%;
+              }
+              .col-md-1 {
+                width: 8%;
+              }
+              .table-header {
+                display: table-header-group;
+              }
+              td {
+                position: relative;
+                max-width: 100%;
+                text-align: left;
+              }
+              td::before {
+                content: attr(data-tooltip);
+                position: absolute;
+                left: 0;
+                bottom: 100%;
+                background: #333;
+                color: #fff;
+                padding: 5px;
+                border-radius: 3px;
+                white-space: nowrap;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.2s;
+              }
+              td:hover::before {
+                opacity: 1;
+                visibility: visible;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="content">
+              ${contents}
+            </div>
+          </body>
+        </html>
       `);
-      frameDoc.document.write("</body></html>");
-      frameDoc.document.close();
-      setTimeout(function () {
-        window.frames["frame3"].focus();
-        window.frames["frame3"].print();
-        document.body.removeChild(iframe);
+
+      frameDoc.close();
+
+      setTimeout(() => {
+        if (iframe.contentWindow) {
+          iframe.contentWindow.focus();
+          iframe.contentWindow.print();
+          document.body.removeChild(iframe);
+        }
       }, 500);
     }, 500);
-
-    // window.print();
   }
 
   getParameterConceptName(parameter, allocations) {

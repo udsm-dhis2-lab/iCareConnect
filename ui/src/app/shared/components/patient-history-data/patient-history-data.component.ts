@@ -25,6 +25,7 @@ export class PatientHistoryDataComponent implements OnInit {
   @Input() specificDrugConceptUuid: any;
   @Input() FacilityDetails?: any;
   @Input() currentUser?: any;
+  @Input() ipdRoundComments?: any;
   labOrders: any[];
   radiologyOrders: any[] = [];
   procedureOrders: any[] = [];
@@ -38,6 +39,8 @@ export class PatientHistoryDataComponent implements OnInit {
 
   ngOnInit(): void {
     let visit = new Visit(this.visit?.visit);
+    this.ipdRoundComments = "daniel kalsasa comment";
+    console.log("vhistory", this.visit);
 
     let observationsWithoutForm = this.visit?.obs?.filter(
       (observation) => observation?.encounter?.form === null
