@@ -191,7 +191,7 @@ export class VisitComponent implements OnInit {
 
     this.verticalProgramUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.visits.types.verticalProgam"
+        "iCare.visits.types.verticalProgram.uuid"
       );
     this.registrationService
       .getServicesConceptHierarchy()
@@ -487,7 +487,7 @@ export class VisitComponent implements OnInit {
         });
       }
     );
-    console.log("patient id", this.patientDetails?.id);
+    // console.log("patient id", this.patientDetails?.id);
   }
 
   get servicesAsPerVisitType() {

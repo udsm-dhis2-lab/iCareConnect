@@ -43,13 +43,14 @@ export class GeneralClientProgramFormsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.formsUuids = (
-      this.currentLocation?.attributes?.filter(
-        (attribute: LocationAttributeGetFull) =>
-          attribute?.attributeType?.uuid ===
-            this.locationFormsAttributeTypeUuid && !attribute?.voided
-      ) || []
-    )?.map((attribute: any) => attribute?.value);
+    this.formsUuids =
+      (
+        this.currentLocation?.attributes?.filter(
+          (attribute: LocationAttributeGetFull) =>
+            attribute?.attributeType?.uuid ===
+              this.locationFormsAttributeTypeUuid && !attribute?.voided
+        ) || []
+      )?.map((attribute: any) => attribute?.value) || [];
     this.store.dispatch(loadCustomOpenMRSForms({ formUuids: this.formsUuids }));
 
     this.forms$ = this.store.select(

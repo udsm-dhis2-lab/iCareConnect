@@ -97,7 +97,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
           } else {
             this.errors = [...this.errors, response];
             return response;
-            console.log();
           }
         })
       );
