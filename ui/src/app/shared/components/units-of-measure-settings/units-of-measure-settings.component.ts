@@ -6,6 +6,7 @@ import { ConceptsService } from "src/app/shared/resources/concepts/services/conc
 import { ConceptGet, ConceptsourceGet } from "src/app/shared/resources/openmrs";
 import { ManageUnitOfMeasureModalComponent } from "../../../modules/maintenance/modals/manage-unit-of-measure-modal/manage-unit-of-measure-modal.component";
 import { SharedConfirmationDialogComponent } from "src/app/shared/components/shared-confirmation-dialog/shared-confirmation-dialog.component";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-units-of-measure-settings",
@@ -17,7 +18,8 @@ export class UnitsOfMeasureSettingsComponent implements OnInit {
   @Input() mappingSource: any;
   constructor(
     private conceptService: ConceptsService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -65,7 +67,14 @@ export class UnitsOfMeasureSettingsComponent implements OnInit {
           this.getUnitsOfMeasure();
         }
       });
+      this.trackActionForAnalytics(`Add Units of Measure: Open`);
   }
+
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
+  }
+
 
   onDelete(concept: ConceptGet): void {
     this.dialog

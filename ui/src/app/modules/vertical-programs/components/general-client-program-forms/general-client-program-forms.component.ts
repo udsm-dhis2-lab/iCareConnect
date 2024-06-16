@@ -90,6 +90,8 @@ export class GeneralClientProgramFormsComponent implements OnInit {
         },
       ],
     };
+
+    
     this.encountersService
       .createEncounter(encounter)
       .subscribe((response: any) => {

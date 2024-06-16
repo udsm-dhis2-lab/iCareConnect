@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialogRef } from "@angular/material/dialog";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { Field } from "src/app/shared/modules/form/models/field.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -21,7 +22,8 @@ export class ManageLedgerComponent implements OnInit {
   shouldConfirm: boolean = false;
   constructor(
     private dialogRef: MatDialogRef<ManageLedgerComponent>,
-    private legderTypeService: LedgerTypeService
+    private legderTypeService: LedgerTypeService,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -86,6 +88,8 @@ export class ManageLedgerComponent implements OnInit {
             setTimeout(() => {
               this.dialogRef.close(true);
             }, 200);
+            this.trackActionForAnalytics(`Ledgers: Save`);
+
           } else {
             this.errorResponse = response?.error;
             this.savingData = false;
@@ -94,6 +98,10 @@ export class ManageLedgerComponent implements OnInit {
     } else {
       this.shouldConfirm = true;
     }
+  }
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
   }
 
   onFormUpdate(formValues: FormValue): void {

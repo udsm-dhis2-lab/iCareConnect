@@ -6,7 +6,7 @@
     platformProductConfigs: platformProductConfigs$ | async
   } as params"
 >
-  <mat-tab-group>
+  <mat-tab-group (selectedTabChange)="onTabChanged($event)">
     <mat-tab label="Drugs">
       <ng-template matTabContent>
         <app-drugs-list></app-drugs-list>

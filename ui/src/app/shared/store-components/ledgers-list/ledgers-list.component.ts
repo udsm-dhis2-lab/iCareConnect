@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { LedgerTypeObject } from "src/app/shared/resources/store/models/ledger-type.model";
 import { LedgerTypeService } from "src/app/shared/resources/store/services/ledger-type.service";
 import { ManageLedgerComponent } from "../../store-modals/manage-ledger/manage-ledger.component";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-ledgers-list",
@@ -14,7 +15,8 @@ export class LedgersListComponent implements OnInit {
   ledgerTypes$: Observable<LedgerTypeObject[]>;
   constructor(
     private ledgerTypesService: LedgerTypeService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -37,5 +39,14 @@ export class LedgersListComponent implements OnInit {
           this.getLedgerTypes();
         }
       });
+      this.trackActionForAnalytics(`Add Ledgers: Open`);
   }
+
+
+
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
+  }
+
 }
