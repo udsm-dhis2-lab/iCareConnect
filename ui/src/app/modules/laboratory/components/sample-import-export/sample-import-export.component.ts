@@ -881,7 +881,7 @@ export class SampleImportExportComponent implements OnInit {
       .toPromise()
       .then((sampleResponse: any) => {
         if (sampleResponse) {
-          console.log(sampleResponse);
+          // console.log(sampleResponse);
           this.createSampleStatuses(sampleDetails, sampleResponse);
         }
       });
