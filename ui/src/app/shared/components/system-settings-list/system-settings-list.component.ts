@@ -5,6 +5,7 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 import { ManageSystemSettingComponent } from "../../dialogs/manage-system-setting/manage-system-setting.component";
 import { SharedConfirmationDialogComponent } from "../shared-confirmation-dialog/shared-confirmation-dialog.component";
 import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-system-settings-list",
@@ -21,7 +22,8 @@ export class SystemSettingsListComponent implements OnInit {
   saving: boolean = false;
   constructor(
     private systemSettingsService: SystemSettingsService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +55,13 @@ export class SystemSettingsListComponent implements OnInit {
           this.getSystemSettings();
         }
       });
+      this.trackActionForAnalytics(`Add New System Settings: Open`);
+  }
+
+
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
   }
 
   getItems(event: Event, action: string): void {
