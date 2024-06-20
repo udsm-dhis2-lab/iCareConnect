@@ -100,35 +100,35 @@
 		</description>
 	</globalProperty>
 	<globalProperty>
-		<property>iCare.surveillance.settings.eventProgramMappings</property>
+		<property>iCare.interoperability.settings.surveillance.dhis2.eventProgramMappings</property>
 		<defaultValue></defaultValue>
 		<description>
 			Surveillance mappings
 		</description>
 	</globalProperty>
 	<globalProperty>
-		<property>iCare.surveillance.settings.eventProgram.uuid</property>
+		<property>iCare.interoperability.settings.surveillance.dhis2.eventProgram.uuid</property>
 		<defaultValue></defaultValue>
 		<description>
 			Surveillance Program
 		</description>
 	</globalProperty>
 	<globalProperty>
-		<property>iCare.surveillance.settings.eventProgramStage.uuid</property>
+		<property>iCare.interoperability.settings.surveillance.dhis2.eventProgramStage.uuid</property>
 		<defaultValue></defaultValue>
 		<description>
 			Surveillance program stage
 		</description>
 	</globalProperty>
 	<globalProperty>
-		<property>iCare.surveillance.settings.captureDiagnosisData</property>
+		<property>iCare.interoperability.settings.surveillance.captureDiagnosisData</property>
 		<defaultValue>false</defaultValue>
 		<description>
 			Check for should capture immediate diagnoses when doctor prescribe
 		</description>
 	</globalProperty>
 	<globalProperty>
-		<property>iCare.surveillance.settings.immediate.diagnoses</property>
+		<property>iCare.interoperability.settings.surveillance.immediate.icdCodedDiagnoses</property>
 		<defaultValue>["A00"]</defaultValue>
 		<description>
 			List of immediate coded diagnoses
@@ -148,7 +148,21 @@
 			For vertical program visit type reference
 		</description>
 	</globalProperty>
-	iCare.visits.types.verticalProgram.uuid
+	<globalProperty>
+		<property>iCare.interoperability.settings.mediators.list</property>
+		<defaultValue>[{"mediatorKey":"dhis2","mediatorUrlPath":"","authenticationType":"basic","mediatorMappingReferenceKey":"iCare.interoperability.settings.surveillance.dhis2.eventProgramMappings","isActive":true}]</defaultValue>
+		<description>
+			List of mediators to push data to
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.general.systemSettings.groups</property>
+		<defaultValue></defaultValue>
+		<description>
+			Settings references
+		</description>
+	</globalProperty>
+
 	
 	<!-- Internationalization -->
 	<!-- All message codes should start with @MODULE_ID@.* -->
