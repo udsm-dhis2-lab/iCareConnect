@@ -197,4 +197,6 @@ public interface ICareService extends OpenmrsService {
 	void saveAuditLog(AuditLog auditLog);
 	
 	String pushEventWithoutRegistrationDataToDHIS2Instance(String eventData);
+	
+	String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType);
 }
