@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { tap } from "rxjs/operators";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { Field } from "src/app/shared/modules/form/models/field.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
@@ -22,7 +23,8 @@ export class ManageReOrderLevelModalComponent implements OnInit {
   constructor(
     private dialogRef: MatDialogRef<ManageReOrderLevelModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
-    private reOrderLevelService: ReOrderLevelService
+    private reOrderLevelService: ReOrderLevelService,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -80,6 +82,8 @@ export class ManageReOrderLevelModalComponent implements OnInit {
             if (response && !response?.error) {
               this.savingData = false;
               this.dialogRef.close(true);
+              this.trackActionForAnalytics('Re-orders Levels: Save');
+
             }
           });
       } else {
@@ -103,9 +107,15 @@ export class ManageReOrderLevelModalComponent implements OnInit {
       this.shouldConfirm = true;
     }
   }
-
   onFormUpdate(formValue: FormValue): void {
     this.formData = formValue.getValues();
     this.isFormValid = formValue.isValid;
   }
+
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
+  }
+
+
 }

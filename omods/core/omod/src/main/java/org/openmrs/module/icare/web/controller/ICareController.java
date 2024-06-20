@@ -1231,7 +1231,7 @@ public class ICareController {
 
 	}
 	
-	@RequestMapping(value = "encounterpatientprogram/{patientProgranUuid}",method = RequestMethod.GET)
+	@RequestMapping(value = "encounterpatientprogram/{patientProgramUuid}",method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getEncountersByPatientProgram(@PathVariable("patientProgramUuid") String patientProgramUuid){
 
