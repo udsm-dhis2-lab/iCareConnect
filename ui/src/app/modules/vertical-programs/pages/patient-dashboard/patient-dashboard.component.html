@@ -50,8 +50,26 @@
           <mat-icon>arrow_back</mat-icon>
           Back to Client List
         </button>
+        <button
+          class="float-right ml-2"
+          mat-icon-button
+          (click)="onToggleGeneralClinicForms($event)"
+        >
+          <mat-icon *ngIf="hideGeneralClinicalFormsBar"
+            >keyboard_arrow_left</mat-icon
+          >
+          <mat-icon *ngIf="!hideGeneralClinicalFormsBar"
+            >keyboard_arrow_right</mat-icon
+          >
+        </button>
       </div>
-      <div class="col-md-8 col-sm-12 col-sx-12">
+      <div
+        [ngClass]="{
+          'col-md-12': hideGeneralClinicalFormsBar,
+          'col-md-8': !hideGeneralClinicalFormsBar
+        }"
+        class="col-sm-12 col-sx-12"
+      >
         <mat-tab-group>
           <mat-tab
             *ngFor="
@@ -119,7 +137,10 @@
           </mat-tab>
         </mat-tab-group>
       </div>
-      <div class="col-md-4 col-sm-12 col-sx-12 right-side-panel">
+      <div
+        class="col-md-4 col-sm-12 col-sx-12 right-side-panel"
+        *ngIf="!hideGeneralClinicalFormsBar"
+      >
         <app-general-client-program-forms
           [patientEnrollmentDetails]="params?.patientEnrollmentDetails"
           [currentLocation]="params?.currentLocation"

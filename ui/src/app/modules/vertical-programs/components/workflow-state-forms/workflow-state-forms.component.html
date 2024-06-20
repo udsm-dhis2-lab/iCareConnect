@@ -1,5 +1,8 @@
 <mat-tab-group *ngIf="forms && forms !== 'none'">
-  <mat-tab *ngFor="let form of forms" label="{{ form?.display }}">
+  <mat-tab
+    *ngFor="let form of forms"
+    label="{{ form?.display ? form?.display : form?.name }}"
+  >
     <ng-template matTabContent>
       <div class="p-3">
         <app-workflow-state-form-data
