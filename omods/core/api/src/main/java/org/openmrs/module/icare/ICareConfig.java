@@ -138,7 +138,7 @@ public class ICareConfig {
 	public static final String SURVEILLANCE_SINGLE_EVENT_PROGRAM_MAPPINGS = "iCare.interoperability.settings.surveillance.dhis2.eventProgramMappings";
 	
 	public static final String INTEROPERABILITY_MEDIATORS_LIST = "iCare.interoperability.settings.mediators.list";
-
+	
 	public static final String HDU_API_WORKFLOW_UUID_FOR_OPD = "iCare.interoperability.settings.hduapi.workflowUuid.uuid";
 	
 }
