@@ -112,7 +112,7 @@
         </mat-step>
     </mat-vertical-stepper>
 </div> -->
-
+<!-- s -->
 <div id="timeline-content">
   <ul class="timeline">
     <li
@@ -142,6 +142,7 @@
         </p>
         <p class="data-description">{{ visitData?.description }}</p>
       </li>
+
       <li class="mini-event" *ngIf="visitData?.category === 'LAB_ORDER'">
         <p class="data-name">
           <strong>
@@ -186,6 +187,15 @@
                       </span>
                     </mat-panel-title>
                   </mat-expansion-panel-header>
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Description</th>
+                      <th *ngIf="!result?.value?.links?.uri">Units</th>
+                      <th *ngIf="!result?.value?.links?.uri">LL</th>
+                      <th *ngIf="!result?.value?.links?.uri">UL</th>
+                    </tr>
+                  </thead>
                   <tbody>
                     <tr *ngFor="let result of visitData?.results">
                       <ng-container *ngIf="result?.value?.links?.uri">
@@ -217,6 +227,7 @@
                           </a>
                         </td>
                       </ng-container>
+
                       <ng-container *ngIf="!result?.value?.links?.uri">
                         <td>{{ result?.concept?.display }}</td>
                         <td>
@@ -225,6 +236,15 @@
                               ? result?.value?.display
                               : result?.value
                           }}
+                        </td>
+                        <td>
+                          {{ result?.concept?.units }}
+                        </td>
+                        <td>
+                          {{ result?.concept?.lowNormal }}
+                        </td>
+                        <td>
+                          {{ result?.concept?.hiNormal }}
                         </td>
                       </ng-container>
                     </tr>

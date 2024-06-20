@@ -98,6 +98,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Input() isTheatre: boolean;
   @Input() visitEndingControlStatusesConceptUuid: string;
   @Input() observations: any;
+  @Input() moduleName:any;
   currentPatient$: Observable<Patient>;
   vitalSignObservations$: Observable<any>;
   loadingVisit$: Observable<boolean>;
@@ -343,8 +344,8 @@ export class SharedPatientDashboardComponent implements OnInit {
   
 
   getSelectedForm(event: Event, form: any): void {
-    this.trackActionForAnalytics(`${form?.name}: Open`)
   
+    this.trackActionForAnalytics(`${form?.name}: Open`)
     this.readyForClinicalNotes = false;
     if (event) {
       event.stopPropagation();
@@ -402,6 +403,7 @@ export class SharedPatientDashboardComponent implements OnInit {
     });
 
   }
+
   trackActionForAnalytics(eventname: any) {
     // Send data to Google Analytics
     this.googleAnalyticsService.sendAnalytics(
@@ -410,57 +412,9 @@ export class SharedPatientDashboardComponent implements OnInit {
       "Clinic"
     );
   }
-  
 
-  // onOpenPopup(
-  //   event: Event,
-  //   formUuid,
-  //   locationType,
-  //   currentPatient,
-  //   visit,
-  //   currentLocation,
-  //   privileges,
-  //   provider,
-  //   facilityDetails,
-  //   observations,
-  //   generalPrescriptionOrderType,
-  //   useGeneralPrescription,
-  //   showPrintButton: boolean,
-  //   actionType:string
-  // ): void {
-  //   this.trackActionForAnalytics(`Refer: Open`);
-  //   event.stopPropagation();
-  //   this.showPrintButton = showPrintButton;
-  //   this.systemSettingsService
-  //     .getSystemSettingsMatchingAKey("iCare.clinic.deathRegistry.form.causes")
-  //     .subscribe((response) => {
-  //       const concepts = response?.map((response: any) => {
-  //         return response?.value;
-  //       });
-  //       if (response) {
-  //         this.dialog.open(CaptureFormDataModalComponent, {
-  //           width: "60%",
-  //           data: {
-  //             patient: currentPatient,
-  //             form: { formUuid },
-  //             privileges,
-  //             provider,
-  //             visit,
-  //             locationType,
-  //             currentLocation,
-  //             causesOfDeathConcepts: concepts,
-  //             fromClinic: true,
-  //             facilityDetails: facilityDetails,
-  //             observations: observations,
-  //             generalPrescriptionOrderType: generalPrescriptionOrderType,
-  //             showPrintButton,
-  //           },
-  //           disableClose: false,
-  //         });
-  //       }
-  //     });
-      
-  // }
+
+
 
   onOpenPopup(
     event: Event,
@@ -476,13 +430,9 @@ export class SharedPatientDashboardComponent implements OnInit {
     generalPrescriptionOrderType,
     useGeneralPrescription,
     showPrintButton: boolean,
-    actionType: string // Add an additional parameter for action type
+    actionType:string
   ): void {
-    if (actionType === 'Refer') { // Check the action type
-      this.trackActionForAnalytics(`Refer: Open`);
-    } else if (actionType === 'MarkDeceased') {
-      this.trackActionForAnalytics(`Mark Patient Deceased: Open`);
-    }
+    this.trackActionForAnalytics(`Refer: Open`);
     event.stopPropagation();
     this.showPrintButton = showPrintButton;
     this.systemSettingsService
@@ -511,10 +461,12 @@ export class SharedPatientDashboardComponent implements OnInit {
             },
             disableClose: false,
           });
+          
         }
-      });  
+      });
+      
   }
-  
+
   onGetCurrentFormDetails(selectedFormDetails: any): void {
     this.currentFormDetails = {
       ...selectedFormDetails,
@@ -647,10 +599,6 @@ export class SharedPatientDashboardComponent implements OnInit {
  
 
   }
-
-  
-
-
   reload(currentPatient: Patient) {
     this.store.dispatch(loadActiveVisit({ patientId: currentPatient?.id }));
   }

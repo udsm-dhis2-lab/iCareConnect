@@ -9,6 +9,7 @@ import { SystemUsersService } from "src/app/core/services/system-users.service";
 import { AppState } from "src/app/store/reducers";
 import { StoreEditUserModalComponent } from "../../store-modals/store-edit-user-modal/store-edit-user-modal.component";
 import { StoreAddNewUserModalComponent } from "../../store-modals/store-add-new-user-modal/store-add-new-user-modal.component";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-store-user-management-dashboard",
@@ -42,7 +43,8 @@ export class StoreUserManagementDashboardComponent implements OnInit {
     private store: Store<AppState>,
     private service: SystemUsersService,
     private dialog: MatDialog,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -78,8 +80,12 @@ export class StoreUserManagementDashboardComponent implements OnInit {
       minWidth: "60%",
       data: securitySystemSettings,
     });
+    this.trackActionForAnalytics(`Add user: Open`);
   }
-
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
+  }
   onEditChild(e) {}
 
   onDelete(e) {}
