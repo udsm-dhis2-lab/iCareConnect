@@ -15,6 +15,7 @@ import {
 } from "../../helpers/format-date.helper";
 import { getAllDiagnosesFromVisitDetails } from "../../helpers/patient.helper";
 import { Diagnosis } from "../../resources/diagnosis/models/diagnosis.model";
+
 @Component({
   selector: "app-discharge-patient-modal",
   templateUrl: "./discharge-patient-modal.component.html",
@@ -49,20 +50,6 @@ export class DischargePatientModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.visitDetails?.patient?.uuid) {
-      console.log('AM IN---------------------------------:');
-      this.visit$ = this.visitService.getActiveVisit(this.visitDetails.patient.uuid, false);
-      this.visit$.subscribe(
-        (visit) => {
-          console.log('Visit data---------------------------------:', visit);
-        },
-        (error) => {
-          console.error('Error fetching visit data:', error);
-        }
-      );
-    } else {
-      console.error('Visit details are missing patient UUID');
-    }
     this.store.dispatch(
       loadCustomOpenMRSForm({ formUuid: this.dischargeFormUuid })
     );
@@ -71,7 +58,6 @@ export class DischargePatientModalComponent implements OnInit {
         `iCareConnect.configurations.location.logoAttribute.uuid`
       );
     this.logoLocationAttributeTypeUuid$.subscribe((response: any) => {
-      // console.log("logoLocationAttributeTypeUuid:-------------------------------",response)
       if (response && response === "none") {
         this.errors = [
           ...this.errors,
@@ -84,8 +70,10 @@ export class DischargePatientModalComponent implements OnInit {
             },
           },
         ];
+        
       }
     });
+    console.log("here in parentLocation .........................");
     this.parentLocation$ = this.store.select(getParentLocation);
     this.dischargeObjects = {
       visitDetails: {
@@ -105,11 +93,11 @@ export class DischargePatientModalComponent implements OnInit {
 
   getVisit(): void {
     this.visit$ = this.visitService.getActiveVisit(
-      this.visitDetails?.patient?.uid,
+      this.visitDetails?.patient?.uuid,
       false
     );
-   
   }
+  
 
   onGetConfirmDischargeStatus(confirm: boolean): void {
     this.readyToConfirmDischarge = confirm;
