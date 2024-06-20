@@ -39,6 +39,7 @@ export class PatientDashboardComponent implements OnInit {
   currentLocation$: Observable<Location>;
   locationFormsAttributeTypeUuid$: Observable<any>;
   errors: any[] = [];
+  hideGeneralClinicalFormsBar: boolean = true;
   constructor(
     private store: Store<AppState>,
     private programService: ProgramsService,
@@ -103,6 +104,11 @@ export class PatientDashboardComponent implements OnInit {
     setTimeout(() => {
       this.renderWorkflowState = true;
     }, 20);
+  }
+
+  onToggleGeneralClinicForms(event: Event): void {
+    event.stopPropagation();
+    this.hideGeneralClinicalFormsBar = !this.hideGeneralClinicalFormsBar;
   }
 
   onBackToList(event: Event, url: string): void {
