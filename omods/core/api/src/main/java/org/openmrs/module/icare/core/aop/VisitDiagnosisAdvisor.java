@@ -109,7 +109,78 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 							for (int count = 0; count < mediatorsList.length(); count++) {
 								JSONObject mediator = mediatorsList.getJSONObject(count);
 								if (mediator.has("isActive") && mediator.getBoolean("isActive")) {
-									if (mediator.has("mediatorKey") && mediator.getString("mediatorKey").equals("dhis2")) {
+									if (mediator.has("mediatorKey") && mediator.getString("mediatorKey").equals("HDUAPI")) {
+										// For HDU API
+										Map<String, Object> dataTemplateData = new HashMap<>();
+										String workflowUuid = adminService.getGlobalProperty(ICareConfig.HDU_API_WORKFLOW_UUID_FOR_OPD);
+										Map<String, Object> templateDetails = new HashMap<>();
+										Map<String, Object> workflow = new HashMap<>();
+										workflow.put("uuid", workflowUuid);
+										templateDetails.put("id", "general");
+										templateDetails.put("code", "GENERAL");
+										templateDetails.put("name", "General");
+										templateDetails.put("workflow", workflow);
+
+										// Formulate HDU API data template
+										List<Map<String, Object>> listGrid = new ArrayList<>();
+										Map<String, Object> reportDetails = new HashMap<>();
+										reportDetails.put("reportingDate", capturedEventData.get("reportingDate"));
+
+										Map<String, Object> facilityDetails = new HashMap<>();
+										facilityDetails.put("HFCode", capturedEventData.get("facilityCode"));
+
+										Map<String, Object> demographicDetails = new HashMap<>();
+										demographicDetails.put("dateOfBirth",capturedEventData.get("dob"));
+										demographicDetails.put("firstName", capturedEventData.get("firstName"));
+										demographicDetails.put("middleName", "");
+										demographicDetails.put("lastName", capturedEventData.get("surname"));
+										demographicDetails.put("gender", capturedEventData.get("gender"));
+										demographicDetails.put("mrn", capturedEventData.get("identifier"));
+										demographicDetails.put("identifier", capturedEventData.get("identifier"));
+
+										Map<String, Object> visitDetails = new HashMap<>();
+										visitDetails.put("visitId", capturedEventData.get("visitNumber"));
+										visitDetails.put("visitDate", capturedEventData.get("eventDate"));
+
+										List<Map<String, Object>> diagnosisDetails = new ArrayList<>();
+										Map<String, Object> diagnosisData = new HashMap<>();
+										diagnosisData.put("diagnosisCode", capturedEventData.get("diseaseCode"));
+										diagnosisData.put("diagnosisDate", capturedEventData.get("eventDate"));
+										diagnosisData.put("certainty", capturedEventData.get("certainty"));
+										diagnosisData.put("diagnosisDescription", capturedEventData.get("certainty"));
+										diagnosisDetails.add(diagnosisData);
+
+										Map<String, Object> listGridItem = new HashMap<>();
+										listGridItem.put("visitDetails", visitDetails);
+										listGridItem.put("demographicDetails", demographicDetails);
+										listGridItem.put("diagnosisDetails", diagnosisDetails);
+										listGrid.add(listGridItem);
+
+										Map<String, Object> dataSection = new HashMap<>();
+										dataSection.put("reportDetails", reportDetails);
+										dataSection.put("facilityDetails", facilityDetails);
+										dataSection.put("listGrid", listGrid);
+										templateDetails.put("data", dataSection);
+
+										String mediatorMappingReferenceKey = mediator.getString("mediatorMappingReferenceKey");
+										String mediatorKey = mediator.getString("mediatorKey");
+										String mediatorUrlPath = mediator.getString("mediatorUrlPath");
+										String authenticationType = mediator.getString("authenticationType");
+										String mappings = adminService.getGlobalProperty(mediatorMappingReferenceKey);
+
+										if (mediatorUrlPath != null && mappings != null) {
+											EidsrWrapper eidsrWrapper = new EidsrWrapper();
+											Map<String, Object> data = eidsrWrapper.formatData(mappings,capturedEventData);
+
+											if (new JSONObject(templateDetails).toString() != null) {
+												String response = iCareService.pushDataToExternalMediator(new JSONObject(templateDetails).toString(),mediatorKey,mediatorUrlPath,authenticationType);
+												GlobalProperty globalProperty2 = new GlobalProperty();
+												globalProperty2.setProperty("HDUAPI.test.response");
+												globalProperty2.setPropertyValue(response);
+												adminService.saveGlobalProperty(globalProperty2);
+											}
+										}
+									} else if (mediator.has("mediatorKey") && mediator.getString("mediatorKey").equals("dhis2")) {
 										String mappings = adminService.getGlobalProperty(ICareConfig.SURVEILLANCE_SINGLE_EVENT_PROGRAM_MAPPINGS);
 										Map<String, Object> event = new HashMap<>();
 										event.put("orgUnit", facilityCode);
@@ -152,6 +223,7 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 									}
 								}
 							}
+
 						}
 					}
 				}
