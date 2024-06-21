@@ -239,6 +239,30 @@ public class ICareController {
 		return null;
 	}
 	
+	@RequestMapping(value = "patientdiagnoses", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Diagnosis onPostDiagnosisCreation(@RequestBody Map<String, Object> diagnosisObject) throws Exception {
+		PatientService patientService = Context.getService(PatientService.class);
+		EncounterService encounterService = Context.getService(EncounterService.class);
+		Patient patient = patientService.getPatientByUuid((String) diagnosisObject.get("patient"));
+		
+		Diagnosis diagnosis = new Diagnosis();
+		CodedOrFreeText diagnosisDetail = new CodedOrFreeText();
+		Concept concept = new Concept();
+		ConceptService conceptService = Context.getService(ConceptService.class);
+		concept = conceptService.getConceptByUuid(diagnosisObject.get("conceptUuid").toString());
+		diagnosisDetail.setCoded(concept);
+		diagnosisDetail.setNonCoded("Cholera");
+		//		diagnosisDetail.setSpecificName(new ConceptName());
+		diagnosis.setDiagnosis(diagnosisDetail);
+		Encounter encounter = encounterService.getEncounterByUuid(diagnosisObject.get("encounter").toString());
+		//		diagnosis.setEncounter(encounter);
+		diagnosis.setCertainty(ConditionVerificationStatus.CONFIRMED);
+		diagnosis.setPatient(patient);
+		System.out.println(diagnosis);
+		return diagnosis;
+	}
+	
 	@RequestMapping(value = "message", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> sendMessage(@RequestBody Map<String, Object> messageObject) throws Exception {
@@ -1207,7 +1231,7 @@ public class ICareController {
 
 	}
 	
-	@RequestMapping(value = "encounterpatientprogram/{patientProgranUuid}",method = RequestMethod.GET)
+	@RequestMapping(value = "encounterpatientprogram/{patientProgramUuid}",method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getEncountersByPatientProgram(@PathVariable("patientProgramUuid") String patientProgramUuid){
 

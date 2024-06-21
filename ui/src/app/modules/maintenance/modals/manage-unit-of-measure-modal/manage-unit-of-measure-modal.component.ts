@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from "@angular/core";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { from, of } from "rxjs";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
@@ -22,7 +23,8 @@ export class ManageUnitOfMeasureModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private conceptService: ConceptsService,
     private api: Api,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -131,11 +133,17 @@ export class ManageUnitOfMeasureModalComponent implements OnInit {
                   this.saving = false;
                   this.dialogRef.close(true);
                 }, 2000);
+                this.trackActionForAnalytics(`Units of Measure: Save`);
               }
             });
           }
         });
       }
     });
+  }
+
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
   }
 }
