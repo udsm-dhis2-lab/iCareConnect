@@ -299,7 +299,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			throw new Exception("Payment Type with id '" + payment.getPaymentType().getUuid() + "' does not exist.");
 		}
 		if (payment.getReferenceNumber() == null) {
-			throw new Exception("Refference number should not be null.");
+			throw new Exception("Reference number should not be null.");
 		}
 		payment.setPaymentType(paymentType);
 		

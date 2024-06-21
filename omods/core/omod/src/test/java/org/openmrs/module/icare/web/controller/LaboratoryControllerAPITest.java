@@ -690,6 +690,17 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		assertThat("The observation value text should be positive", observations.get(0).getValueText(), is("positive"));
 		//
 	}
+
+	@Test
+	public void testUpdateMultipleTestAllocations() throws Exception {
+		// Given
+		String dataReference =this.readFile("dto/approve-test-results.json");
+		Map<String, Object> testAllocationStatuses = (new ObjectMapper()).readValue(dataReference, Map.class);
+		//When
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/allocationstatuses", testAllocationStatuses);
+		MockHttpServletResponse handle = handle(newPostRequest);
+
+	}
 	
 	@Test
 	public void testGettingSummaryWorkload() throws Exception {
