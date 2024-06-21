@@ -26,7 +26,6 @@ import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
 import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.dao.*;
-import org.openmrs.module.icare.core.models.CommonlyOrderedDrugs;
 import org.openmrs.module.icare.core.models.EncounterPatientProgram;
 import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
@@ -954,7 +953,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			//		this.getCreator().getUserProperties().get("")
 			String path = "/api/events.json?";
 			url = new URL(baseUrl.concat(path));
-			System.out.println(request);
 			String returnValue = "";
 
 			BufferedReader reader;
@@ -976,7 +974,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			ObjectMapper mapper = new ObjectMapper();
 			// Converting the Object to JSONString
 			String jsonString = mapper.writeValueAsString(request);
-			System.out.println(jsonString);
 
 			// int status = httpURLConnection.getResponseCode();
 
@@ -1012,7 +1009,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 
 			String path = "/api/events.json?";
 			url = new URL(baseUrl.concat(path));
-			System.out.println(results);
 
 			BufferedReader reader;
 			String line;
@@ -1033,7 +1029,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			ObjectMapper mapper = new ObjectMapper();
 			// Converting the Object to JSONString
 			String jsonString = mapper.writeValueAsString(results);
-			System.out.println(jsonString);
 
 			// int status = httpURLConnection.getResponseCode();
 
@@ -1109,5 +1104,111 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public void saveAuditLog(AuditLog auditLog) {
 		this.auditLogDAO.save(auditLog);
+	}
+	
+	@Override
+	public String pushEventWithoutRegistrationDataToDHIS2Instance(String eventData) {
+		try {
+			AdministrationService administrationService = Context.getAdministrationService();
+			String instance = administrationService.getGlobalProperty("dhis2.instance");
+			String username = administrationService.getGlobalProperty("dhis2.username");
+			String password = administrationService.getGlobalProperty("dhis2.password");
+			// TODO: Use configs to access the API below (Remove hardcoded URL)
+			URL url = new URL(instance.concat("/api/tracker?async=false&orgUnitIdScheme=CODE&dataElementIdScheme=CODE"));
+			
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			
+			String userCredentials = username.concat(":").concat(password);
+			String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+			
+			con.setRequestProperty("Authorization", basicAuth);
+			
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/json; utf-8");
+			con.setRequestProperty("Accept", "application/json");
+			
+			con.setDoOutput(true);
+			
+			String jsonInputString = eventData;
+			
+			OutputStream os;
+			BufferedReader br;
+			
+			try {
+				os = con.getOutputStream();
+				byte[] input = jsonInputString.getBytes("utf-8");
+				os.write(input, 0, input.length);
+			}
+			finally {}
+			
+			try {
+				br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+				StringBuilder response = new StringBuilder();
+				String responseLine = null;
+				while ((responseLine = br.readLine()) != null) {
+					response.append(responseLine.trim());
+				}
+				return response.toString();
+			}
+			finally {}
+			
+		}
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+			return e.toString();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			return e.toString();
+		}
+	}
+	
+	@Override
+	public String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType) {
+		try {
+			AdministrationService administrationService = Context.getAdministrationService();
+			String instance = mediatorKey + administrationService.getGlobalProperty(".instance");
+			String username = mediatorKey + administrationService.getGlobalProperty(".username");
+			String password = mediatorKey + administrationService.getGlobalProperty(".password");
+			URL url = new URL(instance.concat(mediatorUrl));
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			
+			String userCredentials = username.concat(":").concat(password);
+			String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+			con.setRequestProperty("Authorization", basicAuth);
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/json; utf-8");
+			con.setRequestProperty("Accept", "application/json");
+			con.setDoOutput(true);
+			String jsonInputString = data;
+			OutputStream os;
+			BufferedReader br;
+			try {
+				os = con.getOutputStream();
+				byte[] input = jsonInputString.getBytes("utf-8");
+				os.write(input, 0, input.length);
+			}
+			finally {}
+			
+			try {
+				br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+				StringBuilder response = new StringBuilder();
+				String responseLine = null;
+				while ((responseLine = br.readLine()) != null) {
+					response.append(responseLine.trim());
+				}
+				return response.toString();
+			}
+			finally {}
+			
+		}
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+			return e.toString();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			return e.toString();
+		}
 	}
 }

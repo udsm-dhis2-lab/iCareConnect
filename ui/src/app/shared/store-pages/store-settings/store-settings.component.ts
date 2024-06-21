@@ -1,7 +1,9 @@
 import { Component, OnInit } from "@angular/core";
+import { MatTabChangeEvent } from "@angular/material/tabs";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { loadConceptByUuid } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getConceptById } from "src/app/store/selectors";
@@ -18,7 +20,8 @@ export class StoreSettingsComponent implements OnInit {
   platformProductConfigs$: Observable<any>;
   constructor(
     private systemSettingsService: SystemSettingsService,
-    private store: Store<AppState>
+    private store: Store<AppState>,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -38,5 +41,15 @@ export class StoreSettingsComponent implements OnInit {
     this.paymentCategories$ = this.store.select(getConceptById, {
       id: "c95c1065-bcea-4a35-aee0-ca62906ec8e2",
     });
+  }
+  onTabChanged(event: MatTabChangeEvent): void {
+    this.trackActionForAnalytics(`${event.tab.textLabel}: Open`);
+  }
+  trackActionForAnalytics(eventname: any) {
+    this.googleAnalyticsService.sendAnalytics(
+      "Pharmacy",
+      eventname,
+      "Pharmacy"
+    );
   }
 }

@@ -36,6 +36,7 @@ import { go, loadCurrentPatient } from "src/app/store/actions";
 import { MatDialog } from "@angular/material/dialog";
 import { ExemptionConfirmationComponent } from "../../components/exemption-confirmation/exemption-confirmation.component";
 import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-current-patient-billing",
@@ -84,7 +85,8 @@ export class CurrentPatientBillingComponent implements OnInit {
     private ordersService: OrdersService,
     private systemSettingsService: SystemSettingsService,
     private store: Store<AppState>,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit() {
@@ -286,7 +288,10 @@ export class CurrentPatientBillingComponent implements OnInit {
   onPaymentSuccess() {
     this._getPatientDetails();
   }
-
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+    this.googleAnalyticsService.sendAnalytics(`Cashier`,`${eventname}: Print`,`Billing`)
+  }
   onCheckOpenExemptionRequest(orderTypeUuid: any): any {
     this.store
       .select(getIsPatientSentForExemption(orderTypeUuid))
@@ -352,9 +357,10 @@ export class CurrentPatientBillingComponent implements OnInit {
     });
   }
 
+
   onPrint(e: any): void {
     let contents: string;
-
+     
     const frame1: any = document.createElement("iframe");
     frame1.name = "frame3";
     frame1.style.position = "absolute";
@@ -660,7 +666,7 @@ export class CurrentPatientBillingComponent implements OnInit {
     </html>`);
 
     frameDoc.document.close();
-
+    this.trackActionForAnalytics("BillingReceipt");
     setTimeout(function () {
       window.frames["frame3"].focus();
       window.frames["frame3"].print();

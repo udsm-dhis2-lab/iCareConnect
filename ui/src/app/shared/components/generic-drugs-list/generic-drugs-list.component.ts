@@ -5,6 +5,7 @@ import { ConceptsService } from "src/app/shared/resources/concepts/services/conc
 import { ConceptGet } from "src/app/shared/resources/openmrs";
 import { AddNewGenericDrugModalComponent } from "../../../modules/maintenance/modals/add-new-generic-drug-modal/add-new-generic-drug-modal.component";
 import { DrugListModalComponent } from "../../../modules/maintenance/modals/drug-list-modal/drug-list-modal.component";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-generic-drugs-list",
@@ -19,7 +20,8 @@ export class GenericDrugsListComponent implements OnInit {
   searchingText: string;
   constructor(
     private conceptsService: ConceptsService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -84,5 +86,12 @@ export class GenericDrugsListComponent implements OnInit {
           this.getDrugsConcepts();
         }
       });
+      this.trackActionForAnalytics(`Add Generic Drugs: Open`);
+  }
+
+   
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
   }
 }

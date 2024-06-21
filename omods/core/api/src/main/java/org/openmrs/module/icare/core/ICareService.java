@@ -195,4 +195,8 @@ public interface ICareService extends OpenmrsService {
 	List<Encounter> getEncountersByEncounterType(String search, String encounterTypeUuid, Integer limit, Integer startIndex);
 	
 	void saveAuditLog(AuditLog auditLog);
+	
+	String pushEventWithoutRegistrationDataToDHIS2Instance(String eventData);
+	
+	String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType);
 }

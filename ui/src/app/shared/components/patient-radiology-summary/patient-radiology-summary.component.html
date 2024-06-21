@@ -10,6 +10,7 @@
         <th>Radiology order</th>
         <th>Results</th>
         <th>Date & Time</th>
+        <th style="width: 160px">Remarks</th>
         <th style="width: 160px"></th>
       </tr>
     </thead>
@@ -79,6 +80,9 @@
             </td>
             <td>
               {{ order?.dateActivated | date: "medium" }}
+            </td>
+            <td>
+              {{order?.remarks}}
             </td>
             <td>
               <button
