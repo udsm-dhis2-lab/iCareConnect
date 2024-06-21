@@ -44,6 +44,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -333,7 +334,8 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		List newPayments = (new ObjectMapper()).readValue(handler.getContentAsString(), List.class);
 		
 		Map newPayment = (Map) newPayments.get(0);
-		assertThat("List should contain payment", newPayment.get("referenceNumber"), is(payment.get("referenceNumber")));
+		assertThat("List should contain payment", newPayment.get("referenceNumber"),
+		    is(Optional.ofNullable(payment.get("referenceNumber"))));
 		
 		List<Map> itemPayments = (List<Map>) newPayment.get("items");
 		assertThat("List should contain payment", itemPayments.get(0).get("amount"), CoreMatchers.<Object> is(2000.0));
@@ -382,7 +384,8 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		List newPayments = (new ObjectMapper()).readValue(handler.getContentAsString(), List.class);
 		
 		Map newPayment = (Map) newPayments.get(0);
-		assertThat("List should contain payment", newPayment.get("referenceNumber"), is(payment.get("referenceNumber")));
+		assertThat("List should contain payment", newPayment.get("referenceNumber"),
+		    is(Optional.ofNullable(payment.get("referenceNumber"))));
 		
 		List<Map> itemPayments = (List<Map>) newPayment.get("items");
 		//TODO find out how to run a reliable test with the below line
