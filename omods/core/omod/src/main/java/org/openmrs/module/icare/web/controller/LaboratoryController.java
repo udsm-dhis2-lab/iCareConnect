@@ -501,9 +501,7 @@ public class LaboratoryController {
 			testAllocationStatuses.add(testAllocationStatus);
 		}
 		
-		List<Map<String, Object>> savedTestAllocationStatuses = laboratoryService
-		        .updateTestAllocationStatuses(testAllocationStatuses);
-		return savedTestAllocationStatuses;
+		return laboratoryService.updateTestAllocationStatuses(testAllocationStatuses);
 		
 	}
 	
