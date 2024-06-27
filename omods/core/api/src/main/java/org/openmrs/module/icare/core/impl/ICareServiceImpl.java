@@ -1103,7 +1103,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	@Override
 	public void saveAuditLog(AuditLog auditLog) {
-		this.auditLogDAO.save(auditLog);
+		// Check if user is authenticated first
+		User user = Context.getAuthenticatedUser();
+		if (user != null) {
+			this.auditLogDAO.save(auditLog);
+		}
 	}
 	
 	@Override
@@ -1134,6 +1138,55 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			OutputStream os;
 			BufferedReader br;
 			
+			try {
+				os = con.getOutputStream();
+				byte[] input = jsonInputString.getBytes("utf-8");
+				os.write(input, 0, input.length);
+			}
+			finally {}
+			
+			try {
+				br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+				StringBuilder response = new StringBuilder();
+				String responseLine = null;
+				while ((responseLine = br.readLine()) != null) {
+					response.append(responseLine.trim());
+				}
+				return response.toString();
+			}
+			finally {}
+			
+		}
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+			return e.toString();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			return e.toString();
+		}
+	}
+	
+	@Override
+	public String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType) {
+		try {
+			AdministrationService administrationService = Context.getAdministrationService();
+			String instance = mediatorKey + administrationService.getGlobalProperty(".instance");
+			String username = mediatorKey + administrationService.getGlobalProperty(".username");
+			String password = mediatorKey + administrationService.getGlobalProperty(".password");
+			URL url = new URL(instance.concat(mediatorUrl));
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			
+			String userCredentials = username.concat(":").concat(password);
+			String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+			con.setRequestProperty("Authorization", basicAuth);
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/json; utf-8");
+			con.setRequestProperty("Accept", "application/json");
+			con.setDoOutput(true);
+			String jsonInputString = data;
+			OutputStream os;
+			BufferedReader br;
 			try {
 				os = con.getOutputStream();
 				byte[] input = jsonInputString.getBytes("utf-8");
