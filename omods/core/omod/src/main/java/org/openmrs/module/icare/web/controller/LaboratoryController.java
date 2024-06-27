@@ -497,13 +497,12 @@ public class LaboratoryController {
 	        @RequestBody List<Map<String, Object>> testAllocationStatusesObject) throws Exception {
 		List<TestAllocationStatus> testAllocationStatuses = new ArrayList<TestAllocationStatus>();
 		for (Map<String, Object> testAllocationStatusObject : testAllocationStatusesObject) {
+			System.out.println(testAllocationStatusesObject);
 			TestAllocationStatus testAllocationStatus = TestAllocationStatus.fromMap(testAllocationStatusObject);
 			testAllocationStatuses.add(testAllocationStatus);
 		}
 		
-		List<Map<String, Object>> savedTestAllocationStatuses = laboratoryService
-		        .updateTestAllocationStatuses(testAllocationStatuses);
-		return savedTestAllocationStatuses;
+		return laboratoryService.updateTestAllocationStatuses(testAllocationStatuses);
 		
 	}
 	
