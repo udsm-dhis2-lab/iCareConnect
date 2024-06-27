@@ -36,9 +36,9 @@ public class GepgBillingControllerTest {
         payload.put("uuid", "7a4fc84b-ae30-4cf1-b43a-59d102b6898e");
         payload.put("selectedbills", List.of(Map.of("bill", "d5ef14c1-6388-40ee-8818-48d8aeb5fae6")));
         payload.put("totalBill", 10000);
+
         String response = controller.submitBill(payload);
         // assertEquals("Success", response);
-    
     }
 	
 	@Test

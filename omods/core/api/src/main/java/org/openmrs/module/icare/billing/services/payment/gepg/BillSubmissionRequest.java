@@ -20,6 +20,7 @@ public class BillSubmissionRequest {
 	
 	@Autowired
 	BillingService billingService;
+	
 	@JsonProperty("SystemAuth")
 	private SystemAuth systemAuth;
 	
@@ -62,18 +63,19 @@ public class BillSubmissionRequest {
 	}
 	
 	// Utility method to create BillSubmissionRequest
-	public BillSubmissionRequest createGepgPayloadRequest(String uuid, List<Map<String, String>> selectedBills, Integer totalBill) {
-
-        System.out.println("Received UUID on Submission Request: " + uuid + selectedBills + totalBill);
-		if (uuid != null) {
-			List<Invoice> invoices = billingService.getPatientsInvoices(uuid);
-		List<Map<String, Object>> invoiceMaps = new ArrayList<Map<String, Object>>();
-		for (Invoice invoice : invoices) {
-			invoiceMaps.add(invoice.toMap());
-		}
-		  System.out.println("client invoice ----------------------->"+ invoiceMaps);
-		}
-
+	public BillSubmissionRequest createGepgPayloadRequest(String uuid, List<Map<String, String>> selectedBills,
+	        Integer totalBill) {
+		
+		System.out.println("Received UUID on Submission Request: " + uuid + selectedBills + totalBill);
+		// if (uuid != null) {
+		// 	List<Invoice> invoices = billingService.getPatientsInvoices(uuid);
+		// 	List<Map<String, Object>> invoiceMaps = new ArrayList<Map<String, Object>>();
+		// 	for (Invoice invoice : invoices) {
+		// 		invoiceMaps.add(invoice.toMap());
+		// 	}
+		// 	System.out.println("client invoice ----------------------->" + invoiceMaps);
+		// }
+		
 		// Create and populate BillHdr
 		BillHdr billHdr = new BillHdr();
 		billHdr.setSpCode("SP111");
@@ -121,14 +123,15 @@ public class BillSubmissionRequest {
 		SystemAuth systemAuth = new SystemAuth();
 		systemAuth.setSystemCode("90019");
 		systemAuth.setServiceCode("1001");
-		systemAuth.setSignature("H1L8loLjkPsQ2BVueqcVX/KVYH7F7kym1TJ448Pi0jye2ACidAikTVwBJb9UYvW7XaLlftTD3m4/dDuvi5mRoemIjO6rizuwI1TWoWst9b1P8BpthKObnofVKwPVKnD6v2GLpfbXwtoiRSuajvkiyJnSCrqsQvtmBmL8ACV3pls5eesYxppsszXEtV/VfilMePOJhfGsIma64baM7sJ8q7LHyujjWT3094Df5oYZEbMDXOPjykCm63vjsEdrrT0A+vz+N7LblmTdHBhtHar52OJmbpNZkbVq/0ZsL1IbX0Wc7SrlU6cWaNuOt0CRJ3bqNnSe8RlO746zkUJtXerYdg==");
+		systemAuth
+		        .setSignature("H1L8loLjkPsQ2BVueqcVX/KVYH7F7kym1TJ448Pi0jye2ACidAikTVwBJb9UYvW7XaLlftTD3m4/dDuvi5mRoemIjO6rizuwI1TWoWst9b1P8BpthKObnofVKwPVKnD6v2GLpfbXwtoiRSuajvkiyJnSCrqsQvtmBmL8ACV3pls5eesYxppsszXEtV/VfilMePOJhfGsIma64baM7sJ8q7LHyujjWT3094Df5oYZEbMDXOPjykCm63vjsEdrrT0A+vz+N7LblmTdHBhtHar52OJmbpNZkbVq/0ZsL1IbX0Wc7SrlU6cWaNuOt0CRJ3bqNnSe8RlO746zkUJtXerYdg==");
 		
 		// Create and return BillSubmissionRequest
 		BillSubmissionRequest billRequest = new BillSubmissionRequest();
 		billRequest.setSystemAuth(systemAuth);
 		billRequest.setRequestData(requestData);
 		return billRequest;
-
+		
 	}
-
+	
 }
