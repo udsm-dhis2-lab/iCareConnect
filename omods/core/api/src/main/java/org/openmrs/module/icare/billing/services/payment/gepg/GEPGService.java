@@ -6,8 +6,8 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class GEPGService {
-
-    public String submitGepgRequest(String jsonPayload) {
+	
+	public String submitGepgRequest(String jsonPayload) {
 		System.out.println("on submit here ....................");
         String apiUrl = "https://api-testengine.udsm.ac.tz/index.php?r=api/service";
         String apiKey = ""; 
@@ -28,12 +28,12 @@ public class GEPGService {
 
         return response.getBody();
     }
-
-    @Override
-    public String toString() {
-        return "GEPGService []";
-    }
-
+	
+	@Override
+	public String toString() {
+		return "GEPGService []";
+	}
+	
 	public void createBillSubmissionRequest(String anyString) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'createBillSubmissionRequest'");
