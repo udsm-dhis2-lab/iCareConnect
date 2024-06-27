@@ -47,4 +47,3 @@ public class RequestData {
 		this.billTrxInf = billTrxInf;
 	}
 }
-
