@@ -52,6 +52,14 @@ export class RegistrationHomeComponent implements OnInit {
   treatmentLocations$: Observable<any>;
   showCard: boolean;
 
+displayedColumn: string[] = ['sno', 'name', 'clinician', 'time', 'gender'];
+patientData = [
+  { sno: 1, name: 'John Doe', clinician: 'Dr. Smith', time: '10:00 AM', gender: 'Male' },
+  { sno: 2, name: 'Jane Doe', clinician: 'Dr. Brown', time: '10:30 AM', gender: 'Female' },
+  { sno: 3, name: 'Alice Johnson', clinician: 'Dr. White', time: '11:00 AM', gender: 'Female' },
+  { sno: 4, name: 'Bob Brown', clinician: 'Dr. Black', time: '11:30 AM', gender: 'Male' },
+  { sno: 5, name: 'Charlie Green', clinician: 'Dr. Green', time: '12:00 PM', gender: 'Male' }
+];
   constructor(
     private store: Store<AppState>,
     private visitService: VisitsService,
