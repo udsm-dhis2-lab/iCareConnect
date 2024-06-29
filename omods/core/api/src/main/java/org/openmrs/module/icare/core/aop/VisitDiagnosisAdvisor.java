@@ -108,6 +108,7 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 							JSONArray mediatorsList = new JSONArray(mediatorsConfigs);
 							for (int count = 0; count < mediatorsList.length(); count++) {
 								JSONObject mediator = mediatorsList.getJSONObject(count);
+								System.out.println(mediator);
 								if (mediator.has("isActive") && mediator.getBoolean("isActive")) {
 									if (mediator.has("mediatorKey") && mediator.getString("mediatorKey").equals("HDUAPI")) {
 										// For HDU API
@@ -134,7 +135,15 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 										demographicDetails.put("firstName", capturedEventData.get("firstName"));
 										demographicDetails.put("middleName", "");
 										demographicDetails.put("lastName", capturedEventData.get("surname"));
-										demographicDetails.put("gender", capturedEventData.get("gender"));
+										demographicDetails.put("surname", capturedEventData.get("surname"));
+										String gender = capturedEventData.get("gender").toString();
+										if (gender != null && gender.equalsIgnoreCase("m")) {
+											demographicDetails.put("gender", "male");
+										} else if (gender != null && gender.equalsIgnoreCase("f")) {
+											demographicDetails.put("gender", "female");
+										} else {
+											demographicDetails.put("gender", "unknown");
+										}
 										demographicDetails.put("mrn", capturedEventData.get("identifier"));
 										demographicDetails.put("identifier", capturedEventData.get("identifier"));
 
@@ -145,6 +154,7 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 										List<Map<String, Object>> diagnosisDetails = new ArrayList<>();
 										Map<String, Object> diagnosisData = new HashMap<>();
 										diagnosisData.put("diagnosisCode", capturedEventData.get("diseaseCode"));
+										diagnosisData.put("diagnosis", capturedEventData.get("diseaseCode"));
 										diagnosisData.put("diagnosisDate", capturedEventData.get("eventDate"));
 										diagnosisData.put("certainty", capturedEventData.get("certainty"));
 										diagnosisData.put("diagnosisDescription", capturedEventData.get("certainty"));
@@ -160,7 +170,8 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 										dataSection.put("reportDetails", reportDetails);
 										dataSection.put("facilityDetails", facilityDetails);
 										dataSection.put("listGrid", listGrid);
-										templateDetails.put("data", dataSection);
+										dataTemplateData.put("templateDetails", templateDetails);
+										dataTemplateData.put("data", dataSection);
 
 										String mediatorMappingReferenceKey = mediator.getString("mediatorMappingReferenceKey");
 										String mediatorKey = mediator.getString("mediatorKey");
@@ -168,12 +179,9 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 										String authenticationType = mediator.getString("authenticationType");
 										String mappings = adminService.getGlobalProperty(mediatorMappingReferenceKey);
 
-										if (mediatorUrlPath != null && mappings != null) {
-											EidsrWrapper eidsrWrapper = new EidsrWrapper();
-											Map<String, Object> data = eidsrWrapper.formatData(mappings,capturedEventData);
-
-											if (new JSONObject(templateDetails).toString() != null) {
-												String response = iCareService.pushDataToExternalMediator(new JSONObject(templateDetails).toString(),mediatorKey,mediatorUrlPath,authenticationType);
+										if (mediatorUrlPath != null) {
+											if (new JSONObject(dataTemplateData).toString() != null) {
+												String response = iCareService.pushDataToExternalMediator(new JSONObject(dataTemplateData).toString(),mediatorKey,mediatorUrlPath,authenticationType);
 												GlobalProperty globalProperty2 = new GlobalProperty();
 												globalProperty2.setProperty("HDUAPI.test.response");
 												globalProperty2.setPropertyValue(response);
@@ -197,9 +205,36 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 										String response = iCareService.pushEventWithoutRegistrationDataToDHIS2Instance(new JSONObject(eventsPayload).toString());
 
 										GlobalProperty globalProperty = new GlobalProperty();
-										globalProperty.setProperty("surveillance.test.dhis");
+										globalProperty.setProperty("surveillance.test.dhis.test");
 										globalProperty.setPropertyValue(response);
 										adminService.saveGlobalProperty(globalProperty);
+									} else if(mediator.has("mediatorKey") && mediator.getString("mediatorKey").equals("iAdapter") && mediator.has("mediatorUrlPath")) {
+										String mediatorMappingReferenceKey = mediator.getString("mediatorMappingReferenceKey");
+										String mediatorKey = mediator.getString("mediatorKey");
+										String mediatorUrlPath = mediator.getString("mediatorUrlPath");
+										String authenticationType = mediator.getString("authenticationType");
+										String mappings = adminService.getGlobalProperty(mediatorMappingReferenceKey);
+										Map<String, Object> data = new HashMap<>();
+										data.put("namespace", "hieData");
+										data.put("dataKey", new Date().getTime());
+										Map<String, Object> dataValue = new HashMap<>();
+										dataValue.put("gender", capturedEventData.get("gender"));
+										dataValue.put("mrn", capturedEventData.get("identifier"));
+										dataValue.put("diagnosis", capturedEventData.get("diagnosis"));
+										dataValue.put("diagnosisCode", capturedEventData.get("diseaseCode"));
+										dataValue.put("dob", capturedEventData.get("dob"));
+										dataValue.put("status", "Active");
+										data.put("value", dataValue);
+										if (mediatorUrlPath != null) {
+											if (new JSONObject(data).toString() != null) {
+												String response = iCareService.pushDataToExternalMediator(new JSONObject(data).toString(),mediatorKey,mediatorUrlPath,authenticationType);
+												GlobalProperty globalProperty2 = new GlobalProperty();
+												globalProperty2.setProperty("iAdapter.datastore.test.response");
+												globalProperty2.setPropertyValue(response);
+												adminService.saveGlobalProperty(globalProperty2);
+											}
+										}
+
 									} else if (mediator.has("mediatorKey") && mediator.getString("mediatorKey").equals("eidsr") && mediator.has("mediatorMappingReferenceKey") && mediator.has("mediatorUrlPath")) {
 
 										String mediatorMappingReferenceKey = mediator.getString("mediatorMappingReferenceKey");
@@ -211,7 +246,6 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 										if (mediatorUrlPath != null && mappings != null) {
 											EidsrWrapper eidsrWrapper = new EidsrWrapper();
 											Map<String, Object> data = eidsrWrapper.formatData(mappings,capturedEventData);
-
 											if (new JSONObject(data).toString() != null) {
 												String response = iCareService.pushDataToExternalMediator(new JSONObject(data).toString(),mediatorKey,mediatorUrlPath,authenticationType);
 												GlobalProperty globalProperty2 = new GlobalProperty();

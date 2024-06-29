@@ -51,6 +51,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -1103,11 +1104,12 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	@Override
 	public void saveAuditLog(AuditLog auditLog) {
+		this.auditLogDAO.save(auditLog);
 		// Check if user is authenticated first
-		User user = Context.getAuthenticatedUser();
-		if (user != null) {
-			this.auditLogDAO.save(auditLog);
-		}
+		//		User user = Context.getAuthenticatedUser();
+		//		if (user != null) {
+		//			this.auditLogDAO.save(auditLog);
+		//		}
 	}
 	
 	@Override
@@ -1171,31 +1173,34 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	public String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType) {
 		try {
 			AdministrationService administrationService = Context.getAdministrationService();
-			String instance = mediatorKey + administrationService.getGlobalProperty(".instance");
-			String username = mediatorKey + administrationService.getGlobalProperty(".username");
-			String password = mediatorKey + administrationService.getGlobalProperty(".password");
-			URL url = new URL(instance.concat(mediatorUrl));
+			String instance = administrationService.getGlobalProperty(mediatorKey + ".instance");
+			String username = administrationService.getGlobalProperty(mediatorKey + ".username");
+			String password = administrationService.getGlobalProperty(mediatorKey + ".password");
+			String path = instance + mediatorUrl;
+			URL url = new URL(path);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			
 			String userCredentials = username.concat(":").concat(password);
-			String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
-			con.setRequestProperty("Authorization", basicAuth);
+			String basicAuth = "";
+			if (authenticationType.equalsIgnoreCase("basic")) {
+				basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+				con.setRequestProperty("Authorization", basicAuth);
+			}
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Content-Type", "application/json; utf-8");
 			con.setRequestProperty("Accept", "application/json");
 			con.setDoOutput(true);
-			String jsonInputString = data;
 			OutputStream os;
 			BufferedReader br;
 			try {
 				os = con.getOutputStream();
-				byte[] input = jsonInputString.getBytes("utf-8");
+				byte[] input = data.getBytes(StandardCharsets.UTF_8);
 				os.write(input, 0, input.length);
 			}
 			finally {}
 			
 			try {
-				br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+				br = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
 				StringBuilder response = new StringBuilder();
 				String responseLine = null;
 				while ((responseLine = br.readLine()) != null) {

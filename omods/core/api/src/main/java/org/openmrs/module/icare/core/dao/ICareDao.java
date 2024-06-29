@@ -515,7 +515,7 @@ public class ICareDao extends BaseDAO<Item> {
 	        Boolean isDrug) {
 		DbSession session = this.getSession();
 		String queryStr = "";
-		if (isDrug == null || isDrug == true) {
+		if (isDrug == null || isDrug) {
 			queryStr = "SELECT distinct pres.drug AS drug, COUNT(pres.orderId) AS count FROM Prescription pres "
 			        + "GROUP BY pres.drug ORDER BY COUNT(pres.orderId)  DESC";
 		} else {
