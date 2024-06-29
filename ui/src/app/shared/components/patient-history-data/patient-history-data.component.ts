@@ -243,6 +243,8 @@ export class PatientHistoryDataComponent implements OnInit {
       this.specificDrugConceptUuid,
       this.prescriptionArrangementFields
     );
+    // console.log(" HISTORYVISIT.");
+    // console.log(this.visitHistory?.visitOrderedData);
   }
 
   onPrint(e: any, visitData: any): void {
@@ -480,6 +482,7 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
     frameDoc.document.write(`</tbody></table>`);
 
     // -------------------lab orders-------------
+
     if (
       this.visitHistory?.visitOrderedData?.find(
         (visitData) => visitData.category === "LAB_ORDER"

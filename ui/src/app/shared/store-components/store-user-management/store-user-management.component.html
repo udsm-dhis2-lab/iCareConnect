@@ -7,7 +7,7 @@
     *ngIf="!params?.currentUser"
   ></mat-progress-bar>
   <ng-container *ngIf="params?.currentUser">
-    <mat-tab-group>
+    <mat-tab-group (selectedTabChange)="onTabChanged($event)">
       <mat-tab label="Users">
         <ng-template matTabContent>
           <div
