@@ -6,10 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.openmrs.*;
 import org.openmrs.module.icare.billing.models.Invoice;
+import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -123,6 +126,7 @@ public class BillSubmissionRequest {
 		SystemAuth systemAuth = new SystemAuth();
 		systemAuth.setSystemCode("90019");
 		systemAuth.setServiceCode("1001");
+		// TODO: Put this on system settings
 		systemAuth
 		        .setSignature("H1L8loLjkPsQ2BVueqcVX/KVYH7F7kym1TJ448Pi0jye2ACidAikTVwBJb9UYvW7XaLlftTD3m4/dDuvi5mRoemIjO6rizuwI1TWoWst9b1P8BpthKObnofVKwPVKnD6v2GLpfbXwtoiRSuajvkiyJnSCrqsQvtmBmL8ACV3pls5eesYxppsszXEtV/VfilMePOJhfGsIma64baM7sJ8q7LHyujjWT3094Df5oYZEbMDXOPjykCm63vjsEdrrT0A+vz+N7LblmTdHBhtHar52OJmbpNZkbVq/0ZsL1IbX0Wc7SrlU6cWaNuOt0CRJ3bqNnSe8RlO746zkUJtXerYdg==");
 		
@@ -133,5 +137,82 @@ public class BillSubmissionRequest {
 		return billRequest;
 		
 	}
-	
+
+	public BillSubmissionRequest createGePGPayload(Patient patient,
+												   List<InvoiceItem> invoiceItems,
+												   Number totalBillAmount,
+												   Date billExpirlyDate,
+												   String personPhoneAttributeTypeUuid,
+												   String personEmailAttributeTypeUuid,
+												   String currency,
+												   String gepgAuthSignature,
+												   String GFSCodeConceptSourceMappingUuid) throws Exception {
+		String totalAmount = totalBillAmount.toString();
+		String patientNames = patient.getGivenName() + " " + patient.getFamilyName();
+		String patientPhoneNumber = "";
+		String email = "";
+		for(PersonAttribute attribute : patient.getAttributes()) {
+			if (personPhoneAttributeTypeUuid != null && attribute.getAttributeType().getUuid().equals(personPhoneAttributeTypeUuid)) {
+				patientPhoneNumber = attribute.getValue();
+			} else if (personEmailAttributeTypeUuid != null && attribute.getAttributeType().getUuid().equals(personEmailAttributeTypeUuid)) {
+				email = attribute.getValue();
+			}
+		}
+		BillItems billItems = new BillItems();
+		for(InvoiceItem invoiceItem: invoiceItems) {
+			Concept concept = invoiceItem.getItem().getConcept();
+			for(ConceptMap conceptMap: concept.getConceptMappings()) {
+				if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(GFSCodeConceptSourceMappingUuid)) {
+					// TODO: Formulate the bill item with the GSF code, add exception handling in case the GFS code is not present
+					String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
+					billItems.getBillItem().add(new BillItem("11", "N", "5000", "5000", "0.0", GFSCode));
+				}
+			}
+		}
+
+		// Set the required payload
+		BillHdr billHdr = new BillHdr();
+		billHdr.setSpCode("SP111");
+		billHdr.setRtrRespFlg("true");
+
+		// Create and populate BillTrxInf
+		BillTrxInf billTrxInf = new BillTrxInf();
+		billTrxInf.setBillId("123456222");
+		billTrxInf.setSubSpCode("7001");
+		billTrxInf.setSpSysId("LHGSE001");
+		billTrxInf.setBillAmt(totalAmount);
+		billTrxInf.setMiscAmt("0");
+		billTrxInf.setBillExprDt("2018-08-08T07:09:34");
+		billTrxInf.setPyrId("40");
+		billTrxInf.setPyrName(patientNames.toUpperCase());
+		billTrxInf.setBillDesc("Application Fees Payment");
+		LocalDateTime now = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+		String formattedNow = now.format(formatter);
+		billTrxInf.setBillGenDt(formattedNow);
+		billTrxInf.setBillGenBy("40");
+		billTrxInf.setBillApprBy(patientNames.toUpperCase());
+		billTrxInf.setPyrCellNum(patientPhoneNumber);
+		billTrxInf.setPyrEmail(email);
+		billTrxInf.setCcy(currency);
+		billTrxInf.setBillEqvAmt("30000");
+		billTrxInf.setRemFlag("false");
+		billTrxInf.setBillPayOpt("3");
+		// Create and populate RequestData
+		RequestData requestData = new RequestData();
+		requestData.setRequestId("6474647FD8484909");
+		requestData.setBillHdr(billHdr);
+		requestData.setBillTrxInf(billTrxInf);
+
+		// Create and populate SystemAuth
+		SystemAuth systemAuth = new SystemAuth();
+		systemAuth.setSystemCode("90019");
+		systemAuth.setServiceCode("1001");
+		systemAuth.setSignature(gepgAuthSignature);
+
+		BillSubmissionRequest billRequest = new BillSubmissionRequest();
+		billRequest.setSystemAuth(systemAuth);
+		billRequest.setRequestData(requestData);
+		return billRequest;
+	}
 }
