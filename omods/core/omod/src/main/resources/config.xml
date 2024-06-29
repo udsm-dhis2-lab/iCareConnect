@@ -148,8 +148,20 @@
 			For vertical program visit type reference
 		</description>
 	</globalProperty>
-	iCare.visits.types.verticalProgram.uuid
-	
+	<globalProperty>
+		<property>iCare.GePG.settings.authentication.authSignature</property>
+		<defaultValue>GePGAUthenticationCertificateKey</defaultValue>
+		<description>
+			For GePG Authentication
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>icare.billing.mappings.GFSCODEConceptSource.uuid</property>
+		<defaultValue>GFSCODE_CONCEPT_SOURCE_UUID</defaultValue>
+		<description>
+			For GFSCODE Mapping reference
+		</description>
+	</globalProperty>
 	<!-- Internationalization -->
 	<!-- All message codes should start with @MODULE_ID@.* -->
 	<messages>

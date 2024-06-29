@@ -283,6 +283,13 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		}
 		return invoices;
 	}
+
+	@Override
+	public Invoice getInvoiceDetailsByUuid(String uuid) {
+		Invoice invoice = this.invoiceDAO.findByUuid(uuid);
+		// TODO: Check for any discounts
+		return invoice;
+	}
 	
 	@Override
 	public List<Payment> getPatientPayments(String patientUuid) {

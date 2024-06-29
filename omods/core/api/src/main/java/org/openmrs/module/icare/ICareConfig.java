@@ -136,5 +136,9 @@ public class ICareConfig {
 	public static final String SURVEILLANCE_SINGLE_EVENT_PROGRAM_STAGE = "iCare.surveillance.settings.eventProgramStage.uuid";
 	
 	public static final String SURVEILLANCE_SINGLE_EVENT_PROGRAM_MAPPINGS = "iCare.surveillance.settings.eventProgramMappings";
+
+	public static final String GEPG_AUTH_SIGNATURE = "iCare.GePG.settings.authentication.authSignature";
+
+	public static final String GFSCODE_CONCEPT_SOURCE_REFERENCE = "icare.billing.mappings.GFSCODEConceptSource.uuid";
 	
 }
