@@ -15,6 +15,7 @@ import {
 
 import { omit, uniqBy } from "lodash";
 import { Field } from "../../modules/form/models/field.model";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-shared-concept-create",
@@ -77,7 +78,8 @@ export class SharedConceptCreateComponent implements OnInit {
   currentMappings: any[] = [];
   constructor(
     private conceptService: ConceptsService,
-    private billableItemService: BillableItemsService
+    private billableItemService: BillableItemsService,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -529,6 +531,7 @@ export class SharedConceptCreateComponent implements OnInit {
                       this.alertType = "success";
                       this.savingMessage =
                         "Successfully created " + conceptName;
+                        this.trackActionForAnalytics(`Non Drugs: Save`);
 
                       setTimeout(() => {
                         this.savingMessage = null;
@@ -551,4 +554,10 @@ export class SharedConceptCreateComponent implements OnInit {
         }
       });
   }
+ 
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
+  }
+
 }

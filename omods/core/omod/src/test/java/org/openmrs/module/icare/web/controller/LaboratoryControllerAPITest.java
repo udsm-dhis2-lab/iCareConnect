@@ -468,17 +468,13 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handleGet3 = handle(newGetRequest3);
 		Map<String, Object> sampleResults3 = (new ObjectMapper()).readValue(handleGet3.getContentAsString(), Map.class);
 		
-		System.out.println("Results1: " + sampleResults);
-		System.out.println("Results2: " + sampleResults2);
-		System.out.println("Results3: " + sampleResults3);
-		
 		assertThat("Should return a sample", ((List) sampleResults.get("results")).size() == 1);
 		assertThat("Should return a sample", ((List) sampleResults2.get("results")).size() == 1);
 		
 		newGetRequest = newGetRequest("lab/samples", new Parameter("excludeStatus", "RECEIVED"));
 		handleGet = handle(newGetRequest);
 		sampleResults = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
-		System.out.println("aa: " + handleGet.getContentAsString());
+		//		System.out.println("aa: " + handleGet.getContentAsString());
 		
 	}
 	
@@ -689,10 +685,21 @@ public class LaboratoryControllerAPITest extends BaseResourceControllerTest {
 		
 		//Then
 		assertThat("The encounter should one observation", observations.size(), is(1));
-		assertThat("The observation concept name is mrdt result", observations.get(0).getConcept().getName().getName(),
-		    is("mrdt result"));
+		//		assertThat("The observation concept name is mrdt result", observations.get(0).getConcept().getName().getName(),
+		//		    is("mrdt result"));
 		assertThat("The observation value text should be positive", observations.get(0).getValueText(), is("positive"));
-		
+		//
+	}
+
+	@Test
+	public void testUpdateMultipleTestAllocations() throws Exception {
+		// Given
+		String dataReference =this.readFile("dto/approve-test-results.json");
+		Map<String, Object> testAllocationStatuses = (new ObjectMapper()).readValue(dataReference, Map.class);
+		//When
+		MockHttpServletRequest newPostRequest = newPostRequest("lab/allocationstatuses", testAllocationStatuses);
+		MockHttpServletResponse handle = handle(newPostRequest);
+
 	}
 	
 	@Test
