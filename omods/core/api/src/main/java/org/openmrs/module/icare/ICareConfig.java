@@ -135,10 +135,10 @@ public class ICareConfig {
 	
 	public static final String SURVEILLANCE_SINGLE_EVENT_PROGRAM_STAGE = "iCare.interoperability.settings.surveillance.dhis2.eventProgramStage.uuid";
 	
-	public static final String SURVEILLANCE_SINGLE_EVENT_PROGRAM_MAPPINGS = "iCare.interoperability.settings.surveillance.dhis2.eventProgramMappings";
-	
-	public static final String INTEROPERABILITY_MEDIATORS_LIST = "iCare.interoperability.settings.mediators.list";
-	
-	public static final String HDU_API_WORKFLOW_UUID_FOR_OPD = "iCare.interoperability.settings.hduapi.workflowUuid.uuid";
+	public static final String SURVEILLANCE_SINGLE_EVENT_PROGRAM_MAPPINGS = "iCare.surveillance.settings.eventProgramMappings";
+
+	public static final String GEPG_AUTH_SIGNATURE = "iCare.GePG.settings.authentication.authSignature";
+
+	public static final String GFSCODE_CONCEPT_SOURCE_REFERENCE = "icare.billing.mappings.GFSCODEConceptSource.uuid";
 	
 }
