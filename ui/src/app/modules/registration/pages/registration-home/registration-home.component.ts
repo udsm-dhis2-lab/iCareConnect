@@ -20,6 +20,9 @@ import { VisitStatusConfirmationModelComponent } from "../../components/visit-st
 import { PatientService } from "src/app/shared/services/patient.service";
 import { clearActiveVisit } from "src/app/store/actions/visit.actions";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
+import { PatientAppointmentService } from "src/app/core/services/patient.service";
+import { PatientAppointment } from "src/app/core/models/patient.model";
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: "app-registration-home",
@@ -30,6 +33,7 @@ export class RegistrationHomeComponent implements OnInit {
   visits$: Observable<Visit[]>;
   visitColumns: any[];
   dataSource: any;
+  appointmentDataSource: MatTableDataSource<PatientAppointment>;
   loadingData: boolean = false;
   loadedData: boolean = false;
   loadingDataError: string;
@@ -53,21 +57,17 @@ export class RegistrationHomeComponent implements OnInit {
   showCard: boolean;
 
 displayedColumn: string[] = ['sno', 'name', 'clinician', 'time', 'gender'];
-patientData = [
-  { sno: 1, name: 'John Doe', clinician: 'Dr. Smith', time: '10:00 AM', gender: 'Male' },
-  { sno: 2, name: 'Jane Doe', clinician: 'Dr. Brown', time: '10:30 AM', gender: 'Female' },
-  { sno: 3, name: 'Alice Johnson', clinician: 'Dr. White', time: '11:00 AM', gender: 'Female' },
-  { sno: 4, name: 'Bob Brown', clinician: 'Dr. Black', time: '11:30 AM', gender: 'Male' },
-  { sno: 5, name: 'Charlie Green', clinician: 'Dr. Green', time: '12:00 PM', gender: 'Male' }
-];
   constructor(
     private store: Store<AppState>,
     private visitService: VisitsService,
     private dialog: MatDialog,
     private patentService: PatientService,
-    private googleAnalyticsService: GoogleAnalyticsService
+    private patientAppointmentService: PatientAppointmentService,
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private http: HttpClient
   ) {
     this.documentURL = "http://icare.dhis2.udsm.ac.tz/docs/";
+    this.appointmentDataSource = new MatTableDataSource<PatientAppointment>();
   }
 
   get displayedColumns(): string[] {
@@ -93,7 +93,38 @@ patientData = [
     });
 
     this.getPatientsStatsSummary();
+    this.loadPatientAppointmentData();
   }
+
+  loadPatientAppointmentData() {
+    this.patientAppointmentService.getPatients().subscribe(
+      (patients) => {
+        this.appointmentDataSource.data = patients.map((patient, index) => ({
+          ...patient,
+          sno: index + 1
+        }));
+        this.appointmentDataSource.paginator = this.paginator;
+        this.appointmentDataSource.sort = this.sort;
+      },
+      (error) => {
+        console.error('Error fetching patient data', error);
+      }
+    );
+  }
+
+  approveAppointment(id: string) {
+    const url = `http://localhost:4000/api/appointment/${id}`;
+    this.http.put(url, { status: 'complete' }).subscribe(
+      (response) => {
+        console.log('Appointment approved:', response);
+        this.loadPatientAppointmentData();
+      },
+      (error) => {
+        console.error('Error approving appointment:', error);
+      }
+    );
+  }
+  
 
   getPatientsStatsSummary(): void {
     this.patientSummary$ = this.patentService.getPatientSummary();

@@ -96,16 +96,25 @@
             *ngIf="loadingData"
           ></mat-progress-bar>
         </div>
-
       <div class="mt-4 mx-8">
         <h3>Patient List</h3>
-        <table mat-table [dataSource]="patientData" class="mat-elevation-z8" style="width: 100%;">
+        <table mat-table [dataSource]="appointmentDataSource" class="mat-elevation-z8" style="width: 100%;">
           <ng-container *ngFor="let column of displayedColumn" [matColumnDef]="column">
             <th mat-header-cell *matHeaderCellDef style="font-size: '18px';">{{ column | titlecase }}</th>
             <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
           </ng-container>
-          <tr mat-header-row *matHeaderRowDef="displayedColumn"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumn;"></tr>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let element">{{ element.status }}</td>
+          </ng-container>
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>Action</th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-button color="primary" *ngIf="element.status === 'pending'" (click)="approveAppointment(element.id)">Approve</button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumn.concat(['status', 'action'])"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumn.concat(['status', 'action']);"></tr>
         </table>
       </div>
       </div>
