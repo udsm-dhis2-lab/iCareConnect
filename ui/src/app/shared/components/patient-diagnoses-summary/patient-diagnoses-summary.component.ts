@@ -125,6 +125,20 @@ export class PatientDiagnosesSummaryComponent implements OnInit {
         currentDiagnosisUuid: null,
       })
     );
+     // Check if the diagnosis is one of the surveillance diseases
+  const surveillanceDiseases = [
+    "Cholera(A009)",
+    "Diarrhea with Blood (Dysentery)(K580)",
+    "Dengue Fever(A90)",
+    "Ebola or Marburg Virus Diseases(A984)",
+    "Yellow fever(959)",
+    "Small Pox(B03)"
+  ];
+  if (surveillanceDiseases.includes(this.diagnosesData.diagnosis)) {
+    // Share the demographic information of the patient
+    console.log("Sharing demographic information of the patient");
+    // Add code here to share the demographic information
+  }
     this.updateMedicationComponent.emit();
     this.updateConsultationOrder.emit();
   }
