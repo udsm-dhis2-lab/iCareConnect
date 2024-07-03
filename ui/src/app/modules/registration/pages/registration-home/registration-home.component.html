@@ -110,8 +110,10 @@
           <ng-container matColumnDef="action">
             <th mat-header-cell *matHeaderCellDef>Action</th>
             <td mat-cell *matCellDef="let element">
-              <button mat-button color="primary" *ngIf="element.status === 'pending'" (click)="approveAppointment(element.id)">Approve</button>
-            </td>
+              <button mat-button color="primary" (click)="element.status === 'pending' ? approveAppointment(element.id) : null">
+                {{ element.status === 'pending' ? 'Approve' : 'Already Approved' }}
+              </button>
+            </td>                      
           </ng-container>
           <tr mat-header-row *matHeaderRowDef="displayedColumn.concat(['status', 'action'])"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumn.concat(['status', 'action']);"></tr>
