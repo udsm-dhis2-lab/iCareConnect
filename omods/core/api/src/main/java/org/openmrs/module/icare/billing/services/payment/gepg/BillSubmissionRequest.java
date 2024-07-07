@@ -146,9 +146,15 @@ public class BillSubmissionRequest {
 												   String personEmailAttributeTypeUuid,
 												   String currency,
 												   String gepgAuthSignature,
-												   String GFSCodeConceptSourceMappingUuid) throws Exception {
+												   String GFSCodeConceptSourceMappingUuid,
+												   String spCode,
+												   String sytemCode,
+												   String serviceCode,
+												   String SpSysId,
+												   String subSpCode) throws Exception {
 		String totalAmount = totalBillAmount.toString();
 		String patientNames = patient.getGivenName() + " " + patient.getFamilyName();
+		String patientUuid = patient.getUuid();
 		String patientPhoneNumber = "";
 		String email = "";
 		for(PersonAttribute attribute : patient.getAttributes()) {
@@ -172,42 +178,45 @@ public class BillSubmissionRequest {
 
 		// Set the required payload
 		BillHdr billHdr = new BillHdr();
-		billHdr.setSpCode("SP111");
+		billHdr.setSpCode(spCode);
 		billHdr.setRtrRespFlg("true");
 
 		// Create and populate BillTrxInf
 		BillTrxInf billTrxInf = new BillTrxInf();
-		billTrxInf.setBillId("123456222");
-		billTrxInf.setSubSpCode("7001");
-		billTrxInf.setSpSysId("LHGSE001");
+		billTrxInf.setBillId(patientUuid);
+		billTrxInf.setSubSpCode(subSpCode);
+		billTrxInf.setSpSysId(SpSysId);
 		billTrxInf.setBillAmt(totalAmount);
 		billTrxInf.setMiscAmt("0");
-		billTrxInf.setBillExprDt("2018-08-08T07:09:34");
-		billTrxInf.setPyrId("40");
-		billTrxInf.setPyrName(patientNames.toUpperCase());
-		billTrxInf.setBillDesc("Application Fees Payment");
 		LocalDateTime now = LocalDateTime.now();
 		DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 		String formattedNow = now.format(formatter);
 		billTrxInf.setBillGenDt(formattedNow);
-		billTrxInf.setBillGenBy("40");
+
+		LocalDateTime expirationTime = now.plusHours(24);
+        String formattedExpirationTime = expirationTime.format(formatter);
+        billTrxInf.setBillExprDt(formattedExpirationTime);
+		billTrxInf.setPyrId("40");
+		billTrxInf.setPyrName(patientNames.toUpperCase());
+		billTrxInf.setBillDesc("Application Fees Payment");
+		billTrxInf.setBillGenBy("UDSM Hospital");
 		billTrxInf.setBillApprBy(patientNames.toUpperCase());
 		billTrxInf.setPyrCellNum(patientPhoneNumber);
 		billTrxInf.setPyrEmail(email);
 		billTrxInf.setCcy(currency);
-		billTrxInf.setBillEqvAmt("30000");
+		billTrxInf.setBillEqvAmt(totalAmount);
 		billTrxInf.setRemFlag("false");
-		billTrxInf.setBillPayOpt("3");
+		billTrxInf.setBillPayOpt("2");
 		// Create and populate RequestData
 		RequestData requestData = new RequestData();
-		requestData.setRequestId("6474647FD8484909");
+		requestData.setRequestId(patientUuid);
 		requestData.setBillHdr(billHdr);
 		requestData.setBillTrxInf(billTrxInf);
 
 		// Create and populate SystemAuth
 		SystemAuth systemAuth = new SystemAuth();
-		systemAuth.setSystemCode("90019");
-		systemAuth.setServiceCode("1001");
+		systemAuth.setSystemCode(sytemCode);
+		systemAuth.setServiceCode(serviceCode);
 		systemAuth.setSignature(gepgAuthSignature);
 
 		BillSubmissionRequest billRequest = new BillSubmissionRequest();
