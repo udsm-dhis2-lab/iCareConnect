@@ -47,7 +47,7 @@ public class GepgBillingController {
 			// Call the non-static method on the instance
 			jsonPayload = billRequest.toJson();
 			System.out.println("Generated BillSubmissionRequest: " + jsonPayload);
-			response = gepgbillService.submitGepgRequest(jsonPayload);
+			// response = gepgbillService.submitGepgRequest(jsonPayload);
 		}
 		catch (JsonProcessingException e) {
 			e.printStackTrace();
@@ -84,6 +84,11 @@ public class GepgBillingController {
 		AdministrationService administrationService = Context.getAdministrationService();
 		Date billExpDate = new Date(); // TODO: This should be evaluated (Check how as per your needs)
 		String personPhoneNumberAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.PHONE_NUMBER_ATTRIBUTE);
+		String spCode = administrationService.getGlobalProperty(ICareConfig.SP_CODE);
+		String systemCode = administrationService.getGlobalProperty(ICareConfig.SYSTEM_CODE);
+		String serviceCode = administrationService.getGlobalProperty(ICareConfig.SERVICE_CODE);
+		String spsyId = administrationService.getGlobalProperty(ICareConfig.SERVICE_PROVIDER_ID);
+		String subSpCode = administrationService.getGlobalProperty(ICareConfig.SUB_SERVICE_PROVIDER_CODE);
 		String personEmailAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE);
 		String gepgAuthSignature = administrationService.getGlobalProperty(ICareConfig.GEPG_AUTH_SIGNATURE);
 		String GFSCodeConceptSourceMappingUuid = administrationService.getGlobalProperty(ICareConfig.GFSCODE_CONCEPT_SOURCE_REFERENCE);
@@ -96,7 +101,25 @@ public class GepgBillingController {
 				personEmailAttributeTypeUuid,
 				currency,
 				gepgAuthSignature,
-				GFSCodeConceptSourceMappingUuid);
+				GFSCodeConceptSourceMappingUuid,spCode,
+				systemCode,
+				serviceCode,
+				spsyId,
+				subSpCode
+				);
+				String jsonPayload = null;
+		String response = null;
+		
+		try {
+			// Call the non-static method on the instance
+			jsonPayload = billRequest.toJson();
+			System.out.println("Generated BillSubmissionRequest: " + jsonPayload);
+			generatedControlNumberObject = gepgbillService.submitGepgRequest(jsonPayload);
+		}
+		catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		
 		// TODO: review the above method for creating GePG payload to ensure all properties are there. Exception handling is important e.g checking GFSCode
 		return generatedControlNumberObject;
 	}
