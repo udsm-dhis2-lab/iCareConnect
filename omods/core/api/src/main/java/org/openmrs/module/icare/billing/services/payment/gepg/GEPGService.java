@@ -1,5 +1,7 @@
 package org.openmrs.module.icare.billing.services.payment.gepg;
 
+import java.util.Map;
+
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -7,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class GEPGService {
 	
-	public String submitGepgRequest(String jsonPayload) {
+	public Map<String, Object> submitGepgRequest(String jsonPayload) {
 		System.out.println("on submit here ....................");
         String apiUrl = "https://api-testengine.udsm.ac.tz/index.php?r=api/service";
         String apiKey = ""; 
