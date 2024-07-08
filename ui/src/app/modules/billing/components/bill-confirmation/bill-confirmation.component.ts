@@ -54,6 +54,8 @@ export class BillConfirmationComponent implements OnInit {
     };
   
     console.log("Formatted payload:", gepgrequestpayload);
+    //Calling Controll number Generation Function
+    this.onConntrollNumbGen(gepgrequestpayload);
     this.currentUser = this.store.select(getCurrentUserDetails).subscribe({
       next: (currentUser) => {
         return currentUser;
@@ -68,7 +70,23 @@ export class BillConfirmationComponent implements OnInit {
   get controlNumberValue(): string {
     return `GEPG_MNL: ${this.controlNumber}`;
   }
- 
+
+   onConntrollNumbGen(payload){
+    this.billingService
+      .gepgpayBill(payload)
+      .subscribe(
+        (paymentResponse) => {
+          console.log("successfully generated .......",paymentResponse)
+          this.matDialogRef.close(paymentResponse);
+          //:TODO After successfully saved now saving Payed Bill with Control Number
+          
+        },
+        (error) => {
+         console.log("Fail to Generate Control Number .....",error);
+          this.savingPaymentError = error;
+        }
+      );
+   }
 
 
   onFormUpdate(formValues: FormValue): void {
