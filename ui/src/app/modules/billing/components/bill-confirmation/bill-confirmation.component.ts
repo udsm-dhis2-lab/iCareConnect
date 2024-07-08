@@ -79,7 +79,7 @@ export class BillConfirmationComponent implements OnInit {
           console.log("successfully generated .......",paymentResponse)
           this.matDialogRef.close(paymentResponse);
           //:TODO After successfully saved now saving Payed Bill with Control Number
-          
+               
         },
         (error) => {
          console.log("Fail to Generate Control Number .....",error);
