@@ -59,6 +59,7 @@
     </div>
     <div class="controlNumber-field m-3" *ngIf="params?.gepgConceptField && data?.paymentType?.code === 'GePG'">
       <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <div class="text-center"><div>Processing...</div></div>
       <!-- <app-concepts-form 
       [conceptFields]="[params?.gepgConceptField]"
       (formUpdate)="onFormUpdate($event)"
