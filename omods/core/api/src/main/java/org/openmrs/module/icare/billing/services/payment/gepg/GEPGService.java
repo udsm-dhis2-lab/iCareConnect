@@ -5,6 +5,10 @@ import java.util.Map;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class GEPGService {
@@ -19,7 +23,7 @@ public class GEPGService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + apiKey);
-        headers.set("Signature", secretKey);  // Assuming `secretKey` is used for the signature
+        headers.set("Signature", secretKey);
 		System.out.println(jsonPayload);
         HttpEntity<String> entity = new HttpEntity<>(jsonPayload, headers);
 
@@ -28,7 +32,16 @@ public class GEPGService {
         System.out.println("Request payload: " + jsonPayload);
         System.out.println("Response: " + response.getBody());
 
-        return response.getBody();
+        // Convert JSON response to Map
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> responseMap = new HashMap<>();
+        try {
+            responseMap = mapper.readValue(response.getBody(), Map.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return responseMap;
     }
 	
 	@Override
