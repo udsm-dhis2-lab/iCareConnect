@@ -97,6 +97,7 @@ export class DischargePatientModalComponent implements OnInit {
   }
 
   onGetConfirmDischargeStatus(confirm: boolean): void {
+    console.log("onGetConfirmDischargeStatus ......................",confirm);
     this.readyToConfirmDischarge = confirm;
   }
 
@@ -147,6 +148,7 @@ export class DischargePatientModalComponent implements OnInit {
       .saveObservationsViaEncounter(data)
       .subscribe((response: any) => {
         if (response) {
+          console.log("response ............................",response);
           this.getVisit();
           this.savingData = false;
         }
