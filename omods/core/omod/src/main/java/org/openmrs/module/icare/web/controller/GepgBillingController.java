@@ -18,7 +18,7 @@ import org.openmrs.module.webservices.rest.web.RestConstants;
 import java.util.*;
 
 @RestController
-@RequestMapping(value = "/api/" + RestConstants.VERSION_1 + "/gepg")
+@RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/gepg")
 public class GepgBillingController {
 	
 	@Autowired
@@ -120,6 +120,7 @@ public class GepgBillingController {
 			e.printStackTrace();
 		}
 		
+
 		// TODO: review the above method for creating GePG payload to ensure all properties are there. Exception handling is important e.g checking GFSCode
 		return generatedControlNumberObject;
 	}
