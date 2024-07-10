@@ -44,7 +44,7 @@ export class SharedPatientDischargeDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.diagnoses = getAllDiagnosesFromVisitDetails(this.activeVisit);
-    console.log("diagonosis .........",this.diagnoses)
+    console.log("diagnoses .................................",this.diagnoses);
     this.diagnoses =
       this.diagnoses?.filter(
         (diagnosis: Diagnosis) => diagnosis?.isConfirmedDiagnosis
@@ -57,6 +57,7 @@ export class SharedPatientDischargeDetailsComponent implements OnInit {
           "-"
         )[1],
     };
+    
     this.observations = groupObservationByConcept(
       this.activeVisit?.observations
     );
