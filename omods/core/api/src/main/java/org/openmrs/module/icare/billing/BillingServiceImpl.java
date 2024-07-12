@@ -283,6 +283,13 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		}
 		return invoices;
 	}
+
+	@Override
+	public Invoice getInvoiceDetailsByUuid(String uuid) {
+		Invoice invoice = this.invoiceDAO.findByUuid(uuid);
+		// TODO: Check for any discounts
+		return invoice;
+	}
 	
 	@Override
 	public List<Payment> getPatientPayments(String patientUuid) {
@@ -299,7 +306,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			throw new Exception("Payment Type with id '" + payment.getPaymentType().getUuid() + "' does not exist.");
 		}
 		if (payment.getReferenceNumber() == null) {
-			throw new Exception("Refference number should not be null.");
+			throw new Exception("Reference number should not be null.");
 		}
 		payment.setPaymentType(paymentType);
 		

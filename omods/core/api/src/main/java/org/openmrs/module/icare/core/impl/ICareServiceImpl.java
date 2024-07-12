@@ -1103,7 +1103,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	@Override
 	public void saveAuditLog(AuditLog auditLog) {
-		this.auditLogDAO.save(auditLog);
+		// Check if user is authenticated first
+		User user = Context.getAuthenticatedUser();
+		if (user != null) {
+			this.auditLogDAO.save(auditLog);
+		}
 	}
 	
 	@Override

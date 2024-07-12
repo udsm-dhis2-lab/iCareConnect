@@ -1,4 +1,5 @@
 package org.openmrs.module.icare.billing.aop;
+
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -37,13 +38,14 @@ public class VisitEndAdvisor extends StaticMethodMatcherPointcutAdvisor implemen
 			return true;
 		return false;
 	}
-
+	
 	@Override
 	public Advice getAdvice() {
 		return new VisitEndAdvisor.VisitEndAdvice();
 	}
 	
 	private class VisitEndAdvice implements MethodInterceptor {
+		
 		public Object invoke(MethodInvocation invocation) throws Throwable {
 			Visit visit = (Visit) invocation.proceed();
 			String insurance = null;

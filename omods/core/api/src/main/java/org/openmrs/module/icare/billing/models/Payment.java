@@ -39,6 +39,7 @@ public class Payment extends BaseOpenmrsData implements java.io.Serializable {
 	private List<PaymentItem> items = new ArrayList<PaymentItem>(0);
 	
 	public Payment() {
+		
 	}
 	
 	public Invoice getInvoice() {
