@@ -44,10 +44,12 @@ export class SharedPatientDischargeDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.diagnoses = getAllDiagnosesFromVisitDetails(this.activeVisit);
+    console.log("diagonosis .........",this.diagnoses)
     this.diagnoses =
       this.diagnoses?.filter(
         (diagnosis: Diagnosis) => diagnosis?.isConfirmedDiagnosis
       ) || [];
+      console.log("diagonosis updated .........",this.diagnoses)
     this.encounterProvider = {
       ...this.visitDetails?.admissionEncounter?.encounterProviders[0]?.provider,
       display:
@@ -58,6 +60,7 @@ export class SharedPatientDischargeDetailsComponent implements OnInit {
     this.observations = groupObservationByConcept(
       this.activeVisit?.observations
     );
+    console.log("observations  .........",this.observations)
     this.dischargeForm$ = this.store.select(
       getCustomOpenMRSFormById(this.dischargeFormUuid)
     );
