@@ -14,7 +14,7 @@ import java.util.Map;
 public class GEPGService {
 	
 	public Map<String, Object> submitGepgRequest(String jsonPayload) {
-		System.out.println("on submit here ....................");
+		System.out.println("on submit here ...................."+ jsonPayload);
         String apiUrl = "https://api-testengine.udsm.ac.tz/index.php?r=api/service";
         String apiKey = ""; 
         String secretKey = ""; 
@@ -23,7 +23,7 @@ public class GEPGService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + apiKey);
-        headers.set("Signature", secretKey);
+        // headers.set("Signature", secretKey);
 		System.out.println(jsonPayload);
         HttpEntity<String> entity = new HttpEntity<>(jsonPayload, headers);
 
