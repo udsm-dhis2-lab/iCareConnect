@@ -38,7 +38,6 @@ export class PatientHistoryDataComponent implements OnInit {
 
   ngOnInit(): void {
     let visit = new Visit(this.visit?.visit);
-
     let observationsWithoutForm = this.visit?.obs?.filter(
       (observation) => observation?.encounter?.form === null
     );
@@ -244,6 +243,7 @@ export class PatientHistoryDataComponent implements OnInit {
       this.prescriptionArrangementFields
     );
     // console.log(" HISTORYVISIT.");
+    console.log("Final visitHistory:", this.visitHistory);
     // console.log(this.visitHistory?.visitOrderedData);
   }
 
