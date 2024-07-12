@@ -69,7 +69,7 @@
              date_created="2017-02-14 15:51:57.0" version="" uuid="a8102d6d-c528-477a-80bd-acc38ebc6252" />
     <concept concept_id="501" retired="false" datatype_id="3" class_id="7" is_set="false" creator="1"
              date_created="2017-02-14 15:51:57.0" version="" uuid="11102d6d-c528-477a-80bd-acc38ebc6252" />
-    <concept_set concept_set_id="1" concept_id="501" concept_set="500" creator="1" uuid="a8102d6d-c528-477a-80bd-acc38ebc6252"/>
+    <concept_set concept_set_id="1" concept_id="501" date_created="2024-01-12 00:00:00.0" sort_weight="1" concept_set="500" creator="1" uuid="a8102d6d-c528-477a-80bd-acc38ebc6252"/>
 
 
     <concept concept_id="600" retired="false" datatype_id="2" class_id="7" is_set="false" creator="1"
@@ -82,6 +82,8 @@
     <!-- container concept -->
     <concept concept_id="800" retired="false" datatype_id="3" class_id="7" is_set="false" creator="1"
              date_created="2017-02-14 15:51:57.0" version="" uuid="333111zz-0011-477v-8y8y-acc38ebc6252" />
+
+
 
     <concept_name concept_name_id="500" concept_id="800" name="mrdt" locale="en_GB" creator="1"
                   date_created="2014-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
@@ -263,4 +265,48 @@
     <global_property property="mail.transport_protocol" property_value="smtp" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c888" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
     <global_property property="mail.smtp_port" property_value="25" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c616" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
     <global_property property="mail.user" property_value="test" uuid="iCARE110-TEST-OSDH-9beb-d30dcfc0c999" description="DEBUGGING" datatype_config="" preferred_handler="" datatype="TEXT" date_changed="2023-04-18 09:51:57.0" changed_by="1" />
+
+
+
+    <concept concept_id="1111111" retired="false" datatype_id="3" class_id="7" is_set="true" creator="1"
+             date_created="2020-02-14 15:51:57.0" version="" uuid="33898765-0011-477v-8y8y-acc38ebc6252" />
+
+    <!--    Stool urinalysis-->
+    <concept concept_id="166378" retired="false" datatype_id="3" class_id="7" is_set="true" creator="1"
+             date_created="2024-02-14 15:51:57.0" version="" uuid="16428b09-98a6-4326-af9a-295a4b478b8a" />
+    <concept_name concept_name_id="500889" concept_id="166378" name="Stool analysis" locale="en_GB" creator="1"
+                  date_created="2024-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="1123b329-52b9-11e8-b60d-880027ae8765" />
+
+    <concept concept_id="220016" retired="false" datatype_id="3" class_id="7" is_set="false" creator="1"
+             date_created="2024-02-14 15:51:57.0" version="" uuid="2c3e31be-d167-4c63-942c-21c3440b2675" />
+    <concept_name concept_name_id="500229" concept_id="220016" name="Macro appearance" locale="en_GB" creator="1"
+                  date_created="2024-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="1123b329-52b9-1158-b60d-880027ae8765" />
+
+    <concept concept_id="220018" retired="false" datatype_id="3" class_id="7" is_set="false" creator="1"
+             date_created="2024-02-14 15:51:57.0" version="" uuid="449bef8e-3ea3-4eb1-9d00-38e5fff132ff" />
+    <concept_name concept_name_id="500729" concept_id="220018" name="RBCs" locale="en_GB" creator="1"
+                  date_created="2024-01-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="1123b329-5209-11e8-b60d-880027a89876" />
+
+    <concept_set concept_set_id="1030303" concept_id="220016" concept_set="166378" sort_weight="3" date_created="2024-01-12 00:00:00.0" creator="1" uuid="894y6354-c528-477a-80bd-acc38ebc6252"/>
+    <concept_set concept_set_id="1030304" concept_id="220018" concept_set="166378" sort_weight="4" date_created="2024-01-12 00:00:00.0"  creator="1" uuid="894y6354-8977-477a-80bd-acc38ebc6252"/>
+
+    <orders orderer="1" concept_id ="166378" creator="400" date_activated="2024-02-27 00:00:00" order_number="1205" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="211" date_created="2019-10-14 13:56:44" uuid="8634xx66-2220-4acc-8qd7-6648c9575abcd" order_id="30002" patient_id="500" encounter_id="100"/>
+
+    <lb_sample uuid="898767yt-9000-11e3-1111-08002007777" sample_id="20001" visit_id="500" label="Stool Sample" concept_id="166378" date_created="2024-02-27 00:00:00" specimen_source_id="1111111" batch_sample_id="1" voided="false" date_time="2024-02-27 08:10:00" creator="1" />
+
+    <lb_sample_status sample_status_id="100001" sample_id="20001" status="COLLECTED" category="COLLECTED" timestamp="2024-03-27 00:00:00" user_id="1" />
+
+    <lb_sample_order sample_id="20001" order_id="30002"/>
+
+    <lb_test_allocation test_allocation_id="11321" uuid="111xxx60-8498-11e3-1111-0sndiu87hsju" sample_id="20001" order_id="30002" label="Allocation Label AAA" concept_id="220016" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
+
+    <lb_test_allocation test_allocation_id="11324" uuid="222yyy70-8398-11e3-1221-0sndiu87hsja" sample_id="20001" order_id="30002" label="Allocation Label EEE" concept_id="220018"  date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
+
+    <lb_test_result uuid="223yyy70-9303-11e3-1221-0sndiu87hsj3" test_result_id="22113" test_allocation_id="11321" concept_id="220016" value_text="Blue" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
+    <lb_test_result uuid="245yyy70-7181-11e3-1221-0sndiu87hsj3" test_result_id="22112" test_allocation_id="11324" concept_id="220018" value_text="123" date_created="2020-12-27 00:00:00" voided="false" creator="1"/>
+
+    <!--ENd of stool analysis-->
 </dataset>

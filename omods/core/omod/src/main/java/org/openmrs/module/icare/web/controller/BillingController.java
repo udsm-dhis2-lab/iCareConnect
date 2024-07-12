@@ -132,5 +132,11 @@ public class BillingController extends BaseController {
 		}
 		return invoiceMaps;
 	}
+
+	@RequestMapping(value="invoices/{uuid}", method = RequestMethod.GET)
+	@ResponseBody
+	public Invoice getInvoiceDetails(@PathVariable(value = "uuid", required = true) String uuid) throws Exception {
+		return billingService.getInvoiceDetailsByUuid(uuid);
+	}
 	
 }
