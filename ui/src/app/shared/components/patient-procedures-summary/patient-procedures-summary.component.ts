@@ -52,6 +52,10 @@ export class PatientProceduresSummaryComponent implements OnInit {
       this.patientVisit.uuid,
       this.fields
     );
+    this.procedures$.subscribe((item)=>{
+      console.log("procedures ------------------------------>",item)
+    })
+    
     this.observationsKeyedByConcepts$ = this.store.select(
       getGroupedObservationByConcept
     );
