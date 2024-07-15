@@ -72,6 +72,8 @@ public interface BillingService extends OpenmrsService {
 	SyncResult syncInsurance(String insurance) throws Exception;
 	
 	List<Invoice> getInvoicesByVisitUuid(String visit);
+
+	Invoice getInvoiceDetailsByUuid(String uuid);
 	
 	Order createOrderForOngoingIPDPatients() throws Exception;
 	
