@@ -58,11 +58,13 @@
       </div>
     </div>
     <div class="controlNumber-field m-3" *ngIf="params?.gepgConceptField && data?.paymentType?.code === 'GePG'">
-      <app-concepts-form 
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <div class="text-center"><div>Processing...</div></div>
+      <!-- <app-concepts-form 
       [conceptFields]="[params?.gepgConceptField]"
       (formUpdate)="onFormUpdate($event)"
       >
-      </app-concepts-form>
+      </app-concepts-form> -->
     </div>
   </mat-dialog-content>
   <mat-dialog-actions align="end" class="m-0 p-3">
@@ -87,6 +89,18 @@
       cdkFocusInitial
     >
       {{ generatingControlNumber ? "Generating..." : "Get Control number" }}
+    </button>
+    <button
+    *ngIf="params?.gepgConceptField && data?.paymentType?.code === 'GePG'"
+      data-test="generate-control-number-button"
+      [disabled]="false"
+      class = "mr-4"
+      mat-flat-button
+      color=""
+      (click)="onGepgConfirmation($event)"
+      cdkFocusInitial
+    >
+      Print <mat-icon>print</mat-icon>
     </button>
     <button
       *ngIf="params?.gepgConceptField && data?.paymentType?.code === 'GePG'"
