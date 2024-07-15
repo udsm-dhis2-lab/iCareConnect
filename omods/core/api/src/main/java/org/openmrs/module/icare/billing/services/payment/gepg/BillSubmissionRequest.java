@@ -198,7 +198,7 @@ public class BillSubmissionRequest {
         billTrxInf.setBillExprDt(formattedExpirationTime);
 		billTrxInf.setPyrId("40");
 		billTrxInf.setPyrName(patientNames.toUpperCase());
-		billTrxInf.setBillDesc("Application Fees Payment");
+		billTrxInf.setBillDesc("Hospita Bill Payments");
 		billTrxInf.setBillGenBy("UDSM Hospital");
 		billTrxInf.setBillApprBy(patientNames.toUpperCase());
 		billTrxInf.setPyrCellNum(patientPhoneNumber);
