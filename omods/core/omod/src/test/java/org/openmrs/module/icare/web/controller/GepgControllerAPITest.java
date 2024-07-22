@@ -8,7 +8,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.openmrs.Patient;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
@@ -41,7 +41,7 @@ public class GepgControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	public void testSubmitBill_withValidUuid_returnsSuccess() {
+	public void testSubmitBill_withValidUuid_returnsSuccess() throws Exception {
 		//Given
 		PatientService patientService = Context.getService(PatientService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
@@ -53,7 +53,7 @@ public class GepgControllerAPITest extends BaseResourceControllerTest {
 		System.out.println("Test function fired ------------");
 		assertTrue(true);
 	}
-
+	
 	@Test
 	public void testGenerateControlNumber() throws Exception {
 		// Given

@@ -58,17 +58,17 @@ public class ICareConfig {
 	public static final String FACILITY_ADDRESS = "icare.facility.address";
 	
 	public static final String SP_CODE = "SP111";
-
-	public static final String SYSTEM_CODE ="90019";
-
-	public static final String SERVICE_CODE ="1001";
-
-	public static final String SERVICE_PROVIDER_ID ="LHGSE001";
-
-	public static final String SUB_SERVICE_PROVIDER_CODE ="7001";
-
+	
+	public static final String SYSTEM_CODE = "90019";
+	
+	public static final String SERVICE_CODE = "1001";
+	
+	public static final String SERVICE_PROVIDER_ID = "LHGSE001";
+	
+	public static final String SUB_SERVICE_PROVIDER_CODE = "7001";
+	
 	public static final String PHONE_NUMBER_ATTRIBUTE = "icare.person.attribute.phonenumber";
-
+	
 	public static final String PATIENT_SIGNATURE_ATTRIBUTE = "icare.person.attribute.signature";
 	
 	public static final String CONSULTATION_ENCOUNTER_TYPE = "icare.encounterType.consultation";
@@ -150,10 +150,11 @@ public class ICareConfig {
 	public static final String INTEROPERABILITY_MEDIATORS_LIST = "iCare.interoperability.settings.mediators.list";
 	
 	public static final String HDU_API_WORKFLOW_UUID_FOR_OPD = "iCare.interoperability.settings.hduapi.workflowUuid.uuid";
+	
 	// public static final String SURVEILLANCE_SINGLE_EVENT_PROGRAM_MAPPINGS = "iCare.surveillance.settings.eventProgramMappings";
-
+	
 	public static final String GEPG_AUTH_SIGNATURE = "iCare.GePG.settings.authentication.authSignature";
-
+	
 	public static final String GFSCODE_CONCEPT_SOURCE_REFERENCE = "icare.billing.mappings.GFSCODEConceptSource.uuid";
 	
 }
