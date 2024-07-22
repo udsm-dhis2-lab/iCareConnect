@@ -23,6 +23,7 @@ public class GepgBillingController {
 	
 	@Autowired
 	private GEPGService gepgbillService;
+	
 	private BillingService billingService;
 	
 	@RequestMapping(value = "/controlNumber", method = RequestMethod.POST)
@@ -56,7 +57,7 @@ public class GepgBillingController {
 		
 		return response;
 	}
-
+	
 	@RequestMapping(value = "/generatecontrolno", method = RequestMethod.POST)
 	public Map<String, Object> generateControlNumber(@RequestBody List<Map<String, Object>> requestPayload) throws Exception {
 		Map<String, Object> generatedControlNumberObject = new HashMap<>();
