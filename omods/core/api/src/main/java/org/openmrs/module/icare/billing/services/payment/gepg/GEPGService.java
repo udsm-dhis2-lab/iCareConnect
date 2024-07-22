@@ -1,55 +1,65 @@
 package org.openmrs.module.icare.billing.services.payment.gepg;
 
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.util.Map;
 
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class GEPGService {
 	
-	public Map<String, Object> submitGepgRequest(String jsonPayload) {
+	public Map<String, Object> submitGepgRequest(String jsonPayload) throws Exception {
 		System.out.println("on submit here ...................."+ jsonPayload);
         String apiUrl = "https://api-testengine.udsm.ac.tz/index.php?r=api/service";
         String apiKey = ""; 
-        String secretKey = ""; 
+        String secretKey = "";
 
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + apiKey);
-        // headers.set("Signature", secretKey);
-		System.out.println(jsonPayload);
-        HttpEntity<String> entity = new HttpEntity<>(jsonPayload, headers);
+        URL url = new URL(apiUrl);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        String bearer = String.format("Bearer %1s", "authToken.getAccessToken()");
+        con.addRequestProperty("Authorization", bearer);
+        con.addRequestProperty("Content-Type", "application/json");
+        con.setDoInput(true);
+        con.setDoOutput(true);
 
-        ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
+        OutputStream os = con.getOutputStream();
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+        String json = new ObjectMapper().writeValueAsString(jsonPayload);
+        writer.write(json);
 
-        System.out.println("Request payload: " + jsonPayload);
-        System.out.println("Response: " + response.getBody());
-
-        // Convert JSON response to Map
-        ObjectMapper mapper = new ObjectMapper();
+        writer.flush();
+        writer.close();
+        os.close();
         Map<String, Object> responseMap = new HashMap<>();
         try {
-            responseMap = mapper.readValue(response.getBody(), Map.class);
-        } catch (IOException e) {
-            e.printStackTrace();
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer content = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+            responseMap.put("response", jsonPayload);
+            return responseMap;
+        } catch (SocketTimeoutException e) {
+            throw e;
         }
-
-        return responseMap;
     }
 	
-	@Override
-	public String toString() {
-		return "GEPGService []";
-	}
-	
-	public void createBillSubmissionRequest(String anyString) {
+	//	@Override
+	//	public String toString() {
+	//		return "GEPGService []";
+	//	}
+	//
+	public void createBillSubmissionRequest(String anyString) throws Exception {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'createBillSubmissionRequest'");
 	}
