@@ -31,7 +31,7 @@ public class GepgBillingControllerTest {
 	}
 	
 	@Test
-    public void testSubmitBill_withValidUuid_returnsSuccess() {
+    public void testSubmitBill_withValidUuid_returnsSuccess() throws Exception  {
         Map<String, Object> payload = new HashMap<>();
         payload.put("uuid", "7a4fc84b-ae30-4cf1-b43a-59d102b6898e");
         payload.put("selectedbills", List.of(Map.of("bill", "d5ef14c1-6388-40ee-8818-48d8aeb5fae6")));
@@ -42,7 +42,7 @@ public class GepgBillingControllerTest {
     }
 	
 	@Test
-    public void testSubmitBill_withEmptyUuid_returnsErrorMessage() {
+    public void testSubmitBill_withEmptyUuid_returnsErrorMessage() throws Exception {
         Map<String, Object> payload = new HashMap<>();
         payload.put("uuid", "");
 
@@ -58,7 +58,7 @@ public class GepgBillingControllerTest {
     }
 	
 	@Test
-    public void testSubmitBill_withNullUuid_returnsErrorMessage() {
+    public void testSubmitBill_withNullUuid_returnsErrorMessage() throws Exception {
         // Arrange
         Map<String, Object> payload = new HashMap<>();
         payload.put("uuid", null);
