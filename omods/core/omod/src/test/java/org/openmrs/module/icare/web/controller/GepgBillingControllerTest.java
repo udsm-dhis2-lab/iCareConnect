@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.openmrs.module.icare.billing.services.payment.gepg.BillSubmissionRequest;
 import org.openmrs.module.icare.billing.services.payment.gepg.GEPGService;
 
 import java.util.HashMap;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
