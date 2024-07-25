@@ -101,3 +101,4 @@ docs/npm-debug.log*
 docs/yarn-debug.log*
 docs/yarn-error.log*
 ui/node_modules
+node_modules/*
