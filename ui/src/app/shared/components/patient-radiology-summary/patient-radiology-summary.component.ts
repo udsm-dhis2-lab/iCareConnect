@@ -208,7 +208,7 @@ export class PatientRadiologySummaryComponent implements OnInit {
     event.stopPropagation();
     this.dialog.open(SharedPdfPreviewComponent, {
       minWidth: "60%",
-      maxHeight: "700px",
+      maxHeight: "800px",
       data: {
         data,
         rendererType,
