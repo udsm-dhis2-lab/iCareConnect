@@ -28,11 +28,11 @@
           [ngClass]="{
             'attended-radiology-order':
               obsKeyedByConcepts[order?.concept?.uuid]?.uri,
-              'no-mouse-event': order?.canBeAttended,
-            'order-not-to-attend': !order?.canBeAttended
+            'no-mouse-event': !order?.paid && !order?.isAdmitted,
+            'order-not-to-attend': !order?.paid && !order?.isAdmitted
           }"
         >
-        
+        <!-- !order?.canBeAttended -->
           <td>
             {{ count + 1 }}
           </td>

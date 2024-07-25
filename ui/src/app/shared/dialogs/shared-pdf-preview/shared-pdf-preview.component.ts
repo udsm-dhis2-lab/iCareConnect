@@ -15,9 +15,10 @@ export class SharedPdfPreviewComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {}
 
   ngAfterViewInit(): void {
-    console.log("data on modal  .........");
-    console.log(this.data)
+    
     const previewImg = document.getElementById("previewedImage");
+    console.log("data on modal  .........");
+    console.log(this.data?.rendererType)
     if (this.data?.rendererType === "embed") {
       previewImg.setAttribute(
         "src",
@@ -25,6 +26,8 @@ export class SharedPdfPreviewComponent implements OnInit, AfterViewInit {
       );
     } else {
       previewImg.setAttribute("src", this.data?.data);
+      console.log("previewImg  .........");
+    console.log(previewImg)
     }
   }
 
