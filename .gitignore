@@ -24,6 +24,9 @@ omods/*/omod/target/*
 .DS_Store
 
 # See http://help.github.com/ignore-files/ for more about ignoring files.
+# Node modules
+ui/node_modules/
+node_modules/
 
 # compiled output
 ui/dist
@@ -100,5 +103,3 @@ docs/.env.production.local
 docs/npm-debug.log*
 docs/yarn-debug.log*
 docs/yarn-error.log*
-ui/node_modules
-node_modules/*
