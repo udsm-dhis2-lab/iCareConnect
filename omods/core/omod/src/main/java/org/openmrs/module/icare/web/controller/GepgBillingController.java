@@ -93,6 +93,7 @@ public class GepgBillingController {
 		String personEmailAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE);
 		String gepgAuthSignature = administrationService.getGlobalProperty(ICareConfig.GEPG_AUTH_SIGNATURE);
 		String GFSCodeConceptSourceMappingUuid = administrationService.getGlobalProperty(ICareConfig.GFSCODE_CONCEPT_SOURCE_REFERENCE);
+		String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
 		BillSubmissionRequest billRequest = new BillSubmissionRequest().createGePGPayload(
 				visit.getPatient(),
 				invoiceItems,
@@ -115,14 +116,13 @@ public class GepgBillingController {
 			// Call the non-static method on the instance
 			jsonPayload = billRequest.toJson();
 			System.out.println("Generated BillSubmissionRequest: " + jsonPayload);
-			generatedControlNumberObject = gepgbillService.submitGepgRequest(jsonPayload);
+			generatedControlNumberObject = gepgbillService.submitGepgRequest(jsonPayload,clientPrivateKey);
 		}
 		catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
 		
 
-		// TODO: review the above method for creating GePG payload to ensure all properties are there. Exception handling is important e.g checking GFSCode
 		return generatedControlNumberObject;
 	}
 }
