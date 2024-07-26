@@ -31,6 +31,7 @@ export class SharedPdfPreviewComponent implements OnInit, AfterViewInit {
     console.log("Data received:", this.data);
 
     if (this.data?.rendererType === "embed") {
+      console.log("rendererType ................. embeded",)
       const base64data = this.data?.data;
       if (base64data) {
         this.pdfUrl = `data:application/pdf;base64,${base64data}`;
@@ -39,11 +40,12 @@ export class SharedPdfPreviewComponent implements OnInit, AfterViewInit {
         console.error("Base64 data is empty or undefined.");
       }
     } else {
+      console.log("rendererType ................. ",this.data?.rendererType)
       const originalUrl = this.data?.data;
       console.log("Original URL:", originalUrl);
 
       if (originalUrl.startsWith('http://localhost/')) {
-        this.pdfUrl = originalUrl.replace('http://localhost/', this.baseUrl);
+        this.pdfUrl = originalUrl.replace('http://localhost', this.baseUrl);
       } else {
         this.pdfUrl = originalUrl;
       }

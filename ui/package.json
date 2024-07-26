@@ -73,6 +73,7 @@
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^14.14.6",
+    "@types/pdfjs-dist": "^2.10.378",
     "codelyzer": "^6.0.0",
     "commitizen": "^4.3.0",
     "concurrently": "^5.3.0",
