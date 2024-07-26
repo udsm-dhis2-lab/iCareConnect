@@ -188,23 +188,23 @@ export class PatientHistoryComponent implements OnInit {
         })
       );
 
-    this.getIPDRoundDoctorsForm();
+    // this.getIPDRoundDoctorsForm();
   }
 
-  getIPDRoundDoctorsForm(): void {
-    this.systemSettingsService
-      .getSystemSettingsByKey("iCare.forms.doctorsIPDRound.uuid")
-      .subscribe((doctorsIPDRoundFormUuid: string) => {
-        if (doctorsIPDRoundFormUuid) {
-          this.store.dispatch(
-            loadCustomOpenMRSForm({ formUuid: doctorsIPDRoundFormUuid })
-          );
-          this.doctorsIPDRoundForm$ = this.store.select(
-            getCustomOpenMRSFormById(doctorsIPDRoundFormUuid)
-          );
-        }
-      });
-  }
+  // getIPDRoundDoctorsForm(): void {
+  //   this.systemSettingsService
+  //     .getSystemSettingsByKey("iCare.forms.doctorsIPDRound.uuid")
+  //     .subscribe((doctorsIPDRoundFormUuid: string) => {
+  //       if (doctorsIPDRoundFormUuid) {
+  //         this.store.dispatch(
+  //           loadCustomOpenMRSForm({ formUuid: doctorsIPDRoundFormUuid })
+  //         );
+  //         this.doctorsIPDRoundForm$ = this.store.select(
+  //           getCustomOpenMRSFormById(doctorsIPDRoundFormUuid)
+  //         );
+  //       }
+  //     });
+  // }
 
   onDoctorsIPDRoundCommentsFormUpdate(formValue: FormValue): void {
     console.log(formValue.getValues());
