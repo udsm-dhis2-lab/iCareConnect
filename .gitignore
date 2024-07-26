@@ -1,3 +1,8 @@
+# Node modules
+node_modules/
+ui/node_modules/
+messaging/functions/node_modules/
+
 *.iml
 *.class
 
@@ -24,9 +29,7 @@ omods/*/omod/target/*
 .DS_Store
 
 # See http://help.github.com/ignore-files/ for more about ignoring files.
-# Node modules
-ui/node_modules/
-node_modules/
+
 
 # compiled output
 ui/dist
