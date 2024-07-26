@@ -1,3 +1,9 @@
+# Ignore large files
+*.tar.gz
+*.zip
+*.iso
+*.mp4
+
 # Node modules
 node_modules/
 ui/node_modules/
