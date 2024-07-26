@@ -207,7 +207,7 @@ export class PatientHistoryComponent implements OnInit {
   }
 
   onDoctorsIPDRoundCommentsFormUpdate(formValue: FormValue): void {
-    console.log(formValue.getValues());
+    console.log("the heague", formValue.getValues());
     this.formData = formValue.getValues();
   }
 

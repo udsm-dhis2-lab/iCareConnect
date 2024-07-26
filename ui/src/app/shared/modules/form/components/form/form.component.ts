@@ -74,7 +74,7 @@ export class FormComponent implements OnInit {
       this.fields,
       this.fieldsData
     );
-
+    
     // console.log("formValidationRules", this.formValidationRules);
   }
 
@@ -84,6 +84,7 @@ export class FormComponent implements OnInit {
       this.fields,
       this.fieldsData
     );
+
   }
 
   onSubmit(): void {

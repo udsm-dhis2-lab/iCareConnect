@@ -212,7 +212,7 @@ export class RegistrationAddComponent implements OnInit {
     id: "primaryMobileNumber",
     key: "primaryMobileNumber",
     label: "Enter Number of Area leader/Neighbour",
-    required: false,
+    required: true,
     type: "number",
     min: 0,
     placeholder: "Eg: 0711111111",

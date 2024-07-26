@@ -27,21 +27,25 @@ export class DrugsListComponent implements OnInit {
     private dialog: MatDialog,
     private exportDataService: ExportDataService,
     private googleAnalyticsService: GoogleAnalyticsService
-    
   ) {}
 
   ngOnInit(): void {
     this.getDrugs();
   }
 
+
   getDrugs(): void {
+    const searchText = this.searchingText
+      ? this.searchingText.replace(/\+/g, " ")
+      : this.searchingText;
+
     if (this.conceptUuid) {
       this.drugs$ = this.drugService.getDrugsUsingConceptUuid(this.conceptUuid);
     } else {
       this.drugs$ = this.drugService.getAllDrugs({
         startIndex: this.startIndex,
         limit: this.limit,
-        q: this.searchingText,
+        q: searchText,
         v: "custom:(uuid,display,description,strength,concept:(uuid,display))",
       });
     }
@@ -86,7 +90,7 @@ export class DrugsListComponent implements OnInit {
           this.getDrugs();
         }
       });
-      this.trackActionForAnalytics(`Drugs Add: Open`);
+    this.trackActionForAnalytics(`Drugs Add: Open`);
   }
 
   onDownload(event: Event, fileName: string): void {
@@ -112,9 +116,13 @@ export class DrugsListComponent implements OnInit {
     });
     this.trackActionForAnalytics(`Download to Excel: Download`);
   }
-   
+
   trackActionForAnalytics(eventname: any) {
     // Send data to Google Analytics
-   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
+    this.googleAnalyticsService.sendAnalytics(
+      "Pharmacy",
+      eventname,
+      "Pharmacy"
+    );
   }
 }

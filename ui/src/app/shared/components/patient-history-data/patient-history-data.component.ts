@@ -38,17 +38,19 @@ export class PatientHistoryDataComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    let visit = new Visit(this.visit?.visit);
-    this.ipdRoundComments = "daniel kalsasa comment";
-    console.log("vhistory", this.visit);
 
+    let visit = new Visit(this.visit?.visit);
+
+    this.ipdRoundComments = "daniel kalsasa comment";
+
+    // console.log("vhistory", this.visit);
     let observationsWithoutForm = this.visit?.obs?.filter(
       (observation) => observation?.encounter?.form === null
     );
+    
     let observationsWithForm = this.visit?.obs?.filter(
       (observation) => observation?.encounter?.form !== null
     );
-
     // Handle observations linked to form
     this.forms?.map((form) => {
       let observations = [];

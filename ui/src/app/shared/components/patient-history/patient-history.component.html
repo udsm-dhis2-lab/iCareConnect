@@ -13,7 +13,7 @@
     provider: provider$ | async
   } as params"
 >
-  <div *ngIf="!params?.visits?.length && loadingData || !params?.provider">
+  <div *ngIf="(!params?.visits?.length && loadingData) || !params?.provider">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>
   <div *ngIf="params?.visits?.length && !loadingData && params?.provider">
@@ -49,8 +49,6 @@
           [specificDrugConceptUuid]="params?.specificDrugConceptUuid"
         ></app-patient-history-data>
 
-        
-        
         <app-capture-form-data
           *ngIf="params?.doctorsIPDRoundForm"
           [form]="params?.doctorsIPDRoundForm"
@@ -59,22 +57,26 @@
           (formDataUpdate)="onDoctorsIPDRoundCommentsFormUpdate($event)"
         ></app-capture-form-data>
 
-
         <ng-container *ngIf="savedFormData">
           <p>Saved Form Data: {{ savedFormData | json }}</p>
         </ng-container>
-        
+
         <div class="mt-2 w-100 d-flex justify-content-end">
           <button
             mat-flat-button
             color="primary"
-            (click)="onSave($event, params?.doctorsIPDRoundForm,params?.provider, visit)"
+            (click)="
+              onSave(
+                $event,
+                params?.doctorsIPDRoundForm,
+                params?.provider,
+                visit
+              )
+            "
           >
             Save
           </button>
         </div>
-
-        
       </mat-step>
     </mat-vertical-stepper>
     <!-- <div class="history overflow-auto">

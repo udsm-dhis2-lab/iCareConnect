@@ -32,7 +32,7 @@ import { getEncounterTypeByName } from "src/app/store/selectors/encounter-type.s
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { MatTableDataSource } from "@angular/material/table";
 import { getIsPatientSentForExemption } from "src/app/store/selectors/visit.selectors";
-import { go, loadCurrentPatient } from "src/app/store/actions";
+import { go, loadCurrentPatient, loadCurrentPatientFail } from "src/app/store/actions";
 import { MatDialog } from "@angular/material/dialog";
 import { ExemptionConfirmationComponent } from "../../components/exemption-confirmation/exemption-confirmation.component";
 import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
@@ -90,6 +90,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+  
     this.patientId = this.route?.snapshot?.params?.patientId;
     this._getPatientDetails();
 
@@ -359,6 +360,8 @@ export class CurrentPatientBillingComponent implements OnInit {
 
 
   onPrint(e: any): void {
+   
+    
     let contents: string;
      
     const frame1: any = document.createElement("iframe");
@@ -467,6 +470,9 @@ export class CurrentPatientBillingComponent implements OnInit {
         "MRN = ",
         ""
       );
+
+     
+
 
     frameDoc.document.write(`
     
