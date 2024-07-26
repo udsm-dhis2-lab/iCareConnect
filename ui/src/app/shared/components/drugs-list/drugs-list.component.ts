@@ -35,18 +35,21 @@ export class DrugsListComponent implements OnInit {
   }
 
   getDrugs(): void {
+    const searchText = this.searchingText
+      ? this.searchingText.replace(/\+/g, " ")
+      : this.searchingText;
+
     if (this.conceptUuid) {
       this.drugs$ = this.drugService.getDrugsUsingConceptUuid(this.conceptUuid);
     } else {
       this.drugs$ = this.drugService.getAllDrugs({
         startIndex: this.startIndex,
         limit: this.limit,
-        q: this.searchingText,
+        q: searchText,
         v: "custom:(uuid,display,description,strength,concept:(uuid,display))",
       });
     }
   }
-
   onGetList(event: Event, actionType: string): void {
     event.stopPropagation();
     this.page = actionType === "next" ? this.page + 1 : this.page - 1;
