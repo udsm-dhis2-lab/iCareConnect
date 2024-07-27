@@ -61,29 +61,32 @@ public class GepgBillingController {
 	@RequestMapping(value = "/generatecontrolno", method = RequestMethod.POST)
 	public Map<String, Object> generateControlNumber(@RequestBody List<Map<String, Object>> requestPayload) throws Exception {
 		Map<String, Object> generatedControlNumberObject = new HashMap<>();
-		// Assumption all invoices for generating control number are from one visit
-		// If its different visit, then thats another case
-		// Also ya currency type for payment is the same (supplied from front-end)
+	
 		Visit visit = new Visit();
 		Double totalBillAmount = new Double(2);
 		String currency = null;
 		List<InvoiceItem> invoiceItems = new ArrayList<InvoiceItem>();
-		for(Map<String, Object> invoiceReference: requestPayload) {
-			String uuid = invoiceReference.get("uuid").toString();
+		for (Map<String, Object> invoiceReference : requestPayload) {
+			String uuid = (String) invoiceReference.get("uuid");
+			if (uuid == null) {
+				throw new IllegalArgumentException("UUID cannot be null");
+			}
 			if (currency == null) {
-				currency = invoiceReference.get("currency").toString();
+				currency = (String) invoiceReference.get("currency");
 			}
 			Invoice invoice = billingService.getInvoiceDetailsByUuid(uuid);
+			if (invoice == null) {
+				throw new IllegalStateException("Invoice not found for UUID: " + uuid);
+			}
 			visit = invoice.getVisit();
-			for(InvoiceItem invoiceItem: invoice.getInvoiceItems()) {
-				totalBillAmount+= invoiceItem.getPrice();
+			for (InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
+				totalBillAmount += invoiceItem.getPrice();
 				invoiceItems.add(invoiceItem);
 			}
-
 		}
-		//TODO: Get from global property or any other configurations
+		
 		AdministrationService administrationService = Context.getAdministrationService();
-		Date billExpDate = new Date(); // TODO: This should be evaluated (Check how as per your needs)
+		Date billExpDate = new Date(); 
 		String personPhoneNumberAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.PHONE_NUMBER_ATTRIBUTE);
 		String spCode = administrationService.getGlobalProperty(ICareConfig.SP_CODE);
 		String systemCode = administrationService.getGlobalProperty(ICareConfig.SYSTEM_CODE);
