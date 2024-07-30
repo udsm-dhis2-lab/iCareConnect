@@ -66,6 +66,7 @@ public class GepgBillingController {
 		Double totalBillAmount = new Double(2);
 		String currency = null;
 		List<InvoiceItem> invoiceItems = new ArrayList<InvoiceItem>();
+
 		for (Map<String, Object> invoiceReference : requestPayload) {
 			String uuid = (String) invoiceReference.get("uuid");
 			if (uuid == null) {
@@ -74,7 +75,10 @@ public class GepgBillingController {
 			if (currency == null) {
 				currency = (String) invoiceReference.get("currency");
 			}
+			System.out.println("Invoice uuid................."+ uuid);
 			Invoice invoice = billingService.getInvoiceDetailsByUuid(uuid);
+			System.out.println("Invoice ................."+ invoice);
+
 			if (invoice == null) {
 				throw new IllegalStateException("Invoice not found for UUID: " + uuid);
 			}
