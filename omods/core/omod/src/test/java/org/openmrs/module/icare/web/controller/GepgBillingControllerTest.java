@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openmrs.module.icare.billing.services.payment.gepg.GEPGService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,15 +30,21 @@ public class GepgBillingControllerTest {
 	}
 	
 	@Test
-    public void testSubmitBill_withValidUuid_returnsSuccess() throws Exception  {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("uuid", "7a4fc84b-ae30-4cf1-b43a-59d102b6898e");
-        payload.put("selectedbills", List.of(Map.of("bill", "d5ef14c1-6388-40ee-8818-48d8aeb5fae6")));
-        payload.put("totalBill", 10000);
+public void testSubmitBill_withValidUuid_returnsSuccess() throws Exception {
+    List<Map<String, Object>> payload = new ArrayList<>();
+    
+    Map<String, Object> payloadItem = new HashMap<>();
+    payloadItem.put("uuid", "7a4fc84b-ae30-4cf1-b43a-59d102b6898e");
+    payloadItem.put("currency", "Tzs");
+    // payloadItem.put("selectedbills", List.of(Map.of("bill", "d5ef14c1-6388-40ee-8818-48d8aeb5fae6")));
+    // payloadItem.put("totalBill", 10000);
+    
+    payload.add(payloadItem);
 
-        String response = controller.submitBill(payload);
-        // assertEquals("Success", response);
-    }
+    Map<String, Object> response = controller.generateControlNumber(payload);
+    
+   System.out.println("response data ---------------------"+response);
+}
 	
 	@Test
     public void testSubmitBill_withEmptyUuid_returnsErrorMessage() throws Exception {

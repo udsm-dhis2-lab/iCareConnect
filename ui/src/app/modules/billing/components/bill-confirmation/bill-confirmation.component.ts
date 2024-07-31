@@ -80,8 +80,7 @@ export class BillConfirmationComponent implements OnInit {
       .gepgpayBill(payload)
       .subscribe(
         (paymentResponse) => {
-          console.log("Payment Response .......",paymentResponse);
-          console.log("successfully generated .......",paymentResponse);
+          // console.log("successfully generated .......",paymentResponse);
           this.matDialogRef.close(paymentResponse);
                
         },
