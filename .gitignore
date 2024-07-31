@@ -9,10 +9,10 @@
 .project
 .settings/*
 # Ignore package-lock.json
-.package-lock.json
+package-lock.json
 
 # Ignore package.json
-.package.json
+package.json
 
 omods/*/api/.classpath
 omods/*/api/.project
