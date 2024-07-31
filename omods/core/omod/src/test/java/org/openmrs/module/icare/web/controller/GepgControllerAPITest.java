@@ -44,6 +44,7 @@ public class GepgControllerAPITest extends BaseResourceControllerTest {
 	public void testSubmitBill_withValidUuid_returnsSuccess() throws Exception {
 		//Given
 		PatientService patientService = Context.getService(PatientService.class);
+		
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
 		
 		List<Invoice> invoices = billingService.getPendingInvoices(patient.getUuid());
