@@ -21,7 +21,7 @@ export class SharedPdfPreviewComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // Capture the root URL dynamically
     this.baseUrl = `${window.location.protocol}//${window.location.host}/`;
-    console.log("Base URL captured:", this.baseUrl);
+    // console.log("Base URL captured:", this.baseUrl);
   }
 
   ngAfterViewInit(): void {
@@ -34,13 +34,13 @@ export class SharedPdfPreviewComponent implements OnInit, AfterViewInit {
       const base64data = this.data?.data;
       if (base64data) {
         this.pdfUrl = `data:application/pdf;base64,${base64data}`;
-        console.log("Base64 PDF URL:", this.pdfUrl);
+        // console.log("Base64 PDF URL:", this.pdfUrl);
       } else {
         console.error("Base64 data is empty or undefined.");
       }
     } else {
       const originalUrl = this.data?.data;
-      console.log("Original URL:", originalUrl);
+      // console.log("Original URL:", originalUrl);
 
       if (originalUrl.startsWith('http://localhost/')) {
         this.pdfUrl = originalUrl.replace('http://localhost/', this.baseUrl);
@@ -48,7 +48,7 @@ export class SharedPdfPreviewComponent implements OnInit, AfterViewInit {
         this.pdfUrl = originalUrl;
       }
 
-      console.log("Constructed PDF URL:", this.pdfUrl);
+      // console.log("Constructed PDF URL:", this.pdfUrl);
     }
 
     console.log("Loading PDF from URL...");
@@ -72,7 +72,7 @@ export class SharedPdfPreviewComponent implements OnInit, AfterViewInit {
   renderPage(pageNumber: number, pdf: PDFDocumentProxy) {
     pdf.getPage(pageNumber).then(
       (page: PDFPageProxy) => {
-        console.log("Rendering page:", pageNumber);
+        // console.log("Rendering page:", pageNumber);
         const scale = 1.5;
         const viewport = page.getViewport({ scale });
 
@@ -92,7 +92,7 @@ export class SharedPdfPreviewComponent implements OnInit, AfterViewInit {
               (error: any) => console.error("Error rendering page:", error)
             );
           } else {
-            console.error("Canvas context not available.");
+            // console.error("Canvas context not available.");
           }
         } else {
           console.error("Canvas element not found.");
