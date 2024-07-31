@@ -15,7 +15,7 @@
     </button>
   </mat-toolbar>
   <mat-dialog-content class="mat-typography">
-    <div class="alert alert-danger mb-3" *ngIf="savingPaymentError">
+    <div class="alert alert-danger mb-3" *ngIf="savingPayment">
       {{ savingPaymentError }}
     </div>
     <div class="p-3">
@@ -77,7 +77,7 @@
       (click)="onConfirm($event)"
       cdkFocusInitial
     >
-      Confirm Payment
+      Confirm Payment 
     </button>
     <button
       *ngIf="!params?.gepgConceptField && data?.paymentType?.code === 'GePG' && !controlNumber"
