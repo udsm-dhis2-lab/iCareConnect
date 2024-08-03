@@ -51,7 +51,7 @@ export class InpatientHomeComponent implements OnInit {
     private route: ActivatedRoute,
     private locationService: LocationService
   ) {
-    this.store.dispatch(loadRolesDetails());
+    // this.store.dispatch(loadRolesDetails());
   }
 
   ngOnInit(): void {
