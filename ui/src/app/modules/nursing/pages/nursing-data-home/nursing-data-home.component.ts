@@ -42,7 +42,7 @@ export class NursingDataHomeComponent implements OnInit {
     private systemSettingsService: SystemSettingsService
   ) {
     this.store.dispatch(loadFormPrivilegesConfigs());
-    this.store.dispatch(loadRolesDetails());
+    // this.store.dispatch(loadRolesDetails());
   }
 
   ngOnInit(): void {
