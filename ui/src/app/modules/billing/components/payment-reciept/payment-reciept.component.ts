@@ -54,6 +54,9 @@ export class PaymentReceiptComponent implements OnInit {
   }
 
   onPrint(e): void {
+    const mrn = this.data?.currentPatient?.identifier;
+    const truncatedMRN = mrn ? mrn.replace("MRN = ", "") : "";
+
     var contents = document.getElementById("dialog-bill-receipt").innerHTML;
     const frame1: any = document.createElement("iframe");
     frame1.name = "frame3";
@@ -190,12 +193,8 @@ export class PaymentReceiptComponent implements OnInit {
       
       <div id="mid">
         <div class="patient-info">
-          <p> 
-              Patient Name : ${this.data?.currentPatient?.name}</br>
-          </p>
-          <p> 
-              MRN : ${patientMRN}</br>
-          </p>
+           <p>Patient Name: ${this.data?.currentPatient?.name}</p>
+              <p>MRN: ${truncatedMRN}</p>
         </div>
       </div>`);
 
