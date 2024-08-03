@@ -52,10 +52,14 @@ export class BillConfirmationComponent implements OnInit {
       uuid: this.data.currentPatient.patient.uuid,
       totalBill: this.data.totalPayableBill
     };
+    const generateControlNoPayload = this.data.billItems.map((item: any) => ({
+      uuid: this.data.currentPatient.patient.uuid,
+      currency: "Tzs"
+    }));
   
-    console.log("Formatted payload:", gepgrequestpayload);
+    console.log("Formatted payload:", generateControlNoPayload);
     //Calling Controll number Generation Function
-    this.onConntrollNumbGen(gepgrequestpayload);
+    this.onConntrollNumbGen(generateControlNoPayload);
     this.currentUser = this.store.select(getCurrentUserDetails).subscribe({
       next: (currentUser) => {
         return currentUser;
@@ -76,10 +80,8 @@ export class BillConfirmationComponent implements OnInit {
       .gepgpayBill(payload)
       .subscribe(
         (paymentResponse) => {
-          console.log("Payment Response .......",paymentResponse);
-          console.log("successfully generated .......",paymentResponse);
+          // console.log("successfully generated .......",paymentResponse);
           this.matDialogRef.close(paymentResponse);
-          //:TODO After successfully saved now saving Payed Bill with Control Number
                
         },
         (error) => {
@@ -145,7 +147,7 @@ export class BillConfirmationComponent implements OnInit {
 
   onGepgConfirmation(e): void {
     e.stopPropagation();
-    this.savingPayment = true;
+    this.savingPayment = false;
     this.billingService
       .payBill(this.data?.bill, {
         confirmedItems: this.data?.billItems,
@@ -159,7 +161,7 @@ export class BillConfirmationComponent implements OnInit {
           this.matDialogRef.close(paymentResponse);
         },
         (error) => {
-          this.savingPayment = false;
+          this.savingPayment = true;
           this.savingPaymentError = error;
         }
       );
