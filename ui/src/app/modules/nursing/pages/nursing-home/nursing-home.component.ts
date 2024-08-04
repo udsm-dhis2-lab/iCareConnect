@@ -31,7 +31,7 @@ export class NursingHomeComponent implements OnInit {
     private route: ActivatedRoute,
     private googleAnalyticsService: GoogleAnalyticsService
   ) {
-    this.store.dispatch(loadRolesDetails());
+    // this.store.dispatch(loadRolesDetails());
   }
 
   ngOnInit(): void {
@@ -72,20 +72,13 @@ export class NursingHomeComponent implements OnInit {
       })
     );
 
-      this.trackActionForAnalytics(`Nursing Search: View`);
- 
-    
+    this.trackActionForAnalytics(`Nursing Search: View`);
   }
 
   trackActionForAnalytics(eventname: any) {
     // Send data to Google Analytics
-    this.googleAnalyticsService.sendAnalytics(
-      "Nursing",
-      eventname,
-      "Nursing"
-    );
+    this.googleAnalyticsService.sendAnalytics("Nursing", eventname, "Nursing");
   }
-
 
   onBack(e: Event) {
     e.stopPropagation();

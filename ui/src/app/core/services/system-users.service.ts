@@ -25,7 +25,7 @@ export class SystemUsersService {
   }
 
   getUserById(id: string): Observable<UserGetFull> {
-    const url = `user/${id}?v=custom:(uuid,display,roles,allRoles,privileges,username,userProperties,retired,person:(uuid,display,attributes,birthdate,gender,display,preferredName,preferredAddress))`;
+    const url = `user/${id}?v=custom:(uuid,display,privileges,username,userProperties,retired,person:(uuid,display,attributes,birthdate,gender,display,preferredName,preferredAddress))`;
     return this.httpClient.get(url);
   }
 

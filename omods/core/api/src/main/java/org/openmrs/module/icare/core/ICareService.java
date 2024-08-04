@@ -104,6 +104,8 @@ public interface ICareService extends OpenmrsService {
 	
 	List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type,
 	        Boolean stockable);
+
+	List<Item> getStockableItems(String search, Integer limit, Integer startIndex, Item.Type type);
 	
 	Prescription savePrescription(Prescription order, String status, String remarks);
 	

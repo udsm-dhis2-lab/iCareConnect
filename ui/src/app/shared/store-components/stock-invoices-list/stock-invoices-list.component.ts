@@ -12,8 +12,6 @@ import { StockInvoiceFormDialogComponent } from "../../store-modals/stock-invoic
   styleUrls: ["./stock-invoices-list.component.scss"],
 })
 export class StockInvoicesListComponent implements OnInit {
-  @Input() suppliers: any[];
-  @Input() unitsOfMeasurementSettings: any;
   @Input() status: any;
   @Input() currentLocation: any;
 
@@ -85,8 +83,6 @@ export class StockInvoicesListComponent implements OnInit {
         width: "80%",
         data: {
           stockInvoice: stockInvoice,
-          suppliers: this.suppliers,
-          unitsOfMeasurementSettings: this.unitsOfMeasurementSettings,
           currentLocation: this.currentLocation,
         },
       })

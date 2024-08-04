@@ -79,7 +79,7 @@ export class LoginFormComponent implements OnInit {
               userDetails: formatCurrentUserDetails(authenticatedUser),
             })
           );
-          this.store.dispatch(loadRolesDetails());
+          // this.store.dispatch(loadRolesDetails());
           this.closeLogin.emit();
         } else {
           authenticateUserFail({
