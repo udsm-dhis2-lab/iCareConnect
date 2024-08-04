@@ -215,11 +215,11 @@ public class ICareDao extends BaseDAO<Item> {
 		}
 		
 		if (search != null) {
-			queryStr = "SELECT ip FROM Item ip WHERE ip.stockable = true "
+			queryStr = "SELECT ip FROM Item ip "
 			        + "LEFT JOIN ip.concept as c WITH c.retired = false "
 			        + "LEFT JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED' "
 			        + "LEFT JOIN ip.drug as d WITH d.retired=false "
-			        + "WHERE lower(cn.name) like :search  OR lower(d.name) like :search";
+			        + "WHERE ip.stockable = true AND lower(cn.name) like :search  OR lower(d.name) like :search";
 			if (type == Item.Type.DRUG) {
 				queryStr += " AND ip.drug IS NOT NULL";
 			}
