@@ -269,6 +269,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	        Boolean stockable) {
 		return dao.getItems(search, limit, startIndex, department, type, stockable);
 	}
+
+	@Override
+	public List<Item> getStockableItems(String search, Integer limit, Integer startIndex, Item.Type type) {
+		return dao.getStockableItems(search, limit, startIndex, type);
+	}
 	
 	@Override
 	public Prescription savePrescription(Prescription prescription, String status, String remarks) {
