@@ -269,7 +269,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   searchItemFromOptions(event: KeyboardEvent): void {
     const searchingText = (event?.target as any)?.value;
     this.members$ = this.httpClient
-      .get(`icare/item?limit=5&startIndex=0&q=${searchingText}`)
+      .get(`icare/item?limit=15&startIndex=0&q=${searchingText}`)
       .pipe(
         debounceTime(300),
         map((response) => {
