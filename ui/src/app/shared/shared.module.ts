@@ -19,8 +19,14 @@ import { FormatLabelCharCountDisplayPipe } from "./pipes/format-label-char-count
 import { sharedStoreModals } from "./store-modals";
 import { sharedStorePages } from "./store-pages";
 import { sharedStoreComponents } from "./store-components";
+import { NgxMatSelectSearchModule } from "ngx-mat-select-search";
 @NgModule({
-  imports: [CommonModule, ...materialModules, ...modules],
+  imports: [
+    CommonModule,
+    ...materialModules,
+    ...modules,
+    NgxMatSelectSearchModule,
+  ],
   exports: [
     CommonModule,
     FormModule,
@@ -33,6 +39,7 @@ import { sharedStoreComponents } from "./store-components";
     ...sharedPipes,
     ...sharedDialogs,
     HttpClientModule,
+    NgxMatSelectSearchModule,
   ],
   entryComponents: [
     ...sharedEntryComponents,

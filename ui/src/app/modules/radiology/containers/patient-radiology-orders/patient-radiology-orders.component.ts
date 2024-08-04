@@ -49,7 +49,7 @@ export class PatientRadiologyOrdersComponent implements OnInit {
     private route: ActivatedRoute,
     private systemSettingsService: SystemSettingsService
   ) {
-    this.store.dispatch(loadRolesDetails());
+    // this.store.dispatch(loadRolesDetails());
   }
 
   ngOnInit(): void {

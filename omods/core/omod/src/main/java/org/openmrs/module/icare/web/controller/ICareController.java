@@ -128,6 +128,21 @@ public class ICareController {
         results.put("results", items);
         return results;
     }
+
+	@RequestMapping(value = "stockableitems", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetStockableItems(@RequestParam(required = false) String q,
+												   @RequestParam(defaultValue = "100") Integer limit,
+												   @RequestParam(defaultValue = "0") Integer startIndex,
+												   @RequestParam(required = false) Item.Type type) {
+		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+		for (Item item : iCareService.getStockableItems(q, limit, startIndex, type)) {
+			items.add(item.toMap());
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", items);
+		return results;
+	}
 	
 	@RequestMapping(value = "item", method = RequestMethod.POST)
 	@ResponseBody
