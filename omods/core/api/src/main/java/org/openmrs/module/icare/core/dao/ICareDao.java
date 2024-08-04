@@ -202,30 +202,31 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		return query.list();
 	}
-
+	
 	public List<Item> getStockableItems(String search, Integer limit, Integer startIndex, Item.Type type) {
 		DbSession session = getSession();
 		String queryStr;
 		queryStr = "SELECT ip FROM Item ip WHERE id.stockable = true ";
-
+		
 		if (queryStr != null && type == Item.Type.DRUG) {
 			queryStr += " AND ip.drug IS NOT NULL";
 		} else if (queryStr != null && type == Item.Type.CONCEPT) {
 			queryStr += " AND ip.concept IS NOT NULL";
 		}
-
+		
 		if (search != null) {
-			queryStr = "SELECT ip FROM Item ip WHERE ip.stockable = true " + "LEFT JOIN ip.concept as c WITH c.retired = false "
-					+ "LEFT JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED' "
-					+ "LEFT JOIN ip.drug as d WITH d.retired=false "
-					+ "WHERE lower(cn.name) like :search  OR lower(d.name) like :search";
+			queryStr = "SELECT ip FROM Item ip WHERE ip.stockable = true "
+			        + "LEFT JOIN ip.concept as c WITH c.retired = false "
+			        + "LEFT JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED' "
+			        + "LEFT JOIN ip.drug as d WITH d.retired=false "
+			        + "WHERE lower(cn.name) like :search  OR lower(d.name) like :search";
 			if (type == Item.Type.DRUG) {
 				queryStr += " AND ip.drug IS NOT NULL";
 			}
 			if (type == Item.Type.CONCEPT) {
 				queryStr += " AND ip.concept IS NOT NULL";
 			}
-
+			
 		}
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
@@ -235,8 +236,7 @@ public class ICareDao extends BaseDAO<Item> {
 		}
 		return query.list();
 	}
-
-
+	
 	public List<OrderStatus> getOrderStatusByOrderUuid(String orderUuid) {
 		DbSession session = this.getSession();
 		//String queryStr = "SELECT item FROM Item item \n"
