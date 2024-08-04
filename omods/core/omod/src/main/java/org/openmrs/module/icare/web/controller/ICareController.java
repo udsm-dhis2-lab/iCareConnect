@@ -128,7 +128,7 @@ public class ICareController {
         results.put("results", items);
         return results;
     }
-
+	
 	@RequestMapping(value = "stockableitems", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> onGetStockableItems(@RequestParam(required = false) String q,
