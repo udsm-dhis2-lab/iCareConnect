@@ -22,6 +22,8 @@ import { StockInvoicesService } from "src/app/shared/resources/store/services/st
 import { ItemPriceService } from "src/app/shared/services/item-price.service";
 import { OpenmrsHttpClientService } from "../../modules/openmrs-http-client/services/openmrs-http-client.service";
 import { ChangeDetectorRef } from "@angular/core";
+import { FormControl } from "@angular/forms";
+import { MatSelectChange } from "@angular/material/select";
 
 @Component({
   selector: "app-stock-receiving-form-fields",
@@ -75,10 +77,12 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   stockInvoice: any;
   validForm: boolean = false;
   unitItemValue: any;
+  searchingText: string;
+
+  stockableItemCtrl: FormControl = new FormControl();
+  stockableItemsFilterCtrl: FormControl = new FormControl();
 
   constructor(
-    private api: Api,
-    private itemPriceService: ItemPriceService,
     private stockInvoicesService: StockInvoicesService,
     private httpClient: OpenmrsHttpClientService,
     private changeDetectorRef: ChangeDetectorRef
@@ -99,6 +103,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         id: "supplier",
         key: "supplier",
         label: "Supplier",
+        required: true,
         options: supplierFieldOptions,
         value: this.existingStockInvoice
           ? this.existingStockInvoice?.supplier?.uuid
@@ -108,6 +113,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         id: "invoiceNumber",
         key: "invoiceNumber",
         label: "Invoice Number",
+        required: true,
         value: this.existingStockInvoice
           ? this.existingStockInvoice?.invoiceNumber
           : "",
@@ -116,6 +122,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         id: "receivingDate",
         key: "receivingDate",
         label: "Receiving Date",
+        required: true,
         max: formatDateToYYMMDD(new Date()),
         value: this.existingStockInvoice
           ? formatDateToYYMMDD(
@@ -137,26 +144,21 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       };
     });
 
-    // this.itemField = new Textbox({
+    // this.itemField = new Dropdown({
     //   id: "item",
     //   key: "item",
     //   label: "Item",
+    //   required: true,
+    //   options: [],
+    //   shouldHaveLiveSearchForDropDownFields: true,
+    //   searchControlType: "billableItem",
     //   value: this.stockInvoiceItem ? this.stockInvoiceItem?.item?.display : "",
     // });
-    this.itemField = new Dropdown({
-      id: "item",
-      key: "item",
-      label: "Item",
-      required: true,
-      options: [],
-      shouldHaveLiveSearchForDropDownFields: true,
-      searchControlType: "billableItem",
-      value: this.stockInvoiceItem ? this.stockInvoiceItem?.item?.display : "",
-    });
     this.unitField = new Dropdown({
       id: "unit",
       key: "unit",
       label: "Unit of Measure",
+      required: true,
       options: unitOfMeasureOptions,
       value: this.stockInvoiceItem
         ? this.unitsOfMeasurements?.filter(
@@ -168,6 +170,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       id: "orderQuantity",
       key: "orderQuantity",
       label: "Order Quantity",
+      type: "number",
+      required: true,
+      min: 1,
       value: this.stockInvoiceItem ? this.stockInvoiceItem?.orderQuantity : "",
     });
 
@@ -175,6 +180,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       id: "mfgBatchNumber",
       key: "mfgBatchNumber",
       label: "Mfg Batch Number",
+      required: true,
       value: this.stockInvoiceItem ? this.stockInvoiceItem?.batchNo : "",
     });
 
@@ -182,6 +188,8 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       id: "expiryDate",
       key: "expiryDate",
       label: "Expiry Date",
+      type: "date",
+      required: true,
       value: this.stockInvoiceItem
         ? formatDateToYYMMDD(new Date(this.stockInvoiceItem?.expiryDate))
         : "",
@@ -190,6 +198,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       id: "batchQuantity",
       key: "batchQuantity",
       label: "Batch Quantity",
+      type: "number",
+      required: true,
+      min: 1,
       disabled: true,
       value: this.stockInvoiceItem ? this.stockInvoiceItem?.batchQuantity : "",
     });
@@ -201,7 +212,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       id: "amount",
       key: "amount",
       label: "Amount",
-      min: 0,
+      type: "number",
+      required: true,
+      min: 1,
       disabled: true,
     });
 
@@ -223,11 +236,40 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     ];
   }
 
+  // filterStockableItems(searchingText: string): void {
+  //   this.searchingText = searchingText;
+  //   this.members$ =
+  //     searchingText?.length > 2
+  //       ? this.httpClient
+  //           .get(`icare/item?limit=5&startIndex=0&q=${this.searchingText}`)
+  //           .pipe(
+  //             map((response) => {
+  //               return orderBy(
+  //                 uniqBy(
+  //                   response?.results
+  //                     .map((result) => {
+  //                       return {
+  //                         stockable: result?.stockable,
+  //                         uuid: result?.uuid,
+  //                         display: result?.display,
+  //                         unit: result?.unit,
+  //                       };
+  //                     })
+  //                     .filter((item) => item?.stockable),
+  //                   "display"
+  //                 ),
+  //                 ["display"],
+  //                 ["asc"]
+  //               );
+  //             })
+  //           )
+  //       : of([]);
+  // }
+
   searchItemFromOptions(event: KeyboardEvent): void {
     const searchingText = (event?.target as any)?.value;
-    // this.selectedItem = null;
     this.members$ = this.httpClient
-      .get(`icare/item?limit=5&startIndex=0${"&q=" + searchingText}`)
+      .get(`icare/item?limit=5&startIndex=0&q=${searchingText}`)
       .pipe(
         debounceTime(300),
         map((response) => {
@@ -252,11 +294,11 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       );
   }
 
-  getSelectedItemFromOption(event: KeyboardEvent, option: any): void {
-    // console.log(event);
+  getSelectedItemFromOption(event: Event, option: any): void {
     event.stopPropagation();
-    this.changeDetectorRef.detectChanges();
     this.selectedItem = option;
+    // this.stockableItemCtrl.setValue(this.selectedItem);
+    this.searchingText = this.selectedItem?.display;
   }
 
   onFormUpdate(formValues: FormValue) {
@@ -381,6 +423,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         id: "item",
         key: "item",
         label: "Item",
+        required: true,
         value: this.selectedItem?.display,
       });
     }, 10);
@@ -441,7 +484,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
           }
           this.itemFields = [];
           setTimeout(() => {
-            this.selectedItem = null;
+            // this.selectedItem = null;
             this.setFields();
           }, 10);
         });
