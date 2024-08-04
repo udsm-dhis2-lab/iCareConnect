@@ -133,7 +133,7 @@ export class PatientDashboardComponent implements OnInit {
       );
     const patientId = this.route.snapshot.params["patientID"];
     this.store.dispatch(loadFormPrivilegesConfigs());
-    this.store.dispatch(loadRolesDetails());
+    // this.store.dispatch(loadRolesDetails());
     // this.store.dispatch(loadActiveVisit({ patientId }));
     this.store.dispatch(loadCurrentPatient({ uuid: patientId }));
     this.privilegesConfigs$ = this.store.select(getFormPrivilegesConfigs);

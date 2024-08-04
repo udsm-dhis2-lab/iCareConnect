@@ -73,7 +73,7 @@ export class InpatientDashboardComponent implements OnInit {
     private paymentService: PaymentService
   ) {
     this.store.dispatch(loadFormPrivilegesConfigs());
-    this.store.dispatch(loadRolesDetails());
+    // this.store.dispatch(loadRolesDetails());
     this.store.dispatch(loadOrderTypes());
   }
 

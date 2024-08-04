@@ -1,21 +1,11 @@
-<div
-  class="w-100"
-  *ngIf="{
-    suppliers: suppliers$ | async,
-    unitsOfMeasurementSettings: unitsOfMeasurementSettings$ | async
-  } as params"
->
-  <mat-tab-group
-    *ngIf="params?.unitsOfMeasurementSettings && params?.suppliers"
-  >
+<div class="w-100">
+  <mat-tab-group>
     <mat-tab>
       <ng-template mat-tab-label>
         <span>Draft Invoices</span>
       </ng-template>
       <ng-template matTabContent>
         <app-stock-invoices-list
-          [suppliers]="params?.suppliers"
-          [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"
           [currentLocation]="currentLocation"
           [status]="'DRAFT'"
         ></app-stock-invoices-list>
@@ -27,8 +17,6 @@
       </ng-template>
       <ng-template matTabContent>
         <app-stock-invoices-list
-          [suppliers]="params?.suppliers"
-          [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"
           [status]="'RECEIVED'"
         ></app-stock-invoices-list>
       </ng-template>
@@ -39,13 +27,10 @@
       </ng-template>
       <ng-template matTabContent>
         <app-stock-receiving-form
-          [suppliers]="params?.suppliers"
-          [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"
           [currentLocation]="currentLocation"
           [reloadForm]="reloadForm()"
         ></app-stock-receiving-form>
       </ng-template>
-      
     </mat-tab>
   </mat-tab-group>
 </div>
