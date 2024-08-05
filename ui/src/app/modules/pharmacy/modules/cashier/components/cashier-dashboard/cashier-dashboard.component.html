@@ -192,8 +192,8 @@
                 [disabled]="
                   selectedItems?.length === 0 ||
                   !params?.currentLocation ||
-                  itemsPrices['total'] === 0 ||
-                  !itemsPrices[item?.itemUuid]?.price
+                  !itemsPrices ||
+                  itemsPrices['total'] === 0
                 "
               >
                 Save
