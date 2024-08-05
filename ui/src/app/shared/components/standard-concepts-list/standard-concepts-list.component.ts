@@ -15,6 +15,7 @@ export class StandardConceptsListComponent implements OnInit {
   @Input() standardSearchTerm: string;
   @Input() selectedConceptUuid: string;
   @Input() conceptClass: string;
+  @Input() stockable: boolean;
   conceptsList$: Observable<ConceptGetFull[]>;
   saving: boolean = false;
 
@@ -28,18 +29,23 @@ export class StandardConceptsListComponent implements OnInit {
     new EventEmitter<ConceptGetFull>();
   constructor(
     private conceptService: ConceptsService,
-    private billableItemService : BillableItemsService,
+    private billableItemService: BillableItemsService,
     private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-    this.conceptsList$ = this.conceptService.searchConcept({
-      q: this.searchingText,
-      pageSize: this.pageSize,
-      conceptClass: this.conceptClass,
-      page: this.page,
-      searchTerm: this.standardSearchTerm,
-    });
+    this.conceptsList$ = !this.stockable
+      ? this.conceptService.searchConcept({
+          q: this.searchingText,
+          pageSize: this.pageSize,
+          conceptClass: this.conceptClass,
+          page: this.page,
+          searchTerm: this.standardSearchTerm,
+        })
+      : this.conceptService.getConceptsWithItemsDetails([
+          "limit=15",
+          "startIndex=" + this.pageSize * (this.page - 1),
+        ]);
   }
 
   onEdit(event: Event, concept: ConceptGetFull): void {
@@ -131,86 +137,87 @@ export class StandardConceptsListComponent implements OnInit {
       });
   }
 
-  onSetBillable(event : Event, concept: any){
-    this.dialog.open(SharedConfirmationDialogComponent, {
-      minWidth: "20%",
-      data: {
-        header: `Are you sure you want to set billable <b>${concept?.display}<b>`
-      }
-    })
-    .afterClosed()
-    .subscribe((shouldConfirm)=>{
-      if(shouldConfirm){
-        
-        const billableItem = {
-          concept: { uuid: concept?.uuid },
-          unit: "default",
-        };
-        this.billableItemService
-          .createBillableItem(billableItem)
-          .subscribe((billableItemResponse) => {
-            if (billableItemResponse && !billableItemResponse?.error) {
-              // Create prices
-              const prices = [
-                {
-                  item: {
-                    uuid: billableItemResponse?.uuid,
+  onSetBillable(event: Event, concept: any) {
+    this.dialog
+      .open(SharedConfirmationDialogComponent, {
+        minWidth: "20%",
+        data: {
+          header: `Are you sure you want to set billable <b>${concept?.display}<b>`,
+        },
+      })
+      .afterClosed()
+      .subscribe((shouldConfirm) => {
+        if (shouldConfirm) {
+          const billableItem = {
+            concept: { uuid: concept?.uuid },
+            unit: "default",
+          };
+          this.billableItemService
+            .createBillableItem(billableItem)
+            .subscribe((billableItemResponse) => {
+              if (billableItemResponse && !billableItemResponse?.error) {
+                // Create prices
+                const prices = [
+                  {
+                    item: {
+                      uuid: billableItemResponse?.uuid,
+                    },
+                    paymentScheme: {
+                      uuid: "00000102IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                    },
+                    paymentType: {
+                      uuid: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                    },
+                    price: "0",
                   },
-                  paymentScheme: {
-                    uuid: "00000102IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                  {
+                    item: {
+                      uuid: billableItemResponse?.uuid,
+                    },
+                    paymentScheme: {
+                      uuid: "5f53b4e2-da03-4139-b32c-ad6edb699943",
+                    },
+                    paymentType: {
+                      uuid: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
+                    },
+                    price: "0",
                   },
-                  paymentType: {
-                    uuid: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
-                  },
-                  price: "0",
-                },
-                {
-                  item: {
-                    uuid: billableItemResponse?.uuid,
-                  },
-                  paymentScheme: {
-                    uuid: "5f53b4e2-da03-4139-b32c-ad6edb699943",
-                  },
-                  paymentType: {
-                    uuid: "00000100IIIIIIIIIIIIIIIIIIIIIIIIIIII",
-                  },
-                  price: "0",
-                },
-              ];
-              zip(
-                ...prices.map((priceObject) => {
-                  return this.billableItemService.createPrice(
-                    priceObject
-                  );
-                })
-              ).subscribe((priceResponses) => {
-                if (priceResponses) {
-                  this.saving = false;
-                  this.getConceptsList();
-                    
-                }
-              });
-            
-            }
-          });   
-          
-                  
-        
-      }
-    });
+                ];
+                zip(
+                  ...prices.map((priceObject) => {
+                    return this.billableItemService.createPrice(priceObject);
+                  })
+                ).subscribe((priceResponses) => {
+                  if (priceResponses) {
+                    this.saving = false;
+                    this.getConceptsList();
+                  }
+                });
+              }
+            });
+        }
+      });
   }
 
-  searchConcept(event: KeyboardEvent): void {
+  searchConcept(event?: KeyboardEvent): void {
     this.page = 1;
-    this.searchingText = (event.target as HTMLInputElement).value;
+    this.searchingText = event
+      ? (event.target as HTMLInputElement).value
+      : null;
     if (this.searchingText) {
-      this.conceptsList$ = this.conceptService.searchConcept({
-        q: this.searchingText,
-        pageSize: this.pageSize,
-        conceptClass: this.conceptClass,
-        page: this.page,
-        searchTerm: this.standardSearchTerm,
-      });
+      this.conceptsList$ = !this.stockable
+        ? this.conceptService.searchConcept({
+            q: this.searchingText,
+            pageSize: this.pageSize,
+            conceptClass: this.conceptClass,
+            page: this.page,
+            searchTerm: this.standardSearchTerm,
+          })
+        : this.conceptService.getConceptsWithItemsDetails([
+            "limit=15",
+            "startIndex=" + this.pageSize * (this.page - 1),
+            `q=${this.searchingText}`,
+          ]);
     }
   }
 
@@ -224,5 +231,23 @@ export class StandardConceptsListComponent implements OnInit {
       page: this.page,
       searchTerm: this.standardSearchTerm,
     });
+  }
+
+  onMakeItemStockable(event: Event, conceptItem: any): void {
+    console.log(conceptItem);
+    this.conceptService
+      .updateItemStockableStatus({
+        uuid: conceptItem?.item?.uuid,
+        stockable: true,
+      })
+      .subscribe((response: any) => {
+        if (response && !response?.error) {
+          this.saving = false;
+          this.searchConcept();
+        } else {
+          // Handle errors
+          this.saving = false;
+        }
+      });
   }
 }
