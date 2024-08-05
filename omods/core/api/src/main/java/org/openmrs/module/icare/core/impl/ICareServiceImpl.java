@@ -170,7 +170,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public ItemPrice getItemPrice(Visit visit, Concept billableConcept) throws Exception {
+	public ItemPrice getItemPrice(Visit visit, Concept billableConcept) throws ItemNotPayableException,
+	        ConfigurationException {
 		//VisitMetaData visitMetaData = VisitExtrapolator.extrapolateMetaData(visit);
 		VisitWrapper visitWrapper = new VisitWrapper(visit);
 		Concept paymentSchemeConcept = visitWrapper.getPaymentScheme();
@@ -271,7 +272,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public List<Object> getConceptItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable, String conceptClass) {
+	public List<Object> getConceptItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable,
+	        String conceptClass) {
 		return dao.getConceptItems(search, limit, startIndex, type, stockable, conceptClass);
 	}
 	
