@@ -203,9 +203,8 @@ public class ICareDao extends BaseDAO<Item> {
 		return query.list();
 	}
 	
-	public List<Object> getConceptItems(String search, Integer limit, Integer startIndex,
-										Item.Type type, Boolean stockable,
-										String conceptClass) {
+	public List<Object> getConceptItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable,
+	        String conceptClass) {
 		DbSession session = getSession();
 		String queryStr;
 		queryStr = "SELECT item FROM Item item ";
@@ -239,8 +238,8 @@ public class ICareDao extends BaseDAO<Item> {
 		}
 		
 		if (search != null) {
-			queryStr = "SELECT item FROM Item item LEFT JOIN item.concept c " +
-					"  INNER JOIN c.conceptClass cc  "
+			queryStr = "SELECT item FROM Item item LEFT JOIN item.concept c "
+			        + "  INNER JOIN c.conceptClass cc  "
 			        + "LEFT JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED' "
 			        + "LEFT JOIN item.drug as d WITH d.retired=false "
 			        + "WHERE lower(cc.name) like lower(:conceptClass) AND (lower(cn.name) like lower(:search)  OR lower(d.name) like lower(:search)) ";
