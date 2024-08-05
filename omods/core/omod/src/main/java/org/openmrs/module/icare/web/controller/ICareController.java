@@ -173,13 +173,14 @@ public class ICareController {
 	public Map<String, Object> onGetConceptItems(@RequestParam(required = false) String q,
 												 @RequestParam(defaultValue = "100") Integer limit,
 												 @RequestParam(defaultValue = "0") Integer startIndex,
-												 @RequestParam(required = false) Boolean stockable) {
+												 @RequestParam(required = false) Boolean stockable,
+												 @RequestParam(required = false) String conceptClass) {
 		List<Map<String, Object>> conceptItems = new ArrayList<Map<String, Object>>();
 		Pager pager = new Pager();
 		pager.setAllowed(true);
 		pager.setPageSize(limit);
 		pager.setPage((startIndex/limit));
-		for (Object conceptItem : iCareService.getConceptItems(q, limit, startIndex, Item.Type.valueOf("CONCEPT"), stockable)) {
+		for (Object conceptItem : iCareService.getConceptItems(q, limit, startIndex, Item.Type.valueOf("CONCEPT"), stockable, conceptClass)) {
 //			items.add(concept);
 			Map<String, Object> conceptItemObject = new HashMap<>();
 			Concept concept= ((Item) conceptItem).getConcept();
@@ -193,12 +194,12 @@ public class ICareController {
 			conceptItemObject.put("display", concept.getDisplayString());
 			conceptItemObject.put("dateCreated", concept.getDateCreated());
 			conceptItemObject.put("dateChanged", concept.getDateChanged());
-			Map<String, Object> conceptClass = new HashMap<>();
-			conceptClass.put("name", concept.getConceptClass().getName());
-			conceptClass.put("display", concept.getConceptClass().getName());
-			conceptClass.put("uuid", concept.getConceptClass().getUuid());
+			Map<String, Object> conceptClassDetails = new HashMap<>();
+			conceptClassDetails.put("name", concept.getConceptClass().getName());
+			conceptClassDetails.put("display", concept.getConceptClass().getName());
+			conceptClassDetails.put("uuid", concept.getConceptClass().getUuid());
 			conceptItemObject.put("dateChanged", concept.getDateChanged());
-			conceptItemObject.put("class", conceptClass);
+			conceptItemObject.put("class", conceptClassDetails);
 			List<Map<String, Object>> mappings = new ArrayList<>();
 			// TODO: Add support to load mappings
 			for (ConceptMap conceptMap: concept.getConceptMappings()) {
