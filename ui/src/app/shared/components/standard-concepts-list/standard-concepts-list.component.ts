@@ -45,6 +45,7 @@ export class StandardConceptsListComponent implements OnInit {
       : this.conceptService.getConceptsWithItemsDetails([
           "limit=15",
           "startIndex=" + this.pageSize * (this.page - 1),
+          `conceptClass=${this.conceptClass}`,
         ]);
   }
 
@@ -217,6 +218,7 @@ export class StandardConceptsListComponent implements OnInit {
             "limit=15",
             "startIndex=" + this.pageSize * (this.page - 1),
             `q=${this.searchingText}`,
+            `conceptClass=${this.conceptClass}`,
           ]);
     }
   }
@@ -234,7 +236,7 @@ export class StandardConceptsListComponent implements OnInit {
   }
 
   onMakeItemStockable(event: Event, conceptItem: any): void {
-    console.log(conceptItem);
+    // console.log(conceptItem);
     this.conceptService
       .updateItemStockableStatus({
         uuid: conceptItem?.item?.uuid,
