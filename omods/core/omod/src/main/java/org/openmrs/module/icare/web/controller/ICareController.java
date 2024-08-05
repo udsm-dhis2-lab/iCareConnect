@@ -134,9 +134,10 @@ public class ICareController {
 	public Map<String, Object> onGetStockableItems(@RequestParam(required = false) String q,
 												   @RequestParam(defaultValue = "100") Integer limit,
 												   @RequestParam(defaultValue = "0") Integer startIndex,
-												   @RequestParam(required = false) Item.Type type) {
+												   @RequestParam(required = false) Item.Type type,
+												   @RequestParam(required = false) Boolean stockable) {
 		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-		for (Item item : iCareService.getStockableItems(q, limit, startIndex, type)) {
+		for (Item item : iCareService.getStockableItems(q, limit, startIndex, type, stockable)) {
 			items.add(item.toMap());
 		}
 		Map<String, Object> results = new HashMap<>();
@@ -150,6 +151,48 @@ public class ICareController {
 		
 		Item newItem = iCareService.saveItem(item);
 		return newItem.toMap();
+	}
+	
+	@RequestMapping(value = "conceptswithitems", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetConceptItems(@RequestParam(required = false) String q,
+												 @RequestParam(defaultValue = "100") Integer limit,
+												 @RequestParam(defaultValue = "0") Integer startIndex,
+												 @RequestParam(required = false) Boolean stockable) {
+		List<Map<String, Object>> conceptItems = new ArrayList<Map<String, Object>>();
+		for (Object conceptItem : iCareService.getConceptItems(q, limit, startIndex, Item.Type.valueOf("CONCEPT"), stockable)) {
+//			items.add(concept);
+			Map<String, Object> conceptItemObject = new HashMap<>();
+			Concept concept= ((Item) conceptItem).getConcept();
+
+			Map<String, Object> item = new HashMap<>();
+			if (conceptItem != null) {
+				item = ((Item) conceptItem).toMap();
+			}
+			conceptItemObject.put("item", item);
+			conceptItemObject.put("uuid", concept.getUuid());
+			conceptItemObject.put("display", concept.getDisplayString());
+			conceptItemObject.put("dateCreated", concept.getDateCreated());
+			conceptItemObject.put("dateChanged", concept.getDateChanged());
+			Map<String, Object> conceptClass = new HashMap<>();
+			conceptClass.put("name", concept.getConceptClass().getName());
+			conceptClass.put("display", concept.getConceptClass().getName());
+			conceptClass.put("uuid", concept.getConceptClass().getUuid());
+			conceptItemObject.put("dateChanged", concept.getDateChanged());
+			conceptItemObject.put("class", conceptClass);
+			List<Map<String, Object>> mappings = new ArrayList<>();
+			// TODO: Add support to load mappings
+			for (ConceptMap conceptMap: concept.getConceptMappings()) {
+				Map<String, Object> mapping = new HashMap<>();
+			}
+			conceptItemObject.put("retired", concept.getRetired());
+			conceptItemObject.put("retiredOn", concept.getDateRetired());
+			conceptItemObject.put("mappings", mappings);
+			conceptItems.add(conceptItemObject);
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", conceptItems);
+		return results;
 	}
 	
 	@RequestMapping(value = "itemByConcept/{conceptUuid}", method = RequestMethod.GET)
@@ -184,7 +227,6 @@ public class ICareController {
 				items.add(item.toMap());
 			}
 			results.put("results", items);
-			System.out.println("aad");
 		}
 
 		if (visitUuid != null && drugUuid !=null){
@@ -274,7 +316,6 @@ public class ICareController {
 		//		diagnosis.setEncounter(encounter);
 		diagnosis.setCertainty(ConditionVerificationStatus.CONFIRMED);
 		diagnosis.setPatient(patient);
-		System.out.println(diagnosis);
 		return diagnosis;
 	}
 	
