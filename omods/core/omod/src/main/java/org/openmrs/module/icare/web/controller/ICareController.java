@@ -152,6 +152,21 @@ public class ICareController {
 		Item newItem = iCareService.saveItem(item);
 		return newItem.toMap();
 	}
+
+	@RequestMapping(value = "item", method = RequestMethod.PUT)
+	@ResponseBody
+	public Map<String, Object> onUpdateItem(@RequestBody Item itemToUpdate) throws Exception {
+		if (itemToUpdate.getUuid() == null) {
+			throw new RuntimeException("Key `uuid` is Missing");
+		}
+		Item item = iCareService.getItemByUuid(itemToUpdate.getUuid());
+		if (itemToUpdate.getStockable() != null) {
+			item.setStockable(itemToUpdate.getStockable());
+		}
+		// TODO: Add support to handle update as per parameters updated and ensure return resemble action happened
+		Item updatedItem = iCareService.saveItem(item);
+		return updatedItem.toMap();
+	}
 	
 	@RequestMapping(value = "conceptswithitems", method = RequestMethod.GET)
 	@ResponseBody
@@ -160,6 +175,10 @@ public class ICareController {
 												 @RequestParam(defaultValue = "0") Integer startIndex,
 												 @RequestParam(required = false) Boolean stockable) {
 		List<Map<String, Object>> conceptItems = new ArrayList<Map<String, Object>>();
+		Pager pager = new Pager();
+		pager.setAllowed(true);
+		pager.setPageSize(limit);
+		pager.setPage((startIndex/limit));
 		for (Object conceptItem : iCareService.getConceptItems(q, limit, startIndex, Item.Type.valueOf("CONCEPT"), stockable)) {
 //			items.add(concept);
 			Map<String, Object> conceptItemObject = new HashMap<>();
@@ -192,6 +211,7 @@ public class ICareController {
 		}
 		Map<String, Object> results = new HashMap<>();
 		results.put("results", conceptItems);
+		results.put("pager",pager);
 		return results;
 	}
 	
