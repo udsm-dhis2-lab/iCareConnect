@@ -160,22 +160,32 @@ export class CashierDashboardComponent implements OnInit {
   onFormDataUpdate(
     formValue: FormValue,
     itemUuid?: string,
-    drugUuid?: string
+    drugOrConceptUuid?: string,
+    isDrug?: boolean
   ): void {
     this.formData = {
       ...this.formData,
       ...formValue.getValues(),
     };
-    if (itemUuid && drugUuid) {
-      this.onChangeDrugQuantity(itemUuid, drugUuid);
+    if (itemUuid && drugOrConceptUuid) {
+      this.onChangeDrugQuantity(itemUuid, drugOrConceptUuid, isDrug);
     }
   }
 
-  onChangeDrugQuantity(itemUuid: string, drugUuid: string): void {
-    const pricePayload = {
-      visitUuid: this.visitUuid,
-      drugUuid: drugUuid,
-    };
+  onChangeDrugQuantity(
+    itemUuid: string,
+    drugOrConceptUuid: string,
+    isDrug?: boolean
+  ): void {
+    const pricePayload = isDrug
+      ? {
+          visitUuid: this.visitUuid,
+          drugUuid: drugOrConceptUuid,
+        }
+      : {
+          visitUuid: this.visitUuid,
+          conceptUuid: drugOrConceptUuid,
+        };
 
     this.itemsPrices[itemUuid] = {
       ready: false,
