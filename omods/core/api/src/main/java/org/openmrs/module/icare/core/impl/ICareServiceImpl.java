@@ -271,8 +271,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public List<Object> getConceptItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable) {
-		return dao.getConceptItems(search, limit, startIndex, type, stockable);
+	public List<Object> getConceptItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable, String conceptClass) {
+		return dao.getConceptItems(search, limit, startIndex, type, stockable, conceptClass);
 	}
 	
 	@Override

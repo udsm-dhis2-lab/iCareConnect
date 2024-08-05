@@ -203,12 +203,23 @@ public class ICareDao extends BaseDAO<Item> {
 		return query.list();
 	}
 	
-	public List<Object> getConceptItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable) {
+	public List<Object> getConceptItems(String search, Integer limit, Integer startIndex,
+										Item.Type type, Boolean stockable,
+										String conceptClass) {
 		DbSession session = getSession();
 		String queryStr;
 		queryStr = "SELECT item FROM Item item ";
+		System.out.println(conceptClass);
+		if (conceptClass != null) {
+			queryStr += "LEFT JOIN item.concept c INNER JOIN c.conceptClass cc WHERE lower(cc.name) like lower(:conceptClass) ";
+		}
 		if (stockable != null) {
-			queryStr += "WHERE item.stockable = :stockable";
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += " item.stockable = :stockable";
 		}
 		
 		if (queryStr != null && type == Item.Type.DRUG) {
@@ -228,10 +239,11 @@ public class ICareDao extends BaseDAO<Item> {
 		}
 		
 		if (search != null) {
-			queryStr = "SELECT c as concept, item as item FROM Item item LEFT JOIN Concept c "
+			queryStr = "SELECT item FROM Item item LEFT JOIN item.concept c " +
+					"  INNER JOIN c.conceptClass cc  "
 			        + "LEFT JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED' "
 			        + "LEFT JOIN item.drug as d WITH d.retired=false "
-			        + "WHERE lower(cn.name) like :search  OR lower(d.name) like :search";
+			        + "WHERE lower(cc.name) like lower(:conceptClass) AND (lower(cn.name) like lower(:search)  OR lower(d.name) like lower(:search)) ";
 			
 			if (type == Item.Type.DRUG) {
 				queryStr += " AND item.drug IS NOT NULL";
@@ -251,6 +263,9 @@ public class ICareDao extends BaseDAO<Item> {
 		}
 		if (stockable != null) {
 			query.setParameter("stockable", stockable);
+		}
+		if (conceptClass != null) {
+			query.setParameter("conceptClass", conceptClass);
 		}
 		
 		return query.list();
