@@ -60,7 +60,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   lastIndex: number = 0;
   endIndex: any = 10;
   selectedItem: any;
-  reloadFields: boolean = false;
+  reloadAfterChanges: boolean = false;
   amountField: Textbox;
   unitPriceField: Textbox;
   batchQuantityField: Textbox;
@@ -134,7 +134,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     this.setFields();
   }
 
-  setFields() {
+  setFields(clearSetValues?: boolean) {
     const unitOfMeasureOptions = this.unitsOfMeasurements?.map((unit) => {
       return {
         key: unit?.uuid,
@@ -160,7 +160,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       label: "Unit of Measure",
       required: true,
       options: unitOfMeasureOptions,
-      value: this.stockInvoiceItem
+      value: clearSetValues
+        ? null
+        : this.stockInvoiceItem
         ? this.unitsOfMeasurements?.filter(
             (unit) => unit?.uuid === this.stockInvoiceItem?.uom?.uuid
           )[0]
@@ -173,7 +175,11 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       type: "number",
       required: true,
       min: 1,
-      value: this.stockInvoiceItem ? this.stockInvoiceItem?.orderQuantity : "",
+      value: clearSetValues
+        ? null
+        : this.stockInvoiceItem
+        ? this.stockInvoiceItem?.orderQuantity
+        : "",
     });
 
     this.mfgBatchNumberField = new Textbox({
@@ -181,7 +187,11 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       key: "mfgBatchNumber",
       label: "Mfg Batch Number",
       required: true,
-      value: this.stockInvoiceItem ? this.stockInvoiceItem?.batchNo : "",
+      value: clearSetValues
+        ? null
+        : this.stockInvoiceItem
+        ? this.stockInvoiceItem?.batchNo
+        : "",
     });
 
     this.expiryDateField = new DateField({
@@ -190,20 +200,26 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       label: "Expiry Date",
       type: "date",
       required: true,
-      value: this.stockInvoiceItem
+      value: clearSetValues
+        ? null
+        : this.stockInvoiceItem
         ? formatDateToYYMMDD(new Date(this.stockInvoiceItem?.expiryDate))
         : "",
     });
-    this.batchQuantityField = new Textbox({
-      id: "batchQuantity",
-      key: "batchQuantity",
-      label: "Batch Quantity",
-      type: "number",
-      required: true,
-      min: 1,
-      disabled: true,
-      value: this.stockInvoiceItem ? this.stockInvoiceItem?.batchQuantity : "",
-    });
+    // this.batchQuantityField = new Textbox({
+    //   id: "batchQuantity",
+    //   key: "batchQuantity",
+    //   label: "Batch Quantity",
+    //   type: "number",
+    //   required: true,
+    //   min: 1,
+    //   disabled: true,
+    //   value: clearSetValues
+    //     ? null
+    //     : this.stockInvoiceItem
+    //     ? this.stockInvoiceItem?.batchQuantity
+    //     : "",
+    // });
 
     this.amount = this?.stockInvoiceItem
       ? this?.stockInvoiceItem?.amount
@@ -299,6 +315,19 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     this.selectedItem = option;
     // this.stockableItemCtrl.setValue(this.selectedItem);
     this.searchingText = this.selectedItem?.display;
+    this.validForm =
+      this.formValues?.supplier?.value?.toString()?.length &&
+      this.formValues?.invoiceNumber?.value?.toString()?.length &&
+      this.formValues?.receivingDate?.value?.toString()?.length &&
+      this.selectedItem?.toString()?.length &&
+      this.formValues?.unit?.value?.toString()?.length &&
+      this.formValues?.packPrice?.value?.toString()?.length &&
+      this.formValues?.orderQuantity?.value?.toString()?.length &&
+      this.formValues?.mfgBatchNumber?.value?.toString()?.length &&
+      this.formValues?.expiryDate?.value?.toString()?.length &&
+      this.batchQuantity?.toString()?.length
+        ? true
+        : false;
   }
 
   onFormUpdate(formValues: FormValue) {
@@ -323,22 +352,15 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       this.unitOfMeasure &&
       this.formValues?.packPrice?.value
     ) {
-      const unit =
+      const unit = Number(
         this.unitOfMeasure?.mappings?.filter(
           (mapping) =>
             mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
             this.unitsOfMeasurementSettings?.uuid
-        )[0]?.conceptReferenceTerm?.code || 1;
+        )[0]?.conceptReferenceTerm?.code || 1
+      );
       this.unitItemValue = unit;
-      this.batchQuantity =
-        this.batchQuantity &&
-        this.formValues?.orderQuantity?.value * unit === this.batchQuantity
-          ? this.batchQuantity
-          : undefined;
-
-      //note setTimeout
       this.batchQuantity = Number(this.formValues?.orderQuantity?.value) * unit;
-      this.batchQuantityField.value = this.batchQuantity.toString();
 
       this.unitPrice = (
         parseFloat(this.formValues?.packPrice?.value || 0) / Number(unit)
@@ -361,13 +383,13 @@ export class StockReceivingFormFieldsComponent implements OnInit {
       this.formValues?.supplier?.value?.toString()?.length &&
       this.formValues?.invoiceNumber?.value?.toString()?.length &&
       this.formValues?.receivingDate?.value?.toString()?.length &&
-      // this.formValues?.item?.value?.toString()?.length &&
+      this.selectedItem?.toString()?.length &&
       this.formValues?.unit?.value?.toString()?.length &&
       this.formValues?.packPrice?.value?.toString()?.length &&
       this.formValues?.orderQuantity?.value?.toString()?.length &&
       this.formValues?.mfgBatchNumber?.value?.toString()?.length &&
       this.formValues?.expiryDate?.value?.toString()?.length &&
-      this.formValues?.batchQuantity?.value?.toString()?.length
+      this.batchQuantity?.toString()?.length
         ? true
         : false;
   }
@@ -431,7 +453,9 @@ export class StockReceivingFormFieldsComponent implements OnInit {
 
   saveInvoices(e: Event): void {
     e?.stopPropagation();
+    // TODO: Add support to handle errors
     if (this.stockInvoice) {
+      this.reloadAfterChanges = true;
       const invoice = {
         invoiceNumber: this.formValues?.invoiceNumber?.value,
         supplier: {
@@ -482,11 +506,14 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             this.stockInvoice = response;
             this.loadInvoices.emit(response);
           }
-          this.itemFields = [];
-          setTimeout(() => {
-            // this.selectedItem = null;
-            this.setFields();
-          }, 10);
+          if (!response?.error) {
+            this.stockInvoice = response;
+            this.loadInvoices.emit(response);
+          }
+          this.setFields();
+          this.reloadAfterChanges = false;
+          this.amount = undefined;
+          this.batchQuantity = 0;
         });
     } else {
       const invoicesObject = [
@@ -533,7 +560,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
           ],
         },
       ];
-      this.reloadFields = true;
+      this.reloadAfterChanges = true;
 
       this.stockInvoicesService
         .createStockInvoices(invoicesObject)
@@ -542,16 +569,17 @@ export class StockReceivingFormFieldsComponent implements OnInit {
             this.stockInvoice = response;
             this.loadInvoices.emit(response);
           }
-          this.itemFields = [];
           this.setFields();
-          this.reloadFields = false;
+          this.reloadAfterChanges = false;
           this.amount = undefined;
+          this.batchQuantity = 0;
           this.reloadItemFields(true);
         });
     }
   }
 
-  onSaveUdatedInvoice() {
+  onSaveUpdatedInvoice(event: Event): void {
+    event.stopPropagation();
     const invoice = {
       invoiceNumber: this.formValues?.invoiceNumber?.value,
       supplier: {
