@@ -205,22 +205,22 @@ export class StandardConceptsListComponent implements OnInit {
     this.searchingText = event
       ? (event.target as HTMLInputElement).value
       : null;
-    if (this.searchingText) {
-      this.conceptsList$ = !this.stockable
-        ? this.conceptService.searchConcept({
-            q: this.searchingText,
-            pageSize: this.pageSize,
-            conceptClass: this.conceptClass,
-            page: this.page,
-            searchTerm: this.standardSearchTerm,
-          })
-        : this.conceptService.getConceptsWithItemsDetails([
+    this.conceptsList$ = !this.stockable
+      ? this.conceptService.searchConcept({
+          q: this.searchingText,
+          pageSize: this.pageSize,
+          conceptClass: this.conceptClass,
+          page: this.page,
+          searchTerm: this.standardSearchTerm,
+        })
+      : this.conceptService.getConceptsWithItemsDetails(
+          [
             "limit=15",
             "startIndex=" + this.pageSize * (this.page - 1),
-            `q=${this.searchingText}`,
+            this.searchingText ? `q=${this.searchingText}` : null,
             `conceptClass=${this.conceptClass}`,
-          ]);
-    }
+          ].filter((filterItem: any) => filterItem) || []
+        );
   }
 
   getConceptList(event: any, action?: string): void {
