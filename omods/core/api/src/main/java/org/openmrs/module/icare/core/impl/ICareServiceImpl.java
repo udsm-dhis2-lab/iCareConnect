@@ -271,8 +271,19 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public List<Item> getStockableItems(String search, Integer limit, Integer startIndex, Item.Type type) {
-		return dao.getStockableItems(search, limit, startIndex, type);
+	public List<Object> getConceptItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable) {
+		return dao.getConceptItems(search, limit, startIndex, type, stockable);
+	}
+	
+	@Override
+	public List<Item> getStockableItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable) {
+		return dao.getStockableItems(search, limit, startIndex, type, stockable);
+	}
+	
+	@Override
+	public List<Concept> getConceptStockableItems(String search, Integer limit, Integer startIndex, Item.Type type,
+	        Boolean stockable) {
+		return dao.getConceptStockableItems(search, limit, startIndex, type, stockable);
 	}
 	
 	@Override
@@ -305,9 +316,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		AdministrationService administrationService = Context.getAdministrationService();
 		administrationService.setGlobalProperty("validation.disable", "true");
-		System.out.println("Validation:" + ValidateUtil.getDisableValidation());
 		ValidateUtil.setDisableValidation(true);
-		System.out.println("Validation:" + ValidateUtil.getDisableValidation());
 		prescription = (Prescription) Context.getOrderService().saveOrder(prescription, null);
 		// Set respective sOrderStatustatus
 		if (status != null) {
@@ -455,7 +464,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		String idFormat = adminService.getGlobalProperty(ICareConfig.PATIENT_ID_FORMAT);
 
 		if(idFormat.contains("GP{" + DHIS2Config.facilityCode + "}")){
-			System.out.println("Replacing:");
 			String facilityCode = adminService.getGlobalProperty(DHIS2Config.facilityCode);
 			idFormat = idFormat.replace("GP{" + DHIS2Config.facilityCode + "}", facilityCode);
 		}
@@ -1111,7 +1119,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		// Check if user is authenticated first
 		User user = Context.getAuthenticatedUser();
 		if (user != null) {
-			this.auditLogDAO.save(auditLog);
+			//			this.auditLogDAO.save(auditLog);
 		}
 	}
 	
