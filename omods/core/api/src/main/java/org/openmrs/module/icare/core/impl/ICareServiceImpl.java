@@ -1119,7 +1119,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		// Check if user is authenticated first
 		User user = Context.getAuthenticatedUser();
 		if (user != null) {
-//			this.auditLogDAO.save(auditLog);
+			//			this.auditLogDAO.save(auditLog);
 		}
 	}
 	

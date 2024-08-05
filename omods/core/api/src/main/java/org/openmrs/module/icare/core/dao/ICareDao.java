@@ -239,7 +239,7 @@ public class ICareDao extends BaseDAO<Item> {
 			if (type == Item.Type.CONCEPT) {
 				queryStr += " AND item.concept IS NOT NULL";
 			}
-			if(stockable != null) {
+			if (stockable != null) {
 				queryStr += " AND item.stockable = :stockable";
 			}
 		}
@@ -252,7 +252,7 @@ public class ICareDao extends BaseDAO<Item> {
 		if (stockable != null) {
 			query.setParameter("stockable", stockable);
 		}
-
+		
 		return query.list();
 	}
 	
@@ -292,7 +292,7 @@ public class ICareDao extends BaseDAO<Item> {
 			if (type == Item.Type.CONCEPT) {
 				queryStr += " AND item.concept IS NOT NULL";
 			}
-			if(stockable != null) {
+			if (stockable != null) {
 				queryStr += " AND item.stockable = :stockable";
 			}
 		}
@@ -345,7 +345,7 @@ public class ICareDao extends BaseDAO<Item> {
 			if (type == Item.Type.CONCEPT) {
 				queryStr += " AND item.concept IS NOT NULL";
 			}
-			if(stockable != null) {
+			if (stockable != null) {
 				queryStr += " AND item.stockable = :stockable";
 			}
 			
