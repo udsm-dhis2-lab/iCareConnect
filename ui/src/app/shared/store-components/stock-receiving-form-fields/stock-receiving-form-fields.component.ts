@@ -578,7 +578,8 @@ export class StockReceivingFormFieldsComponent implements OnInit {
     }
   }
 
-  onSaveUdatedInvoice() {
+  onSaveUpdatedInvoice(event: Event): void {
+    event.stopPropagation();
     const invoice = {
       invoiceNumber: this.formValues?.invoiceNumber?.value,
       supplier: {
