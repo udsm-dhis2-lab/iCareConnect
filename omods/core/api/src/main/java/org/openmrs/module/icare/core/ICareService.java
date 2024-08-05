@@ -105,7 +105,7 @@ public interface ICareService extends OpenmrsService {
 	List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type,
 	        Boolean stockable);
 	
-	List<Object> getConceptItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable);
+	List<Object> getConceptItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable, String conceptClassName);
 	
 	List<Item> getStockableItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable);
 	
