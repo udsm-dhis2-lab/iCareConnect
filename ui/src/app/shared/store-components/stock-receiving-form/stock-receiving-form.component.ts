@@ -22,6 +22,7 @@ export class StockReceivingFormComponent implements OnInit {
   @Input() existingStockInvoice: any;
   @Input() stockInvoiceItem: any;
   @Input() currentLocation: any;
+  @Input() hideAddedItems: boolean;
   @Output() closeDialog: EventEmitter<any> = new EventEmitter();
 
   suppliers$: Observable<any>;

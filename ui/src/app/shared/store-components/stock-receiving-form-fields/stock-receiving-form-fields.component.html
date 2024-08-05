@@ -176,6 +176,7 @@
         (click)="updateInvoiceItem($event)"
       >
         <mat-icon>save</mat-icon>
+        Update invoice item
       </button>
     </div>
     <div class="col-12 mt-2" *ngIf="existingStockInvoice">
@@ -184,7 +185,7 @@
           class="float-right justify-content-end"
           color="primary"
           mat-flat-button
-          (click)="onSaveUdatedInvoice($event)"
+          (click)="onSaveUpdatedInvoice($event)"
         >
           <mat-icon>save</mat-icon>
           Save Invoice
