@@ -152,7 +152,7 @@ public class ICareController {
 		Item newItem = iCareService.saveItem(item);
 		return newItem.toMap();
 	}
-
+	
 	@RequestMapping(value = "item", method = RequestMethod.PUT)
 	@ResponseBody
 	public Map<String, Object> onUpdateItem(@RequestBody Item itemToUpdate) throws Exception {
