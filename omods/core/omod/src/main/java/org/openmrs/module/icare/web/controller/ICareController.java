@@ -152,7 +152,7 @@ public class ICareController {
 		Item newItem = iCareService.saveItem(item);
 		return newItem.toMap();
 	}
-
+	
 	@RequestMapping(value = "item", method = RequestMethod.PUT)
 	@ResponseBody
 	public Map<String, Object> onUpdateItem(@RequestBody Item itemToUpdate) throws Exception {
@@ -238,12 +238,10 @@ public class ICareController {
 	
 	@RequestMapping(value = "itemprice", method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, Object> onGet(@RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String paymentType, @RequestParam(required = false) String visitUuid, @RequestParam(required = false) String drugUuid ) throws ConfigurationException {
+    public Map<String, Object> onGet(@RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String paymentType, @RequestParam(required = false) String visitUuid, @RequestParam(required = false) String drugUuid , @RequestParam(required = false) String conceptUuid ) throws ConfigurationException {
 		Map<String, Object> results = new HashMap<>();
-		if (visitUuid == null && drugUuid ==null) {
+		if (visitUuid == null && drugUuid ==null && conceptUuid == null) {
 			List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-
-
 			for (ItemPrice item : iCareService.getItemPrices(paymentType, limit, startIndex)) {
 				items.add(item.toMap());
 			}
@@ -251,14 +249,17 @@ public class ICareController {
 		}
 
 		if (visitUuid != null && drugUuid !=null){
-
 			Visit visit = Context.getService(VisitService.class).getVisitByUuid(visitUuid);
 			Drug drug = Context.getService(ConceptService.class).getDrugByUuid(drugUuid);
-
 			ItemPrice item = iCareService.getItemPrice(visit,drug);
-
 			results.put("results",item.toMap());
+		}
 
+		if (visitUuid != null && conceptUuid !=null){
+			Visit visit = Context.getService(VisitService.class).getVisitByUuid(visitUuid);
+			Concept concept = Context.getService(ConceptService.class).getConceptByUuid(conceptUuid);
+			ItemPrice item = iCareService.getItemPrice(visit, concept);
+			results.put("results",item.toMap());
 		}
 
         return results;

@@ -70,7 +70,7 @@ public interface ICareService extends OpenmrsService {
 	
 	ItemPrice getItemPriceByConceptId(Integer serviceConceptId, Integer paymentSchemeConceptId, Integer paymentTypeConceptId);
 	
-	ItemPrice getItemPrice(Visit visit, Concept concept) throws Exception;
+	ItemPrice getItemPrice(Visit visit, Concept concept) throws ItemNotPayableException, ConfigurationException;
 	
 	ItemPrice getItemPrice(Visit visit, Drug drug) throws ItemNotPayableException, ConfigurationException;
 	
@@ -105,7 +105,8 @@ public interface ICareService extends OpenmrsService {
 	List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type,
 	        Boolean stockable);
 	
-	List<Object> getConceptItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable, String conceptClassName);
+	List<Object> getConceptItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable,
+	        String conceptClassName);
 	
 	List<Item> getStockableItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable);
 	
