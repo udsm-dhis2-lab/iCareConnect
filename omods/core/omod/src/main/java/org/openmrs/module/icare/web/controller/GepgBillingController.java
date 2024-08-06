@@ -102,7 +102,7 @@ public class GepgBillingController {
         Date billExpDate = new Date();
         String personPhoneNumberAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.PHONE_NUMBER_ATTRIBUTE);
         String spCode = administrationService.getGlobalProperty(ICareConfig.SP_CODE);
-        String systemCode = administrationService.getGlobalProperty(ICareConfig.SYSTEM_CODE);
+        String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
         String serviceCode = administrationService.getGlobalProperty(ICareConfig.SERVICE_CODE);
         String spsyId = administrationService.getGlobalProperty(ICareConfig.SERVICE_PROVIDER_ID);
         String subSpCode = administrationService.getGlobalProperty(ICareConfig.SUB_SERVICE_PROVIDER_CODE);

@@ -177,6 +177,42 @@
 			For GFSCODE Mapping reference
 		</description>
 	</globalProperty>
+	<globalProperty>
+		<property>iCare.GePG.settings.systemCode</property>
+		<defaultValue>TARIS003</defaultValue>
+		<description>
+			GePG System code
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.GePG.settings.ServiceProviderCode</property>
+		<defaultValue>SP537</defaultValue>
+		<description>
+			GePG Service Provider Code
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.GePG.settings.ServiceCode</property>
+		<defaultValue>1001</defaultValue>
+		<description>
+			GePG Service Code
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.GePG.settings.ServiceProviderID</property>
+		<defaultValue>LHGSE001</defaultValue>
+		<description>
+			Service Provider ID
+		</description>
+	</globalProperty>
+    <globalProperty>
+		<property>iCare.GePG.settings.SubServiceProviderCode</property>
+		<defaultValue>1002</defaultValue>
+		<description>
+			Sub Service Provider Code
+		</description>
+	</globalProperty>
+	
 	<!-- Internationalization -->
 	<!-- All message codes should start with @MODULE_ID@.* -->
 	<messages>

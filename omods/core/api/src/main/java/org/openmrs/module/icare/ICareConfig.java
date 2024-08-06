@@ -57,16 +57,6 @@ public class ICareConfig {
 	
 	public static final String FACILITY_ADDRESS = "icare.facility.address";
 	
-	public static final String SP_CODE = "SP537";
-	
-	public static final String SYSTEM_CODE = "TARIS003";
-	
-	public static final String SERVICE_CODE = "1001";
-	
-	public static final String SERVICE_PROVIDER_ID = "LHGSE001";
-	
-	public static final String SUB_SERVICE_PROVIDER_CODE = "1002";
-	
 	public static final String PHONE_NUMBER_ATTRIBUTE = "icare.person.attribute.phonenumber";
 	
 	public static final String PATIENT_SIGNATURE_ATTRIBUTE = "icare.person.attribute.signature";
@@ -161,5 +151,15 @@ public class ICareConfig {
 	public static final String ENGINE_PUBLIC_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8503OpGb1/RVPOJrnFR31pSpI5dZMK1GjITfX6YSBLd9dHY9S+HS2CCBb6Nvqtu/Wc1NNJhrxPZKALHTK1fMbH55F4J51HycvhjCzJepLKQLxDyE4Aff9mXV77gQcxdh+2SdEb0Qi9+9TNAqpze2TbXd5Zf9wDOhJXKdB5o16XQIDAQAB";
 	
 	public static final String CLIENT_PRIVATE_KEY = "MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAOKJJaeHkWryn6D0A/xrcNLOD9fj5Hn2zJKAJOT+6pEZTaTY/aeiQmqLLr6/s9xfj5oa+TsbmnCEeoiJ63/LdkMqaYEjLgC/TacFsxK7nOLQ7CZeFpEYKG2zZv0ppSTUcEL72a8Ia3+PmuOm7CsuVWGHP/IzoWNRs+bCoNTPdanPAgMBAAECgYEAhWagDuytfJ5N1Fl982pNsUX5XHfuNshYJbligJuBBFszNu01Sj8p/1Xg/CElyJNZnDVgKSeTJclN4xPc44+sHru7JbFUIZYzeXPI3nJzw/KlFDiB3UKJWj9mjF89G9IEgOhqzEfuRvyKtyouwKqlmMvY+XT5z9uphKnGUf9IEUECQQDy066RTEkzZt1en0tM07ZUlvuznfKT7nx+KGHkxxPW1+lkwtKge5jFNvIzYy6H9P8SzFI8iYLU4weoNPs65/hhAkEA7tM3whLxhrUL83brUSIp8UBkWG37G8Rrxgt4wdly/ZRnVA4KZz5ZCZ8KmwYbEVSdN3JL0mBCyKAuQ226ifkQLwJAT534bsuEdMYVbyDrn5ULA1E91fbDwp0/VF4JOunLJ3ZDoDYAuX3M6VzKrO6oIwvBVniHvjGYJBUMPaqhdP76AQJBALPKTKqMykjH2QRjHQnKN1sIR8KOoUCpIR1Jm5ILmlauNw9/NnO86xikIz7LXOsyEN0h7VSl5QDWHZ3jaE/gMT8CQQCFq2VBx7yHNeORrVK4BgArsWxajssplqM0s1zhZO4SM0WZZqRdhdXgedWv7OsO57kP1KlYrkz8atqRo2OwWQSj";
+	
+	public static final String GEPG_SYSTEM_CODE = "iCare.GePG.settings.systemCode";
+	
+	public static final String SP_CODE = "iCare.GePG.settings.ServiceProviderCode";
+	
+	public static final String SERVICE_CODE = "iCare.GePG.settings.ServiceCode";
+	
+	public static final String SERVICE_PROVIDER_ID = "iCare.GePG.settings.ServiceProviderID";
+	
+	public static final String SUB_SERVICE_PROVIDER_CODE = "iCare.GePG.settings.SubServiceProviderCode";
 	
 }
