@@ -209,4 +209,19 @@ export class OrdersService {
         catchError((error) => of(error))
       );
   }
+
+  deductStockAfterSellingOrderedGeneralOrderItem(
+    orderDetails: any
+  ): Observable<any> {
+    return this.openMRSHttpClient
+      .post(`store/generalOrder/${orderDetails?.uuid}/sell`, {
+        location: orderDetails?.location,
+        conceptUuid: orderDetails?.concept?.uuid,
+        quantity: Number(orderDetails?.quantity),
+      })
+      .pipe(
+        map((response) => response),
+        catchError((error) => of(error))
+      );
+  }
 }

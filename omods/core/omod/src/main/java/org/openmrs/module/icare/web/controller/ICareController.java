@@ -129,12 +129,91 @@ public class ICareController {
         return results;
     }
 	
+	@RequestMapping(value = "stockableitems", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetStockableItems(@RequestParam(required = false) String q,
+												   @RequestParam(defaultValue = "100") Integer limit,
+												   @RequestParam(defaultValue = "0") Integer startIndex,
+												   @RequestParam(required = false) Item.Type type,
+												   @RequestParam(required = false) Boolean stockable) {
+		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+		for (Item item : iCareService.getStockableItems(q, limit, startIndex, type, stockable)) {
+			items.add(item.toMap());
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", items);
+		return results;
+	}
+	
 	@RequestMapping(value = "item", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> onPostItemJSON(@RequestBody Item item) {
 		
 		Item newItem = iCareService.saveItem(item);
 		return newItem.toMap();
+	}
+	
+	@RequestMapping(value = "item", method = RequestMethod.PUT)
+	@ResponseBody
+	public Map<String, Object> onUpdateItem(@RequestBody Item itemToUpdate) throws Exception {
+		if (itemToUpdate.getUuid() == null) {
+			throw new RuntimeException("Key `uuid` is Missing");
+		}
+		Item item = iCareService.getItemByUuid(itemToUpdate.getUuid());
+		if (itemToUpdate.getStockable() != null) {
+			item.setStockable(itemToUpdate.getStockable());
+		}
+		// TODO: Add support to handle update as per parameters updated and ensure return resemble action happened
+		Item updatedItem = iCareService.saveItem(item);
+		return updatedItem.toMap();
+	}
+	
+	@RequestMapping(value = "conceptswithitems", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetConceptItems(@RequestParam(required = false) String q,
+												 @RequestParam(defaultValue = "100") Integer limit,
+												 @RequestParam(defaultValue = "0") Integer startIndex,
+												 @RequestParam(required = false) Boolean stockable,
+												 @RequestParam(required = false) String conceptClass) {
+		List<Map<String, Object>> conceptItems = new ArrayList<Map<String, Object>>();
+		Pager pager = new Pager();
+		pager.setAllowed(true);
+		pager.setPageSize(limit);
+		pager.setPage((startIndex/limit));
+		for (Object conceptItem : iCareService.getConceptItems(q, limit, startIndex, Item.Type.valueOf("CONCEPT"), stockable, conceptClass)) {
+//			items.add(concept);
+			Map<String, Object> conceptItemObject = new HashMap<>();
+			Concept concept= ((Item) conceptItem).getConcept();
+
+			Map<String, Object> item = new HashMap<>();
+			if (conceptItem != null) {
+				item = ((Item) conceptItem).toMap();
+			}
+			conceptItemObject.put("item", item);
+			conceptItemObject.put("uuid", concept.getUuid());
+			conceptItemObject.put("display", concept.getDisplayString());
+			conceptItemObject.put("dateCreated", concept.getDateCreated());
+			conceptItemObject.put("dateChanged", concept.getDateChanged());
+			Map<String, Object> conceptClassDetails = new HashMap<>();
+			conceptClassDetails.put("name", concept.getConceptClass().getName());
+			conceptClassDetails.put("display", concept.getConceptClass().getName());
+			conceptClassDetails.put("uuid", concept.getConceptClass().getUuid());
+			conceptItemObject.put("dateChanged", concept.getDateChanged());
+			conceptItemObject.put("class", conceptClassDetails);
+			List<Map<String, Object>> mappings = new ArrayList<>();
+			// TODO: Add support to load mappings
+			for (ConceptMap conceptMap: concept.getConceptMappings()) {
+				Map<String, Object> mapping = new HashMap<>();
+			}
+			conceptItemObject.put("retired", concept.getRetired());
+			conceptItemObject.put("retiredOn", concept.getDateRetired());
+			conceptItemObject.put("mappings", mappings);
+			conceptItems.add(conceptItemObject);
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", conceptItems);
+		results.put("pager",pager);
+		return results;
 	}
 	
 	@RequestMapping(value = "itemByConcept/{conceptUuid}", method = RequestMethod.GET)
@@ -159,28 +238,28 @@ public class ICareController {
 	
 	@RequestMapping(value = "itemprice", method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, Object> onGet(@RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String paymentType, @RequestParam(required = false) String visitUuid, @RequestParam(required = false) String drugUuid ) throws ConfigurationException {
+    public Map<String, Object> onGet(@RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String paymentType, @RequestParam(required = false) String visitUuid, @RequestParam(required = false) String drugUuid , @RequestParam(required = false) String conceptUuid ) throws ConfigurationException {
 		Map<String, Object> results = new HashMap<>();
-		if (visitUuid == null && drugUuid ==null) {
+		if (visitUuid == null && drugUuid ==null && conceptUuid == null) {
 			List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-
-
 			for (ItemPrice item : iCareService.getItemPrices(paymentType, limit, startIndex)) {
 				items.add(item.toMap());
 			}
 			results.put("results", items);
-			System.out.println("aad");
 		}
 
 		if (visitUuid != null && drugUuid !=null){
-
 			Visit visit = Context.getService(VisitService.class).getVisitByUuid(visitUuid);
 			Drug drug = Context.getService(ConceptService.class).getDrugByUuid(drugUuid);
-
 			ItemPrice item = iCareService.getItemPrice(visit,drug);
-
 			results.put("results",item.toMap());
+		}
 
+		if (visitUuid != null && conceptUuid !=null){
+			Visit visit = Context.getService(VisitService.class).getVisitByUuid(visitUuid);
+			Concept concept = Context.getService(ConceptService.class).getConceptByUuid(conceptUuid);
+			ItemPrice item = iCareService.getItemPrice(visit, concept);
+			results.put("results",item.toMap());
 		}
 
         return results;
@@ -259,7 +338,6 @@ public class ICareController {
 		//		diagnosis.setEncounter(encounter);
 		diagnosis.setCertainty(ConditionVerificationStatus.CONFIRMED);
 		diagnosis.setPatient(patient);
-		System.out.println(diagnosis);
 		return diagnosis;
 	}
 	
