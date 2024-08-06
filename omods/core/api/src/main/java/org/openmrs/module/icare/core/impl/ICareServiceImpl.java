@@ -170,7 +170,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public ItemPrice getItemPrice(Visit visit, Concept billableConcept) throws Exception {
+	public ItemPrice getItemPrice(Visit visit, Concept billableConcept) throws ItemNotPayableException,
+	        ConfigurationException {
 		//VisitMetaData visitMetaData = VisitExtrapolator.extrapolateMetaData(visit);
 		VisitWrapper visitWrapper = new VisitWrapper(visit);
 		Concept paymentSchemeConcept = visitWrapper.getPaymentScheme();
@@ -271,6 +272,23 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
+	public List<Object> getConceptItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable,
+	        String conceptClass) {
+		return dao.getConceptItems(search, limit, startIndex, type, stockable, conceptClass);
+	}
+	
+	@Override
+	public List<Item> getStockableItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable) {
+		return dao.getStockableItems(search, limit, startIndex, type, stockable);
+	}
+	
+	@Override
+	public List<Concept> getConceptStockableItems(String search, Integer limit, Integer startIndex, Item.Type type,
+	        Boolean stockable) {
+		return dao.getConceptStockableItems(search, limit, startIndex, type, stockable);
+	}
+	
+	@Override
 	public Prescription savePrescription(Prescription prescription, String status, String remarks) {
 		if (prescription.getUuid() != null) {
 			Prescription existingPrescription = (Prescription) Context.getOrderService().getOrderByUuid(
@@ -300,9 +318,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		AdministrationService administrationService = Context.getAdministrationService();
 		administrationService.setGlobalProperty("validation.disable", "true");
-		System.out.println("Validation:" + ValidateUtil.getDisableValidation());
 		ValidateUtil.setDisableValidation(true);
-		System.out.println("Validation:" + ValidateUtil.getDisableValidation());
 		prescription = (Prescription) Context.getOrderService().saveOrder(prescription, null);
 		// Set respective sOrderStatustatus
 		if (status != null) {
@@ -450,7 +466,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		String idFormat = adminService.getGlobalProperty(ICareConfig.PATIENT_ID_FORMAT);
 
 		if(idFormat.contains("GP{" + DHIS2Config.facilityCode + "}")){
-			System.out.println("Replacing:");
 			String facilityCode = adminService.getGlobalProperty(DHIS2Config.facilityCode);
 			idFormat = idFormat.replace("GP{" + DHIS2Config.facilityCode + "}", facilityCode);
 		}
@@ -1106,7 +1121,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		// Check if user is authenticated first
 		User user = Context.getAuthenticatedUser();
 		if (user != null) {
-			this.auditLogDAO.save(auditLog);
+			//			this.auditLogDAO.save(auditLog);
 		}
 	}
 	

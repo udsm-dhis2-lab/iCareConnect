@@ -556,7 +556,16 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		List<Map<String, Object>> maps = (List) results.get("results");
 		assertThat("Should return 1 item", maps.size(), is(2));
-		
+	}
+	
+	@Test
+	public void testGetConceptsWithItems() throws Exception {
+		MockHttpServletRequest newGetRequest = newGetRequest("icare/conceptswithitems",
+		    new Parameter("conceptClass", "test"), new Parameter("q", "t"));
+		MockHttpServletResponse handle = handle(newGetRequest);
+		Map<String, Object> results = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
+		List<Map<String, Object>> maps = (List) results.get("results");
+		assertThat("Should return 1 item", maps.size(), is(2));
 	}
 	
 	@Test
