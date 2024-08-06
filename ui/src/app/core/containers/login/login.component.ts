@@ -62,7 +62,6 @@ export class LoginComponent implements OnInit {
     const credentialsToken = btoa(
       credentials.username + ":" + credentials.password
     );
-    console.log("login data response .......................");
     console.log(credentialsToken);
     this.store.dispatch(authenticateUser({ credentialsToken }));
   }

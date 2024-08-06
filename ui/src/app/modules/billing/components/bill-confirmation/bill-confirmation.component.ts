@@ -52,14 +52,21 @@ export class BillConfirmationComponent implements OnInit {
       uuid: this.data.currentPatient.patient.uuid,
       totalBill: this.data.totalPayableBill
     };
-    const generateControlNoPayload = this.data.billItems.map((item: any) => ({
-      uuid: this.data.currentPatient.patient.uuid,
-      currency: "Tzs"
-    }));
+    
+    
+    // Construct the request payload
+  const requestPayload = this.data.billItems.map((item: any) => ({
+    uuid: item.bill, 
+    currency: "Tzs" 
+  }));
+
+  console.log("Request Payload:", JSON.stringify(requestPayload, null, 2));
+
   
-    console.log("Formatted payload:", generateControlNoPayload);
+    console.log("Formatted payload:", requestPayload);
     //Calling Controll number Generation Function
-    this.onConntrollNumbGen(generateControlNoPayload);
+    this.generatingControlNumber = true;
+    this.onConntrollNumbGen(requestPayload);
     this.currentUser = this.store.select(getCurrentUserDetails).subscribe({
       next: (currentUser) => {
         return currentUser;
@@ -80,13 +87,18 @@ export class BillConfirmationComponent implements OnInit {
       .gepgpayBill(payload)
       .subscribe(
         (paymentResponse) => {
-          // console.log("successfully generated .......",paymentResponse);
+          console.log("successfully generated .......",paymentResponse);
+          // this.controlNumber = paymentResponse.controlNumber; 
+          this.generatingControlNumber = false;
+          
           this.matDialogRef.close(paymentResponse);
                
         },
         (error) => {
+        
+         this.savingPaymentError = "Error generating control number";
+         this.generatingControlNumber = false;
          console.log("Fail to Generate Control Number .....",error);
-          this.savingPaymentError = error;
         }
       );
    }
