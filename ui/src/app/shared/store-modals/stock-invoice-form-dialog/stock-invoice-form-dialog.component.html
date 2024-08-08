@@ -1,4 +1,10 @@
-<div class="w-100">
+<div
+  class="w-100"
+  *ngIf="{
+    unitsOfMeasurementSettings: unitsOfMeasurementSettings$ | async,
+    suppliers: suppliers$ | async
+  } as params"
+>
   <mat-toolbar color="primary"
     >{{
       data?.stockInvoice
@@ -8,19 +14,25 @@
         : ""
     }}
   </mat-toolbar>
+
+  <mat-progress-bar
+    mode="indeterminate"
+    *ngIf="!params?.unitsOfMeasurementSettings || !params?.suppliers"
+  ></mat-progress-bar>
   <app-stock-receiving-form
-    [suppliers]="data?.suppliers"
-    [unitsOfMeasurementSettings]="data?.unitsOfMeasurementSettings"
+    *ngIf="params?.unitsOfMeasurementSettings && params?.suppliers"
+    [suppliers]="params?.suppliers"
+    [unitsOfMeasurementSettings]="params?.unitsOfMeasurementSettings"
     [existingStockInvoice]="data?.stockInvoice"
     [stockInvoiceItem]="data?.stockInvoiceItem"
     [currentLocation]="data?.currentLocation"
+    [hideAddedItems]="true"
     (closeDialog)="onClosePopup()"
   ></app-stock-receiving-form>
   <div class="mt-2 mb-2" *ngIf="!data?.stockInvoice">
     <button
       class="float-right mr-2 mb-2"
-      mat-flat-button
-      color="primary"
+      mat-stroked-button
       (click)="onClosePopup($event)"
     >
       Close

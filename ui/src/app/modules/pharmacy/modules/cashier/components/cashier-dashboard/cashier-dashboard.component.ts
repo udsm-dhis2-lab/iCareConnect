@@ -15,9 +15,10 @@ import { loadCustomOpenMRSForm } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation } from "src/app/store/selectors";
 import { getCustomOpenMRSFormById } from "src/app/store/selectors/form.selectors";
-import { sum, keyBy } from "lodash";
+import { sum, keyBy, omit } from "lodash";
 import { MatDialog } from "@angular/material/dialog";
 import { PosConfirmSalesModalComponent } from "../../modals/pos-confirm-sales-modal/pos-confirm-sales-modal.component";
+import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 
 @Component({
   selector: "app-cashier-dashboard",
@@ -59,7 +60,8 @@ export class CashierDashboardComponent implements OnInit {
     private visitService: VisitsService,
     private observationService: ObservationService,
     private itemPricesService: ItemPriceService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private ordersService: OrdersService
   ) {}
 
   ngOnInit(): void {
@@ -160,22 +162,32 @@ export class CashierDashboardComponent implements OnInit {
   onFormDataUpdate(
     formValue: FormValue,
     itemUuid?: string,
-    drugUuid?: string
+    drugOrConceptUuid?: string,
+    isDrug?: boolean
   ): void {
     this.formData = {
       ...this.formData,
       ...formValue.getValues(),
     };
-    if (itemUuid && drugUuid) {
-      this.onChangeDrugQuantity(itemUuid, drugUuid);
+    if (itemUuid && drugOrConceptUuid) {
+      this.onChangeDrugQuantity(itemUuid, drugOrConceptUuid, isDrug);
     }
   }
 
-  onChangeDrugQuantity(itemUuid: string, drugUuid: string): void {
-    const pricePayload = {
-      visitUuid: this.visitUuid,
-      drugUuid: drugUuid,
-    };
+  onChangeDrugQuantity(
+    itemUuid: string,
+    drugOrConceptUuid: string,
+    isDrug?: boolean
+  ): void {
+    const pricePayload = isDrug
+      ? {
+          visitUuid: this.visitUuid,
+          drugUuid: drugOrConceptUuid,
+        }
+      : {
+          visitUuid: this.visitUuid,
+          conceptUuid: drugOrConceptUuid,
+        };
 
     this.itemsPrices[itemUuid] = {
       ready: false,
@@ -288,7 +300,9 @@ export class CashierDashboardComponent implements OnInit {
             .saveEncounterWithObsDetails(encounterObject)
             .subscribe((encounterResponse: any) => {
               if (encounterResponse && !encounterResponse?.error) {
-                const prescriptionOrders = items.map((item: any) => {
+                const prescriptionOrders = (
+                  items?.filter((item: any) => item?.drug) || []
+                ).map((item: any) => {
                   const prescriptionOrder = {
                     encounter: encounterResponse?.uuid,
                     orderType: "iCARESTS-PRES-1111-1111-525400e4297f",
@@ -356,6 +370,31 @@ export class CashierDashboardComponent implements OnInit {
                   };
                   return prescriptionOrder;
                 });
+                const generalOrders =
+                  (items?.filter((item: any) => item?.concept) || []).map(
+                    (item: any) => {
+                      return {
+                        encounter: encounterResponse?.uuid,
+                        orderType: "iCARESTS-ADMS-1111-1111-525400e4297f",
+                        concept: item?.concept?.uuid,
+                        action: "NEW",
+                        urgency: "ROUTINE",
+                        type: "order",
+                        orderer: this.provider?.uuid,
+                        patient: this.patientUuid,
+                        orderReason: null,
+                        instructions:
+                          this.formData["instructions" + item?.itemUuid] &&
+                          this.formData["instructions" + item?.itemUuid]?.value
+                            ? this.formData["instructions" + item?.itemUuid]
+                                ?.value
+                            : "",
+                        careSetting: "Outpatient",
+                        quantity:
+                          this.formData["quantity" + item?.itemUuid]?.value,
+                      };
+                    }
+                  ) || [];
                 this.customForm$ = of(null);
 
                 this.currentLocation$ = of(null);
@@ -367,24 +406,52 @@ export class CashierDashboardComponent implements OnInit {
                         map((response: any) => response),
                         catchError((error: any) => of(error))
                       );
+                  }),
+                  ...generalOrders.map((generalOrder: any) => {
+                    return this.ordersService
+                      .createOrder(omit(generalOrder, ["quantity"]))
+                      .pipe(
+                        map((response: any) => {
+                          return {
+                            ...response,
+                            concept: {
+                              uuid: generalOrder?.concept,
+                            },
+                            quantity: generalOrder?.quantity,
+                          };
+                        })
+                      );
                   })
                 ).subscribe((responses: any) => {
                   // console.log("responses", responses);
                   if (responses) {
                     // DIspense all (TODO: improve api to accommodate direct dispensing)
                     zip(
-                      ...responses.map((prescOrder: any) => {
-                        const dispendingDetails = {
-                          uuid: prescOrder?.uuid,
-                          location: currentLocation?.uuid,
-                          drug: {
-                            uuid: prescOrder?.drug?.uuid,
-                          },
-                          quantity: prescOrder?.quantity,
-                        };
-                        return this.drugOrderService.dispenseOrderedDrugOrder(
-                          dispendingDetails
-                        );
+                      ...responses.map((order: any) => {
+                        const dispendingDetails = order?.drug
+                          ? {
+                              uuid: order?.uuid,
+                              location: currentLocation?.uuid,
+                              drug: {
+                                uuid: order?.drug?.uuid,
+                              },
+                              quantity: order?.quantity,
+                            }
+                          : {
+                              uuid: order?.uuid,
+                              location: currentLocation?.uuid,
+                              concept: {
+                                uuid: order?.concept?.uuid,
+                              },
+                              quantity: order?.quantity,
+                            };
+                        return order?.drug
+                          ? this.drugOrderService.dispenseOrderedDrugOrder(
+                              dispendingDetails
+                            )
+                          : this.ordersService.deductStockAfterSellingOrderedGeneralOrderItem(
+                              order
+                            );
                       })
                     ).subscribe((dispenseResponses: any) => {
                       if (dispenseResponses) {

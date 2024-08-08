@@ -27,13 +27,6 @@
 
         <div class="w-75 float-right">
           <div class="float-right" *ngIf="isCurrentLocationMainStore">
-            <!-- <button
-            [disabled]="!userPrivileges['STORE_ADD_NEW_STOCKABLE_ITEM']"
-            class="button-round"
-            color="primary"
-            mat-stroked-button
-            (click)="onAddNewStockRecevied($event, ledgerTypes, currentLocation)"
-          > Receive New Item </button> -->
             <button
               [disabled]="!userPrivileges['STORE_ADD_NEW_STOCKABLE_ITEM']"
               class="button-round ml-2"
@@ -143,7 +136,7 @@
             <ng-container *ngIf="status !== 'EXPIRED'">
               <th style="width: 10%">Eligible Quantity</th>
             </ng-container>
-            <th style="width: 10%"># of Batches </th>
+            <th style="width: 10%"># of Batches</th>
             <th style="width: 12%">
               <span class="float-right">Actions</span>
             </th>
@@ -169,8 +162,10 @@
             >
               <td>{{ stockIndex + 1 + (page - 1) * pageSize }}</td>
               <td style="word-wrap: break-word">{{ stock?.name }}</td>
-              <td *ngIf="status !== 'STOCKOUT' && status !== 'EXPIRED'" >{{ stock?.quantity }}</td>
-              <td >{{ stock?.quantity - stock?.eligibleQuantity }}</td>
+              <td *ngIf="status !== 'STOCKOUT' && status !== 'EXPIRED'">
+                {{ stock?.quantity }}
+              </td>
+              <td>{{ stock?.quantity - stock?.eligibleQuantity }}</td>
               <td *ngIf="status !== 'EXPIRED'">
                 <b>
                   {{ stock?.eligibleQuantity }}

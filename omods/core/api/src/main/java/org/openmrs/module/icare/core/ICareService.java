@@ -33,6 +33,7 @@ import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -70,7 +71,7 @@ public interface ICareService extends OpenmrsService {
 	
 	ItemPrice getItemPriceByConceptId(Integer serviceConceptId, Integer paymentSchemeConceptId, Integer paymentTypeConceptId);
 	
-	ItemPrice getItemPrice(Visit visit, Concept concept) throws Exception;
+	ItemPrice getItemPrice(Visit visit, Concept concept) throws ItemNotPayableException, ConfigurationException;
 	
 	ItemPrice getItemPrice(Visit visit, Drug drug) throws ItemNotPayableException, ConfigurationException;
 	
@@ -103,6 +104,14 @@ public interface ICareService extends OpenmrsService {
 	ItemPrice getItemPriceByDrugId(Integer serviceConceptId, Integer paymentSchemeConceptId, Integer paymentTypeConceptId);
 	
 	List<Item> getItems(String search, Integer limit, Integer startIndex, String department, Item.Type type,
+	        Boolean stockable);
+	
+	List<Object> getConceptItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable,
+	        String conceptClassName);
+	
+	List<Item> getStockableItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable);
+	
+	List<Concept> getConceptStockableItems(String search, Integer limit, Integer startIndex, Item.Type type,
 	        Boolean stockable);
 	
 	Prescription savePrescription(Prescription order, String status, String remarks);
@@ -199,4 +208,6 @@ public interface ICareService extends OpenmrsService {
 	String pushEventWithoutRegistrationDataToDHIS2Instance(String eventData);
 	
 	String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType);
+	
+	Map<String, Object> generateVisitsData(Date startDate, Date endDate, Boolean sendToExternalMediator) throws Exception;
 }
