@@ -189,33 +189,34 @@ public class BillSubmissionRequest {
 		}
 		
 		//BillItems
-
+		
 		BillItems billItems = new BillItems();
 		for (InvoiceItem invoiceItem : invoiceItems) {
-			Drug drug  = invoiceItem.getItem().getDrug();
+			Drug drug = invoiceItem.getItem().getDrug();
 			Concept concept = invoiceItem.getItem().getConcept();
-			if(drug == null && concept == null){
+			if (drug == null && concept == null) {
 				throw new IllegalStateException("Concept cannot be null for InvoiceItem" + drug + concept);
-			} else if(concept != null){
+			} else if (concept != null) {
 				for (ConceptMap conceptMap : concept.getConceptMappings()) {
 					if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
-							.equals(GFSCodeConceptSourceMappingUuid)) {
+					        .equals(GFSCodeConceptSourceMappingUuid)) {
 						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
-						billItems.getBillItem().add(new BillItem("11", "N", totalBillAmount.toString(),"5000", "0.0", GFSCode));
+						billItems.getBillItem().add(
+						    new BillItem("11", "N", totalBillAmount.toString(), "5000", "0.0", GFSCode));
 					}
 				}
-			} else if(drug != null){
-				for(DrugReferenceMap drugMap: drug.getDrugReferenceMaps()){
-					if(drugMap.getDrugReferenceMapId().equals(GFSCodeConceptSourceMappingUuid)){
-						String GFSCode = drugMap.getConceptReferenceTerm().getCode(); 
-						billItems.getBillItem().add(new BillItem("12", "N", totalBillAmount.toString(), "5000", "0.0", GFSCode));
+			} else if (drug != null) {
+				for (DrugReferenceMap drugMap : drug.getDrugReferenceMaps()) {
+					if (drugMap.getDrugReferenceMapId().equals(GFSCodeConceptSourceMappingUuid)) {
+						String GFSCode = drugMap.getConceptReferenceTerm().getCode();
+						billItems.getBillItem().add(
+						    new BillItem("12", "N", totalBillAmount.toString(), "5000", "0.0", GFSCode));
 					}
 					
 				}
 				
 			}
-
-
+			
 		}
 		
 		// Create and populate BillHdr
