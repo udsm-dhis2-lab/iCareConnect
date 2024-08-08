@@ -252,7 +252,11 @@ public class ICareController {
 			Visit visit = Context.getService(VisitService.class).getVisitByUuid(visitUuid);
 			Drug drug = Context.getService(ConceptService.class).getDrugByUuid(drugUuid);
 			ItemPrice item = iCareService.getItemPrice(visit,drug);
-			results.put("results",item.toMap());
+			if (item != null) {
+				results.put("results",item.toMap());
+			} else {
+				results.put("results", new ArrayList<>());
+			}
 		}
 
 		if (visitUuid != null && conceptUuid !=null){
@@ -1471,5 +1475,16 @@ public class ICareController {
 		Map<String, Object> results = new HashMap<>();
 		results.put("results", commonlyUsedItems);
 		return results;
+	}
+	
+	@RequestMapping(value = "generatehduapidatatemplate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> onPGenerateReportForHDUAPI(@RequestBody Map<String, Object> visitParameters) throws Exception {
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		Date startDate = formatter.parse(visitParameters.get("startDate").toString());
+		Date endDate = formatter.parse(visitParameters.get("endDate").toString());
+		Map<String, Object> response = iCareService.generateVisitsData(startDate, endDate,
+		    (Boolean) visitParameters.get("sendToExternal"));
+		return response;
 	}
 }
