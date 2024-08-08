@@ -74,6 +74,7 @@
                   <tr>
                     <th>SN</th>
                     <th>Item</th>
+                    <th>Type</th>
                     <ng-container *ngIf="shouldShowDoseDetails === 'true'">
                       <th [attr.colspan]="prescriptionVariables?.length">
                         Dose details
@@ -98,6 +99,9 @@
                         </td>
                         <td>
                           {{ item?.name }}
+                        </td>
+                        <td>
+                          {{ item?.drug?.uuid ? "Drug" : "Non Drug" }}
                         </td>
                         <ng-container *ngIf="shouldShowDoseDetails === 'true'">
                           <td
@@ -156,14 +160,14 @@
                       <ng-container *ngIf="shouldShowDoseDetails === 'true'">
                         <td
                           style="text-align: right"
-                          [attr.colspan]="prescriptionVariables?.length + 3"
+                          [attr.colspan]="prescriptionVariables?.length + 4"
                         >
                           Total Price
                         </td>
                       </ng-container>
 
                       <ng-container *ngIf="shouldShowDoseDetails !== 'true'">
-                        <td colspan="4" style="text-align: right">
+                        <td colspan="5" style="text-align: right">
                           Total Price
                         </td>
                       </ng-container>
@@ -192,8 +196,8 @@
                 [disabled]="
                   selectedItems?.length === 0 ||
                   !params?.currentLocation ||
-                  itemsPrices['total'] === 0 ||
-                  !itemsPrices[item?.itemUuid]?.price
+                  !itemsPrices ||
+                  itemsPrices['total'] === 0
                 "
               >
                 Save

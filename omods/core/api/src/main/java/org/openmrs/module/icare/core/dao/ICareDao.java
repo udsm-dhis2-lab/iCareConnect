@@ -1095,7 +1095,6 @@ public class ICareDao extends BaseDAO<Item> {
 		Query query = session.createQuery(queryStr);
 		query.setParameter("Id", Id);
 		return query.list();
-		
 	}
 	
 	//	public String voidOrder(String uuid, String voidReason) {
@@ -1120,4 +1119,13 @@ public class ICareDao extends BaseDAO<Item> {
 	//		return uuid;
 	//	}
 	//
+	
+	public List<Visit> getVisitsByStartDateAndEndDate(Date startDate, Date endDate) {
+		DbSession session = getSession();
+		String queryStr = " SELECT visit FROM Visit visit WHERE visit.startDatetime BETWEEN :startDate AND :endDate";
+		Query query = session.createQuery(queryStr);
+		query.setParameter("startDate", startDate);
+		query.setParameter("endDate", endDate);
+		return query.list();
+	}
 }
