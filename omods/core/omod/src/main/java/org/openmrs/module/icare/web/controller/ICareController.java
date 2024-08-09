@@ -1547,7 +1547,7 @@ public class ICareController {
 			}
 		}
 
-		response.put("orderStatus", orderStatus);
+		response.put("orderStatus", orderStatus.getStatus().toString());
 		response.put("order", savedOrder);
 		return response;
 	}
