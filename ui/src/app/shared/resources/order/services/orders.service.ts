@@ -174,6 +174,15 @@ export class OrdersService {
     );
   }
 
+  createNonDrugOrderWithDispensing(payload: any): Observable<any> {
+    return this.openMRSHttpClient
+      .post(`icare/nondrugorderwithdispensing`, payload)
+      .pipe(
+        map((order) => order),
+        catchError((error) => of(error))
+      );
+  }
+
   getOrdersFrequencies() {
     return from(
       this.API.orderfrequency.getAllOrderFrequencies({ v: "full" })

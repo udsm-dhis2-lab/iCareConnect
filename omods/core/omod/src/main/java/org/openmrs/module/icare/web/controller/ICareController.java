@@ -11,6 +11,7 @@ package org.openmrs.module.icare.web.controller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONObject;
 import org.openmrs.*;
@@ -19,6 +20,8 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.auditlog.AuditLog;
 import org.openmrs.module.icare.auditlog.api.AuditLogService;
 import org.openmrs.module.icare.auditlog.api.db.AuditLogDAO;
+import org.openmrs.module.icare.billing.ItemNotPayableException;
+import org.openmrs.module.icare.billing.OrderMetaData;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.BillingService;
@@ -262,8 +265,12 @@ public class ICareController {
 		if (visitUuid != null && conceptUuid !=null){
 			Visit visit = Context.getService(VisitService.class).getVisitByUuid(visitUuid);
 			Concept concept = Context.getService(ConceptService.class).getConceptByUuid(conceptUuid);
-			ItemPrice item = iCareService.getItemPrice(visit, concept);
-			results.put("results",item.toMap());
+			ItemPrice item = iCareService.getItemPriceByConceptAndVisit(visit, concept);
+			if (item != null) {
+				results.put("results",item.toMap());
+			} else {
+				results.put("results", new ArrayList<>());
+			}
 		}
 
         return results;
@@ -1475,6 +1482,74 @@ public class ICareController {
 		Map<String, Object> results = new HashMap<>();
 		results.put("results", commonlyUsedItems);
 		return results;
+	}
+	
+	@RequestMapping(value = "nondrugorderwithdispensing", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> createNonDrugOrder(@RequestBody Map<String, Object> nonDrugOrder) throws Exception{
+		Map<String, Object> response = new HashMap<>();
+
+		Order order = new Order();
+		Map<String, Object> orderObject = (Map<String, Object>) nonDrugOrder.get("order");
+		OrderService orderService = Context.getOrderService();
+		EncounterService encounterService = Context.getEncounterService();
+		ConceptService conceptService = Context.getConceptService();
+		PatientService patientService = Context.getPatientService();
+		ProviderService providerService = Context.getProviderService();
+		Encounter encounter = encounterService.getEncounterByUuid(orderObject.get("encounter").toString());
+		OrderType orderType = orderService.getOrderTypeByUuid(orderObject.get("orderType").toString());
+		Patient patient = patientService.getPatientByUuid(orderObject.get("patient").toString());
+		Concept concept = conceptService.getConceptByUuid(orderObject.get("concept").toString());
+//		System.out.println(orderObject.get("concept").toString());
+		Provider orderer = providerService.getProviderByUuid(orderObject.get("orderer").toString());
+		OrderContext orderContext = new OrderContext();
+		order.setOrderType(orderType);
+		order.setEncounter(encounter);
+		order.setPatient(patient);
+		order.setCareSetting(orderService.getCareSetting(1));
+		order.setConcept(concept);
+		order.setOrderer(orderer);
+		order.setUrgency(Order.Urgency.valueOf("ROUTINE"));
+		order.setAction(Order.Action.valueOf("NEW"));
+		OrderStatus orderStatus = new OrderStatus();
+//		List<Order> orders = new ArrayList<>();
+//		encounter.setOrders( (Set<Order>) orders);
+		Order savedOrder = new Order();
+		if (order != null) {
+//			 encounterService.saveEncounter(encounter);
+			savedOrder = orderService.saveOrder(order, orderContext);
+			Integer quantity;
+			String locationUuid;
+			String remarks = "";
+			if (nonDrugOrder.get("quantity") == null) {
+				throw new Exception("Quantity is not set");
+			} else {
+				quantity = (Integer) nonDrugOrder.get("quantity");
+			}
+			if (nonDrugOrder.get("location") == null) {
+				throw new Exception("Location is not set");
+			} else {
+				locationUuid = nonDrugOrder.get("location").toString();
+			}
+			if (quantity != null && locationUuid != null) {
+				ItemPrice itemPrice = Context.getService(ICareService.class).getItemPriceByConceptAndVisit(savedOrder.getEncounter().getVisit(), savedOrder.getConcept());
+				if (itemPrice == null) {
+					throw new ItemNotPayableException(order.getConcept().getName() + " is not a billable item.");
+				}
+				//Set the metadata
+				Double price = itemPrice.getPrice();
+				itemPrice.setPrice(price*quantity);
+				OrderMetaData<Order> orderMetaData = new OrderMetaData();
+				orderMetaData.setItemPrice(itemPrice);
+				orderMetaData.setOrder(savedOrder);
+				billingService.processOrder(orderMetaData);
+				orderStatus = storeService.dispenseNonDrug(savedOrder, quantity, nonDrugOrder.get("location").toString(), remarks );
+			}
+		}
+
+		response.put("orderStatus", orderStatus);
+		response.put("order", savedOrder);
+		return response;
 	}
 	
 	@RequestMapping(value = "generatehduapidatatemplate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
