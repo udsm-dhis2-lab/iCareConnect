@@ -142,7 +142,9 @@
                         <td>
                           {{
                             itemsPrices && itemsPrices[item?.itemUuid]?.ready
-                              ? itemsPrices[item?.itemUuid]?.price
+                              ? itemsPrices[item?.itemUuid]?.isPriceSet
+                                ? itemsPrices[item?.itemUuid]?.price
+                                : "Not set"
                               : "-"
                           }}
                         </td>
@@ -197,6 +199,7 @@
                   selectedItems?.length === 0 ||
                   !params?.currentLocation ||
                   !itemsPrices ||
+                  !itemsPrices['total'] ||
                   itemsPrices['total'] === 0
                 "
               >
