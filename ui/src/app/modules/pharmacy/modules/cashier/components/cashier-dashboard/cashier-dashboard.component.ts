@@ -369,7 +369,9 @@ export class CashierDashboardComponent implements OnInit {
                           : "d8448002-3243-456b-bbe9-fc95562cf1f9",
                     },
                     careSetting: "Outpatient",
-                    quantity: this.formData["quantity" + item?.itemUuid]?.value,
+                    quantity: Number(
+                      this.formData["quantity" + item?.itemUuid]?.value
+                    ),
                     quantityUnits: {
                       uuid: "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
                     },
@@ -400,8 +402,9 @@ export class CashierDashboardComponent implements OnInit {
                                 ?.value
                             : "",
                         careSetting: "Outpatient",
-                        quantity:
-                          this.formData["quantity" + item?.itemUuid]?.value,
+                        quantity: Number(
+                          this.formData["quantity" + item?.itemUuid]?.value
+                        ),
                       };
                     }
                   ) || [];
@@ -463,9 +466,7 @@ export class CashierDashboardComponent implements OnInit {
                           ? this.drugOrderService.dispenseOrderedDrugOrder(
                               dispendingDetails
                             )
-                          : this.ordersService.deductStockAfterSellingOrderedGeneralOrderItem(
-                              order
-                            );
+                          : of({});
                       })
                     ).subscribe((dispenseResponses: any) => {
                       if (dispenseResponses) {
