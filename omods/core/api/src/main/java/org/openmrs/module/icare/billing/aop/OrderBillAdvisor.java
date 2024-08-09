@@ -57,7 +57,7 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 			if (invocation.getArguments()[0] instanceof TestOrder) {
 				//Determine the item price
 				TestOrder order = (TestOrder) invocation.getArguments()[0];
-				ItemPrice itemPrice = Context.getService(ICareService.class).getItemPrice(order.getEncounter().getVisit(),
+				ItemPrice itemPrice = Context.getService(ICareService.class).getItemPriceByConceptAndVisit(order.getEncounter().getVisit(),
 				    order.getConcept());
 				if (itemPrice == null) {
 					throw new ItemNotPayableException(order.getConcept().getName() + " is not a billable item");
@@ -221,7 +221,7 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 			} else if (invocation.getArguments()[0] instanceof BedOrder) {
 				//Determine the item price
 				BedOrder order = (BedOrder) invocation.getArguments()[0];
-				ItemPrice itemPrice = Context.getService(ICareService.class).getItemPrice(order.getEncounter().getVisit(),
+				ItemPrice itemPrice = Context.getService(ICareService.class).getItemPriceByConceptAndVisit(order.getEncounter().getVisit(),
 				    order.getConcept());
 				if (itemPrice == null) {
 					throw new ItemNotPayableException(order.getConcept().getName() + " is not a billable item");
@@ -238,21 +238,24 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 				return order;
 			} else {
 				Order order = (Order) invocation.getArguments()[0];
-				ItemPrice itemPrice = Context.getService(ICareService.class).getItemPrice(order.getEncounter().getVisit(),
-				    order.getConcept());
-				if (itemPrice == null) {
-					throw new ItemNotPayableException(order.getConcept().getName() + " is not a billable item.");
-				}
-				
-				//Set the metadata
-				OrderMetaData<Order> orderMetaData = new OrderMetaData();
-				orderMetaData.setItemPrice(itemPrice);
-				order = (Order) invocation.proceed();
-				orderMetaData.setOrder(order);
-				billingService.processOrder(orderMetaData);
-				
-				return order;
-			}
+				// TODO: Logic to skip advisor can be added at the top most before any order is checked for execution
+				AdministrationService administrationService = Context.getAdministrationService();
+				String orderTypeToSkipBilling = administrationService.getGlobalProperty(ICareConfig.ORDER_TO_SKIP_BILLING_ADVISOR);
+                if (!order.getOrderType().getUuid().equals(orderTypeToSkipBilling)) {
+                    ItemPrice itemPrice = Context.getService(ICareService.class).getItemPriceByConceptAndVisit(order.getEncounter().getVisit(),
+                            order.getConcept());
+                    if (itemPrice == null) {
+                        throw new ItemNotPayableException(order.getConcept().getName() + " is not a billable item.");
+                    }
+                    //Set the metadata
+                    OrderMetaData<Order> orderMetaData = new OrderMetaData();
+                    orderMetaData.setItemPrice(itemPrice);
+                    order = (Order) invocation.proceed();
+                    orderMetaData.setOrder(order);
+                    billingService.processOrder(orderMetaData);
+                }
+                return order;
+            }
 			
 		}
 	}
