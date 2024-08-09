@@ -200,16 +200,26 @@ export class CashierDashboardComponent implements OnInit {
           if (response) {
             this.itemsPrices[itemUuid] = {
               ready: true,
-              price:
+              price: !isNaN(
                 Number(this.formData["quantity" + itemUuid]?.value) *
-                response?.price,
+                  response?.price
+              )
+                ? Number(this.formData["quantity" + itemUuid]?.value) *
+                  response?.price
+                : null,
+              isPriceSet: !isNaN(
+                Number(this.formData["quantity" + itemUuid]?.value) *
+                  response?.price
+              )
+                ? true
+                : false,
             };
-
-            this.itemsPrices["total"] = sum(
+            const total = sum(
               this.selectedItems?.map((item: any) => {
                 return this.itemsPrices[item?.itemUuid]?.price;
               })
             );
+            this.itemsPrices["total"] = !isNaN(total) ? total : null;
           }
         })
       )
@@ -409,7 +419,11 @@ export class CashierDashboardComponent implements OnInit {
                   }),
                   ...generalOrders.map((generalOrder: any) => {
                     return this.ordersService
-                      .createOrder(omit(generalOrder, ["quantity"]))
+                      .createNonDrugOrderWithDispensing({
+                        order: omit(generalOrder, ["quantity"]),
+                        quantity: generalOrder?.quantity,
+                        location: currentLocation?.uuid,
+                      })
                       .pipe(
                         map((response: any) => {
                           return {

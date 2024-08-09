@@ -174,7 +174,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public ItemPrice getItemPrice(Visit visit, Concept billableConcept) throws ItemNotPayableException,
+	public ItemPrice getItemPriceByConceptAndVisit(Visit visit, Concept billableConcept) throws ItemNotPayableException,
 	        ConfigurationException {
 		//VisitMetaData visitMetaData = VisitExtrapolator.extrapolateMetaData(visit);
 		VisitWrapper visitWrapper = new VisitWrapper(visit);
