@@ -1487,8 +1487,6 @@ public class ICareController {
 	@RequestMapping(value = "nondrugorderwithdispensing", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> createNonDrugOrder(@RequestBody Map<String, Object> nonDrugOrder) throws Exception{
-		Map<String, Object> response = new HashMap<>();
-
 		Order order = new Order();
 		Map<String, Object> orderObject = (Map<String, Object>) nonDrugOrder.get("order");
 		OrderService orderService = Context.getOrderService();
@@ -1547,9 +1545,11 @@ public class ICareController {
 			}
 		}
 
-		response.put("orderStatus", orderStatus.getStatus().toString());
-		response.put("order", savedOrder);
-		return response;
+		Map<String, Object> orderResponse = new HashMap<>();
+		orderResponse.put("uuid", savedOrder.getUuid());
+		orderResponse.put("orderStockStatus", orderStatus.getStatus().toString());
+		orderResponse.put("orderNumber", savedOrder.getOrderNumber());
+		return orderResponse;
 	}
 	
 	@RequestMapping(value = "generatehduapidatatemplate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
