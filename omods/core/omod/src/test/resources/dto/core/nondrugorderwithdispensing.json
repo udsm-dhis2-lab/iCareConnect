@@ -9,7 +9,7 @@
     "orderer": "1a61a0b5-d271-4b00-a803-5cef8b06ba8f",
     "patient": "993c46d2-5007-45e8-9512-969300717761",
     "orderReason": null,
-    "instructions": "",
+    "instructions": null,
     "careSetting": "Outpatient"
   },
   "quantity": 30,
