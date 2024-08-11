@@ -1483,10 +1483,54 @@ public class ICareController {
 		results.put("results", commonlyUsedItems);
 		return results;
 	}
+
+	@RequestMapping(value = "nondrugorderbillanddispensing", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> dispenseAndCreateBillForNonDrug(@RequestBody Map<String, Object> nonDrugObject) throws Exception {
+		Double quantity;
+		String locationUuid;
+		String remarks = "";
+		String orderUuid;
+		Order savedOrder;
+		if (nonDrugObject.get("order") == null) {
+			throw new Exception("Order is not set");
+		} else {
+			orderUuid = nonDrugObject.get("order").toString();
+		}
+		if (nonDrugObject.get("quantity") == null) {
+			throw new Exception("Quantity is not set");
+		} else {
+			quantity = ((Integer) nonDrugObject.get("quantity")).doubleValue();
+		}
+		if (nonDrugObject.get("location") == null) {
+			throw new Exception("Location is not set");
+		} else {
+			locationUuid = nonDrugObject.get("location").toString();
+		}
+		savedOrder = orderService.getOrderByUuid(orderUuid);
+		ItemPrice itemPrice = Context.getService(ICareService.class).getItemPriceByConceptAndVisit(savedOrder.getEncounter().getVisit(), savedOrder.getConcept());
+		if (itemPrice == null) {
+			throw new ItemNotPayableException(savedOrder.getConcept().getName() + " is not a billable item.");
+		}
+		OrderStatus orderStatus = new OrderStatus();
+		Double price = itemPrice.getPrice();
+		itemPrice.setPrice(price*quantity);
+		OrderMetaData<Order> orderMetaData = new OrderMetaData();
+		orderMetaData.setItemPrice(itemPrice);
+		orderMetaData.setOrder(savedOrder);
+		billingService.processOrder(orderMetaData, quantity);
+		orderStatus = storeService.dispenseNonDrug(savedOrder, quantity, locationUuid, remarks );
+		Map<String, Object> orderResponse = new HashMap<>();
+		orderResponse.put("uuid", savedOrder.getUuid());
+		orderResponse.put("orderStockStatus", orderStatus.getStatus().toString());
+		orderResponse.put("orderNumber", savedOrder.getOrderNumber());
+		return orderResponse;
+	}
 	
 	@RequestMapping(value = "nondrugorderwithdispensing", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> createNonDrugOrder(@RequestBody Map<String, Object> nonDrugOrder) throws Exception{
+		// TODO: This has issues with creating order. Review is necessary
 		Order order = new Order();
 		Map<String, Object> orderObject = (Map<String, Object>) nonDrugOrder.get("order");
 		OrderService orderService = Context.getOrderService();
@@ -1498,51 +1542,52 @@ public class ICareController {
 		OrderType orderType = orderService.getOrderTypeByUuid(orderObject.get("orderType").toString());
 		Patient patient = patientService.getPatientByUuid(orderObject.get("patient").toString());
 		Concept concept = conceptService.getConceptByUuid(orderObject.get("concept").toString());
-//		System.out.println(orderObject.get("concept").toString());
 		Provider orderer = providerService.getProviderByUuid(orderObject.get("orderer").toString());
 		OrderContext orderContext = new OrderContext();
 		order.setOrderType(orderType);
 		order.setEncounter(encounter);
 		order.setPatient(patient);
-		order.setCareSetting(orderService.getCareSetting(1));
+		CareSetting careSetting = new CareSetting();
+		if (orderObject.get("careSetting").toString().toLowerCase().equals("outpatient")) {
+			careSetting.setCareSettingType(CareSetting.CareSettingType.OUTPATIENT);
+			orderContext.setCareSetting(careSetting);
+		} else {
+			careSetting.setCareSettingType(CareSetting.CareSettingType.INPATIENT);
+			orderContext.setCareSetting(careSetting);
+		}
 		order.setConcept(concept);
 		order.setOrderer(orderer);
-		order.setUrgency(Order.Urgency.valueOf("ROUTINE"));
-		order.setAction(Order.Action.valueOf("NEW"));
+		order.setUrgency(Order.Urgency.valueOf((String) orderObject.get("urgency")));
+		order.setAction(Order.Action.valueOf((String) orderObject.get("action")));
 		OrderStatus orderStatus = new OrderStatus();
-//		List<Order> orders = new ArrayList<>();
-//		encounter.setOrders( (Set<Order>) orders);
 		Order savedOrder = new Order();
 		if (order != null) {
-//			 encounterService.saveEncounter(encounter);
 			savedOrder = orderService.saveOrder(order, orderContext);
-			Integer quantity;
+			Double quantity;
 			String locationUuid;
 			String remarks = "";
 			if (nonDrugOrder.get("quantity") == null) {
 				throw new Exception("Quantity is not set");
 			} else {
-				quantity = (Integer) nonDrugOrder.get("quantity");
+				quantity = ((Integer) nonDrugOrder.get("quantity")).doubleValue();
 			}
 			if (nonDrugOrder.get("location") == null) {
 				throw new Exception("Location is not set");
 			} else {
 				locationUuid = nonDrugOrder.get("location").toString();
 			}
-			if (quantity != null && locationUuid != null) {
-				ItemPrice itemPrice = Context.getService(ICareService.class).getItemPriceByConceptAndVisit(savedOrder.getEncounter().getVisit(), savedOrder.getConcept());
-				if (itemPrice == null) {
-					throw new ItemNotPayableException(order.getConcept().getName() + " is not a billable item.");
-				}
-				//Set the metadata
-				Double price = itemPrice.getPrice();
-				itemPrice.setPrice(price*quantity);
-				OrderMetaData<Order> orderMetaData = new OrderMetaData();
-				orderMetaData.setItemPrice(itemPrice);
-				orderMetaData.setOrder(savedOrder);
-				billingService.processOrder(orderMetaData);
-				orderStatus = storeService.dispenseNonDrug(savedOrder, quantity, nonDrugOrder.get("location").toString(), remarks );
+			ItemPrice itemPrice = Context.getService(ICareService.class).getItemPriceByConceptAndVisit(savedOrder.getEncounter().getVisit(), savedOrder.getConcept());
+			if (itemPrice == null) {
+				throw new ItemNotPayableException(order.getConcept().getName() + " is not a billable item.");
 			}
+			//Set the metadata
+			Double price = itemPrice.getPrice();
+			itemPrice.setPrice(price*quantity);
+			OrderMetaData<Order> orderMetaData = new OrderMetaData();
+			orderMetaData.setItemPrice(itemPrice);
+			orderMetaData.setOrder(savedOrder);
+			billingService.processOrder(orderMetaData, quantity);
+			orderStatus = storeService.dispenseNonDrug(savedOrder, quantity, locationUuid, remarks );
 		}
 
 		Map<String, Object> orderResponse = new HashMap<>();

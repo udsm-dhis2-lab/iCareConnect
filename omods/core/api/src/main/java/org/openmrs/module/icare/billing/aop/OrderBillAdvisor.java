@@ -73,7 +73,7 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 					order = (TestOrder) invocation.proceed();
 					orderMetaData.setOrder(order);
 				}
-				billingService.processOrder(orderMetaData);
+				billingService.processOrder(orderMetaData, null);
 				
 				return order;
 			} else if (invocation.getArguments()[0] instanceof DrugOrder) {
@@ -120,7 +120,7 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 						
 						order = (DrugOrder) invocation.proceed();
 						orderMetaData.setOrder(order);
-						billingService.processOrder(orderMetaData);
+						billingService.processOrder(orderMetaData,  order.getQuantity());
 					} else if (order.getAction() == Order.Action.REVISE) {
 						//TODO find a way to edit the quantity
 						OrderService orderService = Context.getOrderService();
@@ -130,7 +130,7 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 						savedOrder.setFulfillerStatus(Order.FulfillerStatus.COMPLETED);
 						order = (DrugOrder) orderService.saveRetrospectiveOrder(savedOrder, orderContext);
 						orderMetaData.setOrder(order);
-						billingService.processOrder(orderMetaData);
+						billingService.processOrder(orderMetaData, order.getQuantity());
 					} else if (order.getAction() == Order.Action.DISCONTINUE) {
 						OrderService orderService = Context.getOrderService();
 						DrugOrder savedOrder = (DrugOrder) orderService.getOrderByUuid(order.getUuid());
@@ -205,11 +205,11 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 //					List<OrderStatus> prescriptionOrderStatuses = Context.getService(StoreService.class).getOrderStatusByOrderUuid(prescriptionOrder.getUuid());
 					if (!orderMetaData.getItemPrice().getPaymentType().getName().getName().toLowerCase().equals("cash")) {
 						orderMetaData.setOrder(prescriptionOrder);
-						billingService.processOrder(orderMetaData);
+						billingService.processOrder(orderMetaData,order.getQuantity());
 						return order;
 					} else if (order.getPreviousOrder() != null) {
 						orderMetaData.setOrder(prescriptionOrder);
-						billingService.processOrder(orderMetaData);
+						billingService.processOrder(orderMetaData, order.getQuantity());
 						return order;
 					} else {
 						return  order;
@@ -233,7 +233,7 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 				
 				order = (BedOrder) invocation.proceed();
 				orderMetaData.setOrder(order);
-				billingService.processOrder(orderMetaData);
+				billingService.processOrder(orderMetaData, null);
 				
 				return order;
 			} else {
@@ -241,7 +241,7 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 				// TODO: Logic to skip advisor can be added at the top most before any order is checked for execution
 				AdministrationService administrationService = Context.getAdministrationService();
 				String orderTypeToSkipBilling = administrationService.getGlobalProperty(ICareConfig.ORDER_TO_SKIP_BILLING_ADVISOR);
-                if (!order.getOrderType().getUuid().equals(orderTypeToSkipBilling)) {
+                if (orderTypeToSkipBilling == null || !order.getOrderType().getUuid().equals(orderTypeToSkipBilling)) {
                     ItemPrice itemPrice = Context.getService(ICareService.class).getItemPriceByConceptAndVisit(order.getEncounter().getVisit(),
                             order.getConcept());
                     if (itemPrice == null) {
@@ -252,7 +252,7 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
                     orderMetaData.setItemPrice(itemPrice);
                     order = (Order) invocation.proceed();
                     orderMetaData.setOrder(order);
-                    billingService.processOrder(orderMetaData);
+                    billingService.processOrder(orderMetaData, null);
                 }
                 return order;
             }
