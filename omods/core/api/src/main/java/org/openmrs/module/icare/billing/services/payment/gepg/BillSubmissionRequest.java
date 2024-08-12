@@ -189,7 +189,6 @@ public class BillSubmissionRequest {
 		}
 		
 		//BillItems
-		
 		BillItems billItems = new BillItems();
 		for (InvoiceItem invoiceItem : invoiceItems) {
 			Drug drug = invoiceItem.getItem().getDrug();
