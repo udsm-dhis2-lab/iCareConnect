@@ -572,7 +572,7 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 	}
 	
 	@Override
-	public OrderStatus dispenseNonDrug(Order order, Integer quantity, String locationUuid, String remarks) {
+	public OrderStatus dispenseNonDrug(Order order, Double quantity, String locationUuid, String remarks) {
 		OrderService orderService = Context.getOrderService();
 		List<OrderStatus> orderStatuses = this.stockDAO.getOrderStatusByOrderUuid(order.getUuid());
 		for (OrderStatus orderStatus : orderStatuses) {
