@@ -238,10 +238,9 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 				return order;
 			} else {
 				Order order = (Order) invocation.getArguments()[0];
-				// TODO: Logic to skip advisor can be added at the top most before any order is checked for execution
 				AdministrationService administrationService = Context.getAdministrationService();
 				String orderTypeToSkipBilling = administrationService.getGlobalProperty(ICareConfig.ORDER_TO_SKIP_BILLING_ADVISOR);
-                if (orderTypeToSkipBilling == null || !order.getOrderType().getUuid().equals(orderTypeToSkipBilling)) {
+				if (orderTypeToSkipBilling == null || !order.getOrderType().getUuid().equals(orderTypeToSkipBilling)) {
                     ItemPrice itemPrice = Context.getService(ICareService.class).getItemPriceByConceptAndVisit(order.getEncounter().getVisit(),
                             order.getConcept());
                     if (itemPrice == null) {
@@ -253,7 +252,9 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
                     order = (Order) invocation.proceed();
                     orderMetaData.setOrder(order);
                     billingService.processOrder(orderMetaData, null);
-                }
+                } else {
+					order = (Order) invocation.proceed();
+				}
                 return order;
             }
 			
