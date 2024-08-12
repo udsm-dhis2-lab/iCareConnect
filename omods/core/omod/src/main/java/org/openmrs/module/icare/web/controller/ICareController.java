@@ -1483,7 +1483,7 @@ public class ICareController {
 		results.put("results", commonlyUsedItems);
 		return results;
 	}
-
+	
 	@RequestMapping(value = "nondrugorderbillanddispensing", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> dispenseAndCreateBillForNonDrug(@RequestBody Map<String, Object> nonDrugObject) throws Exception {
