@@ -1,14 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { flatten, orderBy, uniqBy } from "lodash";
+import { orderBy, uniqBy } from "lodash";
 import * as moment from "moment";
-import { from, Observable, of, zip } from "rxjs";
-import {
-  debounceTime,
-  distinctUntilChanged,
-  map,
-  switchMap,
-  tap,
-} from "rxjs/operators";
+import { Observable } from "rxjs";
+import { debounceTime, map, tap } from "rxjs/operators";
 import {
   dateToISOStringMidnight,
   formatDateToYYMMDD,
@@ -17,13 +11,9 @@ import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
-import { Api } from "src/app/shared/resources/openmrs";
 import { StockInvoicesService } from "src/app/shared/resources/store/services/stockInvoice.service";
-import { ItemPriceService } from "src/app/shared/services/item-price.service";
 import { OpenmrsHttpClientService } from "../../modules/openmrs-http-client/services/openmrs-http-client.service";
 import { ChangeDetectorRef } from "@angular/core";
-import { FormControl } from "@angular/forms";
-import { MatSelectChange } from "@angular/material/select";
 
 @Component({
   selector: "app-stock-receiving-form-fields",
@@ -79,8 +69,7 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   unitItemValue: any;
   searchingText: string;
 
-  stockableItemCtrl: FormControl = new FormControl();
-  stockableItemsFilterCtrl: FormControl = new FormControl();
+  saving: boolean = false;
 
   constructor(
     private stockInvoicesService: StockInvoicesService,
@@ -313,7 +302,6 @@ export class StockReceivingFormFieldsComponent implements OnInit {
   getSelectedItemFromOption(event: Event, option: any): void {
     event.stopPropagation();
     this.selectedItem = option;
-    // this.stockableItemCtrl.setValue(this.selectedItem);
     this.searchingText = this.selectedItem?.display;
     this.validForm =
       this.formValues?.supplier?.value?.toString()?.length &&
@@ -641,15 +629,15 @@ export class StockReceivingFormFieldsComponent implements OnInit {
         new Date(moment(this.formValues?.expiryDate?.value).toDate())
       ),
     };
-
+    this.saving = true;
     this.stockInvoicesService
       .updateStockInvoiceItem(this.stockInvoiceItem?.uuid, invoicesItemObject)
-      .pipe(
-        tap((response) => {
-          this.closeDialog.emit();
-        })
-      )
-      .subscribe();
+      .pipe(tap((response) => {}))
+      .subscribe((response: any) => {
+        this.saving = false;
+        this.setFields();
+        this.closeDialog.emit();
+      });
   }
 
   // onGetBatchQuantity(formValue: FormValue) {

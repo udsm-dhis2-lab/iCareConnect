@@ -973,4 +973,33 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		
 		//		TODO: Add test for normal orders
 	}
+	
+	@Test
+	public void testNonDrugOrderBillAndDispensing() throws Exception {
+		AdministrationService administrationService = Context.getAdministrationService();
+		administrationService.setGlobalProperty(ICareConfig.ORDER_TO_SKIP_BILLING_ADVISOR,
+		    "2msir5eb-5345-11e8-9922-40b034c3cfee");
+		String dto = this.readFile("dto/core/non-drug-dispensing-with-billing.json");
+		Map<String, Object> nonDrugOrderData = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest order = newPostRequest("icare/nondrugorderbillanddispensing", nonDrugOrderData);
+		MockHttpServletResponse response = handle(order);
+		
+		Map<String, Object> responseMap = (new ObjectMapper()).readValue(response.getContentAsString(), Map.class);
+		assertThat("Order status shows drug dispensed", responseMap.get("orderStockStatus"), is("DISPENSED"));
+	}
+	
+	@Test
+	public void testSaveNonDrugOrderWithDispensing() throws Exception {
+		AdministrationService administrationService = Context.getAdministrationService();
+		administrationService.setGlobalProperty(ICareConfig.ORDER_TO_SKIP_BILLING_ADVISOR,
+		    "2msir5eb-5345-11e8-9922-40b034c3cfee");
+		String dto = this.readFile("dto/core/nondrugorderwithdispensing.json");
+		Map<String, Object> nonDrugOrderData = (new ObjectMapper()).readValue(dto, Map.class);
+		MockHttpServletRequest order = newPostRequest("icare/nondrugorderwithdispensing", nonDrugOrderData);
+		MockHttpServletResponse response = handle(order);
+		Map<String, Object> responseMap = (new ObjectMapper()).readValue(response.getContentAsString(), Map.class);
+		System.out.println(responseMap);
+		// TODO: Make sure test is running sucessfully beforing using the API
+		assertThat("Order status shows drug dispensed", responseMap.get("orderStockStatus"), is("DISPENSED"));
+	}
 }

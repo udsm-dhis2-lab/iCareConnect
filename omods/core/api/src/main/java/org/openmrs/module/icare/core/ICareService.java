@@ -33,6 +33,7 @@ import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -70,7 +71,8 @@ public interface ICareService extends OpenmrsService {
 	
 	ItemPrice getItemPriceByConceptId(Integer serviceConceptId, Integer paymentSchemeConceptId, Integer paymentTypeConceptId);
 	
-	ItemPrice getItemPrice(Visit visit, Concept concept) throws ItemNotPayableException, ConfigurationException;
+	ItemPrice getItemPriceByConceptAndVisit(Visit visit, Concept concept) throws ItemNotPayableException,
+	        ConfigurationException;
 	
 	ItemPrice getItemPrice(Visit visit, Drug drug) throws ItemNotPayableException, ConfigurationException;
 	
@@ -207,4 +209,6 @@ public interface ICareService extends OpenmrsService {
 	String pushEventWithoutRegistrationDataToDHIS2Instance(String eventData);
 	
 	String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType);
+	
+	Map<String, Object> generateVisitsData(Date startDate, Date endDate, Boolean sendToExternalMediator) throws Exception;
 }
