@@ -277,6 +277,31 @@ export class CashierDashboardComponent implements OnInit {
        2. Save prescription order
        3 Dispense */
 
+          const generalOrders =
+            (items?.filter((item: any) => item?.concept) || []).map(
+              (item: any) => {
+                return {
+                  orderType: "iCARESTS-ADMS-1111-1111-525400e4297f",
+                  concept: item?.concept?.uuid,
+                  action: "NEW",
+                  urgency: "ROUTINE",
+                  type: "order",
+                  orderer: this.provider?.uuid,
+                  patient: this.patientUuid,
+                  orderReason: null,
+                  instructions:
+                    this.formData["instructions" + item?.itemUuid] &&
+                    this.formData["instructions" + item?.itemUuid]?.value
+                      ? this.formData["instructions" + item?.itemUuid]?.value
+                      : "",
+                  careSetting: "Outpatient",
+                  quantity: Number(
+                    this.formData["quantity" + item?.itemUuid]?.value
+                  ),
+                };
+              }
+            ) || [];
+
           let encounterObject = {
             patient: this.patientUuid,
             encounterType: this.encounterTypeUuid,
@@ -298,6 +323,7 @@ export class CashierDashboardComponent implements OnInit {
                   }) || []
                 ).filter((obs: any) => obs?.value) || []
               : [],
+            orders: [],
             form:
               this.formId && customForm
                 ? {
@@ -382,32 +408,7 @@ export class CashierDashboardComponent implements OnInit {
                   };
                   return prescriptionOrder;
                 });
-                const generalOrders =
-                  (items?.filter((item: any) => item?.concept) || []).map(
-                    (item: any) => {
-                      return {
-                        encounter: encounterResponse?.uuid,
-                        orderType: "iCARESTS-ADMS-1111-1111-525400e4297f",
-                        concept: item?.concept?.uuid,
-                        action: "NEW",
-                        urgency: "ROUTINE",
-                        type: "order",
-                        orderer: this.provider?.uuid,
-                        patient: this.patientUuid,
-                        orderReason: null,
-                        instructions:
-                          this.formData["instructions" + item?.itemUuid] &&
-                          this.formData["instructions" + item?.itemUuid]?.value
-                            ? this.formData["instructions" + item?.itemUuid]
-                                ?.value
-                            : "",
-                        careSetting: "Outpatient",
-                        quantity: Number(
-                          this.formData["quantity" + item?.itemUuid]?.value
-                        ),
-                      };
-                    }
-                  ) || [];
+
                 this.customForm$ = of(null);
 
                 this.currentLocation$ = of(null);
@@ -422,10 +423,9 @@ export class CashierDashboardComponent implements OnInit {
                   }),
                   ...generalOrders.map((generalOrder: any) => {
                     return this.ordersService
-                      .createNonDrugOrderWithDispensing({
-                        order: omit(generalOrder, ["quantity"]),
-                        quantity: generalOrder?.quantity,
-                        location: currentLocation?.uuid,
+                      .createOrder({
+                        ...omit(generalOrder, ["quantity"]),
+                        encounter: encounterResponse?.uuid,
                       })
                       .pipe(
                         map((response: any) => {
@@ -440,6 +440,7 @@ export class CashierDashboardComponent implements OnInit {
                       );
                   })
                 ).subscribe((responses: any) => {
+                  // nondrugorderbillanddispensing
                   // console.log("responses", responses);
                   if (responses) {
                     // DIspense all (TODO: improve api to accommodate direct dispensing)
@@ -466,7 +467,13 @@ export class CashierDashboardComponent implements OnInit {
                           ? this.drugOrderService.dispenseOrderedDrugOrder(
                               dispendingDetails
                             )
-                          : of({});
+                          : this.ordersService.createBillAndDispenseNonDrugOrder(
+                              {
+                                order: dispendingDetails?.uuid,
+                                location: dispendingDetails?.location,
+                                quantity: dispendingDetails?.quantity,
+                              }
+                            );
                       })
                     ).subscribe((dispenseResponses: any) => {
                       if (dispenseResponses) {
