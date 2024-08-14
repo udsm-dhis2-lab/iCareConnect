@@ -28,39 +28,6 @@ public class GepgBillingController {
 	@Autowired
 	private BillingService billingService;
 	
-	@RequestMapping(value = "/controlNumber", method = RequestMethod.POST)
-	public String submitBill(@RequestBody Map<String, Object> payload) {
-		String uuid = (String) payload.get("uuid");
-		List<Map<String, String>> selectedBills = (List<Map<String, String>>) payload.get("selectedbills");
-		Integer totalBill = (Integer) payload.get("totalBill");
-		
-		System.out.println("uuid: " + uuid);
-		if (uuid == null || uuid.isEmpty()) {
-			return "UUID is required";
-		}
-		System.out.println("Sent payload: " + payload);
-		
-		String jsonPayload;
-		String response = null;
-		
-		try {
-			// Create an instance of BillSubmissionRequest
-			BillSubmissionRequest billRequest = new BillSubmissionRequest().createGepgPayloadRequest(uuid, selectedBills,
-			    totalBill);
-			// Call the non-static method on the instance
-			jsonPayload = billRequest.toJson();
-			System.out.println("Generated BillSubmissionRequest: " + jsonPayload);
-			// Uncomment and use the following line if the method is available
-			// response = gepgbillService.submitGepgRequest(jsonPayload);
-		}
-		catch (JsonProcessingException e) {
-			e.printStackTrace();
-			return "Error generating JSON payload";
-		}
-		
-		return response;
-	}
-	
 	@RequestMapping(value = "/generatecontrolno", method = RequestMethod.POST)
     public Map<String, Object> generateControlNumber(@RequestBody List<Map<String, Object>> requestPayload) throws Exception {
         Map<String, Object> generatedControlNumberObject = new HashMap<>();
@@ -103,7 +70,7 @@ public class GepgBillingController {
         Date billExpDate = new Date();
         String personPhoneNumberAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.PHONE_NUMBER_ATTRIBUTE);
         String spCode = administrationService.getGlobalProperty(ICareConfig.SP_CODE);
-        String systemCode = administrationService.getGlobalProperty(ICareConfig.SYSTEM_CODE);
+        String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
         String serviceCode = administrationService.getGlobalProperty(ICareConfig.SERVICE_CODE);
         String spsyId = administrationService.getGlobalProperty(ICareConfig.SERVICE_PROVIDER_ID);
         String subSpCode = administrationService.getGlobalProperty(ICareConfig.SUB_SERVICE_PROVIDER_CODE);
