@@ -71,7 +71,8 @@ public interface ICareService extends OpenmrsService {
 	
 	ItemPrice getItemPriceByConceptId(Integer serviceConceptId, Integer paymentSchemeConceptId, Integer paymentTypeConceptId);
 	
-	ItemPrice getItemPrice(Visit visit, Concept concept) throws ItemNotPayableException, ConfigurationException;
+	ItemPrice getItemPriceByConceptAndVisit(Visit visit, Concept concept) throws ItemNotPayableException,
+	        ConfigurationException;
 	
 	ItemPrice getItemPrice(Visit visit, Drug drug) throws ItemNotPayableException, ConfigurationException;
 	
