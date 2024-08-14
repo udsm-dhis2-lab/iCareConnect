@@ -1,5 +1,6 @@
 package org.openmrs.module.icare.web.controller;
 
+import org.openmrs.GlobalProperty;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.AdministrationService;
@@ -102,7 +103,7 @@ public class GepgBillingController {
         Date billExpDate = new Date();
         String personPhoneNumberAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.PHONE_NUMBER_ATTRIBUTE);
         String spCode = administrationService.getGlobalProperty(ICareConfig.SP_CODE);
-        String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
+        String systemCode = administrationService.getGlobalProperty(ICareConfig.SYSTEM_CODE);
         String serviceCode = administrationService.getGlobalProperty(ICareConfig.SERVICE_CODE);
         String spsyId = administrationService.getGlobalProperty(ICareConfig.SERVICE_PROVIDER_ID);
         String subSpCode = administrationService.getGlobalProperty(ICareConfig.SUB_SERVICE_PROVIDER_CODE);
@@ -138,6 +139,10 @@ public class GepgBillingController {
             // Call the non-static method on the instance
             String jsonPayload = billRequest.toJson();
             System.out.println("Generated BillSubmissionRequest: " + jsonPayload);
+            GlobalProperty globalProperty = new GlobalProperty();
+            globalProperty.setProperty("gepg.jsonPayload.icareConnect");
+            globalProperty.setPropertyValue(jsonPayload);
+            administrationService.saveGlobalProperty(globalProperty);
             generatedControlNumberObject = gepgbillService.submitGepgRequest(jsonPayload, clientPrivateKey);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
