@@ -8,6 +8,7 @@ import { ConceptsService } from "src/app/shared/resources/concepts/services/conc
 import { AppState } from "src/app/store/reducers";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import { BillingService } from "../../services/billing.service";
+import { Payment } from "../../models/payment.model";
 
 @Component({
   selector: "app-bill-confirmation",
@@ -82,26 +83,40 @@ export class BillConfirmationComponent implements OnInit {
     return `GEPG_MNL: ${this.controlNumber}`;
   }
 
-   onConntrollNumbGen(payload){
-    this.billingService
-      .gepgpayBill(payload)
-      .subscribe(
-        (paymentResponse) => {
-          console.log("successfully generated .......",paymentResponse);
-          // this.controlNumber = paymentResponse.controlNumber; 
+  onConntrollNumbGen(payload) {
+    this.billingService.gepgpayBill(payload).subscribe(
+      (response: Payment | { error: any }) => {
+        if ((response as Payment).id) {
+          const paymentResponse = response as Payment;
+          console.log("Successfully generated:", paymentResponse);
+          // this.controlNumber = paymentResponse.id; 
           this.generatingControlNumber = false;
-          
+          this.savingPaymentError = ''; 
           this.matDialogRef.close(paymentResponse);
-               
-        },
-        (error) => {
-        
-         this.savingPaymentError = "Error generating control number";
-         this.generatingControlNumber = false;
-         console.log("Fail to Generate Control Number .....",error);
+        } else if ((response as any).error) {
+          // Error response from the API
+          const errorResponse = response as { error: any };
+          this.savingPaymentError = errorResponse.error;
+          this.generatingControlNumber = false;
+          console.log("Error in response:", errorResponse.error);
+          this.generatingControlNumber = false;
+        } else {
+          // Unexpected response
+          this.savingPaymentError = 'Unexpected response from the server';
+          this.generatingControlNumber = false;
+          console.log("Unexpected response:", response);
         }
-      );
-   }
+      },
+      (error) => {
+        // General error handling
+        this.savingPaymentError = error;
+        this.generatingControlNumber = false;
+        console.log("Failed to generate control number:", error);
+      }
+    );
+  }
+  
+  
 
 
   onFormUpdate(formValues: FormValue): void {
