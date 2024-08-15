@@ -113,6 +113,7 @@ export class BillingService {
         if (response.error) {
           throw new Error(response.error); 
         }
+        console.log("API Response : ",response)
         return new Payment(response);
       }),
       catchError((error) => {

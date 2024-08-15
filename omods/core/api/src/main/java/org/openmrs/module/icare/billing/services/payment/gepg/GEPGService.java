@@ -7,7 +7,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Service;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class GEPGService {
@@ -22,8 +21,6 @@ public class GEPGService {
             URL url = new URL(apiUrl);
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
-            con.setConnectTimeout(10000); 
-            con.setReadTimeout(10000); 
 
             // Sign the payload with the CLIENT_PRIVATE_KEY
             String signature = SignatureUtils.signData(jsonPayload, clientPrivateKey);
@@ -91,22 +88,21 @@ public class GEPGService {
 	}
 }
 
-
 // @Service
 // public class GEPGService {
-	
+
 // 	public Map<String, Object> submitGepgRequest(String jsonPayload ,String clientPrivateKey) throws Exception {
-	
+
 // 	    System.out.println("on submit here ...................." + jsonPayload);
 // 	    String apiUrl = "https://api-testengine.udsm.ac.tz/index.php?r=api/service";
-	
+
 // 	    URL url = new URL(apiUrl);
 // 	    HttpURLConnection con = (HttpURLConnection) url.openConnection();
 // 	    con.setRequestMethod("POST");
-	
+
 // 	    // Sign the payload with the CLIENT_PRIVATE_KEY
 // 	    String signature = SignatureUtils.signData(jsonPayload, clientPrivateKey);
-	
+
 // 	    // Added support to headers for authentication and signature
 // 	    String bearer = String.format("Bearer %1s", "authToken.getAccessToken()");
 // 	    con.addRequestProperty("Authorization", bearer);
@@ -114,7 +110,7 @@ public class GEPGService {
 // 	    con.addRequestProperty("Signature", signature); 
 // 	    con.setDoInput(true);
 // 	    con.setDoOutput(true);
-	
+
 // 	    // Write JSON payload
 // 	    OutputStream os = con.getOutputStream();
 // 	    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
@@ -122,7 +118,7 @@ public class GEPGService {
 // 	    writer.flush();
 // 	    writer.close();
 // 	    os.close();
-	
+
 // 	    // Process the response
 // 	    Map<String, Object> responseMap = new HashMap<>();
 // 	    try {
@@ -139,11 +135,11 @@ public class GEPGService {
 // 	        throw e;
 // 	    }
 // 	}
-	
+
 // 	// public Map<String, Object> submitGepgRequest(String jsonPayload, String clientPrivateKey) {
 // 	//     Map<String, Object> responseMap = new HashMap<>();
 // 	//     HttpURLConnection con = null;
-	
+
 // 	//     try {
 // 	//         System.out.println("on submit here ...................." + jsonPayload);
 // 	//         String apiUrl = "https://api-testengine.udsm.ac.tz/index.php?r=api/service";
@@ -152,10 +148,10 @@ public class GEPGService {
 // 	//         con.setRequestMethod("POST");
 // 	//         con.setConnectTimeout(10000); 
 // 	//         con.setReadTimeout(10000); 
-	
+
 // 	//         // Sign the payload with the CLIENT_PRIVATE_KEY
 // 	//         String signature = SignatureUtils.signData(jsonPayload, clientPrivateKey);
-	
+
 // 	//         // Added support to headers for authentication and signature
 // 	//         String bearer = String.format("Bearer %1s", "authToken.getAccessToken()");
 // 	//         con.addRequestProperty("Authorization", bearer);
@@ -163,14 +159,14 @@ public class GEPGService {
 // 	//         con.addRequestProperty("Signature", signature);
 // 	//         con.setDoInput(true);
 // 	//         con.setDoOutput(true);
-	
+
 // 	//         // Write JSON payload
 // 	//         try (OutputStream os = con.getOutputStream();
 // 	//              BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"))) {
 // 	//             writer.write(jsonPayload);
 // 	//             writer.flush();
 // 	//         }
-	
+
 // 	//         // Process the response
 // 	//         int responseCode = con.getResponseCode();
 // 	//         if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -193,7 +189,7 @@ public class GEPGService {
 // 	//             }
 // 	//             responseMap.put("Code", responseCode);
 // 	//         }
-	
+
 // 	//     } catch (SocketTimeoutException e) {
 // 	//         responseMap.put("Code", 504);
 // 	//         responseMap.put("error", "Request timed out: " + e.getMessage());
@@ -208,7 +204,7 @@ public class GEPGService {
 // 	//             con.disconnect();
 // 	//         }
 // 	//     }
-	
+
 // 	//     return responseMap;
 // 	// }
 // 	public void createBillSubmissionRequest(String anyString) throws Exception {

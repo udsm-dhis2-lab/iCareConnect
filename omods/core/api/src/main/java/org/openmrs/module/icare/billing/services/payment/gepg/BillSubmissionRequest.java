@@ -140,7 +140,7 @@ public class BillSubmissionRequest {
 			} else if (drug != null) {
 				for (DrugReferenceMap drugMap : drug.getDrugReferenceMaps()) {
 					globalProperty.setProperty("gepg.DrugConcept.icareConnect");
-					globalProperty.setPropertyValue(drugMap.toString());
+					globalProperty.setPropertyValue(GFSCodeConceptSourceMappingUuid);
 					administrationService.saveGlobalProperty(globalProperty);
 					if (drugMap.getDrugReferenceMapId().equals(GFSCodeConceptSourceMappingUuid)) {
 						String GFSCode = drugMap.getConceptReferenceTerm().getCode();
