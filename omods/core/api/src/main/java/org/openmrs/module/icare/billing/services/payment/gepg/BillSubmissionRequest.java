@@ -70,7 +70,7 @@ public class BillSubmissionRequest {
 	        Date billExpirlyDate, String personPhoneAttributeTypeUuid, String personEmailAttributeTypeUuid, String currency,
 	        String gepgAuthSignature, String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode,
 	        String serviceCode, String SpSysId, String subSpCode) throws Exception {
-		
+		AdministrationService administrationService = Context.getAdministrationService();
 		// Validate inputs
 		if (patient == null) {
 			throw new IllegalArgumentException("Patient cannot be null");
@@ -118,9 +118,9 @@ public class BillSubmissionRequest {
 		}
 		
 		// BillItems
-		AdministrationService administrationService = Context.getAdministrationService();
+		
 		BillItems billItems = new BillItems();
-		GlobalProperty globalProperty = new GlobalProperty();
+		
 		for (InvoiceItem invoiceItem : invoiceItems) {
 			Drug drug = invoiceItem.getItem().getDrug();
 			Concept concept = invoiceItem.getItem().getConcept();
@@ -133,20 +133,28 @@ public class BillSubmissionRequest {
 					        .equals(GFSCodeConceptSourceMappingUuid)) {
 						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
 						billItems.getBillItem().add(
-						    new BillItem("11", "N", invoiceItem.getPrice().toString(), invoiceItem.getPrice().toString(),
-						            "0.0", GFSCode));
+						    new BillItem("11", "N", invoiceItem.getPrice().toString(), invoiceItem.getItem().getPrices()
+						            .toString(), "0.0", GFSCode));
 					}
 				}
 			} else if (drug != null) {
-				for (DrugReferenceMap drugMap : drug.getDrugReferenceMaps()) {
-					globalProperty.setProperty("gepg.DrugConcept.icareConnect");
-					globalProperty.setPropertyValue(GFSCodeConceptSourceMappingUuid);
-					administrationService.saveGlobalProperty(globalProperty);
-					if (drugMap.getDrugReferenceMapId().equals(GFSCodeConceptSourceMappingUuid)) {
-						String GFSCode = drugMap.getConceptReferenceTerm().getCode();
+				
+				Concept drugConcept = drug.getConcept();
+				GlobalProperty globalProperty = new GlobalProperty();
+				for (ConceptMap conceptMap : drugConcept.getConceptMappings()) {
+					if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
+					        .equals(GFSCodeConceptSourceMappingUuid)) {
+						globalProperty.setProperty("iCare.gepg.DrugConcept.icareConnect");
+						globalProperty.setPropertyValue("if condition meet");
+						administrationService.saveGlobalProperty(globalProperty);
+						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
 						billItems.getBillItem().add(
-						    new BillItem("11", "N", invoiceItem.getPrice().toString(), invoiceItem.getPrice().toString(),
-						            "0.0", GFSCode));
+						    new BillItem("11", "N", invoiceItem.getPrice().toString(), invoiceItem.getItem().getPrices()
+						            .toString(), "0.0", GFSCode));
+					} else {
+						globalProperty.setProperty("iCare.gepg.DrugConcept.icareConnect");
+						globalProperty.setPropertyValue(GFSCodeConceptSourceMappingUuid);
+						administrationService.saveGlobalProperty(globalProperty);
 					}
 				}
 			}
