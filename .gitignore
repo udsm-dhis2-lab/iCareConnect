@@ -33,6 +33,7 @@ ui/out-tsc
 ui/bazel-out
 # dependencies
 ui/node_modules
+node_modules/canvas/build/Release/librsvg-2
 # profiling files
 ui/chrome-profiler-events*.json
 ui/speed-measure-plugin*.json
