@@ -313,7 +313,6 @@ export class PriceListComponent implements OnInit, OnChanges {
       this.itemSearchTerm === ""
     ) {
       this.store.dispatch(clearPricingItems());
-
       this.store.dispatch(
         loadPricingItems({
           filterInfo: {
