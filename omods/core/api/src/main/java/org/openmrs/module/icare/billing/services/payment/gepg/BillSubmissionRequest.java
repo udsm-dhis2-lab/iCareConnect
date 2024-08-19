@@ -31,6 +31,9 @@ public class BillSubmissionRequest {
 	@JsonProperty("RequestData")
 	private RequestData requestData;
 	
+	@JsonProperty("BillItems")
+	private BillItems billItems;
+	
 	public String toJson() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		return mapper.writeValueAsString(this);
@@ -64,6 +67,14 @@ public class BillSubmissionRequest {
 	
 	public void setRequestData(RequestData requestData) {
 		this.requestData = requestData;
+	}
+	
+	public void setBillItems(BillItems billItems) {
+		this.billItems = billItems;
+	}
+	
+	public BillItems getBillItems() {
+		return billItems;
 	}
 	
 	public BillSubmissionRequest createGePGPayload(Patient patient, List<InvoiceItem> invoiceItems, Number totalBillAmount,
@@ -117,7 +128,7 @@ public class BillSubmissionRequest {
 			}
 		}
 		
-		// BillItems
+		// BillItems generation
 		
 		BillItems billItems = new BillItems();
 		
@@ -133,8 +144,8 @@ public class BillSubmissionRequest {
 					        .equals(GFSCodeConceptSourceMappingUuid)) {
 						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
 						billItems.getBillItem().add(
-						    new BillItem("11", "N", invoiceItem.getPrice().toString(), invoiceItem.getItem().getPrices()
-						            .toString(), "0.0", GFSCode));
+						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(), invoiceItem.getPrice().toString(),
+						            "0.0", GFSCode));
 					}
 				}
 			} else if (drug != null) {
@@ -149,8 +160,8 @@ public class BillSubmissionRequest {
 						administrationService.saveGlobalProperty(globalProperty);
 						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
 						billItems.getBillItem().add(
-						    new BillItem("11", "N", invoiceItem.getPrice().toString(), invoiceItem.getItem().getPrices()
-						            .toString(), "0.0", GFSCode));
+						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(), invoiceItem.getPrice().toString(),
+						            "0.0", GFSCode));
 					} else {
 						globalProperty.setProperty("iCare.gepg.DrugConcept.icareConnect");
 						globalProperty.setPropertyValue(GFSCodeConceptSourceMappingUuid);
@@ -207,97 +218,11 @@ public class BillSubmissionRequest {
 		
 		// Create and return BillSubmissionRequest
 		BillSubmissionRequest billRequest = new BillSubmissionRequest();
+		
+		//setBills Items on BillSubmittionRequest
+		billRequest.setBillItems(billItems);
 		billRequest.setSystemAuth(systemAuth);
 		billRequest.setRequestData(requestData);
 		return billRequest;
 	}
-	
-	// public BillSubmissionRequest createGePGPayload(Patient patient,
-	// List<InvoiceItem> invoiceItems, Number totalBillAmount,
-	// Date billExpirlyDate, String personPhoneAttributeTypeUuid, String
-	// personEmailAttributeTypeUuid, String currency,
-	// String gepgAuthSignature, String GFSCodeConceptSourceMappingUuid, String
-	// spCode, String sytemCode,
-	// String serviceCode, String SpSysId, String subSpCode) throws Exception {
-	// String totalAmount = totalBillAmount.toString();
-	// String patientNames = patient.getGivenName() + " " + patient.getFamilyName();
-	// String patientUuid = patient.getUuid();
-	// String patientPhoneNumber = "";
-	// String email = "";
-	// for (PersonAttribute attribute : patient.getAttributes()) {
-	// if (personPhoneAttributeTypeUuid != null
-	// &&
-	// attribute.getAttributeType().getUuid().equals(personPhoneAttributeTypeUuid))
-	// {
-	// patientPhoneNumber = attribute.getValue();
-	// } else if (personEmailAttributeTypeUuid != null
-	// &&
-	// attribute.getAttributeType().getUuid().equals(personEmailAttributeTypeUuid))
-	// {
-	// email = attribute.getValue();
-	// }
-	// }
-	// BillItems billItems = new BillItems();
-	// for (InvoiceItem invoiceItem : invoiceItems) {
-	// Concept concept = invoiceItem.getItem().getConcept();
-	// for (ConceptMap conceptMap : concept.getConceptMappings()) {
-	// if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
-	// .equals(GFSCodeConceptSourceMappingUuid)) {
-	// // TODO: Formulate the bill item with the GSF code, add exception handling in
-	// case the GFS code is not present
-	// String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
-	// billItems.getBillItem().add(new BillItem("11", "N", "5000", "5000", "0.0",
-	// GFSCode));
-	// }
-	// }
-	// }
-	
-	// // Set the required payload
-	// BillHdr billHdr = new BillHdr();
-	// billHdr.setSpCode(spCode);
-	// billHdr.setRtrRespFlg("true");
-	
-	// // Create and populate BillTrxInf
-	// BillTrxInf billTrxInf = new BillTrxInf();
-	// billTrxInf.setBillId(patientUuid);
-	// billTrxInf.setSubSpCode(subSpCode);
-	// billTrxInf.setSpSysId(SpSysId);
-	// billTrxInf.setBillAmt(totalAmount);
-	// billTrxInf.setMiscAmt("0");
-	// LocalDateTime now = LocalDateTime.now();
-	// DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-	// String formattedNow = now.format(formatter);
-	// billTrxInf.setBillGenDt(formattedNow);
-	
-	// LocalDateTime expirationTime = now.plusHours(24);
-	// String formattedExpirationTime = expirationTime.format(formatter);
-	// billTrxInf.setBillExprDt(formattedExpirationTime);
-	// billTrxInf.setPyrId("40");
-	// billTrxInf.setPyrName(patientNames.toUpperCase());
-	// billTrxInf.setBillDesc("Hospita Bill Payments");
-	// billTrxInf.setBillGenBy("UDSM Hospital");
-	// billTrxInf.setBillApprBy(patientNames.toUpperCase());
-	// billTrxInf.setPyrCellNum(patientPhoneNumber);
-	// billTrxInf.setPyrEmail(email);
-	// billTrxInf.setCcy(currency);
-	// billTrxInf.setBillEqvAmt(totalAmount);
-	// billTrxInf.setRemFlag("false");
-	// billTrxInf.setBillPayOpt("2");
-	// // Create and populate RequestData
-	// RequestData requestData = new RequestData();
-	// requestData.setRequestId(patientUuid);
-	// requestData.setBillHdr(billHdr);
-	// requestData.setBillTrxInf(billTrxInf);
-	
-	// // Create and populate SystemAuth
-	// SystemAuth systemAuth = new SystemAuth();
-	// systemAuth.setSystemCode(sytemCode);
-	// systemAuth.setServiceCode(serviceCode);
-	// systemAuth.setSignature(gepgAuthSignature);
-	
-	// BillSubmissionRequest billRequest = new BillSubmissionRequest();
-	// billRequest.setSystemAuth(systemAuth);
-	// billRequest.setRequestData(requestData);
-	// return billRequest;
-	// }
 }
