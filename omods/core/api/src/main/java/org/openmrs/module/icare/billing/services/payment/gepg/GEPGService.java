@@ -6,22 +6,25 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.openmrs.GlobalProperty;
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.context.Context;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GEPGService {
 	
-	public Map<String, Object> submitGepgRequest(String jsonPayload, String clientPrivateKey) {
+	public Map<String, Object> submitGepgRequest(String jsonPayload, String signature ,String uccUrl) {
         Map<String, Object> responseMap = new HashMap<>();
         HttpURLConnection con = null;
+        AdministrationService administrationService = Context.getAdministrationService();
 
         try {
-            String apiUrl = "https://api-testengine.udsm.ac.tz/index.php?r=api/service";
+            String apiUrl = uccUrl;
             URL url = new URL(apiUrl);
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
-
-            String signature = SignatureUtils.signData(jsonPayload, clientPrivateKey);
 
             String bearer = String.format("Bearer %1s", "authToken.getAccessToken()");
             con.addRequestProperty("Authorization", bearer);
@@ -30,7 +33,11 @@ public class GEPGService {
             con.setDoInput(true);
             con.setDoOutput(true);
 
-            // Write JSON payload here
+             GlobalProperty globalProperty = new GlobalProperty();
+            globalProperty.setProperty("gepg.signSignature.icareConnect");
+            globalProperty.setPropertyValue(signature);
+            administrationService.saveGlobalProperty(globalProperty);
+            // Write JSON payload 
             try (OutputStream os = con.getOutputStream();
                  BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"))) {
                 writer.write(jsonPayload);

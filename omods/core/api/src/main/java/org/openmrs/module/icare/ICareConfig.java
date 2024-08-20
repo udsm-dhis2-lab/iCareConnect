@@ -147,6 +147,8 @@ public class ICareConfig {
 	
 	public static final String GFSCODE_CONCEPT_SOURCE_REFERENCE = "icare.billing.mappings.GFSCODEConceptSource.uuid";
 	
+	public static final String GEPG_UCC_BASE_URL_API = "icare.GePG.setting.baseurlApi";
+	
 	public static final String ENGINE_PUBLIC_KEY = "iCare.GePG.settings.enginePublicKey";
 	
 	public static final String CLIENT_PRIVATE_KEY = "iCare.GePG.settings.clientPrivateKey";

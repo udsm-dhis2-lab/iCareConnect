@@ -165,7 +165,7 @@
 
 	<globalProperty>
 		<property>iCare.GePG.settings.authentication.authSignature</property>
-		<defaultValue>GePGAUthenticationCertificateKey</defaultValue>
+		<defaultValue></defaultValue>
 		<description>
 			For GePG Authentication
 		</description>
@@ -226,6 +226,14 @@
 		<defaultValue>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8503OpGb1/RVPOJrnFR31pSpI5dZMK1GjITfX6YSBLd9dHY9S+HS2CCBb6Nvqtu/Wc1NNJhrxPZKALHTK1fMbH55F4J51HycvhjCzJepLKQLxDyE4Aff9mXV77gQcxdh+2SdEb0Qi9+9TNAqpze2TbXd5Zf9wDOhJXKdB5o16XQIDAQAB</defaultValue>
 		<description>
 			Engine Public Key
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>icare.GePG.setting.baseurlApi</property>
+		<defaultValue>https://</defaultValue>
+		<description>
+			GePG UCC Base API
 		</description>
 	</globalProperty>
 	

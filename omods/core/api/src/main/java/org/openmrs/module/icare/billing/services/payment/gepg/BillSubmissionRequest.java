@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -77,10 +78,10 @@ public class BillSubmissionRequest {
 		return billItems;
 	}
 	
-	public BillSubmissionRequest createGePGPayload(Patient patient, List<InvoiceItem> invoiceItems, Number totalBillAmount,
+	public Map<String, Object> createGePGPayload(Patient patient, List<InvoiceItem> invoiceItems, Number totalBillAmount,
 	        Date billExpirlyDate, String personPhoneAttributeTypeUuid, String personEmailAttributeTypeUuid, String currency,
 	        String gepgAuthSignature, String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode,
-	        String serviceCode, String SpSysId, String subSpCode) throws Exception {
+	        String serviceCode, String SpSysId, String subSpCode,String clientPrivateKey) throws Exception {
 		AdministrationService administrationService = Context.getAdministrationService();
 		// Validate inputs
 		if (patient == null) {
@@ -93,7 +94,7 @@ public class BillSubmissionRequest {
 			throw new IllegalArgumentException("Currency cannot be null");
 		}
 		if (gepgAuthSignature == null) {
-			throw new IllegalArgumentException("GePG Auth Signature cannot be null");
+			gepgAuthSignature = "";
 		}
 		if (GFSCodeConceptSourceMappingUuid == null) {
 			throw new IllegalArgumentException("GFS Code Concept Source Mapping UUID cannot be null");
@@ -144,8 +145,8 @@ public class BillSubmissionRequest {
 					        .equals(GFSCodeConceptSourceMappingUuid)) {
 						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
 						billItems.getBillItem().add(
-						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(), invoiceItem.getPrice().toString(),
-						            "0.0", GFSCode));
+						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(),
+						            invoiceItem.getPrice().toString(), "0.0", GFSCode));
 					}
 				}
 			} else if (drug != null) {
@@ -160,8 +161,8 @@ public class BillSubmissionRequest {
 						administrationService.saveGlobalProperty(globalProperty);
 						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
 						billItems.getBillItem().add(
-						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(), invoiceItem.getPrice().toString(),
-						            "0.0", GFSCode));
+						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(),
+						            invoiceItem.getPrice().toString(), "0.0", GFSCode));
 					} else {
 						globalProperty.setProperty("iCare.gepg.DrugConcept.icareConnect");
 						globalProperty.setPropertyValue(GFSCodeConceptSourceMappingUuid);
@@ -214,15 +215,26 @@ public class BillSubmissionRequest {
 		SystemAuth systemAuth = new SystemAuth();
 		systemAuth.setSystemCode(sytemCode);
 		systemAuth.setServiceCode(serviceCode);
-		systemAuth.setSignature(gepgAuthSignature);
 		
 		// Create and return BillSubmissionRequest
 		BillSubmissionRequest billRequest = new BillSubmissionRequest();
 		
-		//setBills Items on BillSubmittionRequest
+		// setBills Items on BillSubmittionRequest
 		billRequest.setBillItems(billItems);
 		billRequest.setSystemAuth(systemAuth);
 		billRequest.setRequestData(requestData);
-		return billRequest;
+
+		String jsonPayload = billRequest.toJson();
+		
+		//create signature from the privateKey
+		String signature = SignatureUtils.signData(jsonPayload, clientPrivateKey);
+		//re attach signature on the payload system auth
+		systemAuth.setSignature(signature);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("billRequest", billRequest);
+        result.put("signature", signature);
+
+        return result;
 	}
 }
