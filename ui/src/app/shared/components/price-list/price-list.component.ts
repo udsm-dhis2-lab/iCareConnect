@@ -153,7 +153,11 @@ export class PriceListComponent implements OnInit, OnChanges {
       panelClass: "custom-dialog-container",
       data: { pricingItems },
     });
+<<<<<<< HEAD
     this.trackActionForAnalytics("Add Price List: Open");
+=======
+    this.trackActionForAnalytics('Add Price List: Open');
+>>>>>>> develop
     // TODO: Find best way in order to stop subscribing here
     dialog.afterClosed().subscribe((results) => {
       if (results) {
@@ -213,6 +217,11 @@ export class PriceListComponent implements OnInit, OnChanges {
                 (pricingItem: PricingItemInterface) => {
                   this.addingPricingItem = false;
                   this.store.dispatch(upsertPricingItem({ pricingItem }));
+<<<<<<< HEAD
+=======
+
+                
+>>>>>>> develop
                 },
                 () => {
                   this.addingPricingItem = false;
@@ -326,7 +335,6 @@ export class PriceListComponent implements OnInit, OnChanges {
       );
     }
   }
-
   getSelectedDepartment(event: MatSelectChange): void {
     this.selectedPriceListDepartment = event?.value;
     this.isDrug = event?.value == "Drug";
