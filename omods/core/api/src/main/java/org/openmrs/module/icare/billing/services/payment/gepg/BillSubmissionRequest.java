@@ -225,9 +225,10 @@ public class BillSubmissionRequest {
 		billRequest.setRequestData(requestData);
 
 		String jsonPayload = billRequest.toJson();
-		
+
 		//create signature from the privateKey
 		String signature = SignatureUtils.signData(jsonPayload, clientPrivateKey);
+		
 		//re attach signature on the payload system auth
 		systemAuth.setSignature(signature);
 
