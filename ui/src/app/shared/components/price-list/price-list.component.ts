@@ -153,7 +153,11 @@ export class PriceListComponent implements OnInit, OnChanges {
       panelClass: "custom-dialog-container",
       data: { pricingItems },
     });
+<<<<<<< HEAD
+    this.trackActionForAnalytics("Add Price List: Open");
+=======
     this.trackActionForAnalytics('Add Price List: Open');
+>>>>>>> develop
     // TODO: Find best way in order to stop subscribing here
     dialog.afterClosed().subscribe((results) => {
       if (results) {
@@ -213,8 +217,11 @@ export class PriceListComponent implements OnInit, OnChanges {
                 (pricingItem: PricingItemInterface) => {
                   this.addingPricingItem = false;
                   this.store.dispatch(upsertPricingItem({ pricingItem }));
+<<<<<<< HEAD
+=======
 
                 
+>>>>>>> develop
                 },
                 () => {
                   this.addingPricingItem = false;
@@ -305,9 +312,11 @@ export class PriceListComponent implements OnInit, OnChanges {
       })
     );
   }
+
   onSearch(e: any, departmentId: string): void {
     e.stopPropagation();
     this.itemSearchTerm = e?.target?.value;
+    const encodedSearchTerm = encodeURIComponent(this.itemSearchTerm);
     if (
       (this.itemSearchTerm && this.itemSearchTerm.length >= 3) ||
       this.itemSearchTerm === ""
@@ -318,7 +327,7 @@ export class PriceListComponent implements OnInit, OnChanges {
           filterInfo: {
             limit: 25,
             startIndex: 0,
-            searchTerm: this.itemSearchTerm !== "" ? this.itemSearchTerm : null,
+            searchTerm: this.itemSearchTerm !== "" ? encodedSearchTerm : null,
             conceptSet: departmentId,
             isDrug: this.isDrug,
           },
@@ -334,6 +343,10 @@ export class PriceListComponent implements OnInit, OnChanges {
   }
   trackActionForAnalytics(eventname: any) {
     // Send data to Google Analytics
-   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
+    this.googleAnalyticsService.sendAnalytics(
+      "Pharmacy",
+      eventname,
+      "Pharmacy"
+    );
   }
 }
