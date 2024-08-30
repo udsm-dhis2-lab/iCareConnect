@@ -216,7 +216,7 @@ export class InpatientComponent implements OnInit {
 
   dischargePatient(event: any, visit, currentPatient, provider, lastBedOrder) {
     this.dialog.open(DischargePatientModalComponent, {
-      minWidth: "30%",
+      minWidth: "50%",
       data: {
         ...visit,
         provider,
