@@ -69,11 +69,11 @@ export class StockInvoicesListComponent implements OnInit {
             this.errors = [...this.errors, response.error];
           }
         }),
-        tap((result) =>
+        tap((result) =>{
           result.results.sort((a, b) =>
             a.receivingDate > b.receivingDate ? -1 : 1
           )
-        )
+  })
       );
   }
 
