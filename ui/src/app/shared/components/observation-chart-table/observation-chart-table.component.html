@@ -91,7 +91,7 @@
               <app-form
                 *ngIf="formField?.formFields && formField?.formFields?.length > 0"
                 [fields]="formField?.formFields"
-                [isFormHorizontal]="true"
+                [isFormHorizontal]="false"
                 [isReport]="false"
                 [fieldsData]=""
                 (formUpdate)="onFormUpdate($event)"
