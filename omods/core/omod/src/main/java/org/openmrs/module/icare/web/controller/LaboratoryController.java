@@ -3,6 +3,7 @@ package org.openmrs.module.icare.web.controller;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.io.StreamCorruptedException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -460,7 +462,50 @@ public class LaboratoryController {
 		List<Map<String, Object>> savedResultsResponse = laboratoryService.saveMultipleResults(formattedResults);
 		return savedResultsResponse;
 	}
-	
+
+	@RequestMapping(value="machineobs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> saveMachineObservations(@RequestBody Map<String, Object> machinePayload) throws Exception {
+		Map<String, Object> response = new HashMap<>();
+		if (machinePayload.get("sampleUuid") == null) {
+			throw new RuntimeException("Key `sampleUuid` is missing");
+		}
+		if (machinePayload.get("test") == null) {
+			throw new RuntimeException("Key `test` is missing");
+		}
+
+		Map<String, Object> test = (Map<String, Object>) machinePayload.get("test");
+		 if ( test.get("code") == null) {
+			 throw new RuntimeException("Key `code` on test object is missing");
+		 }
+		 String sampleUuid = machinePayload.get("sampleUuid").toString();
+		 Sample sample = laboratoryService.getSampleByUuid(sampleUuid);
+		 List<SampleOrder> sampleOrders = sample.getSampleOrders();
+
+		 for (SampleOrder sampleOrder: sampleOrders) {
+			 Concept concept = sampleOrder.getOrder().getConcept();
+			 // Check the code as per primary coding source
+			 AdministrationService administrationService = Context.getAdministrationService();
+			 String globalPropertyValue = administrationService.getGlobalProperty(ICareConfig.MACHINE_INTEGRATION_PRIMARY_CONCEPT_SOURCE);
+			 boolean mapped = false;
+			 if (!concept.getConceptMappings().isEmpty()) {
+				 for (ConceptMap conceptMap: concept.getConceptMappings()) {
+					 if (conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))) {
+						 mapped = true;
+					 }
+				 }
+			 }
+			 if (mapped) {
+				 // Check if it has test parameters
+				 List<Concept> parameters =  concept.getSetMembers();
+				 for (Concept parameter: parameters) {
+					 // Implement support to use concept source to get mappings between parameter from observation array
+				 }
+			 }
+		 }
+		return  response;
+	}
+
 	@RequestMapping(value = "voidmultipleresults", method = RequestMethod.PUT)
 	@ResponseBody
 	public List<Map<String, Object>> voidMultipleResults(@RequestBody Map<String, Object> resultsToVoid) throws Exception {

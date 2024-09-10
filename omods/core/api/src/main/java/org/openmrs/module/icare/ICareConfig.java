@@ -164,4 +164,6 @@ public class ICareConfig {
 	public static final String SUB_SERVICE_PROVIDER_CODE = "iCare.GePG.settings.SubServiceProviderCode";
 	
 	public static final String ORDER_TO_SKIP_BILLING_ADVISOR = "iCare.billing.orderTypes.skipBillingOrderAdvisor";
+
+	public static final String MACHINE_INTEGRATION_PRIMARY_CONCEPT_SOURCE = "icare.laboratory.concept.mappings.machineIntegration.conceptSourceUuid";
 }
