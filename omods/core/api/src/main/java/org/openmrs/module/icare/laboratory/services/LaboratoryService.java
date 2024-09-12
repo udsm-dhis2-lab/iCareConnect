@@ -67,6 +67,8 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	Sample getSampleByUuid(String sampleUuid);
 	
+	Sample getSampleById(String id);
+	
 	List<Result> getResults();
 	
 	TestAllocationStatus updateTestAllocationStatus(TestAllocationStatus testAllocationStatus) throws Exception;

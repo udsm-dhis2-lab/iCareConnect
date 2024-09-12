@@ -44,6 +44,18 @@ public class SampleDAO extends BaseDAO<Sample> {
 		return query.list();
 	}
 	
+	public Sample getSamplesById(String id) {
+		DbSession session = this.getSession();
+		String queryStr = "SELECT sample FROM Sample sample WHERE sp.label = :label";
+		Query query = session.createQuery(queryStr);
+		query.setParameter("label", id);
+		if (!query.list().isEmpty()) {
+			return (Sample) query.list().get(0);
+		} else {
+			return new Sample();
+		}
+	}
+	
 	public List<Sample> getSamplesByDates(Date startDate, Date endDate) {
 		
 		DbSession session = this.getSession();

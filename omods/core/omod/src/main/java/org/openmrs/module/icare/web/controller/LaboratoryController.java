@@ -206,10 +206,15 @@ public class LaboratoryController {
 		return responseSamplesObject;
 	}
 	
-	@RequestMapping(value = "sample/{sampleUuid}", method = RequestMethod.GET)
+	@RequestMapping(value = "sample/{sampleIdentification}", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getSamplesByUuid(@PathVariable String sampleUuid) throws Exception {
-		Sample sample = laboratoryService.getSampleByUuid(sampleUuid);
+	public Map<String, Object> getSamplesByIdentification(@PathVariable String sampleIdentification) throws Exception {
+		Sample sample = new Sample();
+		if (laboratoryService.getSampleByUuid(sampleIdentification) != null) {
+			sample = laboratoryService.getSampleByUuid(sampleIdentification);
+		} else {
+			sample = laboratoryService.getSampleById(sampleIdentification);
+		}
 		return sample.toMap();
 	}
 	
@@ -260,35 +265,7 @@ public class LaboratoryController {
 			    specimenSourceUuid, instrumentUuid, visitUuid, excludeStatus);
 			return sampleResults.toMap();
 		}
-		
 		return null;
-		
-		/*List<Sample> samples;
-		
-		if (startDate != null && endDate != null) {
-			
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			
-			Date start = formatter.parse(startDate);
-			Date end = formatter.parse(endDate);
-			
-			samples = laboratoryService.getSampleByDates(start, end);
-			
-		} else {
-			samples = laboratoryService.getAllSamples();
-		}
-		
-		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
-		for (Sample sample : samples) {
-			
-			Map<String, Object> sampleObject = sample.toMap();
-			
-			//add the sample after creating its object
-			responseSamplesObject.add(sampleObject);
-		}
-
-		return responseSamplesObject;*/
-		
 	}
 	
 	@RequestMapping(value = "sampleaccept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -313,7 +290,7 @@ public class LaboratoryController {
 			}
 			
 		}
-		if(unretiredConcepts.size() == 0){
+		if(unretiredConcepts.isEmpty()){
 			throw new Exception("All sample allocations are retired");
 		}
 		List<TestAllocation> savedAllocations = laboratoryService.createAllocationsForSample(allocationsToSave);
@@ -462,50 +439,113 @@ public class LaboratoryController {
 		List<Map<String, Object>> savedResultsResponse = laboratoryService.saveMultipleResults(formattedResults);
 		return savedResultsResponse;
 	}
-
+	
 	@RequestMapping(value="machineobs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> saveMachineObservations(@RequestBody Map<String, Object> machinePayload) throws Exception {
 		Map<String, Object> response = new HashMap<>();
-		if (machinePayload.get("sampleUuid") == null) {
-			throw new RuntimeException("Key `sampleUuid` is missing");
+		if (machinePayload.get("sampleUuid") == null && machinePayload.get("sampleId") == null) {
+			throw new RuntimeException("Sample identification is missing");
 		}
 		if (machinePayload.get("test") == null) {
 			throw new RuntimeException("Key `test` is missing");
 		}
 
 		Map<String, Object> test = (Map<String, Object>) machinePayload.get("test");
-		 if ( test.get("code") == null) {
+		 if (test.get("code") == null) {
 			 throw new RuntimeException("Key `code` on test object is missing");
 		 }
-		 String sampleUuid = machinePayload.get("sampleUuid").toString();
-		 Sample sample = laboratoryService.getSampleByUuid(sampleUuid);
-		 List<SampleOrder> sampleOrders = sample.getSampleOrders();
+		 List<Result> formattedResults = new ArrayList<>();
+		 List<Map<String, Object>> observations = new ArrayList<>();
+		 if (machinePayload.get("observations") != null) {
+			 observations = (List<Map<String, Object>>) machinePayload.get("observations");
+		 }
+		 String sampleIdentification = null;
+		Sample sample = null;
+		 if (machinePayload.get("sampleUuid") != null) {
+			 sampleIdentification = machinePayload.get("sampleUuid").toString();
+			 sample = laboratoryService.getSampleByUuid(sampleIdentification);
+		 } else if (machinePayload.get("sampleId") != null) {
+				sampleIdentification = machinePayload.get("sampleId").toString();
+				sample = laboratoryService.getSampleById(sampleIdentification);
+		}
 
-		 for (SampleOrder sampleOrder: sampleOrders) {
-			 Concept concept = sampleOrder.getOrder().getConcept();
-			 // Check the code as per primary coding source
-			 AdministrationService administrationService = Context.getAdministrationService();
-			 String globalPropertyValue = administrationService.getGlobalProperty(ICareConfig.MACHINE_INTEGRATION_PRIMARY_CONCEPT_SOURCE);
-			 boolean mapped = false;
-			 if (!concept.getConceptMappings().isEmpty()) {
-				 for (ConceptMap conceptMap: concept.getConceptMappings()) {
-					 if (conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))) {
-						 mapped = true;
+		 if (sample != null) {
+			 List<SampleOrder> sampleOrders = sample.getSampleOrders();
+
+			 for (SampleOrder sampleOrder: sampleOrders) {
+				 Concept concept = sampleOrder.getOrder().getConcept();
+				 // Check the code as per primary coding source
+				 AdministrationService administrationService = Context.getAdministrationService();
+				 String globalPropertyValue = administrationService.getGlobalProperty(ICareConfig.MACHINE_INTEGRATION_PRIMARY_CONCEPT_SOURCE);
+				 if (globalPropertyValue == null) {
+					 throw new RuntimeException("Reference concept source is missing");
+				 }
+				 ConceptSource mappingConceptSource = Context.getConceptService().getConceptSourceByUuid(globalPropertyValue);
+				 if (mappingConceptSource == null) {
+					 throw new RuntimeException("The configured concept source is not valid");
+				 }
+				 boolean mapped = false;
+				 if (!concept.getConceptMappings().isEmpty()) {
+					 for (ConceptMap conceptMap: concept.getConceptMappings()) {
+						 if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(globalPropertyValue)
+								 && conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))) {
+							 mapped = true;
+						 }
+					 }
+				 }
+				 // TODO: Add support to capture mapped and non-mapped ones
+				 if (mapped) {
+					 List<TestAllocation> testAllocationList = sampleOrder.getTestAllocations();
+					 // Check if it has test parameters
+					 List<Concept> parameters =  concept.getSetMembers();
+					 if (!parameters.isEmpty() && !testAllocationList.isEmpty()) {
+						 for (Concept parameter: parameters) {
+							 // Implement support to use concept source to get mappings between parameter from observation array
+							 if (!parameter.getConceptMappings().isEmpty()) {
+								 for (ConceptMap parameterConceptMap: parameter.getConceptMappings()) {
+									 for(Map<String, Object> observation: observations) {
+										 if (observation.get("testCode") != null
+												 && parameterConceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(globalPropertyValue)
+												 && parameterConceptMap.getConceptReferenceTerm().getCode().equals(observation.get("testCode"))) {
+											 for (TestAllocation testAllocation: testAllocationList) {
+												 if (testAllocation.getTestConcept().getUuid().equals(parameter.getUuid())) {
+													 Map<String, Object> result =  new HashMap<>();
+													 Map<String, Object> parameterConcept = new HashMap<>();
+													 parameterConcept.put("uuid", parameter.getUuid());
+													 result.put("abnormal", false);
+													 result.put("concept", parameterConcept);
+													 result.put("testAllocation",testAllocation.toMap());
+													 result.put("testedBy", Context.getAuthenticatedUser().getUuid());
+													 if (parameter.getDatatype().isCoded()) {
+														 // TODO: consider using mappings for this
+														 result.put("valueCoded", observation.get("testValue"));
+													 }
+													 if (parameter.getDatatype().isNumeric()) {
+														 result.put("valueNumeric", observation.get("testValue"));
+													 }
+													 if (!parameter.getDatatype().isNumeric() && !parameter.getDatatype().isCoded()) {
+														 result.put("valueText", observation.get("testValue"));
+													 }
+													 formattedResults.add(Result.fromMap(result));
+												 }
+											 }
+										 }
+									 }
+								 }
+							 }
+						 }
 					 }
 				 }
 			 }
-			 if (mapped) {
-				 // Check if it has test parameters
-				 List<Concept> parameters =  concept.getSetMembers();
-				 for (Concept parameter: parameters) {
-					 // Implement support to use concept source to get mappings between parameter from observation array
-				 }
-			 }
+		 } else {
+			 throw new RuntimeException("Sample with given identifier is not found");
 		 }
+		 List<Map<String, Object>> savedResultsResponse = laboratoryService.saveMultipleResults(formattedResults);
+		 response.put("results", savedResultsResponse);
 		return  response;
 	}
-
+	
 	@RequestMapping(value = "voidmultipleresults", method = RequestMethod.PUT)
 	@ResponseBody
 	public List<Map<String, Object>> voidMultipleResults(@RequestBody Map<String, Object> resultsToVoid) throws Exception {

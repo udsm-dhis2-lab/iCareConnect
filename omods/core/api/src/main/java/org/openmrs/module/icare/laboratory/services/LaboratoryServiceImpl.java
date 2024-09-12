@@ -602,6 +602,11 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
+	public Sample getSampleById(String id) {
+		return this.sampleDAO.getSamplesById(id);
+	}
+	
+	@Override
 	public List<Result> getResults() {
 		return IteratorUtils.toList(this.resultDAO.findAll().iterator());
 	}
