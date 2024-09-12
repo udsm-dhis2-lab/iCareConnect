@@ -22,6 +22,8 @@ import java.io.StreamCorruptedException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/lab")
@@ -444,6 +446,8 @@ public class LaboratoryController {
 	@ResponseBody
 	public Map<String, Object> saveMachineObservations(@RequestBody Map<String, Object> machinePayload) throws Exception {
 		Map<String, Object> response = new HashMap<>();
+		List<Map<String, Object>> mappedParameters = new ArrayList<>();
+		List<Map<String, Object>> obsMissingMapping = new ArrayList<>();
 		if (machinePayload.get("sampleUuid") == null && machinePayload.get("sampleId") == null) {
 			throw new RuntimeException("Sample identification is missing");
 		}
@@ -494,7 +498,7 @@ public class LaboratoryController {
 						 }
 					 }
 				 }
-				 // TODO: Add support to capture mapped and non-mapped ones
+				 // TODO: Add support to capture mapped and non-mapped parameters
 				 if (mapped) {
 					 List<TestAllocation> testAllocationList = sampleOrder.getTestAllocations();
 					 // Check if it has test parameters
@@ -505,35 +509,55 @@ public class LaboratoryController {
 							 if (!parameter.getConceptMappings().isEmpty()) {
 								 for (ConceptMap parameterConceptMap: parameter.getConceptMappings()) {
 									 for(Map<String, Object> observation: observations) {
-										 if (observation.get("testCode") != null
-												 && parameterConceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(globalPropertyValue)
-												 && parameterConceptMap.getConceptReferenceTerm().getCode().equals(observation.get("testCode"))) {
-											 for (TestAllocation testAllocation: testAllocationList) {
-												 if (testAllocation.getTestConcept().getUuid().equals(parameter.getUuid())) {
-													 Map<String, Object> result =  new HashMap<>();
-													 Map<String, Object> parameterConcept = new HashMap<>();
-													 parameterConcept.put("uuid", parameter.getUuid());
-													 result.put("abnormal", false);
-													 result.put("concept", parameterConcept);
-													 result.put("testAllocation",testAllocation.toMap());
-													 result.put("testedBy", Context.getAuthenticatedUser().getUuid());
-													 if (parameter.getDatatype().isCoded()) {
-														 // TODO: consider using mappings for this
-														 result.put("valueCoded", observation.get("testValue"));
+										 if (observation.get("testCode") != null) {
+											 String code = null;
+											 String testCodeWithNames = observation.get("testCode").toString();
+											 String regex = "^\\d+-\\d+";
+											 Pattern pattern = Pattern.compile(regex);
+											 Matcher matcher = pattern.matcher(testCodeWithNames);
+											 // Check if a match is found and print the matched part
+											 if (matcher.find()) {
+												 code = matcher.group();
+											 }
+											 if (code != null && parameterConceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(globalPropertyValue)
+													 && parameterConceptMap.getConceptReferenceTerm().getCode().equals(code)) {
+												 for (TestAllocation testAllocation: testAllocationList) {
+													 if (testAllocation.getTestConcept().getUuid().equals(parameter.getUuid())) {
+														 mappedParameters.add(testAllocation.toMap());
+														 Map<String, Object> result =  new HashMap<>();
+														 Map<String, Object> parameterConcept = new HashMap<>();
+														 parameterConcept.put("uuid", parameter.getUuid());
+														 result.put("abnormal", false);
+														 result.put("concept", parameterConcept);
+														 result.put("testAllocation",testAllocation.toMap());
+														 result.put("testedBy", Context.getAuthenticatedUser().getUuid());
+														 if (parameter.getDatatype().isCoded()) {
+															 // TODO: consider using mappings for this
+															 result.put("valueCoded", observation.get("testValue"));
+														 }
+														 if (parameter.getDatatype().isNumeric()) {
+															 result.put("valueNumeric", observation.get("testValue"));
+														 }
+														 if (!parameter.getDatatype().isNumeric() && !parameter.getDatatype().isCoded()) {
+															 result.put("valueText", observation.get("testValue"));
+														 }
+														 formattedResults.add(Result.fromMap(result));
 													 }
-													 if (parameter.getDatatype().isNumeric()) {
-														 result.put("valueNumeric", observation.get("testValue"));
-													 }
-													 if (!parameter.getDatatype().isNumeric() && !parameter.getDatatype().isCoded()) {
-														 result.put("valueText", observation.get("testValue"));
-													 }
-													 formattedResults.add(Result.fromMap(result));
 												 }
 											 }
+										 } else {
+											 obsMissingMapping.add(observation);
 										 }
 									 }
 								 }
+							 } else if (formattedResults.isEmpty()) {
+								 obsMissingMapping = observations;
 							 }
+						 }
+					 } else {
+						 // TODO: Add support to accommodate non-parameterized tests results saving
+						 if (!sampleOrder.getTestAllocations().isEmpty()) {
+							 TestAllocation testAllocation = sampleOrder.getTestAllocations().get(0);
 						 }
 					 }
 				 }
@@ -542,7 +566,19 @@ public class LaboratoryController {
 			 throw new RuntimeException("Sample with given identifier is not found");
 		 }
 		 List<Map<String, Object>> savedResultsResponse = laboratoryService.saveMultipleResults(formattedResults);
-		 response.put("results", savedResultsResponse);
+		 SampleStatus sampleStatusResponse = new SampleStatus();
+		 if (!formattedResults.isEmpty()) {
+			 // TODO: Use configurations to put these statuses
+			 SampleStatus sampleStatus = new SampleStatus();
+			 sampleStatus.setCategory("HAS_RESULTS");
+			 sampleStatus.setSample(sample);
+			 sampleStatus.setRemarks("Fed from machine observations");
+			 sampleStatus.setStatus("HAS_RESULTS");
+			 sampleStatusResponse = laboratoryService.updateSampleStatus(sampleStatus);
+		 }
+		 response.put("obsMissingMapping", obsMissingMapping);
+		 response.put("obsMappedResults", savedResultsResponse);
+		response.put("sampleStatus", sampleStatusResponse);
 		return  response;
 	}
 	
