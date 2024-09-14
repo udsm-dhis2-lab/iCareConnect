@@ -15,6 +15,7 @@ import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.Message;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -22,8 +23,13 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import javax.servlet.http.HttpServletResponse;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 
 public class ICareControllerAPITest extends BaseResourceControllerTest {
@@ -1002,4 +1008,94 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		// TODO: Make sure test is running sucessfully beforing using the API
 		assertThat("Order status shows drug dispensed", responseMap.get("orderStockStatus"), is("DISPENSED"));
 	}
+
+	//EnvayaSMS tests class
+	//for incoming sms
+	@Test
+	public void testProcessIncomingAction() throws Exception {
+		String from = "+255717611117";
+		String message = "IcareSMS Message";
+		String messageType = "sms";
+		
+		MockHttpServletRequest request = newPostRequest("icare/icaresms/handle-actions", "");
+		request.addParameter("action", ICareConfig.ACTION_INCOMING);
+		request.addParameter("from", from);
+		request.addParameter("message", message);
+		request.addParameter("messageType", messageType);
+		
+		MockHttpServletResponse response = handle(request);
+		
+		Map<String, Object> responseMap = (new ObjectMapper()).readValue(response.getContentAsString(), Map.class);
+		
+		assertNotNull(responseMap);
+		System.out.println(responseMap);
+	}
+	
+	//for outgoing sms
+	@Test
+    public void testHandleOutgoingSMS() throws Exception {
+    List<Map<String, Object>> eventJson = new ArrayList<>();
+ 
+    Map<String, Object> eventMap = new HashMap<>();
+    eventMap.put("messages", new ArrayList<>());
+    eventMap.put("event", "send");
+
+    eventJson.add(eventMap);
+
+    MockHttpServletRequest request = newPostRequest("icare/icaresms/handle-actions", "");
+
+    request.addParameter("action", ICareConfig.ACTION_OUTGOING);
+
+    MockHttpServletResponse response = handle(request);
+
+    Map<String, Object> responseMap = new ObjectMapper().readValue(response.getContentAsString(), Map.class);
+
+    assertThat(responseMap.containsKey("events"), is(true));
+
+    List<Map<String, Object>> returnedEvents = (List<Map<String, Object>>) responseMap.get("events");
+
+    assertThat(returnedEvents, is(eventJson));
+    
+    System.out.println(returnedEvents);
+
+    }
+
+	//for invalid actions
+	@Test
+	public void testHandleInvalidAction() throws Exception {
+		MockHttpServletRequest request = newPostRequest("icare/icaresms/handle-actions", "invalid action");
+		request.addParameter("action", "invalid action");
+		
+		MockHttpServletResponse response = handle(request);
+		Map<String, Object> responseMap = new ObjectMapper().readValue(response.getContentAsString(), Map.class);
+		assertThat(responseMap.containsKey("Error"), is(true));
+		System.out.println(responseMap);
+	}
+	
+	@Test
+	public void testInsertingOutgoingMessages() throws Exception {
+		List<String> recipients = Arrays.asList("+255717611117", "+255717611117", "+255717611117");
+		String message = "Hello, it's me for IcareSMS SMS";
+		
+		String jsonPayload = "{ \"recipients\": [";
+		for (int i = 0; i < recipients.size(); i++) {
+			jsonPayload += "\"" + recipients.get(i) + "\"";
+			if (i < recipients.size() - 1) {
+				jsonPayload += ", ";
+			}
+		}
+		jsonPayload += "], \"message\": \"" + message + "\" }";
+		
+		MockHttpServletRequest request = newPostRequest("icare/icaresms/outgoing-message", jsonPayload);
+		request.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		
+		MockHttpServletResponse response = handle(request);
+		
+		assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+		
+		assertEquals("Saved successfully", response.getContentAsString());
+		
+		System.out.println(response);
+	}
+
 }

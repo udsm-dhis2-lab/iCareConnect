@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.auditlog.AuditLog;
 import org.openmrs.module.icare.auditlog.api.AuditLogService;
 import org.openmrs.module.icare.auditlog.api.db.AuditLogDAO;
@@ -1605,6 +1606,56 @@ public class ICareController {
 		Date endDate = formatter.parse(visitParameters.get("endDate").toString());
 		Map<String, Object> response = iCareService.generateVisitsData(startDate, endDate,
 		    (Boolean) visitParameters.get("sendToExternal"));
+		return response;
+	}
+
+
+	// IcareSMS endpoints currently handling two actions, outgoing and incoming actions
+    @RequestMapping(value = "icaresms/handle-actions", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String, Object> handleRequest(
+         @RequestParam(value = "action") String action,
+		 @RequestParam(value = "from", required = false) String from,
+		 @RequestParam(value = "message", required = false) String message,
+		 @RequestParam(value = "messageType", required = false) String messageType
+	)throws Exception{
+		Map<String, Object> response = new HashMap<>();
+        //AdministrationService administrationService = Context.getAdministrationService();
+		if (ICareConfig.ACTION_INCOMING.equals(action)) {
+			iCareService.processIncomingMessage(from, message, messageType);
+			System.out.println("Processed successfully");
+		}
+		else if (ICareConfig.ACTION_OUTGOING.equals(action)) {
+			return iCareService.handleOutgoingsms();
+		}
+		else{
+           response.put("Error", iCareService.error());
+		}
+
+       return response;
+	}
+	
+	//This endpoint insert the messages that later will be pulled by icaresms
+	//It will be used with the web to collect number of phones and messages
+	@RequestMapping(value = "icaresms/outgoing-message", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String insertOutgoingMessages(@RequestBody Map<String, Object> messagePayload) throws Exception {
+		List<String> recipients = (List<String>) messagePayload.get("recipients");
+		String message = (String) messagePayload.get("message");
+		
+		if (recipients == null || recipients.isEmpty()) {
+			throw new IllegalArgumentException("Recipients list cannot be null or empty");
+		}
+		
+		String response = null;
+		for (String recipient : recipients) {
+			try {
+				response = iCareService.insertOutgoingMessages(recipient, message);
+			}
+			catch (Exception e) {
+				throw new RuntimeException("Error saving message for " + recipient + ": " + e.getMessage());
+			}
+		}
 		return response;
 	}
 }
