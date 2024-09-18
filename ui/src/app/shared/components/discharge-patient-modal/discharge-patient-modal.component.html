@@ -4,6 +4,7 @@
     logoLocationAttributeTypeUuid: logoLocationAttributeTypeUuid$ | async,
     visit: visit$ | async
   } as params"
+  
 >
   <div class="loading-overlay" *ngIf="savingData">
     <div class="text-center">
@@ -28,7 +29,8 @@
       *ngIf="!params?.visit"
     ></mat-progress-bar>
     <ng-container *ngIf="params?.visit">
-      <div *ngIf="errors && errors?.length === 0">
+      <!-- <div>{{params?.visit | json}}</div> -->
+      <div >
         <div
           class="alert alert-warning"
           role="alert"
@@ -117,9 +119,12 @@
         </div>
         <!-- <p class="text-center">Are you sure to discharge this patient?</p> -->
       </div>
-      <div class="errors && errors?.length > 0">
-        <app-shared-error [erros]="errors"></app-shared-error>
+      <div *ngIf="!errors && errors?.length !== 0">
+        <div class="errors && errors?.length > 0">
+          <app-shared-error [erros]="errors"></app-shared-error>
+        </div>
       </div>
+      
     </ng-container>
   </mat-dialog-content>
 

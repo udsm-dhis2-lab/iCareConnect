@@ -8,6 +8,7 @@ import { ConceptsService } from "src/app/shared/resources/concepts/services/conc
 import { AppState } from "src/app/store/reducers";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import { BillingService } from "../../services/billing.service";
+import { Payment } from "../../models/payment.model";
 
 @Component({
   selector: "app-bill-confirmation",
@@ -52,14 +53,21 @@ export class BillConfirmationComponent implements OnInit {
       uuid: this.data.currentPatient.patient.uuid,
       totalBill: this.data.totalPayableBill
     };
-    const generateControlNoPayload = this.data.billItems.map((item: any) => ({
-      uuid: this.data.currentPatient.patient.uuid,
-      currency: "Tzs"
-    }));
+    
+    
+    // Construct the request payload
+  const requestPayload = this.data.billItems.map((item: any) => ({
+    uuid: item.bill, 
+    currency: "Tzs" 
+  }));
+
+  console.log("Request Payload:", JSON.stringify(requestPayload, null, 2));
+
   
-    console.log("Formatted payload:", generateControlNoPayload);
+    console.log("Formatted payload:", requestPayload);
     //Calling Controll number Generation Function
-    this.onConntrollNumbGen(generateControlNoPayload);
+    this.generatingControlNumber = true;
+    this.onConntrollNumbGen(requestPayload);
     this.currentUser = this.store.select(getCurrentUserDetails).subscribe({
       next: (currentUser) => {
         return currentUser;
@@ -75,21 +83,40 @@ export class BillConfirmationComponent implements OnInit {
     return `GEPG_MNL: ${this.controlNumber}`;
   }
 
-   onConntrollNumbGen(payload){
-    this.billingService
-      .gepgpayBill(payload)
-      .subscribe(
-        (paymentResponse) => {
-          // console.log("successfully generated .......",paymentResponse);
+  onConntrollNumbGen(payload) {
+    this.billingService.gepgpayBill(payload).subscribe(
+      (response: Payment | { error: any }) => {
+        if ((response as Payment).id) {
+          const paymentResponse = response as Payment;
+          console.log("Successfully generated:", paymentResponse);
+          // this.controlNumber = paymentResponse.id; 
+          this.generatingControlNumber = false;
+          this.savingPaymentError = ''; 
           this.matDialogRef.close(paymentResponse);
-               
-        },
-        (error) => {
-         console.log("Fail to Generate Control Number .....",error);
-          this.savingPaymentError = error;
+        } else if ((response as any).error) {
+          // Error response from the API
+          const errorResponse = response as { error: any };
+          this.savingPaymentError = errorResponse.error;
+          this.generatingControlNumber = false;
+          console.log("Error in response:", errorResponse.error);
+          this.generatingControlNumber = false;
+        } else {
+          // Unexpected response
+          this.savingPaymentError = 'Unexpected response from the server';
+          this.generatingControlNumber = false;
+          console.log("Unexpected response:", response);
         }
-      );
-   }
+      },
+      (error) => {
+        // General error handling
+        this.savingPaymentError = error;
+        this.generatingControlNumber = false;
+        console.log("Failed to generate control number:", error);
+      }
+    );
+  }
+  
+  
 
 
   onFormUpdate(formValues: FormValue): void {

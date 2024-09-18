@@ -74,24 +74,7 @@
               <mat-icon>menu</mat-icon>
             </a>
             <ng-container *ngIf="!useSideBar">
-              <button
-                *ngFor="let form of dashboardParams?.forms"
-                class="mr-2"
-                [ngClass]="{
-                  'selected-form':
-                    (selectedForm &&
-                      !showHistoryDetails &&
-                      selectedForm?.uuid === form?.uuid) ||
-                    (!selectedForm &&
-                      !showHistoryDetails &&
-                      dashboardParams?.forms[0] &&
-                      dashboardParams?.forms[0]?.uuid === form?.uuid)
-                }"
-                mat-stroked-button
-                (click)="getSelectedForm($event, form)"
-              >
-                {{ form?.name }}
-              </button>
+              
             </ng-container>
           </div>
 
