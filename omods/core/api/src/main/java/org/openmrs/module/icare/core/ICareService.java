@@ -211,4 +211,14 @@ public interface ICareService extends OpenmrsService {
 	String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType);
 	
 	Map<String, Object> generateVisitsData(Date startDate, Date endDate, Boolean sendToExternalMediator) throws Exception;
+
+	// Icaresms
+	void processIncomingMessage(String from, String message, String messageType);
+	
+	public Map<String, Object> error();
+	
+	String insertOutgoingMessages(String recipient, String message);
+	
+	Map<String, Object> handleOutgoingsms();
+
 }

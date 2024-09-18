@@ -211,6 +211,169 @@
 			Sub Service Provider Code
 		</description>
 	</globalProperty>
+	<!-- Envaya SMS starts-->
+	<globalProperty>
+		<property>iCare.sms.settings.incoming</property>
+		<defaultValue>incoming</defaultValue>
+		<description>
+			Incoming Status
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.outgoing</property>
+		<defaultValue>outgoing</defaultValue>
+		<description>
+			Outgoing Status
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.queued</property>
+		<defaultValue>queued</defaultValue>
+		<description>
+			Queued Status
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.sent</property>
+		<defaultValue>sent</defaultValue>
+		<description>
+			Sent Status
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.forward.sent</property>
+		<defaultValue>forward sent</defaultValue>
+		<description>
+			forward sent
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.send.status</property>
+		<defaultValue>send status</defaultValue>
+		<description>
+			send status
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.device.status</property>
+		<defaultValue>device status</defaultValue>
+		<description>
+			device status
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.failed</property>
+		<defaultValue>failed</defaultValue>
+		<description>
+			failed status
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.cancelled</property>
+		<defaultValue>cancelled</defaultValue>
+		<description>
+			cancelled status
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.test</property>
+		<defaultValue>test</defaultValue>
+		<description>
+			test status 
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.amqp.started</property>
+		<defaultValue>amqp started</defaultValue>
+		<description>
+			amqp started status 
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.cancel.all</property>
+		<defaultValue>cancel all</defaultValue>
+		<description>
+			cancel all status 
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.cancel</property>
+		<defaultValue>cancel</defaultValue>
+		<description>
+			cancel status 
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.log</property>
+		<defaultValue>log</defaultValue>
+		<description>
+			log of Envaya 
+		</description>
+	</globalProperty>
+    <globalProperty>
+		<property>iCare.sms.settings.settings</property>
+		<defaultValue>settings</defaultValue>
+		<description>
+			settings of Envaya 
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.power.connected</property>
+		<defaultValue>power connected</defaultValue>
+		<description>
+			power connected status 
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.power.disconnected</property>
+		<defaultValue>power disconnected</defaultValue>
+		<description>
+			power disconnected 
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.battery.low</property>
+		<defaultValue>battery low</defaultValue>
+		<description>
+			battery low status
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.battery.okay</property>
+		<defaultValue>battery okay</defaultValue>
+		<description>
+			battery okay status
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.send.limit.exceed</property>
+		<defaultValue>send limit exceed</defaultValue>
+		<description>
+			send limit exceed status
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.sms</property>
+		<defaultValue>sms</defaultValue>
+		<description>
+			service type sms
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.mms</property>
+		<defaultValue>mms</defaultValue>
+		<description>
+			service type mms
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.sms.settings.call</property>
+		<defaultValue>call</defaultValue>
+		<description>
+			service type call
+		</description>
+	</globalProperty>
+	<!-- Envaya SMS ends -->
 	<globalProperty>
 		<property>iCare.GePG.settings.clientPrivateKey</property>
 		<defaultValue>MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAOKJJaeHkWryn6D0A/xrcNLOD9fj5Hn2zJKAJOT+6pEZTaTY/aeiQmqLLr6/s9xfj5oa+TsbmnCEeoiJ63/LdkMqaYEjLgC/TacFsxK7nOLQ7CZeFpEYKG2zZv0ppSTUcEL72a8Ia3+PmuOm7CsuVWGHP/IzoWNRs+bCoNTPdanPAgMBAAECgYEAhWagDuytfJ5N1Fl982pNsUX5XHfuNshYJbligJuBBFszNu01Sj8p/1Xg/CElyJNZnDVgKSeTJclN4xPc44+sHru7JbFUIZYzeXPI3nJzw/KlFDiB3UKJWj9mjF89G9IEgOhqzEfuRvyKtyouwKqlmMvY+XT5z9uphKnGUf9IEUECQQDy066RTEkzZt1en0tM07ZUlvuznfKT7nx+KGHkxxPW1+lkwtKge5jFNvIzYy6H9P8SzFI8iYLU4weoNPs65/hhAkEA7tM3whLxhrUL83brUSIp8UBkWG37G8Rrxgt4wdly/ZRnVA4KZz5ZCZ8KmwYbEVSdN3JL0mBCyKAuQ226ifkQLwJAT534bsuEdMYVbyDrn5ULA1E91fbDwp0/VF4JOunLJ3ZDoDYAuX3M6VzKrO6oIwvBVniHvjGYJBUMPaqhdP76AQJBALPKTKqMykjH2QRjHQnKN1sIR8KOoUCpIR1Jm5ILmlauNw9/NnO86xikIz7LXOsyEN0h7VSl5QDWHZ3jaE/gMT8CQQCFq2VBx7yHNeORrVK4BgArsWxajssplqM0s1zhZO4SM0WZZqRdhdXgedWv7OsO57kP1KlYrkz8atqRo2OwWQSj</defaultValue>
@@ -239,7 +402,7 @@
 			For storing concept source used to map test from machine results
 		</description>
 	</globalProperty>
-	
+
 	<!-- Internationalization -->
 	<!-- All message codes should start with @MODULE_ID@.* -->
 	<messages>

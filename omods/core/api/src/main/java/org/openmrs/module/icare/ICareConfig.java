@@ -163,7 +163,70 @@ public class ICareConfig {
 	
 	public static final String SUB_SERVICE_PROVIDER_CODE = "iCare.GePG.settings.SubServiceProviderCode";
 	
-	public static final String ORDER_TO_SKIP_BILLING_ADVISOR = "iCare.billing.orderTypes.skipBillingOrderAdvisor";
+	public static final String ORDER_TO_SKIP_BILLING_ADVISOR = "iCare.billing.orderTypes.skipBillingOrderAdvisor"
+
+	//  IcareSMS constant values
+	//ACTIONS
+	public static final String ACTION_INCOMING = "incoming";
+	
+	public static final String ACTION_OUTGOING = "outgoing";
+	
+	public static final String ACTION_FORWARD_SENT = "forward sent";
+	
+	public static final String ACTION_SEND_STATUS = "send status";
+	
+	public static final String ACTION_DEVICE_STATUS = "device status";
+	
+	public static final String ACTION_TEST = "test";
+	
+	public static final String ACTION_AMQP_STARTED = "amqp started";
+	
+	//STATUSES
+	public static final String STATUS_QUEUED = "queued";
+	
+	public static final String STATUS_FAILED = "failed";
+	
+	public static final String STATUS_SENT = "sent";
+	
+	public static final String STATUS_CANCELLED = "cancelled";
+	
+	//EVENTS
+	public static final String EVENT_SEND = "send";
+	
+	public static final String EVENT_CANCEL = "cancel";
+	
+	public static final String EVENT_CANCEL_ALL = "all";
+	
+	public static final String EVENT_LOG = "log";
+	
+	public static final String EVENT_SETTINGS = "settings";
+	
+	//DEVICE
+	public static final String DEVICE_STATUS_POWER_CONNECTED = "power connected";
+	
+	public static final String DEVICE_STATUS_POWER_DISCONNECTED = "power disconnected";
+	
+	public static final String DEVICE_STATUS_BATTERY_LOW = "battery low";
+	
+	public static final String DEVICE_STATUS_BATTERY_OKAY = "battery okay";
+	
+	public static final String DEVICE_STATUS_SEND_LIMIT_EXCEED = "send limit exceed";
+	
+	//TYPE OF MESSAGE
+	public static final String MESSAGE_TYPE_SMS = "sms";
+	
+	public static final String MESSAGE_TYPE_MMS = "mms";
+	
+	public static final String MESSAGE_TYPE_CALL = "call";
+	
+	//POWER SOURCE
+	public static final int POWER_SOURCE_BATTERY = 0;
+	
+	public static final int POWER_SOURCE_AC = 1;
+	
+	public static final int POWER_SOURCE_USB = 2;
+
 	
 	public static final String MACHINE_INTEGRATION_PRIMARY_CONCEPT_SOURCE = "icare.laboratory.concept.mappings.machineIntegration.conceptSourceUuid";
+
 }
