@@ -82,7 +82,9 @@
             </p>
           </div>
           <mat-chip-option
-            class="w-20"
+            class="{{
+              params?.iCareConnectConfigurations?.isPharmacy ? 'w-100' : 'w-20'
+            }}"
             *ngIf="params?.privileges"
             (click)="changeRoute($event, 'home')"
             routerLinkActive="active-route"
@@ -102,7 +104,9 @@
             Dashboard
           </mat-chip-option>
           <mat-chip-option
-            class="w-20"
+            class="{{
+              params?.iCareConnectConfigurations?.isPharmacy ? 'w-100' : 'w-20'
+            }}"
             *ngIf="
               params?.privileges &&
               params?.currentLocation &&
@@ -126,7 +130,9 @@
             Dispensing
           </mat-chip-option>
           <mat-chip-option
-            class="w-20"
+            class="{{
+              params?.iCareConnectConfigurations?.isPharmacy ? 'w-100' : 'w-20'
+            }}"
             *ngIf="params?.privileges"
             (click)="changeRoute($event, 'stock')"
             routerLinkActive="active-route"
@@ -146,7 +152,9 @@
             Stock
           </mat-chip-option>
           <mat-chip-option
-            class="w-20"
+            class="{{
+              params?.iCareConnectConfigurations?.isPharmacy ? 'w-100' : 'w-20'
+            }}"
             *ngIf="params?.privileges"
             (click)="changeRoute($event, 'requisition')"
             routerLinkActive="active-route"
@@ -166,7 +174,9 @@
             Request
           </mat-chip-option>
           <mat-chip-option
-            class="w-20"
+            class="{{
+              params?.iCareConnectConfigurations?.isPharmacy ? 'w-100' : 'w-20'
+            }}"
             *ngIf="params?.privileges"
             (click)="changeRoute($event, 'issuing')"
             routerLinkActive="active-route"
@@ -187,7 +197,9 @@
           </mat-chip-option>
 
           <mat-chip-option
-            class="w-20"
+            class="{{
+              params?.iCareConnectConfigurations?.isPharmacy ? 'w-100' : 'w-20'
+            }}"
             *ngIf="params?.privileges"
             (click)="changeRoute($event, 'reports')"
             routerLinkActive="active-route"
@@ -207,7 +219,9 @@
             Reports
           </mat-chip-option>
           <mat-chip-option
-            class="w-20"
+            class="{{
+              params?.iCareConnectConfigurations?.isPharmacy ? 'w-100' : 'w-20'
+            }}"
             *ngIf="params?.privileges"
             (click)="changeRoute($event, 'settings')"
             routerLinkActive="active-route"
