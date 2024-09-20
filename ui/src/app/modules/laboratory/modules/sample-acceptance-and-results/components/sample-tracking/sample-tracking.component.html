@@ -7,7 +7,7 @@
     samplesMarkedForReCollection: samplesMarkedForReCollection$ | async
   } as params"
 >
-  <mat-card>
+  <mat-card appearance="outlined">
     <div *ngIf="params?.samplesLoadedState">
       <mat-tab-group (selectedTabChange)="onOpenNewTab($event)">
         <mat-tab label="All Active Samples">

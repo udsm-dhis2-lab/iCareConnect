@@ -27,6 +27,8 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	List<Sample> getSampleByDates(Date startDate, Date endDate);
 	
+	SampleStatus saveSampleStatus(SampleStatus sampleStatus) throws Exception;
+	
 	SampleStatus updateSampleStatus(SampleStatus sampleStatus) throws Exception;
 	
 	@Transactional

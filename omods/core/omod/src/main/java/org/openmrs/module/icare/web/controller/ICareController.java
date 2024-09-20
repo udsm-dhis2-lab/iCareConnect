@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.Extension;
 import org.openmrs.module.icare.auditlog.AuditLog;
 import org.openmrs.module.icare.auditlog.api.AuditLogService;
 import org.openmrs.module.icare.auditlog.api.db.AuditLogDAO;
@@ -1432,10 +1433,13 @@ public class ICareController {
 												@RequestParam(required = false) String locationUuid,
 												@RequestParam(defaultValue = "10") Integer limit,
 												@RequestParam(defaultValue = "0") Integer startIndex,
-												@RequestParam(required = false) Boolean isDrug) {
+												@RequestParam(required = false) Boolean isDrug,
+												@RequestParam(required = false) String provider,
+												@RequestParam(required = false) Date startDate,
+												@RequestParam(required = false) Date endDate) {
 
 		List<Map<String, Object>> commonlyUsedItems = new ArrayList<>();
-		List<Object[]> orderedItems = iCareService.getCommonlyOrderedItems(visitUuid, orderTypeUuid, limit, startIndex, isDrug);
+		List<Object[]> orderedItems = iCareService.getCommonlyOrderedItems(visitUuid, orderTypeUuid, limit, startIndex, isDrug, provider, startDate, endDate);
 		for (Object[] orderedItemsRowInfo: orderedItems) {
 			Long count = Long.valueOf(orderedItemsRowInfo[1].toString());
 			Drug drugDetails = new Drug();
@@ -1482,6 +1486,75 @@ public class ICareController {
 		Map<String, Object> results = new HashMap<>();
 		results.put("results", commonlyUsedItems);
 		return results;
+	}
+	
+	@RequestMapping(value = "solditems", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> getSoldItems(
+			@RequestParam(defaultValue = "10") Integer limit,
+			@RequestParam(defaultValue = "0") Integer startIndex,
+			@RequestParam(required = false) Date startDate,
+			@RequestParam(required = false) Date endDate,
+			@RequestParam(required = false) String provider
+	) throws Exception {
+		// TODO: This is meant to include price and total amount of money from the expected sold stock. SO far its unfinished
+		List<Map<String, Object>> soldItems = new ArrayList<>();
+		Map<String, Object> response = new HashMap<>();
+		List<Object[]> orderedItems = iCareService.getCommonlyOrderedItems(null, null, limit, startIndex, null,
+				provider, startDate, endDate);
+		for (Object[] orderedItemsRowInfo: orderedItems) {
+			Long count = Long.valueOf(orderedItemsRowInfo[1].toString());
+			Drug drugDetails = new Drug();
+			Concept orderedItemConcept = new Concept();
+			if (orderedItemsRowInfo[0] instanceof Drug) {
+				drugDetails = (Drug) orderedItemsRowInfo[0];
+			} else{
+					orderedItemConcept = (Concept) orderedItemsRowInfo[0];
+			}
+
+			Map<String, Object> returnObj = new HashMap<>();
+			Map<String, Object> orderedItemData = new HashMap<>();
+			if (orderedItemsRowInfo[0] instanceof Drug) {
+				orderedItemData.put("uuid", drugDetails.getUuid());
+				orderedItemData.put("display", drugDetails.getDisplayName());
+			} else{
+				orderedItemData.put("uuid", orderedItemConcept.getUuid());
+				orderedItemData.put("display", orderedItemConcept.getDisplayString());
+			}
+			returnObj.put("item", orderedItemData);
+			returnObj.put("count",count);
+			soldItems.add(returnObj);
+		}
+		response.put("results", soldItems);
+		return response;
+	}
+	
+	@RequestMapping(value = "totalinvoiceamountbyitems", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String, Object>> getTotalInvoice(
+			@RequestParam(required = false) Date startDate,
+			@RequestParam(required = false) Date endDate,
+			@RequestParam(required = false) String provider
+	) throws Exception {
+		List<Map<String, Object>> itemsByAmount = new ArrayList<>();
+		List<Object[]> soldItemsByTotalAmount = billingService.getTotalAmountFromPaidInvoices(startDate, endDate, provider);
+		double totalSum = 0.0;
+		for (Object[] soldItem: soldItemsByTotalAmount) {
+			double totalPrice = Double.parseDouble(soldItem[0].toString());
+			totalSum += totalPrice;
+			Item item = (Item) soldItem[1];
+			Map<String, Object> soldItemWithAmount = new HashMap<>();
+			soldItemWithAmount.put("totalAmount", totalPrice);
+			soldItemWithAmount.put("item", item.toMap());
+			itemsByAmount.add(soldItemWithAmount);
+		}
+		Map<String, Object> overallTotal = new HashMap<>();
+		overallTotal.put("overallTotal", totalSum);
+		Map<String, Object> itemData = new HashMap<>();
+		itemData.put("display", "Total amount");
+		overallTotal.put("item", itemData);
+		itemsByAmount.add(overallTotal);
+		return itemsByAmount;
 	}
 	
 	@RequestMapping(value = "nondrugorderbillanddispensing", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)

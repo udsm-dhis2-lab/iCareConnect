@@ -198,13 +198,24 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
+	public SampleStatus saveSampleStatus(SampleStatus sampleStatus) throws Exception {
+		return this.sampleStatusDAO.save(sampleStatus);
+	}
+	
+	@Override
 	public SampleStatus updateSampleStatus(SampleStatus sampleStatus) throws Exception {
 		
 		Sample sample = this.getSampleByUuid(sampleStatus.getSample().getUuid());
 		if (sample == null) {
 			throw new Exception("Sample with ID '" + sampleStatus.getSample().getUuid() + "' does not exist.");
 		}
-		User user = Context.getUserService().getUserByUuid(sampleStatus.getUser().getUuid());
+		User user = new User();
+		if (sampleStatus.getUser() != null) {
+			Context.getUserService().getUserByUuid(sampleStatus.getUser().getUuid());
+		} else {
+			user = Context.getAuthenticatedUser();
+		}
+		
 		if (user == null) {
 			throw new Exception("The user is not authenticated.");
 		}

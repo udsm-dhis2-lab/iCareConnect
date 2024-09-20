@@ -8,23 +8,22 @@ import { FilterFieldsPipe } from "../../pipes/filter-fields.pipe";
 import { FilterAuthorizationStatusesPipe } from "../../pipes/filter-authorization-statuses.pipe";
 import { FilterAllocationsByNamePipe } from "../../pipes/filter-allocations-by-name.pipe";
 @NgModule({
-  imports: [CommonModule, ...materialModules, SharedModule],
-  exports: [
-    CommonModule,
-    ...labSharedComponents,
-    ...sharedModals,
-    FilterFieldsPipe,
-    FilterAuthorizationStatusesPipe,
-    FilterAllocationsByNamePipe,
-  ],
-  entryComponents: [...sharedModals],
-  declarations: [
-    ...labSharedComponents,
-    ...sharedModals,
-    FilterFieldsPipe,
-    FilterAuthorizationStatusesPipe,
-    FilterAllocationsByNamePipe,
-  ],
-  providers: [],
+    imports: [CommonModule, ...materialModules, SharedModule],
+    exports: [
+        CommonModule,
+        ...labSharedComponents,
+        ...sharedModals,
+        FilterFieldsPipe,
+        FilterAuthorizationStatusesPipe,
+        FilterAllocationsByNamePipe,
+    ],
+    declarations: [
+        ...labSharedComponents,
+        ...sharedModals,
+        FilterFieldsPipe,
+        FilterAuthorizationStatusesPipe,
+        FilterAllocationsByNamePipe,
+    ],
+    providers: []
 })
 export class SharedLabModule {}

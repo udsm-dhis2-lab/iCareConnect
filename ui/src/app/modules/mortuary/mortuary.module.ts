@@ -6,9 +6,8 @@ import { MortuaryRoutingModule } from "./mortuary-routing.module";
 import { mortuaryPages } from "./pages";
 import { dialogs } from "./modals";
 @NgModule({
-  declarations: [...mortuaryPages, ...mortuaryComponents, ...dialogs],
-  entryComponents: [...dialogs],
-  providers: [],
-  imports: [CommonModule, MortuaryRoutingModule, SharedModule],
+    declarations: [...mortuaryPages, ...mortuaryComponents, ...dialogs],
+    providers: [],
+    imports: [CommonModule, MortuaryRoutingModule, SharedModule]
 })
 export class MortuaryModule {}

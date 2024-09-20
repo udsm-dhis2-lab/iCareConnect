@@ -10,14 +10,13 @@ import { billingServices } from "./services";
 import { MenuComponent } from "src/app/core/components/menu/menu.component";
 
 @NgModule({
-  declarations: [
-    HomeComponent,
-    BillingSearchComponent,
-    ...billingPages,
-    ...billingComponents,
-  ],
-  entryComponents: [...billingEntryComponents],
-  providers: [...billingServices],
-  imports: [CommonModule, BillingRoutingModule, SharedModule],
+    declarations: [
+        HomeComponent,
+        BillingSearchComponent,
+        ...billingPages,
+        ...billingComponents,
+    ],
+    providers: [...billingServices],
+    imports: [CommonModule, BillingRoutingModule, SharedModule]
 })
 export class BillingModule {}

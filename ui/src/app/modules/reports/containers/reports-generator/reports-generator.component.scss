@@ -66,6 +66,8 @@
   border-bottom: solid 1px #eee;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.
+ */
 ::ng-deep .mat-form-field-appearance-outline .mat-form-field-flex {
   padding: 0 0.75em 0 0.75em !important;
   margin-top: -0.25em !important;

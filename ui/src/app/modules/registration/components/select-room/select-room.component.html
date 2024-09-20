@@ -25,11 +25,11 @@
         mode="indeterminate"
         *ngIf="loadingPatientLoad"
       ></mat-progress-bar>
-      <mat-chip-list
+      <mat-chip-listbox
         aria-label="Locations"
         *ngIf="params?.locations && !loadingPatientLoad"
       >
-        <mat-chip
+        <mat-chip-option
           *ngFor="let room of params?.locations | filterBy: searchTerm:'name'"
           (click)="onSelectRoom($event, room)"
           color="{{ room.id === currentRoom ? 'primary' : '' }}"
@@ -40,8 +40,8 @@
             *ngIf="params?.patientLoad[room.id] as patientLoad"
             >{{ patientLoad }}</span
           >
-        </mat-chip>
-      </mat-chip-list>
+        </mat-chip-option>
+      </mat-chip-listbox>
     </div>
   </mat-dialog-content>
 </ng-container>
