@@ -64,7 +64,6 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   getSelectedPatient(event, patientVisitDetails) {
     event.stopPropagation();
     this.patientVisitDetails.emit(patientVisitDetails);
-    // console.log("visits tracking updates ..............................................................",patientVisitDetails);
   }
   
 

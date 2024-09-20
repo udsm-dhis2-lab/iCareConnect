@@ -75,52 +75,64 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
     doc.save("preview.pdf");
   }
 
-  fileSelection(event, order): void {
+  fileSelection(event: Event, order: any): void {
+    console.log("Event triggered");
+    console.log("Order:", order);
     event.stopPropagation();
-    const fileInputElement = document.getElementById(
-      "file-selector-" + order?.concept?.uuid
-    );
-    this.file = (fileInputElement as any).files[0];
+  
+    const inputElement = event.target as HTMLInputElement;
+    console.log("Input Element:", inputElement);
+  
+    if (!inputElement.files || inputElement.files.length === 0) {
+      console.error("No file selected.");
+      return;
+    }
+  
+    console.log("File selected:", inputElement.files[0]);
+  
+    this.file = inputElement.files[0];
     if (this.file && this.file.type === "application/pdf") {
       const reader = new FileReader();
-      const that = this;
-      reader.onload = function (e) {
-        const pdfData = new Uint8Array((e.target as any).result);
-
-        let binary = "";
-        const bytes = new Uint8Array(pdfData);
-        const len = bytes.byteLength;
-        for (let i = 0; i < len; i++) {
-          binary += String.fromCharCode(bytes[i]);
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        if (e.target) {
+          const pdfData = new Uint8Array(e.target.result as ArrayBuffer);
+  
+          let binary = "";
+          const bytes = new Uint8Array(pdfData);
+          const len = bytes.byteLength;
+          for (let i = 0; i < len; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+          const base64PDF = btoa(binary);
+          const doc = new jsPDF();
+          doc.addPage();
+          this.base64FileData = base64PDF;
         }
-        const base64PDF = btoa(binary);
-        const doc = new jsPDF();
-        doc.addPage();
-        that.base64FileData = base64PDF;
       };
-
+  
       reader.readAsArrayBuffer(this.file);
       this.values[order?.uuid] = this.file;
+    } else {
+      console.error("Selected file is not a PDF.");
     }
   }
-
-  previewUploadPDF(event: Event, data, rendererType: string): void {
+  
+  previewUploadPDF(event: Event, data: any, rendererType: string): void {
     event.stopPropagation();
+    console.log("data preview ....................",data)
     this.dialog.open(SharedPdfPreviewComponent, {
-      minWidth: "60%",
-      maxHeight: "700px",
-      data: {
-        data,
-        rendererType,
-      },
+      minWidth: '60%',
+      maxHeight: '700px',
+      data: { data, rendererType },
     });
   }
 
-  getRemarks(event, order): void {
-    this.values[order?.uuid + "-comment"] = event?.target?.value;
+  getRemarks(event: Event, order: any): void {
+    this.values[order.uuid + '-comment'] = (event.target as HTMLTextAreaElement).value;
   }
 
   onSave(event: Event, order: any): void {
+    console.log('Save triggered');
     event.stopPropagation();
     this.saving = true;
     let data = new FormData();
@@ -196,5 +208,9 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
           };
         }
       });
+      setTimeout(() => {
+        this.saving = false;
+        console.log('Save complete');
+      }, 2000);
   }
 }

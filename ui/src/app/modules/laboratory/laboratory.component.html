@@ -94,7 +94,7 @@
             </p>
           </div>
           <mat-chip-option
-            class="{{ params?.LISConfigurations?.isLIS ?'w-100':'w-20'}}"
+            class="{{ params?.LISConfigurations?.isLIS ? 'w-100' : 'w-20' }}"
             *ngIf="params?.privileges && params?.LISConfigurations?.isLIS"
             (click)="changeRoute($event, 'dashboard-lab', true)"
             routerLinkActive="active-route"
@@ -112,7 +112,7 @@
             Dashboard
           </mat-chip-option>
           <mat-chip-option
-            class="{{ params?.LISConfigurations?.isLIS ?'w-100':'w-20'}}"
+            class="{{ params?.LISConfigurations?.isLIS ? 'w-100' : 'w-20' }}"
             *ngIf="
               params?.privileges &&
               params?.privileges['Laboratory Orders'] &&
@@ -128,7 +128,7 @@
             Sample Reception & Registration
           </mat-chip-option>
           <mat-chip-option
-            class="{{ params?.LISConfigurations?.isLIS ?'w-100':'w-20'}}"
+            class="{{ params?.LISConfigurations?.isLIS ? 'w-100' : 'w-20' }}"
             *ngIf="
               params?.privileges &&
               params?.privileges['Laboratory Diagnostic Orders'] &&
@@ -143,7 +143,7 @@
             Diagnostic Orders/Services
           </mat-chip-option>
           <mat-chip-option
-            class="{{ params?.LISConfigurations?.isLIS ?'w-100':'w-20'}}"
+            class="{{ params?.LISConfigurations?.isLIS ? 'w-100' : 'w-20' }}"
             *ngIf="
               params?.privileges &&
               params?.privileges['Sample Collection'] &&
@@ -158,7 +158,7 @@
             Sample collection
           </mat-chip-option>
           <mat-chip-option
-            class="{{ params?.LISConfigurations?.isLIS ?'w-100':'w-20'}}"
+            class="{{ params?.LISConfigurations?.isLIS ? 'w-100' : 'w-20' }}"
             routerLinkActive="active-route"
             (click)="changeRoute($event, 'sample-acceptance-and-results', true)"
             [ngClass]="{
@@ -174,7 +174,7 @@
           </mat-chip-option>
           <mat-chip-option
             *ngIf="params?.LISConfigurations?.isLIS"
-            class="{{ params?.LISConfigurations?.isLIS ?'w-100':'w-20'}}"
+            class="{{ params?.LISConfigurations?.isLIS ? 'w-100' : 'w-20' }}"
             routerLinkActive="active-route"
             (click)="changeRoute($event, 'sample-results-list', true)"
             [ngClass]="{
@@ -184,7 +184,7 @@
             Results
           </mat-chip-option>
           <mat-chip-option
-            class="{{ params?.LISConfigurations?.isLIS ?'w-100':'w-20'}}"
+            class="{{ params?.LISConfigurations?.isLIS ? 'w-100' : 'w-20' }}"
             routerLinkActive="active-route"
             (click)="changeRoute($event, 'sample-tracking', true)"
             [ngClass]="{
@@ -195,7 +195,7 @@
             Sample Tracking
           </mat-chip-option>
           <mat-chip-option
-            class="{{ params?.LISConfigurations?.isLIS ?'w-100':'w-20'}}"
+            class="{{ params?.LISConfigurations?.isLIS ? 'w-100' : 'w-20' }}"
             *ngIf="
               params?.privileges &&
               params?.privileges['Laboratory Orders'] &&
@@ -210,7 +210,7 @@
             Sample Storage & Disposal
           </mat-chip-option>
           <mat-chip-option
-            class="{{ params?.LISConfigurations?.isLIS ?'w-100':'w-20'}}"
+            class="{{ params?.LISConfigurations?.isLIS ? 'w-100' : 'w-20' }}"
             routerLinkActive="active-route"
             (click)="changeRoute($event, 'reports', false)"
             [ngClass]="{
@@ -223,7 +223,7 @@
             Reports
           </mat-chip-option>
           <mat-chip-option
-            class="{{ params?.LISConfigurations?.isLIS ?'w-100':'w-20'}}"
+            class="{{ params?.LISConfigurations?.isLIS ? 'w-100' : 'w-20' }}"
             routerLinkActive="active-route"
             (click)="changeRoute($event, 'settings', true)"
             [ngClass]="{
@@ -297,13 +297,5 @@
         </div>
       </div>
     </div>
-
-    <!-- <div
-      class="row"
-      style="margin-top: 20px"
-      *ngIf="params?.sampleTypes?.length > 0"
-    >
-      
-    </div> -->
   </ng-container>
 </div>

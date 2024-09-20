@@ -22,6 +22,7 @@ import { LocationService } from "src/app/core/services";
 import * as moment from "moment";
 import { processDateFromMaterialInput } from "../../helpers/utils.helpers";
 import { PasswordRegExpressionReferences } from "src/app/core/constants/password-security.constants";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-store-add-new-user-modal",
@@ -84,7 +85,8 @@ export class StoreAddNewUserModalComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private dialogRef: MatDialogRef<StoreAddNewUserModalComponent>,
     @Inject(MAT_DIALOG_DATA) data: any,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {
     this.securitySystemSettings = data;
   }
@@ -254,6 +256,8 @@ export class StoreAddNewUserModalComponent implements OnInit {
           setTimeout(() => {
             this.dialogRef.close();
           }, 200);
+
+          this.trackActionForAnalytics(`Add New User: Save`);
         }
       },
       (error: { error: any }) => {
@@ -288,7 +292,17 @@ export class StoreAddNewUserModalComponent implements OnInit {
         ? this.userForm.get("surname").value
         : "")
     );
+
+  
+
   }
+
+    
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
+  }
+
 
   onClose(event: Event): void {
     event.stopPropagation();

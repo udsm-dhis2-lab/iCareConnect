@@ -86,7 +86,7 @@ export class MenuComponent implements OnInit {
       this.store.dispatch(
         loadProviderDetails({ userUuid: sessionResponse?.user?.uuid })
       );
-      this.store.dispatch(loadRolesDetails());
+      // this.store.dispatch(loadRolesDetails());
       this.store.dispatch(
         addSessionStatus({ authenticated: sessionResponse?.authenticated })
       );

@@ -1,9 +1,9 @@
-import { NgModule, isDevMode } from "@angular/core";
 import { AppComponent } from "./app.component";
 import { CoreModule } from "./core";
 import { BrowserModule } from "@angular/platform-browser";
 import { GoogleAnalyticsService } from "./google-analytics.service";
-import { ServiceWorkerModule } from '@angular/service-worker';
+import { ServiceWorkerModule } from "@angular/service-worker";
+import { NgModule, isDevMode } from "@angular/core";
 export const config: any = {
   sizeUnit: "Octet",
 };
@@ -19,17 +19,12 @@ export const config: any = {
       },
     }),
     BrowserModule,
-    ServiceWorkerModule.register('ngsw-worker.js', {
+    ServiceWorkerModule.register("ngsw-worker.js", {
       enabled: !isDevMode(),
-      // Register the ServiceWorker as soon as the application is stable
-      // or after 30 seconds (whichever comes first).
-      registrationStrategy: 'registerWhenStable:30000'
+      registrationStrategy: "registerWhenStable:30000",
     }),
   ],
-  providers: [
-    GoogleAnalyticsService,
-    { provide: 'window', useValue: window }
-  ],
+  providers: [GoogleAnalyticsService, { provide: "window", useValue: window }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

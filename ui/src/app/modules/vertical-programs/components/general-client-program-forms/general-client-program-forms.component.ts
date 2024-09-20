@@ -43,19 +43,23 @@ export class GeneralClientProgramFormsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.formsUuids = (
-      this.currentLocation?.attributes?.filter(
-        (attribute: LocationAttributeGetFull) =>
-          attribute?.attributeType?.uuid ===
-            this.locationFormsAttributeTypeUuid && !attribute?.voided
-      ) || []
-    )?.map((attribute: any) => attribute?.value);
+    this.formsUuids =
+      (
+        this.currentLocation?.attributes?.filter(
+          (attribute: LocationAttributeGetFull) =>
+            attribute?.attributeType?.uuid ===
+              this.locationFormsAttributeTypeUuid && !attribute?.voided
+        ) || []
+      )?.map((attribute: any) => attribute?.value) || [];
     this.store.dispatch(loadCustomOpenMRSForms({ formUuids: this.formsUuids }));
 
     this.forms$ = this.store.select(
       getCustomOpenMRSFormsByIds(this.formsUuids)
     );
-    // this.getProgramEncounterDetails()
+    console.log("patientEnrollmentDetails::", this.patientEnrollmentDetails);
+    if (this.patientEnrollmentDetails?.uuid) {
+      this.getProgramEncounterDetails();
+    }
   }
 
   onFormUpdate(formValue: FormValue): void {
@@ -89,6 +93,8 @@ export class GeneralClientProgramFormsComponent implements OnInit {
         },
       ],
     };
+
+    
     this.encountersService
       .createEncounter(encounter)
       .subscribe((response: any) => {

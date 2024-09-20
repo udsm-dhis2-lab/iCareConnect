@@ -27,6 +27,8 @@ public interface LaboratoryService extends OpenmrsService {
 	
 	List<Sample> getSampleByDates(Date startDate, Date endDate);
 	
+	SampleStatus saveSampleStatus(SampleStatus sampleStatus) throws Exception;
+	
 	SampleStatus updateSampleStatus(SampleStatus sampleStatus) throws Exception;
 	
 	@Transactional
@@ -66,6 +68,8 @@ public interface LaboratoryService extends OpenmrsService {
 	Map<String, Object> saveResultsInstrument(Map<String, Object> resultsInstrumentObject) throws Exception;
 	
 	Sample getSampleByUuid(String sampleUuid);
+	
+	Sample getSampleById(String id);
 	
 	List<Result> getResults();
 	

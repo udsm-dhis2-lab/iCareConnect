@@ -57,7 +57,6 @@ export class AuthEffects {
                     addLoadedUserDetails({
                       userDetails: formatCurrentUserDetails(authenticatedUser),
                     }),
-                    loadRolesDetails(),
                     addSessionStatus({ authenticated }),
                     loadLocationByIds({
                       locationUuids: JSON.parse(

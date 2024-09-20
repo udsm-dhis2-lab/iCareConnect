@@ -6,6 +6,7 @@ import { map } from "rxjs/operators";
 import { ExportDataService } from "src/app/core/services/export-data.service";
 import { DrugsService } from "src/app/shared/resources/drugs/services/drugs.service";
 import { ManageDrugModalComponent } from "../../../modules/maintenance/modals/manage-drug-modal/manage-drug-modal.component";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 @Component({
   selector: "app-drugs-list",
@@ -24,7 +25,9 @@ export class DrugsListComponent implements OnInit {
   constructor(
     private drugService: DrugsService,
     private dialog: MatDialog,
-    private exportDataService: ExportDataService
+    private exportDataService: ExportDataService,
+    private googleAnalyticsService: GoogleAnalyticsService
+    
   ) {}
 
   ngOnInit(): void {
@@ -32,18 +35,21 @@ export class DrugsListComponent implements OnInit {
   }
 
   getDrugs(): void {
+    const searchText = this.searchingText
+      ? this.searchingText.replace(/\+/g, " ")
+      : this.searchingText;
+
     if (this.conceptUuid) {
       this.drugs$ = this.drugService.getDrugsUsingConceptUuid(this.conceptUuid);
     } else {
       this.drugs$ = this.drugService.getAllDrugs({
         startIndex: this.startIndex,
         limit: this.limit,
-        q: this.searchingText,
+        q: searchText,
         v: "custom:(uuid,display,description,strength,concept:(uuid,display))",
       });
     }
   }
-
   onGetList(event: Event, actionType: string): void {
     event.stopPropagation();
     this.page = actionType === "next" ? this.page + 1 : this.page - 1;
@@ -83,6 +89,7 @@ export class DrugsListComponent implements OnInit {
           this.getDrugs();
         }
       });
+      this.trackActionForAnalytics(`Drugs Add: Open`);
   }
 
   onDownload(event: Event, fileName: string): void {
@@ -106,5 +113,11 @@ export class DrugsListComponent implements OnInit {
         this.exportDataService.exportAsExcelFile(data, fileName);
       }
     });
+    this.trackActionForAnalytics(`Download to Excel: Download`);
+  }
+   
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
   }
 }

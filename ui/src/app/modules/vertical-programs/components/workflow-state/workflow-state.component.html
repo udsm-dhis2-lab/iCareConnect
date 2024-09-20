@@ -48,7 +48,10 @@
     <app-workflow-state-forms
       *ngIf="
         workflowState &&
-        patientWorkflowState &&
+        ((patientWorkflowState &&
+          patientEnrollmentDetails?.states &&
+          patientEnrollmentDetails?.states?.length > 0) ||
+          !patientWorkflowState) &&
         !saving &&
         params?.updatedPatientEnrollmentDetails
       "

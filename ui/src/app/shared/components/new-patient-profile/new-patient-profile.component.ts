@@ -21,16 +21,16 @@ export class NewPatientProfileComponent implements OnInit {
 
   ngOnInit(): void {
     const phoneDetails =
-      this.currentPatient.patient.person.attributes &&
-      this.currentPatient.patient.person.attributes?.length > 0
-        ? (this.currentPatient.patient.person.attributes.filter(
+      this.currentPatient?.patient?.person?.attributes &&
+      this.currentPatient?.patient?.person?.attributes?.length > 0
+        ? (this.currentPatient?.patient?.person?.attributes.filter(
             (attribute) => attribute?.display?.indexOf("phone") === 0
           ) || [])[0]
         : null;
     const middleNameDetails =
-      this.currentPatient.patient.person.attributes &&
-      this.currentPatient.patient.person.attributes?.length > 0
-        ? (this.currentPatient.patient.person.attributes.filter(
+      this.currentPatient?.patient?.person?.attributes &&
+      this.currentPatient?.patient?.person?.attributes?.length > 0
+        ? (this.currentPatient?.patient?.person?.attributes.filter(
             (attribute) => attribute?.display?.indexOf("mname") === 0
           ) || [])[0]
         : null;

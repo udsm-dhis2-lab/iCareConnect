@@ -3,6 +3,7 @@ package org.openmrs.module.icare.web.controller;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
@@ -17,9 +18,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.io.StreamCorruptedException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/lab")
@@ -204,10 +208,15 @@ public class LaboratoryController {
 		return responseSamplesObject;
 	}
 	
-	@RequestMapping(value = "sample/{sampleUuid}", method = RequestMethod.GET)
+	@RequestMapping(value = "sample/{sampleIdentification}", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> getSamplesByUuid(@PathVariable String sampleUuid) throws Exception {
-		Sample sample = laboratoryService.getSampleByUuid(sampleUuid);
+	public Map<String, Object> getSamplesByIdentification(@PathVariable String sampleIdentification) throws Exception {
+		Sample sample = new Sample();
+		if (laboratoryService.getSampleByUuid(sampleIdentification) != null) {
+			sample = laboratoryService.getSampleByUuid(sampleIdentification);
+		} else {
+			sample = laboratoryService.getSampleById(sampleIdentification);
+		}
 		return sample.toMap();
 	}
 	
@@ -258,35 +267,7 @@ public class LaboratoryController {
 			    specimenSourceUuid, instrumentUuid, visitUuid, excludeStatus);
 			return sampleResults.toMap();
 		}
-		
 		return null;
-		
-		/*List<Sample> samples;
-		
-		if (startDate != null && endDate != null) {
-			
-			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			
-			Date start = formatter.parse(startDate);
-			Date end = formatter.parse(endDate);
-			
-			samples = laboratoryService.getSampleByDates(start, end);
-			
-		} else {
-			samples = laboratoryService.getAllSamples();
-		}
-		
-		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
-		for (Sample sample : samples) {
-			
-			Map<String, Object> sampleObject = sample.toMap();
-			
-			//add the sample after creating its object
-			responseSamplesObject.add(sampleObject);
-		}
-
-		return responseSamplesObject;*/
-		
 	}
 	
 	@RequestMapping(value = "sampleaccept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -311,7 +292,7 @@ public class LaboratoryController {
 			}
 			
 		}
-		if(unretiredConcepts.size() == 0){
+		if(unretiredConcepts.isEmpty()){
 			throw new Exception("All sample allocations are retired");
 		}
 		List<TestAllocation> savedAllocations = laboratoryService.createAllocationsForSample(allocationsToSave);
@@ -461,6 +442,204 @@ public class LaboratoryController {
 		return savedResultsResponse;
 	}
 	
+	@RequestMapping(value = "machineobs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> saveMachineObservations(@RequestBody Map<String, Object> machinePayload) throws Exception {
+		Map<String, Object> response = new HashMap<>();
+		List<Map<String, Object>> mappedParameters = new ArrayList<>();
+		List<Map<String, Object>> obsWithIssues = new ArrayList<>();
+		List<Result> formattedResults = new ArrayList<>();
+
+		// Validate payload
+		validateMachinePayload(machinePayload);
+
+		// Extract sample and test info
+		Sample sample = getSampleFromPayload(machinePayload);
+		Map<String, Object> test = (Map<String, Object>) machinePayload.get("test");
+		List<Map<String, Object>> observations = (List<Map<String, Object>>) machinePayload.getOrDefault("observations", new ArrayList<>());
+
+		if (sample != null) {
+			processSampleOrders(sample, test, observations, mappedParameters, formattedResults, obsWithIssues);
+		} else {
+			throw new RuntimeException("Sample with the given identifier is not found");
+		}
+
+		// Save sample status and results
+		if (!formattedResults.isEmpty()) {
+			saveSampleStatus(sample, Context.getAuthenticatedUser());
+			List<Map<String, Object>> savedResultsResponse = laboratoryService.saveMultipleResults(formattedResults);
+			response.put("obsMappedResults", savedResultsResponse);
+		}
+
+		response.put("obsWithIssues", obsWithIssues);
+		return response;
+	}
+	
+	private void validateMachinePayload(Map<String, Object> machinePayload) {
+		if (machinePayload.get("sampleUuid") == null && machinePayload.get("sampleId") == null) {
+			throw new RuntimeException("Sample identification is missing");
+		}
+		if (machinePayload.get("test") == null) {
+			throw new RuntimeException("Key `test` is missing");
+		}
+		Map<String, Object> test = (Map<String, Object>) machinePayload.get("test");
+		if (test.get("code") == null) {
+			throw new RuntimeException("Key `code` on test object is missing");
+		}
+	}
+	
+	private Sample getSampleFromPayload(Map<String, Object> machinePayload) {
+		String sampleIdentification = null;
+		if (machinePayload.get("sampleUuid") != null) {
+			sampleIdentification = machinePayload.get("sampleUuid").toString();
+			return laboratoryService.getSampleByUuid(sampleIdentification);
+		} else if (machinePayload.get("sampleId") != null) {
+			sampleIdentification = machinePayload.get("sampleId").toString();
+			return laboratoryService.getSampleById(sampleIdentification);
+		}
+		return null;
+	}
+	
+	private void processSampleOrders(Sample sample, Map<String, Object> test, List<Map<String, Object>> observations,
+	        List<Map<String, Object>> mappedParameters, List<Result> formattedResults,
+	        List<Map<String, Object>> obsWithIssues) throws Exception {
+		
+		List<SampleOrder> sampleOrders = sample.getSampleOrders();
+		ConceptSource mappingConceptSource = getConceptSource();
+		
+		for (SampleOrder sampleOrder : sampleOrders) {
+			Concept concept = sampleOrder.getOrder().getConcept();
+			boolean mapped = isConceptMapped(concept, test, mappingConceptSource);
+			
+			if (mapped) {
+				processTestAllocations(sampleOrder, observations, concept, mappedParameters, formattedResults,
+				    obsWithIssues, mappingConceptSource);
+			}
+		}
+	}
+	
+	private ConceptSource getConceptSource() throws Exception {
+		AdministrationService administrationService = Context.getAdministrationService();
+		String globalPropertyValue = administrationService
+		        .getGlobalProperty(ICareConfig.MACHINE_INTEGRATION_PRIMARY_CONCEPT_SOURCE);
+		if (globalPropertyValue == null) {
+			throw new RuntimeException("Reference concept source is missing");
+		}
+		
+		ConceptSource mappingConceptSource = Context.getConceptService().getConceptSourceByUuid(globalPropertyValue);
+		if (mappingConceptSource == null) {
+			throw new RuntimeException("The configured concept source is not valid");
+		}
+		
+		return mappingConceptSource;
+	}
+	
+	private boolean isConceptMapped(Concept concept, Map<String, Object> test, ConceptSource mappingConceptSource) {
+		if (!concept.getConceptMappings().isEmpty()) {
+			for (ConceptMap conceptMap : concept.getConceptMappings()) {
+				if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(mappingConceptSource.getUuid())
+				        && conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	private void processTestAllocations(SampleOrder sampleOrder, List<Map<String, Object>> observations, Concept concept,
+	        List<Map<String, Object>> mappedParameters, List<Result> formattedResults,
+	        List<Map<String, Object>> obsWithIssues, ConceptSource mappingConceptSource) throws ParseException {
+		
+		List<TestAllocation> testAllocations = sampleOrder.getTestAllocations();
+		List<Concept> parameters = concept.getSetMembers();
+		
+		if (!parameters.isEmpty() && !testAllocations.isEmpty() && !observations.isEmpty()) {
+			for (Map<String, Object> observation : observations) {
+				String code = extractObservationCode(observation);
+				if (code != null) {
+					processParameters(parameters, code, mappedParameters, formattedResults, obsWithIssues, observation,
+					    testAllocations, mappingConceptSource);
+				} else {
+					obsWithIssues.add(observation);
+				}
+			}
+		}
+	}
+	
+	private String extractObservationCode(Map<String, Object> observation) {
+		if (observation.get("loinc") != null) {
+			return observation.get("loinc").toString();
+		} else if (observation.get("testCode") != null) {
+			String testCodeWithNames = observation.get("testCode").toString();
+			String regex = "^\\d+-\\d+";
+			Pattern pattern = Pattern.compile(regex);
+			Matcher matcher = pattern.matcher(testCodeWithNames);
+			if (matcher.find()) {
+				return matcher.group();
+			}
+		}
+		return null;
+	}
+	
+	private void processParameters(List<Concept> parameters, String code, List<Map<String, Object>> mappedParameters,
+	        List<Result> formattedResults, List<Map<String, Object>> obsWithIssues, Map<String, Object> observation,
+	        List<TestAllocation> testAllocations, ConceptSource mappingConceptSource) throws ParseException {
+		
+		for (Concept parameter : parameters) {
+			for (ConceptMap parameterConceptMap : parameter.getConceptMappings()) {
+				if (parameterConceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
+				        .equals(mappingConceptSource.getUuid())
+				        && parameterConceptMap.getConceptReferenceTerm().getCode().equals(code)) {
+					saveResults(testAllocations, parameter, observation, formattedResults, mappedParameters);
+					return;
+				}
+			}
+		}
+		obsWithIssues.add(observation);
+	}
+	
+	private void saveResults(List<TestAllocation> testAllocations, Concept parameter, Map<String, Object> observation,
+	        List<Result> formattedResults, List<Map<String, Object>> mappedParameters) throws ParseException {
+		
+		for (TestAllocation testAllocation : testAllocations) {
+			if (testAllocation.getTestConcept().getUuid().equals(parameter.getUuid())) {
+				Map<String, Object> result = createResultMap(parameter, observation, testAllocation);
+				formattedResults.add(Result.fromMap(result));
+				mappedParameters.add(testAllocation.toMap());
+			}
+		}
+	}
+	
+	private Map<String, Object> createResultMap(Concept parameter, Map<String, Object> observation, TestAllocation testAllocation) {
+		Map<String, Object> result = new HashMap<>();
+		result.put("abnormal", false);
+		Map<String, Object> parameterConcept =  new HashMap<>();
+		parameterConcept.put("uuid", parameter.getUuid());
+		result.put("concept",parameterConcept);
+		result.put("testAllocation", testAllocation.toMap());
+		result.put("testedBy", Context.getAuthenticatedUser().getUuid());
+
+		if (parameter.getDatatype().isCoded()) {
+			result.put("valueCoded", observation.get("testValue"));
+		} else if (parameter.getDatatype().isNumeric()) {
+			result.put("valueNumeric", observation.get("testValue"));
+		} else {
+			result.put("valueText", observation.get("testValue"));
+		}
+		return result;
+	}
+	
+	private void saveSampleStatus(Sample sample, User user) throws Exception {
+		
+		SampleStatus sampleStatus = new SampleStatus();
+		sampleStatus.setUser(user);
+		sampleStatus.setSample(sample);
+		sampleStatus.setRemarks("Fed from machine observations");
+		sampleStatus.setStatus("HAS_RESULTS");
+		sampleStatus.setCategory("HAS_RESULTS");
+		laboratoryService.saveSampleStatus(sampleStatus);
+	}
+	
 	@RequestMapping(value = "voidmultipleresults", method = RequestMethod.PUT)
 	@ResponseBody
 	public List<Map<String, Object>> voidMultipleResults(@RequestBody Map<String, Object> resultsToVoid) throws Exception {
@@ -497,13 +676,12 @@ public class LaboratoryController {
 	        @RequestBody List<Map<String, Object>> testAllocationStatusesObject) throws Exception {
 		List<TestAllocationStatus> testAllocationStatuses = new ArrayList<TestAllocationStatus>();
 		for (Map<String, Object> testAllocationStatusObject : testAllocationStatusesObject) {
+			System.out.println(testAllocationStatusesObject);
 			TestAllocationStatus testAllocationStatus = TestAllocationStatus.fromMap(testAllocationStatusObject);
 			testAllocationStatuses.add(testAllocationStatus);
 		}
 		
-		List<Map<String, Object>> savedTestAllocationStatuses = laboratoryService
-		        .updateTestAllocationStatuses(testAllocationStatuses);
-		return savedTestAllocationStatuses;
+		return laboratoryService.updateTestAllocationStatuses(testAllocationStatuses);
 		
 	}
 	

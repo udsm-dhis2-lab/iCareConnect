@@ -4,6 +4,7 @@ import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { go } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation } from "src/app/store/selectors";
@@ -31,7 +32,8 @@ export class PharmacyComponent implements OnInit {
     private store: Store<AppState>,
     private router: Router,
     private route: ActivatedRoute,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {
     this.iCareConnectConfigurations$ = this.store.select(getLISConfigurations);
     this.currentLocation$ = this.store.select(getCurrentLocation());
@@ -60,7 +62,11 @@ export class PharmacyComponent implements OnInit {
   }
 
   changeRoute(event: Event, routePath: string) {
+    const capitalizedRoutePath = routePath.charAt(0).toUpperCase() + routePath.slice(1);
+    this.trackActionForAnalytics(`${capitalizedRoutePath}: Open`);
+
     if (event) {
+   
       event.stopPropagation();
     }
     this.currentRoutePath = routePath;
@@ -70,4 +76,9 @@ export class PharmacyComponent implements OnInit {
       })
     );
   }
+  trackActionForAnalytics(eventname: any) {
+    // Send data to Google Analytics
+   this.googleAnalyticsService.sendAnalytics('Pharmacy',eventname,'Pharmacy')
+  }
+
 }

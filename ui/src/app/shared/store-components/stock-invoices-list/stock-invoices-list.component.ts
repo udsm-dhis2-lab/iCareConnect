@@ -12,12 +12,9 @@ import { StockInvoiceFormDialogComponent } from "../../store-modals/stock-invoic
   styleUrls: ["./stock-invoices-list.component.scss"],
 })
 export class StockInvoicesListComponent implements OnInit {
-  @Input() suppliers: any[];
-  @Input() unitsOfMeasurementSettings: any;
   @Input() status: any;
   @Input() currentLocation: any;
-
-  errors: any[];
+  errors: any[] = [];
   stockInvoices$: Observable<any>;
   loading: boolean = false;
   viewStockInvoiceItems: any;
@@ -28,6 +25,10 @@ export class StockInvoicesListComponent implements OnInit {
   q: string;
   startDate: Date;
   endDate: Date;
+
+  // This property will store the invoices to use for calculating the total
+  stockInvoices: any[] = [];
+
   constructor(
     private stockInvoicesService: StockInvoicesService,
     private dialog: MatDialog
@@ -35,6 +36,14 @@ export class StockInvoicesListComponent implements OnInit {
 
   ngOnInit(): void {
     this.getInvoices();
+  }
+
+  // Method to calculate the total sum of the `amount` field
+  getTotalAmount(): any {
+    return this.stockInvoices.reduce(
+      (sum, invoice) => sum + (invoice.totalAmount || 0),
+      0
+    );
   }
 
   onGetSearchingText(q: string): void {
@@ -65,17 +74,18 @@ export class StockInvoicesListComponent implements OnInit {
           this.loading = false;
           if (!response?.error) {
             this.pager = response?.pager;
+            this.stockInvoices = response.results || []; // Update stockInvoices
             return response;
           }
           if (response?.error) {
             this.errors = [...this.errors, response.error];
           }
         }),
-        tap((result) =>
+        tap((result) =>{
           result.results.sort((a, b) =>
             a.receivingDate > b.receivingDate ? -1 : 1
           )
-        )
+  })
       );
   }
 
@@ -85,8 +95,6 @@ export class StockInvoicesListComponent implements OnInit {
         width: "80%",
         data: {
           stockInvoice: stockInvoice,
-          suppliers: this.suppliers,
-          unitsOfMeasurementSettings: this.unitsOfMeasurementSettings,
           currentLocation: this.currentLocation,
         },
       })
@@ -103,7 +111,7 @@ export class StockInvoicesListComponent implements OnInit {
         data: {
           modalTitle: "Are you sure to receive all items in this invoice?",
           modalMessage:
-            "This action is irreversible. Please, click confirm to reveice all items in this invoice and click cancel to stop the action.",
+            "This action is irreversible. Please, click confirm to receive all items in this invoice and click cancel to stop the action.",
         },
       })
       .afterClosed()
@@ -122,7 +130,7 @@ export class StockInvoicesListComponent implements OnInit {
           this.stockInvoicesService
             .updateStockInvoice(stockInvoice?.uuid, stockInvoiceObject)
             .pipe(
-              tap((response) => {
+              tap(() => {
                 this.getInvoices();
               })
             )
@@ -152,16 +160,10 @@ export class StockInvoicesListComponent implements OnInit {
       .afterClosed()
       .subscribe((data) => {
         if (data?.confirmed) {
-          // const stockInvoiceObject = {
-          //   ...stockInvoice,
-          //   receivingDate: new Date(stockInvoice?.receivingDate).toISOString(),
-          //   voided: true,
-          // };
-
           this.stockInvoicesService
             .deleteStockInvoice(stockInvoice?.uuid)
             .pipe(
-              tap((response) => {
+              tap(() => {
                 this.getInvoices();
               })
             )
@@ -185,3 +187,4 @@ export class StockInvoicesListComponent implements OnInit {
     this.getInvoices();
   }
 }
+

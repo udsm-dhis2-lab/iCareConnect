@@ -74,24 +74,7 @@
               <mat-icon>menu</mat-icon>
             </a>
             <ng-container *ngIf="!useSideBar">
-              <button
-                *ngFor="let form of dashboardParams?.forms"
-                class="mr-2"
-                [ngClass]="{
-                  'selected-form':
-                    (selectedForm &&
-                      !showHistoryDetails &&
-                      selectedForm?.uuid === form?.uuid) ||
-                    (!selectedForm &&
-                      !showHistoryDetails &&
-                      dashboardParams?.forms[0] &&
-                      dashboardParams?.forms[0]?.uuid === form?.uuid)
-                }"
-                mat-stroked-button
-                (click)="getSelectedForm($event, form)"
-              >
-                {{ form?.name }}
-              </button>
+              
             </ng-container>
           </div>
 
@@ -472,44 +455,45 @@
                       >
                       </app-clinical-notes>
                       <app-patient-observations-chart
-                        *ngIf="
-                          isInpatient &&
-                          !showHistoryDetails &&
-                          !dashboardParams.loadingForms &&
-                          dashboardParams.currentPatient &&
-                          dashboardParams?.forms &&
-                          dashboardParams?.forms?.length > 0 &&
-                          ((selectedForm &&
-                            dashboardParams?.observationChartForm ===
-                              selectedForm?.uuid) ||
-                            (!selectedForm?.uuid &&
+                          *ngIf="
+                            isInpatient &&
+                            !showHistoryDetails &&
+                            !dashboardParams.loadingForms &&
+                            dashboardParams.currentPatient &&
+                            dashboardParams?.forms &&
+                            dashboardParams?.forms?.length > 0 &&
+                            ((selectedForm &&
                               dashboardParams?.observationChartForm ===
-                                dashboardParams?.forms[0].uuid))
-                        "
-                        [clinicalObservations]="
-                          dashboardParams?.observationsGroupedByConcept
-                        "
-                        [patient]="dashboardParams?.currentPatient"
-                        [location]="dashboardParams?.currentLocation"
-                        [visit]="activeVisit"
-                        [forms]="dashboardParams?.forms"
-                        [shouldUseOwnFormSelection]="false"
-                        [obsChartEncounterType]="
-                          dashboardParams?.observationChartEncounterType
-                        "
-                        [provider]="dashboardParams?.provider"
-                        [selectedForm]="
-                          selectedForm &&
-                          dashboardParams?.observationChartForm ===
-                            selectedForm?.uuid
-                            ? selectedForm
-                            : dashboardParams?.forms[0]?.uuid ===
-                              dashboardParams?.observationChartForm
-                            ? dashboardParams?.forms[0]
-                            : {}
-                        "
-                      >
-                      </app-patient-observations-chart>
+                                selectedForm?.uuid) ||
+                              (!selectedForm?.uuid &&
+                                dashboardParams?.observationChartForm ===
+                                  dashboardParams?.forms[0].uuid))
+                          "
+                          [clinicalObservations]="
+                            dashboardParams?.observationsGroupedByConcept
+                          "
+                          [patient]="dashboardParams?.currentPatient"
+                          [location]="dashboardParams?.currentLocation"
+                          [visit]="activeVisit"
+                          [forms]="dashboardParams?.forms"
+                          [shouldUseOwnFormSelection]="false"
+                          [obsChartEncounterType]="
+                            dashboardParams?.observationChartEncounterType
+                          "
+                          [provider]="dashboardParams?.provider"
+                          [selectedForm]="
+                            selectedForm &&
+                            dashboardParams?.observationChartForm ===
+                              selectedForm?.uuid
+                              ? selectedForm
+                              : dashboardParams?.forms[0]?.uuid ===
+                                dashboardParams?.observationChartForm
+                              ? dashboardParams?.forms[0]
+                              : {}
+                          "
+                        >
+                        </app-patient-observations-chart>
+                      
                       <app-ipd-forms
                         *ngIf="
                           isInpatient &&

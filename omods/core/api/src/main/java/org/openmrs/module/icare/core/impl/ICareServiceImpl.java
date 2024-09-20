@@ -10,6 +10,8 @@
 package org.openmrs.module.icare.core.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
@@ -26,10 +28,11 @@ import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.VerificationException;
 import org.openmrs.module.icare.core.*;
 import org.openmrs.module.icare.core.dao.*;
-import org.openmrs.module.icare.core.models.CommonlyOrderedDrugs;
 import org.openmrs.module.icare.core.models.EncounterPatientProgram;
 import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
+import org.openmrs.module.icare.core.utils.Dhis2EventWrapper;
+import org.openmrs.module.icare.core.utils.EidsrWrapper;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
@@ -171,7 +174,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public ItemPrice getItemPrice(Visit visit, Concept billableConcept) throws Exception {
+	public ItemPrice getItemPriceByConceptAndVisit(Visit visit, Concept billableConcept) throws ItemNotPayableException,
+	        ConfigurationException {
 		//VisitMetaData visitMetaData = VisitExtrapolator.extrapolateMetaData(visit);
 		VisitWrapper visitWrapper = new VisitWrapper(visit);
 		Concept paymentSchemeConcept = visitWrapper.getPaymentScheme();
@@ -272,6 +276,23 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
+	public List<Object> getConceptItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable,
+	        String conceptClass) {
+		return dao.getConceptItems(search, limit, startIndex, type, stockable, conceptClass);
+	}
+	
+	@Override
+	public List<Item> getStockableItems(String search, Integer limit, Integer startIndex, Item.Type type, Boolean stockable) {
+		return dao.getStockableItems(search, limit, startIndex, type, stockable);
+	}
+	
+	@Override
+	public List<Concept> getConceptStockableItems(String search, Integer limit, Integer startIndex, Item.Type type,
+	        Boolean stockable) {
+		return dao.getConceptStockableItems(search, limit, startIndex, type, stockable);
+	}
+	
+	@Override
 	public Prescription savePrescription(Prescription prescription, String status, String remarks) {
 		if (prescription.getUuid() != null) {
 			Prescription existingPrescription = (Prescription) Context.getOrderService().getOrderByUuid(
@@ -301,9 +322,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		AdministrationService administrationService = Context.getAdministrationService();
 		administrationService.setGlobalProperty("validation.disable", "true");
-		System.out.println("Validation:" + ValidateUtil.getDisableValidation());
 		ValidateUtil.setDisableValidation(true);
-		System.out.println("Validation:" + ValidateUtil.getDisableValidation());
 		prescription = (Prescription) Context.getOrderService().saveOrder(prescription, null);
 		// Set respective sOrderStatustatus
 		if (status != null) {
@@ -333,8 +352,9 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	@Override
 	public List<Object[]> getCommonlyOrderedItems(String visitUuid, String orderTypeUuid, Integer limit, Integer startIndex,
-	        Boolean isDrug) {
-		return this.dao.getCommonlyOrderedItems(visitUuid, orderTypeUuid, limit, startIndex, isDrug);
+	        Boolean isDrug, String provider, Date startDate, Date endDate) {
+		return this.dao.getCommonlyOrderedItems(visitUuid, orderTypeUuid, limit, startIndex, isDrug, provider, startDate,
+		    endDate);
 	}
 	
 	@Override
@@ -451,7 +471,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		String idFormat = adminService.getGlobalProperty(ICareConfig.PATIENT_ID_FORMAT);
 
 		if(idFormat.contains("GP{" + DHIS2Config.facilityCode + "}")){
-			System.out.println("Replacing:");
 			String facilityCode = adminService.getGlobalProperty(DHIS2Config.facilityCode);
 			idFormat = idFormat.replace("GP{" + DHIS2Config.facilityCode + "}", facilityCode);
 		}
@@ -954,7 +973,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			//		this.getCreator().getUserProperties().get("")
 			String path = "/api/events.json?";
 			url = new URL(baseUrl.concat(path));
-			System.out.println(request);
 			String returnValue = "";
 
 			BufferedReader reader;
@@ -976,7 +994,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			ObjectMapper mapper = new ObjectMapper();
 			// Converting the Object to JSONString
 			String jsonString = mapper.writeValueAsString(request);
-			System.out.println(jsonString);
 
 			// int status = httpURLConnection.getResponseCode();
 
@@ -1012,7 +1029,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 
 			String path = "/api/events.json?";
 			url = new URL(baseUrl.concat(path));
-			System.out.println(results);
 
 			BufferedReader reader;
 			String line;
@@ -1033,7 +1049,6 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			ObjectMapper mapper = new ObjectMapper();
 			// Converting the Object to JSONString
 			String jsonString = mapper.writeValueAsString(results);
-			System.out.println(jsonString);
 
 			// int status = httpURLConnection.getResponseCode();
 
@@ -1108,6 +1123,259 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	
 	@Override
 	public void saveAuditLog(AuditLog auditLog) {
-		this.auditLogDAO.save(auditLog);
+		// Check if user is authenticated first
+		User user = Context.getAuthenticatedUser();
+		if (user != null) {
+			//			this.auditLogDAO.save(auditLog);
+		}
+	}
+	
+	@Override
+	public String pushEventWithoutRegistrationDataToDHIS2Instance(String eventData) {
+		try {
+			AdministrationService administrationService = Context.getAdministrationService();
+			String instance = administrationService.getGlobalProperty("dhis2.instance");
+			String username = administrationService.getGlobalProperty("dhis2.username");
+			String password = administrationService.getGlobalProperty("dhis2.password");
+			// TODO: Use configs to access the API below (Remove hardcoded URL)
+			URL url = new URL(instance.concat("/api/tracker?async=false&orgUnitIdScheme=CODE&dataElementIdScheme=CODE"));
+			
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			
+			String userCredentials = username.concat(":").concat(password);
+			String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+			
+			con.setRequestProperty("Authorization", basicAuth);
+			
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/json; utf-8");
+			con.setRequestProperty("Accept", "application/json");
+			
+			con.setDoOutput(true);
+			
+			String jsonInputString = eventData;
+			
+			OutputStream os;
+			BufferedReader br;
+			
+			try {
+				os = con.getOutputStream();
+				byte[] input = jsonInputString.getBytes("utf-8");
+				os.write(input, 0, input.length);
+			}
+			finally {}
+			
+			try {
+				br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+				StringBuilder response = new StringBuilder();
+				String responseLine = null;
+				while ((responseLine = br.readLine()) != null) {
+					response.append(responseLine.trim());
+				}
+				return response.toString();
+			}
+			finally {}
+			
+		}
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+			return e.toString();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			return e.toString();
+		}
+	}
+	
+	@Override
+	public String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType) {
+		try {
+			AdministrationService administrationService = Context.getAdministrationService();
+			String instance = mediatorKey + administrationService.getGlobalProperty(".instance");
+			String username = mediatorKey + administrationService.getGlobalProperty(".username");
+			String password = mediatorKey + administrationService.getGlobalProperty(".password");
+			URL url = new URL(instance.concat(mediatorUrl));
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			
+			String userCredentials = username.concat(":").concat(password);
+			String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+			con.setRequestProperty("Authorization", basicAuth);
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/json; utf-8");
+			con.setRequestProperty("Accept", "application/json");
+			con.setDoOutput(true);
+			String jsonInputString = data;
+			OutputStream os;
+			BufferedReader br;
+			try {
+				os = con.getOutputStream();
+				byte[] input = jsonInputString.getBytes("utf-8");
+				os.write(input, 0, input.length);
+			}
+			finally {}
+			
+			try {
+				br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+				StringBuilder response = new StringBuilder();
+				String responseLine = null;
+				while ((responseLine = br.readLine()) != null) {
+					response.append(responseLine.trim());
+				}
+				return response.toString();
+			}
+			finally {}
+			
+		}
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+			return e.toString();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			return e.toString();
+		}
+	}
+	
+	public Map<String, Object> generateVisitsData(Date startDate, Date endDate, Boolean sendToExternalMediator) throws Exception {
+		// TODO: Implement for all HDU API template blocks and respective parameters
+		Map<String, Object> response = new HashMap<>();
+		List<Visit> visits = dao.getVisitsByStartDateAndEndDate(startDate,endDate);
+		Map<String, Object> dataTemplateData = new HashMap<>();
+		Dhis2EventWrapper dhis2EventWrapper = new Dhis2EventWrapper();
+		AdministrationService administrationService = Context.getAdministrationService();
+		String workflowUuid = administrationService.getGlobalProperty(ICareConfig.HDU_API_WORKFLOW_UUID_FOR_OPD);
+		Map<String, Object> templateDetails = new HashMap<>();
+		Map<String, Object> workflow = new HashMap<>();
+		workflow.put("uuid", workflowUuid);
+		templateDetails.put("id", "general");
+		templateDetails.put("code", "GENERAL");
+		templateDetails.put("name", "General");
+		templateDetails.put("workflow", workflow);
+
+		// Formulate HDU API data template
+		List<Map<String, Object>> listGrid = new ArrayList<>();
+		Map<String, Object> reportDetails = new HashMap<>();
+		Date todayDate = new Date();
+		reportDetails.put("reportingDate", dhis2EventWrapper.formatDateToYYYYMMDD(todayDate));
+
+		Map<String, Object> facilityDetails = new HashMap<>();
+		String facilityCode = dhis2EventWrapper.getHFRCode();
+		facilityDetails.put("HFCode",facilityCode);
+		for(Visit visit: visits) {
+			List<Map<String, Object>> investigationDetails = new ArrayList<>();
+			Map<String, Object> outcomeDetails = new HashMap<>();
+			Map<String, Object> demographicDetails = new HashMap<>();
+			if (visit.getPatient().getPerson().getBirthdate() != null) {
+				demographicDetails.put("dateOfBirth",visit.getPatient().getPerson().getBirthdate());
+			}
+			if (visit.getPatient().getPerson().getGivenName() != null) {
+				demographicDetails.put("firstName", visit.getPatient().getPerson().getGivenName());
+			}
+
+			demographicDetails.put("middleName", "");
+			if (visit.getPatient().getPerson().getFamilyName() != null) {
+				demographicDetails.put("lastName", visit.getPatient().getPerson().getFamilyName());
+			}
+			if (visit.getPatient().getPerson().getGender().toLowerCase().equals("m")) {
+				demographicDetails.put("gender", "male");
+			} else if (visit.getPatient().getPerson().getGender().toLowerCase().equals("f")) {
+				demographicDetails.put("gender", "female");
+			} else {
+				demographicDetails.put("gender", "unknown");
+			}
+			String phoneNumbers ="";
+			String personPhoneNumberAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.PHONE_NUMBER_ATTRIBUTE);
+			Set<PersonAttribute> personAttributes = visit.getPatient().getPerson().getAttributes();
+			if (personAttributes.size() > 0) {
+				for(PersonAttribute personAttribute: personAttributes) {
+					if (personAttribute.getAttributeType().getUuid().equals(personPhoneNumberAttributeTypeUuid )) {
+						phoneNumbers = personAttribute.getValue();
+					}
+				}
+			}
+			demographicDetails.put("phoneNumbers", phoneNumbers);
+
+			String patientIdentifier = "";
+			for (PatientIdentifier identifier: visit.getPatient().getIdentifiers()) {
+				if (identifier.getPreferred().booleanValue() == true) {
+					patientIdentifier = identifier.getIdentifier().toString();
+				}
+			}
+			demographicDetails.put("mrn", patientIdentifier);
+			demographicDetails.put("identifier", patientIdentifier);
+
+			Map<String, Object> visitDetails = new HashMap<>();
+			visitDetails.put("visitId", visit.getVisitId());
+			visitDetails.put("visitDate", visit.getStartDatetime());
+			visitDetails.put("closedDate", visit.getStopDatetime());
+
+			List<Map<String, Object>> diagnosisDetails = new ArrayList<>();
+			if (visit.getEncounters().size() > 0) {
+				for (Encounter encounter: visit.getEncounters()) {
+					if (encounter.getDiagnoses().size() > 0) {
+						for (Diagnosis diagnosis: encounter.getDiagnoses()) {
+							Map<String, Object> diagnosisData = new HashMap<>();
+							if (diagnosis.getDiagnosis() != null && diagnosis.getDiagnosis().getCoded() != null) {
+								diagnosisData.put("diagnosisCode", diagnosis.getDiagnosis().getCoded());
+							}
+							if (diagnosis.getDiagnosis() != null && diagnosis.getDiagnosis().getSpecificName() != null) {
+								diagnosisData.put("diagnosis", diagnosis.getDiagnosis().getSpecificName());
+							}
+							diagnosisData.put("diagnosisDate", diagnosis.getDateCreated());
+							diagnosisData.put("certainty", diagnosis.getCertainty());
+							diagnosisDetails.add(diagnosisData);
+						}
+					}
+				}
+			}
+			// For death
+			Map<String, Object> deathDetails = new HashMap<>();
+			if (visit.getPatient().getPerson().getDead()) {
+				deathDetails.put("dateOfDeath",visit.getPatient().getPerson().getDeathDate());
+			}
+			// For outcome details
+			if (visit.getPatient().getPerson().getDead() != null) {
+				outcomeDetails.put("isAlive", true);
+			} else {
+				outcomeDetails.put("isAlive", false);
+				outcomeDetails.put("deathDate",visit.getPatient().getPerson().getDeathDate());
+				// admitted USe Admission encounter
+			}
+			Map<String, Object> listGridItem = new HashMap<>();
+			listGridItem.put("visitDetails", visitDetails);
+			listGridItem.put("demographicDetails", demographicDetails);
+			listGridItem.put("diagnosisDetails", diagnosisDetails);
+			listGridItem.put("investigationDetails", investigationDetails);
+			listGridItem.put("outcomeDetails", outcomeDetails);
+			listGrid.add(listGridItem);
+		}
+		Map<String, Object> dataSection = new HashMap<>();
+		dataSection.put("reportDetails", reportDetails);
+		dataSection.put("facilityDetails", facilityDetails);
+		dataSection.put("listGrid", listGrid);
+		dataTemplateData.put("templateDetails", templateDetails);
+		dataTemplateData.put("data", dataSection);
+		if (sendToExternalMediator != null && sendToExternalMediator) {
+			try{
+				AdministrationService adminService = Context.getService(AdministrationService.class);
+				String mediatorsConfigs = adminService.getGlobalProperty(ICareConfig.INTEROPERABILITY_MEDIATORS_LIST);
+				JSONArray mediatorsList = new JSONArray(mediatorsConfigs);
+				ICareService iCareService = Context.getService(ICareService.class);
+				for (int count = 0; count < mediatorsList.length(); count++) {
+					JSONObject mediator = mediatorsList.getJSONObject(count);
+					if (mediator.has("isActive") && mediator.getBoolean("isActive")) {
+						String mediatorKey = mediator.getString("mediatorKey");
+						String mediatorUrlPath = mediator.getString("mediatorUrlPath");
+						String authenticationType = mediator.getString("authenticationType");
+						if (mediator.has("mediatorKey") && mediator.getString("mediatorKey").equals("HDUAPI")) {
+							String externalSystemResponse = iCareService.pushDataToExternalMediator(new JSONObject(dataTemplateData).toString(),mediatorKey,mediatorUrlPath,authenticationType);
+						}
+					}
+				}
+			}catch (Exception e){
+				throw new Exception(e);
+			}
+		}
+		return dataTemplateData;
 	}
 }

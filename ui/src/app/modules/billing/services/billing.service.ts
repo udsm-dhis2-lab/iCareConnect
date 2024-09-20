@@ -7,7 +7,7 @@ import { Payment } from "../models/payment.model";
 import { Discount } from "../models/discount.model";
 import { PaymentInput } from "../models/payment-input.model";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
-import { catchError, map } from "rxjs/operators";
+import { catchError, map, tap } from "rxjs/operators";
 import { omit } from "lodash";
 import { HttpClient } from "@angular/common/http";
 
@@ -105,6 +105,27 @@ export class BillingService {
       .post("billing/payment", billPayment)
       .pipe(map(() => new Payment(billPayment)));
   }
+
+  gepgpayBill(payload: any): Observable<Payment> {
+    const url = `gepg/generatecontrolno`;
+    return this.httpClient.post(url, payload).pipe(
+      map((response: any) => {
+        if (response.error) {
+          throw new Error(response.error); 
+        }
+        console.log("API Response : ",response)
+        return new Payment(response);
+      }),
+      catchError((error) => {
+        console.error("Error in gepgpayBill:", error);
+        return of({ error: error.message || 'An unknown error occurred' } as any);
+      })
+    );
+  }
+  
+  
+  
+  
 
   discountBill(discountDetails): Observable<any> {
     let discountData = omit(discountDetails, "attachmentDetails");

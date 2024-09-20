@@ -28,6 +28,7 @@ export class PatientRadiologySummaryComponent implements OnInit {
   isFormValid: boolean = false;
   formValuesData: any = {};
   orders$: Observable<any>;
+  ordersSubscription: any;
   fields: string =
     "custom:(uuid,encounters:(uuid,location:(uuid,display),encounterType,display,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,orderer,orderType,dateActivated,dateStopped,autoExpireDate,orderNumber,concept,display)))";
   creatingOrdersResponse$: Observable<any>;
@@ -44,7 +45,14 @@ export class PatientRadiologySummaryComponent implements OnInit {
       this.patientVisit.uuid,
       this.fields
     );
-
+    this.ordersSubscription = this.orders$.subscribe(
+      data => {
+        console.log("radiology data .......................................",data); 
+      },
+      error => {
+        console.error('Error fetching orders:', error);
+      }
+    );
     this.getFormFields();
   }
 
@@ -200,7 +208,7 @@ export class PatientRadiologySummaryComponent implements OnInit {
     event.stopPropagation();
     this.dialog.open(SharedPdfPreviewComponent, {
       minWidth: "60%",
-      maxHeight: "700px",
+      maxHeight: "800px",
       data: {
         data,
         rendererType,

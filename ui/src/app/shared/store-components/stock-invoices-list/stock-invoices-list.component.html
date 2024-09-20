@@ -51,7 +51,7 @@
             <span class="ml-4 text-small"
               ><i>
                 Received on:
-                {{ stockInvoice?.receivingDate | date: "dd/MM/yyyy" }}
+                {{ stockInvoice?.receivingDate | date: "MM/dd/yyyy" }}
               </i></span
             >
             <span class="ml-4"
@@ -159,4 +159,14 @@
       </tr>
     </tbody>
   </table>
+  <div class="d-flex justify-content-between p-3">
+    <div></div>
+    <div>
+      <span class="ml-4"
+        ><strong>
+          Total Stock Amount: {{ getTotalAmount() | currency: "Tzs " }}
+        </strong>
+      </span>
+    </div>
+  </div>
 </div>

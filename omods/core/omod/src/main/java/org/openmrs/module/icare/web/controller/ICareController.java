@@ -11,14 +11,18 @@ package org.openmrs.module.icare.web.controller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONObject;
 import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.Extension;
 import org.openmrs.module.icare.auditlog.AuditLog;
 import org.openmrs.module.icare.auditlog.api.AuditLogService;
 import org.openmrs.module.icare.auditlog.api.db.AuditLogDAO;
+import org.openmrs.module.icare.billing.ItemNotPayableException;
+import org.openmrs.module.icare.billing.OrderMetaData;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.BillingService;
@@ -129,12 +133,91 @@ public class ICareController {
         return results;
     }
 	
+	@RequestMapping(value = "stockableitems", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetStockableItems(@RequestParam(required = false) String q,
+												   @RequestParam(defaultValue = "100") Integer limit,
+												   @RequestParam(defaultValue = "0") Integer startIndex,
+												   @RequestParam(required = false) Item.Type type,
+												   @RequestParam(required = false) Boolean stockable) {
+		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+		for (Item item : iCareService.getStockableItems(q, limit, startIndex, type, stockable)) {
+			items.add(item.toMap());
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", items);
+		return results;
+	}
+	
 	@RequestMapping(value = "item", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> onPostItemJSON(@RequestBody Item item) {
 		
 		Item newItem = iCareService.saveItem(item);
 		return newItem.toMap();
+	}
+	
+	@RequestMapping(value = "item", method = RequestMethod.PUT)
+	@ResponseBody
+	public Map<String, Object> onUpdateItem(@RequestBody Item itemToUpdate) throws Exception {
+		if (itemToUpdate.getUuid() == null) {
+			throw new RuntimeException("Key `uuid` is Missing");
+		}
+		Item item = iCareService.getItemByUuid(itemToUpdate.getUuid());
+		if (itemToUpdate.getStockable() != null) {
+			item.setStockable(itemToUpdate.getStockable());
+		}
+		// TODO: Add support to handle update as per parameters updated and ensure return resemble action happened
+		Item updatedItem = iCareService.saveItem(item);
+		return updatedItem.toMap();
+	}
+	
+	@RequestMapping(value = "conceptswithitems", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> onGetConceptItems(@RequestParam(required = false) String q,
+												 @RequestParam(defaultValue = "100") Integer limit,
+												 @RequestParam(defaultValue = "0") Integer startIndex,
+												 @RequestParam(required = false) Boolean stockable,
+												 @RequestParam(required = false) String conceptClass) {
+		List<Map<String, Object>> conceptItems = new ArrayList<Map<String, Object>>();
+		Pager pager = new Pager();
+		pager.setAllowed(true);
+		pager.setPageSize(limit);
+		pager.setPage((startIndex/limit));
+		for (Object conceptItem : iCareService.getConceptItems(q, limit, startIndex, Item.Type.valueOf("CONCEPT"), stockable, conceptClass)) {
+//			items.add(concept);
+			Map<String, Object> conceptItemObject = new HashMap<>();
+			Concept concept= ((Item) conceptItem).getConcept();
+
+			Map<String, Object> item = new HashMap<>();
+			if (conceptItem != null) {
+				item = ((Item) conceptItem).toMap();
+			}
+			conceptItemObject.put("item", item);
+			conceptItemObject.put("uuid", concept.getUuid());
+			conceptItemObject.put("display", concept.getDisplayString());
+			conceptItemObject.put("dateCreated", concept.getDateCreated());
+			conceptItemObject.put("dateChanged", concept.getDateChanged());
+			Map<String, Object> conceptClassDetails = new HashMap<>();
+			conceptClassDetails.put("name", concept.getConceptClass().getName());
+			conceptClassDetails.put("display", concept.getConceptClass().getName());
+			conceptClassDetails.put("uuid", concept.getConceptClass().getUuid());
+			conceptItemObject.put("dateChanged", concept.getDateChanged());
+			conceptItemObject.put("class", conceptClassDetails);
+			List<Map<String, Object>> mappings = new ArrayList<>();
+			// TODO: Add support to load mappings
+			for (ConceptMap conceptMap: concept.getConceptMappings()) {
+				Map<String, Object> mapping = new HashMap<>();
+			}
+			conceptItemObject.put("retired", concept.getRetired());
+			conceptItemObject.put("retiredOn", concept.getDateRetired());
+			conceptItemObject.put("mappings", mappings);
+			conceptItems.add(conceptItemObject);
+		}
+		Map<String, Object> results = new HashMap<>();
+		results.put("results", conceptItems);
+		results.put("pager",pager);
+		return results;
 	}
 	
 	@RequestMapping(value = "itemByConcept/{conceptUuid}", method = RequestMethod.GET)
@@ -159,28 +242,36 @@ public class ICareController {
 	
 	@RequestMapping(value = "itemprice", method = RequestMethod.GET)
     @ResponseBody
-    public Map<String, Object> onGet(@RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String paymentType, @RequestParam(required = false) String visitUuid, @RequestParam(required = false) String drugUuid ) throws ConfigurationException {
+    public Map<String, Object> onGet(@RequestParam(defaultValue = "100") Integer limit, @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(required = false) String paymentType, @RequestParam(required = false) String visitUuid, @RequestParam(required = false) String drugUuid , @RequestParam(required = false) String conceptUuid ) throws ConfigurationException {
 		Map<String, Object> results = new HashMap<>();
-		if (visitUuid == null && drugUuid ==null) {
+		if (visitUuid == null && drugUuid ==null && conceptUuid == null) {
 			List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
-
-
 			for (ItemPrice item : iCareService.getItemPrices(paymentType, limit, startIndex)) {
 				items.add(item.toMap());
 			}
 			results.put("results", items);
-			System.out.println("aad");
 		}
 
 		if (visitUuid != null && drugUuid !=null){
-
 			Visit visit = Context.getService(VisitService.class).getVisitByUuid(visitUuid);
 			Drug drug = Context.getService(ConceptService.class).getDrugByUuid(drugUuid);
-
 			ItemPrice item = iCareService.getItemPrice(visit,drug);
+			if (item != null) {
+				results.put("results",item.toMap());
+			} else {
+				results.put("results", new ArrayList<>());
+			}
+		}
 
-			results.put("results",item.toMap());
-
+		if (visitUuid != null && conceptUuid !=null){
+			Visit visit = Context.getService(VisitService.class).getVisitByUuid(visitUuid);
+			Concept concept = Context.getService(ConceptService.class).getConceptByUuid(conceptUuid);
+			ItemPrice item = iCareService.getItemPriceByConceptAndVisit(visit, concept);
+			if (item != null) {
+				results.put("results",item.toMap());
+			} else {
+				results.put("results", new ArrayList<>());
+			}
 		}
 
         return results;
@@ -237,6 +328,29 @@ public class ICareController {
 		//Order newOrder = billingService.createLabOrder(order);
 		//return newOrder;
 		return null;
+	}
+	
+	@RequestMapping(value = "patientdiagnoses", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Diagnosis onPostDiagnosisCreation(@RequestBody Map<String, Object> diagnosisObject) throws Exception {
+		PatientService patientService = Context.getService(PatientService.class);
+		EncounterService encounterService = Context.getService(EncounterService.class);
+		Patient patient = patientService.getPatientByUuid((String) diagnosisObject.get("patient"));
+		
+		Diagnosis diagnosis = new Diagnosis();
+		CodedOrFreeText diagnosisDetail = new CodedOrFreeText();
+		Concept concept = new Concept();
+		ConceptService conceptService = Context.getService(ConceptService.class);
+		concept = conceptService.getConceptByUuid(diagnosisObject.get("conceptUuid").toString());
+		diagnosisDetail.setCoded(concept);
+		diagnosisDetail.setNonCoded("Cholera");
+		//		diagnosisDetail.setSpecificName(new ConceptName());
+		diagnosis.setDiagnosis(diagnosisDetail);
+		Encounter encounter = encounterService.getEncounterByUuid(diagnosisObject.get("encounter").toString());
+		//		diagnosis.setEncounter(encounter);
+		diagnosis.setCertainty(ConditionVerificationStatus.CONFIRMED);
+		diagnosis.setPatient(patient);
+		return diagnosis;
 	}
 	
 	@RequestMapping(value = "message", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -1207,7 +1321,7 @@ public class ICareController {
 
 	}
 	
-	@RequestMapping(value = "encounterpatientprogram/{patientProgranUuid}",method = RequestMethod.GET)
+	@RequestMapping(value = "encounterpatientprogram/{patientProgramUuid}",method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getEncountersByPatientProgram(@PathVariable("patientProgramUuid") String patientProgramUuid){
 
@@ -1319,10 +1433,13 @@ public class ICareController {
 												@RequestParam(required = false) String locationUuid,
 												@RequestParam(defaultValue = "10") Integer limit,
 												@RequestParam(defaultValue = "0") Integer startIndex,
-												@RequestParam(required = false) Boolean isDrug) {
+												@RequestParam(required = false) Boolean isDrug,
+												@RequestParam(required = false) String provider,
+												@RequestParam(required = false) Date startDate,
+												@RequestParam(required = false) Date endDate) {
 
 		List<Map<String, Object>> commonlyUsedItems = new ArrayList<>();
-		List<Object[]> orderedItems = iCareService.getCommonlyOrderedItems(visitUuid, orderTypeUuid, limit, startIndex, isDrug);
+		List<Object[]> orderedItems = iCareService.getCommonlyOrderedItems(visitUuid, orderTypeUuid, limit, startIndex, isDrug, provider, startDate, endDate);
 		for (Object[] orderedItemsRowInfo: orderedItems) {
 			Long count = Long.valueOf(orderedItemsRowInfo[1].toString());
 			Drug drugDetails = new Drug();
@@ -1369,5 +1486,198 @@ public class ICareController {
 		Map<String, Object> results = new HashMap<>();
 		results.put("results", commonlyUsedItems);
 		return results;
+	}
+	
+	@RequestMapping(value = "solditems", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> getSoldItems(
+			@RequestParam(defaultValue = "10") Integer limit,
+			@RequestParam(defaultValue = "0") Integer startIndex,
+			@RequestParam(required = false) Date startDate,
+			@RequestParam(required = false) Date endDate,
+			@RequestParam(required = false) String provider
+	) throws Exception {
+		// TODO: This is meant to include price and total amount of money from the expected sold stock. SO far its unfinished
+		List<Map<String, Object>> soldItems = new ArrayList<>();
+		Map<String, Object> response = new HashMap<>();
+		List<Object[]> orderedItems = iCareService.getCommonlyOrderedItems(null, null, limit, startIndex, null,
+				provider, startDate, endDate);
+		for (Object[] orderedItemsRowInfo: orderedItems) {
+			Long count = Long.valueOf(orderedItemsRowInfo[1].toString());
+			Drug drugDetails = new Drug();
+			Concept orderedItemConcept = new Concept();
+			if (orderedItemsRowInfo[0] instanceof Drug) {
+				drugDetails = (Drug) orderedItemsRowInfo[0];
+			} else{
+					orderedItemConcept = (Concept) orderedItemsRowInfo[0];
+			}
+
+			Map<String, Object> returnObj = new HashMap<>();
+			Map<String, Object> orderedItemData = new HashMap<>();
+			if (orderedItemsRowInfo[0] instanceof Drug) {
+				orderedItemData.put("uuid", drugDetails.getUuid());
+				orderedItemData.put("display", drugDetails.getDisplayName());
+			} else{
+				orderedItemData.put("uuid", orderedItemConcept.getUuid());
+				orderedItemData.put("display", orderedItemConcept.getDisplayString());
+			}
+			returnObj.put("item", orderedItemData);
+			returnObj.put("count",count);
+			soldItems.add(returnObj);
+		}
+		response.put("results", soldItems);
+		return response;
+	}
+	
+	@RequestMapping(value = "totalinvoiceamountbyitems", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String, Object>> getTotalInvoice(
+			@RequestParam(required = false) Date startDate,
+			@RequestParam(required = false) Date endDate,
+			@RequestParam(required = false) String provider
+	) throws Exception {
+		List<Map<String, Object>> itemsByAmount = new ArrayList<>();
+		List<Object[]> soldItemsByTotalAmount = billingService.getTotalAmountFromPaidInvoices(startDate, endDate, provider);
+		double totalSum = 0.0;
+		for (Object[] soldItem: soldItemsByTotalAmount) {
+			double totalPrice = Double.parseDouble(soldItem[0].toString());
+			totalSum += totalPrice;
+			Item item = (Item) soldItem[1];
+			Map<String, Object> soldItemWithAmount = new HashMap<>();
+			soldItemWithAmount.put("totalAmount", totalPrice);
+			soldItemWithAmount.put("item", item.toMap());
+			itemsByAmount.add(soldItemWithAmount);
+		}
+		Map<String, Object> overallTotal = new HashMap<>();
+		overallTotal.put("overallTotal", totalSum);
+		Map<String, Object> itemData = new HashMap<>();
+		itemData.put("display", "Total amount");
+		overallTotal.put("item", itemData);
+		itemsByAmount.add(overallTotal);
+		return itemsByAmount;
+	}
+	
+	@RequestMapping(value = "nondrugorderbillanddispensing", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> dispenseAndCreateBillForNonDrug(@RequestBody Map<String, Object> nonDrugObject) throws Exception {
+		Double quantity;
+		String locationUuid;
+		String remarks = "";
+		String orderUuid;
+		Order savedOrder;
+		if (nonDrugObject.get("order") == null) {
+			throw new Exception("Order is not set");
+		} else {
+			orderUuid = nonDrugObject.get("order").toString();
+		}
+		if (nonDrugObject.get("quantity") == null) {
+			throw new Exception("Quantity is not set");
+		} else {
+			quantity = ((Integer) nonDrugObject.get("quantity")).doubleValue();
+		}
+		if (nonDrugObject.get("location") == null) {
+			throw new Exception("Location is not set");
+		} else {
+			locationUuid = nonDrugObject.get("location").toString();
+		}
+		savedOrder = orderService.getOrderByUuid(orderUuid);
+		ItemPrice itemPrice = Context.getService(ICareService.class).getItemPriceByConceptAndVisit(savedOrder.getEncounter().getVisit(), savedOrder.getConcept());
+		if (itemPrice == null) {
+			throw new ItemNotPayableException(savedOrder.getConcept().getName() + " is not a billable item.");
+		}
+		OrderStatus orderStatus = new OrderStatus();
+		Double price = itemPrice.getPrice();
+		itemPrice.setPrice(price*quantity);
+		OrderMetaData<Order> orderMetaData = new OrderMetaData();
+		orderMetaData.setItemPrice(itemPrice);
+		orderMetaData.setOrder(savedOrder);
+		billingService.processOrder(orderMetaData, quantity);
+		orderStatus = storeService.dispenseNonDrug(savedOrder, quantity, locationUuid, remarks );
+		Map<String, Object> orderResponse = new HashMap<>();
+		orderResponse.put("uuid", savedOrder.getUuid());
+		orderResponse.put("orderStockStatus", orderStatus.getStatus().toString());
+		orderResponse.put("orderNumber", savedOrder.getOrderNumber());
+		return orderResponse;
+	}
+	
+	@RequestMapping(value = "nondrugorderwithdispensing", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> createNonDrugOrder(@RequestBody Map<String, Object> nonDrugOrder) throws Exception{
+		// TODO: This has issues with creating order. Review is necessary
+		Order order = new Order();
+		Map<String, Object> orderObject = (Map<String, Object>) nonDrugOrder.get("order");
+		OrderService orderService = Context.getOrderService();
+		EncounterService encounterService = Context.getEncounterService();
+		ConceptService conceptService = Context.getConceptService();
+		PatientService patientService = Context.getPatientService();
+		ProviderService providerService = Context.getProviderService();
+		Encounter encounter = encounterService.getEncounterByUuid(orderObject.get("encounter").toString());
+		OrderType orderType = orderService.getOrderTypeByUuid(orderObject.get("orderType").toString());
+		Patient patient = patientService.getPatientByUuid(orderObject.get("patient").toString());
+		Concept concept = conceptService.getConceptByUuid(orderObject.get("concept").toString());
+		Provider orderer = providerService.getProviderByUuid(orderObject.get("orderer").toString());
+		OrderContext orderContext = new OrderContext();
+		order.setOrderType(orderType);
+		order.setEncounter(encounter);
+		order.setPatient(patient);
+		CareSetting careSetting = new CareSetting();
+		if (orderObject.get("careSetting").toString().toLowerCase().equals("outpatient")) {
+			careSetting.setCareSettingType(CareSetting.CareSettingType.OUTPATIENT);
+			orderContext.setCareSetting(careSetting);
+		} else {
+			careSetting.setCareSettingType(CareSetting.CareSettingType.INPATIENT);
+			orderContext.setCareSetting(careSetting);
+		}
+		order.setConcept(concept);
+		order.setOrderer(orderer);
+		order.setUrgency(Order.Urgency.valueOf((String) orderObject.get("urgency")));
+		order.setAction(Order.Action.valueOf((String) orderObject.get("action")));
+		OrderStatus orderStatus = new OrderStatus();
+		Order savedOrder = new Order();
+		if (order != null) {
+			savedOrder = orderService.saveOrder(order, orderContext);
+			Double quantity;
+			String locationUuid;
+			String remarks = "";
+			if (nonDrugOrder.get("quantity") == null) {
+				throw new Exception("Quantity is not set");
+			} else {
+				quantity = ((Integer) nonDrugOrder.get("quantity")).doubleValue();
+			}
+			if (nonDrugOrder.get("location") == null) {
+				throw new Exception("Location is not set");
+			} else {
+				locationUuid = nonDrugOrder.get("location").toString();
+			}
+			ItemPrice itemPrice = Context.getService(ICareService.class).getItemPriceByConceptAndVisit(savedOrder.getEncounter().getVisit(), savedOrder.getConcept());
+			if (itemPrice == null) {
+				throw new ItemNotPayableException(order.getConcept().getName() + " is not a billable item.");
+			}
+			//Set the metadata
+			Double price = itemPrice.getPrice();
+			itemPrice.setPrice(price*quantity);
+			OrderMetaData<Order> orderMetaData = new OrderMetaData();
+			orderMetaData.setItemPrice(itemPrice);
+			orderMetaData.setOrder(savedOrder);
+			billingService.processOrder(orderMetaData, quantity);
+			orderStatus = storeService.dispenseNonDrug(savedOrder, quantity, locationUuid, remarks );
+		}
+
+		Map<String, Object> orderResponse = new HashMap<>();
+		orderResponse.put("uuid", savedOrder.getUuid());
+		orderResponse.put("orderStockStatus", orderStatus.getStatus().toString());
+		orderResponse.put("orderNumber", savedOrder.getOrderNumber());
+		return orderResponse;
+	}
+	
+	@RequestMapping(value = "generatehduapidatatemplate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> onPGenerateReportForHDUAPI(@RequestBody Map<String, Object> visitParameters) throws Exception {
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		Date startDate = formatter.parse(visitParameters.get("startDate").toString());
+		Date endDate = formatter.parse(visitParameters.get("endDate").toString());
+		Map<String, Object> response = iCareService.generateVisitsData(startDate, endDate,
+		    (Boolean) visitParameters.get("sendToExternal"));
+		return response;
 	}
 }

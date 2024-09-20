@@ -1,5 +1,8 @@
-import { Component, EventEmitter, OnInit, Output } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import {
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  Validators,
+} from "@angular/forms";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import {
@@ -20,6 +23,7 @@ import {
 import { formatCurrentUserDetails } from "../../helpers";
 import { Credentials } from "../../models";
 import { AuthService } from "../../services/auth.service";
+import { Component, EventEmitter, OnInit, Output } from "@angular/core";
 
 @Component({
   selector: "app-login-form",
@@ -79,7 +83,7 @@ export class LoginFormComponent implements OnInit {
               userDetails: formatCurrentUserDetails(authenticatedUser),
             })
           );
-          this.store.dispatch(loadRolesDetails());
+          // this.store.dispatch(loadRolesDetails());
           this.closeLogin.emit();
         } else {
           authenticateUserFail({
