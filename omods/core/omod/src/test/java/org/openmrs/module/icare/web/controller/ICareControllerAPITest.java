@@ -965,7 +965,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testGetCommonlyOrderedItems() throws Exception {
 		MockHttpServletRequest drugs = newGetRequest("icare/commonlyordereditems", new Parameter("locationUuid",
-		        "44939999-d333-fff2-9bff-61d11117c22e"), new Parameter("provider","1010d442-e134-11de-babe-001e378eb67e"));
+		        "44939999-d333-fff2-9bff-61d11117c22e"), new Parameter("provider", "1010d442-e134-11de-babe-001e378eb67e"));
 		MockHttpServletResponse response = handle(drugs);
 		Map<String, Object> drugsMap = (new ObjectMapper()).readValue(response.getContentAsString(), Map.class);
 		List<Map<String, Object>> results = (List) drugsMap.get("results");
@@ -973,14 +973,14 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		
 		//		TODO: Add test for normal orders
 	}
-
-
+	
 	@Test
 	public void testGetTotalinvoiceamountbyitems() throws Exception {
-		MockHttpServletRequest drugs = newGetRequest("icare/totalinvoiceamountbyitems",
-				new Parameter("provider","1010d442-e134-11de-babe-001e378eb67e"));
+		MockHttpServletRequest drugs = newGetRequest("icare/totalinvoiceamountbyitems", new Parameter("provider",
+		        "1010d442-e134-11de-babe-001e378eb67e"));
 		MockHttpServletResponse response = handle(drugs);
-		List<Map<String, Object>> invoiceItemsByAmount = (new ObjectMapper()).readValue(response.getContentAsString(), List.class);
+		List<Map<String, Object>> invoiceItemsByAmount = (new ObjectMapper()).readValue(response.getContentAsString(),
+		    List.class);
 		assertThat("Count of items with total amount", invoiceItemsByAmount.size(), is(0));
 	}
 	

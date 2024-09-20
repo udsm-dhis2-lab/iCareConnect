@@ -729,7 +729,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		}
 		return newOrder;
 	}
-
+	
 	@Override
 	public List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) throws Exception {
 		return this.invoiceDAO.getTotalAmountFromPaidInvoices(startDate, endDate, provider);

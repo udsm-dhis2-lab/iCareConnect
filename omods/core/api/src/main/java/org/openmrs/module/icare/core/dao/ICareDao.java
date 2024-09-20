@@ -689,7 +689,7 @@ public class ICareDao extends BaseDAO<Item> {
 		if (isDrug == null || isDrug == true) {
 			queryStr = "SELECT distinct pres.drug AS drug, COUNT(pres.orderId) AS count FROM Prescription pres ";
 			if (provider != null) {
-				queryStr+= " LEFT JOIN pres.orderer provider WHERE provider.uuid = :provider ";
+				queryStr += " LEFT JOIN pres.orderer provider WHERE provider.uuid = :provider ";
 			}
 			if (startDate != null && endDate != null) {
 				if (queryStr.contains("WHERE")) {
@@ -698,11 +698,11 @@ public class ICareDao extends BaseDAO<Item> {
 					queryStr += " WHERE ps.dateActivated BETWEEN :startDate AND :endDate";
 				}
 			}
-			queryStr+= "GROUP BY pres.drug ORDER BY COUNT(pres.orderId)  DESC";
+			queryStr += "GROUP BY pres.drug ORDER BY COUNT(pres.orderId)  DESC";
 		} else {
 			queryStr = "SELECT distinct order, COUNT(order.orderId) AS count FROM Order order ";
 			if (provider != null) {
-				queryStr+=  " LEFT JOIN pres.orderer provider WHERE provider.uuid = :provider ";
+				queryStr += " LEFT JOIN pres.orderer provider WHERE provider.uuid = :provider ";
 			}
 			if (startDate != null && endDate != null) {
 				if (queryStr.contains("WHERE")) {
@@ -711,11 +711,11 @@ public class ICareDao extends BaseDAO<Item> {
 					queryStr += " WHERE ps.dateActivated BETWEEN :startDate AND :endDate";
 				}
 			}
-			queryStr+= "GROUP BY order.concept ORDER BY COUNT(order.orderId) DESC";
+			queryStr += "GROUP BY order.concept ORDER BY COUNT(order.orderId) DESC";
 		}
 		
 		Query query = session.createQuery(queryStr);
-
+		
 		if (provider != null) {
 			query.setParameter("provider", provider);
 		}

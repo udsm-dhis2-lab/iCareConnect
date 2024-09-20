@@ -1487,7 +1487,7 @@ public class ICareController {
 		results.put("results", commonlyUsedItems);
 		return results;
 	}
-
+	
 	@RequestMapping(value = "solditems", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> getSoldItems(
@@ -1528,7 +1528,7 @@ public class ICareController {
 		response.put("results", soldItems);
 		return response;
 	}
-
+	
 	@RequestMapping(value = "totalinvoiceamountbyitems", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> getTotalInvoice(
@@ -1538,14 +1538,20 @@ public class ICareController {
 	) throws Exception {
 		List<Map<String, Object>> itemsByAmount = new ArrayList<>();
 		List<Object[]> soldItemsByTotalAmount = billingService.getTotalAmountFromPaidInvoices(startDate, endDate, provider);
+		double totalSum = 0.0;
 		for (Object[] soldItem: soldItemsByTotalAmount) {
-			Long totalPrice = Long.valueOf(soldItem[0].toString());
+			double totalPrice = Double.parseDouble(soldItem[0].toString());
+			totalSum += totalPrice;
 			Item item = (Item) soldItem[1];
 			Map<String, Object> soldItemWithAmount = new HashMap<>();
 			soldItemWithAmount.put("totalPrice", totalPrice);
 			soldItemWithAmount.put("item", item.getDisplayString());
 			itemsByAmount.add(soldItemWithAmount);
 		}
+		Map<String, Object> overallTotal = new HashMap<>();
+		overallTotal.put("overallTotal", totalSum);
+		overallTotal.put("item", "Total amount");
+		itemsByAmount.add(overallTotal);
 		return itemsByAmount;
 	}
 	

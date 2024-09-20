@@ -79,6 +79,6 @@ public interface BillingService extends OpenmrsService {
 	Order createOrderForOngoingIPDPatients() throws Exception;
 	
 	Order createOrderForOngoingDeceasedPatients() throws Exception;
-
+	
 	List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) throws Exception;
 }
