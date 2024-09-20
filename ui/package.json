@@ -64,6 +64,7 @@
     "ngx-mat-select-search": "^7.0.5",
     "ngx-print": "^1.5.1",
     "num-words": "^1.2.2",
+    "pdfjs-dist": "^4.6.82",
     "pdfmake": "^0.2.7",
     "quick-pivot": "^2.7.0",
     "rxjs": "~6.6.0",
