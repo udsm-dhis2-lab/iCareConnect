@@ -21,10 +21,7 @@ import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 
 import javax.naming.ConfigurationException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class BillingServiceImpl extends BaseOpenmrsService implements BillingService {
@@ -731,5 +728,10 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			newOrder = orderService.saveOrder(order, orderContext);
 		}
 		return newOrder;
+	}
+	
+	@Override
+	public List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) throws Exception {
+		return this.invoiceDAO.getTotalAmountFromPaidInvoices(startDate, endDate, provider);
 	}
 }
