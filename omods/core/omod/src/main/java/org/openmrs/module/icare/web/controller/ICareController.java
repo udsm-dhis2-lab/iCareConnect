@@ -1544,13 +1544,15 @@ public class ICareController {
 			totalSum += totalPrice;
 			Item item = (Item) soldItem[1];
 			Map<String, Object> soldItemWithAmount = new HashMap<>();
-			soldItemWithAmount.put("totalPrice", totalPrice);
-			soldItemWithAmount.put("item", item.getDisplayString());
+			soldItemWithAmount.put("totalAmount", totalPrice);
+			soldItemWithAmount.put("item", item.toMap());
 			itemsByAmount.add(soldItemWithAmount);
 		}
 		Map<String, Object> overallTotal = new HashMap<>();
 		overallTotal.put("overallTotal", totalSum);
-		overallTotal.put("item", "Total amount");
+		Map<String, Object> itemData = new HashMap<>();
+		itemData.put("display", "Total amount");
+		overallTotal.put("item", itemData);
 		itemsByAmount.add(overallTotal);
 		return itemsByAmount;
 	}
