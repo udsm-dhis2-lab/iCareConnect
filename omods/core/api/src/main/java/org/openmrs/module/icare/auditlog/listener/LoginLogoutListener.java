@@ -12,14 +12,14 @@ import java.util.Date;
 
 @Component
 public class LoginLogoutListener implements UserSessionListener {
-
+	
 	@Autowired
 	ICareService iCareService;
-
+	
 	@Override
 	@Transactional
 	public void loggedInOrOut(User user, Event event, Status status) {
-
+		
 		if (event == Event.LOGIN) {
 			// User logged in successfully
 			System.out.println("User " + user.getUsername() + " logged in at " + new Date() + " and status " + event);
