@@ -98,7 +98,6 @@ public class InvoiceDAO extends BaseDAO<Invoice> {
 	
 	public List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) {
 		DbSession session = this.getSession();
-		new InvoiceItem();
 		String queryStr = "SELECT SUM(inv.price * inv.quantity) as total, inv.id.item FROM InvoiceItem inv ";
 		if (startDate != null && endDate != null) {
 			queryStr += " WHERE inv.id.order.dataActivated BETWEEN :startDate AND :endDate ";
