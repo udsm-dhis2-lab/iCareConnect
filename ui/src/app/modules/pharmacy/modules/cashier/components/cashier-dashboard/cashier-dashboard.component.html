@@ -20,7 +20,7 @@
           mode="indeterminate"
           *ngIf="!params?.currentLocation"
         ></mat-progress-bar>
-        <mat-card>
+        <mat-card appearance="outlined">
           <!-- <fieldset>
             <legend>Drug/Non-drug</legend> -->
           <div class="row mb-2 d-flex justify-content-left">
@@ -211,7 +211,7 @@
       </ng-container>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-12 col-sx-12">
-      <mat-card *ngIf="!saving">
+      <mat-card appearance="outlined" class="p-3" *ngIf="!saving">
         <div class="h5">Commonly sold items</div>
         <app-commonly-ordered-items
           [currentLocation]="currentLocation"

@@ -1,4 +1,4 @@
-import { getSelectors, RouterReducerState } from '@ngrx/router-store';
+import { getRouterSelectors, RouterReducerState } from '@ngrx/router-store';
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 
 import { AppState } from '../reducers';
@@ -12,7 +12,7 @@ export const {
   selectRouteParams: getRouteParams, // select the current route params
   selectRouteData: getRouteData, // select the current route data
   selectUrl: getUrl, // select the current url
-} = getSelectors(selectRouter);
+} = getRouterSelectors(selectRouter);
 
 export const getIfNonLoginRoute = createSelector(
   getUrl,

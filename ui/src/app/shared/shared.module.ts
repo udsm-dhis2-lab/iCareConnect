@@ -38,13 +38,9 @@ import { NgxMatSelectSearchModule } from "ngx-mat-select-search";
     ...sharedStoreModals,
     ...sharedPipes,
     ...sharedDialogs,
+    ...sharedEntryComponents,
     HttpClientModule,
     NgxMatSelectSearchModule,
-  ],
-  entryComponents: [
-    ...sharedEntryComponents,
-    ...sharedDialogs,
-    ...sharedStoreModals,
   ],
   declarations: [
     ...components,

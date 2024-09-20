@@ -21,11 +21,11 @@
         ></app-form>
       </div>
       <div *ngIf="params?.drugsAvailable" style="width: 100%; overflow: auto">
-        <mat-chip-list aria-label="Available Drugs">
-          <mat-chip *ngFor="let availableDrug of params?.drugsAvailable">
+        <mat-chip-listbox aria-label="Available Drugs">
+          <mat-chip-option *ngFor="let availableDrug of params?.drugsAvailable">
             {{ availableDrug?.display }}
-          </mat-chip>
-        </mat-chip-list>
+          </mat-chip-option>
+        </mat-chip-listbox>
       </div>
       <div>
         <app-form

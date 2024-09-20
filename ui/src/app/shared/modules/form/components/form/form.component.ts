@@ -8,7 +8,7 @@ import {
   ViewChild,
   SimpleChanges,
 } from "@angular/core";
-import { FormGroup } from "@angular/forms";
+import { UntypedFormGroup } from "@angular/forms";
 import { Field } from "../../models/field.model";
 import { FieldControlService } from "../../services";
 import { FieldsData } from "../../models/fields-data.model";
@@ -46,7 +46,7 @@ export class FormComponent implements OnInit {
 
   values: any;
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   payload = "";
   fieldsResponsedToEnterKey: any = {};
 
@@ -90,7 +90,7 @@ export class FormComponent implements OnInit {
     // this.formUpdate.emit(this.form.getRawValue());
   }
 
-  onFieldUpdate(form: FormGroup): void {
+  onFieldUpdate(form: UntypedFormGroup): void {
     if (!this.showSaveButton && form) {
       this.values = this.form?.getRawValue();
 

@@ -23,7 +23,12 @@
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "src/manifest.webmanifest",
+              "src/manifest.webmanifest"
+            ],
             "styles": [
               "./src/theme.scss",
               "src/styles.scss",
@@ -36,7 +41,9 @@
             "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "serviceWorker": true,
+            "ngswConfigPath": "ngsw-config.json"
           },
           "configurations": {
             "production": {
@@ -72,19 +79,19 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "icare-ui:build",
-            "proxyConfig": "proxy-config.json"
+            "proxyConfig": "proxy-config.json",
+            "buildTarget": "icare-ui:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "icare-ui:build:production"
+              "buildTarget": "icare-ui:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "icare-ui:build"
+            "buildTarget": "icare-ui:build"
           }
         },
         "test": {
@@ -94,20 +101,14 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "src/manifest.webmanifest",
+              "src/manifest.webmanifest"
+            ],
             "styles": ["src/styles.scss"],
             "scripts": []
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "tsconfig.app.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
-            ],
-            "exclude": ["**/node_modules/**"]
           }
         },
         "e2e": {
@@ -125,7 +126,6 @@
       }
     }
   },
-  "defaultProject": "icare-ui",
   "cli": {
     "analytics": "5c599b07-2246-4c48-b1af-c2064c384d98"
   }
