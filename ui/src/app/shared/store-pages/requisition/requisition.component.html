@@ -19,7 +19,7 @@
 >
   <mat-card appearance="outlined" class="border">
     <div class="d-flex justify-content-between">
-      <div class="w-50">
+      <div class="w-75">
         <div class="d-flex">
           <div class="">
             <app-invoice-filters
@@ -28,7 +28,7 @@
               (definedStartDate)="onGetStartDate($event)"
             ></app-invoice-filters>
           </div>
-          <mat-form-field class="w-25 ml-2" appearance="fill">
+          <mat-form-field class="w-100 ml-2" appearance="fill">
             <mat-label>Filter </mat-label>
             <mat-select (selectionChange)="onSelectStatus($event)">
               <mat-option *ngFor="let status of statuses" [value]="status">
@@ -232,7 +232,7 @@
                 <span class="ml-4 text-small"
                   ><i>
                     Requested on:
-                    {{ requisition?.created | date: "dd/MM/yyyy" }}
+                    {{ requisition?.created | date : "dd/MM/yyyy" }}
                   </i></span
                 >
                 <span class="ml-4">

@@ -1500,8 +1500,15 @@ public class ICareController {
 		// TODO: This is meant to include price and total amount of money from the expected sold stock. SO far its unfinished
 		List<Map<String, Object>> soldItems = new ArrayList<>();
 		Map<String, Object> response = new HashMap<>();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		Date start = null;
+		Date end = null;
+		if (startDate!= null && endDate != null) {
+			start = formatter.parse(startDate.toString());
+			end = formatter.parse(endDate.toString());
+		}
 		List<Object[]> orderedItems = iCareService.getCommonlyOrderedItems(null, null, limit, startIndex, null,
-				provider, startDate, endDate);
+				provider, start, end);
 		for (Object[] orderedItemsRowInfo: orderedItems) {
 			Long count = Long.valueOf(orderedItemsRowInfo[1].toString());
 			Drug drugDetails = new Drug();
@@ -1536,8 +1543,15 @@ public class ICareController {
 			@RequestParam(required = false) Date endDate,
 			@RequestParam(required = false) String provider
 	) throws Exception {
+		Date start = null;
+		Date end = null;
 		List<Map<String, Object>> itemsByAmount = new ArrayList<>();
-		List<Object[]> soldItemsByTotalAmount = billingService.getTotalAmountFromPaidInvoices(startDate, endDate, provider);
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		if (startDate!= null && endDate != null) {
+			start = formatter.parse(startDate.toString());
+			end = formatter.parse(endDate.toString());
+		}
+		List<Object[]> soldItemsByTotalAmount = billingService.getTotalAmountFromPaidInvoices(start, end, provider);
 		double totalSum = 0.0;
 		for (Object[] soldItem: soldItemsByTotalAmount) {
 			double totalPrice = Double.parseDouble(soldItem[0].toString());
@@ -1549,7 +1563,7 @@ public class ICareController {
 			itemsByAmount.add(soldItemWithAmount);
 		}
 		Map<String, Object> overallTotal = new HashMap<>();
-		overallTotal.put("overallTotal", totalSum);
+		overallTotal.put("overAllTotal", totalSum);
 		Map<String, Object> itemData = new HashMap<>();
 		itemData.put("display", "Total amount");
 		overallTotal.put("item", itemData);
@@ -1674,10 +1688,24 @@ public class ICareController {
 	@ResponseBody
 	public Map<String, Object> onPGenerateReportForHDUAPI(@RequestBody Map<String, Object> visitParameters) throws Exception {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		Date startDate = formatter.parse(visitParameters.get("startDate").toString());
-		Date endDate = formatter.parse(visitParameters.get("endDate").toString());
-		Map<String, Object> response = iCareService.generateVisitsData(startDate, endDate,
-		    (Boolean) visitParameters.get("sendToExternal"));
-		return response;
+		
+		Date startDate = null;
+		Date endDate = null;
+		if (visitParameters.get("startDate") != null) {
+			startDate = formatter.parse(visitParameters.get("startDate").toString());
+		} else {
+			throw new IllegalArgumentException("Start date cannot be null.");
+		}
+		
+		if (visitParameters.get("endDate") != null) {
+			endDate = formatter.parse(visitParameters.get("endDate").toString());
+		} else {
+			throw new IllegalArgumentException("End date cannot be null.");
+		}
+		Boolean sendToExternal = (Boolean) visitParameters.get("sendToExternal");
+		if (sendToExternal == null) {
+			throw new IllegalArgumentException("sendToExternal parameter cannot be null.");
+		}
+		return iCareService.generateVisitsData(startDate, endDate, sendToExternal);
 	}
 }
