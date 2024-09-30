@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewEncapsulation } from "@angular/core";
 import { Observable, of } from "rxjs";
 import { Store } from "@ngrx/store";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
@@ -40,6 +40,7 @@ import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configu
   selector: "lab-root",
   templateUrl: "./laboratory.component.html",
   styleUrls: ["./laboratory.component.scss"],
+  encapsulation: ViewEncapsulation.None 
 })
 export class LaboratoryComponent implements OnInit {
   title = "Laboratory";
