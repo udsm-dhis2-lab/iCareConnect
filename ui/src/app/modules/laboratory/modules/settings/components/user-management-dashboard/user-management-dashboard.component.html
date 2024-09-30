@@ -5,7 +5,7 @@
     mode="indeterminate"
     *ngIf="!params?.securitySystemSettings"
   ></mat-progress-bar>
-  <mat-card *ngIf="params?.securitySystemSettings">
+  <mat-card appearance="outlined" *ngIf="params?.securitySystemSettings">
     <div class="w-100 d-flex justify-content-between mb-2">
       <div class="h4 font-weight-normal">User Management</div>
       <button

@@ -6,8 +6,7 @@ import { SharedModule } from "../../shared/shared.module";
 import { StoreHomePageComponent } from "./pages/store-home-page/store-home-page.component";
 
 @NgModule({
-  declarations: [StoreHomePageComponent],
-  entryComponents: [],
-  imports: [CommonModule, StoreRoutingModule, SharedModule],
+    declarations: [StoreHomePageComponent],
+    imports: [CommonModule, StoreRoutingModule, SharedModule]
 })
 export class StoreModule {}

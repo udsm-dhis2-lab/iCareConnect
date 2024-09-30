@@ -10,6 +10,7 @@ import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.billing.models.DiscountInvoiceItem;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -92,6 +93,31 @@ public class InvoiceDAO extends BaseDAO<Invoice> {
 		//queryStr = "SELECT i FROM Invoice i WHERE i.patient.uuid = :patientUuid";
 		Query query = session.createQuery(queryStr);
 		query.setParameter("visitUuid", visitUuid);
+		return query.list();
+	}
+	
+	public List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) {
+		DbSession session = this.getSession();
+		String queryStr = "SELECT SUM(inv.price * inv.quantity) as total, inv.id.item FROM InvoiceItem inv ";
+		if (startDate != null && endDate != null) {
+			queryStr += " WHERE inv.id.order.dataActivated BETWEEN :startDate AND :endDate ";
+		}
+		if (provider != null) {
+			if (queryStr.contains("WHERE")) {
+				queryStr += " AND inv.id.order.orderer.uuid = :provider ";
+			} else {
+				queryStr += " WHERE inv.id.order.orderer.uuid = :provider ";
+			}
+		}
+		queryStr += " GROUP BY inv.id.item";
+		Query query = session.createQuery(queryStr);
+		if (startDate != null && endDate != null) {
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
+		}
+		if (provider != null) {
+			query.setParameter("provider", provider);
+		}
 		return query.list();
 	}
 }

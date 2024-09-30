@@ -15,6 +15,7 @@
   padding: 15px;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version. */
 ::ng-deep .mat-select-value,
 ::ng-deep .mat-select-disabled .mat-select-value {
   color: #222 !important;

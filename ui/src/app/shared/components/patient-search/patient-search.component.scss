@@ -49,7 +49,7 @@
   margin-left: -8px;
   margin-right: -8px;
   padding-bottom: 10px;
-
+  /*TODO(mdc-migration): The following rule targets internal classes of option that may no longer apply for the MDC version.*/
   mat-option {
     font-size: 14px;
     height: 35px;
