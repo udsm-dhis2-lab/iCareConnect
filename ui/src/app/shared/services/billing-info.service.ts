@@ -1,12 +1,14 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { from, Observable, zip } from 'rxjs';
-import { BASE_URL } from '../constants/constants.constants';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { from, Observable, of, zip } from "rxjs";
+import { BASE_URL } from "../constants/constants.constants";
+import { SoldItemsAmount } from "../models/sold-items-amount.model";
+import { catchError, map } from "rxjs/operators";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
-export class LabOrdersBillingService {
+export class GeneralBillingService {
   constructor(private httpClient: HttpClient) {}
 
   getLabOrdersBillingInfo(parameters): Observable<any> {
@@ -17,17 +19,22 @@ export class LabOrdersBillingService {
         return from(
           this.httpClient.get(
             BASE_URL +
-              'billing/quotation/read/dates/indexed?endDate=' +
+              "billing/quotation/read/dates/indexed?endDate=" +
               parameters.endDate +
-              '&endIndex=' +
+              "&endIndex=" +
               (Number(index) + 100) +
-              '&isAscending=false&startDate=' +
+              "&isAscending=false&startDate=" +
               parameters.startDate +
-              '&startIndex=' +
+              "&startIndex=" +
               (Number(index) + 1)
           )
         );
       })
+    ).pipe(
+      map((response: any) => {
+        return response;
+      }),
+      catchError((error: any) => of(error))
     );
     // .pipe(
     //   map((visitResponse: any) => {
@@ -57,12 +64,30 @@ export class LabOrdersBillingService {
   billingInfoBymRN(mrn, visitsParameters) {
     return this.httpClient.get(
       BASE_URL +
-        'billing/order/read/patient/identifier?endDate=' +
+        "billing/order/read/patient/identifier?endDate=" +
         visitsParameters?.endDate +
-        '&isAscending=false&patientMRN=' +
+        "&isAscending=false&patientMRN=" +
         mrn +
-        '&startDate=' +
+        "&startDate=" +
         visitsParameters?.startDate
     );
+  }
+
+  loadSoldItemsGeneratedAmount(
+    parameters?: string[]
+  ): Observable<SoldItemsAmount[]> {
+    return this.httpClient
+      .get<SoldItemsAmount>(
+        BASE_URL +
+          `icare/totalinvoiceamountbyitems?${
+            parameters?.length > 0 ? parameters.join("&") : ""
+          }`
+      )
+      .pipe(
+        map((response: any) => {
+          return response;
+        }),
+        catchError((error: any) => of(error))
+      );
   }
 }

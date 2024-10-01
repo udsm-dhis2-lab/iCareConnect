@@ -346,7 +346,6 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		visitData = handle.getContentAsString();
 		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
 		visitDetails = (List<Map>) visitMap.get("results");
-		System.out.println(visitDetails.size());
 		assertThat("Should return a visit", visitDetails.size() == 0);
 		
 	}
@@ -976,12 +975,12 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testGetTotalinvoiceamountbyitems() throws Exception {
-		MockHttpServletRequest drugs = newGetRequest("icare/totalinvoiceamountbyitems", new Parameter("provider",
-		        "1010d442-e134-11de-babe-001e378eb67e"));
+		MockHttpServletRequest drugs = newGetRequest("icare/totalinvoiceamountbyitems", new Parameter("startDate",
+		        "2024-09-24"), new Parameter("endDate", "2024-10-02"));
 		MockHttpServletResponse response = handle(drugs);
 		List<Map<String, Object>> invoiceItemsByAmount = (new ObjectMapper()).readValue(response.getContentAsString(),
 		    List.class);
-		assertThat("Count of items with total amount", invoiceItemsByAmount.size(), is(0));
+		assertThat("Count of items with total amount", invoiceItemsByAmount.size(), is(3));
 	}
 	
 	@Test
