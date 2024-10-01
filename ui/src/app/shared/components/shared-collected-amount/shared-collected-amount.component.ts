@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { GeneralBillingService } from "../../services/billing-info.service";
 import { Observable } from "rxjs";
 import { SoldItemsAmount } from "../../models/sold-items-amount.model";
@@ -15,9 +15,12 @@ export class SharedCollectedAmountComponent implements OnInit {
   soldItemsByAmountDetails$: Observable<SoldItemsAmount[]>;
   userCategory: string = "me";
   parameters: string[] = [];
+  @Input() provider: any;
   constructor(private generalBillingService: GeneralBillingService) {}
 
   ngOnInit(): void {
+    console.log(this.provider);
+    this.parameters = [...this.parameters, `provider=${this.provider?.uuid}`];
     this.loadBillingData();
   }
 
@@ -27,13 +30,14 @@ export class SharedCollectedAmountComponent implements OnInit {
   }
 
   onToggleToday(event: MatCheckbox): void {
-    console.log(event);
+    const today = new Date();
     this.parameters = [
       ...this.parameters,
-      `startDate=${formatDateToYYMMDD(new Date())}`,
-      `endDate=${formatDateToYYMMDD(new Date())}`,
+      `startDate=${formatDateToYYMMDD(today)}`,
+      `endDate=${formatDateToYYMMDD(
+        new Date(today.setDate(today.getDate() + 1))
+      )}`,
     ];
-    console.log(this.parameters);
     this.loadBillingData();
   }
 

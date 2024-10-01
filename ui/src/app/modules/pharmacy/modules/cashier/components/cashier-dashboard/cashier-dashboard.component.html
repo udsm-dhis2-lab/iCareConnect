@@ -237,7 +237,9 @@
               (confirmExemption)="onConfirmExemption($event)"
             >
             </app-exemption-item> -->
-            <app-shared-collected-amount></app-shared-collected-amount>
+            <app-shared-collected-amount
+              [provider]="provider"
+            ></app-shared-collected-amount>
           </mat-expansion-panel>
         </mat-accordion>
       </div>

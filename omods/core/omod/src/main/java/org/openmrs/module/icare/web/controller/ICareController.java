@@ -23,6 +23,8 @@ import org.openmrs.module.icare.auditlog.api.AuditLogService;
 import org.openmrs.module.icare.auditlog.api.db.AuditLogDAO;
 import org.openmrs.module.icare.billing.ItemNotPayableException;
 import org.openmrs.module.icare.billing.OrderMetaData;
+import org.openmrs.module.icare.billing.models.Invoice;
+import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.BillingService;
@@ -1493,8 +1495,8 @@ public class ICareController {
 	public Map<String, Object> getSoldItems(
 			@RequestParam(defaultValue = "10") Integer limit,
 			@RequestParam(defaultValue = "0") Integer startIndex,
-			@RequestParam(required = false) Date startDate,
-			@RequestParam(required = false) Date endDate,
+			@RequestParam(required = false) String startDate,
+			@RequestParam(required = false) String endDate,
 			@RequestParam(required = false) String provider
 	) throws Exception {
 		// TODO: This is meant to include price and total amount of money from the expected sold stock. SO far its unfinished
@@ -1504,8 +1506,8 @@ public class ICareController {
 		Date start = null;
 		Date end = null;
 		if (startDate!= null && endDate != null) {
-			start = formatter.parse(startDate.toString());
-			end = formatter.parse(endDate.toString());
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
 		}
 		List<Object[]> orderedItems = iCareService.getCommonlyOrderedItems(null, null, limit, startIndex, null,
 				provider, start, end);
@@ -1539,8 +1541,8 @@ public class ICareController {
 	@RequestMapping(value = "totalinvoiceamountbyitems", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> getTotalInvoice(
-			@RequestParam(required = false) Date startDate,
-			@RequestParam(required = false) Date endDate,
+			@RequestParam(required = false) String startDate,
+			@RequestParam(required = false) String endDate,
 			@RequestParam(required = false) String provider
 	) throws Exception {
 		Date start = null;
@@ -1548,15 +1550,17 @@ public class ICareController {
 		List<Map<String, Object>> itemsByAmount = new ArrayList<>();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		if (startDate!= null && endDate != null) {
-			start = formatter.parse(startDate.toString());
-			end = formatter.parse(endDate.toString());
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
 		}
 		List<Object[]> soldItemsByTotalAmount = billingService.getTotalAmountFromPaidInvoices(start, end, provider);
+
 		double totalSum = 0.0;
 		for (Object[] soldItem: soldItemsByTotalAmount) {
 			double totalPrice = Double.parseDouble(soldItem[0].toString());
 			totalSum += totalPrice;
 			Item item = (Item) soldItem[1];
+			InvoiceItem invoiceItem = (InvoiceItem) soldItem[2];
 			Map<String, Object> soldItemWithAmount = new HashMap<>();
 			soldItemWithAmount.put("totalAmount", totalPrice);
 			soldItemWithAmount.put("item", item.toMap());
