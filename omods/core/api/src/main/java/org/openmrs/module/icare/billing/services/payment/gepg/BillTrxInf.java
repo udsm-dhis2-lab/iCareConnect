@@ -2,194 +2,194 @@ package org.openmrs.module.icare.billing.services.payment.gepg;
 
 public class BillTrxInf {
 	
-	private String billId;
+	private String BillId;
 	
-	private String subSpCode;
+	private String SubSpCode;
 	
-	private String spSysId;
+	private String SpSysId;
 	
-	private String billAmt;
+	private String BillAmt;
 	
-	private String miscAmt;
+	private String MiscAmt;
 	
-	private String billExprDt;
+	private String BillExprDt;
 	
-	private String pyrId;
+	private String PyrId;
 	
-	private String pyrName;
+	private String PyrName;
 	
-	private String billDesc;
+	private String BillDesc;
 	
-	private String billGenDt;
+	private String BillGenDt;
 	
-	private String billGenBy;
+	private String BillGenBy;
 	
-	private String billApprBy;
+	private String BillApprBy;
 	
-	private String pyrCellNum;
+	private String PyrCellNum;
 	
-	private String pyrEmail;
+	private String PyrEmail;
 	
-	private String ccy;
+	private String Ccy;
 	
-	private String billEqvAmt;
+	private String BillEqvAmt;
 	
-	private String remFlag;
+	private String RemFlag;
 	
-	private String billPayOpt;
+	private String BillPayOpt;
 	
-	private BillItems billItems;
+	private BillItems BillItems;
 	
-	// Getters and setters
+	// Getters and Setters
 	public String getBillId() {
-		return billId;
+		return BillId;
 	}
 	
-	public void setBillId(String billId) {
-		this.billId = billId;
+	public void setBillId(String BillId) {
+		this.BillId = BillId;
 	}
 	
 	public String getSubSpCode() {
-		return subSpCode;
+		return SubSpCode;
 	}
 	
-	public void setSubSpCode(String subSpCode) {
-		this.subSpCode = subSpCode;
+	public void setSubSpCode(String SubSpCode) {
+		this.SubSpCode = SubSpCode;
 	}
 	
 	public String getSpSysId() {
-		return spSysId;
+		return SpSysId;
 	}
 	
-	public void setSpSysId(String spSysId) {
-		this.spSysId = spSysId;
+	public void setSpSysId(String SpSysId) {
+		this.SpSysId = SpSysId;
 	}
 	
 	public String getBillAmt() {
-		return billAmt;
+		return BillAmt;
 	}
 	
-	public void setBillAmt(String billAmt) {
-		this.billAmt = billAmt;
+	public void setBillAmt(String BillAmt) {
+		this.BillAmt = BillAmt;
 	}
 	
 	public String getMiscAmt() {
-		return miscAmt;
+		return MiscAmt;
 	}
 	
-	public void setMiscAmt(String miscAmt) {
-		this.miscAmt = miscAmt;
+	public void setMiscAmt(String MiscAmt) {
+		this.MiscAmt = MiscAmt;
 	}
 	
 	public String getBillExprDt() {
-		return billExprDt;
+		return BillExprDt;
 	}
 	
-	public void setBillExprDt(String billExprDt) {
-		this.billExprDt = billExprDt;
+	public void setBillExprDt(String BillExprDt) {
+		this.BillExprDt = BillExprDt;
 	}
 	
 	public String getPyrId() {
-		return pyrId;
+		return PyrId;
 	}
 	
-	public void setPyrId(String pyrId) {
-		this.pyrId = pyrId;
+	public void setPyrId(String PyrId) {
+		this.PyrId = PyrId;
 	}
 	
 	public String getPyrName() {
-		return pyrName;
+		return PyrName;
 	}
 	
-	public void setPyrName(String pyrName) {
-		this.pyrName = pyrName;
+	public void setPyrName(String PyrName) {
+		this.PyrName = PyrName;
 	}
 	
 	public String getBillDesc() {
-		return billDesc;
+		return BillDesc;
 	}
 	
-	public void setBillDesc(String billDesc) {
-		this.billDesc = billDesc;
+	public void setBillDesc(String BillDesc) {
+		this.BillDesc = BillDesc;
 	}
 	
 	public String getBillGenDt() {
-		return billGenDt;
+		return BillGenDt;
 	}
 	
-	public void setBillGenDt(String billGenDt) {
-		this.billGenDt = billGenDt;
+	public void setBillGenDt(String BillGenDt) {
+		this.BillGenDt = BillGenDt;
 	}
 	
 	public String getBillGenBy() {
-		return billGenBy;
+		return BillGenBy;
 	}
 	
-	public void setBillGenBy(String billGenBy) {
-		this.billGenBy = billGenBy;
+	public void setBillGenBy(String BillGenBy) {
+		this.BillGenBy = BillGenBy;
 	}
 	
 	public String getBillApprBy() {
-		return billApprBy;
+		return BillApprBy;
 	}
 	
-	public void setBillApprBy(String billApprBy) {
-		this.billApprBy = billApprBy;
+	public void setBillApprBy(String BillApprBy) {
+		this.BillApprBy = BillApprBy;
 	}
 	
 	public String getPyrCellNum() {
-		return pyrCellNum;
+		return PyrCellNum;
 	}
 	
-	public void setPyrCellNum(String pyrCellNum) {
-		this.pyrCellNum = pyrCellNum;
+	public void setPyrCellNum(String PyrCellNum) {
+		this.PyrCellNum = PyrCellNum;
 	}
 	
 	public String getPyrEmail() {
-		return pyrEmail;
+		return PyrEmail;
 	}
 	
-	public void setPyrEmail(String pyrEmail) {
-		this.pyrEmail = pyrEmail;
+	public void setPyrEmail(String PyrEmail) {
+		this.PyrEmail = PyrEmail;
 	}
 	
 	public String getCcy() {
-		return ccy;
+		return Ccy;
 	}
 	
-	public void setCcy(String ccy) {
-		this.ccy = ccy;
+	public void setCcy(String Ccy) {
+		this.Ccy = Ccy;
 	}
 	
 	public String getBillEqvAmt() {
-		return billEqvAmt;
+		return BillEqvAmt;
 	}
 	
-	public void setBillEqvAmt(String billEqvAmt) {
-		this.billEqvAmt = billEqvAmt;
+	public void setBillEqvAmt(String BillEqvAmt) {
+		this.BillEqvAmt = BillEqvAmt;
 	}
 	
 	public String getRemFlag() {
-		return remFlag;
+		return RemFlag;
 	}
 	
-	public void setRemFlag(String remFlag) {
-		this.remFlag = remFlag;
+	public void setRemFlag(String RemFlag) {
+		this.RemFlag = RemFlag;
 	}
 	
 	public String getBillPayOpt() {
-		return billPayOpt;
+		return BillPayOpt;
 	}
 	
-	public void setBillPayOpt(String billPayOpt) {
-		this.billPayOpt = billPayOpt;
+	public void setBillPayOpt(String BillPayOpt) {
+		this.BillPayOpt = BillPayOpt;
 	}
 	
 	public BillItems getBillItems() {
-		return billItems;
+		return BillItems;
 	}
 	
-	public void setBillItems(BillItems billItems) {
-		this.billItems = billItems;
+	public void setBillItems(BillItems BillItems) {
+		this.BillItems = BillItems;
 	}
 }

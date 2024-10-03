@@ -32,9 +32,6 @@ public class BillSubmissionRequest {
 	@JsonProperty("RequestData")
 	private RequestData requestData;
 	
-	@JsonProperty("BillItems")
-	private BillItems billItems;
-	
 	public String toJson() throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		return mapper.writeValueAsString(this);
@@ -68,14 +65,6 @@ public class BillSubmissionRequest {
 	
 	public void setRequestData(RequestData requestData) {
 		this.requestData = requestData;
-	}
-	
-	public void setBillItems(BillItems billItems) {
-		this.billItems = billItems;
-	}
-	
-	public BillItems getBillItems() {
-		return billItems;
 	}
 	
 	public Map<String, Object> createGePGPayload(Patient patient, List<InvoiceItem> invoiceItems, Number totalBillAmount,
@@ -150,7 +139,6 @@ public class BillSubmissionRequest {
 					}
 				}
 			} else if (drug != null) {
-				
 				Concept drugConcept = drug.getConcept();
 				GlobalProperty globalProperty = new GlobalProperty();
 				for (ConceptMap conceptMap : drugConcept.getConceptMappings()) {
@@ -204,7 +192,7 @@ public class BillSubmissionRequest {
 		billTrxInf.setBillEqvAmt(totalBillAmount.toString());
 		billTrxInf.setRemFlag("false");
 		billTrxInf.setBillPayOpt("2");
-		
+		billTrxInf.setBillItems(billItems);
 		// Create and populate RequestData
 		RequestData requestData = new RequestData();
 		requestData.setRequestId(patientUuid);
@@ -218,9 +206,6 @@ public class BillSubmissionRequest {
 		
 		// Create and return BillSubmissionRequest
 		BillSubmissionRequest billRequest = new BillSubmissionRequest();
-		
-		// setBills Items on BillSubmittionRequest
-		billRequest.setBillItems(billItems);
 		billRequest.setSystemAuth(systemAuth);
 		billRequest.setRequestData(requestData);
 
