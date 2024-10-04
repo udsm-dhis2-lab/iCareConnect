@@ -71,7 +71,7 @@ public class BillSubmissionRequest {
 	        Date billExpirlyDate, String personPhoneAttributeTypeUuid, String personEmailAttributeTypeUuid, String currency,
 	        String gepgAuthSignature, String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode,
 	        String serviceCode, String SpSysId, String subSpCode,String clientPrivateKey) throws Exception {
-		AdministrationService administrationService = Context.getAdministrationService();
+		    AdministrationService administrationService = Context.getAdministrationService();
 		// Validate inputs
 		if (patient == null) {
 			throw new IllegalArgumentException("Patient cannot be null");
