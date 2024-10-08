@@ -2,7 +2,8 @@ package org.openmrs.module.icare.billing.services.payment.gepg;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -10,8 +11,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.security.cert.Certificate;
+import java.io.FileInputStream;
+import java.security.KeyStore;
 import org.openmrs.*;
+import java.net.URL;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.billing.models.Invoice;
@@ -67,11 +71,13 @@ public class BillSubmissionRequest {
 		this.requestData = requestData;
 	}
 	
-	public Map<String, Object> createGePGPayload(Patient patient, List<InvoiceItem> invoiceItems, Number totalBillAmount,
-	        Date billExpirlyDate, String personPhoneAttributeTypeUuid, String personEmailAttributeTypeUuid, String currency,
-	        String gepgAuthSignature, String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode,
-	        String serviceCode, String SpSysId, String subSpCode,String clientPrivateKey) throws Exception {
-		    AdministrationService administrationService = Context.getAdministrationService();
+	public Map<String, Object> createGePGPayload(Patient patient, List<InvoiceItem> invoiceItems,
+			Number totalBillAmount,
+			Date billExpirlyDate, String personPhoneAttributeTypeUuid, String personEmailAttributeTypeUuid,
+			String currency,
+			String gepgAuthSignature, String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode,
+			String serviceCode, String SpSysId, String subSpCode, String clientPrivateKey,String pkcs12Path, String pkcs12Password,String enginepublicKey) throws Exception {
+		AdministrationService administrationService = Context.getAdministrationService();
 		// Validate inputs
 		if (patient == null) {
 			throw new IllegalArgumentException("Patient cannot be null");
@@ -102,7 +108,7 @@ public class BillSubmissionRequest {
 				missingParams += "subSpCode ";
 			throw new IllegalArgumentException("Missing system parameters: " + missingParams.trim());
 		}
-		
+
 		// Retrieve patient attributes
 		String patientNames = patient.getGivenName() + " " + patient.getFamilyName();
 		String patientUuid = patient.getUuid();
@@ -110,32 +116,33 @@ public class BillSubmissionRequest {
 		String email = "";
 		for (PersonAttribute attribute : patient.getAttributes()) {
 			if (personPhoneAttributeTypeUuid != null
-			        && attribute.getAttributeType().getUuid().equals(personPhoneAttributeTypeUuid)) {
+					&& attribute.getAttributeType().getUuid().equals(personPhoneAttributeTypeUuid)) {
 				patientPhoneNumber = attribute.getValue();
 			} else if (personEmailAttributeTypeUuid != null
-			        && attribute.getAttributeType().getUuid().equals(personEmailAttributeTypeUuid)) {
+					&& attribute.getAttributeType().getUuid().equals(personEmailAttributeTypeUuid)) {
 				email = attribute.getValue();
 			}
 		}
-		
+
 		// BillItems generation
-		
+
 		BillItems billItems = new BillItems();
-		
+
 		for (InvoiceItem invoiceItem : invoiceItems) {
 			Drug drug = invoiceItem.getItem().getDrug();
 			Concept concept = invoiceItem.getItem().getConcept();
-			
+
 			if (drug == null && concept == null) {
 				throw new IllegalStateException("Concept can not be null for InvoiceItem" + drug + concept);
 			} else if (concept != null) {
 				for (ConceptMap conceptMap : concept.getConceptMappings()) {
 					if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
-					        .equals(GFSCodeConceptSourceMappingUuid)) {
+							.equals(GFSCodeConceptSourceMappingUuid)) {
 						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
 						billItems.getBillItem().add(
-						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(),
-						            invoiceItem.getPrice().toString(), "0.0", GFSCode));
+								new BillItem(invoiceItem.getItem().getId().toString(), "N",
+										invoiceItem.getPrice().toString(),
+										invoiceItem.getPrice().toString(), "0.0", GFSCode));
 					}
 				}
 			} else if (drug != null) {
@@ -143,14 +150,15 @@ public class BillSubmissionRequest {
 				GlobalProperty globalProperty = new GlobalProperty();
 				for (ConceptMap conceptMap : drugConcept.getConceptMappings()) {
 					if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
-					        .equals(GFSCodeConceptSourceMappingUuid)) {
+							.equals(GFSCodeConceptSourceMappingUuid)) {
 						globalProperty.setProperty("iCare.gepg.DrugConcept.icareConnect");
 						globalProperty.setPropertyValue("if condition meet");
 						administrationService.saveGlobalProperty(globalProperty);
 						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
 						billItems.getBillItem().add(
-						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(),
-						            invoiceItem.getPrice().toString(), "0.0", GFSCode));
+								new BillItem(invoiceItem.getItem().getId().toString(), "N",
+										invoiceItem.getPrice().toString(),
+										invoiceItem.getPrice().toString(), "0.0", GFSCode));
 					} else {
 						globalProperty.setProperty("iCare.gepg.DrugConcept.icareConnect");
 						globalProperty.setPropertyValue(GFSCodeConceptSourceMappingUuid);
@@ -158,14 +166,14 @@ public class BillSubmissionRequest {
 					}
 				}
 			}
-			
+
 		}
-		
+
 		// Create and populate BillHdr
 		BillHdr billHdr = new BillHdr();
 		billHdr.setSpCode(spCode);
 		billHdr.setRtrRespFlg("true");
-		
+
 		// Create and populate BillTrxInf
 		BillTrxInf billTrxInf = new BillTrxInf();
 		billTrxInf.setBillId(patientUuid);
@@ -177,7 +185,7 @@ public class BillSubmissionRequest {
 		DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 		String formattedNow = now.format(formatter);
 		billTrxInf.setBillGenDt(formattedNow);
-		
+
 		LocalDateTime expirationTime = now.plusHours(24);
 		String formattedExpirationTime = expirationTime.format(formatter);
 		billTrxInf.setBillExprDt(formattedExpirationTime);
@@ -198,29 +206,42 @@ public class BillSubmissionRequest {
 		requestData.setRequestId(patientUuid);
 		requestData.setBillHdr(billHdr);
 		requestData.setBillTrxInf(billTrxInf);
-		
+
 		// Create and populate SystemAuth
 		SystemAuth systemAuth = new SystemAuth();
 		systemAuth.setSystemCode(sytemCode);
 		systemAuth.setServiceCode(serviceCode);
-		
+
 		// Create and return BillSubmissionRequest
 		BillSubmissionRequest billRequest = new BillSubmissionRequest();
 		billRequest.setSystemAuth(systemAuth);
 		billRequest.setRequestData(requestData);
 
-		String jsonPayload = billRequest.toJson();
-
-		//create signature from the privateKey
-		String signature = SignatureUtils.signData(jsonPayload, clientPrivateKey);
+		// Serialize RequestData to JSON for signing
+		String requestDataJson = new ObjectMapper().writeValueAsString(requestData);
 		
-		//re attach signature on the payload system auth
+		// Save the payload in a global property
+		GlobalProperty globalProperty = new GlobalProperty();
+		globalProperty.setProperty("gepg.requestDataJson.icareConnect");
+		globalProperty.setPropertyValue(requestDataJson);
+		administrationService.saveGlobalProperty(globalProperty);
+
+        // Sign the request data
+        String signature = SignatureUtils.signData(requestDataJson,clientPrivateKey);
+        // Verify the signature
+        boolean isVerified = SignatureUtils.verifySignature(requestDataJson,enginepublicKey, signature);
+
+		globalProperty.setProperty("gepg.signatureisVerified.icareConnect");
+		globalProperty.setPropertyValue(Boolean.toString(isVerified));
+		administrationService.saveGlobalProperty(globalProperty);
+
+		// Attach the signature to the payload's system auth section
 		systemAuth.setSignature(signature);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("billRequest", billRequest);
-        result.put("signature", signature);
+		Map<String, Object> result = new HashMap<>();
+		result.put("billRequest", billRequest);
+		result.put("signature", signature);
 
-        return result;
+		return result;
 	}
 }

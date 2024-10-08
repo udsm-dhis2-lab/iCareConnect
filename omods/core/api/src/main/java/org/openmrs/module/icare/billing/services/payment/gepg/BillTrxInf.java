@@ -50,14 +50,14 @@ public class BillTrxInf {
 		return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
 	}
 	
-	// Getters and Setters with capitalization applied in the setters
+	// Getters and Setters with capitalization applied in the getters
 	@JsonProperty("BillId")
 	public String getBillId() {
 		return BillId;
 	}
 	
 	public void setBillId(String BillId) {
-		this.BillId = capitalizeFirstLetter(BillId);
+		this.BillId = BillId;
 	}
 	
 	@JsonProperty("SubSpCode")
@@ -66,7 +66,7 @@ public class BillTrxInf {
 	}
 	
 	public void setSubSpCode(String SubSpCode) {
-		this.SubSpCode = capitalizeFirstLetter(SubSpCode);
+		this.SubSpCode = SubSpCode;
 	}
 	
 	@JsonProperty("SpSysId")
@@ -75,7 +75,7 @@ public class BillTrxInf {
 	}
 	
 	public void setSpSysId(String SpSysId) {
-		this.SpSysId = capitalizeFirstLetter(SpSysId);
+		this.SpSysId = SpSysId;
 	}
 	
 	@JsonProperty("BillAmt")
@@ -84,7 +84,7 @@ public class BillTrxInf {
 	}
 	
 	public void setBillAmt(String BillAmt) {
-		this.BillAmt = capitalizeFirstLetter(BillAmt);
+		this.BillAmt = BillAmt;
 	}
 	
 	@JsonProperty("MiscAmt")
@@ -93,7 +93,7 @@ public class BillTrxInf {
 	}
 	
 	public void setMiscAmt(String MiscAmt) {
-		this.MiscAmt = capitalizeFirstLetter(MiscAmt);
+		this.MiscAmt = MiscAmt;
 	}
 	
 	@JsonProperty("BillExprDt")
@@ -102,7 +102,7 @@ public class BillTrxInf {
 	}
 	
 	public void setBillExprDt(String BillExprDt) {
-		this.BillExprDt = capitalizeFirstLetter(BillExprDt);
+		this.BillExprDt = BillExprDt;
 	}
 	
 	@JsonProperty("PyrId")
@@ -111,7 +111,7 @@ public class BillTrxInf {
 	}
 	
 	public void setPyrId(String PyrId) {
-		this.PyrId = capitalizeFirstLetter(PyrId);
+		this.PyrId = PyrId;
 	}
 	
 	@JsonProperty("PyrName")
@@ -120,7 +120,7 @@ public class BillTrxInf {
 	}
 	
 	public void setPyrName(String PyrName) {
-		this.PyrName = capitalizeFirstLetter(PyrName);
+		this.PyrName = PyrName;
 	}
 	
 	@JsonProperty("BillDesc")
@@ -129,7 +129,7 @@ public class BillTrxInf {
 	}
 	
 	public void setBillDesc(String BillDesc) {
-		this.BillDesc = capitalizeFirstLetter(BillDesc);
+		this.BillDesc = BillDesc;
 	}
 	
 	@JsonProperty("BillGenDt")
@@ -138,7 +138,7 @@ public class BillTrxInf {
 	}
 	
 	public void setBillGenDt(String BillGenDt) {
-		this.BillGenDt = capitalizeFirstLetter(BillGenDt);
+		this.BillGenDt = BillGenDt;
 	}
 	
 	@JsonProperty("BillGenBy")
@@ -147,7 +147,7 @@ public class BillTrxInf {
 	}
 	
 	public void setBillGenBy(String BillGenBy) {
-		this.BillGenBy = capitalizeFirstLetter(BillGenBy);
+		this.BillGenBy = BillGenBy;
 	}
 	
 	@JsonProperty("BillApprBy")
@@ -156,7 +156,7 @@ public class BillTrxInf {
 	}
 	
 	public void setBillApprBy(String BillApprBy) {
-		this.BillApprBy = capitalizeFirstLetter(BillApprBy);
+		this.BillApprBy = BillApprBy;
 	}
 	
 	@JsonProperty("PyrCellNum")
@@ -165,7 +165,7 @@ public class BillTrxInf {
 	}
 	
 	public void setPyrCellNum(String PyrCellNum) {
-		this.PyrCellNum = capitalizeFirstLetter(PyrCellNum);
+		this.PyrCellNum = PyrCellNum;
 	}
 	
 	@JsonProperty("PyrEmail")
@@ -174,7 +174,7 @@ public class BillTrxInf {
 	}
 	
 	public void setPyrEmail(String PyrEmail) {
-		this.PyrEmail = capitalizeFirstLetter(PyrEmail);
+		this.PyrEmail = PyrEmail;
 	}
 	
 	@JsonProperty("Ccy")
@@ -183,7 +183,7 @@ public class BillTrxInf {
 	}
 	
 	public void setCcy(String Ccy) {
-		this.Ccy = capitalizeFirstLetter(Ccy);
+		this.Ccy = Ccy;
 	}
 	
 	@JsonProperty("BillEqvAmt")
@@ -192,7 +192,7 @@ public class BillTrxInf {
 	}
 	
 	public void setBillEqvAmt(String BillEqvAmt) {
-		this.BillEqvAmt = capitalizeFirstLetter(BillEqvAmt);
+		this.BillEqvAmt = BillEqvAmt;
 	}
 	
 	@JsonProperty("RemFlag")
@@ -201,7 +201,7 @@ public class BillTrxInf {
 	}
 	
 	public void setRemFlag(String RemFlag) {
-		this.RemFlag = capitalizeFirstLetter(RemFlag);
+		this.RemFlag = RemFlag;
 	}
 	
 	@JsonProperty("BillPayOpt")
@@ -210,7 +210,7 @@ public class BillTrxInf {
 	}
 	
 	public void setBillPayOpt(String BillPayOpt) {
-		this.BillPayOpt = capitalizeFirstLetter(BillPayOpt);
+		this.BillPayOpt = BillPayOpt;
 	}
 	
 	@JsonProperty("BillItems")

@@ -79,6 +79,9 @@ public class GepgBillingController {
         String GFSCodeConceptSourceMappingUuid = administrationService.getGlobalProperty(ICareConfig.GFSCODE_CONCEPT_SOURCE_REFERENCE);
         String GEPGUccBaseUrl = administrationService.getGlobalProperty(ICareConfig.GEPG_UCC_BASE_URL_API);
         String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
+        String enginepublicKey = administrationService.getGlobalProperty(ICareConfig.ENGINE_PUBLIC_KEY);
+        String pkcs12Path = administrationService.getGlobalProperty(ICareConfig.PKCS12_PATH);
+        String pkcs12Password = administrationService.getGlobalProperty(ICareConfig.PKCS12_PASSWORD);
     
         if (currency == null) {
             throw new IllegalArgumentException("Currency cannot be null");
@@ -104,7 +107,10 @@ public class GepgBillingController {
             serviceCode,
             spsyId,
             subSpCode,
-            clientPrivateKey
+            clientPrivateKey,
+            pkcs12Path,
+            pkcs12Password,
+            enginepublicKey
         );
     
         try {
