@@ -4,18 +4,22 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.openmrs.GlobalProperty;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.stereotype.Service;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
-import org.springframework.stereotype.Service;
+import org.openmrs.GlobalProperty;
 
 @Service
 public class GEPGService {
-	
-	public Map<String, Object> submitGepgRequest(String jsonPayload, String signature ,String uccUrl) {
+
+    // A map to hold callback responses based on the request ID
+    private final Map<String, Map<String, Object>> callbackResponses = new ConcurrentHashMap<>();
+
+    // Synchronized method to submit GePG request and wait for the callback
+    public Map<String, Object> submitGepgRequest(String jsonPayload, String signature, String uccUrl) {
         Map<String, Object> responseMap = new HashMap<>();
         HttpURLConnection con = null;
         AdministrationService administrationService = Context.getAdministrationService();
@@ -25,26 +29,26 @@ public class GEPGService {
             URL url = new URL(apiUrl);
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
-
-            String bearer = String.format("Bearer %1s", "authToken.getAccessToken()");
-            con.addRequestProperty("Authorization", bearer);
+            con.addRequestProperty("Authorization", "Bearer " + "authToken.getAccessToken()");
             con.addRequestProperty("Content-Type", "application/json");
             con.addRequestProperty("Signature", signature);
             con.setDoInput(true);
             con.setDoOutput(true);
 
-             GlobalProperty globalProperty = new GlobalProperty();
+            // Save the signature globally
+            GlobalProperty globalProperty = new GlobalProperty();
             globalProperty.setProperty("gepg.signSignature.icareConnect");
             globalProperty.setPropertyValue(signature);
             administrationService.saveGlobalProperty(globalProperty);
-            // Write JSON payload 
+
+            // Write JSON payload
             try (OutputStream os = con.getOutputStream();
                  BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"))) {
                 writer.write(jsonPayload);
                 writer.flush();
             }
 
-            // Process the response maped object
+            // Process the response
             int responseCode = con.getResponseCode();
             responseMap.put("Code", responseCode);
 
@@ -55,25 +59,29 @@ public class GEPGService {
                     while ((inputLine = in.readLine()) != null) {
                         content.append(inputLine);
                     }
-                    responseMap.put("response", content.toString());
+                    String responseString = content.toString();
+                    responseMap.put("response", responseString);
+
+                    // Extract SystemAckCode and check if it's "R3001"
+                    if (responseString.contains("\"SystemAckCode\":\"R3001\"")) {
+                        String requestId = extractRequestId(responseString); 
+
+                        // Wait for the callback data for up to 2 minutes
+                        synchronized (this) {
+                            waitForCallbackResponse(requestId, responseMap);
+                        }
+                    }
                 }
             } else {
                 try (BufferedReader errorReader = new BufferedReader(new InputStreamReader(con.getErrorStream()))) {
-                    String errorLine;
                     StringBuilder errorContent = new StringBuilder();
+                    String errorLine;
                     while ((errorLine = errorReader.readLine()) != null) {
                         errorContent.append(errorLine);
                     }
                     responseMap.put("error", errorContent.toString());
                 }
             }
-
-        } catch (SocketTimeoutException e) {
-            responseMap.put("Code", 504);
-            responseMap.put("error", "Request timed out: " + e.getMessage());
-        } catch (IOException e) {
-            responseMap.put("Code", 500);
-            responseMap.put("error", "I/O error: " + e.getMessage());
         } catch (Exception e) {
             responseMap.put("Code", 500);
             responseMap.put("error", "Unexpected error: " + e.getMessage());
@@ -82,11 +90,36 @@ public class GEPGService {
                 con.disconnect();
             }
         }
-
         return responseMap;
     }
-	
-	public void createBillSubmissionRequest(String anyString) throws Exception {
-		throw new UnsupportedOperationException("Error on method 'createBillSubmissionRequest'");
-	}
+
+    // Wait for the callback response
+    private void waitForCallbackResponse(String requestId, Map<String, Object> responseMap) {
+        try {
+            // Wait for a maximum of 2 minutes
+            for (int i = 0; i < 120; i++) {
+                if (callbackResponses.containsKey(requestId)) {
+                    // Once the callback is received, merge it into the responseMap
+                    responseMap.putAll(callbackResponses.remove(requestId));
+                    break;
+                }
+                TimeUnit.SECONDS.sleep(1);  // Wait for 1 second
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            responseMap.put("error", "Callback waiting interrupted");
+        }
+    }
+
+    // Helper method to extract RequestId from the response
+    private String extractRequestId(String responseString) {
+        // Logic to extract RequestId from the response JSON
+        // You can use a JSON parser or simple string manipulation here
+        return responseString.contains("RequestId") ? responseString.split("RequestId\":\"")[1].split("\"")[0] : null;
+    }
+
+    // Method to save callback data
+    public void saveCallbackData(String requestId, Map<String, Object> callbackData) {
+        callbackResponses.put(requestId, callbackData);
+    }
 }
