@@ -138,20 +138,20 @@ public class InvoiceDAO extends BaseDAO<Invoice> {
 		}
 		queryStr += " GROUP BY inv.id.item";
 		
-		//		new Prescription();
+				new Prescription();
 		queryStr += " UNION ALL ";
 		queryStr += "SELECT SUM(inv.price * inv.quantity) as total, inv.id.item, inv " + "FROM InvoiceItem inv "
-		        + "JOIN inv.id.order o LEFT JOIN Prescription p ON p.order = o ";
+		        + "JOIN inv.id.order o LEFT JOIN Prescription p ON p.orderId = o.orderId ";
 		// Use polymorphic queries to ensure DrugOrder, as a subclass of Order, is included.
 		if (startDate != null && endDate != null) {
-			queryStr += " WHERE o.dateCreated BETWEEN :startDate AND :endDate ";
+			queryStr += " WHERE p.dateCreated BETWEEN :startDate AND :endDate ";
 		}
 		
 		if (provider != null) {
 			if (queryStr.contains("WHERE")) {
-				queryStr += " AND o.orderer.uuid = :provider ";
+				queryStr += " AND p.orderer.uuid = :provider ";
 			} else {
-				queryStr += " WHERE o.orderer.uuid = :provider ";
+				queryStr += " WHERE p.orderer.uuid = :provider ";
 			}
 		}
 		

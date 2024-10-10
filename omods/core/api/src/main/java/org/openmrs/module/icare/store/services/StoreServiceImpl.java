@@ -800,7 +800,6 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 				}
 			}
 		}
-		
 		return stockInvoiceItemDAO.updateStockInvoiceItem(stockInvoiceItem);
 	}
 	
@@ -840,6 +839,23 @@ public class StoreServiceImpl extends BaseOpenmrsService implements StoreService
 		}
 		
 		return savedStockInvoiceItem;
+	}
+
+	@Override
+	public ListResult getStockInvoiceItems(
+			Pager pager,
+			String stockInvoice,
+			Date startDate,
+			Date endDate,
+			String provider,
+			String paymentScheme) {
+		return stockInvoiceItemDAO.getStockInvoiceItems(
+				pager,
+				stockInvoice,
+				startDate,
+				endDate,
+				provider,
+				paymentScheme);
 	}
 	
 	@Override

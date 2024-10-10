@@ -8,6 +8,7 @@ import org.openmrs.Location;
 import org.openmrs.PatientProgram;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
+import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.ListResult;
@@ -24,10 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/store")
@@ -933,7 +931,74 @@ public class StoreController {
 		StockInvoiceItem stockInvoiceItem = storeService.getStockInvoiceItemByUuid(stockInvoiceItemUuid);
 		return stockInvoiceItem.toMap();
 	}
-	
+
+	@RequestMapping(value = "reports/summarycost", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String,Object> getStockItemsSummaryCost(
+			@RequestParam(value = "stockInvoice", required = false) String stockInvoice,
+			@RequestParam(value = "startDate", required = false) String startDate,
+			@RequestParam(value = "endDate", required = false) String endDate,
+			@RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+			@RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+			@RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+			@RequestParam(value = "provider", required = false) String provider,
+			@RequestParam(value = "paymentScheme", required = false) String paymentScheme
+	) throws Exception {
+		try {
+			Date start = null;
+			Date end = null;
+			if (startDate != null && endDate != null) {
+				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+				start = formatter.parse(startDate);
+				end = formatter.parse(endDate);
+			}
+			Pager pager = new Pager();
+			pager.setAllowed(paging);
+			pager.setPageSize(pageSize);
+			pager.setPage(page);
+			System.out.println(paymentScheme);
+			ListResult response = storeService.getStockInvoiceItems(
+					pager,
+					stockInvoice,
+					start,
+					end,
+					provider,
+					paymentScheme);
+			Pager pagerInfo = response.getPager();
+			List<Object[]> results = response.getResults();
+			Map<String,Object> outputData = new HashMap<>();
+			for (Object[] result: results) {
+				double totalBuyingAmount = Double.parseDouble(result[0].toString());
+				Item item =  (Item) result[1];
+				StockInvoice stockInvoiceData = (StockInvoice) result[2];
+				double totalItemAmount = Double.parseDouble(result[3].toString());
+				double totalItemIncomeExpected = 0.0;
+				if (paymentScheme != null) {
+					totalItemIncomeExpected = Double.parseDouble(result[4].toString());
+				}
+				Map<String,Object> itemBuyAndSellDetails = item.toMap();
+				if (!item.getPrices().isEmpty()) {
+					List<Map<String,Object>> pricesBuyAndSellingAmount = new ArrayList<>();
+					for (ItemPrice itemPrice: item.getPrices()) {
+						Map<String,Object> priceDetails = new HashMap<>();
+						priceDetails.put("price", itemPrice.getPrice());
+						priceDetails.put("totalBuyAmount", totalBuyingAmount);
+						priceDetails.put("totalExpectedSellAmount", itemPrice.getPrice().doubleValue() * totalItemAmount);
+						pricesBuyAndSellingAmount.add(priceDetails);
+					}
+					itemBuyAndSellDetails.put("itemBuyAndSellDetails", pricesBuyAndSellingAmount);
+				}
+				outputData.put("totalBuyingAmount", totalBuyingAmount);
+				outputData.put("totalItemIncomeExpected",totalItemIncomeExpected);
+				outputData.put("itemBuyAndSellDetails", itemBuyAndSellDetails);
+			}
+			outputData.put("pager", pagerInfo);
+			return outputData;
+		} catch (Exception e) {
+			throw  new Exception(e.getMessage());
+		}
+	}
+
 	@RequestMapping(value = "encounterpatientprogram", method = RequestMethod.POST)
 	@ResponseBody
 	public List<Map<String, Object>> createEncounterPatientProgram(@RequestBody Map<String, Object> encounterPatientProgramMap) {
@@ -957,6 +1022,5 @@ public class StoreController {
 		}
 
 		return encounterWorkflowStateListMap;
-
 	}
 }

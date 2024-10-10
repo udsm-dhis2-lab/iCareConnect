@@ -7,6 +7,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
+import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.store.models.IssueStatus;
 import org.openmrs.module.icare.store.models.RequisitionStatus;
 import org.openmrs.module.icare.store.services.StoreService;
@@ -957,5 +958,15 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		Boolean handleGetObject = new ObjectMapper().readValue(handleGet.getContentAsString(), Boolean.class);
 		assertThat("The item is in pending requisition", (handleGet.getContentAsString()), is("true"));
+	}
+
+	@Test
+	public void testGetSummaryCost() throws Exception {
+		MockHttpServletRequest newGetRequest = newGetRequest("store/reports/summarycost",
+				new Parameter("paymentScheme", "111xb1yz-1011-487z-868y-acc38ebc6252"));
+		MockHttpServletResponse handleGet = handle(newGetRequest);
+		Map<String, Object> reportCost = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
+		Double totalAmount = (Double) reportCost.get("totalBuyingAmount");
+		assertThat("The amount used to buy the items at stock is ", totalAmount, is(1000000.0));
 	}
 }
