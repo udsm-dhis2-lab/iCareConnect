@@ -11,27 +11,29 @@ import org.openmrs.api.context.Context;
 
 public class SignatureUtils {
 	
-	// public static String signData(String data, String base64PrivateKey) throws Exception {
-	// 	// Decode the base64 encoded private key
-	// 	byte[] keyBytes = Base64.getDecoder().decode(base64PrivateKey);
-	// 	PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-	// 	KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-	// 	PrivateKey privateKey = keyFactory.generatePrivate(spec);
+	// public static String signData(String data, String base64PrivateKey) throws
+	// Exception {
+	// // Decode the base64 encoded private key
+	// byte[] keyBytes = Base64.getDecoder().decode(base64PrivateKey);
+	// PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+	// KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+	// PrivateKey privateKey = keyFactory.generatePrivate(spec);
 	
-	// 	// Create a Signature object and initialize it with the private key
-	// 	Signature signature = Signature.getInstance("SHA1withRSA");
-	// 	signature.initSign(privateKey);
-	// 	signature.update(data.getBytes(StandardCharsets.UTF_8));
+	// // Create a Signature object and initialize it with the private key
+	// Signature signature = Signature.getInstance("SHA1withRSA");
+	// signature.initSign(privateKey);
+	// signature.update(data.getBytes(StandardCharsets.UTF_8));
 	
-	// 	// Sign the data and encode the signature in BASE64
-	// 	byte[] digitalSignature = signature.sign();
-	// 	String base64Signature = Base64.getEncoder().encodeToString(digitalSignature);
+	// // Sign the data and encode the signature in BASE64
+	// byte[] digitalSignature = signature.sign();
+	// String base64Signature =
+	// Base64.getEncoder().encodeToString(digitalSignature);
 	
-	// 	// Log the signed data and signature
-	// 	System.out.println("Data: " + data);
-	// 	System.out.println("Base64 Signature: " + base64Signature);
+	// // Log the signed data and signature
+	// System.out.println("Data: " + data);
+	// System.out.println("Base64 Signature: " + base64Signature);
 	
-	// 	return base64Signature;
+	// return base64Signature;
 	// }
 	
 	public static String signData(String payload, String base64PrivateKey) throws Exception {
@@ -81,60 +83,48 @@ public class SignatureUtils {
 		return signature.verify(digitalSignature);
 	}
 }
-
 // import java.nio.charset.StandardCharsets;
 // import java.security.*;
 // import java.security.spec.PKCS8EncodedKeySpec;
 // import java.security.spec.X509EncodedKeySpec;
 // import java.util.Base64;
-
 // public class SignatureUtils {
-
-// 	// Method to sign data using the private key
-// 	public static String signData(String data, String base64PrivateKey) throws Exception {
-// 		// Decode the Base64-encoded private key
-// 		byte[] privateKeyBytes = Base64.getDecoder().decode(base64PrivateKey);
-
-// 		// Create PKCS8EncodedKeySpec with the private key bytes
-// 		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
-
-// 		// Generate PrivateKey object using RSA
-// 		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-// 		PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
-
-// 		// Initialize a Signature object with SHA256withRSA algorithm
-// 		Signature signature = Signature.getInstance("SHA256withRSA");
-// 		signature.initSign(privateKey);
-
-// 		// Update the signature object with the data
-// 		signature.update(data.getBytes(StandardCharsets.UTF_8));
-
-// 		// Sign the data and return the Base64-encoded signature
-// 		byte[] signedBytes = signature.sign();
-// 		return Base64.getEncoder().encodeToString(signedBytes);
-// 	}
-
-// 	// Method to verify signed data using the public key
-// 	public static boolean verifySignature(String data, String base64PublicKey, String base64Signature) throws Exception {
-// 		// Decode the Base64-encoded public key
-// 		byte[] publicKeyBytes = Base64.getDecoder().decode(base64PublicKey);
-
-// 		// Create X509EncodedKeySpec with the public key bytes
-// 		X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyBytes);
-
-// 		// Generate PublicKey object using RSA
-// 		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-// 		PublicKey publicKey = keyFactory.generatePublic(keySpec);
-
-// 		// Initialize a Signature object with SHA256withRSA algorithm
-// 		Signature signature = Signature.getInstance("SHA256withRSA");
-// 		signature.initVerify(publicKey);
-
-// 		// Update the signature object with the original data
-// 		signature.update(data.getBytes(StandardCharsets.UTF_8));
-
-// 		// Verify the signature and return the result
-// 		byte[] signedBytes = Base64.getDecoder().decode(base64Signature);
-// 		return signature.verify(signedBytes);
-// 	}
+// // Method to sign data using the private key
+// public static String signData(String data, String base64PrivateKey) throws
+// Exception {
+// // Decode the Base64-encoded private key
+// byte[] privateKeyBytes = Base64.getDecoder().decode(base64PrivateKey);
+// // Create PKCS8EncodedKeySpec with the private key bytes
+// PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+// // Generate PrivateKey object using RSA
+// KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+// PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
+// // Initialize a Signature object with SHA256withRSA algorithm
+// Signature signature = Signature.getInstance("SHA256withRSA");
+// signature.initSign(privateKey);
+// // Update the signature object with the data
+// signature.update(data.getBytes(StandardCharsets.UTF_8));
+// // Sign the data and return the Base64-encoded signature
+// byte[] signedBytes = signature.sign();
+// return Base64.getEncoder().encodeToString(signedBytes);
+// }
+// // Method to verify signed data using the public key
+// public static boolean verifySignature(String data, String base64PublicKey,
+// String base64Signature) throws Exception {
+// // Decode the Base64-encoded public key
+// byte[] publicKeyBytes = Base64.getDecoder().decode(base64PublicKey);
+// // Create X509EncodedKeySpec with the public key bytes
+// X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyBytes);
+// // Generate PublicKey object using RSA
+// KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+// PublicKey publicKey = keyFactory.generatePublic(keySpec);
+// // Initialize a Signature object with SHA256withRSA algorithm
+// Signature signature = Signature.getInstance("SHA256withRSA");
+// signature.initVerify(publicKey);
+// // Update the signature object with the original data
+// signature.update(data.getBytes(StandardCharsets.UTF_8));
+// // Verify the signature and return the result
+// byte[] signedBytes = Base64.getDecoder().decode(base64Signature);
+// return signature.verify(signedBytes);
+// }
 // }

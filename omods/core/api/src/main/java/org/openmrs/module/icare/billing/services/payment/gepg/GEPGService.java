@@ -99,11 +99,11 @@ public class GEPGService {
             // Wait for a maximum of 2 minutes
             for (int i = 0; i < 120; i++) {
                 if (callbackResponses.containsKey(requestId)) {
-                    // Once the callback is received, merge it into the responseMap
+                    // Once the callback is received, merged into the responseMap
                     responseMap.putAll(callbackResponses.remove(requestId));
                     break;
                 }
-                TimeUnit.SECONDS.sleep(1);  // Wait for 1 second
+                TimeUnit.SECONDS.sleep(1); 
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
