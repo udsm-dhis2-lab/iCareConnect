@@ -968,13 +968,13 @@ public class StoreController {
 			List<Object[]> results = response.getResults();
 			Map<String,Object> outputData = new HashMap<>();
 			for (Object[] result: results) {
-				Double totalBuyingAmount = Double.valueOf(result[0].toString());
+				double totalBuyingAmount = Double.parseDouble(result[0].toString());
 				Item item =  (Item) result[1];
 				StockInvoice stockInvoiceData = (StockInvoice) result[2];
-				Double totalItemAmount = Double.valueOf(result[3].toString());
-				Double totalItemIncomeExpected = null;
+				double totalItemAmount = Double.parseDouble(result[3].toString());
+				double totalItemIncomeExpected = 0.0;
 				if (paymentScheme != null) {
-					totalItemIncomeExpected = Double.valueOf(result[4].toString());
+					totalItemIncomeExpected = Double.parseDouble(result[4].toString());
 				}
 				Map<String,Object> itemBuyAndSellDetails = item.toMap();
 				if (!item.getPrices().isEmpty()) {
