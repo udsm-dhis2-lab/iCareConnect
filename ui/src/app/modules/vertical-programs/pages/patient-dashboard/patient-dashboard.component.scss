@@ -10,6 +10,7 @@
   z-index: 100;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of tabs that may no longer apply for the MDC version. */
 ::ng-deep .mat-tab-labels :last-child.mat-tab-label {
   color: unset;
   opacity: unset;

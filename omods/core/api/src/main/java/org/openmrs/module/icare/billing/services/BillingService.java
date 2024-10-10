@@ -18,6 +18,7 @@ import org.openmrs.module.icare.billing.services.insurance.SyncResult;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 
 @Transactional
@@ -78,4 +79,6 @@ public interface BillingService extends OpenmrsService {
 	Order createOrderForOngoingIPDPatients() throws Exception;
 	
 	Order createOrderForOngoingDeceasedPatients() throws Exception;
+	
+	List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) throws Exception;
 }

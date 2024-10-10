@@ -2,6 +2,7 @@
   cursor: pointer;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 ::ng-deep .mat-form-field-flex {
   border-radius: 4px 4px !important;
   border: solid 1px rgba(0, 0, 0, 0.18);
@@ -15,6 +16,7 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 .mat-form-field-underline {
   display: none !important;
 }

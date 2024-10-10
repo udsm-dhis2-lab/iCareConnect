@@ -5,8 +5,8 @@
   <mat-form-field class="w-100">
     <input matInput placeholder="Search Rooms" (keyup)="searchRoom($event)" />
   </mat-form-field>
-  <mat-chip-list aria-label="Locations" *ngIf="locations?.length > 0">
-    <mat-chip
+  <mat-chip-listbox aria-label="Locations" *ngIf="locations?.length > 0">
+    <mat-chip-option
       *ngFor="let room of locations | filterBy: searchTerm:'name'"
       (click)="onSelectRoom($event, room)"
       color="{{
@@ -21,8 +21,8 @@
       "
     >
       {{ room.name }}
-    </mat-chip>
-  </mat-chip-list>
+    </mat-chip-option>
+  </mat-chip-listbox>
 
   <div class="alert alert-warning" role="alert" *ngIf="locations?.length === 0">
     NO Doctor's Room available for the save service
