@@ -1707,9 +1707,27 @@ public class ICareController {
 			throw new IllegalArgumentException("End date cannot be null.");
 		}
 		Boolean sendToExternal = (Boolean) visitParameters.get("sendToExternal");
+		String visitUuid = visitParameters.get("uuid").toString();
+
 		if (sendToExternal == null) {
 			throw new IllegalArgumentException("sendToExternal parameter cannot be null.");
 		}
-		return iCareService.generateVisitsData(startDate, endDate, sendToExternal);
+		return iCareService.generateVisitsData(startDate, endDate, sendToExternal, visitUuid);
+	}
+
+	@RequestMapping(value = "referral", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> sendReferralDataToMediator(@RequestBody Map<String, Object> referralVisitDetails) throws Exception {
+		Map<String, Object> response = new HashMap<>();
+		response = iCareService.sendReferralDataToMediator(referralVisitDetails.get("uuid").toString());
+		return response;
+	}
+
+	@RequestMapping(value = "sharedRecords", method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String getClientDataFromExternalMediator(@RequestParam(value = "hfrCode", required = false) String hfrCode,
+																 @RequestParam(value ="id", required = true) String id,
+																 @RequestParam(value="idType", required = false) String idType) throws Exception {
+		return iCareService.getSharedRecordsFromExternalMediator(hfrCode,id,idType);
 	}
 }

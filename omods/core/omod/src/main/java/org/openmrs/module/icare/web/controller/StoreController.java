@@ -931,7 +931,7 @@ public class StoreController {
 		StockInvoiceItem stockInvoiceItem = storeService.getStockInvoiceItemByUuid(stockInvoiceItemUuid);
 		return stockInvoiceItem.toMap();
 	}
-
+	
 	@RequestMapping(value = "reports/summarycost", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String,Object> getStockItemsSummaryCost(
@@ -998,7 +998,7 @@ public class StoreController {
 			throw  new Exception(e.getMessage());
 		}
 	}
-
+	
 	@RequestMapping(value = "encounterpatientprogram", method = RequestMethod.POST)
 	@ResponseBody
 	public List<Map<String, Object>> createEncounterPatientProgram(@RequestBody Map<String, Object> encounterPatientProgramMap) {
