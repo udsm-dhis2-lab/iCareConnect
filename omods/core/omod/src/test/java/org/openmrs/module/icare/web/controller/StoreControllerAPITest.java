@@ -959,11 +959,11 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		Boolean handleGetObject = new ObjectMapper().readValue(handleGet.getContentAsString(), Boolean.class);
 		assertThat("The item is in pending requisition", (handleGet.getContentAsString()), is("true"));
 	}
-
+	
 	@Test
 	public void testGetSummaryCost() throws Exception {
-		MockHttpServletRequest newGetRequest = newGetRequest("store/reports/summarycost",
-				new Parameter("paymentScheme", "111xb1yz-1011-487z-868y-acc38ebc6252"));
+		MockHttpServletRequest newGetRequest = newGetRequest("store/reports/summarycost", new Parameter("paymentScheme",
+		        "111xb1yz-1011-487z-868y-acc38ebc6252"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		Map<String, Object> reportCost = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		Double totalAmount = (Double) reportCost.get("totalBuyingAmount");

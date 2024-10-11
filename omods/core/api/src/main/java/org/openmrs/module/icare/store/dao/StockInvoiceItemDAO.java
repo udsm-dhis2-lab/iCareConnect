@@ -162,33 +162,26 @@ public class StockInvoiceItemDAO extends BaseDAO<StockInvoiceItem> {
 		
 		return query.list();
 	}
-
-	public ListResult getStockInvoiceItems(
-			Pager pager,
-			String stockInvoiceUuid,
-			Date startDate,
-			Date endDate,
-			String providerUuid,
-			String paymentScheme) {
-
+	
+	public ListResult getStockInvoiceItems(Pager pager, String stockInvoiceUuid, Date startDate, Date endDate,
+	        String providerUuid, String paymentScheme) {
+		
 		DbSession session = this.getSession();
-
-		String queryStr = " SELECT SUM(siitem.amount*siitem.unitPrice) as totalPriceAmount," +
-				" siitem.item, " +
-				" siitem.stockInvoice," +
-				" SUM(siitem.amount) as totalItems ";
-
+		
+		String queryStr = " SELECT SUM(siitem.amount*siitem.unitPrice) as totalPriceAmount," + " siitem.item, "
+		        + " siitem.stockInvoice," + " SUM(siitem.amount) as totalItems ";
+		
 		if (paymentScheme != null) {
 			queryStr += ",SUM(prices.price*siitem.amount) as totalItems ";
 		}
-
+		
 		queryStr += " FROM StockInvoiceItem siitem ";
 		if (paymentScheme != null) {
 			new ItemPrice();
 			new Item();
 			queryStr += " JOIN siitem.item.prices prices WHERE prices.id.paymentScheme.uuid =:paymentScheme";
 		}
-
+		
 		if (stockInvoiceUuid != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
@@ -198,16 +191,16 @@ public class StockInvoiceItemDAO extends BaseDAO<StockInvoiceItem> {
 			queryStr += " siitem.stockInvoice.uuid = :stockInvoiceUuid ";
 		}
 		queryStr += " GROUP BY siitem.item";
-
+		
 		Query query = session.createQuery(queryStr);
-
+		
 		if (paymentScheme != null) {
 			query.setParameter("paymentScheme", paymentScheme);
 		}
 		if (stockInvoiceUuid != null) {
 			query.setParameter("stockInvoiceUuid", stockInvoiceUuid);
 		}
-
+		
 		if (pager.isAllowed()) {
 			pager.setTotal(query.list().size());
 			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
@@ -216,7 +209,7 @@ public class StockInvoiceItemDAO extends BaseDAO<StockInvoiceItem> {
 		ListResult<Sample> listResults = new ListResult();
 		listResults.setPager(pager);
 		listResults.setResults(query.list());
-
+		
 		return listResults;
 	}
 }

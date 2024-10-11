@@ -1011,4 +1011,38 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		// TODO: Make sure test is running sucessfully beforing using the API
 		assertThat("Order status shows drug dispensed", responseMap.get("orderStockStatus"), is("DISPENSED"));
 	}
+
+	@Test
+	public void testReferralAPI() throws Exception {
+		Map<String,Object> referralVisit = new HashMap<>();
+		AdministrationService administrationService = Context.getAdministrationService();
+		String mediators = this.readFile("dto/core/mediators-list.json");
+		administrationService.setGlobalProperty(
+				ICareConfig.INTEROPERABILITY_MEDIATORS_LIST,
+				mediators);
+		referralVisit.put("uuid", "298b75eb-er45-12e8-9c7c-42b0yt63cfepi");
+		MockHttpServletRequest referralMockedRequest = newPostRequest("icare/referral", referralVisit);
+		MockHttpServletResponse mockedResponse = handle(referralMockedRequest);
+		Map<String, Object> responseMap = (new ObjectMapper()).readValue(mockedResponse.getContentAsString(), Map.class);
+		System.out.println(responseMap);
+	}
+
+	@Test
+	public void testSharedRecordsAPI() throws Exception {
+		Map<String,Object> referralVisit = new HashMap<>();
+		AdministrationService administrationService = Context.getAdministrationService();
+		String mediators = this.readFile("dto/core/mediators-list.json");
+		administrationService.setGlobalProperty(
+				ICareConfig.INTEROPERABILITY_MEDIATORS_LIST,
+				mediators);
+		administrationService.setGlobalProperty("HDUAPI.instance","https://iadapter.dhis2.udsm.ac.tz");
+		administrationService.setGlobalProperty("HDUAPI.username","admin");
+		administrationService.setGlobalProperty("HDUAPI.password","AdminUser");
+		MockHttpServletRequest getSharedRecordMockedRequest = newGetRequest("icare/sharedRecords",
+				new Parameter("hfrCode","19209-2"),
+				new Parameter("id","19209-2/2024/004"));
+		MockHttpServletResponse mockedResponse = handle(getSharedRecordMockedRequest);
+		Map<String, Object> responseMap = (new ObjectMapper()).readValue(mockedResponse.getContentAsString(), Map.class);
+		System.out.println(responseMap);
+	}
 }

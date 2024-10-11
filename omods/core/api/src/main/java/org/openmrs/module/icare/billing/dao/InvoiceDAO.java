@@ -138,7 +138,7 @@ public class InvoiceDAO extends BaseDAO<Invoice> {
 		}
 		queryStr += " GROUP BY inv.id.item";
 		
-				new Prescription();
+		new Prescription();
 		queryStr += " UNION ALL ";
 		queryStr += "SELECT SUM(inv.price * inv.quantity) as total, inv.id.item, inv " + "FROM InvoiceItem inv "
 		        + "JOIN inv.id.order o LEFT JOIN Prescription p ON p.orderId = o.orderId ";
