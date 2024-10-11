@@ -1282,7 +1282,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			templateData.put("investigationDetails", new ArrayList<>());  // Assuming this is filled somewhere else
 			templateData.put("outcomeDetails", prepareOutcomeDetails(visit));
 		}
-		System.out.println(templateData);
+//		System.out.println(templateData);
 		String response = pushDataToExternalMediator(templateData, "HDUAPI", "SHR");
 		return visitData;
 	}
@@ -1317,6 +1317,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		Map<String, Object> facilityDetails = new HashMap<>();
 		String facilityCode = dhis2EventWrapper.getHFRCode();
 		facilityDetails.put("HFCode", facilityCode);
+		facilityDetails.put("code", facilityCode);
 
 		return facilityDetails;
 	}
@@ -1337,7 +1338,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 
 	private Map<String, Object> prepareVisitDetails(Visit visit) {
 		Map<String, Object> visitDetails = new HashMap<>();
-		visitDetails.put("visitId", visit.getVisitId());
+		visitDetails.put("id", visit.getVisitId());
 		visitDetails.put("visitDate", visit.getStartDatetime());
 		visitDetails.put("closedDate", visit.getStopDatetime());
 		return visitDetails;
@@ -1356,7 +1357,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		demographicDetails.put("phoneNumbers", getPhoneNumbers(person));
 		demographicDetails.put("mrn", getPreferredIdentifier(patient));
 		demographicDetails.put("identifier", getPreferredIdentifier(patient));
-
+		demographicDetails.put("identifiers", getPatientIdentifiers(patient));
 		return demographicDetails;
 	}
 
@@ -1451,6 +1452,19 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			}
 		}
 		return "";
+	}
+
+	private List<Map<String,Object>> getPatientIdentifiers(Patient patient) {
+		List<Map<String,Object>> identifiers = new ArrayList<>();
+		if (patient.getIdentifiers() != null) {
+			for (PatientIdentifier patientIdentifier: patient.getIdentifiers()) {
+				Map<String,Object> identifier = new HashMap<>();
+				identifier.put("id", patientIdentifier.getIdentifier().toString());
+				identifier.put("type", patientIdentifier.getIdentifierType().getName());
+				identifier.put("preferred", patientIdentifier.getPreferred());
+			}
+		}
+		return identifiers;
 	}
 
 	@Override
