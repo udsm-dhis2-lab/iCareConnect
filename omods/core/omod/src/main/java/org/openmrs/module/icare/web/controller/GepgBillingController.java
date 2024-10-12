@@ -12,6 +12,7 @@ import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.payment.gepg.BillSubmissionRequest;
 import org.openmrs.module.icare.billing.services.payment.gepg.GEPGService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -140,30 +141,9 @@ public class GepgBillingController {
     }
 	
 	@RequestMapping(value = "/callback", method = RequestMethod.POST)
-    public Map<String, Object> handleCallback(@RequestBody Map<String, Object> callbackData) {
-        System.out.println("Callback data received: " + callbackData);
-
-        Map<String, Object> response = new HashMap<>();
-
-        try {
-            // Extract RequestId from the callbackData
-            String requestId = (String) callbackData.get("RequestId");
-
-            // Save the callback data in the GEPGService
-            gepgbillService.saveCallbackData(requestId, callbackData);
-
-            response.put("status", "success");
-            response.put("message", "Callback processed successfully");
-            response.put("data", callbackData);
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            // Prepare an error response
-            response.put("status", "error");
-            response.put("message", "Internal server error");
-            response.put("error", e.getMessage());
-        }
-
-        return response;
-    }
+	public Map<String, Object> handleCallback(@RequestBody Map<String, Object> callbackData) {
+		System.out.println("Callback data received: " + callbackData);
+		
+		return gepgbillService.processGepgCallbackResponse(callbackData);
+	}
 }

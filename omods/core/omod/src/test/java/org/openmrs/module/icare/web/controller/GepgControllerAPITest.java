@@ -1,8 +1,11 @@
 package org.openmrs.module.icare.web.controller;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.After;
@@ -16,9 +19,11 @@ import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class GepgControllerAPITest extends BaseResourceControllerTest {
@@ -38,6 +43,32 @@ public class GepgControllerAPITest extends BaseResourceControllerTest {
 	public void tearDown() throws SQLException, ClassNotFoundException {
 		this.shutDown();
 		this.clearSessionAfterEachTest();
+	}
+	
+	@Test
+	public void testcallbackApi() throws Exception {
+		List<String> recipients = Arrays.asList("+255717611117", "+1234567890", "+0987654321");
+		String message = "Hello, it's me for Envaya SMS";
+		
+		String jsonPayload = "{ \"recipients\": [";
+		for (int i = 0; i < recipients.size(); i++) {
+			jsonPayload += "\"" + recipients.get(i) + "\"";
+			if (i < recipients.size() - 1) {
+				jsonPayload += ", ";
+			}
+		}
+		jsonPayload += "], \"message\": \"" + message + "\" }";
+		
+		MockHttpServletRequest request = newPostRequest("icare/envayasms/outgoing-message", jsonPayload);
+		request.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		
+		MockHttpServletResponse response = handle(request);
+		
+		assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+		
+		assertEquals("Saved successfully", response.getContentAsString());
+		
+		System.out.println(response);
 	}
 	
 	@Test

@@ -68,7 +68,7 @@ public class GEPGService {
 
                         // Wait for the callback data for up to 2 minutes
                         synchronized (this) {
-                            waitForCallbackResponse(requestId, responseMap);
+                            // waitForCallbackResponse(requestId, responseMap);
                         }
                     }
                 }
@@ -93,23 +93,37 @@ public class GEPGService {
         return responseMap;
     }
 
-    // Wait for the callback response
-    private void waitForCallbackResponse(String requestId, Map<String, Object> responseMap) {
+     // Method to process the callback response
+     public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callbackData) {
+        System.out.println("Processing callback data: " + callbackData);
+    
+        Map<String, Object> response = new HashMap<>();
+    
         try {
-            // Wait for a maximum of 2 minutes
-            for (int i = 0; i < 120; i++) {
-                if (callbackResponses.containsKey(requestId)) {
-                    // Once the callback is received, merged into the responseMap
-                    responseMap.putAll(callbackResponses.remove(requestId));
-                    break;
-                }
-                TimeUnit.SECONDS.sleep(1); 
+            if (callbackData.containsKey("Status")) {
+                Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
+                String requestId = (String) status.get("RequestId");
+                
+                callbackResponses.put(requestId, status);
+    
+                response.put("status", "success");
+                response.put("message", "Callback processed successfully");
+                response.put("data", callbackData);
+            } else {
+                System.out.println("Status field not found in callback data");
+                response.put("status", "error");
+                response.put("message", "Status field not found in callback data");
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            responseMap.put("error", "Callback waiting interrupted");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("status", "error");
+            response.put("message", "Internal server error");
+            response.put("error", e.getMessage());
         }
+    
+        return response;
     }
+    
 
     // Helper method to extract RequestId from the response
     private String extractRequestId(String responseString) {

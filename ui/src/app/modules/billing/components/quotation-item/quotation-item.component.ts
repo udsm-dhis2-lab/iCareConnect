@@ -13,6 +13,8 @@ import { PaymentReceiptComponent } from "../payment-reciept/payment-reciept.comp
 import { sum, sumBy } from "lodash";
 import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
 import { forEach } from "cypress/types/lodash";
+import { event } from "cypress/types/jquery";
+import { BillingService } from "../../services/billing.service";
 
 @Component({
   selector: "app-quotation-item",
@@ -44,6 +46,7 @@ export class QuotationItemComponent implements OnInit {
   constructor(
     private dialog: MatDialog,
     private billableItemsService: BillableItemsService,
+    private billingService: BillingService,
     private systemSettingsService: SystemSettingsService
   ) {}
 
@@ -198,6 +201,42 @@ export class QuotationItemComponent implements OnInit {
   onChangePaymentType(e) {
     // console.log(e);
   }
+  testCallback(event:any){
+    const payload = {
+      SystemAuth: {
+        ServiceCode: "1001",
+        Signature: "iRSuajvkiyJnloLjkPsQ2BVueqcVX/KVYH7F7kym1TJ448Pi0jye2ACidAikTVwBJb9UYvW7XaLlftTD3m4/dDuvi5mRoemIjO6rizuwI1TWoWst9b1P8BpthKObnofVKwPVKnD6v2GLpfbXwtoiRSuajvkiyJnSCrqsQvtmBmL8ACV3pls5eesYxppsszXEtV/VfilMePOJhfGsIma64baM7sJ8q7LHyujjWT3094Df5oYZEbMDXOPjy13kCm63vjsEdrrT0A+vz+N7LblmTdHBhtHar52OJmbpNZkbVq/0ZsL1IbX0Wc7SrlU6cWaNuOt0CRJ3bqNnSe8RlO746zkUJtXerYdg=="
+      },
+      FeedbackData: {
+        gepgBillSubResp: {
+          BillTrxInf: {
+            BillId:"hdfgagfhjgsafkjsdhbgragfjskfb", 
+            PayCntrNum: "991110164278", 
+            TrxSts: "GF", 
+          }
+        }
+      },
+      Status: {
+        RequestId: "hdfgagfhjgsafkjsdhbgragfjskfb_iugf", 
+        Code: "7301;7201", 
+        Description: "Duplicate,Fail" 
+      }
+    };
+    this.onConntrollNumbGen(payload);
+  }
+
+  onConntrollNumbGen(payload) {
+    console.log("Callback API Fired.........",payload);
+    this.billingService.gepgpayCallBack(payload).subscribe(
+      (response: any) => {
+        console.log("Callback Response:", response);
+      },
+      (error) => {
+       
+        console.log("Failed to generate control number:", error);
+      }
+    );
+  }
 
   getControlNumber(e: any, gepgConceptUuid?: any) {
     e.stopPropagation();
@@ -216,7 +255,7 @@ export class QuotationItemComponent implements OnInit {
         gepgConceptUuid: gepgConceptUuid,
       },
     });
-
+    
     dialog.afterClosed().subscribe((paymentResponse) => {
       this.paymentSuccess.emit();
       if (paymentResponse) {
