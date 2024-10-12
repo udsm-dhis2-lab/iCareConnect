@@ -1147,9 +1147,7 @@ public class ICareDao extends BaseDAO<Item> {
 	//	}
 	//
 	
-	public List<Visit> getVisitsByStartDateAndEndDate(Date startDate,
-													  Date endDate,
-													  String uuid) {
+	public List<Visit> getVisitsByStartDateAndEndDate(Date startDate, Date endDate, String uuid) {
 		DbSession session = getSession();
 		String queryStr = "";
 		if (uuid != null) {
@@ -1162,7 +1160,7 @@ public class ICareDao extends BaseDAO<Item> {
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
 		}
-
+		
 		if (uuid != null) {
 			query.setParameter("uuid", uuid);
 		}
