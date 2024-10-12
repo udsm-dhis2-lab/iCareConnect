@@ -9,6 +9,7 @@ import { ShortMessageConstructionComponent } from "./short-message-construction/
 import { VisitConsultationStatusModalComponent } from "./visit-consultation-status-modal/visit-consultation-status-modal.component";
 import { SharedPdfPreviewComponent } from "./shared-pdf-preview/shared-pdf-preview.component";
 import { ManageReportsModalComponent } from "./manage-reports-modal/manage-reports-modal.component";
+import { SharedRemotePatientHistoryModalComponent } from "./shared-remote-patient-history-modal/shared-remote-patient-history-modal.component";
 
 export const sharedDialogs: any[] = [
   PatientListDialogComponent,
@@ -22,6 +23,7 @@ export const sharedDialogs: any[] = [
   PatientHistoryDialogComponent,
   SharedPdfPreviewComponent,
   ManageReportsModalComponent,
+  SharedRemotePatientHistoryModalComponent,
 ];
 export {
   PatientListDialogComponent,

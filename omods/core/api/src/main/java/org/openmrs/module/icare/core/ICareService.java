@@ -207,11 +207,13 @@ public interface ICareService extends OpenmrsService {
 	
 	String pushEventWithoutRegistrationDataToDHIS2Instance(String eventData);
 	
-	String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType, String authReferenceKey);
+	String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType,
+	        String authReferenceKey);
 	
-	Map<String, Object> generateVisitsData(Date startDate, Date endDate, Boolean sendToExternalMediator, String uuid) throws Exception;
-
+	Map<String, Object> generateVisitsData(Date startDate, Date endDate, Boolean sendToExternalMediator, String uuid)
+	        throws Exception;
+	
 	Map<String, Object> sendReferralDataToMediator(String uuid) throws Exception;
-
+	
 	String getSharedRecordsFromExternalMediator(String hfrCode, String id, String idType) throws Exception;
 }
