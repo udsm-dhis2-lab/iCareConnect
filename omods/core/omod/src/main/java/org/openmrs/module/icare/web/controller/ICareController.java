@@ -1723,7 +1723,7 @@ public class ICareController {
 		return response;
 	}
 
-	@RequestMapping(value = "sharedRecords", method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "sharedrecords", method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public String getClientDataFromExternalMediator(@RequestParam(value = "hfrCode", required = false) String hfrCode,
 																 @RequestParam(value ="id", required = true) String id,
