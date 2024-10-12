@@ -52,14 +52,7 @@
       </div>
       <div class="w-100 patient-other-details-padding">
         <div
-          class="
-            d-flex
-            justify-content-between
-            align-items-center
-            pt-2
-            pl-3
-            pr-3
-          "
+          class="d-flex justify-content-between align-items-center pt-2 pl-3 pr-3"
         >
           <div class="d-flex justify-content-left">
             <button
@@ -73,9 +66,7 @@
             <a mat-icon-button class="mr-4" (click)="toggleSideBarMenu($event)">
               <mat-icon>menu</mat-icon>
             </a>
-            <ng-container *ngIf="!useSideBar">
-              
-            </ng-container>
+            <ng-container *ngIf="!useSideBar"> </ng-container>
           </div>
 
           <div class="w-50 d-flex justify-content-end">
@@ -278,6 +269,22 @@
                   activeVisitDeathStatus || !dashboardParams?.provider
                 "
                 (click)="
+                  onOpenClientHistoryFromRemote(
+                    $event,
+                    dashboardParams?.currentPatient,
+                    activeVisit,
+                    dashboardParams?.provider
+                  )
+                "
+              >
+                Get remote history
+              </button>
+              <button
+                mat-menu-item
+                [disabled]="
+                  activeVisitDeathStatus || !dashboardParams?.provider
+                "
+                (click)="
                   onOpenPopup(
                     $event,
                     '73d36615-9a4a-46a4-8134-2dca15acacc1',
@@ -455,45 +462,45 @@
                       >
                       </app-clinical-notes>
                       <app-patient-observations-chart
-                          *ngIf="
-                            isInpatient &&
-                            !showHistoryDetails &&
-                            !dashboardParams.loadingForms &&
-                            dashboardParams.currentPatient &&
-                            dashboardParams?.forms &&
-                            dashboardParams?.forms?.length > 0 &&
-                            ((selectedForm &&
-                              dashboardParams?.observationChartForm ===
-                                selectedForm?.uuid) ||
-                              (!selectedForm?.uuid &&
-                                dashboardParams?.observationChartForm ===
-                                  dashboardParams?.forms[0].uuid))
-                          "
-                          [clinicalObservations]="
-                            dashboardParams?.observationsGroupedByConcept
-                          "
-                          [patient]="dashboardParams?.currentPatient"
-                          [location]="dashboardParams?.currentLocation"
-                          [visit]="activeVisit"
-                          [forms]="dashboardParams?.forms"
-                          [shouldUseOwnFormSelection]="false"
-                          [obsChartEncounterType]="
-                            dashboardParams?.observationChartEncounterType
-                          "
-                          [provider]="dashboardParams?.provider"
-                          [selectedForm]="
-                            selectedForm &&
+                        *ngIf="
+                          isInpatient &&
+                          !showHistoryDetails &&
+                          !dashboardParams.loadingForms &&
+                          dashboardParams.currentPatient &&
+                          dashboardParams?.forms &&
+                          dashboardParams?.forms?.length > 0 &&
+                          ((selectedForm &&
                             dashboardParams?.observationChartForm ===
-                              selectedForm?.uuid
-                              ? selectedForm
-                              : dashboardParams?.forms[0]?.uuid ===
-                                dashboardParams?.observationChartForm
-                              ? dashboardParams?.forms[0]
-                              : {}
-                          "
-                        >
-                        </app-patient-observations-chart>
-                      
+                              selectedForm?.uuid) ||
+                            (!selectedForm?.uuid &&
+                              dashboardParams?.observationChartForm ===
+                                dashboardParams?.forms[0].uuid))
+                        "
+                        [clinicalObservations]="
+                          dashboardParams?.observationsGroupedByConcept
+                        "
+                        [patient]="dashboardParams?.currentPatient"
+                        [location]="dashboardParams?.currentLocation"
+                        [visit]="activeVisit"
+                        [forms]="dashboardParams?.forms"
+                        [shouldUseOwnFormSelection]="false"
+                        [obsChartEncounterType]="
+                          dashboardParams?.observationChartEncounterType
+                        "
+                        [provider]="dashboardParams?.provider"
+                        [selectedForm]="
+                          selectedForm &&
+                          dashboardParams?.observationChartForm ===
+                            selectedForm?.uuid
+                            ? selectedForm
+                            : dashboardParams?.forms[0]?.uuid ===
+                              dashboardParams?.observationChartForm
+                            ? dashboardParams?.forms[0]
+                            : {}
+                        "
+                      >
+                      </app-patient-observations-chart>
+
                       <app-ipd-forms
                         *ngIf="
                           isInpatient &&
@@ -679,7 +686,7 @@
                                   onUpdateConsultationOrder()
                                 "
                               ></app-patient-investigations-and-procedures>
-                              
+
                               <div
                                 class="alert alert-warning"
                                 role="alert"
