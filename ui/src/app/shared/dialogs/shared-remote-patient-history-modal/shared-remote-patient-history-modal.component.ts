@@ -16,7 +16,7 @@ export class SharedRemotePatientHistoryModalComponent implements OnInit {
   ngOnInit(): void {
     console.log(this.data);
     this.httpClientService
-      .get("icare/sharedRecords")
+      .get("icare/sharedrecords")
       .subscribe((response: any) => {
         console.log(response);
       });
