@@ -14,6 +14,31 @@
     ></app-form>
   </div>
   <div *ngIf="params?.remotePatientHistory">
-    <h5>Remote patient history</h5>
+    <h4>
+      {{ patient?.display }}
+    </h4>
+    <hr />
+    <div
+      class="mb-2"
+      *ngFor="let history of params?.remotePatientHistory?.results"
+    >
+      <div class="row">
+        <div class="col-md-6 col-sm-12 col-sx-12">
+          <p style="margin-bottom: 0px">
+            Names: {{ history?.demographicDetails?.firstName }}
+            <span *ngIf="history?.demographicDetails?.middleName">
+              - {{ history?.demographicDetails?.lastName }}
+            </span>
+            - {{ history?.demographicDetails?.lastName }}
+          </p>
+          <p>Gender: {{ history?.demographicDetails?.gender }}</p>
+        </div>
+        <div class="col-md-6 col-sm-12 col-sx-12">
+          <h5>Facility details</h5>
+          <p>Name: {{ history?.facilityDetails?.name }}</p>
+          <p>HFR Code: {{ history?.facilityDetails?.code }}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </ng-container>
