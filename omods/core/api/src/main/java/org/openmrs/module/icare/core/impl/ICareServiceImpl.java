@@ -1492,6 +1492,20 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 					String username = administrationService.getGlobalProperty(authReferenceKey + ".username");
 					String password = administrationService.getGlobalProperty(authReferenceKey + ".password");
 
+					if (id != null) {
+						mediatorUrl += "?id=" + id;
+					}
+
+					if (hfrCode != null) {
+						if (mediatorUrl.contains("?")) {
+							mediatorUrl += "&hfrCode="+ hfrCode;
+						}
+					}
+					if (idType != null) {
+						if (mediatorUrl.contains("?")) {
+							mediatorUrl += "&idType="+ idType;
+						}
+					}
 					// Construct the URL for the GET request
 					URL url = new URL(instance.concat(mediatorUrl));
 					HttpURLConnection con = (HttpURLConnection) url.openConnection();

@@ -263,7 +263,7 @@
               >
                 Refer
               </button>
-              <button
+              <!-- <button
                 mat-menu-item
                 [disabled]="
                   activeVisitDeathStatus || !dashboardParams?.provider
@@ -278,7 +278,7 @@
                 "
               >
                 Get remote history
-              </button>
+              </button> -->
               <button
                 mat-menu-item
                 [disabled]="
@@ -405,7 +405,29 @@
                         [activeVisit]="activeVisit"
                       ></app-shared-visit-history-summary> -->
                             <div class="w-100" *ngIf="showHistoryDetails">
-                              <mat-accordion>
+                              <mat-radio-group aria-label="History options">
+                                <mat-radio-button
+                                  color="primary"
+                                  [checked]="
+                                    selectedHistoryCategory === 'local'
+                                  "
+                                  [value]="'local'"
+                                  (change)="onToggleHistoryType($event)"
+                                  >Local</mat-radio-button
+                                >
+                                <mat-radio-button
+                                  color="primary"
+                                  [checked]="
+                                    selectedHistoryCategory === 'remote'
+                                  "
+                                  [value]="'remote'"
+                                  (change)="onToggleHistoryType($event)"
+                                  >Remote</mat-radio-button
+                                >
+                              </mat-radio-group>
+                              <mat-accordion
+                                *ngIf="selectedHistoryCategory === 'local'"
+                              >
                                 <mat-expansion-panel
                                   class="mb-2 border p-0"
                                   [expanded]="true"
@@ -423,6 +445,26 @@
                                       dashboardParams?.currentLocation
                                     "
                                   ></app-patient-history>
+                                </mat-expansion-panel>
+                              </mat-accordion>
+                              <mat-accordion
+                                *ngIf="selectedHistoryCategory === 'remote'"
+                              >
+                                <mat-expansion-panel
+                                  class="mb-2 border p-0"
+                                  [expanded]="true"
+                                >
+                                  <mat-expansion-panel-header>
+                                    <mat-panel-title
+                                      >Remote Patient History
+                                    </mat-panel-title>
+                                  </mat-expansion-panel-header>
+                                  <app-shared-remote-patient-history
+                                    [patient]="
+                                      dashboardParams?.currentPatient?.patient
+                                    "
+                                    [activeVisit]="dashboardParams?.activeVisit"
+                                  ></app-shared-remote-patient-history>
                                 </mat-expansion-panel>
                               </mat-accordion>
                             </div>
