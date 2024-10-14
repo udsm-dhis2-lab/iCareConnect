@@ -81,6 +81,7 @@ import { keyBy, orderBy } from "lodash";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { SharedRemotePatientHistoryModalComponent } from "../../dialogs/shared-remote-patient-history-modal/shared-remote-patient-history-modal.component";
+import { MatRadioChange } from "@angular/material/radio";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -154,6 +155,8 @@ export class SharedPatientDashboardComponent implements OnInit {
   tabsToShow: string[] = ["LABORATORY", "PROCEDURE", "RADIOLOGY"];
   currentFormDetails: any = {};
   useSideBar: boolean = false;
+
+  selectedHistoryCategory: string = "local";
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -596,5 +599,9 @@ export class SharedPatientDashboardComponent implements OnInit {
         provider,
       },
     });
+  }
+
+  onToggleHistoryType(event: MatRadioChange): void {
+    this.selectedHistoryCategory = event?.value;
   }
 }

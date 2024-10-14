@@ -131,6 +131,7 @@ import { GenericDrugsListComponent } from "./generic-drugs-list/generic-drugs-li
 import { UnitsOfMeasureSettingsComponent } from "./units-of-measure-settings/units-of-measure-settings.component";
 import { SharedDisplayOrderedTestsNamesComponent } from "./shared-display-ordered-tests-names/shared-display-ordered-tests-names.component";
 import { SharedCollectedAmountComponent } from "./shared-collected-amount/shared-collected-amount.component";
+import { SharedRemotePatientHistoryComponent } from "./shared-remote-patient-history/shared-remote-patient-history.component";
 
 export const components: any[] = [
   PatientAddressComponent,
@@ -266,6 +267,7 @@ export const components: any[] = [
   UnitsOfMeasureSettingsComponent,
   SharedDisplayOrderedTestsNamesComponent,
   SharedCollectedAmountComponent,
+  SharedRemotePatientHistoryComponent,
 ];
 
 export const sharedEntryComponents: any[] = [
