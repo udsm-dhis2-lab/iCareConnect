@@ -1011,7 +1011,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		// TODO: Make sure test is running sucessfully beforing using the API
 		assertThat("Order status shows drug dispensed", responseMap.get("orderStockStatus"), is("DISPENSED"));
 	}
-
+	
 	@Test
 	public void testReferralAPI() throws Exception {
 		Map<String,Object> referralVisit = new HashMap<>();
@@ -1026,7 +1026,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> responseMap = (new ObjectMapper()).readValue(mockedResponse.getContentAsString(), Map.class);
 		System.out.println(responseMap);
 	}
-
+	
 	@Test
 	public void testSharedRecordsAPI() throws Exception {
 		Map<String,Object> referralVisit = new HashMap<>();

@@ -1187,11 +1187,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public String pushDataToExternalMediator(String data,
-											 String mediatorKey,
-											 String mediatorUrl,
-											 String authenticationType,
-											 String authReferenceKey) {
+	public String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType,
+	        String authReferenceKey) {
 		try {
 			AdministrationService administrationService = Context.getAdministrationService();
 			String instance = administrationService.getGlobalProperty(authReferenceKey + ".instance");
@@ -1199,7 +1196,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			String password = administrationService.getGlobalProperty(authReferenceKey + ".password");
 			URL url = new URL(instance.concat(mediatorUrl));
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
+			
 			System.out.println(instance);
 			String userCredentials = username.concat(":").concat(password);
 			String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
@@ -1268,7 +1265,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return dataTemplateData;
 	}
-
+	
 	public Map<String,Object> sendReferralDataToMediator(String uuid) throws Exception {
 		Map<String,Object> visitData = new HashMap<>();
 		List<Visit> visits = dao.getVisitsByStartDateAndEndDate(null, null, uuid);
@@ -1286,7 +1283,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		String response = pushDataToExternalMediator(templateData, "HDUAPI", "SHR");
 		return visitData;
 	}
-
+	
 	private Map<String, Object> prepareTemplateDetails() {
 		AdministrationService administrationService = Context.getAdministrationService();
 		String workflowUuid = administrationService.getGlobalProperty(ICareConfig.HDU_API_WORKFLOW_UUID_FOR_OPD);
@@ -1302,7 +1299,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 
 		return templateDetails;
 	}
-
+	
 	private Map<String, Object> generateReportDetails() throws Exception {
 		Dhis2EventWrapper dhis2EventWrapper = new Dhis2EventWrapper();
 		Map<String, Object> reportDetails = new HashMap<>();
@@ -1311,7 +1308,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 
 		return reportDetails;
 	}
-
+	
 	private Map<String, Object> generateFacilityDetails() throws ConfigurationException {
 		Dhis2EventWrapper dhis2EventWrapper = new Dhis2EventWrapper();
 		Map<String, Object> facilityDetails = new HashMap<>();
@@ -1321,7 +1318,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 
 		return facilityDetails;
 	}
-
+	
 	private List<Map<String, Object>> generateListGrid(List<Visit> visits) {
 		List<Map<String, Object>> listGrid = new ArrayList<>();
 		for (Visit visit : visits) {
@@ -1335,7 +1332,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return listGrid;
 	}
-
+	
 	private Map<String, Object> prepareVisitDetails(Visit visit) {
 		Map<String, Object> visitDetails = new HashMap<>();
 		visitDetails.put("id", visit.getVisitId());
@@ -1343,7 +1340,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		visitDetails.put("closedDate", visit.getStopDatetime());
 		return visitDetails;
 	}
-
+	
 	private Map<String, Object> prepareDemographicDetails(Visit visit) {
 		Map<String, Object> demographicDetails = new HashMap<>();
 		Patient patient = visit.getPatient();
@@ -1360,15 +1357,18 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		demographicDetails.put("identifiers", getPatientIdentifiers(patient));
 		return demographicDetails;
 	}
-
+	
 	private String convertGender(String gender) {
 		switch (gender.toLowerCase()) {
-			case "m": return "male";
-			case "f": return "female";
-			default: return "unknown";
+			case "m":
+				return "male";
+			case "f":
+				return "female";
+			default:
+				return "unknown";
 		}
 	}
-
+	
 	private List<Map<String, Object>> prepareDiagnosisDetails(Visit visit) {
 		List<Map<String, Object>> diagnosisDetails = new ArrayList<>();
 		for (Encounter encounter : visit.getEncounters()) {
@@ -1383,7 +1383,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return diagnosisDetails;
 	}
-
+	
 	private Map<String, Object> prepareOutcomeDetails(Visit visit) {
 		Map<String, Object> outcomeDetails = new HashMap<>();
 		Person person = visit.getPatient().getPerson();
@@ -1395,41 +1395,40 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return outcomeDetails;
 	}
-
-	private String pushDataToExternalMediator(Map<String, Object> dataTemplateData,
-											  String mediatorKeyType,
-											  String authReferenceKey) throws Exception {
+	
+	private String pushDataToExternalMediator(Map<String, Object> dataTemplateData, String mediatorKeyType,
+	        String authReferenceKey) throws Exception {
 		try {
 			AdministrationService adminService = Context.getService(AdministrationService.class);
 			String mediatorsConfigs = adminService.getGlobalProperty(ICareConfig.INTEROPERABILITY_MEDIATORS_LIST);
-
+			
 			JSONArray mediatorsList = new JSONArray(mediatorsConfigs);
 			ICareService iCareService = Context.getService(ICareService.class);
-
+			
 			for (int count = 0; count < mediatorsList.length(); count++) {
 				JSONObject mediator = mediatorsList.getJSONObject(count);
 				if (mediator.optBoolean("isActive") && mediatorKeyType.equals(mediator.getString("mediatorKey"))) {
 					String mediatorKey = mediator.getString("mediatorKey");
 					String mediatorUrlPath = mediator.getString("mediatorUrlPath");
 					String authenticationType = mediator.getString("authenticationType");
-					authReferenceKey = mediator.getString("") != null ? mediator.getString("authKeyReference"): mediator.getString("mediatorKey");
-					return iCareService.pushDataToExternalMediator(
-							new JSONObject(dataTemplateData).toString(),
-							mediatorKey, mediatorUrlPath,
-							authenticationType,
-							authReferenceKey);
+					authReferenceKey = mediator.getString("") != null ? mediator.getString("authKeyReference") : mediator
+					        .getString("mediatorKey");
+					return iCareService.pushDataToExternalMediator(new JSONObject(dataTemplateData).toString(), mediatorKey,
+					    mediatorUrlPath, authenticationType, authReferenceKey);
 				}
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
 		return "";
 	}
-
+	
 	private String getPhoneNumbers(Person person) {
 		AdministrationService administrationService = Context.getAdministrationService();
-		String personPhoneNumberAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.PHONE_NUMBER_ATTRIBUTE);
-
+		String personPhoneNumberAttributeTypeUuid = administrationService
+		        .getGlobalProperty(ICareConfig.PHONE_NUMBER_ATTRIBUTE);
+		
 		if (person.getAttributes() != null) {
 			for (PersonAttribute attribute : person.getAttributes()) {
 				if (attribute.getAttributeType().getUuid().equals(personPhoneNumberAttributeTypeUuid)) {
@@ -1439,6 +1438,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return "";
 	}
+	
 	private String getPreferredIdentifier(Patient patient) {
 		if (patient.getIdentifiers() != null) {
 			for (PatientIdentifier identifier : patient.getIdentifiers()) {
@@ -1446,14 +1446,14 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 					return identifier.getIdentifier();
 				}
 			}
-
+			
 			if (!patient.getIdentifiers().isEmpty()) {
 				return patient.getIdentifiers().iterator().next().getIdentifier();
 			}
 		}
 		return "";
 	}
-
+	
 	private List<Map<String,Object>> getPatientIdentifiers(Patient patient) {
 		List<Map<String,Object>> identifiers = new ArrayList<>();
 		if (patient.getIdentifiers() != null) {
@@ -1466,7 +1466,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return identifiers;
 	}
-
+	
 	@Override
 	public String getSharedRecordsFromExternalMediator(String hfrCode,
 													   String id,

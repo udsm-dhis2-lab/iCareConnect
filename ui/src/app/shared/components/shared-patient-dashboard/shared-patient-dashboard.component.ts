@@ -80,6 +80,7 @@ import { map, map as rxMap } from "rxjs/operators";
 import { keyBy, orderBy } from "lodash";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
+import { SharedRemotePatientHistoryModalComponent } from "../../dialogs/shared-remote-patient-history-modal/shared-remote-patient-history-modal.component";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -98,7 +99,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Input() isTheatre: boolean;
   @Input() visitEndingControlStatusesConceptUuid: string;
   @Input() observations: any;
-  @Input() moduleName:any;
+  @Input() moduleName: any;
   currentPatient$: Observable<Patient>;
   vitalSignObservations$: Observable<any>;
   loadingVisit$: Observable<boolean>;
@@ -163,7 +164,6 @@ export class SharedPatientDashboardComponent implements OnInit {
     private conceptService: ConceptsService,
     private billingService: BillingService,
     private googleAnalyticsService: GoogleAnalyticsService
- 
   ) {
     this.store.dispatch(loadEncounterTypes());
   }
@@ -332,20 +332,15 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
 
   onToggleVitalsSummary(event: Event): void {
- console.log("data tracing ...............");
+    console.log("data tracing ...............");
     console.log(event);
-     event.stopPropagation();
-      this.trackActionForAnalytics(`View Vitals: Open`);
-      this.showVitalsSummary = !this.showVitalsSummary;
- 
+    event.stopPropagation();
+    this.trackActionForAnalytics(`View Vitals: Open`);
+    this.showVitalsSummary = !this.showVitalsSummary;
   }
-  
-  
-  
 
   getSelectedForm(event: Event, form: any): void {
-  
-    this.trackActionForAnalytics(`${form?.name}: Open`)
+    this.trackActionForAnalytics(`${form?.name}: Open`);
     this.readyForClinicalNotes = false;
     if (event) {
       event.stopPropagation();
@@ -357,9 +352,6 @@ export class SharedPatientDashboardComponent implements OnInit {
     }, 50);
   }
 
-
- 
-  
   onSaveObservations(observations: ObsCreate[], patient): void {
     this.store.dispatch(
       saveObservations({ observations, patientId: patient?.patient?.uuid })
@@ -401,20 +393,12 @@ export class SharedPatientDashboardComponent implements OnInit {
       minHeight: "75vh",
       data: { patientUuid },
     });
-
   }
 
   trackActionForAnalytics(eventname: any) {
     // Send data to Google Analytics
-    this.googleAnalyticsService.sendAnalytics(
-      "Clinic",
-      eventname,
-      "Clinic"
-    );
+    this.googleAnalyticsService.sendAnalytics("Clinic", eventname, "Clinic");
   }
-
-
-
 
   onOpenPopup(
     event: Event,
@@ -430,7 +414,7 @@ export class SharedPatientDashboardComponent implements OnInit {
     generalPrescriptionOrderType,
     useGeneralPrescription,
     showPrintButton: boolean,
-    actionType:string
+    actionType: string
   ): void {
     this.trackActionForAnalytics(`Refer: Open`);
     event.stopPropagation();
@@ -461,10 +445,8 @@ export class SharedPatientDashboardComponent implements OnInit {
             },
             disableClose: false,
           });
-          
         }
       });
-      
   }
 
   onGetCurrentFormDetails(selectedFormDetails: any): void {
@@ -569,8 +551,6 @@ export class SharedPatientDashboardComponent implements OnInit {
     this.trackActionForAnalytics(`View Discharge: Open`);
     event.stopPropagation();
     this.dichargePatient.emit({ discharge: true, invoice: invoice });
-
-
   }
 
   onOpenModalToEndConsultation(
@@ -594,12 +574,27 @@ export class SharedPatientDashboardComponent implements OnInit {
         location,
       },
     });
-    
-      this.trackActionForAnalytics(`End Consultation: Open`);
- 
 
+    this.trackActionForAnalytics(`End Consultation: Open`);
   }
   reload(currentPatient: Patient) {
     this.store.dispatch(loadActiveVisit({ patientId: currentPatient?.id }));
+  }
+
+  onOpenClientHistoryFromRemote(
+    event,
+    currentPatient,
+    activeVisit,
+    provider
+  ): void {
+    event.stopPropagation();
+    this.dialog.open(SharedRemotePatientHistoryModalComponent, {
+      minWidth: "40%",
+      data: {
+        currentPatient,
+        activeVisit,
+        provider,
+      },
+    });
   }
 }
