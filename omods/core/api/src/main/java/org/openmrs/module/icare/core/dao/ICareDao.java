@@ -1146,12 +1146,23 @@ public class ICareDao extends BaseDAO<Item> {
 	//	}
 	//
 	
-	public List<Visit> getVisitsByStartDateAndEndDate(Date startDate, Date endDate) {
+	public List<Visit> getVisitsByStartDateAndEndDate(Date startDate, Date endDate, String uuid) {
 		DbSession session = getSession();
-		String queryStr = " SELECT visit FROM Visit visit WHERE visit.startDatetime BETWEEN :startDate AND :endDate";
+		String queryStr = "";
+		if (uuid != null) {
+			queryStr = " SELECT visit FROM Visit visit WHERE visit.uuid = :uuid";
+		} else {
+			queryStr = " SELECT visit FROM Visit visit WHERE visit.startDatetime BETWEEN :startDate AND :endDate";
+		}
 		Query query = session.createQuery(queryStr);
-		query.setParameter("startDate", startDate);
-		query.setParameter("endDate", endDate);
+		if (startDate != null && endDate != null) {
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
+		}
+		
+		if (uuid != null) {
+			query.setParameter("uuid", uuid);
+		}
 		return query.list();
 	}
 	

@@ -275,7 +275,6 @@ public class SampleDAO extends BaseDAO<Sample> {
 		//			queryStr += ",ss.timestamp DESC";
 		//		}
 		Query query = session.createQuery(queryStr);
-		System.out.println(queryStr);
 		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
