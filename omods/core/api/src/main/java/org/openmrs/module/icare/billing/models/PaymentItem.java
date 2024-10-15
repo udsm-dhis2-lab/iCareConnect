@@ -63,7 +63,7 @@ public class PaymentItem {
 	
 	@Column(name = "amount", nullable = false)
 	private Double amount;
-
+	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = true)
 	private PaymentStatus status;
@@ -133,11 +133,11 @@ public class PaymentItem {
 	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
-
+	
 	public PaymentStatus getStatus() {
 		return status;
 	}
-
+	
 	public void setStatus(PaymentStatus status) {
 		this.status = status;
 	}

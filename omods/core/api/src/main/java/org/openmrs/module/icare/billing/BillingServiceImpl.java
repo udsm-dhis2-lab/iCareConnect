@@ -737,7 +737,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	public List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) throws Exception {
 		return this.invoiceDAO.getTotalAmountFromPaidInvoices(startDate, endDate, provider);
 	}
-
+	
 	@Override
 	public Map<String,Object> processGepgCallbackResponse(Map<String,Object> callbackData) throws Exception {
 //		System.out.println("Processing callback data: " + callbackData);

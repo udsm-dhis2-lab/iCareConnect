@@ -102,21 +102,22 @@ public class GepgControllerAPITest extends BaseResourceControllerTest {
 		// Then
 		// TODO: Implement test results
 	}
-
+	
 	@Test
 	public void TestGePGCallBackAPI() throws Exception {
 		String callBackPayloadStr = this.readFile("dto/billing/gepg-return-payload.json");
-		Map<String,Object> payload = (new ObjectMapper()).readValue(callBackPayloadStr, Map.class);
-
+		Map<String, Object> payload = (new ObjectMapper()).readValue(callBackPayloadStr, Map.class);
+		
 		// Set icare.billing.controlNumberBasedPaymentType.concept.uuid
 		AdministrationService administrationService = Context.getAdministrationService();
 		administrationService.setGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER,
-				"GEPGTEST-5e44-11e8-ie7c-50b6etwQqQee");
+		    "GEPGTEST-5e44-11e8-ie7c-50b6etwQqQee");
 		MockHttpServletRequest mockedPostRequest = newPostRequest("gepg/callback", payload);
 		MockHttpServletResponse mockedCallBackResponse = handle(mockedPostRequest);
-
-		Map<String,Object> responseMap = (new ObjectMapper()).readValue(mockedCallBackResponse.getContentAsString(), Map.class);
+		
+		Map<String, Object> responseMap = (new ObjectMapper()).readValue(mockedCallBackResponse.getContentAsString(),
+		    Map.class);
 		System.out.println(responseMap);
-//		assertThat("Payment with status unpaid has been created with reference number", responseMap.get("referenceNumber"), is("991110164278"));
+		//		assertThat("Payment with status unpaid has been created with reference number", responseMap.get("referenceNumber"), is("991110164278"));
 	}
 }
