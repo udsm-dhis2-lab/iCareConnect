@@ -147,6 +147,7 @@ public class GEPGService {
                     paymentItem.setAmount(invoiceItem.getPrice());
                     paymentItem.setOrder(invoiceItem.getOrder());
                     paymentItem.setItem(invoiceItem.getItem());
+                    paymentItem.setStatus(PaymentStatus.UNPAID);
                     paymentItems.add(paymentItem);
                 }
                 payment.setItems(paymentItems);
