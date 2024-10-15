@@ -13,8 +13,10 @@ import org.junit.Before;
 
 import org.junit.Test;
 import org.openmrs.Patient;
+import org.openmrs.api.AdministrationService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
@@ -23,6 +25,8 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -97,5 +101,22 @@ public class GepgControllerAPITest extends BaseResourceControllerTest {
 		System.out.println(generateControlNumberRequest.getContentAsString());
 		// Then
 		// TODO: Implement test results
+	}
+
+	@Test
+	public void TestGePGCallBackAPI() throws Exception {
+		String callBackPayloadStr = this.readFile("dto/billing/gepg-return-payload.json");
+		Map<String,Object> payload = (new ObjectMapper()).readValue(callBackPayloadStr, Map.class);
+
+		// Set icare.billing.controlNumberBasedPaymentType.concept.uuid
+		AdministrationService administrationService = Context.getAdministrationService();
+		administrationService.setGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER,
+				"GEPGTEST-5e44-11e8-ie7c-50b6etwQqQee");
+		MockHttpServletRequest mockedPostRequest = newPostRequest("gepg/callback", payload);
+		MockHttpServletResponse mockedCallBackResponse = handle(mockedPostRequest);
+
+		Map<String,Object> responseMap = (new ObjectMapper()).readValue(mockedCallBackResponse.getContentAsString(), Map.class);
+		System.out.println(responseMap);
+//		assertThat("Payment with status unpaid has been created with reference number", responseMap.get("referenceNumber"), is("991110164278"));
 	}
 }

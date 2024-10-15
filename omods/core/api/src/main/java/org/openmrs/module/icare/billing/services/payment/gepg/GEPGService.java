@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.openmrs.Concept;
+import org.openmrs.Patient;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.Utils.PaymentStatus;
 import org.openmrs.module.icare.billing.dao.PaymentDAO;
@@ -121,10 +122,10 @@ public class GEPGService {
             if (callbackData.containsKey("Status") && callbackData.containsKey("FeedbackData")) {
                 Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
                 Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
-    
+
                 Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
                 Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
-    
+
                 String billId = (String) billTrxInf.get("BillId");
                 String payCntrNum = (String) billTrxInf.get("PayCntrNum");
 
@@ -156,19 +157,25 @@ public class GEPGService {
                 payment.setItems(paymentItems);
                 payment.setReceivedBy("SYSTEM");
                 payment.setStatus(PaymentStatus.UNPAID);
+                payment.setCreator(Context.getAuthenticatedUser());
+                payment.setDateCreated( new Date());
+                new Payment();
                 boolean isUpdated = true;
                 // will used to update Control Number
                 // boolean isUpdated = icareService.updateGepgControlNumber(payCntrNum, billId);
 
                 if (isUpdated) {
                     // Save control number in global property
+                    List<Payment> payments = this.paymentDAO.findByPatientUuid(invoice.getVisit().getPatient().getUuid());
+                    System.out.println(payments.size());
                     Payment savedPayment = this.paymentDAO.save(payment);
+//                    response.put("referenceNumber",payCntrNum);
                     GlobalProperty globalProperty = new GlobalProperty();
                     AdministrationService administrationService = Context.getAdministrationService();
                     globalProperty.setProperty("gepg.updatedInvoiceItem.icareConnect");
-                    globalProperty.setPropertyValue("Success Control NUmber saved with payment control number "+ savedPayment.getReferenceNumber() + " and uuid " + savedPayment.getUuid());
+//                    globalProperty.setPropertyValue("Success Control NUmber saved with payment control number "+ savedPayment.getReferenceNumber() + " and uuid " + savedPayment.getUuid());
                     administrationService.saveGlobalProperty(globalProperty);
-    
+
                     response.put("status", "success");
                     response.put("message", "Callback processed and control number updated successfully");
                 } else {

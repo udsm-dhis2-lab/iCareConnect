@@ -39,8 +39,7 @@ public class Payment extends BaseOpenmrsData implements java.io.Serializable {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "id.payment", cascade = { CascadeType.PERSIST })
 	private List<PaymentItem> items = new ArrayList<PaymentItem>(0);
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "status", nullable = true)
+	@Column(name = "status", nullable = true, length = 16)
 	private PaymentStatus status;
 
 	public Payment() {
@@ -148,8 +147,8 @@ public class Payment extends BaseOpenmrsData implements java.io.Serializable {
 		
 		/*Map<String, Object> invoiceMap = new HashMap<String, Object>();
 		invoiceMap.put("uuid", this.getInvoice().getUuid());
-		paymentMap.put("invoice", invoiceMap);*/
-		
+//		paymentMap.put("invoice", invoiceMap);*/
+		paymentMap.put("receivedBy", this.getReceivedBy());
 		Map<String, Object> paymentTypeMap = new HashMap<String, Object>();
 		paymentTypeMap.put("uuid", this.getPaymentType().getUuid());
 		paymentTypeMap.put("name", this.getPaymentType().getDisplayString());

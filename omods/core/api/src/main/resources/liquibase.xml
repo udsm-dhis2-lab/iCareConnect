@@ -5499,7 +5499,7 @@
             </not>
         </preConditions>
         <addColumn tableName="bl_payment_item" >
-            <column name="status" type="TEXT">
+            <column name="status" type="VARCHAR(16)">
                 <constraints nullable="true"></constraints>
             </column>
         </addColumn>

@@ -737,4 +737,86 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	public List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) throws Exception {
 		return this.invoiceDAO.getTotalAmountFromPaidInvoices(startDate, endDate, provider);
 	}
+
+	@Override
+	public Map<String,Object> processGepgCallbackResponse(Map<String,Object> callbackData) throws Exception {
+//		System.out.println("Processing callback data: " + callbackData);
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			if (callbackData.containsKey("Status") && callbackData.containsKey("FeedbackData")) {
+				Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
+				Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
+
+				Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
+				Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
+
+				String billId = (String) billTrxInf.get("BillId");
+				String payCntrNum = (String) billTrxInf.get("PayCntrNum");
+
+				// 1. Get invoice from bill
+				Invoice invoice = invoiceDAO.findByUuid(billId);
+				if (invoice == null) {
+					throw new Exception("Bill id " + billId + " is not valid");
+				}
+				String  paymentTypeConceptUuid = Context.getAdministrationService().getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
+				if (paymentTypeConceptUuid == null) {
+					throw new Exception("No default payment type based on control number");
+				}
+				Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
+				Payment payment = new Payment();
+				payment.setPaymentType(paymentType);
+				payment.setReferenceNumber(payCntrNum);
+				payment.setInvoice(invoice);
+
+				// Payment Items
+				List<PaymentItem> paymentItems = new ArrayList<PaymentItem>();
+				for (InvoiceItem invoiceItem: invoice.getInvoiceItems()) {
+					PaymentItem paymentItem = new PaymentItem();
+					paymentItem.setAmount(invoiceItem.getPrice());
+					paymentItem.setOrder(invoiceItem.getOrder());
+					paymentItem.setItem(invoiceItem.getItem());
+					paymentItem.setStatus(PaymentStatus.UNPAID);
+					paymentItems.add(paymentItem);
+				}
+//				payment.setItems(paymentItems);
+				payment.setReceivedBy("SYSTEM");
+				payment.setStatus(PaymentStatus.UNPAID);
+				payment.setCreator(Context.getAuthenticatedUser());
+				payment.setDateCreated( new Date());
+				new Payment();
+				boolean isUpdated = true;
+				// will used to update Control Number
+				// boolean isUpdated = icareService.updateGepgControlNumber(payCntrNum, billId);
+
+				if (isUpdated) {
+					// Save control number in global property
+					Payment savedPayment = this.paymentDAO.save(payment);
+                    response.put("referenceNumber",payCntrNum);
+					System.out.println(savedPayment.getUuid());
+					GlobalProperty globalProperty = new GlobalProperty();
+					AdministrationService administrationService = Context.getAdministrationService();
+					globalProperty.setProperty("gepg.updatedInvoiceItem.icareConnect");
+//                    globalProperty.setPropertyValue("Success Control NUmber saved with payment control number "+ savedPayment.getReferenceNumber() + " and uuid " + savedPayment.getUuid());
+					administrationService.saveGlobalProperty(globalProperty);
+
+					response.put("status", "success");
+					response.put("message", "Callback processed and control number updated successfully");
+				} else {
+					response.put("status", "error");
+					response.put("message", "Failed to update control number for BillId: " + billId);
+				}
+			} else {
+				System.out.println("Status or FeedbackData field not found in callback data");
+				response.put("status", "error");
+				response.put("message", "Status or FeedbackData field not found in callback data");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("status", "error");
+			response.put("message", "Internal server error");
+			response.put("error", e.getMessage());
+		}
+		return response;
+	}
 }

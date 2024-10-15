@@ -143,9 +143,7 @@ public class GepgBillingController {
     }
 	
 	@RequestMapping(value = "/callback", method = RequestMethod.POST)
-	public Map<String, Object> handleCallback(@RequestBody Map<String, Object> callbackData) {
-		System.out.println("Callback data received: " + callbackData);
-		
-		return gepgbillService.processGepgCallbackResponse(callbackData);
+	public Map<String, Object> handleCallback(@RequestBody Map<String, Object> callbackData) throws Exception {
+		return billingService.processGepgCallbackResponse(callbackData);
 	}
 }
