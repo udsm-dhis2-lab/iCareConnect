@@ -8,8 +8,11 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.openmrs.Concept;
+import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.Payment;
+import org.openmrs.module.icare.billing.models.PaymentItem;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -126,8 +129,26 @@ public class GEPGService {
                 if (invoice == null) {
                     throw new Exception("Bill id " + billId + " is not valid");
                 }
+                String  paymentTypeConceptUuid = Context.getAdministrationService().getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
+                if (paymentTypeConceptUuid == null) {
+                    throw new Exception("No default payment type based on control number");
+                }
+                Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
                 Payment payment = new Payment();
+                payment.setPaymentType(paymentType);
+                payment.setReferenceNumber(payCntrNum);
+                payment.setInvoice(invoice);
 
+                // Payment Items
+                List<PaymentItem> paymentItems = new ArrayList<PaymentItem>();
+                for (InvoiceItem invoiceItem: invoice.getInvoiceItems()) {
+                    PaymentItem paymentItem = new PaymentItem();
+                    paymentItem.setAmount(invoiceItem.getPrice());
+                    paymentItem.setOrder(invoiceItem.getOrder());
+                    paymentItem.setItem(invoiceItem.getItem());
+                    paymentItems.add(paymentItem);
+                }
+                payment.setItems(paymentItems);
                 boolean isUpdated = true;
                 // will used to update Control Number
                 // boolean isUpdated = icareService.updateGepgControlNumber(payCntrNum, billId);

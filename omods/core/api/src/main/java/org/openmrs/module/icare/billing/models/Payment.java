@@ -4,6 +4,7 @@ import org.codehaus.jackson.annotate.JsonSetter;
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Concept;
 import org.openmrs.Order;
+import org.openmrs.module.icare.billing.Utils.PaymentStatus;
 import org.openmrs.module.icare.core.Item;
 
 import javax.persistence.*;
@@ -37,7 +38,11 @@ public class Payment extends BaseOpenmrsData implements java.io.Serializable {
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "id.payment", cascade = { CascadeType.PERSIST })
 	private List<PaymentItem> items = new ArrayList<PaymentItem>(0);
-	
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "status", nullable = true)
+	private PaymentStatus status;
+
 	public Payment() {
 		
 	}
@@ -169,5 +174,13 @@ public class Payment extends BaseOpenmrsData implements java.io.Serializable {
 	
 	public void setItems(List<PaymentItem> items) {
 		this.items = items;
+	}
+
+	public PaymentStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(PaymentStatus status) {
+		this.status = status;
 	}
 }
