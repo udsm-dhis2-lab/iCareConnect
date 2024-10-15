@@ -7,6 +7,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.attribute.AttributeType;
 import org.openmrs.module.icare.ICareConfig;
+import org.openmrs.module.icare.billing.Utils.PaymentStatus;
 import org.openmrs.module.icare.billing.dao.DiscountDAO;
 import org.openmrs.module.icare.billing.dao.InvoiceDAO;
 import org.openmrs.module.icare.billing.dao.PaymentDAO;
@@ -325,8 +326,10 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			}
 			item.setItem(invoiceItem.getItem());
 			item.setOrder(invoiceItem.getOrder());
+			item.setStatus(PaymentStatus.PAID);
 		}
 		payment.setReceivedBy(Context.getAuthenticatedUser().getName());
+		payment.setStatus(PaymentStatus.PAID);
 		return this.paymentDAO.save(payment);
 	}
 	
