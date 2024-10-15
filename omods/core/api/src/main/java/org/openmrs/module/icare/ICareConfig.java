@@ -170,4 +170,6 @@ public class ICareConfig {
 	public static final String ALLOW_REMOTE_HISTORY = "iCare.interoperability.settings.allowRemoteHistory";
 
 	public static final String DATA_EXCHANGE_LOCATION_TAG = "iCare.interoperability.settings.exchangeLocationsTag";
+
+	public static final String HFRCODE_LOCATION_ATTRIBUTE_TYPE_UUID = "icare.location.attributes.hfrCode.attributeUuid";
 }
