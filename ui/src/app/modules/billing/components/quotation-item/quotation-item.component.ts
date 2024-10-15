@@ -210,14 +210,14 @@ export class QuotationItemComponent implements OnInit {
       FeedbackData: {
         gepgBillSubResp: {
           BillTrxInf: {
-            BillId:"hdfgagfhjgsafkjsdhbgragfjskfb", 
+            BillId:"24d5fcec-4bd5-4d62-8a61-dc938694556a", 
             PayCntrNum: "991110164278", 
             TrxSts: "GF", 
           }
         }
       },
       Status: {
-        RequestId: "hdfgagfhjgsafkjsdhbgragfjskfb_iugf", 
+        RequestId: "24d5fcec-4bd5-4d62-8a61-dc938694556a_iugf", 
         Code: "7301;7201", 
         Description: "Duplicate,Fail" 
       }

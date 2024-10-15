@@ -18,6 +18,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.auditlog.AuditLog;
+import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.core.Item;
@@ -29,8 +30,6 @@ import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.store.models.OrderStatus;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.HashMap;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1155,4 +1154,36 @@ public class ICareDao extends BaseDAO<Item> {
 		query.setParameter("endDate", endDate);
 		return query.list();
 	}
+	
+	public boolean updateGepgControlNumber(String controlNumber, String uuid) {
+		DbSession session = getSession();
+		boolean isSuccess = false;
+		
+		try {
+			String queryStr = "UPDATE bl_invoice_item SET control_number = :controlNumber "
+			        + "WHERE invoice_id = (SELECT invoice_id FROM bl_invoice WHERE uuid = :uuid)";
+			SQLQuery query = session.createSQLQuery(queryStr);
+			query.setParameter("controlNumber", controlNumber);
+			query.setParameter("uuid", uuid);
+			int updateCount = query.executeUpdate();
+			
+			if (updateCount > 0) {
+				String selectQueryStr = "SELECT * FROM bl_invoice_item WHERE invoice_id = (SELECT invoice_id FROM bl_invoice WHERE uuid = :uuid)";
+				SQLQuery selectQuery = session.createSQLQuery(selectQueryStr);
+				selectQuery.addEntity(InvoiceItem.class);
+				selectQuery.setParameter("uuid", uuid);
+				
+				InvoiceItem updatedInvoiceItem = (InvoiceItem) selectQuery.uniqueResult();
+				if (updatedInvoiceItem != null && controlNumber.equals(updatedInvoiceItem.getControlNumber())) {
+					isSuccess = true;
+				}
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return isSuccess;
+	}
+	
 }

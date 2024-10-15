@@ -15,6 +15,7 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.icare.auditlog.AuditLog;
 import org.openmrs.module.icare.billing.ItemNotPayableException;
+import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
@@ -128,6 +129,8 @@ public interface ICareService extends OpenmrsService {
 	
 	List<Object[]> getCommonlyOrderedItems(String visitUuid, String orderTypeUuid, Integer limit, Integer startIndex,
 	        Boolean isDrug, String provider, Date startDate, Date endDate);
+	
+	Boolean updateGepgControlNumber(String controlNumber, String uuid);
 	
 	Message sendMessage(Message message) throws MalformedURLException, IOException, Exception;
 	

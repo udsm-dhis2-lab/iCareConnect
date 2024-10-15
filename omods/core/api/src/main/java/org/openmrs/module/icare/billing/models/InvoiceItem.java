@@ -71,6 +71,9 @@ public class InvoiceItem implements java.io.Serializable {
 	@Column(name = "price", nullable = false, precision = 10, scale = 0)
 	private Double price;
 	
+	@Column(name = "control_number", nullable = true)
+	private String controlNumber;
+	
 	public InvoiceItem() {
 		
 	}
@@ -89,6 +92,14 @@ public class InvoiceItem implements java.io.Serializable {
 	
 	public void setPrice(Double price) {
 		this.price = price;
+	}
+	
+	public String getControlNumber() {
+		return this.controlNumber;
+	}
+	
+	public void setControlNumber(String controlNumber) {
+		this.controlNumber = controlNumber;
 	}
 	
 	public InvoiceItemID getId() {
