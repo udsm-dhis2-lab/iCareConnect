@@ -130,7 +130,7 @@ public interface ICareService extends OpenmrsService {
 	List<Object[]> getCommonlyOrderedItems(String visitUuid, String orderTypeUuid, Integer limit, Integer startIndex,
 	        Boolean isDrug, String provider, Date startDate, Date endDate);
 	
-	Boolean updateGepgControlNumber(String controlNumber, String uuid);
+	// Boolean updateGepgControlNumber(String controlNumber, String uuid);
 	
 	Message sendMessage(Message message) throws MalformedURLException, IOException, Exception;
 	

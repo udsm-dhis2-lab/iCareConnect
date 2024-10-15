@@ -76,7 +76,7 @@ public class BillSubmissionRequest {
 			Date billExpirlyDate, String personPhoneAttributeTypeUuid, String personEmailAttributeTypeUuid,
 			String currency,
 			String gepgAuthSignature, String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode,
-			String serviceCode, String SpSysId, String subSpCode, String clientPrivateKey,String pkcs12Path, String pkcs12Password,String enginepublicKey) throws Exception {
+			String serviceCode, String SpSysId, String subSpCode, String clientPrivateKey,String pkcs12Path, String pkcs12Password,String enginepublicKey,String billId) throws Exception {
 		AdministrationService administrationService = Context.getAdministrationService();
 		// Validate inputs
 		if (patient == null) {
@@ -176,7 +176,7 @@ public class BillSubmissionRequest {
 
 		// Create and populate BillTrxInf
 		BillTrxInf billTrxInf = new BillTrxInf();
-		billTrxInf.setBillId(patientUuid);
+		billTrxInf.setBillId(billId);
 		billTrxInf.setSubSpCode(subSpCode);
 		billTrxInf.setSpSysId(SpSysId);
 		billTrxInf.setBillAmt(totalBillAmount.toString());

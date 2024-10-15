@@ -358,10 +358,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		    endDate);
 	}
 	
-	@Override
-	public Boolean updateGepgControlNumber(String controlNumber, String uuid) {
-		return this.dao.updateGepgControlNumber(controlNumber, uuid);
-	}
+	// @Override
+	// public Boolean updateGepgControlNumber(String controlNumber, String uuid) {
+	// 	return this.dao.updateGepgControlNumber(controlNumber, uuid);
+	// }
 	
 	@Override
 	public Message sendMessage(Message message) throws Exception {

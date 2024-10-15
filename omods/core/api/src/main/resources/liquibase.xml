@@ -296,13 +296,6 @@
         <addPrimaryKey tableName="bl_invoice_item" columnNames="invoice_id,item_id,order_id"/>
     </changeSet>
 
-    <changeSet id="add_control_number_to_bl_invoice_item" author="gaspar-giddson">
-    <addColumn tableName="bl_invoice_item">
-        <column name="control_number" type="TEXT" defaultValue="NULL"/>
-    </addColumn>
-    </changeSet>
-
-
 
     <changeSet id="create_bl_discount_invoice_item" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">

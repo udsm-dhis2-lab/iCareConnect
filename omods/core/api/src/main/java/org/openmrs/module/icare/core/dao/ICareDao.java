@@ -1155,35 +1155,35 @@ public class ICareDao extends BaseDAO<Item> {
 		return query.list();
 	}
 	
-	public boolean updateGepgControlNumber(String controlNumber, String uuid) {
-		DbSession session = getSession();
-		boolean isSuccess = false;
-		
-		try {
-			String queryStr = "UPDATE bl_invoice_item SET control_number = :controlNumber "
-			        + "WHERE invoice_id = (SELECT invoice_id FROM bl_invoice WHERE uuid = :uuid)";
-			SQLQuery query = session.createSQLQuery(queryStr);
-			query.setParameter("controlNumber", controlNumber);
-			query.setParameter("uuid", uuid);
-			int updateCount = query.executeUpdate();
-			
-			if (updateCount > 0) {
-				String selectQueryStr = "SELECT * FROM bl_invoice_item WHERE invoice_id = (SELECT invoice_id FROM bl_invoice WHERE uuid = :uuid)";
-				SQLQuery selectQuery = session.createSQLQuery(selectQueryStr);
-				selectQuery.addEntity(InvoiceItem.class);
-				selectQuery.setParameter("uuid", uuid);
-				
-				InvoiceItem updatedInvoiceItem = (InvoiceItem) selectQuery.uniqueResult();
-				if (updatedInvoiceItem != null && controlNumber.equals(updatedInvoiceItem.getControlNumber())) {
-					isSuccess = true;
-				}
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return isSuccess;
-	}
+	// public boolean updateGepgControlNumber(String controlNumber, String uuid) {
+	// 	DbSession session = getSession();
+	// 	boolean isSuccess = false;
+	
+	// 	try {
+	// 		String queryStr = "UPDATE bl_invoice_item SET control_number = :controlNumber "
+	// 		        + "WHERE invoice_id = (SELECT invoice_id FROM bl_invoice WHERE uuid = :uuid)";
+	// 		SQLQuery query = session.createSQLQuery(queryStr);
+	// 		query.setParameter("controlNumber", controlNumber);
+	// 		query.setParameter("uuid", uuid);
+	// 		int updateCount = query.executeUpdate();
+	
+	// 		if (updateCount > 0) {
+	// 			String selectQueryStr = "SELECT * FROM bl_invoice_item WHERE invoice_id = (SELECT invoice_id FROM bl_invoice WHERE uuid = :uuid)";
+	// 			SQLQuery selectQuery = session.createSQLQuery(selectQueryStr);
+	// 			selectQuery.addEntity(InvoiceItem.class);
+	// 			selectQuery.setParameter("uuid", uuid);
+	
+	// 			InvoiceItem updatedInvoiceItem = (InvoiceItem) selectQuery.uniqueResult();
+	// 			if (updatedInvoiceItem != null && controlNumber.equals(updatedInvoiceItem.getControlNumber())) {
+	// 				isSuccess = true;
+	// 			}
+	// 		}
+	// 	}
+	// 	catch (Exception e) {
+	// 		e.printStackTrace();
+	// 	}
+	
+	// 	return isSuccess;
+	// }
 	
 }

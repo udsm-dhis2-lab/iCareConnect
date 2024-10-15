@@ -39,10 +39,12 @@ public class GepgBillingController {
         Visit visit = null;
         Double totalBillAmount = 0.0;
         String currency = null;
+        String billId= null;
         List<InvoiceItem> invoiceItems = new ArrayList<>();
 
         for (Map<String, Object> invoiceReference : requestPayload) {
             String uuid = (String) invoiceReference.get("uuid");
+            billId = uuid;
             if (uuid == null) {
                 throw new IllegalArgumentException("UUID cannot be null");
             }
@@ -116,7 +118,7 @@ public class GepgBillingController {
                 clientPrivateKey,
                 pkcs12Path,
                 pkcs12Password,
-                enginepublicKey);
+                enginepublicKey,billId);
 
         try {
             // billRequest from the gepgPayloadResponse map

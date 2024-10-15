@@ -114,8 +114,9 @@ public class GEPGService {
     
                 String billId = (String) billTrxInf.get("BillId");
                 String payCntrNum = (String) billTrxInf.get("PayCntrNum");
-    
-                boolean isUpdated = icareService.updateGepgControlNumber(payCntrNum, billId);
+                boolean isUpdated = true;
+                // will used to update Control Number
+                // boolean isUpdated = icareService.updateGepgControlNumber(payCntrNum, billId);
     
                 if (isUpdated) {
                     // Save control number in global property
