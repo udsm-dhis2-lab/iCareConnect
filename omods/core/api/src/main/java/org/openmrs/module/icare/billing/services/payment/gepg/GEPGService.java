@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.openmrs.Concept;
 import org.openmrs.module.icare.ICareConfig;
+import org.openmrs.module.icare.billing.Utils.PaymentStatus;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.Payment;
 import org.openmrs.module.icare.billing.models.PaymentItem;
@@ -149,6 +150,7 @@ public class GEPGService {
                     paymentItems.add(paymentItem);
                 }
                 payment.setItems(paymentItems);
+                payment.setStatus(PaymentStatus.UNPAID);
                 boolean isUpdated = true;
                 // will used to update Control Number
                 // boolean isUpdated = icareService.updateGepgControlNumber(payCntrNum, billId);
