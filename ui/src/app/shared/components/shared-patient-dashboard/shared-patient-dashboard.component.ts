@@ -76,12 +76,13 @@ import { UserService } from "src/app/modules/maintenance/services/users.service"
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { VisitConsultationStatusModalComponent } from "../../dialogs/visit-consultation-status-modal/visit-consultation-status-modal.component";
 import { BillingService } from "src/app/modules/billing/services/billing.service";
-import { map, map as rxMap } from "rxjs/operators";
+import { map, map as rxMap, switchMap } from "rxjs/operators";
 import { keyBy, orderBy } from "lodash";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { SharedRemotePatientHistoryModalComponent } from "../../dialogs/shared-remote-patient-history-modal/shared-remote-patient-history-modal.component";
 import { MatRadioChange } from "@angular/material/radio";
+import { LocationService } from "src/app/core/services";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -157,6 +158,10 @@ export class SharedPatientDashboardComponent implements OnInit {
   useSideBar: boolean = false;
 
   selectedHistoryCategory: string = "local";
+
+  shouldAllowRemoteHistory$: Observable<any>;
+  dataExchangeLocations$: Observable<any>;
+  hfrCodeLocationAttribute$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -166,7 +171,8 @@ export class SharedPatientDashboardComponent implements OnInit {
     private userService: UserService,
     private conceptService: ConceptsService,
     private billingService: BillingService,
-    private googleAnalyticsService: GoogleAnalyticsService
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private locationService: LocationService
   ) {
     this.store.dispatch(loadEncounterTypes());
   }
@@ -273,6 +279,33 @@ export class SharedPatientDashboardComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.ipd.encounterType.observationChart"
       );
+
+    this.shouldAllowRemoteHistory$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.interoperability.settings.allowRemoteHistory"
+      );
+
+    this.hfrCodeLocationAttribute$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "icare.location.attributes.hfrCode.attributeUuid"
+      );
+
+    this.dataExchangeLocations$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        "iCare.interoperability.settings.exchangeLocationsTag"
+      )
+      .pipe(
+        switchMap((response: any) => {
+          return response != "none"
+            ? this.locationService.getLocationsByTagName(response).pipe(
+                map((locationsResponse: any) => {
+                  return locationsResponse;
+                })
+              )
+            : "";
+        })
+      );
+
     this.facilityDetails$ = this.configService.getFacilityDetails();
     this.facilityDetails$ = this.userService.getLoginLocations();
 

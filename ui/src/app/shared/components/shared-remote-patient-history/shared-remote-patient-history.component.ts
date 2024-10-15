@@ -12,12 +12,17 @@ import { FormValue } from "../../modules/form/models/form-value.model";
 export class SharedRemotePatientHistoryComponent implements OnInit {
   @Input() patient: any;
   @Input() activeVisit: any;
+  @Input() dataExchangeLocations: any[];
+  @Input() hfrCodeLocationAttribute: string;
   selectedIdentifier: string;
+  selectedHFRCode: string;
   remotePatientHistory$: Observable<any>;
   identifierFormField: any;
+  locationFormField: any;
   constructor(private httpClientService: OpenmrsHttpClientService) {}
 
   ngOnInit(): void {
+    // console.log(this.dataExchangeLocations);
     this.selectedIdentifier = this.getPreferredIdentifier(
       this.patient?.identifiers
     );
@@ -27,30 +32,58 @@ export class SharedRemotePatientHistoryComponent implements OnInit {
       label: "Identifier Types",
       options: this.patient?.identifiers?.map((identifier: any) => {
         return {
-          id: identifier?.identifierType?.display,
           key: identifier?.identifierType?.display,
+          name: identifier?.identifierType?.display,
           label: identifier?.identifierType?.display,
-          value: identifier?.identifier,
+          value: identifier?.identifierType?.display,
+        };
+      }),
+    });
+    // console.log("dataExchangeLocations", this.dataExchangeLocations);
+    this.locationFormField = new Dropdown({
+      id: "location",
+      key: "location",
+      label: "Health Facility",
+      options: this.dataExchangeLocations?.map((location: any) => {
+        return {
+          key: location?.uuid,
+          name: location?.display,
+          label: location?.display,
+          value: this.getHFRCode(location?.attributes),
         };
       }),
     });
     this.getRemoteHistory();
   }
 
+  getHFRCode(locationAttributes: any): string {
+    return (locationAttributes?.filter(
+      (location: any) =>
+        location?.attributeType?.uuid === this.hfrCodeLocationAttribute
+    ) || [])[0]?.value;
+  }
+
   getRemoteHistory(): void {
     this.remotePatientHistory$ = this.httpClientService.get(
-      `icare/sharedrecords?id=` + this.selectedIdentifier
+      `icare/sharedrecords?id=${this.selectedIdentifier}${
+        this.selectedHFRCode ? "&hfrCode=" + this.selectedHFRCode : ""
+      }`
     );
   }
 
   onFormUpdate(formValue: FormValue): void {
     const values = formValue.getValues();
-    const identifierType = values?.identifierType?.value;
+    const identifierType = values?.identifierType?.value
+      ? values?.identifierType?.value
+      : "MRN";
+    this.selectedHFRCode = values?.location?.value;
     if (identifierType) {
       this.selectedIdentifier = this.getIdentifierByIdentifierType(
         identifierType,
         this.patient?.identifiers
       );
+    }
+    if (this.selectedHFRCode || this.selectedIdentifier) {
       this.getRemoteHistory();
     }
   }
@@ -59,6 +92,8 @@ export class SharedRemotePatientHistoryComponent implements OnInit {
     identifierType: string,
     identifiers: any[]
   ): string {
+    console.log(identifiers);
+    console.log(identifierType);
     return (identifiers?.filter(
       (identifier: any) =>
         identifier?.identifierType?.display === identifierType
