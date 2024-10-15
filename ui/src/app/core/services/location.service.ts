@@ -205,32 +205,33 @@ export class LocationService {
     if (parameters?.v) {
       othersParameters += `&v=${parameters?.v}`;
     }
-    return this.httpClient
-      .get(
-        "location?tag=" +
-          tagName +
-          (othersParameters != "" ? othersParameters : "&v=full&limit=100")
-      )
-      .pipe(
-        map((response) => {
-          return (
-            response?.results?.filter((res: any) => !res?.retired) || []
-          ).map((result) => {
-            return {
-              ...result,
-              childLocations:
-                result?.childLocations?.filter(
-                  (childLoc: any) => !childLoc?.retired
-                ) || [],
-              attributes:
-                result?.attributes && result?.attributes?.length > 0
-                  ? result?.attributes.filter((attribute) => !attribute?.voided)
-                  : [],
-            };
-          });
-        }),
-        catchError((error) => of(error))
-      );
+    const path =
+      "location?tag=" +
+      tagName +
+      (othersParameters != "" ? othersParameters : "&v=full&limit=100");
+    console.log("PATH", path);
+    return this.httpClient.get(path).pipe(
+      map((response) => {
+        return (
+          response?.results?.filter((res: any) => !res?.retired) || []
+        ).map((result) => {
+          return {
+            ...result,
+            childLocations:
+              result?.childLocations?.filter(
+                (childLoc: any) => !childLoc?.retired
+              ) || [],
+            attributes:
+              result?.attributes && result?.attributes?.length > 0
+                ? result?.attributes.filter((attribute) => !attribute?.voided)
+                : [],
+          };
+        });
+      }),
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 
   getLocationsByTagNames(

@@ -468,7 +468,9 @@
                                     </mat-panel-title>
                                   </mat-expansion-panel-header>
                                   <app-shared-remote-patient-history
-                                    *ngIf="params?.dataExchangeLocations"
+                                    *ngIf="
+                                      dashboardParams?.dataExchangeLocations
+                                    "
                                     [patient]="
                                       dashboardParams?.currentPatient?.patient
                                     "

@@ -76,7 +76,7 @@ import { UserService } from "src/app/modules/maintenance/services/users.service"
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { VisitConsultationStatusModalComponent } from "../../dialogs/visit-consultation-status-modal/visit-consultation-status-modal.component";
 import { BillingService } from "src/app/modules/billing/services/billing.service";
-import { map, map as rxMap } from "rxjs/operators";
+import { map, map as rxMap, switchMap } from "rxjs/operators";
 import { keyBy, orderBy } from "lodash";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
@@ -289,11 +289,10 @@ export class SharedPatientDashboardComponent implements OnInit {
         "iCare.interoperability.settings.exchangeLocationsTag"
       )
       .pipe(
-        map((response: any) => {
+        switchMap((response: any) => {
           return response != "none"
             ? this.locationService.getLocationsByTagName(response).pipe(
                 map((locationsResponse: any) => {
-                  console.log("locationsResponse", locationsResponse);
                   return locationsResponse;
                 })
               )
