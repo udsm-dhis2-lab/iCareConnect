@@ -82,6 +82,7 @@ import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { SharedRemotePatientHistoryModalComponent } from "../../dialogs/shared-remote-patient-history-modal/shared-remote-patient-history-modal.component";
 import { MatRadioChange } from "@angular/material/radio";
+import { LocationService } from "src/app/core/services";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -157,6 +158,9 @@ export class SharedPatientDashboardComponent implements OnInit {
   useSideBar: boolean = false;
 
   selectedHistoryCategory: string = "local";
+
+  shouldAllowRemoteHistory$: Observable<any>;
+  dataExchangeLocations$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -166,7 +170,8 @@ export class SharedPatientDashboardComponent implements OnInit {
     private userService: UserService,
     private conceptService: ConceptsService,
     private billingService: BillingService,
-    private googleAnalyticsService: GoogleAnalyticsService
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private locationService: LocationService
   ) {
     this.store.dispatch(loadEncounterTypes());
   }
@@ -273,6 +278,29 @@ export class SharedPatientDashboardComponent implements OnInit {
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.ipd.encounterType.observationChart"
       );
+
+    this.shouldAllowRemoteHistory$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "iCare.interoperability.settings.allowRemoteHistory"
+      );
+
+    this.dataExchangeLocations$ = this.systemSettingsService
+      .getSystemSettingsByKey(
+        "iCare.interoperability.settings.exchangeLocationsTag"
+      )
+      .pipe(
+        map((response: any) => {
+          return response != "none"
+            ? this.locationService.getLocationsByTagName(response).pipe(
+                map((locationsResponse: any) => {
+                  console.log("locationsResponse", locationsResponse);
+                  return locationsResponse;
+                })
+              )
+            : "";
+        })
+      );
+
     this.facilityDetails$ = this.configService.getFacilityDetails();
     this.facilityDetails$ = this.userService.getLoginLocations();
 

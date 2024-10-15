@@ -29,7 +29,9 @@
     visitEndingControlStatusesConcept:
       visitEndingControlStatusesConcept$ | async,
     patientInvoice: patientInvoice$ | async,
-    latestRound: latestRound$ | async
+    latestRound: latestRound$ | async,
+    shouldAllowRemoteHistory: shouldAllowRemoteHistory$ | async,
+    dataExchangeLocations: dataExchangeLocations$ | async
   } as dashboardParams"
 >
   <div
@@ -405,7 +407,13 @@
                         [activeVisit]="activeVisit"
                       ></app-shared-visit-history-summary> -->
                             <div class="w-100" *ngIf="showHistoryDetails">
-                              <mat-radio-group aria-label="History options">
+                              <mat-radio-group
+                                aria-label="History options"
+                                *ngIf="
+                                  dashboardParams?.shouldAllowRemoteHistory ==
+                                  'true'
+                                "
+                              >
                                 <mat-radio-button
                                   color="primary"
                                   [checked]="
@@ -460,10 +468,14 @@
                                     </mat-panel-title>
                                   </mat-expansion-panel-header>
                                   <app-shared-remote-patient-history
+                                    *ngIf="params?.dataExchangeLocations"
                                     [patient]="
                                       dashboardParams?.currentPatient?.patient
                                     "
                                     [activeVisit]="dashboardParams?.activeVisit"
+                                    [dataExchangeLocations]="
+                                      params?.dataExchangeLocations
+                                    "
                                   ></app-shared-remote-patient-history>
                                 </mat-expansion-panel>
                               </mat-accordion>

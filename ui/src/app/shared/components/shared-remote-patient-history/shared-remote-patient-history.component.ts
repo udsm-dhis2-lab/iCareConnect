@@ -12,12 +12,14 @@ import { FormValue } from "../../modules/form/models/form-value.model";
 export class SharedRemotePatientHistoryComponent implements OnInit {
   @Input() patient: any;
   @Input() activeVisit: any;
+  @Input() dataExchangeLocations: any[];
   selectedIdentifier: string;
   remotePatientHistory$: Observable<any>;
   identifierFormField: any;
   constructor(private httpClientService: OpenmrsHttpClientService) {}
 
   ngOnInit(): void {
+    console.log(this.dataExchangeLocations);
     this.selectedIdentifier = this.getPreferredIdentifier(
       this.patient?.identifiers
     );
