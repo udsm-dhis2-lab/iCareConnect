@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.openmrs.Concept;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.Utils.PaymentStatus;
+import org.openmrs.module.icare.billing.dao.PaymentDAO;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.Payment;
 import org.openmrs.module.icare.billing.models.PaymentItem;
@@ -31,6 +32,8 @@ public class GEPGService {
 
     @Autowired
     private BillingService billingService;
+
+    PaymentDAO paymentDAO;
     // A map to hold callback responses based on the request ID
     private final Map<String, Map<String, Object>> callbackResponses = new ConcurrentHashMap<>();
    
@@ -151,6 +154,7 @@ public class GEPGService {
                     paymentItems.add(paymentItem);
                 }
                 payment.setItems(paymentItems);
+                payment.setReceivedBy("SYSTEM");
                 payment.setStatus(PaymentStatus.UNPAID);
                 boolean isUpdated = true;
                 // will used to update Control Number
@@ -158,10 +162,11 @@ public class GEPGService {
 
                 if (isUpdated) {
                     // Save control number in global property
+                    Payment savedPayment = this.paymentDAO.save(payment);
                     GlobalProperty globalProperty = new GlobalProperty();
                     AdministrationService administrationService = Context.getAdministrationService();
                     globalProperty.setProperty("gepg.updatedInvoiceItem.icareConnect");
-                    globalProperty.setPropertyValue("Success Control NUmber saved");  
+                    globalProperty.setPropertyValue("Success Control NUmber saved with payment control number "+ savedPayment.getReferenceNumber() + " and uuid " + savedPayment.getUuid());
                     administrationService.saveGlobalProperty(globalProperty);
     
                     response.put("status", "success");
