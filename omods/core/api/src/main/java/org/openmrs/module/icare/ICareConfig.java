@@ -166,4 +166,8 @@ public class ICareConfig {
 	public static final String ORDER_TO_SKIP_BILLING_ADVISOR = "iCare.billing.orderTypes.skipBillingOrderAdvisor";
 	
 	public static final String MACHINE_INTEGRATION_PRIMARY_CONCEPT_SOURCE = "icare.laboratory.concept.mappings.machineIntegration.conceptSourceUuid";
+
+	public static final String ALLOW_REMOTE_HISTORY = "iCare.interoperability.settings.allowRemoteHistory";
+
+	public static final String DATA_EXCHANGE_LOCATION_TAG = "iCare.interoperability.settings.exchangeLocationsTag";
 }
