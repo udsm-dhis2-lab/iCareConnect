@@ -209,7 +209,6 @@ export class LocationService {
       "location?tag=" +
       tagName +
       (othersParameters != "" ? othersParameters : "&v=full&limit=100");
-    console.log("PATH", path);
     return this.httpClient.get(path).pipe(
       map((response) => {
         return (

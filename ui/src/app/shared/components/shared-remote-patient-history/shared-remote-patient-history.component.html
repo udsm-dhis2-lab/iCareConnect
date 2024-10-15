@@ -9,7 +9,8 @@
   </div>
   <div class="d-flex justify-content-end">
     <app-form
-      [fields]="[identifierFormField]"
+      [fields]="[identifierFormField, locationFormField]"
+      [isFormHorizontal]="true"
       (formUpdate)="onFormUpdate($event)"
     ></app-form>
   </div>
@@ -32,6 +33,12 @@
             - {{ history?.demographicDetails?.lastName }}
           </p>
           <p>Gender: {{ history?.demographicDetails?.gender }}</p>
+          <h5 class="mt-2">Visit summary</h5>
+          <p>ID: {{ history?.visitDetails?.id }}</p>
+          <p>Visit date: {{ history?.visitDetails?.visitDate | date }}</p>
+          <p>
+            Visit closed date: {{ history?.visitDetails?.closedDate | date }}
+          </p>
         </div>
         <div class="col-md-6 col-sm-12 col-sx-12">
           <h5>Facility details</h5>

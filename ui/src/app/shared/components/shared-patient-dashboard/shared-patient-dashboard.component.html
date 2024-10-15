@@ -31,7 +31,8 @@
     patientInvoice: patientInvoice$ | async,
     latestRound: latestRound$ | async,
     shouldAllowRemoteHistory: shouldAllowRemoteHistory$ | async,
-    dataExchangeLocations: dataExchangeLocations$ | async
+    dataExchangeLocations: dataExchangeLocations$ | async,
+    hfrCodeLocationAttribute: hfrCodeLocationAttribute$ | async
   } as dashboardParams"
 >
   <div
@@ -469,14 +470,18 @@
                                   </mat-expansion-panel-header>
                                   <app-shared-remote-patient-history
                                     *ngIf="
-                                      dashboardParams?.dataExchangeLocations
+                                      dashboardParams?.dataExchangeLocations &&
+                                      dashboardParams?.hfrCodeLocationAttribute
                                     "
                                     [patient]="
                                       dashboardParams?.currentPatient?.patient
                                     "
                                     [activeVisit]="dashboardParams?.activeVisit"
                                     [dataExchangeLocations]="
-                                      params?.dataExchangeLocations
+                                      dashboardParams?.dataExchangeLocations
+                                    "
+                                    [hfrCodeLocationAttribute]="
+                                      dashboardParams?.hfrCodeLocationAttribute
                                     "
                                   ></app-shared-remote-patient-history>
                                 </mat-expansion-panel>

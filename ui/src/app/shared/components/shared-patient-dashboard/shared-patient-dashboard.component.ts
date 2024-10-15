@@ -161,6 +161,7 @@ export class SharedPatientDashboardComponent implements OnInit {
 
   shouldAllowRemoteHistory$: Observable<any>;
   dataExchangeLocations$: Observable<any>;
+  hfrCodeLocationAttribute$: Observable<any>;
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -282,6 +283,11 @@ export class SharedPatientDashboardComponent implements OnInit {
     this.shouldAllowRemoteHistory$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.interoperability.settings.allowRemoteHistory"
+      );
+
+    this.hfrCodeLocationAttribute$ =
+      this.systemSettingsService.getSystemSettingsByKey(
+        "icare.location.attributes.hfrCode.attributeUuid"
       );
 
     this.dataExchangeLocations$ = this.systemSettingsService
