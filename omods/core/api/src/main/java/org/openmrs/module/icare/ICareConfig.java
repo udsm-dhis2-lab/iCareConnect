@@ -170,4 +170,6 @@ public class ICareConfig {
 	public static final String PKCS12_PATH = "iCare.GePG.settings.pkcs12Path";
 	
 	public static final String PKCS12_PASSWORD = "iCare.GePG.settings.pkcs12Password";
+
+	public static final String DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER = "icare.billing.controlNumberBasedPaymentType.concept.uuid";
 }

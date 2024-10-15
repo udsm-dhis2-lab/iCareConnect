@@ -8,6 +8,9 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.openmrs.module.icare.billing.models.Invoice;
+import org.openmrs.module.icare.billing.models.Payment;
+import org.openmrs.module.icare.billing.services.BillingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.openmrs.api.AdministrationService;
@@ -21,6 +24,9 @@ public class GEPGService {
 
     @Autowired
     private ICareService icareService;
+
+    @Autowired
+    private BillingService billingService;
     // A map to hold callback responses based on the request ID
     private final Map<String, Map<String, Object>> callbackResponses = new ConcurrentHashMap<>();
    
@@ -114,10 +120,18 @@ public class GEPGService {
     
                 String billId = (String) billTrxInf.get("BillId");
                 String payCntrNum = (String) billTrxInf.get("PayCntrNum");
+
+                // 1. Get invoice from bill
+                Invoice invoice = billingService.getInvoiceDetailsByUuid(billId);
+                if (invoice == null) {
+                    throw new Exception("Bill id " + billId + " is not valid");
+                }
+                Payment payment = new Payment();
+
                 boolean isUpdated = true;
                 // will used to update Control Number
                 // boolean isUpdated = icareService.updateGepgControlNumber(payCntrNum, billId);
-    
+
                 if (isUpdated) {
                     // Save control number in global property
                     GlobalProperty globalProperty = new GlobalProperty();

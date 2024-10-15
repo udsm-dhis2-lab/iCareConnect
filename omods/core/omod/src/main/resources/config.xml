@@ -256,7 +256,13 @@
 			For storing concept source used to map test from machine results
 		</description>
 	</globalProperty>
-	
+	<globalProperty>
+		<property>icare.billing.controlNumberBasedPaymentType.concept.uuid</property>
+		<defaultValue>uuid</defaultValue>
+		<description>
+			Default for GePG
+		</description>
+	</globalProperty>
 	<!-- Internationalization -->
 	<!-- All message codes should start with @MODULE_ID@.* -->
 	<messages>
