@@ -1,5 +1,6 @@
 FROM udsmdhis2/icare-openmrs:1.0.0
 RUN apt-get update && \
+    apt-get install -y curl gnupg apt-transport-https ca-certificates && \
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 RUN node -v
