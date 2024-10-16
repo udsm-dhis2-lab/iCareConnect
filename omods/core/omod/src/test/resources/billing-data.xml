@@ -318,7 +318,7 @@
 
     <orders orderer="200" concept_id ="1003" creator="1" date_activated="2018-12-27 00:00:00" order_number="124" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="1" date_created="2020-10-14 00:00:00" uuid="7634gd66-3333-4abd-8fd7-a748c9575" order_id="301" patient_id="1000" encounter_id="100"/>
 
-    <orders orderer="200" concept_id ="1003" creator="1" date_activated="2018-12-27 00:00:00" order_number="125" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="1" date_created="2020-10-15 00:00:00" uuid="7634gd66-3333-4abd-8fd7-a748c9575" order_id="301" patient_id="2000" encounter_id="100"/>
+    <orders orderer="200" concept_id ="1003" creator="1" date_activated="2018-12-27 00:00:00" order_number="125" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="1" date_created="2020-10-15 00:00:00" uuid="7634gd66-3333-4abd-8fd7-a748c9574" order_id="301" patient_id="2000" encounter_id="100"/>
 
     <orders orderer="200" concept_id ="1003" creator="1" date_activated="2018-12-27 00:00:00" order_number="126" urgency="ROUTINE" care_setting="1" order_action="NEW" voided="false" order_type_id="2" date_created="2020-10-15 00:00:00" uuid="7634gd66-3333-4abd-8fd7-a748c9576" order_id="302" patient_id="2000" encounter_id="300"/>
 
@@ -328,12 +328,17 @@
     <item item_id="123" unit="Data" uuid="8o00d43570-8y37-11f3-1234-08002007777" concept_id="1003" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
     <!--<st_device_type device_type_id="22" uuid="2msir5eb-5345-11e8-9c7c-40b034c3cfee" name="lab_device_"/>-->
     <item item_id="124" unit="Data" uuid="8o00d43570-8y37-11f3-1234-08002007779" concept_id="1003" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
+    <item item_id="125" unit="Data" uuid="9990d43570-8y37-11f3-1234-08002007779" concept_id="1006" date_created="2020-12-27 00:00:00" voided="false" creator="1" stockable="true"/>
 
     <!-- Invoice -->
     <bl_invoice invoice_id="11" visit_id="10" payment_mode_id="1003" uuid="298b75eb-er45-12e8-9c7cs" creator="1" voided="0" date_created="2020-12-27 00:00:00" />
+    <bl_invoice invoice_id="101" visit_id="10" payment_mode_id="1003" uuid="89898765-er45-12e8-9c7cs" creator="1" voided="0" date_created="2024-10-01 00:00:00" />
+    <bl_invoice invoice_id="102" visit_id="10" payment_mode_id="1003" uuid="90987876-er45-12e8-9c7cs" creator="1" voided="0" date_created="2024-10-01 00:00:00" />
     <!-- Invoice Item-->
     <bl_invoice_item order_id="301" invoice_id="11" item_id="123" quantity="1" price="100" />
     <bl_invoice_item order_id="301" invoice_id="11" item_id="124" quantity="1" price="10" />
+    <bl_invoice_item order_id="100" invoice_id="101" item_id="124" quantity="1" price="200" />
+    <bl_invoice_item order_id="101" invoice_id="102" item_id="125" quantity="1" price="300" />
 
     <!--Payment-->
     <bl_payment payment_id="1" uuid="98b75eb-er45-12e8-9c7cs" invoice_id="11" reference_number="abc123" payment_type_id="500" received_by="abc" date_created="2020-12-27 00:00:00" voided="0" creator="1" />
@@ -392,8 +397,20 @@
 <!--    <drug drug_id="111" name="One drug" combination="1" concept_id="10"  creator="1" date_created="2023-10-21" retired="0" uuid="3cfcf118-931c-46f7-8ff6-7b876f0d4202"/>-->
 
 <!--    <drug drug_id="211" name="Two drug" combination="2" concept_id="12"  creator="1" date_created="2023-10-21" retired="0" uuid="05ec820a-d297-44e3-be6e-698531d9dd3f"/>-->
-
+    <drug drug_id="1" concept_id="1000" combination="1" creator="1" date_created="2024-10-01 00:00:00"
+          retired="1" uuid="888643571-yy77-11ff-2244-08002007600"   />
+    <order_type order_type_id="4" name="Prescription" creator="1" date_created="2024-10-01 00:00:00" retired="0" uuid="777c820a-d297-44e3-be6e-698531d9d888" java_class_name="org.openmrs.DrugOrder" />
     <location location_id="200" name="store A" creator="1" date_created="2017-02-27 12:47:30" retired="false" uuid="44939999-d333-fff2-9bff-61d11117c22e" />
+
+    <drug_order order_id="100" quantity="200" dispense_as_written="1" as_needed="1"/>
+
+    <prescription order_id="100" dose="1" quantity="10" drug_inventory_id="1" />
+
+    <orders order_id="100" order_type_id="4" concept_id="1006" orderer="1" encounter_id="300" creator="1" date_activated="2024-10-01 00:00:00" date_created="2024-10-01 00:00:00" voided="0"
+                patient_id="2000" uuid="787643571-yy77-11ff-2244-08002007600" urgency="ROUTINE" order_number="200839" order_action="NEW" care_setting="1" />
+
+    <orders order_id="101" order_type_id="1" concept_id="1006" orderer="1" encounter_id="300" creator="1" date_activated="2024-10-01 00:00:00" date_created="2024-10-01 00:00:00" voided="0"
+            patient_id="2000" uuid="787643571-yy77-11ff-2244-08002007611" urgency="ROUTINE" order_number="210839" order_action="NEW" care_setting="1" />
 
 <!--    <conditions condition_id="1"  condition_coded="" condition_non_coded="Testing diagnosis" condition_coded_name="500" date_created="2017-02-27 12:47:30" clinical_status="1" voided="0" creator="1" patient_id="1000"/>-->
 </dataset>

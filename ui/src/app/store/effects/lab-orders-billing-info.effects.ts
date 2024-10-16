@@ -1,24 +1,24 @@
-import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { Injectable } from "@angular/core";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
 import {
   loadLabOrdersBillingInformation,
   addLoadedLabOrdersBillingInfo,
   loadingLabOrderBillingInfoFails,
   getBillingInfoByVisitUuid,
   getBillingInfoBymRNo,
-} from '../actions';
-import { switchMap, map, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+} from "../actions";
+import { switchMap, map, catchError } from "rxjs/operators";
+import { of } from "rxjs";
 
-import * as _ from 'lodash';
-import { LabOrdersBillingService } from 'src/app/shared/services/billing-info.service';
-import { formatBillingInfo } from 'src/app/shared/helpers/lab-order-billing-info.helper';
+import * as _ from "lodash";
+import { GeneralBillingService } from "src/app/shared/services/billing-info.service";
+import { formatBillingInfo } from "src/app/shared/helpers/lab-order-billing-info.helper";
 
 @Injectable()
 export class LabOrdersBillingInfoEffects {
   constructor(
     private actions$: Actions,
-    private billingService: LabOrdersBillingService
+    private billingService: GeneralBillingService
   ) {}
 
   labOrdersBillingInfo$ = createEffect(() =>
@@ -73,7 +73,7 @@ export class LabOrdersBillingInfoEffects {
                   )
                     billingInfo[
                       billingData?.saleQuote?.visit?.uuid +
-                        '-' +
+                        "-" +
                         qLine?.saleQuoteLine?.item?.uuid
                     ] = qLine;
                 });

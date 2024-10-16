@@ -19,7 +19,6 @@ import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
-import org.openmrs.module.icare.core.models.CommonlyOrderedDrugs;
 import org.openmrs.module.icare.core.models.EncounterPatientProgram;
 import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
@@ -208,7 +207,13 @@ public interface ICareService extends OpenmrsService {
 	
 	String pushEventWithoutRegistrationDataToDHIS2Instance(String eventData);
 	
-	String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType);
+	String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType,
+	        String authReferenceKey);
 	
-	Map<String, Object> generateVisitsData(Date startDate, Date endDate, Boolean sendToExternalMediator) throws Exception;
+	Map<String, Object> generateVisitsData(Date startDate, Date endDate, Boolean sendToExternalMediator, String uuid)
+	        throws Exception;
+	
+	Map<String, Object> sendReferralDataToMediator(String uuid) throws Exception;
+	
+	String getSharedRecordsFromExternalMediator(String hfrCode, String id, String idType) throws Exception;
 }

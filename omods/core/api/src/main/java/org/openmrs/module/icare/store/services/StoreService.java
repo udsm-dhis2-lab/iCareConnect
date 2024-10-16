@@ -136,6 +136,9 @@ public interface StoreService extends OpenmrsService {
 	
 	StockInvoiceItem updateStockInvoiceItem(StockInvoiceItem stockInvoiceItem) throws Exception;
 	
+	ListResult getStockInvoiceItems(Pager pager, String stockInvoice, Date startDate, Date endDate, String provider,
+	        String paymentScheme) throws Exception;
+	
 	StockInvoiceItem getStockInvoiceItemByUuid(String stockInvoiceItemUuid);
 	
 	StockInvoiceItem saveStockInvoiceItem(StockInvoiceItem stockInvoiceItem) throws Exception;

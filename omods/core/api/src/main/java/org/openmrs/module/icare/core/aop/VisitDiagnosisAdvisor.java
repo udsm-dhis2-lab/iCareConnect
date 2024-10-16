@@ -167,6 +167,7 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 										String mediatorKey = mediator.getString("mediatorKey");
 										String mediatorUrlPath = mediator.getString("mediatorUrlPath");
 										String authenticationType = mediator.getString("authenticationType");
+										String authReferenceKey = mediator.getString("authReferenceKey");
 										String mappings = adminService.getGlobalProperty(mediatorMappingReferenceKey);
 
 										if (mediatorUrlPath != null && mappings != null) {
@@ -174,7 +175,10 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 											Map<String, Object> data = eidsrWrapper.formatData(mappings,capturedEventData);
 
 											if (new JSONObject(templateDetails).toString() != null) {
-												String response = iCareService.pushDataToExternalMediator(new JSONObject(dataTemplateData).toString(),mediatorKey,mediatorUrlPath,authenticationType);
+												String response = iCareService.pushDataToExternalMediator(
+														new JSONObject(dataTemplateData).toString(),
+														mediatorKey,mediatorUrlPath,
+														authenticationType,authReferenceKey);
 //												GlobalProperty globalProperty2 = new GlobalProperty();
 //												globalProperty2.setProperty("HDUAPI.test.response");
 //												globalProperty2.setPropertyValue(response);
@@ -207,6 +211,7 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 										String mediatorKey = mediator.getString("mediatorKey");
 										String mediatorUrlPath = mediator.getString("mediatorUrlPath");
 										String authenticationType = mediator.getString("authenticationType");
+										String authReferenceKey = mediator.getString("authReferenceKey");
 										String mappings = adminService.getGlobalProperty(mediatorMappingReferenceKey);
 
 										if (mediatorUrlPath != null && mappings != null) {
@@ -214,7 +219,12 @@ public class VisitDiagnosisAdvisor extends StaticMethodMatcherPointcutAdvisor im
 											Map<String, Object> data = eidsrWrapper.formatData(mappings,capturedEventData);
 
 											if (new JSONObject(data).toString() != null) {
-												String response = iCareService.pushDataToExternalMediator(new JSONObject(data).toString(),mediatorKey,mediatorUrlPath,authenticationType);
+												String response = iCareService.pushDataToExternalMediator(
+														new JSONObject(data).toString(),
+														mediatorKey,
+														mediatorUrlPath,
+														authenticationType,
+														authReferenceKey);
 												GlobalProperty globalProperty2 = new GlobalProperty();
 												globalProperty2.setProperty("surveillance.test.eidsrMediator.response");
 												globalProperty2.setPropertyValue(response);

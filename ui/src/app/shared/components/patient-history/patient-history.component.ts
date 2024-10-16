@@ -84,7 +84,6 @@ export class PatientHistoryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log(this.patient);
     this.loadData();
   }
 

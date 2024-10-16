@@ -3,10 +3,14 @@ package org.openmrs.module.icare.billing.dao;
 // Generated Oct 7, 2020 12:49:21 PM by Hibernate Tools 5.2.10.Final
 
 import org.hibernate.Query;
+import org.openmrs.DrugOrder;
+import org.openmrs.Order;
+import org.openmrs.OrderType;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
+import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.billing.models.DiscountInvoiceItem;
 
@@ -98,26 +102,60 @@ public class InvoiceDAO extends BaseDAO<Invoice> {
 	
 	public List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) {
 		DbSession session = this.getSession();
-		String queryStr = "SELECT SUM(inv.price * inv.quantity) as total, inv.id.item FROM InvoiceItem inv ";
-		if (startDate != null && endDate != null) {
-			queryStr += " WHERE inv.id.order.dataActivated BETWEEN :startDate AND :endDate ";
-		}
-		if (provider != null) {
-			if (queryStr.contains("WHERE")) {
-				queryStr += " AND inv.id.order.orderer.uuid = :provider ";
-			} else {
-				queryStr += " WHERE inv.id.order.orderer.uuid = :provider ";
-			}
-		}
-		queryStr += " GROUP BY inv.id.item";
+		
+		String queryStr = formulateQueryString(startDate, endDate, provider);
+		
 		Query query = session.createQuery(queryStr);
+		
+		// Set parameters for date range
 		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
 		}
+		
+		// Set parameter for provider
 		if (provider != null) {
 			query.setParameter("provider", provider);
 		}
+		
 		return query.list();
+	}
+	
+	private String formulateQueryString(Date startDate, Date endDate, String provider) {
+		String queryStr = "SELECT SUM(inv.price * inv.quantity) as total, inv.id.item, inv " + "FROM InvoiceItem inv "
+		        + "JOIN inv.id.order o ";
+		// Use polymorphic queries to ensure DrugOrder, as a subclass of Order, is included.
+		if (startDate != null && endDate != null) {
+			queryStr += " WHERE o.dateCreated BETWEEN :startDate AND :endDate ";
+		}
+		
+		if (provider != null) {
+			if (queryStr.contains("WHERE")) {
+				queryStr += " AND o.orderer.uuid = :provider ";
+			} else {
+				queryStr += " WHERE o.orderer.uuid = :provider ";
+			}
+		}
+		queryStr += " GROUP BY inv.id.item";
+		
+		new Prescription();
+		queryStr += " UNION ALL ";
+		queryStr += "SELECT SUM(inv.price * inv.quantity) as total, inv.id.item, inv " + "FROM InvoiceItem inv "
+		        + "JOIN inv.id.order o LEFT JOIN Prescription p ON p.orderId = o.orderId ";
+		// Use polymorphic queries to ensure DrugOrder, as a subclass of Order, is included.
+		if (startDate != null && endDate != null) {
+			queryStr += " WHERE p.dateCreated BETWEEN :startDate AND :endDate ";
+		}
+		
+		if (provider != null) {
+			if (queryStr.contains("WHERE")) {
+				queryStr += " AND p.orderer.uuid = :provider ";
+			} else {
+				queryStr += " WHERE p.orderer.uuid = :provider ";
+			}
+		}
+		
+		queryStr += " GROUP BY inv.id.item";
+		return queryStr;
 	}
 }

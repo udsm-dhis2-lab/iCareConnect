@@ -1,12 +1,19 @@
 package org.openmrs.module.icare.store.dao;
 
+import org.openmrs.Concept;
 import org.openmrs.api.db.hibernate.DbSession;
+import org.openmrs.module.icare.billing.models.ItemPrice;
+import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
+import org.openmrs.module.icare.laboratory.models.Sample;
 import org.openmrs.module.icare.store.models.StockInvoice;
 import org.openmrs.module.icare.store.models.StockInvoiceItem;
 import org.hibernate.Query;
 import org.openmrs.module.icare.store.models.StockInvoiceItemStatus;
 
+import java.util.Date;
 import java.util.List;
 
 public class StockInvoiceItemDAO extends BaseDAO<StockInvoiceItem> {
@@ -154,5 +161,55 @@ public class StockInvoiceItemDAO extends BaseDAO<StockInvoiceItem> {
 		query.setParameter("stockinvoice", stockInvoice);
 		
 		return query.list();
+	}
+	
+	public ListResult getStockInvoiceItems(Pager pager, String stockInvoiceUuid, Date startDate, Date endDate,
+	        String providerUuid, String paymentScheme) {
+		
+		DbSession session = this.getSession();
+		
+		String queryStr = " SELECT SUM(siitem.amount*siitem.unitPrice) as totalPriceAmount," + " siitem.item, "
+		        + " siitem.stockInvoice," + " SUM(siitem.amount) as totalItems ";
+		
+		if (paymentScheme != null) {
+			queryStr += ",SUM(prices.price*siitem.amount) as totalItems ";
+		}
+		
+		queryStr += " FROM StockInvoiceItem siitem ";
+		if (paymentScheme != null) {
+			new ItemPrice();
+			new Item();
+			queryStr += " JOIN siitem.item.prices prices WHERE prices.id.paymentScheme.uuid =:paymentScheme";
+		}
+		
+		if (stockInvoiceUuid != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += " siitem.stockInvoice.uuid = :stockInvoiceUuid ";
+		}
+		queryStr += " GROUP BY siitem.item";
+		
+		Query query = session.createQuery(queryStr);
+		
+		if (paymentScheme != null) {
+			query.setParameter("paymentScheme", paymentScheme);
+		}
+		if (stockInvoiceUuid != null) {
+			query.setParameter("stockInvoiceUuid", stockInvoiceUuid);
+		}
+		
+		if (pager.isAllowed()) {
+			pager.setTotal(query.list().size());
+			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+			query.setMaxResults(pager.getPageSize());
+		}
+		ListResult<Sample> listResults = new ListResult();
+		listResults.setPager(pager);
+		listResults.setResults(query.list());
+		
+		return listResults;
 	}
 }
