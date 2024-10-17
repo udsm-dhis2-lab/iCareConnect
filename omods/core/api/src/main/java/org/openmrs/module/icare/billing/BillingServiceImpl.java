@@ -757,6 +757,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 
 				String billId = (String) billTrxInf.get("BillId");
 				String payCntrNum = (String) billTrxInf.get("PayCntrNum");
+				String requestId = (String) status.get("RequestId");
 
 				// 1. Get invoice from bill
 				Invoice invoice = invoiceDAO.findByUuid(billId);
@@ -785,13 +786,14 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 					paymentItem.setAmount(invoiceItem.getPrice());
 					paymentItem.setOrder(invoiceItem.getOrder());
 					paymentItem.setItem(invoiceItem.getItem());
-					paymentItem.setStatus(PaymentStatus.UNPAID);
+					paymentItem.setStatus(PaymentStatus.REQUESTED);
 					paymentItems.add(paymentItem);
 				}
 				// Payment.setItems(paymentItems);
 				payment.setReceivedBy("SYSTEM");
-				payment.setStatus(PaymentStatus.UNPAID);
+				payment.setStatus(PaymentStatus.REQUESTED);
 				payment.setCreator(Context.getAuthenticatedUser());
+				payment.setUuid(requestId);
 				payment.setDateCreated(new Date());
 				new Payment();
 				boolean isUpdated = true;
@@ -811,11 +813,11 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 					// savedPayment.getUuid());
 					administrationService.saveGlobalProperty(globalProperty);
 
-					response.put("status", "success");
-					response.put("message", "Callback processed and control number updated successfully");
+					response.put("status", "Success");
+					response.put("message", "Callback processed and control number updated received");
 				} else {
-					response.put("status", "error");
-					response.put("message", "Failed to update control number for BillId: " + billId);
+					response.put("status", "Error");
+					response.put("message", "Failed to update control number for this BillId: " + billId);
 				}
 			} else {
 				System.out.println("Status or FeedbackData field not found in callback data");
@@ -829,5 +831,30 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			response.put("error", e.getMessage());
 		}
 		return response;
+	}
+	
+	public String fetchControlNumber(String requestId) throws Exception {
+		String controlNumber = null;
+		long startTime = System.currentTimeMillis();
+		long timeout = 32000;
+		
+		while (System.currentTimeMillis() - startTime < timeout) {
+			controlNumber = paymentDAO.getReferenceNumberByRequestId(requestId);
+			AdministrationService administrationService = Context.getAdministrationService();
+			GlobalProperty globalProperty = new GlobalProperty();
+			globalProperty.setProperty("gepg.controlNumberRes.icareConnect");
+			globalProperty.setPropertyValue(controlNumber);
+			administrationService.saveGlobalProperty(globalProperty);
+			if (controlNumber != null) {
+				break;
+			}
+			try {
+				Thread.sleep(4000);
+			}
+			catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+		}
+		return controlNumber;
 	}
 }
