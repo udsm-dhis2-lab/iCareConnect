@@ -22,7 +22,6 @@ export class SharedRemotePatientHistoryComponent implements OnInit {
   constructor(private httpClientService: OpenmrsHttpClientService) {}
 
   ngOnInit(): void {
-    // console.log(this.dataExchangeLocations);
     this.selectedIdentifier = this.getPreferredIdentifier(
       this.patient?.identifiers
     );
@@ -39,7 +38,6 @@ export class SharedRemotePatientHistoryComponent implements OnInit {
         };
       }),
     });
-    // console.log("dataExchangeLocations", this.dataExchangeLocations);
     this.locationFormField = new Dropdown({
       id: "location",
       key: "location",
@@ -92,8 +90,6 @@ export class SharedRemotePatientHistoryComponent implements OnInit {
     identifierType: string,
     identifiers: any[]
   ): string {
-    console.log(identifiers);
-    console.log(identifierType);
     return (identifiers?.filter(
       (identifier: any) =>
         identifier?.identifierType?.display === identifierType
