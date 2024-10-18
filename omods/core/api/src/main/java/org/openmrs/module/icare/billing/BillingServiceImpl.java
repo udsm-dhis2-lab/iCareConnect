@@ -7,6 +7,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.attribute.AttributeType;
 import org.openmrs.module.icare.ICareConfig;
+import org.openmrs.module.icare.billing.Utils.PaymentStatus;
 import org.openmrs.module.icare.billing.dao.DiscountDAO;
 import org.openmrs.module.icare.billing.dao.InvoiceDAO;
 import org.openmrs.module.icare.billing.dao.PaymentDAO;
@@ -76,7 +77,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			}
 		}
 		return invoices;
-		//return this.invoiceDAO.findByPatientUuid(patientUuid);
+		// return this.invoiceDAO.findByPatientUuid(patientUuid);
 	}
 	
 	@Override
@@ -94,7 +95,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			Prescription drugOrder = (Prescription) orderMetaData.getOrder();
 			invoiceItem.setQuantity(drugOrder.getQuantity());
 		} else if (orderMetaData.getOrder() instanceof TestOrder) {
-			//TestOrder testOrder = (TestOrder) orderMetaData.getOrder();
+			// TestOrder testOrder = (TestOrder) orderMetaData.getOrder();
 			invoiceItem.setQuantity(1.0);
 		} else {
 			invoiceItem.setQuantity(1.0);
@@ -122,7 +123,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			Prescription drugOrder = (Prescription) orderMetaData.getOrder();
 			invoiceItem.setQuantity(drugOrder.getQuantity());
 		} else if (orderMetaData.getOrder() instanceof TestOrder) {
-			//TestOrder testOrder = (TestOrder) orderMetaData.getOrder();
+			// TestOrder testOrder = (TestOrder) orderMetaData.getOrder();
 			invoiceItem.setQuantity(1.0);
 		} else {
 			invoiceItem.setQuantity(1.0);
@@ -214,7 +215,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 				}
 			}
 			
-			//Automatic discount creation for full exempted discounts
+			// Automatic discount creation for full exempted discounts
 			List<DiscountInvoiceItem> discountInvoiceItems = existingInvoice.getDiscountItems();
 			Boolean isFullExemptedCheck = false;
 			
@@ -230,7 +231,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			
 			if (isFullExemptedCheck) {
 				for (InvoiceItem invoiceItem : existingInvoice.getInvoiceItems()) {
-					//Find the coresponding discount item
+					// Find the coresponding discount item
 					boolean found = false;
 					for (DiscountInvoiceItem discountItem : discountInvoiceItems) {
 						if (discountItem.getItem().getUuid().equals(invoiceItem.getItem().getUuid())) {
@@ -300,7 +301,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	@Override
 	public Payment confirmPayment(Payment payment) throws Exception {
 		Invoice invoice = invoiceDAO.findByUuid(payment.getInvoice().getUuid());
-		//TODO Payments should address particular item prices in the invoice
+		// TODO Payments should address particular item prices in the invoice
 		payment.setInvoice(invoice);
 		Concept paymentType = Context.getService(ConceptService.class).getConceptByUuid(payment.getPaymentType().getUuid());
 		if (paymentType == null) {
@@ -325,8 +326,10 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			}
 			item.setItem(invoiceItem.getItem());
 			item.setOrder(invoiceItem.getOrder());
+			item.setStatus(PaymentStatus.PAID);
 		}
 		payment.setReceivedBy(Context.getAuthenticatedUser().getName());
+		payment.setStatus(PaymentStatus.PAID);
 		return this.paymentDAO.save(payment);
 	}
 	
@@ -370,7 +373,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			}
 			discount.setAttachment(obs);
 		}
-		//discount.setCreator(Context.getAuthenticatedUser());
+		// discount.setCreator(Context.getAuthenticatedUser());
 		
 		return discountDAO.save(discount);
 	}
@@ -427,7 +430,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			        + ICareConfig.CONSULTATION_ORDER_TYPE + "'");
 		}
 		
-		//Validate the visit with required attributes
+		// Validate the visit with required attributes
 		if (visit.getServiceConceptUuid() == null) {
 			throw new VisitInvalidException("Service has not been specified in the visit");
 		}
@@ -516,7 +519,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			        + "'.");
 		}
 		visitMetaData.setConsultationOrderType(consultationOrderType);
-		//Check the existance of Item Prices
+		// Check the existance of Item Prices
 		ICareService iCareService = Context.getService(ICareService.class);
 		ItemPrice serviceItemPrice = iCareService.getItemPriceByConceptId(serviceConcept.getId(), visit.getPaymentScheme()
 		        .getId(), paymentTypeConcept.getId());
@@ -543,13 +546,13 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	public void processVisit(VisitWrapper visitWrapper, VisitMetaData visitMetaData) throws VisitInvalidException,
 	        ConfigurationException {
 		
-		//Start Creating Invoice
+		// Start Creating Invoice
 		Patient patient = visitWrapper.getVisit().getPatient();
 		Invoice invoice = new Invoice();
 		invoice.setVisit(visitWrapper.getVisit());
-		//invoice.setPatient(patient);
+		// invoice.setPatient(patient);
 		
-		//Create a patient encounter at the registration
+		// Create a patient encounter at the registration
 		EncounterService encounterService = Context.getService(EncounterService.class);
 		Encounter encounter = new Encounter();
 		encounter.setVisit(visitWrapper.getVisit());
@@ -571,16 +574,18 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		visitWrapper.getVisit().addEncounter(encounter);
 		encounterService.saveEncounter(encounter);
 		
-		//Get concepts for payment type and payment scheme to assosciate with item price
+		// Get concepts for payment type and payment scheme to assosciate with item
+		// price
 		
 		OrderService orderService = Context.getService(OrderService.class);
 		VisitService visitService = Context.getService(VisitService.class);
-		//List<Visit> visits = visitService.getVisitsByPatient(patient);
+		// List<Visit> visits = visitService.getVisitsByPatient(patient);
 		Date newDate = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(Integer.valueOf("24")));
-		//If this is the first visit for this patient create a registration fee order
-		//Check if patient existed in the system to determine whether they should be billed for Registration Fee
+		// If this is the first visit for this patient create a registration fee order
+		// Check if patient existed in the system to determine whether they should be
+		// billed for Registration Fee
 		if (patient.getDateCreated().after(newDate)) {
-			//TODO Soft code the UUID for fee concept
+			// TODO Soft code the UUID for fee concept
 			Concept feeConcept = visitMetaData.getRegistrationFeeConcept();
 			
 			Order order = new Order();
@@ -592,13 +597,13 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			
 			OrderContext orderContext = new OrderContext();
 			
-			//TODO Softcode to get the current care setting of the visit
+			// TODO Softcode to get the current care setting of the visit
 			orderContext.setCareSetting(orderService.getCareSetting(1));
 			encounter.addOrder(order);
 			orderService.saveOrder(order, orderContext);
 		}
 		
-		//Get concepts for service
+		// Get concepts for service
 		Concept serviceConcept = visitMetaData.getServiceConcept();
 		
 		Order order = new Order();
@@ -609,7 +614,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		order.setOrderType(visitMetaData.getConsultationOrderType());
 		
 		OrderContext orderContext = new OrderContext();
-		//TODO Softcode to get the current care setting of the visit
+		// TODO Softcode to get the current care setting of the visit
 		orderContext.setCareSetting(orderService.getCareSetting(1));
 		encounter.addOrder(order);
 		orderService.saveOrder(order, orderContext);
@@ -617,8 +622,8 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	
 	@Override
 	public Visit createVisit(MethodInvocation invocation) throws Throwable {
-		//Visit visit = (Visit) invocation.getArguments()[0];
-		//VisitWrapper visit = new VisitWrapper((Visit) invocation.getArguments()[0]);
+		// Visit visit = (Visit) invocation.getArguments()[0];
+		// VisitWrapper visit = new VisitWrapper((Visit) invocation.getArguments()[0]);
 		VisitWrapper visitWrapper = new VisitWrapper((Visit) invocation.getArguments()[0]);
 		VisitService visitService = Context.getVisitService();
 		Visit existingVisit = visitService.getVisitByUuid(visitWrapper.getVisit().getUuid());
@@ -733,5 +738,123 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	@Override
 	public List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) throws Exception {
 		return this.invoiceDAO.getTotalAmountFromPaidInvoices(startDate, endDate, provider);
+	}
+	
+	@Override
+	public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callbackData) throws Exception {
+
+		// System.out.println("Processing callback data: " + callbackData);
+
+		Map<String, Object> response = new HashMap<>();
+
+		try {
+			if (callbackData.containsKey("Status") && callbackData.containsKey("FeedbackData")) {
+				Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
+				Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
+
+				Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
+				Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
+
+				String billId = (String) billTrxInf.get("BillId");
+				String payCntrNum = (String) billTrxInf.get("PayCntrNum");
+				String requestId = (String) status.get("RequestId");
+
+				// 1. Get invoice from bill
+				Invoice invoice = invoiceDAO.findByUuid(billId);
+				if (invoice == null) {
+					throw new Exception("Bill id " + billId + " is not valid");
+				}
+				String paymentTypeConceptUuid = Context.getAdministrationService()
+						.getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
+				if (paymentTypeConceptUuid == null) {
+					throw new Exception("No default payment type based on control number");
+				}
+				Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
+				if (paymentType == null) {
+					throw new Exception("Payment type concept not found for UUID: " + paymentTypeConceptUuid);
+				}
+
+				Payment payment = new Payment();
+				payment.setPaymentType(paymentType);
+				payment.setReferenceNumber(payCntrNum);
+				payment.setInvoice(invoice);
+
+				// Payment Items
+				List<PaymentItem> paymentItems = new ArrayList<PaymentItem>();
+				for (InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
+					PaymentItem paymentItem = new PaymentItem();
+					paymentItem.setAmount(invoiceItem.getPrice());
+					paymentItem.setOrder(invoiceItem.getOrder());
+					paymentItem.setItem(invoiceItem.getItem());
+					paymentItem.setStatus(PaymentStatus.REQUESTED);
+					paymentItems.add(paymentItem);
+				}
+				// Payment.setItems(paymentItems);
+				payment.setReceivedBy("SYSTEM");
+				payment.setStatus(PaymentStatus.REQUESTED);
+				payment.setCreator(Context.getAuthenticatedUser());
+				payment.setUuid(requestId);
+				payment.setDateCreated(new Date());
+				new Payment();
+				boolean isUpdated = true;
+				// will used to update Control Number
+				// boolean isUpdated = icareService.updateGepgControlNumber(payCntrNum, billId);
+
+				if (isUpdated) {
+					// Save control number in global property
+					Payment savedPayment = this.paymentDAO.save(payment);
+					response.put("referenceNumber", payCntrNum);
+					System.out.println(savedPayment.getUuid());
+					GlobalProperty globalProperty = new GlobalProperty();
+					AdministrationService administrationService = Context.getAdministrationService();
+					globalProperty.setProperty("gepg.updatedInvoiceItem.icareConnect");
+					// globalProperty.setPropertyValue("Success Control NUmber saved with payment
+					// control number "+ savedPayment.getReferenceNumber() + " and uuid " +
+					// savedPayment.getUuid());
+					administrationService.saveGlobalProperty(globalProperty);
+
+					response.put("status", "Success");
+					response.put("message", "Callback processed and control number updated received");
+				} else {
+					response.put("status", "Error");
+					response.put("message", "Failed to update control number for this BillId: " + billId);
+				}
+			} else {
+				System.out.println("Status or FeedbackData field not found in callback data");
+				response.put("status", "error");
+				response.put("message", "Status or FeedbackData field not found in callback data");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.put("status", "error");
+			response.put("message", "Internal server error");
+			response.put("error", e.getMessage());
+		}
+		return response;
+	}
+	
+	public String fetchControlNumber(String requestId) throws Exception {
+		String controlNumber = null;
+		long startTime = System.currentTimeMillis();
+		long timeout = 32000;
+		
+		while (System.currentTimeMillis() - startTime < timeout) {
+			controlNumber = paymentDAO.getReferenceNumberByRequestId(requestId);
+			AdministrationService administrationService = Context.getAdministrationService();
+			GlobalProperty globalProperty = new GlobalProperty();
+			globalProperty.setProperty("gepg.controlNumberRes.icareConnect");
+			globalProperty.setPropertyValue(controlNumber);
+			administrationService.saveGlobalProperty(globalProperty);
+			if (controlNumber != null) {
+				break;
+			}
+			try {
+				Thread.sleep(4000);
+			}
+			catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+		}
+		return controlNumber;
 	}
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonSetter;
 import org.openmrs.Order;
+import org.openmrs.module.icare.billing.Utils.PaymentStatus;
 import org.openmrs.module.icare.core.Item;
 
 import javax.persistence.*;
@@ -62,6 +63,10 @@ public class PaymentItem {
 	
 	@Column(name = "amount", nullable = false)
 	private Double amount;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "status", nullable = true)
+	private PaymentStatus status;
 	
 	public Payment getPayment() {
 		return id.getPayment();
@@ -127,5 +132,13 @@ public class PaymentItem {
 	
 	public void setAmount(Double amount) {
 		this.amount = amount;
+	}
+	
+	public PaymentStatus getStatus() {
+		return status;
+	}
+	
+	public void setStatus(PaymentStatus status) {
+		this.status = status;
 	}
 }

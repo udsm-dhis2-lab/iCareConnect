@@ -296,6 +296,7 @@
         <addPrimaryKey tableName="bl_invoice_item" columnNames="invoice_id,item_id,order_id"/>
     </changeSet>
 
+
     <changeSet id="create_bl_discount_invoice_item" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -5478,5 +5479,29 @@
 
     </changeSet>
 
+    <changeSet id="add_column_to_bl_payment_table" author="josephat-mwakyusa" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="status" tableName="bl_payment"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bl_payment" >
+            <column name="status" type="TEXT">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
 
+    <changeSet id="add_status_to_bl_payment_item_table" author="gaspar-giddson" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="status" tableName="bl_payment_item"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bl_payment_item" >
+            <column name="status" type="VARCHAR(16)">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
