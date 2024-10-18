@@ -84,9 +84,9 @@
       {{ generatingControlNumber ? "Generating..." : "Get Control number" }}
     </button>
 
-    <app-print-button *ngIf="controlNumber && data?.paymentType?.code === 'GePG'" [iconName]="'print'" [toolTipText]="'Click to print control number'" [showText]="'Print Control Number'" [classesList]="['float-right', 'button', 'mr-5']"
+    <!-- <app-print-button *ngIf="controlNumber && data?.paymentType?.code === 'GePG'" [iconName]="'print'" [toolTipText]="'Click to print control number'" [showText]="'Print Control Number'" [classesList]="['float-right', 'button', 'mr-5']"
       [ElementToBePrinted]="{ControlNumber: controlNumber, CurrentPatient: data?.currentPatient, FacilityDetails: facilityDetailsJson}" (print)="onPrint($event)">
-    </app-print-button>
+    </app-print-button> -->
     <button *ngIf="controlNumber && data?.paymentType?.code === 'GePG'" mat-flat-button color="primary" (click)="onGepgConfirmation($event)">
       Confirm Payment
     </button>
