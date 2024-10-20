@@ -1,15 +1,13 @@
+#!/bin/bash
 branch=$(git branch | grep \* | cut -d ' ' -f2)
+NODE_IMAGE="node:20"
 
+docker run --rm -w="/app" -v "$(pwd)/ui":/app $NODE_IMAGE npm install --legacy-peer-deps
+docker run --rm -w="/app" -v "$(pwd)/ui":/app $NODE_IMAGE npm run build:prod
 
-docker run -w="/app" -v "$(pwd)/ui":/app udsmdhis2/icare-ui-compiler cp -r /node_modules .
-docker run -w="/app" -v "$(pwd)/ui":/app udsmdhis2/icare-ui-compiler npm install --legacy-peer-deps
-docker run -w="/app" -v "$(pwd)/ui":/app udsmdhis2/icare-ui-compiler npm run build:prod
-#cd ../docs
-#docker run -w="/app" -v "$(pwd)":/app node:16.14 npm install
-#docker run -w="/app" -v "$(pwd)":/app node:16.14 npm run build
-#cd ..
-#docker run --rm -v maven-repo:/root/.m2 -v $(pwd)/omods/core:/usr/src/omod -w /usr/src/omod maven:3.6.3-openjdk-11-slim mvn clean package -DskipTests
 docker run --rm -v $(pwd)/omods/core:/usr/src/omod -w /usr/src/omod udsmdhis2/icare-omod-compiler mvn clean package -DskipTests
+
 version=$(cat version)
 docker build --no-cache -t udsmdhis2/icare-core:$branch-$version .
+
 # docker build --no-cache -t udsmdhis2/icare-core:local .
