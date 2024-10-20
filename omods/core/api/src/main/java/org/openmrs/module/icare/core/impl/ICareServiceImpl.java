@@ -32,7 +32,6 @@ import org.openmrs.module.icare.core.models.EncounterPatientProgram;
 import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
 import org.openmrs.module.icare.core.utils.Dhis2EventWrapper;
-import org.openmrs.module.icare.core.utils.EidsrWrapper;
 import org.openmrs.module.icare.core.utils.PatientWrapper;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.openmrs.module.icare.report.dhis2.DHIS2Config;
@@ -1188,15 +1187,17 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	}
 	
 	@Override
-	public String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType) {
+	public String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType,
+	        String authReferenceKey) {
 		try {
 			AdministrationService administrationService = Context.getAdministrationService();
-			String instance = mediatorKey + administrationService.getGlobalProperty(".instance");
-			String username = mediatorKey + administrationService.getGlobalProperty(".username");
-			String password = mediatorKey + administrationService.getGlobalProperty(".password");
+			String instance = administrationService.getGlobalProperty(authReferenceKey + ".instance");
+			String username = administrationService.getGlobalProperty(authReferenceKey + ".username");
+			String password = administrationService.getGlobalProperty(authReferenceKey + ".password");
 			URL url = new URL(instance.concat(mediatorUrl));
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			
+			System.out.println(instance);
 			String userCredentials = username.concat(":").concat(password);
 			String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
 			con.setRequestProperty("Authorization", basicAuth);
@@ -1236,146 +1237,315 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 	}
 	
-	public Map<String, Object> generateVisitsData(Date startDate, Date endDate, Boolean sendToExternalMediator) throws Exception {
+	public Map<String, Object> generateVisitsData(Date startDate,
+												  Date endDate,
+												  Boolean sendToExternalMediator,
+												  String uuid) throws Exception {
 		// TODO: Implement for all HDU API template blocks and respective parameters
-		Map<String, Object> response = new HashMap<>();
-		List<Visit> visits = dao.getVisitsByStartDateAndEndDate(startDate,endDate);
 		Map<String, Object> dataTemplateData = new HashMap<>();
-		Dhis2EventWrapper dhis2EventWrapper = new Dhis2EventWrapper();
+		List<Visit> visits = dao.getVisitsByStartDateAndEndDate(startDate, endDate, uuid);
+
+		Map<String, Object> templateDetails = prepareTemplateDetails();
+
+		List<Map<String, Object>> listGrid = generateListGrid(visits);
+
+		Map<String, Object> reportDetails = generateReportDetails();
+		Map<String, Object> facilityDetails = generateFacilityDetails();
+
+		Map<String, Object> dataSection = new HashMap<>();
+		dataSection.put("reportDetails", reportDetails);
+		dataSection.put("facilityDetails", facilityDetails);
+		dataSection.put("listGrid", listGrid);
+
+		dataTemplateData.put("templateDetails", templateDetails);
+		dataTemplateData.put("data", dataSection);
+
+		if (Boolean.TRUE.equals(sendToExternalMediator)) {
+			pushDataToExternalMediator(dataTemplateData, "HDUAPI", "HDUAPI");
+		}
+		return dataTemplateData;
+	}
+	
+	public Map<String,Object> sendReferralDataToMediator(String uuid) throws Exception {
+		Map<String,Object> visitData = new HashMap<>();
+		List<Visit> visits = dao.getVisitsByStartDateAndEndDate(null, null, uuid);
+
+		Map<String, Object> templateData = new HashMap<>();
+		if (!visits.isEmpty()) {
+			Visit visit =  visits.get(0);
+			templateData.put("visitDetails", prepareVisitDetails(visit));
+			templateData.put("demographicDetails", prepareDemographicDetails(visit));
+			templateData.put("diagnosisDetails", prepareDiagnosisDetails(visit));
+			templateData.put("investigationDetails", new ArrayList<>());  // Assuming this is filled somewhere else
+			templateData.put("outcomeDetails", prepareOutcomeDetails(visit));
+		}
+//		System.out.println(templateData);
+		String response = pushDataToExternalMediator(templateData, "HDUAPI", "SHR");
+		return visitData;
+	}
+	
+	private Map<String, Object> prepareTemplateDetails() {
 		AdministrationService administrationService = Context.getAdministrationService();
 		String workflowUuid = administrationService.getGlobalProperty(ICareConfig.HDU_API_WORKFLOW_UUID_FOR_OPD);
+
 		Map<String, Object> templateDetails = new HashMap<>();
 		Map<String, Object> workflow = new HashMap<>();
 		workflow.put("uuid", workflowUuid);
+
 		templateDetails.put("id", "general");
 		templateDetails.put("code", "GENERAL");
 		templateDetails.put("name", "General");
 		templateDetails.put("workflow", workflow);
 
-		// Formulate HDU API data template
-		List<Map<String, Object>> listGrid = new ArrayList<>();
+		return templateDetails;
+	}
+	
+	private Map<String, Object> generateReportDetails() throws Exception {
+		Dhis2EventWrapper dhis2EventWrapper = new Dhis2EventWrapper();
 		Map<String, Object> reportDetails = new HashMap<>();
 		Date todayDate = new Date();
 		reportDetails.put("reportingDate", dhis2EventWrapper.formatDateToYYYYMMDD(todayDate));
 
+		return reportDetails;
+	}
+	
+	private Map<String, Object> generateFacilityDetails() throws ConfigurationException {
+		Dhis2EventWrapper dhis2EventWrapper = new Dhis2EventWrapper();
 		Map<String, Object> facilityDetails = new HashMap<>();
 		String facilityCode = dhis2EventWrapper.getHFRCode();
-		facilityDetails.put("HFCode",facilityCode);
-		for(Visit visit: visits) {
-			List<Map<String, Object>> investigationDetails = new ArrayList<>();
-			Map<String, Object> outcomeDetails = new HashMap<>();
-			Map<String, Object> demographicDetails = new HashMap<>();
-			if (visit.getPatient().getPerson().getBirthdate() != null) {
-				demographicDetails.put("dateOfBirth",visit.getPatient().getPerson().getBirthdate());
-			}
-			if (visit.getPatient().getPerson().getGivenName() != null) {
-				demographicDetails.put("firstName", visit.getPatient().getPerson().getGivenName());
-			}
+		facilityDetails.put("HFCode", facilityCode);
+		facilityDetails.put("code", facilityCode);
 
-			demographicDetails.put("middleName", "");
-			if (visit.getPatient().getPerson().getFamilyName() != null) {
-				demographicDetails.put("lastName", visit.getPatient().getPerson().getFamilyName());
-			}
-			if (visit.getPatient().getPerson().getGender().toLowerCase().equals("m")) {
-				demographicDetails.put("gender", "male");
-			} else if (visit.getPatient().getPerson().getGender().toLowerCase().equals("f")) {
-				demographicDetails.put("gender", "female");
-			} else {
-				demographicDetails.put("gender", "unknown");
-			}
-			String phoneNumbers ="";
-			String personPhoneNumberAttributeTypeUuid = administrationService.getGlobalProperty(ICareConfig.PHONE_NUMBER_ATTRIBUTE);
-			Set<PersonAttribute> personAttributes = visit.getPatient().getPerson().getAttributes();
-			if (personAttributes.size() > 0) {
-				for(PersonAttribute personAttribute: personAttributes) {
-					if (personAttribute.getAttributeType().getUuid().equals(personPhoneNumberAttributeTypeUuid )) {
-						phoneNumbers = personAttribute.getValue();
-					}
-				}
-			}
-			demographicDetails.put("phoneNumbers", phoneNumbers);
-
-			String patientIdentifier = "";
-			for (PatientIdentifier identifier: visit.getPatient().getIdentifiers()) {
-				if (identifier.getPreferred().booleanValue() == true) {
-					patientIdentifier = identifier.getIdentifier().toString();
-				}
-			}
-			demographicDetails.put("mrn", patientIdentifier);
-			demographicDetails.put("identifier", patientIdentifier);
-
-			Map<String, Object> visitDetails = new HashMap<>();
-			visitDetails.put("visitId", visit.getVisitId());
-			visitDetails.put("visitDate", visit.getStartDatetime());
-			visitDetails.put("closedDate", visit.getStopDatetime());
-
-			List<Map<String, Object>> diagnosisDetails = new ArrayList<>();
-			if (visit.getEncounters().size() > 0) {
-				for (Encounter encounter: visit.getEncounters()) {
-					if (encounter.getDiagnoses().size() > 0) {
-						for (Diagnosis diagnosis: encounter.getDiagnoses()) {
-							Map<String, Object> diagnosisData = new HashMap<>();
-							if (diagnosis.getDiagnosis() != null && diagnosis.getDiagnosis().getCoded() != null) {
-								diagnosisData.put("diagnosisCode", diagnosis.getDiagnosis().getCoded());
-							}
-							if (diagnosis.getDiagnosis() != null && diagnosis.getDiagnosis().getSpecificName() != null) {
-								diagnosisData.put("diagnosis", diagnosis.getDiagnosis().getSpecificName());
-							}
-							diagnosisData.put("diagnosisDate", diagnosis.getDateCreated());
-							diagnosisData.put("certainty", diagnosis.getCertainty());
-							diagnosisDetails.add(diagnosisData);
-						}
-					}
-				}
-			}
-			// For death
-			Map<String, Object> deathDetails = new HashMap<>();
-			if (visit.getPatient().getPerson().getDead()) {
-				deathDetails.put("dateOfDeath",visit.getPatient().getPerson().getDeathDate());
-			}
-			// For outcome details
-			if (visit.getPatient().getPerson().getDead() != null) {
-				outcomeDetails.put("isAlive", true);
-			} else {
-				outcomeDetails.put("isAlive", false);
-				outcomeDetails.put("deathDate",visit.getPatient().getPerson().getDeathDate());
-				// admitted USe Admission encounter
-			}
+		return facilityDetails;
+	}
+	
+	private List<Map<String, Object>> generateListGrid(List<Visit> visits) {
+		List<Map<String, Object>> listGrid = new ArrayList<>();
+		for (Visit visit : visits) {
 			Map<String, Object> listGridItem = new HashMap<>();
-			listGridItem.put("visitDetails", visitDetails);
-			listGridItem.put("demographicDetails", demographicDetails);
-			listGridItem.put("diagnosisDetails", diagnosisDetails);
-			listGridItem.put("investigationDetails", investigationDetails);
-			listGridItem.put("outcomeDetails", outcomeDetails);
+			listGridItem.put("visitDetails", prepareVisitDetails(visit));
+			listGridItem.put("demographicDetails", prepareDemographicDetails(visit));
+			listGridItem.put("diagnosisDetails", prepareDiagnosisDetails(visit));
+			listGridItem.put("investigationDetails", new ArrayList<>());  // Assuming this is filled somewhere else
+			listGridItem.put("outcomeDetails", prepareOutcomeDetails(visit));
 			listGrid.add(listGridItem);
 		}
-		Map<String, Object> dataSection = new HashMap<>();
-		dataSection.put("reportDetails", reportDetails);
-		dataSection.put("facilityDetails", facilityDetails);
-		dataSection.put("listGrid", listGrid);
-		dataTemplateData.put("templateDetails", templateDetails);
-		dataTemplateData.put("data", dataSection);
-		if (sendToExternalMediator != null && sendToExternalMediator) {
-			try{
-				AdministrationService adminService = Context.getService(AdministrationService.class);
-				String mediatorsConfigs = adminService.getGlobalProperty(ICareConfig.INTEROPERABILITY_MEDIATORS_LIST);
-				JSONArray mediatorsList = new JSONArray(mediatorsConfigs);
-				ICareService iCareService = Context.getService(ICareService.class);
-				for (int count = 0; count < mediatorsList.length(); count++) {
-					JSONObject mediator = mediatorsList.getJSONObject(count);
-					if (mediator.has("isActive") && mediator.getBoolean("isActive")) {
-						String mediatorKey = mediator.getString("mediatorKey");
-						String mediatorUrlPath = mediator.getString("mediatorUrlPath");
-						String authenticationType = mediator.getString("authenticationType");
-						if (mediator.has("mediatorKey") && mediator.getString("mediatorKey").equals("HDUAPI")) {
-							String externalSystemResponse = iCareService.pushDataToExternalMediator(new JSONObject(dataTemplateData).toString(),mediatorKey,mediatorUrlPath,authenticationType);
-						}
-					}
-				}
-			}catch (Exception e){
-				throw new Exception(e);
+		return listGrid;
+	}
+	
+	private Map<String, Object> prepareVisitDetails(Visit visit) {
+		Map<String, Object> visitDetails = new HashMap<>();
+		visitDetails.put("id", visit.getVisitId());
+		visitDetails.put("visitDate", visit.getStartDatetime());
+		visitDetails.put("closedDate", visit.getStopDatetime());
+		return visitDetails;
+	}
+	
+	private Map<String, Object> prepareDemographicDetails(Visit visit) {
+		Map<String, Object> demographicDetails = new HashMap<>();
+		Patient patient = visit.getPatient();
+		Person person = patient.getPerson();
+
+		demographicDetails.put("dateOfBirth", person.getBirthdate());
+		demographicDetails.put("firstName", person.getGivenName());
+		demographicDetails.put("middleName", "");
+		demographicDetails.put("lastName", person.getFamilyName());
+		demographicDetails.put("gender", convertGender(person.getGender()));
+		demographicDetails.put("phoneNumbers", getPhoneNumbers(person));
+		demographicDetails.put("mrn", getPreferredIdentifier(patient));
+		demographicDetails.put("identifier", getPreferredIdentifier(patient));
+		demographicDetails.put("identifiers", getPatientIdentifiers(patient));
+		return demographicDetails;
+	}
+	
+	private String convertGender(String gender) {
+		switch (gender.toLowerCase()) {
+			case "m":
+				return "male";
+			case "f":
+				return "female";
+			default:
+				return "unknown";
+		}
+	}
+	
+	private List<Map<String, Object>> prepareDiagnosisDetails(Visit visit) {
+		List<Map<String, Object>> diagnosisDetails = new ArrayList<>();
+		for (Encounter encounter : visit.getEncounters()) {
+			for (Diagnosis diagnosis : encounter.getDiagnoses()) {
+				Map<String, Object> diagnosisData = new HashMap<>();
+				diagnosisData.put("diagnosisCode", diagnosis.getDiagnosis().getCoded());
+				diagnosisData.put("diagnosis", diagnosis.getDiagnosis().getSpecificName());
+				diagnosisData.put("diagnosisDate", diagnosis.getDateCreated());
+				diagnosisData.put("certainty", diagnosis.getCertainty());
+				diagnosisDetails.add(diagnosisData);
 			}
 		}
-		return dataTemplateData;
+		return diagnosisDetails;
+	}
+	
+	private Map<String, Object> prepareOutcomeDetails(Visit visit) {
+		Map<String, Object> outcomeDetails = new HashMap<>();
+		Person person = visit.getPatient().getPerson();
+		boolean isAlive = person.getDead() == null || !person.getDead();
+
+		outcomeDetails.put("isAlive", isAlive);
+		if (!isAlive) {
+			outcomeDetails.put("deathDate", person.getDeathDate());
+		}
+		return outcomeDetails;
+	}
+	
+	private String pushDataToExternalMediator(Map<String, Object> dataTemplateData, String mediatorKeyType,
+	        String authReferenceKey) throws Exception {
+		try {
+			AdministrationService adminService = Context.getService(AdministrationService.class);
+			String mediatorsConfigs = adminService.getGlobalProperty(ICareConfig.INTEROPERABILITY_MEDIATORS_LIST);
+			
+			JSONArray mediatorsList = new JSONArray(mediatorsConfigs);
+			ICareService iCareService = Context.getService(ICareService.class);
+			
+			for (int count = 0; count < mediatorsList.length(); count++) {
+				JSONObject mediator = mediatorsList.getJSONObject(count);
+				if (mediator.optBoolean("isActive") && mediatorKeyType.equals(mediator.getString("mediatorKey"))) {
+					String mediatorKey = mediator.getString("mediatorKey");
+					String mediatorUrlPath = mediator.getString("mediatorUrlPath");
+					String authenticationType = mediator.getString("authenticationType");
+					authReferenceKey = mediator.getString("") != null ? mediator.getString("authKeyReference") : mediator
+					        .getString("mediatorKey");
+					return iCareService.pushDataToExternalMediator(new JSONObject(dataTemplateData).toString(), mediatorKey,
+					    mediatorUrlPath, authenticationType, authReferenceKey);
+				}
+			}
+		}
+		catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
+		return "";
+	}
+	
+	private String getPhoneNumbers(Person person) {
+		AdministrationService administrationService = Context.getAdministrationService();
+		String personPhoneNumberAttributeTypeUuid = administrationService
+		        .getGlobalProperty(ICareConfig.PHONE_NUMBER_ATTRIBUTE);
+		
+		if (person.getAttributes() != null) {
+			for (PersonAttribute attribute : person.getAttributes()) {
+				if (attribute.getAttributeType().getUuid().equals(personPhoneNumberAttributeTypeUuid)) {
+					return attribute.getValue();
+				}
+			}
+		}
+		return "";
+	}
+	
+	private String getPreferredIdentifier(Patient patient) {
+		if (patient.getIdentifiers() != null) {
+			for (PatientIdentifier identifier : patient.getIdentifiers()) {
+				if (identifier.getPreferred() != null && identifier.getPreferred()) {
+					return identifier.getIdentifier();
+				}
+			}
+			
+			if (!patient.getIdentifiers().isEmpty()) {
+				return patient.getIdentifiers().iterator().next().getIdentifier();
+			}
+		}
+		return "";
+	}
+	
+	private List<Map<String,Object>> getPatientIdentifiers(Patient patient) {
+		List<Map<String,Object>> identifiers = new ArrayList<>();
+		if (patient.getIdentifiers() != null) {
+			for (PatientIdentifier patientIdentifier: patient.getIdentifiers()) {
+				Map<String,Object> identifier = new HashMap<>();
+				identifier.put("id", patientIdentifier.getIdentifier().toString());
+				identifier.put("type", patientIdentifier.getIdentifierType().getName());
+				identifier.put("preferred", patientIdentifier.getPreferred());
+			}
+		}
+		return identifiers;
+	}
+	
+	@Override
+	public String getSharedRecordsFromExternalMediator(String hfrCode,
+													   String id,
+													   String idType) throws Exception {
+		try {
+			Map<String,Object> responseData = new HashMap<>();
+			AdministrationService administrationService = Context.getAdministrationService();
+			String mediatorsConfigs = administrationService.getGlobalProperty(ICareConfig.INTEROPERABILITY_MEDIATORS_LIST);
+			JSONArray mediatorsList = new JSONArray(mediatorsConfigs);
+			JSONObject sharedRecordsMediatorConfigs = null;
+			for (int count = 0; count < mediatorsList.length(); count++) {
+				JSONObject mediator = mediatorsList.getJSONObject(count);
+				if (mediator.getString("mediatorKey").equals("GET-SHR")) {
+					sharedRecordsMediatorConfigs =  mediator;
+				}
+			}
+			if (sharedRecordsMediatorConfigs != null) {
+				try {
+					String authReferenceKey = sharedRecordsMediatorConfigs.getString("authReferenceKey");
+					String mediatorUrl = sharedRecordsMediatorConfigs.getString("mediatorUrlPath");
+					// Obtain the necessary configurations from OpenMRS AdministrationService
+					String instance = administrationService.getGlobalProperty(authReferenceKey + ".instance");
+					String username = administrationService.getGlobalProperty(authReferenceKey + ".username");
+					String password = administrationService.getGlobalProperty(authReferenceKey + ".password");
+
+					if (id != null) {
+						mediatorUrl += "?id=" + id;
+					}
+
+					if (hfrCode != null) {
+						if (mediatorUrl.contains("?")) {
+							mediatorUrl += "&hfrCode="+ hfrCode;
+						}
+					}
+					if (idType != null) {
+						if (mediatorUrl.contains("?")) {
+							mediatorUrl += "&idType="+ idType;
+						}
+					}
+					// Construct the URL for the GET request
+					URL url = new URL(instance.concat(mediatorUrl));
+					HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+					// Create the Basic Authentication header
+					String userCredentials = username.concat(":").concat(password);
+					String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+
+					// Set up the connection properties
+					con.setRequestProperty("Authorization", basicAuth);
+					con.setRequestMethod("GET");  // Change to GET request
+					con.setRequestProperty("Accept", "application/json");
+
+					// Read the response
+					BufferedReader br = null;
+					try {
+						br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"));
+						StringBuilder response = new StringBuilder();
+						String responseLine;
+						while ((responseLine = br.readLine()) != null) {
+							response.append(responseLine.trim());
+						}
+						return response.toString();
+					} finally {
+						if (br != null) {
+							br.close();  // Ensure resources are closed properly
+						}
+					}
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+					return e.toString();
+				} catch (IOException e) {
+					e.printStackTrace();
+					return e.toString();
+				}
+			} else {
+				throw new Exception("Mediator for retrieving data from is not set");
+			}
+		}catch (Exception e) {
+			throw new Exception(e.getMessage());
+		}
 	}
 }

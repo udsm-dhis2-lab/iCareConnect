@@ -23,6 +23,8 @@ import org.openmrs.module.icare.auditlog.api.AuditLogService;
 import org.openmrs.module.icare.auditlog.api.db.AuditLogDAO;
 import org.openmrs.module.icare.billing.ItemNotPayableException;
 import org.openmrs.module.icare.billing.OrderMetaData;
+import org.openmrs.module.icare.billing.models.Invoice;
+import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.BillingService;
@@ -1493,15 +1495,22 @@ public class ICareController {
 	public Map<String, Object> getSoldItems(
 			@RequestParam(defaultValue = "10") Integer limit,
 			@RequestParam(defaultValue = "0") Integer startIndex,
-			@RequestParam(required = false) Date startDate,
-			@RequestParam(required = false) Date endDate,
+			@RequestParam(required = false) String startDate,
+			@RequestParam(required = false) String endDate,
 			@RequestParam(required = false) String provider
 	) throws Exception {
 		// TODO: This is meant to include price and total amount of money from the expected sold stock. SO far its unfinished
 		List<Map<String, Object>> soldItems = new ArrayList<>();
 		Map<String, Object> response = new HashMap<>();
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		Date start = null;
+		Date end = null;
+		if (startDate!= null && endDate != null) {
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
 		List<Object[]> orderedItems = iCareService.getCommonlyOrderedItems(null, null, limit, startIndex, null,
-				provider, startDate, endDate);
+				provider, start, end);
 		for (Object[] orderedItemsRowInfo: orderedItems) {
 			Long count = Long.valueOf(orderedItemsRowInfo[1].toString());
 			Drug drugDetails = new Drug();
@@ -1532,24 +1541,33 @@ public class ICareController {
 	@RequestMapping(value = "totalinvoiceamountbyitems", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> getTotalInvoice(
-			@RequestParam(required = false) Date startDate,
-			@RequestParam(required = false) Date endDate,
+			@RequestParam(required = false) String startDate,
+			@RequestParam(required = false) String endDate,
 			@RequestParam(required = false) String provider
 	) throws Exception {
+		Date start = null;
+		Date end = null;
 		List<Map<String, Object>> itemsByAmount = new ArrayList<>();
-		List<Object[]> soldItemsByTotalAmount = billingService.getTotalAmountFromPaidInvoices(startDate, endDate, provider);
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		if (startDate!= null && endDate != null) {
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+		List<Object[]> soldItemsByTotalAmount = billingService.getTotalAmountFromPaidInvoices(start, end, provider);
+
 		double totalSum = 0.0;
 		for (Object[] soldItem: soldItemsByTotalAmount) {
 			double totalPrice = Double.parseDouble(soldItem[0].toString());
 			totalSum += totalPrice;
 			Item item = (Item) soldItem[1];
+			InvoiceItem invoiceItem = (InvoiceItem) soldItem[2];
 			Map<String, Object> soldItemWithAmount = new HashMap<>();
 			soldItemWithAmount.put("totalAmount", totalPrice);
 			soldItemWithAmount.put("item", item.toMap());
 			itemsByAmount.add(soldItemWithAmount);
 		}
 		Map<String, Object> overallTotal = new HashMap<>();
-		overallTotal.put("overallTotal", totalSum);
+		overallTotal.put("overAllTotal", totalSum);
 		Map<String, Object> itemData = new HashMap<>();
 		itemData.put("display", "Total amount");
 		overallTotal.put("item", itemData);
@@ -1674,10 +1692,42 @@ public class ICareController {
 	@ResponseBody
 	public Map<String, Object> onPGenerateReportForHDUAPI(@RequestBody Map<String, Object> visitParameters) throws Exception {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		Date startDate = formatter.parse(visitParameters.get("startDate").toString());
-		Date endDate = formatter.parse(visitParameters.get("endDate").toString());
-		Map<String, Object> response = iCareService.generateVisitsData(startDate, endDate,
-		    (Boolean) visitParameters.get("sendToExternal"));
+		
+		Date startDate = null;
+		Date endDate = null;
+		if (visitParameters.get("startDate") != null) {
+			startDate = formatter.parse(visitParameters.get("startDate").toString());
+		} else {
+			throw new IllegalArgumentException("Start date cannot be null.");
+		}
+		
+		if (visitParameters.get("endDate") != null) {
+			endDate = formatter.parse(visitParameters.get("endDate").toString());
+		} else {
+			throw new IllegalArgumentException("End date cannot be null.");
+		}
+		Boolean sendToExternal = (Boolean) visitParameters.get("sendToExternal");
+		String visitUuid = visitParameters.get("uuid").toString();
+		
+		if (sendToExternal == null) {
+			throw new IllegalArgumentException("sendToExternal parameter cannot be null.");
+		}
+		return iCareService.generateVisitsData(startDate, endDate, sendToExternal, visitUuid);
+	}
+	
+	@RequestMapping(value = "referral", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> sendReferralDataToMediator(@RequestBody Map<String, Object> referralVisitDetails) throws Exception {
+		Map<String, Object> response = new HashMap<>();
+		response = iCareService.sendReferralDataToMediator(referralVisitDetails.get("uuid").toString());
 		return response;
+	}
+	
+	@RequestMapping(value = "sharedrecords", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String getClientDataFromExternalMediator(@RequestParam(value = "hfrCode", required = false) String hfrCode,
+	        @RequestParam(value = "id", required = true) String id,
+	        @RequestParam(value = "idType", required = false) String idType) throws Exception {
+		return iCareService.getSharedRecordsFromExternalMediator(hfrCode, id, idType);
 	}
 }

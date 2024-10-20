@@ -239,7 +239,27 @@
 			For storing concept source used to map test from machine results
 		</description>
 	</globalProperty>
-	
+	<globalProperty>
+		<property>iCare.interoperability.settings.allowRemoteHistory</property>
+		<defaultValue>false</defaultValue>
+		<description>
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>iCare.interoperability.settings.exchangeLocationsTag</property>
+		<defaultValue>HDU API Exchange</defaultValue>
+		<description>
+			Location tag for facilities allowed for health data universal exchange
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>icare.location.attributes.hfrCode.attributeUuid</property>
+		<defaultValue>UUID</defaultValue>
+		<description>
+			HFRCODE Location Attribute type UUID
+		</description>
+	</globalProperty>
+
 	<!-- Internationalization -->
 	<!-- All message codes should start with @MODULE_ID@.* -->
 	<messages>
