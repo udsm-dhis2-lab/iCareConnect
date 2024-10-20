@@ -27,7 +27,7 @@ public class StockInvoiceItemStatus extends BaseOpenmrsData implements java.io.S
 	public String remarks;
 	
 	public enum Type {
-		DRAFT, RECEIVED
+		DRAFT, RECEIVED, PENDING, PAID
 	}
 	
 	@Override

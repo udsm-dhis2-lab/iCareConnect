@@ -166,10 +166,16 @@ public class ICareConfig {
 	public static final String ORDER_TO_SKIP_BILLING_ADVISOR = "iCare.billing.orderTypes.skipBillingOrderAdvisor";
 	
 	public static final String MACHINE_INTEGRATION_PRIMARY_CONCEPT_SOURCE = "icare.laboratory.concept.mappings.machineIntegration.conceptSourceUuid";
-
+	
+	public static final String PKCS12_PATH = "iCare.GePG.settings.pkcs12Path";
+	
+	public static final String PKCS12_PASSWORD = "iCare.GePG.settings.pkcs12Password";
+	
+	public static final String DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER = "icare.billing.controlNumberBasedPaymentType.concept.uuid";
+	
 	public static final String ALLOW_REMOTE_HISTORY = "iCare.interoperability.settings.allowRemoteHistory";
-
+	
 	public static final String DATA_EXCHANGE_LOCATION_TAG = "iCare.interoperability.settings.exchangeLocationsTag";
-
+	
 	public static final String HFRCODE_LOCATION_ATTRIBUTE_TYPE_UUID = "icare.location.attributes.hfrCode.attributeUuid";
 }

@@ -7,6 +7,7 @@ import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.icare.billing.models.Payment;
 import org.openmrs.module.icare.core.dao.BaseDAO;
+import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
  * @see org.openmrs.module.icare.billing.models.Payment
  * @author Hibernate Tools
  */
+@Repository
 @Transactional
 public class PaymentDAO extends BaseDAO<Payment> {
 	
@@ -46,4 +48,14 @@ public class PaymentDAO extends BaseDAO<Payment> {
 		query.setParameter("patientUuid", patientUuid);
 		return query.list();
 	}
+	
+	public String getReferenceNumberByRequestId(String requestId) {
+		DbSession session = this.getSession();
+		String queryStr = "SELECT p.referenceNumber FROM Payment p WHERE p.uuid = :requestId";
+		Query query = session.createQuery(queryStr);
+		query.setParameter("requestId", requestId);
+		String referenceNumber = (String) query.uniqueResult();
+		return referenceNumber;
+	}
+	
 }
