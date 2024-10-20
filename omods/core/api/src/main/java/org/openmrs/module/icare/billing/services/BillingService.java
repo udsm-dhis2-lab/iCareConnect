@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Transactional
 public interface BillingService extends OpenmrsService {
@@ -81,4 +82,8 @@ public interface BillingService extends OpenmrsService {
 	Order createOrderForOngoingDeceasedPatients() throws Exception;
 	
 	List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) throws Exception;
+	
+	Map<String, Object> processGepgCallbackResponse(Map<String, Object> feedBack) throws Exception;
+	
+	String fetchControlNumber(String requestId) throws Exception;
 }

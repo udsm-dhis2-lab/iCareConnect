@@ -4,6 +4,7 @@ import org.codehaus.jackson.annotate.JsonSetter;
 import org.openmrs.BaseOpenmrsData;
 import org.openmrs.Concept;
 import org.openmrs.Order;
+import org.openmrs.module.icare.billing.Utils.PaymentStatus;
 import org.openmrs.module.icare.core.Item;
 
 import javax.persistence.*;
@@ -37,6 +38,9 @@ public class Payment extends BaseOpenmrsData implements java.io.Serializable {
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "id.payment", cascade = { CascadeType.PERSIST })
 	private List<PaymentItem> items = new ArrayList<PaymentItem>(0);
+	
+	@Column(name = "status", nullable = true, length = 16)
+	private PaymentStatus status;
 	
 	public Payment() {
 		
@@ -143,8 +147,8 @@ public class Payment extends BaseOpenmrsData implements java.io.Serializable {
 		
 		/*Map<String, Object> invoiceMap = new HashMap<String, Object>();
 		invoiceMap.put("uuid", this.getInvoice().getUuid());
-		paymentMap.put("invoice", invoiceMap);*/
-		
+//		paymentMap.put("invoice", invoiceMap);*/
+		paymentMap.put("receivedBy", this.getReceivedBy());
 		Map<String, Object> paymentTypeMap = new HashMap<String, Object>();
 		paymentTypeMap.put("uuid", this.getPaymentType().getUuid());
 		paymentTypeMap.put("name", this.getPaymentType().getDisplayString());
@@ -155,7 +159,7 @@ public class Payment extends BaseOpenmrsData implements java.io.Serializable {
 			invoiceItems.add(paymentItem.getMap());
 		}
 		paymentMap.put("items", invoiceItems);
-
+        
 		Map<String,Object> visitMap = new HashMap<>();
 		visitMap.put("uuid",this.getInvoice().getVisit().getUuid());
 		paymentMap.put("visit",visitMap);
@@ -169,5 +173,13 @@ public class Payment extends BaseOpenmrsData implements java.io.Serializable {
 	
 	public void setItems(List<PaymentItem> items) {
 		this.items = items;
+	}
+	
+	public PaymentStatus getStatus() {
+		return status;
+	}
+	
+	public void setStatus(PaymentStatus status) {
+		this.status = status;
 	}
 }

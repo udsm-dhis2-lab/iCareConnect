@@ -20,6 +20,7 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.auditlog.AuditLog;
 import org.openmrs.module.icare.billing.ItemNotPayableException;
+import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
@@ -355,6 +356,11 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		return this.dao.getCommonlyOrderedItems(visitUuid, orderTypeUuid, limit, startIndex, isDrug, provider, startDate,
 		    endDate);
 	}
+	
+	// @Override
+	// public Boolean updateGepgControlNumber(String controlNumber, String uuid) {
+	// 	return this.dao.updateGepgControlNumber(controlNumber, uuid);
+	// }
 	
 	@Override
 	public Message sendMessage(Message message) throws Exception {
