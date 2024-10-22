@@ -49,15 +49,30 @@
         </table>
       </div>
 
-      <!-- Control Number Display -->
-      <div *ngIf="controlNumber">
-        <div class="d-flex justify-content-center align-items-center control-number-container">
-          <div class="text-center">
-            <div class="h3 mb-4">Bill Control Number</div>
-            <div class="control-number">{{ controlNumber }}</div>
-          </div>
-        </div>
+     <!-- Control Number Display -->
+<div *ngIf="controlNumber === 'Not found within timeout'; else displayControlNumber">
+  <div class="text-center">
+    <div class="text-danger small font-weight-bold">
+      Sorry, your request is taking longer than expected!
+    </div>
+      <div class="text-danger small font-weight-bold">
+      Please refresh the page after 5 minutes.
+     </div>
+    
+  </div>
+</div>
+
+<ng-template #displayControlNumber>
+  <div *ngIf="controlNumber">
+    <div class="d-flex justify-content-center align-items-center control-number-container">
+      <div class="text-center">
+        <div class="h3 mb-4">Bill Control Number</div>
+        <div class="control-number">{{ controlNumber }}</div>
       </div>
+    </div>
+  </div>
+</ng-template>
+
 
       <!-- Control Number Generation -->
       <div class="controlNumber-field m-3" *ngIf="params?.gepgConceptField && data?.paymentType?.code === 'GePG'">
