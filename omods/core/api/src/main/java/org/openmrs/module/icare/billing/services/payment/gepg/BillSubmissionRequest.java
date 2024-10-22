@@ -143,6 +143,8 @@ public class BillSubmissionRequest {
 								new BillItem(invoiceItem.getItem().getId().toString(), "N",
 										invoiceItem.getPrice().toString(),
 										invoiceItem.getPrice().toString(), "0.0", GFSCode));
+					}else {
+						throw new IllegalStateException("Please verify GFS CODE concept mapping if configured in a correct way");
 					}
 				}
 			} else if (drug != null) {
@@ -160,9 +162,7 @@ public class BillSubmissionRequest {
 										invoiceItem.getPrice().toString(),
 										invoiceItem.getPrice().toString(), "0.0", GFSCode));
 					} else {
-						globalProperty.setProperty("iCare.gepg.DrugConcept.icareConnect");
-						globalProperty.setPropertyValue(GFSCodeConceptSourceMappingUuid);
-						administrationService.saveGlobalProperty(globalProperty);
+						throw new IllegalStateException("Please verify GFS CODE concept mapping if configured in a correct way");
 					}
 				}
 			}
