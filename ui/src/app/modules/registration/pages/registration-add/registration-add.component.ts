@@ -203,7 +203,7 @@ export class RegistrationAddComponent implements OnInit {
     required: true,
     type: "number",
     min: 0,
-    placeholder: "Mobile number",
+    placeholder: "Start with 0xxxxxxxxx",
     category: "phoneNumber",
     // value: this?.editMode ? this    ""
   });

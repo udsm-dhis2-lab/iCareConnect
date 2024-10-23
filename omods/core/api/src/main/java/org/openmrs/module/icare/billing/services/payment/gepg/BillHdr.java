@@ -25,7 +25,7 @@ public class BillHdr {
 	}
 	
 	public void setSpCode(String spCode) {
-		this.spCode = capitalizeFirstLetter(spCode);
+		this.spCode = spCode;
 	}
 	
 	@JsonProperty("RtrRespFlg")
@@ -34,6 +34,6 @@ public class BillHdr {
 	}
 	
 	public void setRtrRespFlg(String rtrRespFlg) {
-		this.rtrRespFlg = capitalizeFirstLetter(rtrRespFlg);
+		this.rtrRespFlg = rtrRespFlg;
 	}
 }

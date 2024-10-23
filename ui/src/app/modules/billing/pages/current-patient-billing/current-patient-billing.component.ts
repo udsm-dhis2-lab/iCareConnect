@@ -38,6 +38,21 @@ import { ExemptionConfirmationComponent } from "../../components/exemption-confi
 import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
+
+export interface PeriodicElement {
+  name: string;
+  position: number;
+  weight: number;
+  status: string; // Changed from 'symbol' to 'status'
+  controlNumber: string;
+}
+
+const ELEMENT_DATA: PeriodicElement[] = [
+  { position: 1, name: 'Juma Ally', weight: 1.0079, status: 'REQUESTED', controlNumber: '4256347156316' },
+  { position: 2, name: 'Juma Ally', weight: 1.0079, status: 'PAID', controlNumber: '4256347156316' },
+  { position: 3, name: 'Juma Ally', weight: 1.0079, status: 'REQUESTED', controlNumber: '4256347156316' },
+  { position: 4, name: 'Juma Ally', weight: 1.0079, status: 'PENDING', controlNumber: '4256347156316' },
+];
 @Component({
   selector: "app-current-patient-billing",
   templateUrl: "./current-patient-billing.component.html",
@@ -73,6 +88,9 @@ export class CurrentPatientBillingComponent implements OnInit {
   hasOpenExemptionRequest: boolean;
   isBillCleared: boolean;
   errors: any[] = [];
+  displayedColumns: string[] = ['position', 'name', 'weight', 'status', 'controlNumber'];
+  dataSource = new MatTableDataSource(ELEMENT_DATA);
+  color = 'transparent';
 
   constructor(
     private route: ActivatedRoute,
@@ -92,7 +110,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   ngOnInit() {
     this.patientId = this.route?.snapshot?.params?.patientId;
     this._getPatientDetails();
-
+    this.getPaymentList();
     this.currentPatient$ = this.patientService.getPatient(this.patientId);
     this.store.dispatch(
       loadCurrentPatient({ uuid: this.patientId, isRegistrationPage: false })
@@ -241,6 +259,21 @@ export class CurrentPatientBillingComponent implements OnInit {
           }
         })
       );
+     
+  }
+
+
+  getPaymentList() {
+    console.log("Callback API Fired.........");
+    this.billingService.getpayments().subscribe(
+      (response: any) => {
+        console.log("Payments List Response:", response);
+      },
+      (error) => {
+       
+        console.log("Failed to generate control number:", error);
+      }
+    );
   }
 
   private _getPatientDetails() {

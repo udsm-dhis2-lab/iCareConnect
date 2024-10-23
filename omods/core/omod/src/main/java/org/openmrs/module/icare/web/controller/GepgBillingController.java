@@ -8,6 +8,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
+import org.openmrs.module.icare.billing.models.Payment;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.payment.gepg.BillSubmissionRequest;
 import org.openmrs.module.icare.billing.services.payment.gepg.GEPGService;
@@ -146,4 +147,17 @@ public class GepgBillingController {
 	public Map<String, Object> handleCallback(@RequestBody Map<String, Object> callbackData) throws Exception {
 		return billingService.processGepgCallbackResponse(callbackData);
 	}
+	
+	@RequestMapping(value = "/paymentsRequests", method = RequestMethod.GET)
+    public Map<String, Object> getPaymentsWithStatus() throws Exception {
+    // Fetch payments from the service layer
+    List<Payment> payments = billingService.getAllPaymentsWithStatus();
+    
+    // Create response map
+    Map<String, Object> response = new HashMap<>();
+    response.put("status", "success");
+    response.put("data", payments); 
+
+       return response;
+    }
 }

@@ -86,4 +86,6 @@ public interface BillingService extends OpenmrsService {
 	Map<String, Object> processGepgCallbackResponse(Map<String, Object> feedBack) throws Exception;
 	
 	String fetchControlNumber(String requestId) throws Exception;
+	
+	List<Payment> getAllPaymentsWithStatus() throws Exception;
 }

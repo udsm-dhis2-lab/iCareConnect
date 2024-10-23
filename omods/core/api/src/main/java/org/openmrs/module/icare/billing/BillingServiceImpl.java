@@ -833,6 +833,12 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		return response;
 	}
 	
+	@Override
+	public List<Payment> getAllPaymentsWithStatus() throws Exception {
+		// Fetch all payments with their statuses from the DAO
+		return this.paymentDAO.getAllPaymentsWithStatus();
+	}
+	
 	public String fetchControlNumber(String requestId) throws Exception {
 		String controlNumber = null;
 		long startTime = System.currentTimeMillis();

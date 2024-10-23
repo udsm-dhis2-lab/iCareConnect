@@ -182,9 +182,9 @@ public class BillSubmissionRequest {
 		billTrxInf.setBillAmt(totalBillAmount.toString());
 		billTrxInf.setMiscAmt("0");
 		LocalDateTime now = LocalDateTime.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-		String formattedNow = now.format(formatter);
-		billTrxInf.setBillGenDt(formattedNow);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        String formattedNow = now.format(formatter);
+        billTrxInf.setBillGenDt(formattedNow);
 
 		LocalDateTime expirationTime = now.plusHours(24);
 		String formattedExpirationTime = expirationTime.format(formatter);
