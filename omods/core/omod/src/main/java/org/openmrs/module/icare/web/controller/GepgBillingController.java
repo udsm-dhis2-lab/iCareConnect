@@ -5,6 +5,7 @@ import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.context.ContextAuthenticationException;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
@@ -91,6 +92,7 @@ public class GepgBillingController {
         String enginepublicKey = administrationService.getGlobalProperty(ICareConfig.ENGINE_PUBLIC_KEY);
         String pkcs12Path = administrationService.getGlobalProperty(ICareConfig.PKCS12_PATH);
         String pkcs12Password = administrationService.getGlobalProperty(ICareConfig.PKCS12_PASSWORD);
+         
 
         if (currency == null) {
             throw new IllegalArgumentException("Currency cannot be null");
@@ -144,9 +146,26 @@ public class GepgBillingController {
     }
 	
 	@RequestMapping(value = "/callback", method = RequestMethod.POST)
-	public Map<String, Object> handleCallback(@RequestBody Map<String, Object> callbackData) throws Exception {
-		return billingService.processGepgCallbackResponse(callbackData);
-	}
+   public Map<String, Object> handleCallback(@RequestBody Map<String, Object> callbackData) throws Exception {
+    AdministrationService administrationService = Context.getAdministrationService();
+    //GePG user
+    String GepgUsername = administrationService.getGlobalProperty(ICareConfig.GEPG_USERNAME);
+    String GepgPassword = administrationService.getGlobalProperty(ICareConfig.GEPG_PASSWORD);
+
+    try {
+        Context.authenticate(GepgUsername, GepgPassword);
+        return billingService.processGepgCallbackResponse(callbackData);
+    } catch (ContextAuthenticationException e) {
+        // Handle authentication failure
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("status", "error");
+        errorResponse.put("message", "Authentication failed: " + e.getMessage());
+        return errorResponse;
+    } finally {
+        // Ensure to logout to clear the context after handling the request
+        Context.logout();
+    }
+}
 	
 	@RequestMapping(value = "/paymentsRequests", method = RequestMethod.GET)
     public Map<String, Object> getPaymentsWithStatus() throws Exception {

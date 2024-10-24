@@ -62,7 +62,7 @@ public class PaymentDAO extends BaseDAO<Payment> {
 	}
 	
 	//Get All Payments with its status
-	public List<Payment> getAllPaymentsWithStatus() {
+	public List<Payment> getAllPayments() {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT p FROM Payment p";
 		Query query = session.createQuery(queryStr);

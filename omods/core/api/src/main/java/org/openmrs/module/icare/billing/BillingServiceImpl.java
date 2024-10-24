@@ -837,7 +837,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	@Override
 	public List<Payment> getAllPaymentsWithStatus() throws Exception {
 		// Fetch all payments with their statuses from the DAO
-		return this.paymentDAO.getAllPaymentsWithStatus();
+		return this.paymentDAO.getAllPayments();
 	}
 	
 	public String fetchControlNumber(String requestId) throws Exception {
