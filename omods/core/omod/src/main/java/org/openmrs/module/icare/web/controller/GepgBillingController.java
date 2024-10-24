@@ -45,7 +45,6 @@ public class GepgBillingController {
 
         for (Map<String, Object> invoiceReference : requestPayload) {
             String uuid = (String) invoiceReference.get("uuid");
-            billId = uuid;
             if (uuid == null) {
                 throw new IllegalArgumentException("UUID cannot be null");
             }
@@ -55,6 +54,7 @@ public class GepgBillingController {
             }
 
             Invoice invoice = billingService.getInvoiceDetailsByUuid(uuid);
+            billId =  invoice.getId().toString();
             System.out.println("Invoice: " + invoice);
 
             if (invoice == null) {

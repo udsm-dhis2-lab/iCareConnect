@@ -755,12 +755,13 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 				Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
 				Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
 
-				String billId = (String) billTrxInf.get("BillId");
+				String billIdString = (String) billTrxInf.get("BillId");
 				String payCntrNum = (String) billTrxInf.get("PayCntrNum");
 				String requestId = (String) status.get("RequestId");
 
 				// 1. Get invoice from bill
-				Invoice invoice = invoiceDAO.findByUuid(billId);
+				Integer billId = Integer.parseInt(billIdString);
+				Invoice invoice = invoiceDAO.findById(billId);
 				if (invoice == null) {
 					throw new Exception("Bill id " + billId + " is not valid");
 				}

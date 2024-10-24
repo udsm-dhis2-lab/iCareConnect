@@ -111,7 +111,7 @@ public class BillSubmissionRequest {
 
 		// Retrieve patient attributes
 		String patientNames = patient.getGivenName() + " " + patient.getFamilyName();
-		String patientUuid = patient.getUuid();
+		String patientUuid = patient.getId().toString();
 		String patientPhoneNumber = "";
 		String email = "";
 		for (PersonAttribute attribute : patient.getAttributes()) {
