@@ -38,9 +38,9 @@ public class PaymentDAO extends BaseDAO<Payment> {
 	public Payment save(Payment entity) {
 		DbSession session = getSession();
 		session.persist(this.getType(), entity);
-		session.flush();
+		// session.flush();
 		
-		//this.sessionFactory.getCurrentSession().saveOrUpdate(entity);
+		this.sessionFactory.getCurrentSession().saveOrUpdate(entity);
 		return entity;
 	}
 	
@@ -69,6 +69,14 @@ public class PaymentDAO extends BaseDAO<Payment> {
 		
 		// Return the list of Payment objects
 		return query.list();
+	}
+	
+	public Payment getPaymentByRequestId(String requestId) {
+		DbSession session = this.getSession();
+		String queryStr = "SELECT p FROM Payment p WHERE p.uuid = :requestId";
+		Query query = session.createQuery(queryStr);
+		query.setParameter("requestId", requestId);
+		return (Payment) query.uniqueResult();
 	}
 	
 }

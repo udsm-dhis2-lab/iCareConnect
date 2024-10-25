@@ -21,6 +21,7 @@ import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
+import javax.transaction.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -744,7 +745,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	}
 	
 	@Override
-public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callbackData) throws Exception {
+    public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callbackData) throws Exception {
     AdministrationService administrationService = Context.getAdministrationService();
     
     // Initialize the response structure
@@ -781,59 +782,53 @@ public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callb
                 throw new Exception("Payment type concept not found for UUID: " + paymentTypeConceptUuid);
             }
 
+            // Create a new Payment object
             Payment payment = new Payment();
             payment.setPaymentType(paymentType);
             payment.setReferenceNumber(payCntrNum);
             payment.setInvoice(invoice);
-
-            // Payment Items
-            List<PaymentItem> paymentItems = new ArrayList<>();
-            for (InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
-                PaymentItem paymentItem = new PaymentItem();
-                paymentItem.setAmount(invoiceItem.getPrice());
-                paymentItem.setOrder(invoiceItem.getOrder());
-                paymentItem.setItem(invoiceItem.getItem());
-                paymentItem.setStatus(PaymentStatus.REQUESTED);
-                paymentItems.add(paymentItem);
-            }
             payment.setReceivedBy("SYSTEM");
             payment.setStatus(PaymentStatus.REQUESTED);
             payment.setCreator(Context.getAuthenticatedUser());
             payment.setUuid(requestId);
             payment.setDateCreated(new Date());
 
-            boolean isUpdated = true; 
-
-            if (isUpdated) {
-                // Save control number in global property
-                Payment savedPayment = this.paymentDAO.save(payment);
-                
-                String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
-				String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
-                // Set up SystemAuth
-                systemAuth.put("SystemCode", systemCode);
-                
-                // Prepare the ackData for signing
-                ackData.put("RequestId", requestId);
-                ackData.put("SystemAckCode", "0");
+            // Check if the payment already exists
+            Payment existingPayment = this.paymentDAO.getPaymentByRequestId(requestId);
+            if (existingPayment != null) {
+                // Update existing payment
+                existingPayment.setReferenceNumber(payCntrNum);
+                existingPayment.setStatus(PaymentStatus.REQUESTED);
+                // Update any other fields as necessary
+                this.paymentDAO.save(existingPayment);
+                // Handle response for update
                 ackData.put("Description", "Success");
-
-                // Sign the ackData
-				String acKDataJson = new ObjectMapper().writeValueAsString(ackData);
-                String signature = SignatureUtils.signData(acKDataJson, clientPrivateKey); 
-                systemAuth.put("Signature", signature); 
-
-                // Set the response
-                response.put("SystemAuth", systemAuth);
-                response.put("AckData", ackData);
             } else {
-                ackData.put("RequestId", requestId);
-                ackData.put("SystemAckCode", "204");
-                ackData.put("Description", "Failed to update control number for this BillId: " + billId);
-
-                response.put("SystemAuth", systemAuth);
-                response.put("AckData", ackData);
+                // Save new payment
+                Payment savedPayment = this.paymentDAO.save(payment);
+                if (savedPayment == null) {
+                    throw new Exception("Failed to save payment.");
+                }
+                ackData.put("Description", "Success");
             }
+
+            // Set up SystemAuth
+            String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
+            String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
+            systemAuth.put("SystemCode", systemCode);
+            
+            // Prepare the ackData for signing
+            ackData.put("RequestId", requestId);
+            ackData.put("SystemAckCode", "0");
+
+            // Sign the ackData
+            String acKDataJson = new ObjectMapper().writeValueAsString(ackData);
+            String signature = SignatureUtils.signData(acKDataJson, clientPrivateKey); 
+            systemAuth.put("Signature", signature); 
+
+            // Set the response
+            response.put("SystemAuth", systemAuth);
+            response.put("AckData", ackData);
         } else {
             System.out.println("Status or FeedbackData field not found in callback data");
             ackData.put("RequestId", null);
