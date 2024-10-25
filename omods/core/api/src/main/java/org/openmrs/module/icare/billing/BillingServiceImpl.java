@@ -16,10 +16,13 @@ import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.*;
 import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFConfig;
 import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFServiceImpl;
+import org.openmrs.module.icare.billing.services.payment.gepg.SignatureUtils;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.naming.ConfigurationException;
 import java.util.*;
@@ -741,98 +744,117 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	}
 	
 	@Override
-	public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callbackData) throws Exception {
+public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callbackData) throws Exception {
+    AdministrationService administrationService = Context.getAdministrationService();
+    
+    // Initialize the response structure
+    Map<String, Object> response = new HashMap<>();
+    Map<String, Object> systemAuth = new HashMap<>();
+    Map<String, Object> ackData = new HashMap<>();
 
-		// System.out.println("Processing callback data: " + callbackData);
+    try {
+        if (callbackData.containsKey("Status") && callbackData.containsKey("FeedbackData")) {
+            Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
+            Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
 
-		Map<String, Object> response = new HashMap<>();
+            Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
+            Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
 
-		try {
-			if (callbackData.containsKey("Status") && callbackData.containsKey("FeedbackData")) {
-				Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
-				Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
+            String billIdString = (String) billTrxInf.get("BillId");
+            String payCntrNum = (String) billTrxInf.get("PayCntrNum");
+            String requestId = (String) status.get("RequestId");
 
-				Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
-				Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
+            // 1. Get invoice from bill
+            Integer billId = Integer.parseInt(billIdString);
+            Invoice invoice = invoiceDAO.findById(billId);
+            if (invoice == null) {
+                throw new Exception("Bill id " + billId + " is not valid");
+            }
 
-				String billIdString = (String) billTrxInf.get("BillId");
-				String payCntrNum = (String) billTrxInf.get("PayCntrNum");
-				String requestId = (String) status.get("RequestId");
+            String paymentTypeConceptUuid = administrationService.getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
+            if (paymentTypeConceptUuid == null) {
+                throw new Exception("No default payment type based on control number");
+            }
 
-				// 1. Get invoice from bill
-				Integer billId = Integer.parseInt(billIdString);
-				Invoice invoice = invoiceDAO.findById(billId);
-				if (invoice == null) {
-					throw new Exception("Bill id " + billId + " is not valid");
-				}
-				String paymentTypeConceptUuid = Context.getAdministrationService()
-						.getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
-				if (paymentTypeConceptUuid == null) {
-					throw new Exception("No default payment type based on control number");
-				}
-				Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
-				if (paymentType == null) {
-					throw new Exception("Payment type concept not found for UUID: " + paymentTypeConceptUuid);
-				}
+            Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
+            if (paymentType == null) {
+                throw new Exception("Payment type concept not found for UUID: " + paymentTypeConceptUuid);
+            }
 
-				Payment payment = new Payment();
-				payment.setPaymentType(paymentType);
-				payment.setReferenceNumber(payCntrNum);
-				payment.setInvoice(invoice);
+            Payment payment = new Payment();
+            payment.setPaymentType(paymentType);
+            payment.setReferenceNumber(payCntrNum);
+            payment.setInvoice(invoice);
 
-				// Payment Items
-				List<PaymentItem> paymentItems = new ArrayList<PaymentItem>();
-				for (InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
-					PaymentItem paymentItem = new PaymentItem();
-					paymentItem.setAmount(invoiceItem.getPrice());
-					paymentItem.setOrder(invoiceItem.getOrder());
-					paymentItem.setItem(invoiceItem.getItem());
-					paymentItem.setStatus(PaymentStatus.REQUESTED);
-					paymentItems.add(paymentItem);
-				}
-				// Payment.setItems(paymentItems);
-				payment.setReceivedBy("SYSTEM");
-				payment.setStatus(PaymentStatus.REQUESTED);
-				payment.setCreator(Context.getAuthenticatedUser());
-				payment.setUuid(requestId);
-				payment.setDateCreated(new Date());
-				new Payment();
-				boolean isUpdated = true;
-				// will used to update Control Number
-				// boolean isUpdated = icareService.updateGepgControlNumber(payCntrNum, billId);
+            // Payment Items
+            List<PaymentItem> paymentItems = new ArrayList<>();
+            for (InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
+                PaymentItem paymentItem = new PaymentItem();
+                paymentItem.setAmount(invoiceItem.getPrice());
+                paymentItem.setOrder(invoiceItem.getOrder());
+                paymentItem.setItem(invoiceItem.getItem());
+                paymentItem.setStatus(PaymentStatus.REQUESTED);
+                paymentItems.add(paymentItem);
+            }
+            payment.setReceivedBy("SYSTEM");
+            payment.setStatus(PaymentStatus.REQUESTED);
+            payment.setCreator(Context.getAuthenticatedUser());
+            payment.setUuid(requestId);
+            payment.setDateCreated(new Date());
 
-				if (isUpdated) {
-					// Save control number in global property
-					Payment savedPayment = this.paymentDAO.save(payment);
-					response.put("referenceNumber", payCntrNum);
-					System.out.println(savedPayment.getUuid());
-					GlobalProperty globalProperty = new GlobalProperty();
-					AdministrationService administrationService = Context.getAdministrationService();
-					globalProperty.setProperty("gepg.updatedInvoiceItem.icareConnect");
-					// globalProperty.setPropertyValue("Success Control NUmber saved with payment
-					// control number "+ savedPayment.getReferenceNumber() + " and uuid " +
-					// savedPayment.getUuid());
-					administrationService.saveGlobalProperty(globalProperty);
+            boolean isUpdated = true; 
 
-					response.put("status", "Success");
-					response.put("message", "Callback processed and control number updated received");
-				} else {
-					response.put("status", "Error");
-					response.put("message", "Failed to update control number for this BillId: " + billId);
-				}
-			} else {
-				System.out.println("Status or FeedbackData field not found in callback data");
-				response.put("status", "error");
-				response.put("message", "Status or FeedbackData field not found in callback data");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			response.put("status", "error");
-			response.put("message", "Internal server error");
-			response.put("error", e.getMessage());
-		}
-		return response;
-	}
+            if (isUpdated) {
+                // Save control number in global property
+                Payment savedPayment = this.paymentDAO.save(payment);
+                
+                String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
+				String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
+                // Set up SystemAuth
+                systemAuth.put("SystemCode", systemCode);
+                
+                // Prepare the ackData for signing
+                ackData.put("RequestId", requestId);
+                ackData.put("SystemAckCode", "0");
+                ackData.put("Description", "Success");
+
+                // Sign the ackData
+				String acKDataJson = new ObjectMapper().writeValueAsString(ackData);
+                String signature = SignatureUtils.signData(acKDataJson, clientPrivateKey); 
+                systemAuth.put("Signature", signature); 
+
+                // Set the response
+                response.put("SystemAuth", systemAuth);
+                response.put("AckData", ackData);
+            } else {
+                ackData.put("RequestId", requestId);
+                ackData.put("SystemAckCode", "204");
+                ackData.put("Description", "Failed to update control number for this BillId: " + billId);
+
+                response.put("SystemAuth", systemAuth);
+                response.put("AckData", ackData);
+            }
+        } else {
+            System.out.println("Status or FeedbackData field not found in callback data");
+            ackData.put("RequestId", null);
+            ackData.put("SystemAckCode", "206");
+            ackData.put("Description", "Status or FeedbackData field not found in callback data");
+
+            response.put("SystemAuth", systemAuth);
+            response.put("AckData", ackData);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.put("SystemAuth", systemAuth);
+        ackData.put("RequestId", null);
+        ackData.put("SystemAckCode", "500");
+        ackData.put("Description", "Internal server error: " + e.getMessage());
+
+        response.put("AckData", ackData);
+    }
+    
+    return response;
+}
 	
 	@Override
 	public List<Payment> getAllPaymentsWithStatus() throws Exception {

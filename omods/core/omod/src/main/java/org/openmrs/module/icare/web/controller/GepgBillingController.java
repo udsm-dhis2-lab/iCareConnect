@@ -4,6 +4,7 @@ import org.openmrs.GlobalProperty;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.AdministrationService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.ContextAuthenticationException;
 import org.openmrs.module.icare.ICareConfig;
@@ -13,6 +14,7 @@ import org.openmrs.module.icare.billing.models.Payment;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.payment.gepg.BillSubmissionRequest;
 import org.openmrs.module.icare.billing.services.payment.gepg.GEPGService;
+import org.openmrs.module.icare.billing.services.payment.gepg.SignatureUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -146,23 +148,42 @@ public class GepgBillingController {
     }
 	
 	@RequestMapping(value = "/callback", method = RequestMethod.POST)
-   public Map<String, Object> handleCallback(@RequestBody Map<String, Object> callbackData) throws Exception {
+    public Map<String, Object> handleCallback(@RequestBody Map<String, Object> callbackData) throws Exception {
     AdministrationService administrationService = Context.getAdministrationService();
-    //GePG user
-    String GepgUsername = administrationService.getGlobalProperty(ICareConfig.GEPG_USERNAME);
-    String GepgPassword = administrationService.getGlobalProperty(ICareConfig.GEPG_PASSWORD);
+    
+    // GePG user credentials
+    String gepgUsername = administrationService.getGlobalProperty(ICareConfig.GEPG_USERNAME);
+    String gepgPassword = administrationService.getGlobalProperty(ICareConfig.GEPG_PASSWORD);
+
+    String signature = (String) ((Map<String, Object>) callbackData.get("SystemAuth")).get("Signature");
+
+    Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
+
+    String payload = new ObjectMapper().writeValueAsString(feedbackData);
+
+    String enginePublicKey = administrationService.getGlobalProperty(ICareConfig.ENGINE_PUBLIC_KEY);
 
     try {
-        Context.authenticate(GepgUsername, GepgPassword);
+        
+        Context.authenticate(gepgUsername, gepgPassword);
+        //TODOO 
+        //Agreed to proceed with verification after UUCC insuring lenght of signature 
+        // boolean isVerified = SignatureUtils.verifyData(payload, signature, enginePublicKey);
+        
+        // if (!isVerified) {
+        //     Map<String, Object> errorResponse = new HashMap<>();
+        //     errorResponse.put("status", "error");
+        //     errorResponse.put("message", "Signature verification failed");
+        //     return errorResponse;
+        // }
         return billingService.processGepgCallbackResponse(callbackData);
+        
     } catch (ContextAuthenticationException e) {
-        // Handle authentication failure
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("status", "error");
         errorResponse.put("message", "Authentication failed: " + e.getMessage());
         return errorResponse;
     } finally {
-        // Ensure to logout to clear the context after handling the request
         Context.logout();
     }
 }

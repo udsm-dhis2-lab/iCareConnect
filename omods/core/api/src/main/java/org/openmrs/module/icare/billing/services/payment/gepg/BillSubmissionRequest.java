@@ -228,14 +228,6 @@ public class BillSubmissionRequest {
 
         // Sign the request data
         String signature = SignatureUtils.signData(requestDataJson,clientPrivateKey);
-        // Verify the signature
-        boolean isVerified = SignatureUtils.verifySignature(requestDataJson,enginepublicKey, signature);
-
-		globalProperty.setProperty("gepg.signatureisVerified.icareConnect");
-		globalProperty.setPropertyValue(Boolean.toString(isVerified));
-		administrationService.saveGlobalProperty(globalProperty);
-
-		// Attach the signature to the payload's system auth section
 		systemAuth.setSignature(signature);
 
 		Map<String, Object> result = new HashMap<>();
