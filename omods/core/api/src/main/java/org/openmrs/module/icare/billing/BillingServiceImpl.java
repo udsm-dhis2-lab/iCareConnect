@@ -21,7 +21,6 @@ import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
-import javax.transaction.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -745,15 +744,17 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	}
 	
 	@Override
-    public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callbackData) throws Exception {
+public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callbackData) {
+
     AdministrationService administrationService = Context.getAdministrationService();
-    
+
     // Initialize the response structure
     Map<String, Object> response = new HashMap<>();
     Map<String, Object> systemAuth = new HashMap<>();
     Map<String, Object> ackData = new HashMap<>();
 
     try {
+        // Check if Status and FeedbackData fields are present
         if (callbackData.containsKey("Status") && callbackData.containsKey("FeedbackData")) {
             Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
             Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
@@ -763,26 +764,34 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 
             String billIdString = (String) billTrxInf.get("BillId");
             String payCntrNum = (String) billTrxInf.get("PayCntrNum");
-            String requestId = (String) status.get("RequestId");
+            String requestId = status.containsKey("RequestId") ? (String) status.get("RequestId") : null;
+            // SystemAuth setup
+            String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
+            String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
+            systemAuth.put("SystemCode", systemCode);
+            if (billIdString == null || payCntrNum == null || requestId == null) {
+                return buildErrorResponse(response, systemAuth, ackData, requestId, "Invalid data in callbackData: missing BillId, PayCntrNum, or RequestId");
+            }
 
-            // 1. Get invoice from bill
             Integer billId = Integer.parseInt(billIdString);
             Invoice invoice = invoiceDAO.findById(billId);
             if (invoice == null) {
-                throw new Exception("Bill id " + billId + " is not valid");
+				systemAuth.put("Signature", null);
+                return buildErrorResponse(response, systemAuth, ackData, requestId, "Invoice of this Bill id " + billId + " is not valid");
             }
 
             String paymentTypeConceptUuid = administrationService.getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
             if (paymentTypeConceptUuid == null) {
-                throw new Exception("No default payment type based on control number");
+				systemAuth.put("Signature", null);
+                return buildErrorResponse(response, systemAuth, ackData, requestId, "No default payment type based on control number");
             }
 
             Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
             if (paymentType == null) {
-                throw new Exception("Payment type concept not found for UUID: " + paymentTypeConceptUuid);
+				systemAuth.put("Signature", null);
+                return buildErrorResponse(response, systemAuth, ackData, requestId, "Payment type concept not found for UUID: " + paymentTypeConceptUuid);
             }
 
-            // Create a new Payment object
             Payment payment = new Payment();
             payment.setPaymentType(paymentType);
             payment.setReferenceNumber(payCntrNum);
@@ -793,63 +802,52 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
             payment.setUuid(requestId);
             payment.setDateCreated(new Date());
 
-            // Check if the payment already exists
-            Payment existingPayment = this.paymentDAO.getPaymentByRequestId(requestId);
-            if (existingPayment != null) {
-                // Update existing payment
-                existingPayment.setReferenceNumber(payCntrNum);
-                existingPayment.setStatus(PaymentStatus.REQUESTED);
-                // Update any other fields as necessary
-                this.paymentDAO.save(existingPayment);
-                // Handle response for update
-                ackData.put("Description", "Success");
-            } else {
-                // Save new payment
-                Payment savedPayment = this.paymentDAO.save(payment);
-                if (savedPayment == null) {
-                    throw new Exception("Failed to save payment.");
-                }
-                ackData.put("Description", "Success");
-            }
-
-            // Set up SystemAuth
-            String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
-            String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
-            systemAuth.put("SystemCode", systemCode);
-            
             // Prepare the ackData for signing
             ackData.put("RequestId", requestId);
-            ackData.put("SystemAckCode", "0");
+
+            Payment existingPayment = this.paymentDAO.getPaymentByRequestId(requestId);
+            if (existingPayment != null) {
+                ackData.put("SystemAckCode", "0");
+                ackData.put("Description", "Duplicated");
+            } else {
+                this.paymentDAO.save(payment);
+                ackData.put("Description", "Success");
+                GlobalProperty globalProperty = new GlobalProperty();
+                globalProperty.setProperty("gepg.updatedInvoiceItem.icareConnect");
+                administrationService.saveGlobalProperty(globalProperty);
+                ackData.put("SystemAckCode", "1");
+            }
 
             // Sign the ackData
-            String acKDataJson = new ObjectMapper().writeValueAsString(ackData);
-            String signature = SignatureUtils.signData(acKDataJson, clientPrivateKey); 
-            systemAuth.put("Signature", signature); 
+            String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
+            String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
+            systemAuth.put("Signature", signature);
 
-            // Set the response
             response.put("SystemAuth", systemAuth);
             response.put("AckData", ackData);
+
         } else {
-            System.out.println("Status or FeedbackData field not found in callback data");
-            ackData.put("RequestId", null);
-            ackData.put("SystemAckCode", "206");
-            ackData.put("Description", "Status or FeedbackData field not found in callback data");
-
-            response.put("SystemAuth", systemAuth);
-            response.put("AckData", ackData);
+            return buildErrorResponse(response, systemAuth, ackData, null, "Status or FeedbackData field not found in callback data");
         }
     } catch (Exception e) {
         e.printStackTrace();
-        response.put("SystemAuth", systemAuth);
-        ackData.put("RequestId", null);
-        ackData.put("SystemAckCode", "500");
-        ackData.put("Description", "Internal server error: " + e.getMessage());
-
-        response.put("AckData", ackData);
+        return buildErrorResponse(response, systemAuth, ackData, null, "Internal server error: " + e.getMessage());
     }
-    
     return response;
 }
+	
+	// Helper method to build error response
+	private Map<String, Object> buildErrorResponse(Map<String, Object> response, Map<String, Object> systemAuth,
+	        Map<String, Object> ackData, String requestId, String errorMessage) {
+		ackData.put("RequestId", requestId != null ? requestId : "Unknown Request");
+		ackData.put("SystemAckCode", "400");
+		ackData.put("Description", errorMessage);
+		
+		response.put("SystemAuth", systemAuth);
+		response.put("AckData", ackData);
+		
+		return response;
+	}
 	
 	@Override
 	public List<Payment> getAllPaymentsWithStatus() throws Exception {

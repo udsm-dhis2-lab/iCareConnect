@@ -38,9 +38,9 @@ public class PaymentDAO extends BaseDAO<Payment> {
 	public Payment save(Payment entity) {
 		DbSession session = getSession();
 		session.persist(this.getType(), entity);
-		// session.flush();
+		session.flush();
 		
-		this.sessionFactory.getCurrentSession().saveOrUpdate(entity);
+		// this.sessionFactory.getCurrentSession().saveOrUpdate(entity);
 		return entity;
 	}
 	

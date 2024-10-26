@@ -147,8 +147,8 @@ public class GepgBillingController {
         return generatedControlNumberObject;
     }
 	
-	@RequestMapping(value = "/callback", method = RequestMethod.POST)
-    public Map<String, Object> handleCallback(@RequestBody Map<String, Object> callbackData) throws Exception {
+	@RequestMapping(value = "/callback", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE)
+    public Map<String, Object> handleCallback(@RequestBody(required = false) Map<String, Object> callbackData) throws Exception {
     AdministrationService administrationService = Context.getAdministrationService();
     
     // GePG user credentials
