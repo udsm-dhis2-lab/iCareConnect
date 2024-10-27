@@ -71,12 +71,22 @@ public class PaymentDAO extends BaseDAO<Payment> {
 		return query.list();
 	}
 	
-	public Payment getPaymentByRequestId(String requestId) {
+	public Payment getPaymentByRequestId(Integer requestId) {
 		DbSession session = this.getSession();
-		String queryStr = "SELECT p FROM Payment p WHERE p.uuid = :requestId";
+		String queryStr = "SELECT p FROM Payment p WHERE p.id = :requestId";
 		Query query = session.createQuery(queryStr);
 		query.setParameter("requestId", requestId);
 		return (Payment) query.uniqueResult();
+	}
+	
+	public int setReferenceNumberByPaymentId(Integer paymentId, String pyReference) {
+		DbSession session = this.getSession();
+		String queryStr = "UPDATE Payment p SET p.referenceNumber = :pyReference WHERE p.id = :paymentId";
+		Query query = session.createQuery(queryStr);
+		query.setParameter("pyReference", pyReference);
+		query.setParameter("paymentId", paymentId);
+		
+		return query.executeUpdate();
 	}
 	
 }

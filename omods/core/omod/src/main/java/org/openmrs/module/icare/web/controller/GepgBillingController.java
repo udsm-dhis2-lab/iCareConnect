@@ -105,7 +105,7 @@ public class GepgBillingController {
 
         // Create the GePG payload using BillSubmissionRequest
         BillSubmissionRequest billSubmissionRequest = new BillSubmissionRequest();
-        Map<String, Object> gepgPayloadResponse = billSubmissionRequest.createGePGPayload(
+        Map<String, Object> gepgPayloadResponse = billingService.createGePGPayload(
                 visit.getPatient(),
                 invoiceItems,
                 totalBillAmount,
@@ -147,7 +147,8 @@ public class GepgBillingController {
         return generatedControlNumberObject;
     }
 	
-	@RequestMapping(value = "/callback", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE)
+	@RequestMapping(value = "/callback", method = RequestMethod.POST, 
+                    consumes = "application/json", produces = "application/json")
     public Map<String, Object> handleCallback(@RequestBody(required = false) Map<String, Object> callbackData) throws Exception {
     AdministrationService administrationService = Context.getAdministrationService();
     
@@ -169,7 +170,7 @@ public class GepgBillingController {
         //TODOO 
         //Agreed to proceed with verification after UUCC insuring lenght of signature 
         // boolean isVerified = SignatureUtils.verifyData(payload, signature, enginePublicKey);
-        
+
         // if (!isVerified) {
         //     Map<String, Object> errorResponse = new HashMap<>();
         //     errorResponse.put("status", "error");
