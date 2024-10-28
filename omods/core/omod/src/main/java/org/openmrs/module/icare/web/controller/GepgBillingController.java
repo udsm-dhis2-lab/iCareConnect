@@ -149,20 +149,6 @@ public class GepgBillingController {
         return generatedControlNumberObject;
     }
 	
-	//	@RequestMapping(value = "/callback", method = RequestMethod.POST)
-	//    public ResponseEntity<Map<String ,Object>> handleCallback(@RequestBody(required = false) Map<String, Object> callbackData) throws Exception {
-	//
-	//     AdministrationService administrationService = Context.getAdministrationService();
-	//
-	//    //     // GePG user credentials
-	//    String gepgUsername = administrationService.getGlobalProperty(ICareConfig.GEPG_USERNAME);
-	//    String gepgPassword = administrationService.getGlobalProperty(ICareConfig.GEPG_PASSWORD);
-	//    Context.authenticate(gepgUsername, gepgPassword);
-	//    Map<String, Object> dataMap = new HashMap<>();
-	//    dataMap.put("value1","Testing");
-	//    dataMap.put("Value2", "Juma");
-	//    return ResponseEntity.ok(dataMap);
-	//}
 	
 	@RequestMapping(value = "/callback", method = RequestMethod.POST)
     public ResponseEntity<Map<String ,Object>> handleCallback(@RequestBody(required = false) Map<String, Object> callbackData) throws Exception {
