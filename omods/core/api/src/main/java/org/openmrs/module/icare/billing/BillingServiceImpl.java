@@ -830,8 +830,7 @@ public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callb
     }
            
           } else {
-    // Save new payment if no existing record is found
-    // this.paymentDAO.save(payment);
+    ackData.put("SystemAckCode", "3");
     ackData.put("Description", "Fail to get reference Payments");
     }
 

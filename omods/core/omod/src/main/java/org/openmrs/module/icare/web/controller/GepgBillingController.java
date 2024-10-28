@@ -149,7 +149,6 @@ public class GepgBillingController {
         return generatedControlNumberObject;
     }
 	
-	
 	@RequestMapping(value = "/callback", method = RequestMethod.POST)
     public ResponseEntity<Map<String ,Object>> handleCallback(@RequestBody(required = false) Map<String, Object> callbackData) throws Exception {
 	     AdministrationService administrationService = Context.getAdministrationService();
