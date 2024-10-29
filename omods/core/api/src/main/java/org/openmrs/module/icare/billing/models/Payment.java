@@ -165,7 +165,8 @@ public class Payment extends BaseOpenmrsData implements java.io.Serializable {
 		Map<String,Object> visitMap = new HashMap<>();
 		visitMap.put("uuid",this.getInvoice().getVisit().getUuid());
 		paymentMap.put("visit",visitMap);
-
+		// Include status in the map
+		paymentMap.put("status", this.getStatus() != null ? this.getStatus().name() : null);
 		return paymentMap;
 	}
 	

@@ -216,13 +216,4 @@ public class GepgBillingController {
 	     }
 	 }
 	
-	@RequestMapping(value = "/paymentsRequests", method = RequestMethod.GET)
-    public List<Payment> getPaymentsWithStatus(@RequestParam("patient") String patient) {
-        List<Payment> payments = billingService.getPatientPayments(patient);
-        // Create response map
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("data", payments);
-        return billingService.getPatientPayments(patient);
-    }
 }

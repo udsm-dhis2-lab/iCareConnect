@@ -324,53 +324,60 @@
                     [matBadgeHidden]="
                       patientBillingDetails.pendingPayments?.length === 0
                     "
-                    >All Payments
+                    >Payments Requests
                   </span>
                 </ng-template>
 
-                <div
-                  
-                  class="py-4"
-                  style="text-align: center"
-                >
-                <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-                  <!-- Position Column -->
-                  <ng-container matColumnDef="position">
-                    <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> #. </th>
-                    <td mat-cell *matCellDef="let element"> {{element.position}} </td>
-                  </ng-container>
-                
-                  <!-- Name Column -->
-                  <ng-container matColumnDef="name">
-                    <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Name </th>
-                    <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-                  </ng-container>
-                
-                  <!-- Weight Column -->
-                  <ng-container matColumnDef="weight">
-                    <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Payment Type </th>
-                    <td mat-cell *matCellDef="let element"> {{element.weight}} </td>
-                  </ng-container>
-                
-                  <!-- Status Column -->
-                  <ng-container matColumnDef="status">
-                    <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Payment Status </th>
-                    <td mat-cell *matCellDef="let element"> {{element.status}} </td>
-                  </ng-container>
-                
-                  <!-- Control Number Column -->
-                  <ng-container matColumnDef="controlNumber">
-                    <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Control Number </th>
-                    <td mat-cell *matCellDef="let element"> {{element.controlNumber}} </td>
-                  </ng-container>
-                
-                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                      [ngClass]="{'pale-green': row.status === 'PAID', 'pale-orange': row.status === 'REQUESTED'}"></tr>
-                </table>
-                
-                
+                <div class="py-4" style="text-align: center">
+                  <table mat-table [dataSource]="dataSource" class="mat-elevation-z2">
+                    
+                    <!-- Position Column -->
+                    <ng-container matColumnDef="position">
+                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> # </th>
+                      <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+                    </ng-container>
+                    <!-- created -->
+                    <ng-container matColumnDef="createdAt">
+                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Created At </th>
+                      <td mat-cell *matCellDef="let element"> {{element.createdAt}} </td>
+                    </ng-container>
+                    <!-- Received By Column -->
+                    <ng-container matColumnDef="receivedBy">
+                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Received By </th>
+                      <td mat-cell *matCellDef="let element"> {{element.receivedBy}} </td>
+                    </ng-container>
+                    
+                    <!-- Creator Column -->
+                    <ng-container matColumnDef="creator">
+                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Creator </th>
+                      <td mat-cell *matCellDef="let element"> {{element.creator}} </td>
+                    </ng-container>
+                    
+                    <!-- Payment Type Column -->
+                    <ng-container matColumnDef="paymentType">
+                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Payment Type </th>
+                      <td mat-cell *matCellDef="let element"> {{element.paymentType}} </td>
+                    </ng-container>
+                    
+                    <!-- Reference Number Column -->
+                    <ng-container matColumnDef="referenceNumber">
+                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Reference Number </th>
+                      <td mat-cell *matCellDef="let element"> {{element.referenceNumber}} </td>
+                    </ng-container>
+                    
+                    <!-- Status Column -->
+                    <ng-container matColumnDef="status">
+                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Status </th>
+                      <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+                    </ng-container>
+                    
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                        [ngClass]="{'green': row.status === 'PAID' , 'pale-orange': (row.referenceNumber != null|| row.referenceNumber != '') && row.paymentType!='Cash'}">
+                    </tr>
+                  </table>
                 </div>
+                
                 <div>
                   <!-- <app-quotations
                     [bills]="patientBillingDetails?.pendingPayments"

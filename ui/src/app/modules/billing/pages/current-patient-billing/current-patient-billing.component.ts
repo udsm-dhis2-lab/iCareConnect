@@ -39,20 +39,17 @@ import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 
 
-export interface PeriodicElement {
-  name: string;
+interface Payments {
   position: number;
-  weight: number;
-  status: string; // Changed from 'symbol' to 'status'
-  controlNumber: string;
+  receivedBy: string;
+  creator: string;
+  paymentType: string;
+  referenceNumber: string;
+  status: string;
+  createdAt: string; 
 }
 
-const ELEMENT_DATA: PeriodicElement[] = [
-  { position: 1, name: 'Juma Ally', weight: 1.0079, status: 'REQUESTED', controlNumber: '4256347156316' },
-  { position: 2, name: 'Juma Ally', weight: 1.0079, status: 'PAID', controlNumber: '4256347156316' },
-  { position: 3, name: 'Juma Ally', weight: 1.0079, status: 'REQUESTED', controlNumber: '4256347156316' },
-  { position: 4, name: 'Juma Ally', weight: 1.0079, status: 'PENDING', controlNumber: '4256347156316' },
-];
+
 @Component({
   selector: "app-current-patient-billing",
   templateUrl: "./current-patient-billing.component.html",
@@ -88,9 +85,10 @@ export class CurrentPatientBillingComponent implements OnInit {
   hasOpenExemptionRequest: boolean;
   isBillCleared: boolean;
   errors: any[] = [];
-  displayedColumns: string[] = ['position', 'name', 'weight', 'status', 'controlNumber'];
-  dataSource = new MatTableDataSource(ELEMENT_DATA);
-  color = 'transparent';
+  displayedColumns: string[] = ['position','createdAt', 'receivedBy', 'creator', 'paymentType', 'referenceNumber', 'status'];
+  dataSource: Payments[] = [];
+  color: string = '';
+  expandedElement: any | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -110,7 +108,6 @@ export class CurrentPatientBillingComponent implements OnInit {
   ngOnInit() {
     this.patientId = this.route?.snapshot?.params?.patientId;
     this._getPatientDetails();
-    this.getPaymentList();
     this.currentPatient$ = this.patientService.getPatient(this.patientId);
     this.store.dispatch(
       loadCurrentPatient({ uuid: this.patientId, isRegistrationPage: false })
@@ -120,6 +117,9 @@ export class CurrentPatientBillingComponent implements OnInit {
     this.facilityDetails$ = this.store.select(getParentLocation);
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
     this.provider$ = this.store.select(getProviderDetails);
+    this.patientBillingDetails$.subscribe((payments)=>{
+      console.log("payments ....",payments)
+    })
 
     this.billingService
       .getAllPatientInvoices(this.patientId, false, "all")
@@ -259,22 +259,25 @@ export class CurrentPatientBillingComponent implements OnInit {
           }
         })
       );
-     
+      this.patientBillingDetails$
+      .pipe(
+        map((data: any) => data.payments.map((payment: any, index: number) => ({
+          position: index + 1,
+          receivedBy: payment.paymentDetails.receivedBy,
+          creator: payment.paymentDetails.creator.display,
+          paymentType: payment.paymentDetails.paymentType.name,
+          referenceNumber: payment.paymentDetails.referenceNumber,
+          status: payment.status,
+          createdAt: new Date(payment.created).toLocaleDateString(),
+
+        })))
+      )
+      .subscribe((payments: Payments[]) => {
+        this.dataSource = payments;
+      });
   }
 
 
-  getPaymentList() {
-    console.log("Callback API Fired.........");
-    this.billingService.getpayments(this.patientId).subscribe(
-      (response: any) => {
-        console.log("Payments List Response:", response);
-      },
-      (error) => {
-       
-        console.log("Failed to generate control number:", error);
-      }
-    );
-  }
 
   private _getPatientDetails() {
     this.loading = true;

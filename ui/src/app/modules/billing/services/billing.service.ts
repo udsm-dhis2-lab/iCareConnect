@@ -145,24 +145,6 @@ export class BillingService {
     );
   }
   
-  
-  getpayments( patientId): Observable<Payment> {
-    const url = `gepg/paymentsRequests?patient=${patientId}`;
-    return this.httpClient.get(url).pipe(
-      map((response: any) => {
-        if (response.error) {
-          throw new Error(response.error); 
-        }
-        console.log("paymentsRequests Response : ",response)
-        return response
-      }),
-      catchError((error) => {
-        console.error("Error in /paymentsRequests:", error);
-        return of({ error: error.message || 'An unknown error occurred' } as any);
-      })
-    );
-  }
-  
 
   discountBill(discountDetails): Observable<any> {
     let discountData = omit(discountDetails, "attachmentDetails");
