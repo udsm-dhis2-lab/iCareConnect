@@ -85,7 +85,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   hasOpenExemptionRequest: boolean;
   isBillCleared: boolean;
   errors: any[] = [];
-  displayedColumns: string[] = ['position','createdAt', 'receivedBy', 'creator', 'paymentType', 'referenceNumber', 'status'];
+  displayedColumns: string[] = ['position','createdAt', 'receivedBy', 'creator', 'paymentType', 'referenceNumber', 'status','print'];
   dataSource: Payments[] = [];
   color: string = '';
   expandedElement: any | null = null;
@@ -278,7 +278,11 @@ export class CurrentPatientBillingComponent implements OnInit {
   }
 
 
+  printElement(element: any) {
+    console.log('Printing:', element);
+  }
 
+  
   private _getPatientDetails() {
     this.loading = true;
 
