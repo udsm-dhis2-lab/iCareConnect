@@ -7,6 +7,8 @@ import org.openmrs.Order;
 import org.openmrs.module.icare.billing.Utils.PaymentStatus;
 import org.openmrs.module.icare.core.Item;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.util.*;
 

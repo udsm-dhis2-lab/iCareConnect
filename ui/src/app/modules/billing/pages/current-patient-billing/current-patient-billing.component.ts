@@ -265,7 +265,7 @@ export class CurrentPatientBillingComponent implements OnInit {
 
   getPaymentList() {
     console.log("Callback API Fired.........");
-    this.billingService.getpayments().subscribe(
+    this.billingService.getpayments(this.patientId).subscribe(
       (response: any) => {
         console.log("Payments List Response:", response);
       },

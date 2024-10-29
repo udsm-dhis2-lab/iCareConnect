@@ -146,8 +146,8 @@ export class BillingService {
   }
   
   
-  getpayments(): Observable<Payment> {
-    const url = `gepg/paymentsRequests`;
+  getpayments( patientId): Observable<Payment> {
+    const url = `gepg/paymentsRequests?patient=${patientId}`;
     return this.httpClient.get(url).pipe(
       map((response: any) => {
         if (response.error) {

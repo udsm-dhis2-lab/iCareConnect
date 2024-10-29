@@ -825,12 +825,12 @@ public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callb
         ackData.put("SystemAckCode", "0");
         ackData.put("Description", "Successfully Updated");
     } else {
-        ackData.put("SystemAckCode", "2");
+        ackData.put("SystemAckCode", "0");
         ackData.put("Description", "Fail to Update");
     }
            
           } else {
-    ackData.put("SystemAckCode", "3");
+    ackData.put("SystemAckCode", "0");
     ackData.put("Description", "Fail to get reference Payments");
     }
 
@@ -856,7 +856,7 @@ public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callb
 	private Map<String, Object> buildErrorResponse(Map<String, Object> response, Map<String, Object> systemAuth,
 	        Map<String, Object> ackData, String requestId, String errorMessage) {
 		ackData.put("RequestId", requestId != null ? requestId : "Unknown Request");
-		ackData.put("SystemAckCode", "400");
+		ackData.put("SystemAckCode", "0");
 		ackData.put("Description", errorMessage);
 		
 		response.put("SystemAuth", systemAuth);
@@ -867,8 +867,24 @@ public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callb
 	
 	@Override
 	public List<Payment> getAllPaymentsWithStatus() throws Exception {
-		// Fetch all payments with their statuses from the DAO
-		return this.paymentDAO.getAllPayments();
+		// Fetch the default payment type UUID from the administration service
+		AdministrationService administrationService = Context.getAdministrationService();
+		String paymentTypeConceptUuid = administrationService
+		        .getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
+		
+		if (paymentTypeConceptUuid == null || paymentTypeConceptUuid.isEmpty()) {
+			throw new Exception("No default payment type UUID configured for control number.");
+		}
+		
+		// Fetch the Concept by UUID
+		Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
+		if (paymentType == null) {
+			throw new Exception("Payment type concept not found for UUID: " + paymentTypeConceptUuid);
+		}
+		
+		// Use the concept ID to retrieve payments by payment type
+		Integer paymentTypeId = paymentType.getId();
+		return paymentDAO.findByPaymentTypeId(paymentTypeId);
 	}
 	
 	public String fetchControlNumber(String requestId) throws Exception {

@@ -1,6 +1,5 @@
 package org.openmrs.module.icare.web.controller;
 
-import java.util.HashMap;
 import org.openmrs.GlobalProperty;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
@@ -150,8 +149,34 @@ public class GepgBillingController {
     }
 	
 	@RequestMapping(value = "/callback", method = RequestMethod.POST)
-    public ResponseEntity<Map<String ,Object>> handleCallback(@RequestBody(required = false) Map<String, Object> callbackData) throws Exception {
-	     AdministrationService administrationService = Context.getAdministrationService();
+    public ResponseEntity<Map<String, Object>> handleCallback(
+    @RequestBody(required = false) Map<String, Object> callbackData,
+    @RequestParam(required = false) String fallback) throws Exception {
+        AdministrationService administrationService = Context.getAdministrationService();
+        
+        if (callbackData == null || callbackData.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            
+            String serviceCode = administrationService.getGlobalProperty(ICareConfig.SERVICE_CODE);
+            String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
+    
+            // Initialize response parts
+            Map<String, Object> ackData = new HashMap<>();
+            ackData.put("Description", "Empty content not allowed");
+            ackData.put("RequestId", null);
+            ackData.put("SystemAckCode", "0");
+    
+            Map<String, Object> systemAuth = new HashMap<>();
+            systemAuth.put("SystemCode", serviceCode);
+            systemAuth.put("Signature", "");
+    
+            // Build final response
+            response.put("AckData", ackData);
+            response.put("SystemAuth", systemAuth);
+            
+            // Return response with 200 OK
+            return ResponseEntity.ok(response);
+        }
 	
 	     // GePG user credentials
 	     String gepgUsername = administrationService.getGlobalProperty(ICareConfig.GEPG_USERNAME);
@@ -192,15 +217,12 @@ public class GepgBillingController {
 	 }
 	
 	@RequestMapping(value = "/paymentsRequests", method = RequestMethod.GET)
-    public Map<String, Object> getPaymentsWithStatus() throws Exception {
-    // Fetch payments from the service layer
-    List<Payment> payments = billingService.getAllPaymentsWithStatus();
-    
-    // Create response map
-    Map<String, Object> response = new HashMap<>();
-    response.put("status", "success");
-    response.put("data", payments); 
-
-       return response;
+    public List<Payment> getPaymentsWithStatus(@RequestParam("patient") String patient) {
+        List<Payment> payments = billingService.getPatientPayments(patient);
+        // Create response map
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("data", payments);
+        return billingService.getPatientPayments(patient);
     }
 }
