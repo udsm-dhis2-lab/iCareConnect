@@ -37,6 +37,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { ExemptionConfirmationComponent } from "../../components/exemption-confirmation/exemption-confirmation.component";
 import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
+import { animate, state, style, transition, trigger } from "@angular/animations";
 
 
 interface Payments {
@@ -54,6 +55,13 @@ interface Payments {
   selector: "app-current-patient-billing",
   templateUrl: "./current-patient-billing.component.html",
   styleUrls: ["./current-patient-billing.component.scss"],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 export class CurrentPatientBillingComponent implements OnInit {
   loading: boolean;
@@ -88,7 +96,12 @@ export class CurrentPatientBillingComponent implements OnInit {
   displayedColumns: string[] = ['position','createdAt', 'receivedBy', 'creator', 'paymentType', 'referenceNumber', 'status','print'];
   dataSource: Payments[] = [];
   color: string = '';
-  expandedElement: any | null = null;
+  expandedElement: Payments | null;
+  // Method to toggle expanded row
+  toggleRow(row: Payments) {
+    this.expandedElement = this.expandedElement === row ? null : row;
+  }
+
 
   constructor(
     private route: ActivatedRoute,
