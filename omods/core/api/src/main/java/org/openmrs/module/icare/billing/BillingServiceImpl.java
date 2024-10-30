@@ -798,6 +798,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 						paymentDAO.updatePayment(payment);
 						ackData.put("SystemAckCode", "0");
 						ackData.put("Description", "Payment Successfully Updated");
+						ackData.put("RequestId", requestId);
 						// Sign the ackData
 						String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
 						String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
@@ -806,6 +807,17 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 						response.put("SystemAuth", systemAuth);
 						response.put("AckData", ackData);
 
+					}else{
+						ackData.put("SystemAckCode", "0");
+						ackData.put("Description", "Fail, No Data with this RequestId");
+						ackData.put("RequestId", requestId);
+						// Sign the ackData
+						String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
+						String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
+						systemAuth.put("Signature", signature);
+						systemAuth.put("SystemCode", systemCode);
+						response.put("SystemAuth", systemAuth);
+						response.put("AckData", ackData);
 					}
 				} else if (feedbackData.containsKey("gepgBillSubResp")) {
 					Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
@@ -864,6 +876,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 						int rowsUpdated = this.paymentDAO.setReferenceNumberByPaymentId(requestId_, payCntrNum);
 
 						if (rowsUpdated > 0) {
+							
 							ackData.put("SystemAckCode", "0");
 							ackData.put("Description", "Successfully Updated");
 						} else {
