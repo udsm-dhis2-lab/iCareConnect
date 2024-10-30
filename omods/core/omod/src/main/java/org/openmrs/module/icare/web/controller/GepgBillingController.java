@@ -215,5 +215,4 @@ public class GepgBillingController {
 	         Context.logout();
 	     }
 	 }
-	
 }

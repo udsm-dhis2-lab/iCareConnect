@@ -106,7 +106,130 @@
                   </div>
                 </div>
               </mat-tab>
+<!-- Payments Requests) -->
+<mat-tab>
+  <ng-template mat-tab-label>
+    <span class="mr-2" [matBadge]="patientBillingDetails.pendingPayments?.length" matBadgePosition="after"
+      matBadgeOverlap="false" [matBadgeHidden]="
+        patientBillingDetails.pendingPayments?.length === 0
+      ">Payments Requests
+    </span>
+  </ng-template>
 
+  <div class="py-4" style="text-align: center">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" multiTemplateDataRows>
+
+      <!-- Position Column -->
+      <ng-container matColumnDef="position">
+        <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> # </th>
+        <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+      </ng-container>
+
+      <!-- Created Column -->
+      <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Created At </th>
+        <td mat-cell *matCellDef="let element"> {{element.createdAt}} </td>
+      </ng-container>
+
+      <!-- Received By Column -->
+      <ng-container matColumnDef="receivedBy">
+        <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Received By </th>
+        <td mat-cell *matCellDef="let element"> {{element.receivedBy}} </td>
+      </ng-container>
+
+      <!-- Creator Column -->
+      <ng-container matColumnDef="creator">
+        <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Creator </th>
+        <td mat-cell *matCellDef="let element"> {{element.creator}} </td>
+      </ng-container>
+
+      <!-- Payment Type Column -->
+      <ng-container matColumnDef="paymentType">
+        <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Payment Type </th>
+        <td mat-cell *matCellDef="let element"> {{element.paymentType}} </td>
+      </ng-container>
+
+      <!-- Reference Number Column -->
+      <ng-container matColumnDef="referenceNumber">
+        <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Control Number </th>
+        <td mat-cell *matCellDef="let element"> {{element.referenceNumber}} </td>
+      </ng-container>
+
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Status </th>
+        <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+      </ng-container>
+
+      <!-- Print Column (No Title) -->
+      <ng-container matColumnDef="print">
+        <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button *ngIf="element.referenceNumber" (click)="printElement(element)">
+            <mat-icon>print</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+     <!-- Expanded Content Column -->
+     <ng-container matColumnDef="expandedDetail">
+      <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+        <div class="example-element-detail" [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
+          <table>
+            <thead>
+              <tr>
+                <th>Receipt Number</th>
+                <th>Control Number</th>
+                <th>Bill Amount</th>
+                <th>Paid Amount</th>
+                <th>Payment Date</th>
+                <th>Payer Number</th>
+                <th>Payer Name</th>
+                <th>PSP Name</th>
+                <th>A/C Number</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>RCPT12345</td>
+                <td>CTRL67890</td>
+                <td>5000 TZS</td>
+                <td>5000 TZS</td>
+                <td>2024-10-25</td>
+                <td>255123456789</td>
+                <td>John Doe</td>
+                <td>Mobile Network X</td>
+                <td>A/C123456789</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </td>
+    </ng-container>
+    
+
+
+
+      <!-- Header and data rows -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+      [ngClass]="{'green': row.status === 'PAID', 'pale-orange': row.referenceNumber}"
+        (click)="expandedElement = expandedElement === row ? null : row" class="example-element-row"
+        [class.example-expanded-row]="expandedElement === row">
+      </tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+    </table>
+  </div>
+
+
+  <div>
+    <!-- <app-quotations
+      [bills]="patientBillingDetails?.pendingPayments"
+      [disableControls]="true"
+      (confirmPayment)="onConfirmBillPayment($event)"
+    >
+    </app-quotations> -->
+  </div>
+</mat-tab>
               <!-- Loans / Debts -->
               <mat-tab>
                 <ng-template mat-tab-label>
@@ -208,130 +331,7 @@
                   </div>
                 </div>
               </mat-tab>
-              <!-- Pending Payments (Covered by Insurance) -->
-              <mat-tab>
-                <ng-template mat-tab-label>
-                  <span class="mr-2" [matBadge]="patientBillingDetails.pendingPayments?.length" matBadgePosition="after"
-                    matBadgeOverlap="false" [matBadgeHidden]="
-                      patientBillingDetails.pendingPayments?.length === 0
-                    ">Payments Requests
-                  </span>
-                </ng-template>
-
-                <div class="py-4" style="text-align: center">
-                  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" multiTemplateDataRows>
-
-                    <!-- Position Column -->
-                    <ng-container matColumnDef="position">
-                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> # </th>
-                      <td mat-cell *matCellDef="let element"> {{element.position}} </td>
-                    </ng-container>
-
-                    <!-- Created Column -->
-                    <ng-container matColumnDef="createdAt">
-                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Created At </th>
-                      <td mat-cell *matCellDef="let element"> {{element.createdAt}} </td>
-                    </ng-container>
-
-                    <!-- Received By Column -->
-                    <ng-container matColumnDef="receivedBy">
-                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Received By </th>
-                      <td mat-cell *matCellDef="let element"> {{element.receivedBy}} </td>
-                    </ng-container>
-
-                    <!-- Creator Column -->
-                    <ng-container matColumnDef="creator">
-                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Creator </th>
-                      <td mat-cell *matCellDef="let element"> {{element.creator}} </td>
-                    </ng-container>
-
-                    <!-- Payment Type Column -->
-                    <ng-container matColumnDef="paymentType">
-                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Payment Type </th>
-                      <td mat-cell *matCellDef="let element"> {{element.paymentType}} </td>
-                    </ng-container>
-
-                    <!-- Reference Number Column -->
-                    <ng-container matColumnDef="referenceNumber">
-                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Control Number </th>
-                      <td mat-cell *matCellDef="let element"> {{element.referenceNumber}} </td>
-                    </ng-container>
-
-                    <!-- Status Column -->
-                    <ng-container matColumnDef="status">
-                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Status </th>
-                      <td mat-cell *matCellDef="let element"> {{element.status}} </td>
-                    </ng-container>
-
-                    <!-- Print Column (No Title) -->
-                    <ng-container matColumnDef="print">
-                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> </th>
-                      <td mat-cell *matCellDef="let element">
-                        <button mat-icon-button *ngIf="element.referenceNumber" (click)="printElement(element)">
-                          <mat-icon>print</mat-icon>
-                        </button>
-                      </td>
-                    </ng-container>
-                   <!-- Expanded Content Column -->
-                   <ng-container matColumnDef="expandedDetail">
-                    <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
-                      <div class="example-element-detail" [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
-                        <table>
-                          <thead>
-                            <tr>
-                              <th>Receipt Number</th>
-                              <th>Control Number</th>
-                              <th>Bill Amount</th>
-                              <th>Paid Amount</th>
-                              <th>Payment Date</th>
-                              <th>Payer Number</th>
-                              <th>Payer Name</th>
-                              <th>PSP Name</th>
-                              <th>A/C Number</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>RCPT12345</td>
-                              <td>CTRL67890</td>
-                              <td>5000 TZS</td>
-                              <td>5000 TZS</td>
-                              <td>2024-10-25</td>
-                              <td>255123456789</td>
-                              <td>John Doe</td>
-                              <td>Mobile Network X</td>
-                              <td>A/C123456789</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </td>
-                  </ng-container>
-                  
-
-
-
-                    <!-- Header and data rows -->
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                    [ngClass]="{'green': row.status === 'PAID', 'pale-orange': row.referenceNumber}"
-                      (click)="expandedElement = expandedElement === row ? null : row" class="example-element-row"
-                      [class.example-expanded-row]="expandedElement === row">
-                    </tr>
-                    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
-                  </table>
-                </div>
-
-
-                <div>
-                  <!-- <app-quotations
-                    [bills]="patientBillingDetails?.pendingPayments"
-                    [disableControls]="true"
-                    (confirmPayment)="onConfirmBillPayment($event)"
-                  >
-                  </app-quotations> -->
-                </div>
-              </mat-tab>
+              
             </mat-tab-group>
           </div>
         </div>
