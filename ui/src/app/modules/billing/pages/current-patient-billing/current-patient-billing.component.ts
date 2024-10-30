@@ -47,8 +47,17 @@ interface Payments {
   paymentType: string;
   referenceNumber: string;
   status: string;
-  createdAt: string; 
+  createdAt: string;
+  receiptNumber: string;
+  billAmount: number;
+  paidAmount: number;
+  gepgpaymentDate: string;
+  payerNumber: string;
+  payerName: string;
+  pspName: string;
+  accountNumber: string;
 }
+
 
 
 @Component({
@@ -282,12 +291,20 @@ export class CurrentPatientBillingComponent implements OnInit {
           referenceNumber: payment.paymentDetails.referenceNumber,
           status: payment.status,
           createdAt: new Date(payment.created).toLocaleDateString(),
-
+          receiptNumber: payment.paymentDetails.receiptNumber,
+          billAmount: payment.paymentDetails.billAmount,
+          paidAmount: payment.paymentDetails.paidAmount,
+          gepgpaymentDate: new Date(payment.paymentDetails.paymentDate).toLocaleDateString(),
+          payerNumber: payment.paymentDetails.payerNumber,
+          payerName: payment.paymentDetails.payerName,
+          pspName: payment.paymentDetails.pspName,
+          accountNumber: payment.paymentDetails.accountNumber,
         })))
       )
       .subscribe((payments: Payments[]) => {
         this.dataSource = payments;
       });
+    
   }
 
 
