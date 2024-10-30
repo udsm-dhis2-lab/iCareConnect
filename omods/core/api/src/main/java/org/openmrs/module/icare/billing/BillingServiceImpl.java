@@ -34,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.naming.ConfigurationException;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -754,103 +755,146 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	}
 	
 	@Override
-public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callbackData) {
+	public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callbackData) {
 
-    AdministrationService administrationService = Context.getAdministrationService();
+		AdministrationService administrationService = Context.getAdministrationService();
 
-    // Initialize the response structure
-    Map<String, Object> response = new HashMap<>();
-    Map<String, Object> systemAuth = new HashMap<>();
-    Map<String, Object> ackData = new HashMap<>();
+		// Initialize the response structure
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> systemAuth = new HashMap<>();
+		Map<String, Object> ackData = new HashMap<>();
+		// SystemAuth setup
+		String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
+		String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
 
-    try {
-        // Check if Status and FeedbackData fields are present
-        if (callbackData.containsKey("Status") && callbackData.containsKey("FeedbackData")) {
-            Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
-            Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
+		try {
+			// Check if Status and FeedbackData fields are present
+			if (callbackData.containsKey("Status") && callbackData.containsKey("FeedbackData")) {
 
-            Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
-            Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
+				Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
+				Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
 
-            String billIdString = (String) billTrxInf.get("BillId");
-            String payCntrNum = (String) billTrxInf.get("PayCntrNum");
-            String requestId = status.containsKey("RequestId") ? (String) status.get("RequestId") : null;
-            // SystemAuth setup
-            String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
-            String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
-            systemAuth.put("SystemCode", systemCode);
-            if (billIdString == null || payCntrNum == null || requestId == null) {
-                return buildErrorResponse(response, systemAuth, ackData, requestId, "Invalid data in callbackData: missing BillId, PayCntrNum, or RequestId");
-            }
+				if (feedbackData.containsKey("gepgPmtSpInfo")) {
+					Map<String, Object> gepgPmtSpInfo = (Map<String, Object>) feedbackData.get("gepgPmtSpInfo");
+					Map<String, Object> pymtTrxInf = (Map<String, Object>) gepgPmtSpInfo.get("PymtTrxInf");
+					String requestId = status.containsKey("RequestId") ? (String) status.get("RequestId") : null;
+					Payment payment = this.paymentDAO.getPaymentByRequestId(Integer.parseInt(requestId));
 
-            Integer billId = Integer.parseInt(billIdString);
-            Invoice invoice = invoiceDAO.findById(billId);
-            if (invoice == null) {
-				systemAuth.put("Signature", null);
-                return buildErrorResponse(response, systemAuth, ackData, requestId, "Invoice of this Bill id " + billId + " is not valid");
-            }
+					if (payment != null) {
+						payment.setReferenceNumber((String) pymtTrxInf.get("PspReceiptNumber"));
+						payment.setBillAmount(Double.parseDouble((String) pymtTrxInf.get("BillAmt")));
+						payment.setPaidAmount(Double.parseDouble((String) pymtTrxInf.get("PaidAmt")));
+						LocalDateTime localDateTime = LocalDateTime.parse((String) pymtTrxInf.get("TrxDtTm"));
+						Date paymentDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+						payment.setReceiptNumber((String) pymtTrxInf.get("PspReceiptNumber"));
+						payment.setPaymentDate(paymentDate);
+						payment.setPayerNumber((String) pymtTrxInf.get("PyrCellNum"));
+						payment.setPayerName((String) pymtTrxInf.get("PyrName"));
+						payment.setPspName((String) pymtTrxInf.get("PspName"));
+						payment.setAccountNumber((String) pymtTrxInf.get("CtrAccNum"));
+						payment.setStatus(PaymentStatus.PAID);
 
-            String paymentTypeConceptUuid = administrationService.getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
-            if (paymentTypeConceptUuid == null) {
-				systemAuth.put("Signature", null);
-                return buildErrorResponse(response, systemAuth, ackData, requestId, "No default payment type based on control number");
-            }
+						// Save the updated payment
+						paymentDAO.updatePayment(payment);
+						ackData.put("SystemAckCode", "0");
+						ackData.put("Description", "Payment Successfully Updated");
+						// Sign the ackData
+						String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
+						String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
+						systemAuth.put("Signature", signature);
+						systemAuth.put("SystemCode", systemCode);
+						response.put("SystemAuth", systemAuth);
+						response.put("AckData", ackData);
 
-            Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
-            if (paymentType == null) {
-				systemAuth.put("Signature", null);
-                return buildErrorResponse(response, systemAuth, ackData, requestId, "Payment type concept not found for UUID: " + paymentTypeConceptUuid);
-            }
+					}
+				} else if (feedbackData.containsKey("gepgBillSubResp")) {
+					Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
+					Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
 
-            Payment payment = new Payment();
-            // payment.setPaymentType(paymentType);
-            payment.setReferenceNumber(payCntrNum);
-            // payment.setInvoice(invoice);
-            // payment.setReceivedBy("SYSTEM");
-            // payment.setStatus(PaymentStatus.REQUESTED);
-            // payment.setCreator(Context.getAuthenticatedUser());
-            // payment.setUuid(requestId);
-            payment.setDateCreated(new Date());
+					String billIdString = (String) billTrxInf.get("BillId");
+					String payCntrNum = (String) billTrxInf.get("PayCntrNum");
+					String requestId = status.containsKey("RequestId") ? (String) status.get("RequestId") : null;
 
-            // Prepare the ackData for signing
-            ackData.put("RequestId", requestId);
-			Integer paymentId = Integer.parseInt(requestId);
-            Payment existingPayment = this.paymentDAO.getPaymentByRequestId(paymentId);
-            if (existingPayment != null) {
-              // Update the existing payment reference number
-	         Integer requestId_ = Integer.parseInt(requestId);
-			 int rowsUpdated = this.paymentDAO.setReferenceNumberByPaymentId(requestId_, payCntrNum);
-    
-    if (rowsUpdated > 0) {
-        ackData.put("SystemAckCode", "0");
-        ackData.put("Description", "Successfully Updated");
-    } else {
-        ackData.put("SystemAckCode", "0");
-        ackData.put("Description", "Fail to Update");
-    }
-           
-          } else {
-    ackData.put("SystemAckCode", "0");
-    ackData.put("Description", "Fail to get reference Payments");
-    }
+					systemAuth.put("SystemCode", systemCode);
+					if (billIdString == null || payCntrNum == null || requestId == null) {
+						return buildErrorResponse(response, systemAuth, ackData, requestId,
+								"Invalid data in callbackData: missing BillId, PayCntrNum, or RequestId");
+					}
 
-            // Sign the ackData
-            String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
-            String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
-            systemAuth.put("Signature", signature);
+					Integer billId = Integer.parseInt(billIdString);
+					Invoice invoice = invoiceDAO.findById(billId);
+					if (invoice == null) {
+						systemAuth.put("Signature", null);
+						return buildErrorResponse(response, systemAuth, ackData, requestId,
+								"Invoice of this Bill id " + billId + " is not valid");
+					}
 
-            response.put("SystemAuth", systemAuth);
-            response.put("AckData", ackData);
+					String paymentTypeConceptUuid = administrationService
+							.getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
+					if (paymentTypeConceptUuid == null) {
+						systemAuth.put("Signature", null);
+						return buildErrorResponse(response, systemAuth, ackData, requestId,
+								"No default payment type based on control number");
+					}
 
-        } else {
-            return buildErrorResponse(response, systemAuth, ackData, null, "Status or FeedbackData field not found in callback data");
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-        return buildErrorResponse(response, systemAuth, ackData, null, "Internal server error: " + e.getMessage());
-    }
-    return response;
-}
+					Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
+					if (paymentType == null) {
+						systemAuth.put("Signature", null);
+						return buildErrorResponse(response, systemAuth, ackData, requestId,
+								"Payment type concept not found for UUID: " + paymentTypeConceptUuid);
+					}
+
+					Payment payment = new Payment();
+					// payment.setPaymentType(paymentType);
+					payment.setReferenceNumber(payCntrNum);
+					// payment.setInvoice(invoice);
+					// payment.setReceivedBy("SYSTEM");
+					// payment.setStatus(PaymentStatus.REQUESTED);
+					// payment.setCreator(Context.getAuthenticatedUser());
+					// payment.setUuid(requestId);
+					payment.setDateCreated(new Date());
+
+					// Prepare the ackData for signing
+					ackData.put("RequestId", requestId);
+					Integer paymentId = Integer.parseInt(requestId);
+					Payment existingPayment = this.paymentDAO.getPaymentByRequestId(paymentId);
+					if (existingPayment != null) {
+						// Update the existing payment reference number
+						Integer requestId_ = Integer.parseInt(requestId);
+						int rowsUpdated = this.paymentDAO.setReferenceNumberByPaymentId(requestId_, payCntrNum);
+
+						if (rowsUpdated > 0) {
+							ackData.put("SystemAckCode", "0");
+							ackData.put("Description", "Successfully Updated");
+						} else {
+							ackData.put("SystemAckCode", "0");
+							ackData.put("Description", "Fail to Update");
+						}
+
+					} else {
+						ackData.put("SystemAckCode", "0");
+						ackData.put("Description", "Fail to get Reference Payments");
+					}
+
+					// Sign the ackData
+					String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
+					String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
+					systemAuth.put("Signature", signature);
+
+					response.put("SystemAuth", systemAuth);
+					response.put("AckData", ackData);
+				}
+
+			} else {
+				return buildErrorResponse(response, systemAuth, ackData, null,
+						"Status or FeedbackData field not found in callback data");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return buildErrorResponse(response, systemAuth, ackData, null, "Internal server error: " + e.getMessage());
+		}
+		return response;
+	}
 	
 	// Helper method to build error response
 	private Map<String, Object> buildErrorResponse(Map<String, Object> response, Map<String, Object> systemAuth,
@@ -912,14 +956,15 @@ public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callb
 		return controlNumber;
 	}
 	
-	//create payload for GePG Control Number Generation 
+	// create payload for GePG Control Number Generation
 	@Override
 	public Map<String, Object> createGePGPayload(Patient patient, List<InvoiceItem> invoiceItems,
 			Number totalBillAmount,
 			Date billExpirlyDate, String personPhoneAttributeTypeUuid, String personEmailAttributeTypeUuid,
 			String currency,
 			String gepgAuthSignature, String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode,
-			String serviceCode, String SpSysId, String subSpCode, String clientPrivateKey,String pkcs12Path, String pkcs12Password,String enginepublicKey,String billId) throws Exception {
+			String serviceCode, String SpSysId, String subSpCode, String clientPrivateKey, String pkcs12Path,
+			String pkcs12Password, String enginepublicKey, String billId) throws Exception {
 		AdministrationService administrationService = Context.getAdministrationService();
 		// Validate inputs
 		if (patient == null) {
@@ -986,8 +1031,9 @@ public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callb
 								new BillItem(invoiceItem.getItem().getId().toString(), "N",
 										invoiceItem.getPrice().toString(),
 										invoiceItem.getPrice().toString(), "0.0", GFSCode));
-					}else {
-						throw new IllegalStateException("Please verify GFS CODE concept mapping if configured in a correct way");
+					} else {
+						throw new IllegalStateException(
+								"Please verify GFS CODE concept mapping if configured in a correct way");
 					}
 				}
 			} else if (drug != null) {
@@ -1005,7 +1051,8 @@ public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callb
 										invoiceItem.getPrice().toString(),
 										invoiceItem.getPrice().toString(), "0.0", GFSCode));
 					} else {
-						throw new IllegalStateException("Please verify GFS CODE concept mapping if configured in a correct way");
+						throw new IllegalStateException(
+								"Please verify GFS CODE concept mapping if configured in a correct way");
 					}
 				}
 			}
@@ -1025,9 +1072,9 @@ public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callb
 		billTrxInf.setBillAmt(totalBillAmount.toString());
 		billTrxInf.setMiscAmt("0");
 		LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-        String formattedNow = now.format(formatter);
-        billTrxInf.setBillGenDt(formattedNow);
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+		String formattedNow = now.format(formatter);
+		billTrxInf.setBillGenDt(formattedNow);
 
 		LocalDateTime expirationTime = now.plusHours(24);
 		String formattedExpirationTime = expirationTime.format(formatter);
@@ -1045,42 +1092,42 @@ public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callb
 		billTrxInf.setBillPayOpt("2");
 		billTrxInf.setBillItems(billItems);
 		// Create and populate RequestData
-		//Save PaymentData before Reference Number (Control Number)
+		// Save PaymentData before Reference Number (Control Number)
 		RequestData requestData = new RequestData();
-		try{
+		try {
 			Integer billUuid = Integer.parseInt(billId);
-            Invoice invoice = invoiceDAO.findById(billUuid);
-            if (invoice == null) {
+			Invoice invoice = invoiceDAO.findById(billUuid);
+			if (invoice == null) {
 				throw new Exception("Invoice of this Bill id " + billId + " is not valid");
-				
-            }
 
-            String paymentTypeConceptUuid = administrationService.getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
-            if (paymentTypeConceptUuid == null) {
+			}
+
+			String paymentTypeConceptUuid = administrationService
+					.getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
+			if (paymentTypeConceptUuid == null) {
 				throw new Exception("No default payment type based on control number");
-            }
+			}
 
-            Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
-            if (paymentType == null) {
+			Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
+			if (paymentType == null) {
 				throw new Exception("Payment type concept not found for UUID: " + paymentTypeConceptUuid);
-            }
+			}
 
-            Payment payment = new Payment();
-            payment.setPaymentType(paymentType);
-            payment.setReferenceNumber(null);
-            payment.setInvoice(invoice);
-            payment.setReceivedBy("SYSTEM");
-            payment.setStatus(PaymentStatus.REQUESTED);
-            payment.setCreator(Context.getAuthenticatedUser());
-            payment.setDateCreated(new Date());
+			Payment payment = new Payment();
+			payment.setPaymentType(paymentType);
+			payment.setReferenceNumber(null);
+			payment.setInvoice(invoice);
+			payment.setReceivedBy("SYSTEM");
+			payment.setStatus(PaymentStatus.REQUESTED);
+			payment.setCreator(Context.getAuthenticatedUser());
+			payment.setDateCreated(new Date());
 			this.paymentDAO.save(payment);
-            Integer paymentId = payment.getId();
+			Integer paymentId = payment.getId();
 			requestData.setRequestId(paymentId.toString());
-		}catch (Exception e){
+		} catch (Exception e) {
 			throw new Exception("Failed to Save Payments Data: " + e.getMessage());
 		}
-		
-		
+
 		requestData.setBillHdr(billHdr);
 		requestData.setBillTrxInf(billTrxInf);
 
@@ -1096,15 +1143,15 @@ public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callb
 
 		// Serialize RequestData to JSON for signing
 		String requestDataJson = new ObjectMapper().writeValueAsString(requestData);
-		
+
 		// Save the payload in a global property
 		GlobalProperty globalProperty = new GlobalProperty();
 		globalProperty.setProperty("gepg.requestDataJson.icareConnect");
 		globalProperty.setPropertyValue(requestDataJson);
 		administrationService.saveGlobalProperty(globalProperty);
 
-        // Sign the request data
-        String signature = SignatureUtils.signData(requestDataJson,clientPrivateKey);
+		// Sign the request data
+		String signature = SignatureUtils.signData(requestDataJson, clientPrivateKey);
 		systemAuth.setSignature(signature);
 
 		Map<String, Object> result = new HashMap<>();

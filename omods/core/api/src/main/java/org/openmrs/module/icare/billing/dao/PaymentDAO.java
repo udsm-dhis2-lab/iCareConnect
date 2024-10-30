@@ -96,4 +96,10 @@ public class PaymentDAO extends BaseDAO<Payment> {
 		return query.list();
 	}
 	
+	public void updatePayment(Payment payment) {
+		DbSession session = getSession();
+		session.update(payment);
+		session.flush();
+	}
+	
 }
