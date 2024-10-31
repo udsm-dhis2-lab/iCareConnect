@@ -111,7 +111,7 @@ public class BillSubmissionRequest {
 
 		// Retrieve patient attributes
 		String patientNames = patient.getGivenName() + " " + patient.getFamilyName();
-		String patientUuid = patient.getUuid();
+		String patientUuid = patient.getId().toString();
 		String patientPhoneNumber = "";
 		String email = "";
 		for (PersonAttribute attribute : patient.getAttributes()) {
@@ -182,9 +182,9 @@ public class BillSubmissionRequest {
 		billTrxInf.setBillAmt(totalBillAmount.toString());
 		billTrxInf.setMiscAmt("0");
 		LocalDateTime now = LocalDateTime.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-		String formattedNow = now.format(formatter);
-		billTrxInf.setBillGenDt(formattedNow);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        String formattedNow = now.format(formatter);
+        billTrxInf.setBillGenDt(formattedNow);
 
 		LocalDateTime expirationTime = now.plusHours(24);
 		String formattedExpirationTime = expirationTime.format(formatter);
@@ -228,14 +228,6 @@ public class BillSubmissionRequest {
 
         // Sign the request data
         String signature = SignatureUtils.signData(requestDataJson,clientPrivateKey);
-        // Verify the signature
-        boolean isVerified = SignatureUtils.verifySignature(requestDataJson,enginepublicKey, signature);
-
-		globalProperty.setProperty("gepg.signatureisVerified.icareConnect");
-		globalProperty.setPropertyValue(Boolean.toString(isVerified));
-		administrationService.saveGlobalProperty(globalProperty);
-
-		// Attach the signature to the payload's system auth section
 		systemAuth.setSignature(signature);
 
 		Map<String, Object> result = new HashMap<>();

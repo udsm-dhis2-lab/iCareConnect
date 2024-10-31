@@ -31,11 +31,9 @@ export class Payment {
     return this.paymentDetails?.referenceNumber;
   }
 
-  get status(): 'PENDING' | 'PAID' {
+  get status(): string  {
     //TODO: Find best way to get payment status
-    return BILLING_CONFIGURATION?.paymentType.GEPG === this.paymentType?.uuid
-      ? 'PENDING'
-      : 'PAID';
+    return this.paymentDetails?.status;
   }
   
 

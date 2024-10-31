@@ -4,14 +4,19 @@ import org.openmrs.GlobalProperty;
 import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.AdministrationService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.context.ContextAuthenticationException;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
+import org.openmrs.module.icare.billing.models.Payment;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.payment.gepg.BillSubmissionRequest;
 import org.openmrs.module.icare.billing.services.payment.gepg.GEPGService;
+import org.openmrs.module.icare.billing.services.payment.gepg.SignatureUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +49,6 @@ public class GepgBillingController {
 
         for (Map<String, Object> invoiceReference : requestPayload) {
             String uuid = (String) invoiceReference.get("uuid");
-            billId = uuid;
             if (uuid == null) {
                 throw new IllegalArgumentException("UUID cannot be null");
             }
@@ -54,6 +58,7 @@ public class GepgBillingController {
             }
 
             Invoice invoice = billingService.getInvoiceDetailsByUuid(uuid);
+            billId =  invoice.getId().toString();
             System.out.println("Invoice: " + invoice);
 
             if (invoice == null) {
@@ -90,6 +95,7 @@ public class GepgBillingController {
         String enginepublicKey = administrationService.getGlobalProperty(ICareConfig.ENGINE_PUBLIC_KEY);
         String pkcs12Path = administrationService.getGlobalProperty(ICareConfig.PKCS12_PATH);
         String pkcs12Password = administrationService.getGlobalProperty(ICareConfig.PKCS12_PASSWORD);
+         
 
         if (currency == null) {
             throw new IllegalArgumentException("Currency cannot be null");
@@ -100,7 +106,7 @@ public class GepgBillingController {
 
         // Create the GePG payload using BillSubmissionRequest
         BillSubmissionRequest billSubmissionRequest = new BillSubmissionRequest();
-        Map<String, Object> gepgPayloadResponse = billSubmissionRequest.createGePGPayload(
+        Map<String, Object> gepgPayloadResponse = billingService.createGePGPayload(
                 visit.getPatient(),
                 invoiceItems,
                 totalBillAmount,
@@ -143,7 +149,70 @@ public class GepgBillingController {
     }
 	
 	@RequestMapping(value = "/callback", method = RequestMethod.POST)
-	public Map<String, Object> handleCallback(@RequestBody Map<String, Object> callbackData) throws Exception {
-		return billingService.processGepgCallbackResponse(callbackData);
-	}
+    public ResponseEntity<Map<String, Object>> handleCallback(
+    @RequestBody(required = false) Map<String, Object> callbackData,
+    @RequestParam(required = false) String fallback) throws Exception {
+        AdministrationService administrationService = Context.getAdministrationService();
+        
+        if (callbackData == null || callbackData.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            
+            String serviceCode = administrationService.getGlobalProperty(ICareConfig.SERVICE_CODE);
+            String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
+    
+            // Initialize response parts
+            Map<String, Object> ackData = new HashMap<>();
+            ackData.put("Description", "Empty content not allowed");
+            ackData.put("RequestId", null);
+            ackData.put("SystemAckCode", "0");
+    
+            Map<String, Object> systemAuth = new HashMap<>();
+            systemAuth.put("SystemCode", serviceCode);
+            systemAuth.put("Signature", "");
+    
+            // Build final response
+            response.put("AckData", ackData);
+            response.put("SystemAuth", systemAuth);
+            
+            // Return response with 200 OK
+            return ResponseEntity.ok(response);
+        }
+	
+	     // GePG user credentials
+	     String gepgUsername = administrationService.getGlobalProperty(ICareConfig.GEPG_USERNAME);
+	     String gepgPassword = administrationService.getGlobalProperty(ICareConfig.GEPG_PASSWORD);
+	
+	     String signature = (String) ((Map<String, Object>) callbackData.get("SystemAuth")).get("Signature");
+	
+	     Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
+	
+	     String payload = new ObjectMapper().writeValueAsString(feedbackData);
+	
+	     String enginePublicKey = administrationService.getGlobalProperty(ICareConfig.ENGINE_PUBLIC_KEY);
+	
+	     try {
+	
+	         Context.authenticate(gepgUsername, gepgPassword);
+	         //TODOO
+	         //Agreed to proceed with verification after UUCC insuring lenght of signature
+	         // boolean isVerified = SignatureUtils.verifyData(payload, signature, enginePublicKey);
+	
+	         // if (!isVerified) {
+	         //     Map<String, Object> errorResponse = new HashMap<>();
+	         //     errorResponse.put("status", "error");
+	         //     errorResponse.put("message", "Signature verification failed");
+	         //     return errorResponse;
+	         // }
+	         return ResponseEntity.ok(billingService.processGepgCallbackResponse(callbackData)) ;
+	
+	     } catch (ContextAuthenticationException e) {
+	         Map<String, Object> errorResponse = new HashMap<>();
+
+	         errorResponse.put("status", "error");
+	         errorResponse.put("message", "Authentication failed: " + e.getMessage());
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse) ;
+	     } finally {
+	         Context.logout();
+	     }
+	 }
 }

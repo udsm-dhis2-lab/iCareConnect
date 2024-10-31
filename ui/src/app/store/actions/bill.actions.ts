@@ -45,8 +45,10 @@ export const discountBillFail = createAction(
 
 export const confirmPatientBillSuccess = createAction(
   '[Billing] Confirm patient bill success',
-  props<{ bill: BillObject; status: 'PENDING' | 'PAID'; items?: BillItem[] }>()
+  props<{ bill: BillObject; status?: string; items?: BillItem[] }>()
 );
+
+
 
 export const discountPatientBillSuccess = createAction(
   '[Billing] Discount patient bill success',
