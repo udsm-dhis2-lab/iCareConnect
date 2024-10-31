@@ -59,7 +59,7 @@ export class BillConfirmationComponent implements OnInit {
     // Construct the request payload
   const requestPayload = this.data.billItems.map((item: any) => ({
     uuid: item.bill, 
-    currency: "Tzs" 
+    currency: "TZS" 
   }));
 
   console.log("Request Payload:", JSON.stringify(requestPayload, null, 2));

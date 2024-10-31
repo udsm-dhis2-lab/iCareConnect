@@ -145,9 +145,6 @@ export class BillingService {
     );
   }
   
-  
-  
-  
 
   discountBill(discountDetails): Observable<any> {
     let discountData = omit(discountDetails, "attachmentDetails");

@@ -249,6 +249,40 @@
 			GePG UCC Base API
 		</description>
 	</globalProperty>
+
+	<globalProperty>
+		<property>icare.person.attribute.phonenumber</property>
+		<defaultValue>ATTRIBUTE_PHONE_NUMBER</defaultValue>
+		<description>
+			Attribute Phote Number 
+		</description>
+	</globalProperty>
+
+   <globalProperty>
+		<property>icare.email.person.attributeTypeUuid</property>
+		<defaultValue>ATTRIBUTE_EMAIL</defaultValue>
+		<description>
+			Attribute Patience Email 
+		</description>
+	</globalProperty>
+
+
+	<globalProperty>
+		<property>iCare.GePG.settings.GepgUsername</property>
+		<defaultValue></defaultValue>
+		<description>
+			GEPG_USERNAME
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>iCare.GePG.settings.GepgPassword</property>
+		<defaultValue></defaultValue>
+		<description>
+			GEPG_PASSWORD
+		</description>
+	</globalProperty>
+
 	<globalProperty>
 		<property>icare.laboratory.concept.mappings.machineIntegration.conceptSourceUuid</property>
 		<defaultValue>machine-integration</defaultValue>
