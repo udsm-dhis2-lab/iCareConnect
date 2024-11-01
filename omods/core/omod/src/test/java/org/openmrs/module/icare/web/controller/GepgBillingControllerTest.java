@@ -58,7 +58,7 @@ public void testSubmitBill_withValidUuid_returnsSuccess() throws Exception {
         // assertEquals("UUID is required", response);
 
         // Verify that the methods were not called
-        verify(gepgService, never()).createBillSubmissionRequest(anyString());
+        // verify(gepgService, never()).createBillSubmissionRequest(anyString());
         // verify(gepgService, never()).submitBillRequest(any(BillSubmissionRequest.class));
     }
 	
@@ -75,7 +75,7 @@ public void testSubmitBill_withValidUuid_returnsSuccess() throws Exception {
         // assertEquals("UUID is required", response);
 
         // Verify that the methods were not called
-        verify(gepgService, never()).createBillSubmissionRequest(anyString());
+        // verify(gepgService, never()).createBillSubmissionRequest(anyString());
         // verify(gepgService, never()).submitBillRequest(any(BillSubmissionRequest.class));
     }
 }

@@ -16,7 +16,8 @@ import { Payment } from "../../models/payment.model";
   styleUrls: ["./bill-confirmation.component.scss"],
 })
 export class BillConfirmationComponent implements OnInit {
-  controlNumber?: number;
+  controlNumber?: string;
+  // controlNumber?: number;
   generatingControlNumber: boolean;
   savingPayment: boolean;
   savingPaymentError: string;
@@ -58,7 +59,7 @@ export class BillConfirmationComponent implements OnInit {
     // Construct the request payload
   const requestPayload = this.data.billItems.map((item: any) => ({
     uuid: item.bill, 
-    currency: "Tzs" 
+    currency: "TZS" 
   }));
 
   console.log("Request Payload:", JSON.stringify(requestPayload, null, 2));
@@ -79,41 +80,37 @@ export class BillConfirmationComponent implements OnInit {
     });
   }
    
-  get controlNumberValue(): string {
-    return `GEPG_MNL: ${this.controlNumber}`;
-  }
+ 
 
-  onConntrollNumbGen(payload) {
+  onConntrollNumbGen(payload: any) {
+    this.generatingControlNumber = true;  
     this.billingService.gepgpayBill(payload).subscribe(
-      (response: Payment | { error: any }) => {
-        if ((response as Payment).id) {
-          const paymentResponse = response as Payment;
-          console.log("Successfully generated:", paymentResponse);
-          // this.controlNumber = paymentResponse.id; 
-          this.generatingControlNumber = false;
-          this.savingPaymentError = ''; 
-          this.matDialogRef.close(paymentResponse);
-        } else if ((response as any).error) {
-          // Error response from the API
-          const errorResponse = response as { error: any };
-          this.savingPaymentError = errorResponse.error;
-          this.generatingControlNumber = false;
-          console.log("Error in response:", errorResponse.error);
-          this.generatingControlNumber = false;
+      (response: any) => {
+        if (response && response.controlNumber) {
+          this.controlNumber = response.controlNumber;
+          console.log("Successfully generated control number:", this.controlNumber);
+        } else if (response.error) {
+          this.savingPaymentError = response.error;
+          console.log("Error in response:", response.error);
         } else {
-          // Unexpected response
-          this.savingPaymentError = 'Unexpected response from the server';
-          this.generatingControlNumber = false;
+          this.savingPaymentError = 'Server Error Please Contact an Admin !';
           console.log("Unexpected response:", response);
         }
+        this.generatingControlNumber = false; 
+        // this.matDialogRef.close(response);
       },
       (error) => {
-        // General error handling
         this.savingPaymentError = error;
-        this.generatingControlNumber = false;
+        this.generatingControlNumber = false; 
         console.log("Failed to generate control number:", error);
       }
     );
+  }
+  
+
+  
+  get controlNumberValue(): string {
+    return `GEPG_MNL: ${this.controlNumber}`;
   }
   
   
@@ -128,7 +125,7 @@ export class BillConfirmationComponent implements OnInit {
       String(formValues.getValues()[this.data?.gepgConceptUuid]?.value)
     );
     if (correntCN) {
-      this.controlNumber = Number(
+      this.controlNumber = String(
         formValues.getValues()[this.data?.gepgConceptUuid]?.value
       );
     } else {

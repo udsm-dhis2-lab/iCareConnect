@@ -75,6 +75,7 @@
                 <mat-select
                   id="patientType"
                   name="patientType"
+                  required
                   [(ngModel)]="patient['patientType']"
                   (selectionChange)="
                     getPatientType($event.value, params?.occupationInfo)

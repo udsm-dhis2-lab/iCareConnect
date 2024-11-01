@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-
     <changeSet author="jesse-justin" id="create_item_table" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -40,21 +38,18 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="item"
                 constraintName="item_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="item"
                 constraintName="item_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
     <changeSet author="jesse-justin" id="create_bl_discount_criteria" dbms="mysql">
         <preConditions onFail="MARK_RAN">
@@ -85,24 +80,19 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="bl_discount_criteria"
                 constraintName="creator_criteria_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="bl_discount_criteria"
                 constraintName="changed_by_criteria_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
     <changeSet author="jesse-justin" id="create_bl_discount" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -134,21 +124,18 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="bl_discount"
                 constraintName="bl_discount_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="bl_discount"
                 constraintName="bl_discount_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="discount_criteria_id"
                 baseTableName="bl_discount"
@@ -156,7 +143,6 @@
                 referencedColumnNames="discount_criteria_id"
                 referencedTableName="bl_discount_criteria"/>
     </changeSet>
-
     <changeSet author="jesse-justin" id="create_bl_invoice" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -188,29 +174,24 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
-
         <addForeignKeyConstraint
                 baseColumnNames="payment_mode_id"
                 baseTableName="bl_invoice"
                 constraintName="bl_invoice_payment_mode_id_concept_concept_id_fk"
                 referencedColumnNames="concept_id"
                 referencedTableName="concept"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="bl_invoice"
                 constraintName="bl_invoice_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="bl_invoice"
                 constraintName="bl_invoice_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
     <changeSet id="create_bl_payment" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
@@ -263,7 +244,6 @@
                 constraintName="bl_payment_item_item_item_id_fk"
                 referencedTableName="item"
                 referencedColumnNames="item_id"/>
-
         <addPrimaryKey tableName="bl_payment_item" columnNames="payment_id,item_id,order_id"/>
     </changeSet>
     <changeSet id="create_bl_invoice_item" author="jesse-justin" dbms="mysql">
@@ -292,10 +272,8 @@
                 constraintName="bl_item_item_item_id_fk"
                 referencedTableName="item"
                 referencedColumnNames="item_id"/>
-
         <addPrimaryKey tableName="bl_invoice_item" columnNames="invoice_id,item_id,order_id"/>
     </changeSet>
-
     <changeSet id="create_bl_discount_invoice_item" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -309,7 +287,6 @@
             <column name="item_id" type="INTEGER"/>
             <column name="amount" type="DOUBLE"/>
         </createTable>
-
         <addPrimaryKey
                 columnNames="discount_id,invoice_id,item_id"
                 constraintName="pk_discount_invoice_item_id"
@@ -333,7 +310,6 @@
                 referencedTableName="bl_discount"
                 referencedColumnNames="discount_id"/>
     </changeSet>
-
     <changeSet id="create_bl_item_price" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -388,7 +364,6 @@
             <column name="invoice_id" type="INTEGER"/>
             <column name="amount" type="DECIMAL"/>
         </createTable>
-
         <addPrimaryKey
                 tableName="bl_invoice_item_payment"
                 columnNames="item_id,invoice_id,payment_id"
@@ -406,7 +381,6 @@
                 referencedTableName="bl_payment"
                 referencedColumnNames="payment_id"/>
     </changeSet>
-
     <changeSet id="create_st_device_type" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -435,14 +409,12 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="bl_invoice"
                 constraintName="st_device_type_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="bl_invoice"
@@ -450,7 +422,6 @@
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
     </changeSet>
-
     <changeSet id="create_lb_device" author="jesse-justin">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -482,14 +453,12 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_device"
                 constraintName="lb_device_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_device"
@@ -509,7 +478,6 @@
                 referencedTableName="st_device_type"
                 referencedColumnNames="device_type_id"/>
     </changeSet>
-
     <changeSet id="create_lb_device_location" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -522,9 +490,7 @@
             <column name="location_id" type="INTEGER"/>
             <column name="serial_number" type="INTEGER"/>
         </createTable>
-
         <addPrimaryKey columnNames="device_id,location_id" tableName="lb_device_location"/>
-
         <addForeignKeyConstraint
                 baseTableName="lb_device_location"
                 baseColumnNames="device_id"
@@ -532,7 +498,6 @@
                 referencedTableName="lb_device"
                 referencedColumnNames="device_id"/>
     </changeSet>
-
     <changeSet id="create_lb_dispensable_item" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -544,7 +509,6 @@
             <column name="item_id" type="INTEGER"/>
             <column name="concept_id" type="INTEGER"/>
         </createTable>
-
         <addPrimaryKey columnNames="item_id,concept_id" tableName="lb_dispensable_item"/>
         <addForeignKeyConstraint
                 baseTableName="lb_dispensable_item"
@@ -553,7 +517,6 @@
                 referencedTableName="item"
                 referencedColumnNames="item_id"/>
     </changeSet>
-
     <changeSet id="create_lb_sample" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -584,14 +547,12 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_sample"
                 constraintName="lb_sample_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_sample"
@@ -599,7 +560,6 @@
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
     </changeSet>
-
     <changeSet id="create_lb_sample_order" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -626,7 +586,6 @@
                 referencedTableName="users"
                 referencedColumnNames="user_id"/>
     </changeSet>
-
     <changeSet id="create_lb_sample_status" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -651,7 +610,6 @@
                 referencedTableName="lb_sample"
                 referencedColumnNames="sample_id"/>
     </changeSet>
-
     <changeSet id="create_lb_storage_type" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -669,7 +627,6 @@
             <column name="name" type="VARCHAR(32)"/>
         </createTable>
     </changeSet>
-
     <changeSet id="create_lb_storage" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -688,7 +645,6 @@
             <column name="capacity" type="INTEGER"/>
             <column name="name" type="VARCHAR(32)"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseTableName="lb_storage"
                 baseColumnNames="storage_type_id"
@@ -696,7 +652,6 @@
                 referencedTableName="lb_storage_type"
                 referencedColumnNames="storage_type_id"/>
     </changeSet>
-
     <changeSet id="create_lb_sample_storage" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -708,7 +663,6 @@
             <column name="sample_id" type="INTEGER"/>
             <column name="storage_id" type="INTEGER"/>
         </createTable>
-
         <addPrimaryKey columnNames="sample_id,storage_id" tableName="lb_sample_storage"
                        constraintName="lb_sample_storage_id_pk"/>
         <addForeignKeyConstraint
@@ -724,7 +678,6 @@
                 referencedTableName="lb_storage"
                 referencedColumnNames="storage_id"/>
     </changeSet>
-
     <changeSet id="create_lb_test_allocation" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -757,21 +710,18 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_test_allocation"
                 constraintName="lb_test_allocation_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_test_allocation"
                 constraintName="lb_test_allocation_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseTableName="lb_test_allocation"
                 baseColumnNames="sample_id"
@@ -791,7 +741,6 @@
                 referencedTableName="lb_device"
                 referencedColumnNames="device_id"/>
     </changeSet>
-
     <changeSet id="create_lb_test_allocation_status" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -815,9 +764,7 @@
                 constraintName="lb_test_allocation_status_lb_test_allocation_test_allocation_id"
                 referencedTableName="lb_test_allocation"
                 referencedColumnNames="test_allocation_id"/>
-
     </changeSet>
-
     <changeSet id="create_lb_test_result" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -841,8 +788,6 @@
             <column name="value_date_time" type="DATETIME"/>
             <column name="value_modifier" type="TEXT"/>
             <column name="value_complex" type="TEXT"/>
-
-
         </createTable>
         <addForeignKeyConstraint
                 baseTableName="lb_test_result"
@@ -869,7 +814,6 @@
                 referencedColumnNames="concept_id"
                 referencedTableName="concept"/>
     </changeSet>
-
     <changeSet id="add_columns_to_lb_sample" author="josephat-mwakyusa" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -888,7 +832,6 @@
                 referencedColumnNames="concept_id"
                 referencedTableName="concept"/>
     </changeSet>
-
     <changeSet id="add_foreign_key_for_lb_test_result" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -901,8 +844,6 @@
             FOREIGN KEY (value_group_id) REFERENCES lb_test_result(test_result_id);
         </sql>
     </changeSet>
-
-
     <changeSet id="create_st_requisition" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -929,23 +870,19 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_requisition"
                 constraintName="st_requisition_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_requisition"
                 constraintName="st_requisition_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
     <changeSet id="create_st_issue" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -973,31 +910,25 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_issue"
                 constraintName="st_issue_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_issue"
                 constraintName="st_issue_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
-
         <addForeignKeyConstraint
                 baseTableName="st_issue"
                 baseColumnNames="requisition_id"
                 constraintName="st_issue_st_requisition_requisition_id"
                 referencedTableName="st_requisition"
                 referencedColumnNames="requisition_id"/>
-
     </changeSet>
-
     <changeSet id="create_st_issue_item" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -1012,7 +943,6 @@
             <column name="batch_no" type="VARCHAR(32)"/>
             <column name="expiry_date" type="DATETIME"/>
         </createTable>
-
         <addPrimaryKey columnNames="issue_id,item_id" tableName="st_issue_item"/>
         <addForeignKeyConstraint
                 baseTableName="st_issue_item"
@@ -1026,9 +956,7 @@
                 constraintName="st_issue_item_item_id"
                 referencedTableName="item"
                 referencedColumnNames="item_id"/>
-
     </changeSet>
-
     <changeSet id="create_st_issue_status" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -1056,21 +984,18 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_issue_status"
                 constraintName="st_issue_status_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_issue_status"
                 constraintName="st_issue_status_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseTableName="st_issue_status"
                 baseColumnNames="issue_id"
@@ -1078,7 +1003,6 @@
                 referencedTableName="st_issue"
                 referencedColumnNames="issue_id"/>
     </changeSet>
-
     <changeSet id="create_st_ledger_type" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -1105,23 +1029,19 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_ledger_type"
                 constraintName="st_ledger_type_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_ledger_type"
                 constraintName="st_ledger_type_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
     <changeSet id="create_st_ledger" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -1154,21 +1074,18 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_ledger"
                 constraintName="st_ledger_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_ledger"
                 constraintName="st_ledger_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseTableName="st_ledger"
                 baseColumnNames="ledger_type_id"
@@ -1182,7 +1099,6 @@
                 referencedTableName="item"
                 referencedColumnNames="item_id"/>
     </changeSet>
-
     <changeSet id="create_st_receipt" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -1210,14 +1126,12 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_receipt"
                 constraintName="st_receipt_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_receipt"
@@ -1230,9 +1144,7 @@
                 constraintName="st_receipt_st_issue_issue_id_fk"
                 referencedTableName="st_issue"
                 referencedColumnNames="issue_id"/>
-
     </changeSet>
-
     <changeSet id="create_st_receipt_item" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -1260,9 +1172,7 @@
                 constraintName="st_receipt_item_item_item_id"
                 referencedTableName="item"
                 referencedColumnNames="item_id"/>
-
     </changeSet>
-
     <changeSet id="create_st_reorder_level" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -1282,9 +1192,7 @@
                 constraintName="st_reorder_level_item_item_id_fk"
                 referencedTableName="item"
                 referencedColumnNames="item_id"/>
-
     </changeSet>
-
     <changeSet id="create_st_requisition_item" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -1310,9 +1218,7 @@
                 constraintName="st_requisition_item_st_requisition_requisition_id_fk"
                 referencedTableName="st_requisition"
                 referencedColumnNames="requisition_id"/>
-
     </changeSet>
-
     <changeSet id="create_st_requisition_status" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -1340,14 +1246,12 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_requisition_status"
                 constraintName="st_requisition_status_status_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_requisition_status"
@@ -1361,7 +1265,6 @@
                 referencedTableName="st_requisition"
                 referencedColumnNames="requisition_id"/>
     </changeSet>
-
     <changeSet id="create_st_transaction_type" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -1376,7 +1279,6 @@
             <column name="name" type="VARCHAR(64)"/>
         </createTable>
     </changeSet>
-
     <changeSet id="create_st_transaction" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -1409,7 +1311,6 @@
                 referencedTableName="st_transaction_type"
                 referencedColumnNames="transaction_type_id"/>
     </changeSet>
-
     <changeSet id="create_st_stock" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -1440,14 +1341,9 @@
             <column name="location_id"></column>
         </createIndex>
     </changeSet>
-
-
-
-
     <changeSet id="group_services_concept" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <sqlCheck  expectedResult="0">select count(*) from concept_class where name = 'ConceptGroup'</sqlCheck>
-
         </preConditions>
         <insert tableName="concept_class">
             <column name="concept_class_id" value="30"/>
@@ -1480,7 +1376,6 @@
             <column name="date_created" value="2020-10-28 00:00:00"/>
             <column name="uuid" value="00000003333IIIIIIIIIIIIIIIIIIIIIIIII"/>
         </insert>
-
         <insert tableName="concept_set">
             <column name="concept_id" value="1100"/>
             <column name="concept_set" value="1103"/>
@@ -1489,7 +1384,6 @@
             <column name="date_created" value="2020-10-28 00:00:00"/>
             <column name="uuid" value="00001113IIIIIIIIIIIIIIIIIIIIIIIIIIII"/>
         </insert>
-
         <insert tableName="concept_set">
             <column name="concept_id" value="1101"/>
             <column name="concept_set" value="1103"/>
@@ -1498,16 +1392,11 @@
             <column name="date_created" value="2020-10-28 00:00:00"/>
             <column name="uuid" value="000022223IIIIIIIIIIIIIIIIIIIIIIIIIIII"/>
         </insert>
-
     </changeSet>
-
     <changeSet id="group_payments_concept" author="jesse-justin" dbms="mysql">
-
         <preConditions onFail="MARK_RAN">
             <sqlCheck  expectedResult="0">select count(*) from concept where short_name = 'PaymentCategories'</sqlCheck>
-
         </preConditions>
-
         <insert tableName="concept">
             <column name="concept_id" value="1111"/>
             <column name="short_name" value="PaymentCategories"/>
@@ -1531,7 +1420,6 @@
             <column name="date_created" value="2020-10-28 00:00:00"/>
             <column name="uuid" value="00000004444IIIIIIIIIIIIIIIIIIIIIIIII"/>
         </insert>
-
         <insert tableName="concept_set">
             <column name="concept_id" value="1150"/>
             <column name="concept_set" value="1111"/>
@@ -1540,7 +1428,6 @@
             <column name="date_created" value="2020-10-28 00:00:00"/>
             <column name="uuid" value="00001114IIIIIIIIIIIIIIIIIIIIIIIIIIII"/>
         </insert>
-
         <insert tableName="concept_set">
             <column name="concept_id" value="1151"/>
             <column name="concept_set" value="1111"/>
@@ -1549,14 +1436,11 @@
             <column name="date_created" value="2020-10-28 00:00:00"/>
             <column name="uuid" value="000022224IIIIIIIIIIIIIIIIIIIIIIIIIIII"/>
         </insert>
-
     </changeSet>
-
     <changeSet author="jesse-justin" id="insert_visit_types" dbms="mysql">
         <preConditions  onFail="MARK_RAN">
             <sqlCheck  expectedResult="0">select count(*) from visit_type where name = 'OPD'</sqlCheck>
         </preConditions>
-
         <insert tableName="visit_type">
             <column name="uuid" value="2mnxl2eb-5345-11e8-5555-40b034c3cfee"/>
             <column name="name" value="OPD"/>
@@ -1565,7 +1449,6 @@
             <column name="date_created" value="2020-12-27 00:00:00"/>
             <column name="retired" value="0"/>
         </insert>
-
         <insert tableName="visit_type">
             <column name="uuid" value="2msir5eb-5ww5-11e8-5555-40b034c3cfee"/>
             <column name="name" value="Health Programs"/>
@@ -1574,8 +1457,6 @@
             <column name="date_created" value="2020-12-27 00:00:00"/>
             <column name="retired" value="0"/>
         </insert>
-
-
         <insert tableName="visit_attribute_type">
             <column name="name" value="PaymentCategory"/>
             <column name="min_occurs" value="1"/>
@@ -1585,7 +1466,6 @@
             <column name="uuid" value="PTYPE000IIIIIIIIIIIIIIIIIIIIIIIATYPE"/>
             <column name="datatype" value="org.openmrs.customdatatype.datatype.FreeTextDatatype"/>
         </insert>
-
         <insert tableName="visit_attribute_type">
             <column name="name" value="PaymentScheme"/>
             <column name="min_occurs" value="1"/>
@@ -1595,7 +1475,6 @@
             <column name="uuid" value="PSCHEME0IIIIIIIIIIIIIIIIIIIIIIIATYPE"/>
             <column name="datatype" value="org.openmrs.customdatatype.datatype.FreeTextDatatype"/>
         </insert>
-
         <insert tableName="visit_attribute_type">
             <column name="name" value="Service"/>
             <column name="min_occurs" value="1"/>
@@ -1633,7 +1512,6 @@
             <column name="datatype" value="org.openmrs.customdatatype.datatype.FreeTextDatatype"/>
         </insert>
     </changeSet>
-
     <changeSet author="vincent-minde" id="insert_billing_metadata" dbms="mysql">
         <preConditions  onFail="MARK_RAN">
             <sqlCheck  expectedResult="0">select count(*) from encounter_type where name = 'Registration'</sqlCheck>
@@ -1668,7 +1546,6 @@
             <column name="datatype_id" value="3"/>
             <column name="class_id" value="11"/>
         </insert>
-
         <insert tableName="concept_name">
             <column name="concept_id" value="1110"/>
             <column name="name" value="Registration Fee"/>
@@ -1681,13 +1558,10 @@
             <column name="uuid" value="REG00000IIIIIIIIIIIIIIIIIIIIIIIIIIII"/>
         </insert>
     </changeSet>
-
     <changeSet id="create_person_attributes" author="jesse-justin" dbms="mysql">
-
         <preConditions  onFail="MARK_RAN">
             <sqlCheck  expectedResult="0">select count(*) from person_attribute_type where name = 'occupation'</sqlCheck>
         </preConditions>
-
         <insert tableName="person_attribute_type">
             <column name="name" value="occupation"/>
             <column name="searchable" value="1"/>
@@ -1696,7 +1570,6 @@
             <column name="retired" value="0"/>
             <column name="uuid" value="5c4b5322-703e-4589-b79c-b206b538fdae"/>
         </insert>
-
         <insert tableName="person_attribute_type">
             <column name="name" value="mname"/>
             <column name="searchable" value="1"/>
@@ -1705,7 +1578,6 @@
             <column name="retired" value="0"/>
             <column name="uuid" value="6c990333-aa2b-4778-846f-9ba6edfd3661"/>
         </insert>
-
         <insert tableName="person_attribute_type">
             <column name="name" value="fileNo"/>
             <column name="searchable" value="1"/>
@@ -1714,7 +1586,6 @@
             <column name="retired" value="0"/>
             <column name="uuid" value="4041b679-61b6-478e-a391-4cab3c48cd97"/>
         </insert>
-
         <insert tableName="person_attribute_type">
             <column name="name" value="tribe"/>
             <column name="searchable" value="1"/>
@@ -1723,7 +1594,6 @@
             <column name="retired" value="0"/>
             <column name="uuid" value="50c61832-3f6c-4ea1-8ae3-9e363972d905"/>
         </insert>
-
         <insert tableName="person_attribute_type">
             <column name="name" value="maritalStatus"/>
             <column name="searchable" value="1"/>
@@ -1732,7 +1602,6 @@
             <column name="retired" value="0"/>
             <column name="uuid" value="0eeecb5a-b034-431f-98ec-d2b672719495"/>
         </insert>
-
         <insert tableName="person_attribute_type">
             <column name="name" value="kinFname"/>
             <column name="searchable" value="1"/>
@@ -1757,7 +1626,6 @@
             <column name="retired" value="0"/>
             <column name="uuid" value="c38d5e55-7036-4b7a-8fc7-ad15e8c2d87a"/>
         </insert>
-
         <insert tableName="person_attribute_type">
             <column name="name" value="kinRelationship"/>
             <column name="searchable" value="1"/>
@@ -1766,22 +1634,20 @@
             <column name="retired" value="0"/>
             <column name="uuid" value="8aaff8a9-1eae-4d67-b336-8fc5d0c56e51"/>
         </insert>
-
     </changeSet>
-
     <changeSet id="add_patient_identifier" author="jesse-justin" dbms="mysql" >
         <preConditions  onFail="MARK_RAN">
             <sqlCheck  expectedResult="0">select count(*) from patient_identifier_type where name = 'MRN'</sqlCheck>
         </preConditions>
         <insert tableName="patient_identifier_type">
-                <column name="name" value="MRN"/>
-                <column name="check_digit" value="0"/>
-                <column name="required" value="1"/>
-                <column name="creator" value="1"/>
-                <column name="date_created" value="2020-10-28 00:00:00"/>
-                <column name="retired" value="0"/>
-                <column name="uuid" value="26742868-a38c-4e6a-ac1d-ae283c414c2e"/>
-            </insert>
+            <column name="name" value="MRN"/>
+            <column name="check_digit" value="0"/>
+            <column name="required" value="1"/>
+            <column name="creator" value="1"/>
+            <column name="date_created" value="2020-10-28 00:00:00"/>
+            <column name="retired" value="0"/>
+            <column name="uuid" value="26742868-a38c-4e6a-ac1d-ae283c414c2e"/>
+        </insert>
         <update tableName="patient_identifier_type">
             <column name="required" value="0"/>
             <where>name = 'OpenMRS ID'</where>
@@ -1802,7 +1668,6 @@
         <preConditions  onFail="MARK_RAN">
             <sqlCheck  expectedResult="0">select count(*) from concept_class where name = 'Service'</sqlCheck>
         </preConditions>
-
         <!-- Create Class for Service -->
         <insert tableName="concept_class">
             <column name="concept_class_id" value="26"/>
@@ -2077,13 +1942,11 @@
             <column name="uuid" value="00000019IIIIIIIIIIIIIIIIIIIIIIIIIIII"/>
         </insert>
     </changeSet>
-
     <changeSet author="vincent-minde" id="create_payment_concepts" dbms="mysql">
         <!-- Create Class for Payment Type -->
         <preConditions  onFail="MARK_RAN">
             <sqlCheck  expectedResult="0">select count(*) from concept_class where name = 'Payment Type'</sqlCheck>
         </preConditions>
-
         <insert tableName="concept_class">
             <column name="concept_class_id" value="27"/>
             <column name="name" value="Payment Type"/>
@@ -2315,7 +2178,6 @@
             <column name="uuid" value="00000112IIIIIIIIIIIIIIIIIIIIIIIIIIII"/>
         </insert>
     </changeSet>
-
     <changeSet id="delete_facility_visit" author="jesse-justin" dbms="mysql">
         <preConditions  onFail="MARK_RAN">
             <sqlCheck  expectedResult="1">select count(*) from visit_type where name = 'Facility Visit'</sqlCheck>
@@ -2324,7 +2186,6 @@
             <where>name='Facility Visit'</where>
         </delete>
     </changeSet>
-
     <changeSet id="add_columns_to_bl_payment" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2345,23 +2206,19 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </addColumn>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="bl_payment"
                 constraintName="bl_payment_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="bl_payment"
                 constraintName="bl_payment_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
     <changeSet id="add_columns_to_lb_storage_type" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2382,23 +2239,19 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </addColumn>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_storage_type"
                 constraintName="lb_storage_type_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_storage_type"
                 constraintName="lb_storage_type_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
     <changeSet id="add_columns_to_lb_storage" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2419,36 +2272,31 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </addColumn>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_storage"
                 constraintName="lb_storage_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_storage"
                 constraintName="lb_storage_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
     <changeSet id="add_columns_to_st_requisition" author="jesse-justin" dbms="mysql">
-    <preConditions onFail="MARK_RAN">
-        <not>
-            <columnExists columnName="uuid" tableName="st_requisition"/>
-        </not>
-    </preConditions>
-    <addColumn tableName="st_requisition" >
-        <column name="uuid" type="char(38)">
-            <constraints nullable="false" unique="true"></constraints>
-        </column>
-    </addColumn>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="uuid" tableName="st_requisition"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="st_requisition" >
+            <column name="uuid" type="char(38)">
+                <constraints nullable="false" unique="true"></constraints>
+            </column>
+        </addColumn>
     </changeSet>
-
     <changeSet id="add_columns_to_st_issue" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2461,7 +2309,6 @@
             </column>
         </addColumn>
     </changeSet>
-
     <changeSet id="add_columns_to_st_issue_status" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2474,7 +2321,6 @@
             </column>
         </addColumn>
     </changeSet>
-
     <changeSet id="add_columns_to_st_transaction" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2498,32 +2344,27 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </addColumn>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_transaction"
                 constraintName="st_transaction_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_transaction"
                 constraintName="st_transaction_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
-        <changeSet  author="jesse-justin"  id="dropForeignKeyConstraintDiscountToDiscountCriteria">
-            <preConditions onFail="MARK_RAN">
-                <foreignKeyConstraintExists foreignKeyName="discount_discount_criteria_discount_criteria_id_fk"/>
-            </preConditions>
-            <dropForeignKeyConstraint
+    <changeSet  author="jesse-justin"  id="dropForeignKeyConstraintDiscountToDiscountCriteria">
+        <preConditions onFail="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyName="discount_discount_criteria_discount_criteria_id_fk"/>
+        </preConditions>
+        <dropForeignKeyConstraint
                     baseTableName="bl_discount"
                     constraintName="discount_discount_criteria_discount_criteria_id_fk"/>
-        </changeSet>
-
+    </changeSet>
     <changeSet id="add_columns_to_st_ledger" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2536,7 +2377,6 @@
             </column>
         </addColumn>
     </changeSet>
-
     <changeSet id="add_columns_to_st_ledger_type" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2549,7 +2389,6 @@
             </column>
         </addColumn>
     </changeSet>
-
     <changeSet id="add_columns_to_st_requisition_status" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2562,7 +2401,6 @@
             </column>
         </addColumn>
     </changeSet>
-
     <changeSet id="add_columns_to_st_receipts" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2575,7 +2413,6 @@
             </column>
         </addColumn>
     </changeSet>
-
     <changeSet id="add_datetime_to_lb_sample" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2588,7 +2425,6 @@
             </column>
         </addColumn>
     </changeSet>
-
     <changeSet id="add_abnormal_column_to_lb_test_result" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2601,7 +2437,6 @@
             </column>
         </addColumn>
     </changeSet>
-
     <changeSet id="add_openmrs_columns_to_lb_test_result" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2617,22 +2452,18 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </addColumn>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_test_result"
                 constraintName="lb_test_result_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
     <changeSet id="update_date_created_column_to_datetime" author="josephat-mwakyusa" dbms="mysql">
         <sql>
             ALTER TABLE lb_test_result MODIFY COLUMN date_created DATETIME
         </sql>
     </changeSet>
-
     <changeSet id="add_uuid_column_to_lb_test_result" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2643,7 +2474,6 @@
             <column name="uuid" type="char(38)"/>
         </addColumn>
     </changeSet>
-
     <changeSet author="jesse-justin" id="create_lb_test_time_configuration" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2673,30 +2503,25 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_test_time_configuration"
                 constraintName="lb_test_time_configuration_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_test_time_configuration"
                 constraintName="lb_test_time_configuration_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="concept_id"
                 baseTableName="lb_test_time_configuration"
                 constraintName="lb_test_time_configuration_concept_id_concept_concept_id_fk"
                 referencedColumnNames="concept_id"
                 referencedTableName="concept"/>
-
     </changeSet>
-
     <changeSet author="jesse-justin" id="create_lb_test_ranges_configuration" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2730,30 +2555,25 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_test_ranges_configuration"
                 constraintName="lb_test_ranges_configuration_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_test_ranges_configuration"
                 constraintName="lb_test_ranges_configuration_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="concept_id"
                 baseTableName="lb_test_ranges_configuration"
                 constraintName="lb_test_ranges_configuration_concept_id_concept_concept_id_fk"
                 referencedColumnNames="concept_id"
                 referencedTableName="concept"/>
-
     </changeSet>
-
     <changeSet id="create_lb_test_order_location" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2765,8 +2585,8 @@
             <column name="test_order_location_id" type="INTEGER"/>
             <column name="concept_id" type="INTEGER"/>
             <column name="location_id" type="INTEGER"/>
-             <column name="created_by" type="INTEGER"/>
-              <column name="created_on" type="DATETIME"/>
+            <column name="created_by" type="INTEGER"/>
+            <column name="created_on" type="DATETIME"/>
         </createTable>
         <addPrimaryKey columnNames="id" tableName="test_order_location"/>
         <addForeignKeyConstraint
@@ -2786,10 +2606,8 @@
                 baseColumnNames="created_by"
                 constraintName="test_order_location_created_by_fk"
                 referencedTableName="users"
-                referencedColumnNames="user_id"/>        
-
+                referencedColumnNames="user_id"/>
     </changeSet>
-
     <changeSet id="add_concept_id_column_to_lb_test_allocation" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2800,7 +2618,6 @@
             <column name="concept_id" type="INTEGER"/>
         </addColumn>
     </changeSet>
-
     <changeSet id="add_version_column_to_lb_test_time_configuration" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2813,7 +2630,6 @@
             </column>
         </addColumn>
     </changeSet>
-
     <changeSet id="add_version_column_to_lb_test_ranges_configuration" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2826,8 +2642,6 @@
             </column>
         </addColumn>
     </changeSet>
-
-
     <changeSet id="add_sample_reserved_lables" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2847,7 +2661,6 @@
             </column>
         </createTable>
     </changeSet>
-
     <changeSet id="add_tat_columns_to_lb_test_results" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2866,8 +2679,6 @@
             </column>
         </addColumn>
     </changeSet>
-
-
     <changeSet author="jesse-justin" id="dh_transaction" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2898,14 +2709,12 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="dh_transaction"
                 constraintName="dh_transaction_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="dh_transaction"
@@ -2913,7 +2722,6 @@
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
     </changeSet>
-
     <changeSet  author="jesse-justin"  id="rename_column_add_dhis_transaction_table" dbms="mysql">
         <renameColumn
                 columnDataType="int"
@@ -2921,7 +2729,6 @@
                 oldColumnName="add_dhis_transaction_table"
                 tableName="dh_transaction"/>
     </changeSet>
-
     <changeSet author="jesse-justin" id="add_dh_event_transaction" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2952,14 +2759,12 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="dh_event_transaction"
                 constraintName="dh_event_transaction_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="dh_event_transaction"
@@ -2967,7 +2772,6 @@
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
     </changeSet>
-
     <changeSet id="add_creator_column_to_lb_test_result" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -2984,7 +2788,6 @@
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
     </changeSet>
-
     <changeSet id="create_st_order_status" author="vincent-minde" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3017,21 +2820,18 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_order_status"
                 constraintName="st_order_status_changed_id_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_order_status"
                 constraintName="st_order_status_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseTableName="st_order_status"
                 baseColumnNames="order_id"
@@ -3048,22 +2848,22 @@
         <addColumn tableName="bl_invoice" >
             <column name="visit_id" type="int" />
         </addColumn>
-<!--        <sql>-->
-<!--            UPDATE bl_invoice i-->
-<!--            INNER JOIN bl_invoice_item ii ON(ii.invoice_id=i.invoice_id)-->
-<!--            INNER JOIN orders o ON(o.order_id=ii.order_id)-->
-<!--            INNER JOIN encounter e ON(e.encounter_id=o.encounter_id)-->
-<!--            INNER JOIN visit v ON(v.visit_id=e.visit_id)-->
-<!--            SET i.visit_id = v.visit_id;-->
-<!--        </sql>-->
-<!--        <addForeignKeyConstraint-->
-<!--                baseColumnNames="visit_id"-->
-<!--                baseTableName="bl_invoice"-->
-<!--                constraintName="bl_invoice_visit_id_visit_visit_id_fk"-->
-<!--                referencedColumnNames="visit_id"-->
-<!--                referencedTableName="visit"/>-->
-<!--        <dropColumn columnName="patient_id"-->
-<!--                     tableName="bl_invoice"/>-->
+        <!--        <sql>-->
+        <!--            UPDATE bl_invoice i-->
+        <!--            INNER JOIN bl_invoice_item ii ON(ii.invoice_id=i.invoice_id)-->
+        <!--            INNER JOIN orders o ON(o.order_id=ii.order_id)-->
+        <!--            INNER JOIN encounter e ON(e.encounter_id=o.encounter_id)-->
+        <!--            INNER JOIN visit v ON(v.visit_id=e.visit_id)-->
+        <!--            SET i.visit_id = v.visit_id;-->
+        <!--        </sql>-->
+        <!--        <addForeignKeyConstraint-->
+        <!--                baseColumnNames="visit_id"-->
+        <!--                baseTableName="bl_invoice"-->
+        <!--                constraintName="bl_invoice_visit_id_visit_visit_id_fk"-->
+        <!--                referencedColumnNames="visit_id"-->
+        <!--                referencedTableName="visit"/>-->
+        <!--        <dropColumn columnName="patient_id"-->
+        <!--                     tableName="bl_invoice"/>-->
     </changeSet>
     <changeSet id="update_visit_id_in_bl_invoice" author="vincent-minde" dbms="mysql">
         <preConditions onFail="MARK_RAN">
@@ -3094,7 +2894,7 @@
                         constraintName="bl_invoice_visit_id_visit_visit_id_fk"
                         referencedColumnNames="visit_id"
                         referencedTableName="visit"/>
-                <dropColumn columnName="patient_id"
+        <dropColumn columnName="patient_id"
                              tableName="bl_invoice"/>
     </changeSet>
     <changeSet author="vincent_minde" id="create_prescription">
@@ -3115,7 +2915,6 @@
             <column name="frequency" type="INT"/>
         </createTable>
     </changeSet>
-
     <changeSet id="add_is_full_exempted_column_to_bl_discount" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3126,13 +2925,11 @@
             <column name="is_full_exempted" defaultValueBoolean="false" type="BOOLEAN"/>
         </addColumn>
     </changeSet>
-
     <changeSet id="update_attachment_column_to_bl_discount" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE bl_discount MODIFY COLUMN attachment_id VARCHAR(100)
         </sql>
     </changeSet>
-
     <changeSet id="add_columns_to_sample_status" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3146,7 +2943,6 @@
             <column name="retired" type="BOOLEAN" defaultValueBoolean="false" />
         </addColumn>
     </changeSet>
-
     <changeSet id="add_columns_to_test_allocation_status" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3160,7 +2956,6 @@
             <column name="retired" type="BOOLEAN" defaultValueBoolean="false" />
         </addColumn>
     </changeSet>
-
     <changeSet id="add_columns_to_lb_test_allocation_status" author="josephat-mwakyusa" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3179,29 +2974,21 @@
                 referencedColumnNames="test_result_id"
                 referencedTableName="lb_test_result"/>
     </changeSet>
-
     <changeSet id="update_primary_key_for_st_issue_item" author="dennis-kibahila" dbms="mysql">
-
         <sql>
             ALTER TABLE st_issue_item DROP PRIMARY KEY, ADD PRIMARY KEY(issue_id,item_id,batch_no)
         </sql>
-
     </changeSet>
-
     <changeSet id="update_status_column_to_lb_sample_status" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_sample_status MODIFY COLUMN status VARCHAR(100)
         </sql>
     </changeSet>
-
     <changeSet id="update_primary_key_for_st_receipt_item" author="dennis-kibahila" dbms="mysql">
-
         <sql>
             ALTER TABLE st_receipt_item DROP PRIMARY KEY, ADD PRIMARY KEY(receipt_id,item_id,batch_no)
         </sql>
-
     </changeSet>
-
     <changeSet id="add_location_column_to_lb_sample" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3212,9 +2999,7 @@
             <column name="location_id" type="INT">
                 <constraints nullable="true"></constraints>
             </column>
-
         </addColumn>
-
         <addForeignKeyConstraint
                 baseColumnNames="location_id"
                 baseTableName="lb_sample"
@@ -3222,7 +3007,6 @@
                 referencedColumnNames="location_id"
                 referencedTableName="location"/>
     </changeSet>
-
     <changeSet id="create_lb_batch_set" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3254,14 +3038,12 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_batch_set"
                 constraintName="lb_batch_set_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_batch_set"
@@ -3269,7 +3051,6 @@
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
     </changeSet>
-
     <changeSet id="create_lb_batch" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3304,21 +3085,18 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_batch"
                 constraintName="lb_batch_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_batch"
                 constraintName="lb_batch_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="batch_set_id"
                 baseTableName="lb_batch"
@@ -3326,7 +3104,6 @@
                 referencedColumnNames="batch_set_id"
                 referencedTableName="lb_batch_set"/>
     </changeSet>
-
     <changeSet id="create_lb_batch_set_status" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3354,7 +3131,6 @@
                 constraintName="lb_batch_set_status_lb_batch_set_id"
                 referencedTableName="lb_batch_set"
                 referencedColumnNames="batch_set_id"/>
-
         <addForeignKeyConstraint
                 baseTableName="lb_batch_set_status"
                 baseColumnNames="user_id"
@@ -3362,7 +3138,6 @@
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
     </changeSet>
-
     <changeSet id="create_lb_batch_status" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3390,7 +3165,6 @@
                 constraintName="lb_batch_status_lb_batch_batch_id"
                 referencedTableName="lb_batch"
                 referencedColumnNames="batch_id"/>
-
         <addForeignKeyConstraint
                 baseTableName="lb_batch_status"
                 baseColumnNames="user_id"
@@ -3398,7 +3172,6 @@
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
     </changeSet>
-
     <changeSet id="add_batch_column_to_lb_sample" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3409,9 +3182,7 @@
             <column name="batch_id" type="INT">
                 <constraints nullable="true"></constraints>
             </column>
-
         </addColumn>
-
         <addForeignKeyConstraint
                 baseColumnNames="batch_id"
                 baseTableName="lb_sample"
@@ -3419,7 +3190,6 @@
                 referencedColumnNames="batch_id"
                 referencedTableName="lb_batch"/>
     </changeSet>
-
     <changeSet id="create_lb_worksheet" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3453,28 +3223,24 @@
             <column name="retired_by" type="INTEGER"/>
             <column name="retire_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_worksheet"
                 constraintName="lb_worksheet_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_worksheet"
                 constraintName="lb_worksheet_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="test_order_id"
                 baseTableName="lb_worksheet"
                 constraintName="lb_worksheet_test_order_id_concept_concept_id_fk"
                 referencedColumnNames="concept_id"
                 referencedTableName="concept"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="instrument_id"
                 baseTableName="lb_worksheet"
@@ -3482,7 +3248,6 @@
                 referencedColumnNames="concept_id"
                 referencedTableName="concept"/>
     </changeSet>
-
     <changeSet id="create_lb_worksheet_definition" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3512,30 +3277,25 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_worksheet_definition"
                 constraintName="lb_worksheet_definition_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_worksheet_definition"
                 constraintName="lb_worksheet_definition_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="worksheet_id"
                 baseTableName="lb_worksheet_definition"
                 constraintName="lb_worksheet_definition_worksheet_id_concept_concept_id_fk"
                 referencedColumnNames="concept_id"
                 referencedTableName="concept"/>
-
     </changeSet>
-
     <changeSet id="add_columns_to_lb_worksheet_definition" author="josephat-mwakyusa" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3548,7 +3308,6 @@
             </column>
         </addColumn>
     </changeSet>
-
     <changeSet id="create_lb_worksheet_control" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3579,30 +3338,25 @@
             <column name="retired_by" type="INTEGER"/>
             <column name="retire_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_worksheet_control"
                 constraintName="lb_worksheet_control_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_worksheet_control"
                 constraintName="lb_worksheet_control_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="test_order_id"
                 baseTableName="lb_worksheet_control"
                 constraintName="lb_worksheet_control_test_order_id_concept_concept_id_fk"
                 referencedColumnNames="concept_id"
                 referencedTableName="concept"/>
-
     </changeSet>
-
     <changeSet id="create_lb_worksheet_sample" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3641,44 +3395,37 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_worksheet_sample"
                 constraintName="lb_worksheet_sample_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_worksheet_sample"
                 constraintName="lb_worksheet_sample_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="worksheet_definition_id"
                 baseTableName="lb_worksheet_sample"
                 constraintName="lb_sheet_sample_sheet_dfn_id_sheet_dfn_sheet_dfn_id_fk"
                 referencedColumnNames="worksheet_definition_id"
                 referencedTableName="lb_worksheet_definition"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="sample_id"
                 baseTableName="lb_worksheet_sample"
                 constraintName="lb_worksheet_sample_sample_id_lb_sample_sample_id_fk"
                 referencedColumnNames="worksheet_control_id"
                 referencedTableName="lb_worksheet_control"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="control_id"
                 baseTableName="lb_worksheet_sample"
                 constraintName="lb_worksheet_control_control_id_lb_sample_sample_id_fk"
                 referencedColumnNames="sample_id"
                 referencedTableName="lb_sample"/>
-
     </changeSet>
-
     <changeSet id="create_lb_worksheet_sample_status" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3710,31 +3457,25 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_worksheet_sample_status"
                 constraintName="lb_worksheet_sample_status_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_worksheet_sample_status"
                 constraintName="lb_worksheet_sample_status_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="worksheet_sample_id"
                 baseTableName="lb_worksheet_sample_status"
                 constraintName="sheet_smpl_sts_sheet_smpl_id_sheet_smpl_sheet_smpl_id_fk"
                 referencedColumnNames="worksheet_sample_id"
                 referencedTableName="lb_worksheet_sample"/>
-
-
     </changeSet>
-
     <changeSet id="create_lb_worksheet_status" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3766,51 +3507,43 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_worksheet_status"
                 constraintName="lb_worksheet_status_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_worksheet_status"
                 constraintName="lb_worksheet_status_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="worksheet_id"
                 baseTableName="lb_worksheet_status"
                 constraintName="lb_sheet_status_sheet_id_lb_sheet_sheet_id_fk"
                 referencedColumnNames="worksheet_id"
                 referencedTableName="lb_worksheet"/>
-
     </changeSet>
-
     <changeSet id="update_lb_worksheet_add_column_name" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_worksheet
             ADD COLUMN name VARCHAR(50) AFTER code;
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_worksheet_control_add_column_description" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_worksheet_control
             ADD COLUMN description VARCHAR(50) AFTER name;
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_worksheet_definition_add_column_header_fields" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_worksheet_definition
             ADD COLUMN header_fields TEXT(100000) AFTER code;
         </sql>
     </changeSet>
-
     <!-- column name was a mysqlkeyword -->
     <changeSet id="update_lb_worksheet_sample_rename_row_to_rows" author="dennis-kibahila" dbms="mysql">
         <sql>
@@ -3818,7 +3551,6 @@
             CHANGE row rows INT;
         </sql>
     </changeSet>
-
     <!-- column name was a mysql keyword -->
     <changeSet id="update_lb_worksheet_sample_rename_column_to_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
@@ -3826,7 +3558,6 @@
             CHANGE `column` `columns` INT;
         </sql>
     </changeSet>
-
     <!-- foreign key was wrongly referenced in lb_worksheet_sample -->
     <changeSet id="update_lb_worksheet_sample_change_sample_id_foreign_key" author="dennis-kibahila" dbms="mysql">
         <sql>
@@ -3841,7 +3572,6 @@
             ADD FOREIGN KEY control_id_lb_worksheet_control_control_id_fk(control_id) REFERENCES lb_worksheet_control(worksheet_control_id);
         </sql>
     </changeSet>
-
     <!-- foreign key was wrongly referenced in lb_worksheet_definition -->
     <changeSet id="update_lb_worksheet_definition_change_worksheet_id_foreign_key" author="dennis-kibahila" dbms="mysql">
         <sql>
@@ -3849,19 +3579,16 @@
             ADD FOREIGN KEY lb_worksheet_definition_worksheet_id_worksheet_worksheet_id_fk(worksheet_id) REFERENCES lb_worksheet(worksheet_id);
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_sample_drop_foreign_key_batch_id" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_sample DROP FOREIGN KEY lb_sample_batch_id_lb_batch_batch_id_fk
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_sample_drop_column_batch_id" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_sample DROP COLUMN batch_id;
         </sql>
     </changeSet>
-
     <changeSet id="create_lb_batch_sample" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3891,30 +3618,25 @@
             <column name="voided_by" type="INTEGER"/>
             <column name="void_reason" type="TEXT"/>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_batch_sample"
                 constraintName="lb_batch_sample_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_batch_sample"
                 constraintName="lb_batch_sample_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="batch_id"
                 baseTableName="lb_batch_sample"
                 constraintName="lb_batch_sample_batch_id_lb_batch_fk"
                 referencedColumnNames="batch_id"
                 referencedTableName="lb_batch"/>
-
     </changeSet>
-
     <changeSet id="add_batch_sample_column_to_lb_sample" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3925,9 +3647,7 @@
             <column name="batch_sample_id" type="INT">
                 <constraints nullable="true"></constraints>
             </column>
-
         </addColumn>
-
         <addForeignKeyConstraint
                 baseColumnNames="batch_sample_id"
                 baseTableName="lb_sample"
@@ -3935,7 +3655,6 @@
                 referencedColumnNames="batch_sample_id"
                 referencedTableName="lb_batch_sample"/>
     </changeSet>
-
     <changeSet id="create_st_supplier" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -3965,23 +3684,19 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_supplier"
                 constraintName="st_supplier_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_supplier"
                 constraintName="st_supplier_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
     <changeSet id="create_st_supplier_attribute_type" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4011,23 +3726,19 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_supplier_attribute_type"
                 constraintName="st_supplier_attr_type_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_supplier_attribute_type"
                 constraintName="st_supplier_attr_type_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
     <changeSet id="create_st_supplier_attribute" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4058,37 +3769,31 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_supplier_attribute"
                 constraintName="st_supplier_attr_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_supplier_attribute"
                 constraintName="st_supplier_attr_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="supplier_id"
                 baseTableName="st_supplier_attribute"
                 constraintName="st_supplier_attr_supplier_id_st_supplier_fk"
                 referencedColumnNames="supplier_id"
                 referencedTableName="st_supplier"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="supplier_attribute_type_id"
                 baseTableName="st_supplier_attribute"
                 constraintName="st_supplier_attr_supplier_attr_id_st_supplier_attr_fk"
                 referencedColumnNames="supplier_attribute_type_id"
                 referencedTableName="st_supplier_attribute_type"/>
-
     </changeSet>
-
     <changeSet id="create_st_purchase_order" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4119,23 +3824,19 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_purchase_order"
                 constraintName="st_purchase_order_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_purchase_order"
                 constraintName="st_purchase_order_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
     <changeSet id="create_st_purchase_order_item" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4166,37 +3867,31 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_purchase_order_item"
                 constraintName="st_purchase_order_item_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_purchase_order_item"
                 constraintName="st_purchase_order_item_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="purchase_order_id"
                 baseTableName="st_purchase_order_item"
                 constraintName="st_purchase_order_item_purchase_order_id_purchase_order_fk"
                 referencedColumnNames="purchase_order_id"
                 referencedTableName="st_purchase_order"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="item_id"
                 baseTableName="st_purchase_order_item"
                 constraintName="st_purchase_order_item_item_id_item_fk"
                 referencedColumnNames="item_id"
                 referencedTableName="item"/>
-
     </changeSet>
-
     <changeSet id="create_st_purchase_order_status" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4227,31 +3922,25 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_purchase_order_status"
                 constraintName="st_purchase_order_status_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_purchase_order_status"
                 constraintName="st_purchase_order_status_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="purchase_order_id"
                 baseTableName="st_purchase_order_status"
                 constraintName="st_purchase_order_status_purchase_order_id_purchase_order_fk"
                 referencedColumnNames="purchase_order_id"
                 referencedTableName="st_purchase_order"/>
-
     </changeSet>
-
-
     <changeSet id="create_st_stock_invoice" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4285,37 +3974,31 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_stock_invoice"
                 constraintName="st_stock_invoice_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_stock_invoice"
                 constraintName="st_stock_invoice_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="supplier_id"
                 baseTableName="st_stock_invoice"
                 constraintName="st_stock_invoice_supplier_id_supplier_fk"
                 referencedColumnNames="supplier_id"
                 referencedTableName="st_supplier"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="purchase_order_id"
                 baseTableName="st_stock_invoice"
                 constraintName="st_stock_invoice_purchase_order_id_st_purchase_order_fk"
                 referencedColumnNames="purchase_order_id"
                 referencedTableName="st_purchase_order"/>
-
     </changeSet>
-
     <changeSet id="create_st_stock_invoice_attribute_type" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4345,23 +4028,19 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_stock_invoice_attribute_type"
                 constraintName="st_stock_invoice_attr_type_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_stock_invoice_attribute_type"
                 constraintName="st_stock_invoice_attr_type_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
     <changeSet id="create_st_stock_invoice_attribute" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4392,37 +4071,31 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_stock_invoice_attribute"
                 constraintName="st_stock_invoice_attr_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_supplier_attribute"
                 constraintName="st_stock_invoice_attr_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="stock_invoice_id"
                 baseTableName="st_stock_invoice_attribute"
                 constraintName="st_stock_invoice_attr_stock_invoice_id_st_stock_invoice_fk"
                 referencedColumnNames="stock_invoice_id"
                 referencedTableName="st_stock_invoice"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="stock_invoice_attribute_type_id"
                 baseTableName="st_stock_invoice_attribute"
                 constraintName="st_stock_invoice_attr_invoice_attr_type_id_st_stock_inv_attr_fk"
                 referencedColumnNames="stock_invoice_attribute_type_id"
                 referencedTableName="st_stock_invoice_attribute_type"/>
-
     </changeSet>
-
     <changeSet id="create_st_stock_invoice_item" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4459,37 +4132,31 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_stock_invoice_item"
                 constraintName="st_stock_invoice_item_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_stock_invoice_item"
                 constraintName="st_stock_invoice_item_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="stock_invoice_id"
                 baseTableName="st_stock_invoice_item"
                 constraintName="st_stock_invoice_item_st_inv_id_stock_invoice_fk"
                 referencedColumnNames="stock_invoice_id"
                 referencedTableName="st_stock_invoice"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="uom"
                 baseTableName="st_stock_invoice_item"
                 constraintName="st_stock_invoice_item_uom_concept_fk"
                 referencedColumnNames="concept_id"
                 referencedTableName="concept"/>
-
     </changeSet>
-
     <changeSet id="create_st_stock_invoice_status" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4520,30 +4187,25 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_stock_invoice_status"
                 constraintName="st_stock_invoice_status_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_stock_invoice_status"
                 constraintName="st_stock_invoice_status_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="stock_invoice_id"
                 baseTableName="st_stock_invoice_status"
                 constraintName="st_stock_invoice_status_st_invoice_id_st_stock_invoice_fk"
                 referencedColumnNames="stock_invoice_id"
                 referencedTableName="st_stock_invoice"/>
-
     </changeSet>
-
     <changeSet id="create_st_stock_invoice_item_status" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4574,30 +4236,25 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_stock_invoice_item_status"
                 constraintName="st_stock_invoice_item_status_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_stock_invoice_item_status"
                 constraintName="st_stock_invoice_item_status_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="stock_invoice_item_id"
                 baseTableName="st_stock_invoice_item_status"
                 constraintName="st_stock_invoice_item_status_st_invoice_id_st_stock_invoice_fk"
                 referencedColumnNames="stock_invoice_item_id"
                 referencedTableName="st_stock_invoice_item"/>
-
     </changeSet>
-
     <changeSet id="update_st_stock_invoice_item_add_column_location" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_stock_invoice_item
@@ -4605,7 +4262,6 @@
             ADD FOREIGN KEY(location_id) REFERENCES location(location_id);
         </sql>
     </changeSet>
-
     <changeSet id="create_lb_associated_field" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4635,7 +4291,6 @@
             <column name="uuid" type="char(38)">
                 <constraints nullable="false" unique="true"></constraints>
             </column>
-
         </createTable>
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
@@ -4643,14 +4298,12 @@
                 constraintName="lb_associated_field_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_associated_field"
                 constraintName="lb_associated_field_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="voided_by"
                 baseTableName="lb_associated_field"
@@ -4658,7 +4311,6 @@
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
     </changeSet>
-
     <changeSet id="add_columns_to_st_requisition_item" author="dennis-kibahila" dbms="mysql">
         <addColumn tableName="st_requisition_item" >
             <column name="creator" type="INTEGER"/>
@@ -4672,7 +4324,6 @@
             <column name="uuid"  type="char(38)" >
                 <constraints nullable="true"  unique="true"></constraints>
             </column>
-
         </addColumn>
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
@@ -4680,16 +4331,13 @@
                 constraintName="st_requisition_item_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_requisition_item"
                 constraintName="st_requisition_item_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
     <changeSet id="create_lb_test_allocation_associated_field" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4719,35 +4367,30 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="lb_test_allocation_associated_field"
                 constraintName="lb_alloc_field_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_test_allocation_associated_field"
                 constraintName="lb_alloc_field_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="voided_by"
                 baseTableName="lb_test_allocation_associated_field"
                 constraintName="lb_alloc_field_voided_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="test_allocation_id"
                 baseTableName="lb_test_allocation_associated_field"
                 constraintName="lb_alloc_field_alloc_id_test_allocation_alloc_id_fk"
                 referencedColumnNames="test_allocation_id"
                 referencedTableName="lb_test_allocation"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="associated_field_id"
                 baseTableName="lb_test_allocation_associated_field"
@@ -4755,7 +4398,6 @@
                 referencedColumnNames="associated_field_id"
                 referencedTableName="lb_associated_field"/>
     </changeSet>
-
     <changeSet id="create_lb_associated_field_result" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4792,28 +4434,24 @@
                 constraintName="lb_assoc_field_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="lb_associated_field_result"
                 constraintName="lb_assoc_field_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="voided_by"
                 baseTableName="lb_associated_field_result"
                 constraintName="lb_assoc_field_voided_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="associated_field_id"
                 baseTableName="lb_associated_field_result"
                 constraintName="lb_assoc_field_assoc_field_associated_field_id_fk"
                 referencedColumnNames="associated_field_id"
                 referencedTableName="lb_associated_field"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="test_result_id"
                 baseTableName="lb_associated_field_result"
@@ -4821,7 +4459,6 @@
                 referencedColumnNames="test_result_id"
                 referencedTableName="lb_test_result"/>
     </changeSet>
-
     <changeSet id="update_st_transaction_add_column_source_location" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_transaction
@@ -4829,7 +4466,6 @@
             ADD FOREIGN KEY(source_location_id) REFERENCES location(location_id);;
         </sql>
     </changeSet>
-
     <changeSet id="create_st_requisition_item_status" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -4861,28 +4497,24 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_requisition_item_status"
                 constraintName="st_requisition_item_status_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_requisition_item_status"
                 constraintName="st_requisition_item_status_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="item_id"
                 baseTableName="st_requisition_item_status"
                 constraintName="st_requisition_item_status_item_fk"
                 referencedColumnNames="item_id"
                 referencedTableName="item"/>
-
         <addForeignKeyConstraint
                 baseTableName="st_requisition_item_status"
                 baseColumnNames="requisition_id"
@@ -4890,14 +4522,12 @@
                 referencedTableName="st_requisition"
                 referencedColumnNames="requisition_id"/>
     </changeSet>
-
     <changeSet id="update_st_requisition_add_column_code" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_requisition
             ADD COLUMN code VARCHAR(50) NULL AFTER requisition_id;
         </sql>
     </changeSet>
-
     <changeSet id="update_st_transaction_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_transaction
@@ -4906,7 +4536,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_worksheet_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_worksheet
@@ -4915,7 +4544,6 @@
             MODIFY date_retired DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_worksheet_control_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_worksheet_control
@@ -4924,7 +4552,6 @@
             MODIFY date_retired DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_worksheet_sample_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_worksheet_sample
@@ -4933,8 +4560,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
-
     <changeSet id="update_lb_worksheet_sample_status_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_worksheet_sample_status
@@ -4943,7 +4568,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_worksheet_status_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_worksheet_status
@@ -4952,7 +4576,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_batch_sample_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_batch_sample
@@ -4961,7 +4584,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_st_requisition_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_requisition
@@ -4970,7 +4592,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_st_requisition_status_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_requisition_status
@@ -4979,7 +4600,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_st_stock_invoice_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_stock_invoice
@@ -4988,7 +4608,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_st_stock_invoice_attribute_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_stock_invoice_attribute
@@ -4997,7 +4616,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_st_stock_invoice_attribute_type_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_stock_invoice_attribute_type
@@ -5006,7 +4624,6 @@
             MODIFY date_retired DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_st_stock_invoice_item_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_stock_invoice_item
@@ -5015,7 +4632,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_st_stock_invoice_item_status_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_stock_invoice_item_status
@@ -5024,7 +4640,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_st_stock_invoice_status_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_stock_invoice_status
@@ -5033,7 +4648,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_st_supplier_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_supplier
@@ -5042,7 +4656,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_st_supplier_attribute_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_supplier_attribute
@@ -5051,7 +4664,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_st_supplier_attribute_type_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_supplier_attribute_type
@@ -5060,7 +4672,6 @@
             MODIFY date_retired DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_batch_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_batch
@@ -5069,7 +4680,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_batch_set_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_batch_set
@@ -5078,7 +4688,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="update_st_issue_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_issue
@@ -5087,8 +4696,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
-
     <changeSet id="update_st_issue_status_date_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_issue_status
@@ -5097,7 +4704,6 @@
             MODIFY date_voided DATETIME;
         </sql>
     </changeSet>
-
     <changeSet id="create_st_issue_item_status" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -5130,28 +4736,24 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="st_issue_item_status"
                 constraintName="st_issue_item_status_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_issue_item_status"
                 constraintName="st_issue_item_status_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="item_id"
                 baseTableName="st_issue_item_status"
                 constraintName="st_issue_item_status_item_fk"
                 referencedColumnNames="item_id"
                 referencedTableName="item"/>
-
         <addForeignKeyConstraint
                 baseTableName="st_issue_item_status"
                 baseColumnNames="issue_id"
@@ -5159,7 +4761,6 @@
                 referencedTableName="st_issue"
                 referencedColumnNames="issue_id"/>
     </changeSet>
-
     <changeSet id="add_columns_to_st_issue_item" author="dennis-kibahila" dbms="mysql">
         <addColumn tableName="st_issue_item" >
             <column name="creator" type="INTEGER"/>
@@ -5173,7 +4774,6 @@
             <column name="uuid"  type="char(38)" >
                 <constraints nullable="true"  unique="true"></constraints>
             </column>
-
         </addColumn>
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
@@ -5181,16 +4781,13 @@
                 constraintName="st_issue_item_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_requisition_item"
                 constraintName="st_issue_item_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
     <changeSet id="update_st_supplier_add_location_column" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_supplier
@@ -5198,7 +4795,6 @@
             ADD FOREIGN KEY(location_id) REFERENCES location(location_id);
         </sql>
     </changeSet>
-
     <changeSet id="update_st_transaction_add_column_destination_location" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_transaction
@@ -5206,20 +4802,17 @@
             ADD FOREIGN KEY(destination_location_id) REFERENCES location(location_id);
         </sql>
     </changeSet>
-
     <changeSet id="update_st_issue_item_status_batch_no_column" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_issue_item_status MODIFY COLUMN batch_no VARCHAR(32)
         </sql>
     </changeSet>
-
     <changeSet id="update_st_stock_invoice_modify_invoice_number_supplier_unique" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_stock_invoice
             ADD CONSTRAINT invoice_number_supplier_unique UNIQUE (invoice_number,supplier_id);
         </sql>
     </changeSet>
-
     <changeSet id="add_columns_to_st_reorder_level" author="dennis-kibahila" dbms="mysql">
         <addColumn tableName="st_reorder_level" >
             <column name="creator" type="INTEGER"/>
@@ -5233,7 +4826,6 @@
             <column name="uuid"  type="char(38)" >
                 <constraints nullable="true"  unique="true"></constraints>
             </column>
-
         </addColumn>
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
@@ -5241,16 +4833,13 @@
                 constraintName="st_reorder_level_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="st_reorder_level"
                 constraintName="st_reorder_level_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
     </changeSet>
-
     <changeSet id="add_related_allocation_column_to_lb_test_allocation" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -5261,30 +4850,38 @@
             <column name="related_allocation_uuid" type="char(38)"/>
         </addColumn>
     </changeSet>
-
     <changeSet id="create_audit_log" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
-            <not><tableExists tableName="audit_log" /></not>
+            <not>
+                <tableExists tableName="audit_log" />
+            </not>
         </preConditions>
         <comment>Adding audit_log table</comment>
         <createTable tableName="audit_log">
             <column name="audit_log_id" type="int" autoIncrement="true" >
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="type" type="varchar(512)"><constraints nullable="false" /></column>
-            <column name="action" type="TEXT"><constraints nullable="false" /></column>
+            <column name="type" type="varchar(512)">
+                <constraints nullable="false" />
+            </column>
+            <column name="action" type="TEXT">
+                <constraints nullable="false" />
+            </column>
             <column name="user_id" type="int" />
             <column name="serialized_data" type="longblob" />
-            <column name="date_created" type="DATETIME"><constraints nullable="false" /></column>
+            <column name="date_created" type="DATETIME">
+                <constraints nullable="false" />
+            </column>
             <column name="parent_auditlog_id" type="int" />
-            <column name="uuid" type="varchar(38)"><constraints nullable="false" unique="true" /></column>
+            <column name="uuid" type="varchar(38)">
+                <constraints nullable="false" unique="true" />
+            </column>
         </createTable>
         <addForeignKeyConstraint
                 constraintName="authenticated_user"
                 baseTableName="audit_log" baseColumnNames="user_id"
                 referencedTableName="users" referencedColumnNames="user_id" />
     </changeSet>
-
     <changeSet id="update_st_transaction_add_order_column" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE st_transaction
@@ -5292,10 +4889,11 @@
             ADD FOREIGN KEY(order_id) REFERENCES orders(order_id);
         </sql>
     </changeSet>
-
     <changeSet id="create_password_history" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
-            <not><tableExists tableName="password_history" /></not>
+            <not>
+                <tableExists tableName="password_history" />
+            </not>
         </preConditions>
         <comment>Adding password_history table</comment>
         <createTable tableName="password_history">
@@ -5303,15 +4901,18 @@
                 <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="user_id" type="int" />
-            <column name="password" type="varchar(128)"><constraints nullable="true" /></column>
-            <column name="change_date" type="DATETIME"><constraints nullable="false" /></column>
+            <column name="password" type="varchar(128)">
+                <constraints nullable="true" />
+            </column>
+            <column name="change_date" type="DATETIME">
+                <constraints nullable="false" />
+            </column>
         </createTable>
         <addForeignKeyConstraint
                 constraintName="user_id"
                 baseTableName="password_history" baseColumnNames="user_id"
                 referencedTableName="users" referencedColumnNames="user_id" />
     </changeSet>
-
     <changeSet id="update_lb_test_result_add_column_tested_by" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_test_result
@@ -5325,14 +4926,12 @@
             ADD COLUMN date_tested DATETIME NULL AFTER tested_by;
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_test_time_configuration" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_test_time_configuration
             ADD CONSTRAINT concept_id UNIQUE (concept_id);
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_test_time_configuration_add_columns" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_test_time_configuration
@@ -5342,7 +4941,6 @@
             ADD COLUMN config_type VARCHAR(20) NULL AFTER additional_request_time_limit;
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_test_time_configuration_add_tat_column" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_test_time_configuration
@@ -5350,14 +4948,12 @@
             ADD COLUMN referral_config_type VARCHAR(20) NULL AFTER routine_config_type;
         </sql>
     </changeSet>
-
     <changeSet id="update_lb_test_time_config_rename_config_type" author="dennis-kibahila" dbms="mysql">
         <sql>
             ALTER TABLE lb_test_time_configuration
             CHANGE config_type urgent_config_type  VARCHAR(20);
         </sql>
     </changeSet>
-
     <changeSet id="create_encounter_patient_state" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -5387,37 +4983,31 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="encounter_patient_state"
                 constraintName="encounter_state_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="encounter_patient_state"
                 constraintName="encounter_state_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="encounter_id"
                 baseTableName="encounter_patient_state"
                 constraintName="encounter_state_encounter_id_encounter_fk"
                 referencedColumnNames="encounter_id"
                 referencedTableName="encounter"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="patient_state_id"
                 baseTableName="encounter_patient_state"
                 constraintName="state_state_id_patient_state_fk"
                 referencedColumnNames="patient_state_id"
                 referencedTableName="patient_state"/>
-
     </changeSet>
-
     <changeSet id="create_encounter_patient_program" author="dennis-kibahila" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -5447,36 +5037,107 @@
                 <constraints nullable="false" unique="true"></constraints>
             </column>
         </createTable>
-
         <addForeignKeyConstraint
                 baseColumnNames="changed_by"
                 baseTableName="encounter_patient_program"
                 constraintName="encounter_program_changed_by_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="creator"
                 baseTableName="encounter_patient_program"
                 constraintName="encounter_program_creator_users_user_id_fk"
                 referencedColumnNames="user_id"
                 referencedTableName="users"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="encounter_id"
                 baseTableName="encounter_patient_program"
                 constraintName="encounter_program_encounter_id_encounter_fk"
                 referencedColumnNames="encounter_id"
                 referencedTableName="encounter"/>
-
         <addForeignKeyConstraint
                 baseColumnNames="patient_program_id"
                 baseTableName="encounter_patient_program"
                 constraintName="program_program_id_patient_program_fk"
                 referencedColumnNames="patient_program_id"
                 referencedTableName="patient_program"/>
-
     </changeSet>
-
-
+    <changeSet id="add_column_to_bl_payment_table" author="josephat-mwakyusa" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="status" tableName="bl_payment"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bl_payment" >
+            <column name="status" type="TEXT">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="add_status_to_bl_payment_item_table" author="gaspar-giddson" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="status" tableName="bl_payment_item"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bl_payment_item" >
+            <column name="status" type="VARCHAR(16)">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="add_columns_to_bl_payment_table" author="gaspar-giddson" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists columnName="receipt_number" tableName="bl_payment" />
+            </not>
+            <not>
+                <columnExists columnName="bill_amount" tableName="bl_payment" />
+            </not>
+            <not>
+                <columnExists columnName="paid_amount" tableName="bl_payment" />
+            </not>
+            <not>
+                <columnExists columnName="payment_date" tableName="bl_payment" />
+            </not>
+            <not>
+                <columnExists columnName="payer_number" tableName="bl_payment" />
+            </not>
+            <not>
+                <columnExists columnName="payer_name" tableName="bl_payment" />
+            </not>
+            <not>
+                <columnExists columnName="psp_name" tableName="bl_payment" />
+            </not>
+            <not>
+                <columnExists columnName="account_number" tableName="bl_payment" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bl_payment">
+            <column name="receipt_number" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="bill_amount" type="DECIMAL(10, 2)">
+                <constraints nullable="true" />
+            </column>
+            <column name="paid_amount" type="DECIMAL(10, 2)">
+                <constraints nullable="true" />
+            </column>
+            <column name="payment_date" type="DATE">
+                <constraints nullable="true" />
+            </column>
+            <column name="payer_number" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="payer_name" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="psp_name" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="account_number" type="VARCHAR(255)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

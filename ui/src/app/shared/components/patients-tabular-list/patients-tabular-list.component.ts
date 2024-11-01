@@ -45,6 +45,7 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
         this.page
       )
     );
+    console.log("dataSource ........",this.visits);
     this.dataSource.paginator = this.paginator;
   }
 

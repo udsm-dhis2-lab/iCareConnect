@@ -178,11 +178,28 @@
 	</globalProperty>
 	<globalProperty>
 		<property>iCare.GePG.settings.systemCode</property>
-		<defaultValue>TARIS003</defaultValue>
+		<defaultValue>90011</defaultValue>
 		<description>
 			GePG System code
 		</description>
 	</globalProperty>
+
+	<globalProperty>
+		<property>iCare.GePG.settings.pkcs12Path</property>
+		<defaultValue>certificates/keystore.p12</defaultValue>
+		<description>
+			pkcs12Path from relative certificate folder
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>iCare.GePG.settings.pkcs12Password</property>
+		<defaultValue>dhis2lab</defaultValue>
+		<description>
+			pkcs12Password 
+		</description>
+	</globalProperty>
+
 	<globalProperty>
 		<property>iCare.GePG.settings.ServiceProviderCode</property>
 		<defaultValue>SP537</defaultValue>
@@ -213,14 +230,14 @@
 	</globalProperty>
 	<globalProperty>
 		<property>iCare.GePG.settings.clientPrivateKey</property>
-		<defaultValue>MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAOKJJaeHkWryn6D0A/xrcNLOD9fj5Hn2zJKAJOT+6pEZTaTY/aeiQmqLLr6/s9xfj5oa+TsbmnCEeoiJ63/LdkMqaYEjLgC/TacFsxK7nOLQ7CZeFpEYKG2zZv0ppSTUcEL72a8Ia3+PmuOm7CsuVWGHP/IzoWNRs+bCoNTPdanPAgMBAAECgYEAhWagDuytfJ5N1Fl982pNsUX5XHfuNshYJbligJuBBFszNu01Sj8p/1Xg/CElyJNZnDVgKSeTJclN4xPc44+sHru7JbFUIZYzeXPI3nJzw/KlFDiB3UKJWj9mjF89G9IEgOhqzEfuRvyKtyouwKqlmMvY+XT5z9uphKnGUf9IEUECQQDy066RTEkzZt1en0tM07ZUlvuznfKT7nx+KGHkxxPW1+lkwtKge5jFNvIzYy6H9P8SzFI8iYLU4weoNPs65/hhAkEA7tM3whLxhrUL83brUSIp8UBkWG37G8Rrxgt4wdly/ZRnVA4KZz5ZCZ8KmwYbEVSdN3JL0mBCyKAuQ226ifkQLwJAT534bsuEdMYVbyDrn5ULA1E91fbDwp0/VF4JOunLJ3ZDoDYAuX3M6VzKrO6oIwvBVniHvjGYJBUMPaqhdP76AQJBALPKTKqMykjH2QRjHQnKN1sIR8KOoUCpIR1Jm5ILmlauNw9/NnO86xikIz7LXOsyEN0h7VSl5QDWHZ3jaE/gMT8CQQCFq2VBx7yHNeORrVK4BgArsWxajssplqM0s1zhZO4SM0WZZqRdhdXgedWv7OsO57kP1KlYrkz8atqRo2OwWQSj</defaultValue>
+		<defaultValue></defaultValue>
 		<description>
 			Client Private Key
 		</description>
 	</globalProperty>
 	<globalProperty>
 		<property>iCare.GePG.settings.enginePublicKey</property>
-		<defaultValue>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8503OpGb1/RVPOJrnFR31pSpI5dZMK1GjITfX6YSBLd9dHY9S+HS2CCBb6Nvqtu/Wc1NNJhrxPZKALHTK1fMbH55F4J51HycvhjCzJepLKQLxDyE4Aff9mXV77gQcxdh+2SdEb0Qi9+9TNAqpze2TbXd5Zf9wDOhJXKdB5o16XQIDAQAB</defaultValue>
+		<defaultValue></defaultValue>
 		<description>
 			Engine Public Key
 		</description>
@@ -232,11 +249,52 @@
 			GePG UCC Base API
 		</description>
 	</globalProperty>
+
+	<globalProperty>
+		<property>icare.person.attribute.phonenumber</property>
+		<defaultValue>ATTRIBUTE_PHONE_NUMBER</defaultValue>
+		<description>
+			Attribute Phote Number 
+		</description>
+	</globalProperty>
+
+   <globalProperty>
+		<property>icare.email.person.attributeTypeUuid</property>
+		<defaultValue>ATTRIBUTE_EMAIL</defaultValue>
+		<description>
+			Attribute Patience Email 
+		</description>
+	</globalProperty>
+
+
+	<globalProperty>
+		<property>iCare.GePG.settings.GepgUsername</property>
+		<defaultValue></defaultValue>
+		<description>
+			GEPG_USERNAME
+		</description>
+	</globalProperty>
+
+	<globalProperty>
+		<property>iCare.GePG.settings.GepgPassword</property>
+		<defaultValue></defaultValue>
+		<description>
+			GEPG_PASSWORD
+		</description>
+	</globalProperty>
+
 	<globalProperty>
 		<property>icare.laboratory.concept.mappings.machineIntegration.conceptSourceUuid</property>
 		<defaultValue>machine-integration</defaultValue>
 		<description>
 			For storing concept source used to map test from machine results
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>icare.billing.controlNumberBasedPaymentType.concept.uuid</property>
+		<defaultValue>uuid</defaultValue>
+		<description>
+			Default for GePG
 		</description>
 	</globalProperty>
 	<globalProperty>

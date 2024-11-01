@@ -77,6 +77,9 @@
 
     <concept concept_id="1020" retired="false" datatype_id="2" class_id="1" is_set="true" creator="1"
              date_created="2016-01-01 00:00:57.0" version="" uuid="90981c30-5e44-11e8-ie7c-50b6etwQqQee" />
+
+    <concept concept_id="10020" retired="false" datatype_id="2" class_id="1" is_set="true" creator="1"
+             date_created="2016-01-01 00:00:57.0" version="" uuid="GEPGTEST-5e44-11e8-ie7c-50b6etwQqQee" />
     <concept concept_id="1029" retired="false" datatype_id="2" class_id="1" is_set="true" creator="1"
              date_created="2016-01-01 00:00:57.0" version="" uuid="999nec30-5344-11e8-ie7c-40b6etw3cfee" />
     <concept concept_id="1030" retired="false" datatype_id="2" class_id="1" is_set="true" creator="1"
@@ -143,6 +146,9 @@
     <concept_name concept_name_id="1003" concept_id="1003" name="CASH" locale="en_GB" creator="1"
                   date_created="2017-05-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="a457ac00-5345-11e8-9c7c-4ybs34c3cfee" />
+    <concept_name concept_name_id="1022" concept_id="10020" name="GEPG" locale="en_GB" creator="1"
+                  date_created="2017-05-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
+                  uuid="GEPG234-5345-11e8-9c7c-4ybs34c3cfee" />
     <concept_name concept_name_id="1004" concept_id="1004" name="INSURANCE" locale="en_GB" creator="1"
                   date_created="2017-05-12 00:00:00.0" concept_name_type="FULLY_SPECIFIED" locale_preferred="1" voided="false"
                   uuid="a457ac00-5345-11e8-9c7c-4ybs34kksdee" />
@@ -341,8 +347,8 @@
     <bl_invoice_item order_id="101" invoice_id="102" item_id="125" quantity="1" price="300" />
 
     <!--Payment-->
-    <bl_payment payment_id="1" uuid="98b75eb-er45-12e8-9c7cs" invoice_id="11" reference_number="abc123" payment_type_id="500" received_by="abc" date_created="2020-12-27 00:00:00" voided="0" creator="1" />
-    <bl_payment_item order_id="301" item_id="123" amount="50" payment_id="1" />
+<!--    <bl_payment payment_id="1" uuid="98b75eb-er45-12e8-9c7cs" status="PAID" invoice_id="11" reference_number="abc123" payment_type_id="500" received_by="abc" date_created="2020-12-27 00:00:00" voided="0" creator="1" />-->
+<!--    <bl_payment_item order_id="301" item_id="123" status="PAID" amount="50" payment_id="1" />-->
 
     <!--Discount -->
     <bl_discount discount_id="1" uuid="8b75eb-er45-12e8" discount_criteria_id="500" patient_id="1000" creator="1" date_created="2020-12-27 00:00:00" voided="0" />
