@@ -1730,4 +1730,18 @@ public class ICareController {
 	        @RequestParam(value = "idType", required = false) String idType) throws Exception {
 		return iCareService.getSharedRecordsFromExternalMediator(hfrCode, id, idType);
 	}
+
+	@RequestMapping(value = "emrHealthRecords", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> retrieveClientsData(@RequestParam(value = "hfrCode", required = false) String hfrCode,
+									  @RequestParam(value = "id", required = true) String id,
+									  @RequestParam(value = "idType", required = false) String idType,
+									  @RequestParam(value = "count", required = false) Integer count) throws Exception {
+		try {
+			return iCareService.getPatientVisitsByIdentifier(id, idType, count);
+		}catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception(e.getMessage());
+		}
+	}
 }

@@ -215,6 +215,7 @@ public interface ICareService extends OpenmrsService {
 	
 	Map<String, Object> generateVisitsData(Date startDate, Date endDate, Boolean sendToExternalMediator, String uuid)
 	        throws Exception;
+	List<Map<String,Object>> getPatientVisitsByIdentifier(String id, String idType, Integer numberOfVisits) throws Exception;
 	
 	Map<String, Object> sendReferralDataToMediator(String uuid) throws Exception;
 	
