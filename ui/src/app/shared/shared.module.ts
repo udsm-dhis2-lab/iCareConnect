@@ -28,6 +28,7 @@ import { NgxMatSelectSearchModule } from "ngx-mat-select-search";
     NgxMatSelectSearchModule,
   ],
   exports: [
+    CommonModule,
     FormModule,
     ...materialModules,
     ...modules,
