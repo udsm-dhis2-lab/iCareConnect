@@ -1045,15 +1045,13 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> responseMap = (new ObjectMapper()).readValue(mockedResponse.getContentAsString(), Map.class);
 		System.out.println(responseMap);
 	}
-
+	
 	@Test
 	public void testGetPatientVisitsByIdentifier() throws Exception {
-		MockHttpServletRequest emrHealthRecordsRequest = newGetRequest("icare/emrHealthRecords",
-				new Parameter("id", "110620-2/10891/21"),
-				new Parameter("idType", "MRN"),
-				new Parameter("count", "1"));
+		MockHttpServletRequest emrHealthRecordsRequest = newGetRequest("icare/emrHealthRecords", new Parameter("id",
+		        "110620-2/10891/21"), new Parameter("idType", "MRN"), new Parameter("count", "1"));
 		MockHttpServletResponse mockedResponse = handle(emrHealthRecordsRequest);
-		Map<String,Object> responseMap = (new ObjectMapper()).readValue(mockedResponse.getContentAsString(), Map.class);
+		Map<String, Object> responseMap = (new ObjectMapper()).readValue(mockedResponse.getContentAsString(), Map.class);
 		System.out.println(responseMap);
 	}
 }

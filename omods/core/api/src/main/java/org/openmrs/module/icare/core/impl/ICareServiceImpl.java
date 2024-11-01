@@ -1271,7 +1271,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		}
 		return dataTemplateData;
 	}
-
+	
 	public List<Map<String,Object>> getPatientVisitsByIdentifier(String id, String idType, Integer numberOfVisits) throws Exception {
 		// 1. Get client from OpenMRS
 		List<Visit> visits = dao.getPatientVisitsByIdentifier(id, idType,numberOfVisits);
