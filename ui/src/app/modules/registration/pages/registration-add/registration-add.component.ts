@@ -878,7 +878,11 @@ export class RegistrationAddComponent implements OnInit {
         //TODO: add check for edit mode to see if can create or edit mode
         if (this.editMode) {
           this.registrationService
-            .updatePatient(patientPayload, this.patientInformation?.id)
+            .updatePatient(
+              patientPayload,
+              this.patientInformation?.id,
+              this.patientInformation?.patient?.identifiers
+            )
             .subscribe(
               (updatePatientResponse) => {
                 if (!updatePatientResponse?.error) {
