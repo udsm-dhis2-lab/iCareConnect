@@ -45,7 +45,6 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
         this.page
       )
     );
-    console.log("dataSource ........",this.visits);
     this.dataSource.paginator = this.paginator;
   }
 
@@ -66,7 +65,6 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
     event.stopPropagation();
     this.patientVisitDetails.emit(patientVisitDetails);
   }
-  
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;

@@ -1730,7 +1730,7 @@ public class ICareController {
 	        @RequestParam(value = "idType", required = false) String idType) throws Exception {
 		return iCareService.getSharedRecordsFromExternalMediator(hfrCode, id, idType);
 	}
-
+	
 	@RequestMapping(value = "emrHealthRecords", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String,Object> retrieveClientsData(@RequestParam(value = "hfrCode", required = false) String hfrCode,

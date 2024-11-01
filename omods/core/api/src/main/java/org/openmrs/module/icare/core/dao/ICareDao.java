@@ -1196,19 +1196,19 @@ public class ICareDao extends BaseDAO<Item> {
 	
 	// 	return isSuccess;
 	// }
-
+	
 	public List<Visit> getPatientVisitsByIdentifier(String id, String idType, Integer numberOfVisits) throws Exception {
 		DbSession session = this.getSession();
-
-		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p LEFT JOIN p.identifiers pi " +
-		" LEFT JOIN pi.identifierType pitype ";
+		
+		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p LEFT JOIN p.identifiers pi "
+		        + " LEFT JOIN pi.identifierType pitype ";
 		queryStr += " WHERE pi.identifier=:id AND pitype.name =:idType";
 		Query query = session.createQuery(queryStr);
 		if (id != null && id != null) {
 			query.setParameter("id", id);
 			query.setParameter("idType", idType);
 		}
-
+		
 		if (numberOfVisits != null) {
 			query.setMaxResults(numberOfVisits);
 		}
