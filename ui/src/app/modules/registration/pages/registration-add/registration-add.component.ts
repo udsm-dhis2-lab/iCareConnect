@@ -46,6 +46,7 @@ import { Dropdown } from "src/app/shared/modules/form/models/dropdown.model";
 import { PatientService } from "src/app/shared/resources/patient/services/patients.service";
 import { Field } from "src/app/shared/modules/form/models/field.model";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
+import { MatSelectChange } from "@angular/material/select";
 @Component({
   selector: "app-registration-add",
   templateUrl: "./registration-add.component.html",
@@ -148,6 +149,7 @@ export class RegistrationAddComponent implements OnInit {
     id: "",
     format: "",
   };
+  definedIdentifierTypes: any[] = [];
   loadingForm: boolean;
   loadingFormError: string;
 
@@ -548,6 +550,18 @@ export class RegistrationAddComponent implements OnInit {
               this.patientIdentifierTypes
             );
 
+            this.definedIdentifierTypes = !this.patientInformation
+              ? []
+              : (
+                  this.patientInformation?.patient?.identifiers?.map(
+                    (identifier: any) => {
+                      return this.otherPatientIdentifierTypes.find(
+                        (identifierType) =>
+                          identifierType.id === identifier?.identifierType?.uuid
+                      );
+                    }
+                  ) || []
+                )?.filter((identifierType: any) => identifierType);
             const otherIdentifierObject =
               this.patientInformation?.patient?.identifiers?.filter(
                 (identifier) => {
@@ -563,24 +577,27 @@ export class RegistrationAddComponent implements OnInit {
                   return attribute.attributeType.display === "patientType";
                 }
               )[0]?.value;
-            // otherIdentifierObject?.identifierType?.uuid ===
-            // ("6e7203dd-0d6b-4c92-998d-fdc82a71a1b0" ||
-            //   "9f6496ec-cf8e-4186-b8fc-aaf9e93b3406")
-            //   ? otherIdentifierObject?.identifierType?.display?.split(" ")[0]
-            //   : "Other";
 
+            // TODO: Consider reviewing these two lines as they might be duplicate with the afterwards logic
             this.selectedIdentifierType.id =
               otherIdentifierObject?.identifierType?.uuid;
 
             this.patient[this.selectedIdentifierType?.id] =
               otherIdentifierObject?.identifier;
-            // this.selectedIdentifierType.id = 6e7203dd-0d6b-4c92-998d-fdc82a71a1b0 sTAFF
 
-            //   this.patientInformation?.patient?.identifiers.filter(
-            //     (identifier) =>
-            //       identifier.identifierType.display === "Student ID" ||
-            //       "Staff ID"
-            //   )[0]?.identifier;
+            if (
+              this.patientInformation &&
+              this.patientInformation?.patient?.identifiers?.length > 0
+            ) {
+              this.definedIdentifierTypes.forEach((identifierType) => {
+                this.patient[identifierType.id] =
+                  this.patientInformation?.patient?.identifiers?.find(
+                    (identifier) =>
+                      identifier.identifierType.uuid === identifierType.id
+                  )?.identifier;
+              });
+            }
+
             this.patient.dob =
               this.patientInformation.patient?.person?.birthdate;
             this.dateSet();
@@ -1076,10 +1093,13 @@ export class RegistrationAddComponent implements OnInit {
     }
   }
 
-  onSelectOtherIdentifier(e: Event, identifier: any): void {
-    e.stopPropagation();
-    this.selectedIdentifierType = identifier;
-    this.patient[identifier.id] = null;
+  onSelectOtherIdentifier(e: MatSelectChange): void {
+    this.definedIdentifierTypes = e.value;
+    this.definedIdentifierTypes.forEach((identifierType: any) => {
+      if (!this.patient[identifierType.id]) {
+        this.patient[identifierType.id] = null;
+      }
+    });
   }
 
   getPatientType(value: string, occupationInfo) {

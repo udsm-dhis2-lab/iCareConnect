@@ -32,7 +32,7 @@ export class RegistrationService {
   }
 
   updatePatient(patientPayload, uuid) {
-    let url = `patient/${uuid}?v=full`;
+    let url = `patient/${uuid}`;
     return this.httpClient.post(url, patientPayload).pipe(
       map((response) => response),
       catchError((error) => of(error))
