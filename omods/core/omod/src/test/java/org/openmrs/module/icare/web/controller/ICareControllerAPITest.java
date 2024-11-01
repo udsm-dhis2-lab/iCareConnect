@@ -1053,7 +1053,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 				new Parameter("idType", "MRN"),
 				new Parameter("count", "1"));
 		MockHttpServletResponse mockedResponse = handle(emrHealthRecordsRequest);
-		List responseMap = (new ObjectMapper()).readValue(mockedResponse.getContentAsString(), List.class);
+		Map<String,Object> responseMap = (new ObjectMapper()).readValue(mockedResponse.getContentAsString(), Map.class);
 		System.out.println(responseMap);
 	}
 }

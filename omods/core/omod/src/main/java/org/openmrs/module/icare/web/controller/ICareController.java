@@ -1733,12 +1733,19 @@ public class ICareController {
 
 	@RequestMapping(value = "emrHealthRecords", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public List<Map<String,Object>> retrieveClientsData(@RequestParam(value = "hfrCode", required = false) String hfrCode,
+	public Map<String,Object> retrieveClientsData(@RequestParam(value = "hfrCode", required = false) String hfrCode,
 									  @RequestParam(value = "id", required = true) String id,
 									  @RequestParam(value = "idType", required = false) String idType,
-									  @RequestParam(value = "count", required = false) Integer count) throws Exception {
+									  @RequestParam(value = "count", required = true, defaultValue = "1") Integer count) throws Exception {
 		try {
-			return iCareService.getPatientVisitsByIdentifier(id, idType, count);
+			Map<String,Object> response = new HashMap<>();
+			Map<String,Object> requestInfo = new HashMap<>();
+			requestInfo.put("id", id);
+			requestInfo.put("idType", idType);
+			requestInfo.put("count", count);
+			response.put("requestInfo",requestInfo);
+			response.put("results", iCareService.getPatientVisitsByIdentifier(id, idType, count));
+			return response;
 		}catch (Exception e) {
 			e.printStackTrace();
 			throw new Exception(e.getMessage());
