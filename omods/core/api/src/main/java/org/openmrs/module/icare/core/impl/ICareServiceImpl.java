@@ -1422,23 +1422,28 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			AdministrationService adminService = Context.getService(AdministrationService.class);
 			String mediatorsConfigs = adminService.getGlobalProperty(ICareConfig.INTEROPERABILITY_MEDIATORS_LIST);
 			
-			JSONArray mediatorsList = new JSONArray(mediatorsConfigs);
-			ICareService iCareService = Context.getService(ICareService.class);
-			
-			for (int count = 0; count < mediatorsList.length(); count++) {
-				JSONObject mediator = mediatorsList.getJSONObject(count);
-				if (mediator.optBoolean("isActive") && mediatorKeyType.equals(mediator.getString("mediatorKey"))) {
-					String mediatorKey = mediator.getString("mediatorKey");
-					String mediatorUrlPath = mediator.getString("mediatorUrlPath");
-					String authenticationType = mediator.getString("authenticationType");
-					authReferenceKey = mediator.getString("") != null ? mediator.getString("authKeyReference") : mediator
-					        .getString("mediatorKey");
-					return iCareService.pushDataToExternalMediator(new JSONObject(dataTemplateData).toString(), mediatorKey,
-					    mediatorUrlPath, authenticationType, authReferenceKey);
+			if (mediatorsConfigs != null) {
+				JSONArray mediatorsList = new JSONArray(mediatorsConfigs);
+				ICareService iCareService = Context.getService(ICareService.class);
+
+				if (!mediatorsList.isEmpty()) {
+					for (int count = 0; count < mediatorsList.length(); count++) {
+						JSONObject mediator = mediatorsList.getJSONObject(count);
+						if (mediator.optBoolean("isActive") && mediatorKeyType.equals(mediator.getString("mediatorKey"))) {
+							String mediatorKey = mediator.getString("mediatorKey");
+							String mediatorUrlPath = mediator.getString("mediatorUrlPath");
+							String authenticationType = mediator.getString("authenticationType");
+							authReferenceKey = mediator.getString("") != null ? mediator.getString("authKeyReference") : mediator
+									.getString("mediatorKey");
+							return iCareService.pushDataToExternalMediator(new JSONObject(dataTemplateData).toString(), mediatorKey,
+									mediatorUrlPath, authenticationType, authReferenceKey);
+						}
+					}
 				}
 			}
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			throw new Exception(e.getMessage());
 		}
 		return "";

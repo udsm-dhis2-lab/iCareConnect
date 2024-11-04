@@ -36,10 +36,13 @@ public class AutoGenerateAndSendDataTemplateTask extends AbstractTask {
 				Date startDate = calendar.getTime();
 				
 				ICareService iCareService = Context.getService(ICareService.class);
+				System.out.println(startDate);
+				System.out.println(endDate);
 				iCareService.generateVisitsData(startDate, endDate, true, null);
 			}
-			catch (Exception var5) {
-				log.error("Error while auto generating data template and sending to external mediator ", var5);
+			catch (Exception e) {
+				e.printStackTrace();
+				log.error("Error while auto generating data template and sending to external mediator ", e);
 			}
 			finally {
 				this.stopExecuting();
