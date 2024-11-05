@@ -1272,9 +1272,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		return dataTemplateData;
 	}
 	
-	public List<Map<String,Object>> getPatientVisitsByIdentifier(String id, String idType, Integer numberOfVisits) throws Exception {
+	public List<Map<String,Object>> getPatientVisitsByIdentifier(String id, String idType, String referralNumber, Integer numberOfVisits) throws Exception {
 		// 1. Get client from OpenMRS
-		List<Visit> visits = dao.getPatientVisitsByIdentifier(id, idType,numberOfVisits);
+		// TODO: Add support to search visits by referralNumber
+		List<Visit> visits = dao.getPatientVisitsByIdentifier(id, idType, numberOfVisits);
 		List<Map<String,Object>> visitsData = new ArrayList<>();
 		for(Visit visit: visits) {
 			Map<String,Object> templateData = new HashMap<>();
@@ -1495,7 +1496,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public String getSharedRecordsFromExternalMediator(String hfrCode,
 													   String id,
-													   String idType) throws Exception {
+													   String idType,
+													   String referralNumber) throws Exception {
 		try {
 			Map<String,Object> responseData = new HashMap<>();
 			AdministrationService administrationService = Context.getAdministrationService();
@@ -1519,16 +1521,27 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 
 					if (id != null) {
 						mediatorUrl += "?id=" + id;
+						if (idType != null) {
+							if (mediatorUrl.contains("?")) {
+								mediatorUrl += "&idType="+ idType;
+							}
+						}
 					}
 
 					if (hfrCode != null) {
 						if (mediatorUrl.contains("?")) {
 							mediatorUrl += "&hfrCode="+ hfrCode;
+						} else {
+							mediatorUrl += "?hfrCode=" + hfrCode;
 						}
 					}
-					if (idType != null) {
+
+
+					if (referralNumber != null) {
 						if (mediatorUrl.contains("?")) {
-							mediatorUrl += "&idType="+ idType;
+							mediatorUrl += "&referralNumber="+ referralNumber;
+						} else {
+							mediatorUrl += "?referralNumber=" + referralNumber;
 						}
 					}
 					// Construct the URL for the GET request
