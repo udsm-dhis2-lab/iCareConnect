@@ -49,6 +49,7 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
+
     this.dataSource = new MatTableDataSource(
       sanitizePatientsVisitsForTabularPatientListing(
         this.visits,

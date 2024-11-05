@@ -81,6 +81,8 @@ export class PatientListComponent implements OnInit, OnChanges {
   ngOnChanges() {}
 
   ngOnInit() {
+
+    console.log('Items per page:', this.itemsPerPage);
     this.filters$ = this.systemSettingsService
       .getSystemSettingsMatchingAKey(
         "iCare.filters." + (this.filterCategory ? this.filterCategory : "")
@@ -100,6 +102,8 @@ export class PatientListComponent implements OnInit, OnChanges {
     // if (this.filterCategory === "billing") {
     //   this.includeDeadPatients = true;
     // }
+
+    console.log('Items per page 2:', this.itemsPerPage);
     this.getVisits(this.visits);
   }
 

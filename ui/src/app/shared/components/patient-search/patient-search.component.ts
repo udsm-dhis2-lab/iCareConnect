@@ -45,7 +45,7 @@ export class PatientSearchComponent implements OnInit {
 
       this.patients$ = this.patientService.getPatients(e.target.value).pipe(
         map((results) => {
-          return results?.map((res) => {
+          return results?.slice(0, 100).map((res) => {
             return {
               ...res,
               insurance:
