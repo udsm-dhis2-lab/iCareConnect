@@ -14,7 +14,8 @@
     userPrivileges: userPrivileges$ | async,
     verticalPrograms: verticalPrograms$ | async,
     verticalProgramUuid: verticalProgramUuid$ | async,
-    selectedService: selectedService$ | async
+    selectedService: selectedService$ | async,
+    remoteReferralDetails: remoteReferralDetails$ | async
   } as params"
 >
   <!-- <div class="centered-container" *ngIf="!params?.currentPatient">
@@ -218,19 +219,35 @@
                 </mat-checkbox>
                 <br />
 
-                <mat-form-field
-                  *ngIf="isReferralVisit"
-                  appearance="fill"
-                  class="w-25"
-                >
-                  <mat-label>Referral No:</mat-label>
-                  <input
-                    [(ngModel)]="visitDetails['referralNo']"
-                    (change)="getReferralNumber($event.target.value)"
-                    matInput
-                    type="text"
-                  />
-                </mat-form-field>
+                <div class="d-flex justify-content-left">
+                  <mat-form-field
+                    *ngIf="isReferralVisit"
+                    appearance="fill"
+                    class="w-25"
+                  >
+                    <mat-label>Referral No:</mat-label>
+                    <input
+                      [(ngModel)]="visitDetails['referralNo']"
+                      (change)="getReferralNumber($event.target.value)"
+                      matInput
+                      type="text"
+                    />
+                  </mat-form-field>
+                  <div class="w-25">
+                    <button
+                      class="ml-2"
+                      mat-button
+                      (click)="
+                        onGetReferralFromRemote(
+                          $event,
+                          visitDetails['referralNo']
+                        )
+                      "
+                    >
+                      Search
+                    </button>
+                  </div>
+                </div>
                 <br />
 
                 <div *ngIf="isReferralVisit">
@@ -348,8 +365,8 @@
                     *ngIf="
                       (
                         treatmentLocations
-                        | filterBy: searchTerm:'name'
-                        | filterLocationByService: currentVisitService
+                        | filterBy : searchTerm : 'name'
+                        | filterLocationByService : currentVisitService
                       ).length > 0
                     "
                   >
@@ -365,16 +382,16 @@
                       *ngIf="
                         (
                           treatmentLocations
-                          | filterBy: searchTerm:'name'
-                          | filterLocationByService: currentVisitService
+                          | filterBy : searchTerm : 'name'
+                          | filterLocationByService : currentVisitService
                         ).length > 0
                       "
                     >
                       <mat-chip-option
                         *ngFor="
                           let room of treatmentLocations
-                            | filterBy: searchTerm:'name'
-                            | filterLocationByService: currentVisitService
+                            | filterBy : searchTerm : 'name'
+                            | filterLocationByService : currentVisitService
                         "
                         (click)="onSelectRoom($event, room)"
                         color="{{ room.id === currentRoom ? 'primary' : '' }}"
@@ -400,8 +417,8 @@
                     *ngIf="
                       (
                         treatmentLocations
-                        | filterBy: searchTerm:'name'
-                        | filterLocationByService: currentVisitService
+                        | filterBy : searchTerm : 'name'
+                        | filterLocationByService : currentVisitService
                       ).length === 0 && currentVisitService
                     "
                   >
@@ -418,8 +435,8 @@
                     *ngIf="
                       (
                         treatmentLocations
-                        | filterBy: searchTerm:'name'
-                        | filterLocationByService: currentVisitService
+                        | filterBy : searchTerm : 'name'
+                        | filterLocationByService : currentVisitService
                       ).length === 0 && !currentVisitService
                     "
                   >
@@ -457,8 +474,8 @@
                     *ngIf="
                       (
                         treatmentLocations
-                        | filterBy: searchTerm:'name'
-                        | filterLocationByService: currentVisitService
+                        | filterBy : searchTerm : 'name'
+                        | filterLocationByService : currentVisitService
                       ).length > 0
                     "
                   >
@@ -474,8 +491,8 @@
                       <mat-chip-option
                         *ngFor="
                           let room of treatmentLocations
-                            | filterBy: searchTerm:'name'
-                            | filterLocationByService: currentVisitService
+                            | filterBy : searchTerm : 'name'
+                            | filterLocationByService : currentVisitService
                         "
                         (click)="onSelectRoom($event, room)"
                         color="{{ room.id === currentRoom ? 'primary' : '' }}"
@@ -495,8 +512,8 @@
                     *ngIf="
                       (
                         treatmentLocations
-                        | filterBy: searchTerm:'name'
-                        | filterLocationByService: currentVisitService
+                        | filterBy : searchTerm : 'name'
+                        | filterLocationByService : currentVisitService
                       ).length === 0 && currentVisitService
                     "
                   >
@@ -513,8 +530,8 @@
                     *ngIf="
                       (
                         treatmentLocations
-                        | filterBy: searchTerm:'name'
-                        | filterLocationByService: currentVisitService
+                        | filterBy : searchTerm : 'name'
+                        | filterLocationByService : currentVisitService
                       ).length === 0 && !currentVisitService
                     "
                   >
