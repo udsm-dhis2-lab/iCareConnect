@@ -37,3 +37,10 @@
 .item {
   height: calc(100%/3);
 }
+
+.adjustable-height {
+  flex: 1;
+  max-height: 100%; 
+  box-sizing: border-box; 
+  padding-top: 25px;
+}
