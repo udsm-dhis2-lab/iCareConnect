@@ -51,10 +51,12 @@ export class PatientListComponent implements OnInit, OnChanges {
   @Input() doNotUseLocation: boolean;
   @Input() encounterType: string;
   @Input() includeDeadPatients: boolean;
+  @Input() isAdmited: boolean = false;
 
   page: number = 0;
   visits$: Observable<Visit[]>;
   filteredVisits$: Observable<Visit[]>;
+  dischargedPatientsVisits$:Observable<Visit[]>;
   searchTerm: string;
   loadingPatients: boolean;
   locationsUuids: string[] = [];
@@ -103,8 +105,23 @@ export class PatientListComponent implements OnInit, OnChanges {
     this.getVisits(this.visits);
   }
 
+
   private getVisits(visits: Visit[]) {
     this.loadingPatients = true;
+    // this.service = "LABS";
+    console.log("hereeee  ........");
+    this.dischargedPatientsVisits$ = this.visitService
+    .getPatientsVisitsByEncounterType(this.encounterType)
+    .pipe(
+      map((response: any) => {
+        return response;
+      })
+    );
+    this.dischargedPatientsVisits$.subscribe((item)=>{
+      console.log("dischargedPatientsVisits ........",item);
+    })
+    
+    console.log("visit type ........",this.encounterType);
     this.visits$ = visits
       ? of(visits)
       : this.service && this.service === "LABS"
@@ -116,7 +133,7 @@ export class PatientListComponent implements OnInit, OnChanges {
       : this.visitService
           .getAllVisits(
             !this.doNotUseLocation ? this.currentLocation : null,
-            false,
+            true,
             false,
             null,
             this.startingIndex,
@@ -141,6 +158,7 @@ export class PatientListComponent implements OnInit, OnChanges {
             })
           );
   }
+
 
   getAnotherList(event: Event, visit, type): void {
     const details = {

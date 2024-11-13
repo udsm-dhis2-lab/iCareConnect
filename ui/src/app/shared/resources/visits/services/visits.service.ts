@@ -240,6 +240,7 @@ export class VisitsService {
   getPatientsVisitsByEncounterType(
     encounterTypeUuid: string
   ): Observable<any[]> {
+    
     return this.httpClient
       .get(
         `icare/visit?encounterTypeUuid=${encounterTypeUuid}&includeDeadPatients=true`
@@ -292,11 +293,11 @@ export class VisitsService {
 
   getAllVisits(
     location?: string | string[],
-    includeInactive?: boolean,
-    onlyInsurance?: boolean,
+    includeInactive = false,
+    onlyInsurance = false,
     queryParam?: string,
-    startIndex?: number,
-    limit?: number,
+    startIndex = 0,
+    limit = 100,
     orderType?: string,
     orderStatus?: string,
     orderStatusCode?: string,
@@ -306,109 +307,55 @@ export class VisitsService {
     encounterType?: string,
     sampleCategory?: string,
     excludedSampleCategories?: string[],
-    includeDeadPatients?: boolean
+    includeDeadPatients = false
   ): Observable<any> {
-    const locationUuids: any = isArray(location)
-      ? location
-      : location
-      ? [location]
-      : [];
-
-    // Parameters for sorting
-    let parametersString = "";
-    if (orderBy) {
-      parametersString += `&OrderBy=${orderBy}`;
-    }
-    if (orderStatus) {
-      parametersString += `&fulfillerStatus=${orderStatus}`;
-    }
-    if (orderByDirection) {
-      parametersString += `&orderByDirection=${orderByDirection}`;
-    }
-    if (orderStatusCode) {
-      parametersString += `&orderStatusCode=${orderStatusCode}`;
-    }
-    if (orderType) {
-      parametersString += `&orderTypeUuid=${orderType}`;
-    }
-    if (queryParam) {
-      parametersString += `&q=${queryParam}`;
-    }
-
-    if (sampleCategory) {
-      parametersString += `&sampleCategory=${sampleCategory}`;
-    }
-    if (filterBy) {
-      parametersString += filterBy;
-    }
-
-    if (encounterType) {
-      parametersString += `&encounterTypeUuid=${encounterType}`;
-    }
-
-    if (excludedSampleCategories && excludedSampleCategories?.length > 0) {
-      parametersString += `&exclude=${excludedSampleCategories.join(",")}`;
-    }
-    if (includeDeadPatients && includeDeadPatients === true) {
-      parametersString += `&includeDeadPatients=true`;
-    }
-    //
-    return (
-      locationUuids?.length > 0
-        ? zip(
-            ...locationUuids.map((locationUuid) => {
-              const locationParameter = `locationUuid=${locationUuid}`;
-              return this.httpClient.get(
-                `icare/visit?${locationParameter}${parametersString}&startIndex=${startIndex}&limit=${limit}`
-              );
-            })
-          )
-        : this.httpClient.get(
-            `icare/visit?${parametersString.replace(
-              "&",
-              ""
-            )}&startIndex=${startIndex}&limit=${limit}`
-          )
-    ).pipe(
-      map((visitResponse: any) => {
-        const results =
-          locationUuids?.length > 0
-            ? flatten(visitResponse.map((visitData) => visitData?.results))
-            : visitResponse?.results;
-        // TODO: Softcode Insurance attribute value (Concept UUID) - 00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII
-        return (
-          (flatten(results) || [])
-            .map((visitResult: any) => {
-              const formattedResult = {
-                pager:
-                  locationUuids?.length > 0
-                    ? visitResponse[0].links
-                    : visitResponse?.links,
-                ...visitResult,
-                paymentType:
-                  (
-                    visitResult?.attributes.filter(
-                      (attribute) =>
-                        attribute &&
-                        attribute?.display &&
-                        attribute?.display ===
-                          "00000101IIIIIIIIIIIIIIIIIIIIIIIIIIII"
-                    ) || []
-                  ).length > 0
-                    ? "Insurance"
-                    : "Cash",
-              };
-              return new Visit(formattedResult);
-            })
-            .filter((visit) =>
-              !onlyInsurance ? visit : visit?.paymentType === "Insurance"
-            ) || []
-        );
+    const locationUuids = Array.isArray(location) ? location : location ? [location] : [];
+  
+    // Build query parameters
+    let parametersString = '';
+    if (orderBy) parametersString += `&OrderBy=${orderBy}`;
+    if (orderStatus) parametersString += `&fulfillerStatus=${orderStatus}`;
+    if (orderByDirection) parametersString += `&orderByDirection=${orderByDirection}`;
+    if (orderStatusCode) parametersString += `&orderStatusCode=${orderStatusCode}`;
+    if (orderType) parametersString += `&orderTypeUuid=${orderType}`;
+    if (queryParam) parametersString += `&q=${queryParam}`;
+    if (sampleCategory) parametersString += `&sampleCategory=${sampleCategory}`;
+    if (filterBy) parametersString += filterBy;
+    if (encounterType) parametersString += `&encounterTypeUuid=${encounterType}`;
+    if (excludedSampleCategories?.length) parametersString += `&exclude=${excludedSampleCategories.join(",")}`;
+    if (includeDeadPatients) parametersString += `&includeDeadPatients=true`;
+  
+    const getRequest = (locationUuid?: string) => {
+      const locationParameter = locationUuid ? `locationUuid=${locationUuid}&` : '';
+      const url = `icare/visit?${locationParameter}${parametersString}&startIndex=${startIndex}&limit=${limit}`;
+      console.log("all visit query url .......",url);
+      return this.httpClient.get(url).pipe(
+        map((response: any) => response?.results || [])
+      );
+    };
+  
+    const requests$ = locationUuids.length ? zip(...locationUuids.map(getRequest)) : getRequest();
+  
+    return requests$.pipe(
+      map((visitResponses: any[]) => {
+        const results = flatten(visitResponses);
+        return results
+          .map((visitResult: any) => {
+            const paymentType = (visitResult?.attributes.some(attr =>
+              attr?.display?.includes("Insurance ID")) ? "Insurance" : "Cash");
+  
+            return new Visit({
+              pager: visitResponses[0]?.links,
+              ...visitResult,
+              paymentType,
+            });
+          })
+          .filter((visit) => !onlyInsurance || visit.paymentType === "Insurance");
       }),
-      catchError((error) => {
-        return of(error);
-      })
+      catchError((error) => of(error))
     );
+  
+  
     // }
     return (
       locationUuids?.length > 0

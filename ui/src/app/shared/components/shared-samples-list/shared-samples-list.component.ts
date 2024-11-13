@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -82,7 +83,8 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     private sampleService: SamplesService,
     private dialog: MatDialog,
     private store: Store<AppState>,
-    private visitsService: VisitsService
+    private visitsService: VisitsService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngAfterViewInit(): void {
@@ -92,7 +94,9 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       error: (err) => console.log(err), // Called if at any point WebSocket API signals some kind of error.
       complete: () => console.log("complete"), // Called when connection is closed (for whatever reason).
     });
+    console.log("sample type out ...............",this.sampleTypes);
     if (this.listType === "samples") {
+      console.log("sample ...............");
       this.getSamples({
         category: this.category,
         hasStatus: this.hasStatus,
@@ -101,12 +105,16 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       });
     } else {
       this.getPatients();
+      console.log("patience ...............",this.getPatients());
     }
+    this.cdr.detectChanges(); 
   }
 
   ngOnInit(): void {
     this.listType = !this.LISConfigurations?.isLIS ? "patients" : "samples";
+    console.log("category ...............",this.category);
 
+    console.log("this.tabType ...............",this.tabType);
     this.sampleVisitParameters = {
       hasStatus: this.hasStatus,
       sampleCategory:
@@ -114,6 +122,8 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
           ? "NOT ACCEPTED"
           : this.category,
     };
+    console.log("this.sampleVisitParameters ...............",this.sampleVisitParameters);
+    
     this.searchingTestField = new Dropdown({
       id: "test",
       key: "test",
@@ -235,6 +245,8 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   }
 
   getPatients(): void {
+    console.log("this.category ...........",this.category);
+    console.log("this.excludedSampleCategories ...........",this.excludedSampleCategories);
     this.samples$ = this.visitsService
       .getAllVisits(
         null,
@@ -255,12 +267,17 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       )
       .pipe(
         map((response) => {
+          console.log("sample response ...........",response);
           return {
             pager: null,
             results: response?.map((visitData) => visitData?.visit),
           };
         })
       );
+      this.samples$.subscribe((sample)=>{
+        console.log("sample observable ...........",sample);
+      })
+      
   }
 
   getSamplesListByVisit(event: Event, visit: any, parameters: any): void {

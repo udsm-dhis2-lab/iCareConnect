@@ -4,6 +4,7 @@ import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
 import { sanitizePatientsVisitsForTabularPatientListing } from "../../helpers/sanitize-visits-list-for-patient-tabular-listing.helper";
 import { Visit } from "../../resources/visits/models/visit.model";
+import { VisitsService } from "../../resources/visits/services";
 
 @Component({
   selector: "app-patients-tabular-list",
@@ -16,6 +17,7 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   @Input() paymentTypeSelected: string;
   @Input() itemsPerPage: number;
   @Input() page: number;
+  @Input() isAdmited?:boolean ;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @Output() patientVisitDetails: EventEmitter<any> = new EventEmitter<any>();
   @Output() shouldLoadNewList: EventEmitter<boolean> =
@@ -33,9 +35,14 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
     "startDatetime",
   ];
   dataSource: any;
-  constructor() {}
+  constructor( private visitService: VisitsService,) {}
 
   ngOnInit(): void {
+    let filteredVisits = this.visits;
+    console.log("filteredVisits .....",this.isAdmited);
+    if (this.isAdmited !== undefined) {
+      filteredVisits = this.visits.filter((visit: Visit) => visit.isAdmitted === this.isAdmited);
+    }
     this.dataSource = new MatTableDataSource(
       sanitizePatientsVisitsForTabularPatientListing(
         this.visits,
@@ -45,22 +52,36 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
         this.page
       )
     );
-    console.log("dataSource ........",this.visits);
+    console.log("visit list ........",this.visits);
     this.dataSource.paginator = this.paginator;
+    const activeVisit = this.visitService.getActiveVisit(this.visits[5].patientUuid, false);
+    activeVisit.subscribe(
+    (data) => console.log("Active visit data:", data.waitingToBeAdmitted),
+    (error) => console.error("Error fetching active visit:", error)
+    );
+
   }
 
   ngOnChanges() {
+    let filteredVisits = this.visits;
+  
+    if (this.isAdmited !== undefined) {
+      filteredVisits = this.visits.filter((visit: Visit) => visit.isAdmitted === this.isAdmited);
+    }
     this.dataSource = new MatTableDataSource(
       sanitizePatientsVisitsForTabularPatientListing(
-        this.visits,
+        filteredVisits,  
         this.shouldShowParentLocation,
         this.paymentTypeSelected,
         this.itemsPerPage,
         this.page
       )
     );
+  
     this.dataSource.paginator = this.paginator;
   }
+  
+  
 
   getSelectedPatient(event, patientVisitDetails) {
     event.stopPropagation();
