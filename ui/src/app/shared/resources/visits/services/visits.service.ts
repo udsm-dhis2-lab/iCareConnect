@@ -329,7 +329,6 @@ export class VisitsService {
     const getRequest = (locationUuid?: string) => {
       const locationParameter = locationUuid ? `locationUuid=${locationUuid}&` : '';
       const url = `icare/visit?${locationParameter}${parametersString}&startIndex=${startIndex}&limit=${limit}`;
-      console.log("all visit query url .......",url);
       return this.httpClient.get(url).pipe(
         map((response: any) => response?.results || [])
       );

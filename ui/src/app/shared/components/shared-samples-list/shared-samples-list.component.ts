@@ -94,7 +94,6 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       error: (err) => console.log(err), // Called if at any point WebSocket API signals some kind of error.
       complete: () => console.log("complete"), // Called when connection is closed (for whatever reason).
     });
-    console.log("sample type ...............",this.sampleTypes);
     // [tabType]="'completed-samples'"
     if (this.listType === "samples") {
       
@@ -106,13 +105,11 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       });
     } else {
       this.getPatients();
-      console.log("patience ...............",this.getPatients());
     }
     this.cdr.detectChanges(); 
   }
 
   ngOnInit(): void {
-    console.log("this.tabType ...............",this.tabType);
     this.listType = !this.LISConfigurations?.isLIS ? "patients" : "samples";
     this.pageSize = this.tabType == "completed-samples"?200:100;
     this.sampleVisitParameters = {
@@ -264,7 +261,6 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       )
       .pipe(
         map((response) => {
-          console.log("sample response ...........",response);
           return {
             pager: null,
             results: response?.map((visitData) => visitData?.visit),
@@ -276,21 +272,12 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   }
 
   getSamplesListByVisit(event: Event, visit: any, parameters: any): void {
-    console.log("sample parameter ....",event);
-    console.log("sample parameter ....",visit);
-    console.log("sample parameter ....",parameters);
-
-    console.log("parameters  ....",parameters);
-    console.log("visit?.uuid  ....",visit?.uuid);
     event.stopPropagation();
     this.currentVisit = visit;
     this.currentSamplesByVisits$ = this.visitsService.getSamplesByVisitUuid(
       visit?.uuid,
       parameters
     );
-    this.currentSamplesByVisits$.subscribe((visit)=>{
-      console.log("curent sample by visit ....",visit);
-    })
     
   }
 

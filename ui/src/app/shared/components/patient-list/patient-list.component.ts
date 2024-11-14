@@ -111,7 +111,6 @@ export class PatientListComponent implements OnInit, OnChanges {
     this.loadingPatients = true;
     // this.service = "LABS";
 
-    console.log("visit type ........",this.encounterType);
     this.visits$ = visits
       ? of(visits)
       : this.service && this.service === "LABS"
@@ -141,7 +140,6 @@ export class PatientListComponent implements OnInit, OnChanges {
           )
           .pipe(
             tap((response: any) => {
-              console.log("visit list ........",response);
               this.loadingPatients = false;
               if (response?.error) {
                 this.errors = [...this.errors, response?.error];
