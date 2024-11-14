@@ -95,6 +95,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       complete: () => console.log("complete"), // Called when connection is closed (for whatever reason).
     });
     console.log("sample type out ...............",this.sampleTypes);
+    // [tabType]="'completed-samples'"
     if (this.listType === "samples") {
       console.log("sample ...............");
       this.getSamples({
@@ -112,9 +113,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.listType = !this.LISConfigurations?.isLIS ? "patients" : "samples";
-    console.log("category ...............",this.category);
-
-    console.log("this.tabType ...............",this.tabType);
+    this.pageSize = this.tabType == "completed-samples"?200:10;
     this.sampleVisitParameters = {
       hasStatus: this.hasStatus,
       sampleCategory:
@@ -122,7 +121,6 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
           ? "NOT ACCEPTED"
           : this.category,
     };
-    console.log("this.sampleVisitParameters ...............",this.sampleVisitParameters);
     
     this.searchingTestField = new Dropdown({
       id: "test",
@@ -245,8 +243,6 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   }
 
   getPatients(): void {
-    console.log("this.category ...........",this.category);
-    console.log("this.excludedSampleCategories ...........",this.excludedSampleCategories);
     this.samples$ = this.visitsService
       .getAllVisits(
         null,
@@ -254,7 +250,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
         false,
         null,
         0,
-        10,
+        this.pageSize,
         null,
         null,
         null,
@@ -274,9 +270,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
           };
         })
       );
-      this.samples$.subscribe((sample)=>{
-        console.log("sample observable ...........",sample);
-      })
+      
       
   }
 
