@@ -26,10 +26,7 @@
     mode="indeterminate"
   ></mat-progress-bar>
   <div *ngIf="params?.currentPatient">
-    <app-new-patient-profile
-      [currentPatient]="params?.currentPatient"
-    ></app-new-patient-profile>
-
+    <app-new-patient-profile [currentPatient]="params?.currentPatient"></app-new-patient-profile>
     <!-- current patient consultation panel -->
     <div
       class="patient-consultation-container mat-elevation-z1 border"

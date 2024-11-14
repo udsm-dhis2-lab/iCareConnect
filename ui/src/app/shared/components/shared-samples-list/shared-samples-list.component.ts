@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -82,7 +83,8 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     private sampleService: SamplesService,
     private dialog: MatDialog,
     private store: Store<AppState>,
-    private visitsService: VisitsService
+    private visitsService: VisitsService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngAfterViewInit(): void {
@@ -92,7 +94,9 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       error: (err) => console.log(err), // Called if at any point WebSocket API signals some kind of error.
       complete: () => console.log("complete"), // Called when connection is closed (for whatever reason).
     });
+    // [tabType]="'completed-samples'"
     if (this.listType === "samples") {
+      
       this.getSamples({
         category: this.category,
         hasStatus: this.hasStatus,
@@ -102,11 +106,12 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     } else {
       this.getPatients();
     }
+    this.cdr.detectChanges(); 
   }
 
   ngOnInit(): void {
     this.listType = !this.LISConfigurations?.isLIS ? "patients" : "samples";
-
+    this.pageSize = this.tabType == "completed-samples"?200:100;
     this.sampleVisitParameters = {
       hasStatus: this.hasStatus,
       sampleCategory:
@@ -114,6 +119,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
           ? "NOT ACCEPTED"
           : this.category,
     };
+    
     this.searchingTestField = new Dropdown({
       id: "test",
       key: "test",
@@ -238,11 +244,11 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     this.samples$ = this.visitsService
       .getAllVisits(
         null,
-        true,
+        false,
         false,
         null,
         0,
-        10,
+        this.pageSize,
         null,
         null,
         null,
@@ -261,6 +267,8 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
           };
         })
       );
+      
+      
   }
 
   getSamplesListByVisit(event: Event, visit: any, parameters: any): void {
@@ -270,6 +278,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       visit?.uuid,
       parameters
     );
+    
   }
 
   getSamples(params?: any): void {

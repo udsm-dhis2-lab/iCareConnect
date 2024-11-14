@@ -4,6 +4,7 @@ import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
 import { sanitizePatientsVisitsForTabularPatientListing } from "../../helpers/sanitize-visits-list-for-patient-tabular-listing.helper";
 import { Visit } from "../../resources/visits/models/visit.model";
+import { VisitsService } from "../../resources/visits/services";
 
 @Component({
   selector: "app-patients-tabular-list",
@@ -33,7 +34,7 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
     "startDatetime",
   ];
   dataSource: any;
-  constructor() {}
+  constructor( private visitService: VisitsService,) {}
 
   ngOnInit(): void {
     this.dataSource = new MatTableDataSource(
@@ -51,15 +52,18 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   ngOnChanges() {
     this.dataSource = new MatTableDataSource(
       sanitizePatientsVisitsForTabularPatientListing(
-        this.visits,
+        this.visits,  
         this.shouldShowParentLocation,
         this.paymentTypeSelected,
         this.itemsPerPage,
         this.page
       )
     );
+  
     this.dataSource.paginator = this.paginator;
   }
+  
+  
 
   getSelectedPatient(event, patientVisitDetails) {
     event.stopPropagation();
