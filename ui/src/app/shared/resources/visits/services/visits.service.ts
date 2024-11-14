@@ -323,6 +323,7 @@ export class VisitsService {
     if (filterBy) parametersString += filterBy;
     if (encounterType) parametersString += `&encounterTypeUuid=${encounterType}`;
     if (excludedSampleCategories?.length) parametersString += `&exclude=${excludedSampleCategories.join(",")}`;
+    if (includeInactive) parametersString +=`&includeInactive=${includeInactive}`;
     if (includeDeadPatients) parametersString += `&includeDeadPatients=true`;
   
     const getRequest = (locationUuid?: string) => {
@@ -990,6 +991,7 @@ export class VisitsService {
     Object.keys(parameters)?.map((key) => {
       queryParams = [...queryParams, key + "=" + parameters[key]];
     });
+    console.log("get sample by visit uuid url ......","lab/samples?visit=" + visitUuid + "&" + queryParams.join("&"))
     return this.httpClient
       .get("lab/samples?visit=" + visitUuid + "&" + queryParams.join("&"))
       ?.pipe(

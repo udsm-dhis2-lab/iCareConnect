@@ -17,7 +17,6 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   @Input() paymentTypeSelected: string;
   @Input() itemsPerPage: number;
   @Input() page: number;
-  @Input() isAdmited?:boolean ;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @Output() patientVisitDetails: EventEmitter<any> = new EventEmitter<any>();
   @Output() shouldLoadNewList: EventEmitter<boolean> =
@@ -38,11 +37,6 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   constructor( private visitService: VisitsService,) {}
 
   ngOnInit(): void {
-    let filteredVisits = this.visits;
-    console.log("filteredVisits .....",this.isAdmited);
-    if (this.isAdmited !== undefined) {
-      filteredVisits = this.visits.filter((visit: Visit) => visit.isAdmitted === this.isAdmited);
-    }
     this.dataSource = new MatTableDataSource(
       sanitizePatientsVisitsForTabularPatientListing(
         this.visits,
@@ -52,25 +46,13 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
         this.page
       )
     );
-    console.log("visit list ........",this.visits);
     this.dataSource.paginator = this.paginator;
-    const activeVisit = this.visitService.getActiveVisit(this.visits[5].patientUuid, false);
-    activeVisit.subscribe(
-    (data) => console.log("Active visit data:", data.waitingToBeAdmitted),
-    (error) => console.error("Error fetching active visit:", error)
-    );
-
   }
 
   ngOnChanges() {
-    let filteredVisits = this.visits;
-  
-    if (this.isAdmited !== undefined) {
-      filteredVisits = this.visits.filter((visit: Visit) => visit.isAdmitted === this.isAdmited);
-    }
     this.dataSource = new MatTableDataSource(
       sanitizePatientsVisitsForTabularPatientListing(
-        filteredVisits,  
+        this.visits,  
         this.shouldShowParentLocation,
         this.paymentTypeSelected,
         this.itemsPerPage,

@@ -51,7 +51,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   @Input() doNotUseLocation: boolean;
   @Input() encounterType: string;
   @Input() includeDeadPatients: boolean;
-  @Input() isAdmited: boolean = false;
+  @Input() isDischarge: boolean = false;
 
   page: number = 0;
   visits$: Observable<Visit[]>;
@@ -83,6 +83,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   ngOnChanges() {}
 
   ngOnInit() {
+    // this.itemsPerPage = this.isDischarge ? 100:this.itemsPerPage ;
     this.filters$ = this.systemSettingsService
       .getSystemSettingsMatchingAKey(
         "iCare.filters." + (this.filterCategory ? this.filterCategory : "")
@@ -109,18 +110,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   private getVisits(visits: Visit[]) {
     this.loadingPatients = true;
     // this.service = "LABS";
-    console.log("hereeee  ........");
-    this.dischargedPatientsVisits$ = this.visitService
-    .getPatientsVisitsByEncounterType(this.encounterType)
-    .pipe(
-      map((response: any) => {
-        return response;
-      })
-    );
-    this.dischargedPatientsVisits$.subscribe((item)=>{
-      console.log("dischargedPatientsVisits ........",item);
-    })
-    
+
     console.log("visit type ........",this.encounterType);
     this.visits$ = visits
       ? of(visits)
@@ -133,7 +123,7 @@ export class PatientListComponent implements OnInit, OnChanges {
       : this.visitService
           .getAllVisits(
             !this.doNotUseLocation ? this.currentLocation : null,
-            true,
+            this.isDischarge ? true:false,
             false,
             null,
             this.startingIndex,
@@ -151,6 +141,7 @@ export class PatientListComponent implements OnInit, OnChanges {
           )
           .pipe(
             tap((response: any) => {
+              console.log("visit list ........",response);
               this.loadingPatients = false;
               if (response?.error) {
                 this.errors = [...this.errors, response?.error];
@@ -188,7 +179,7 @@ export class PatientListComponent implements OnInit, OnChanges {
         : this.visitService
             .getAllVisits(
               this.currentLocation,
-              false,
+              this.isDischarge ? true:false,
               false,
               this.searchTerm,
               details.visit?.pager
@@ -225,7 +216,7 @@ export class PatientListComponent implements OnInit, OnChanges {
     this.visits$ = this.visitService
       .getAllVisits(
         this.currentLocation,
-        false,
+        this.isDischarge ? true:false,
         false,
         this.searchTerm,
         0,

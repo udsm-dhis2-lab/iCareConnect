@@ -97,7 +97,7 @@
             <!-- TODO: Softcode the order uuid -->
             <!-- {{ locationsIds$ | async | json }} -->
             <app-patient-list
-              [isAdmited]="false"
+              [isDischarge]="true"
               [encounterType]="'181820aa-88c9-479b-9077-af92f5364329'"
               (selectPatient)="onSelectPatient($event)"
               [shouldShowParentLocation]="true"

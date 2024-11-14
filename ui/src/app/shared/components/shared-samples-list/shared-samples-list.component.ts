@@ -94,10 +94,10 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       error: (err) => console.log(err), // Called if at any point WebSocket API signals some kind of error.
       complete: () => console.log("complete"), // Called when connection is closed (for whatever reason).
     });
-    console.log("sample type out ...............",this.sampleTypes);
+    console.log("sample type ...............",this.sampleTypes);
     // [tabType]="'completed-samples'"
     if (this.listType === "samples") {
-      console.log("sample ...............");
+      
       this.getSamples({
         category: this.category,
         hasStatus: this.hasStatus,
@@ -112,8 +112,9 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    console.log("this.tabType ...............",this.tabType);
     this.listType = !this.LISConfigurations?.isLIS ? "patients" : "samples";
-    this.pageSize = this.tabType == "completed-samples"?200:10;
+    this.pageSize = this.tabType == "completed-samples"?200:100;
     this.sampleVisitParameters = {
       hasStatus: this.hasStatus,
       sampleCategory:
@@ -246,7 +247,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     this.samples$ = this.visitsService
       .getAllVisits(
         null,
-        true,
+        false,
         false,
         null,
         0,
@@ -275,12 +276,22 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   }
 
   getSamplesListByVisit(event: Event, visit: any, parameters: any): void {
+    console.log("sample parameter ....",event);
+    console.log("sample parameter ....",visit);
+    console.log("sample parameter ....",parameters);
+
+    console.log("parameters  ....",parameters);
+    console.log("visit?.uuid  ....",visit?.uuid);
     event.stopPropagation();
     this.currentVisit = visit;
     this.currentSamplesByVisits$ = this.visitsService.getSamplesByVisitUuid(
       visit?.uuid,
       parameters
     );
+    this.currentSamplesByVisits$.subscribe((visit)=>{
+      console.log("curent sample by visit ....",visit);
+    })
+    
   }
 
   getSamples(params?: any): void {
