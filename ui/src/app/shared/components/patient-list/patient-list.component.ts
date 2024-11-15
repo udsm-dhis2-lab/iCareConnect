@@ -51,7 +51,7 @@ export class PatientListComponent implements OnInit, OnChanges {
   @Input() doNotUseLocation: boolean;
   @Input() encounterType: string;
   @Input() includeDeadPatients: boolean;
-  @Input() isDischarge: boolean = false;
+  @Input() isDischarge?: boolean = false;
 
   page: number = 0;
   visits$: Observable<Visit[]>;
@@ -83,7 +83,9 @@ export class PatientListComponent implements OnInit, OnChanges {
   ngOnChanges() {}
 
   ngOnInit() {
-    // this.itemsPerPage = this.isDischarge ? 100:this.itemsPerPage ;
+    if (this.isDischarge === undefined) {
+      this.isDischarge = false;
+    }
     this.filters$ = this.systemSettingsService
       .getSystemSettingsMatchingAKey(
         "iCare.filters." + (this.filterCategory ? this.filterCategory : "")
