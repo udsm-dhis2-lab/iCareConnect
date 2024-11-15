@@ -265,9 +265,8 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
             pager: null,
             results: response?.map((visitData) => visitData?.visit),
           };
-        })
+        })  
       );
-      
       
   }
 

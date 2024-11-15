@@ -30,9 +30,27 @@ export class WardsListComponent implements OnInit {
 
   constructor(
     private store: Store<AppState>,
-    private visitService: VisitsService
-  ) {}
+    private visitService: VisitsService,
+    
+  ) {
+    this.admittedPatientsVisits$ = this.getAdmittedPatientsVisits();
+    this.admissionVisitsAdded$ = this.getAdmissionVisitsAdded();
+  }
+  private getAdmittedPatientsVisits(): Observable<any> {
+    // Replace with real data fetching logic
+    return new Observable((observer) => {
+      observer.next({});
+      observer.complete();
+    });
+  }
 
+  private getAdmissionVisitsAdded(): Observable<any> {
+    // Replace with real data fetching logic
+    return new Observable((observer) => {
+      observer.next(false);
+      observer.complete();
+    });
+  }
   ngOnInit(): void {
     this.wardsInfo$ = this.store.select(
       getBedsGroupedByTheCurrentLocationChildren,
@@ -52,6 +70,7 @@ export class WardsListComponent implements OnInit {
     this.admissionVisitsAdded$ = this.store.select(
       getPatientVisitsForAdmissionAddedState
     );
+    
   }
 
   onGetStatus(e, bed, visitData, bedOrdersWithBillStatus): void {

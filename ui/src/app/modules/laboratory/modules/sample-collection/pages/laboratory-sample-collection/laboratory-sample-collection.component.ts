@@ -78,9 +78,6 @@ export class LaboratorySampleCollectionComponent implements OnInit {
     this.visitLoadedState$ = this.store.select(getVisitLoadedState);
     this.loadingVisit$ = this.store.select(getVisitLoadingState);
     this.samplesCollected$ = this.store.select(getAllLabSamples);
-    this.samplesCollected$.subscribe((sample)=>{
-      console.log("Collected samples ...............",sample)
-    })
     this.activeVisit$ = this.store.select(getActiveVisit);
     this.payments$ = this.store.select(getAllPayments);
   }
