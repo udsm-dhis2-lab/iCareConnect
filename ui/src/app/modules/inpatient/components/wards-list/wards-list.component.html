@@ -95,22 +95,22 @@
           }"
           *ngFor="let childLocation of ward?.childMembers"
         >
-          <div
-            *ngIf="childLocation && childLocation?.isBed"
-            class="bed mb-2"
-            [ngClass]="{
-              'bg-light': !params?.admittedPatientsVisits[childLocation?.uuid],
-              'bg-warning': params?.admittedPatientsVisits[childLocation?.uuid]
-            }"
-            (click)="
-              onGetStatus(
-                $event,
-                childLocation,
-                params?.admittedPatientsVisits[childLocation?.uuid],
-                bedOrdersWithBillStatus
-              )
-            "
-          >
+        <div
+        *ngIf="childLocation && childLocation.isBed"
+        class="bed mb-2"
+        [ngClass]="{
+          'bg-light': !params?.admittedPatientsVisits?.[childLocation?.uuid],
+          'bg-warning': params?.admittedPatientsVisits?.[childLocation?.uuid]
+        }"
+        (click)="
+          onGetStatus(
+            $event,
+            childLocation,
+            params?.admittedPatientsVisits?.[childLocation?.uuid],
+            bedOrdersWithBillStatus
+          )
+        "
+      >
             <div class="d-flex justify-content-center m-2">
               <img
                 height="60px"

@@ -240,7 +240,6 @@ export class VisitsService {
   getPatientsVisitsByEncounterType(
     encounterTypeUuid: string
   ): Observable<any[]> {
-    
     return this.httpClient
       .get(
         `icare/visit?encounterTypeUuid=${encounterTypeUuid}&includeDeadPatients=true`
@@ -309,125 +308,81 @@ export class VisitsService {
     excludedSampleCategories?: string[],
     includeDeadPatients = false
   ): Observable<any> {
-    const locationUuids = Array.isArray(location) ? location : location ? [location] : [];
-  
+    const locationUuids = Array.isArray(location)
+      ? location
+      : location
+      ? [location]
+      : [];
+
     // Build query parameters
-    let parametersString = '';
+    let parametersString = "";
     if (orderBy) parametersString += `&OrderBy=${orderBy}`;
     if (orderStatus) parametersString += `&fulfillerStatus=${orderStatus}`;
-    if (orderByDirection) parametersString += `&orderByDirection=${orderByDirection}`;
-    if (orderStatusCode) parametersString += `&orderStatusCode=${orderStatusCode}`;
+    if (orderByDirection)
+      parametersString += `&orderByDirection=${orderByDirection}`;
+    if (orderStatusCode)
+      parametersString += `&orderStatusCode=${orderStatusCode}`;
     if (orderType) parametersString += `&orderTypeUuid=${orderType}`;
     if (queryParam) parametersString += `&q=${queryParam}`;
     if (sampleCategory) parametersString += `&sampleCategory=${sampleCategory}`;
     if (filterBy) parametersString += filterBy;
-    if (encounterType) parametersString += `&encounterTypeUuid=${encounterType}`;
-    if (excludedSampleCategories?.length) parametersString += `&exclude=${excludedSampleCategories.join(",")}`;
-    if (includeInactive) parametersString +=`&includeInactive=${includeInactive}`;
+    if (encounterType)
+      parametersString += `&encounterTypeUuid=${encounterType}`;
+    if (excludedSampleCategories?.length)
+      parametersString += `&exclude=${excludedSampleCategories.join(",")}`;
+    if (includeInactive)
+      parametersString += `&includeInactive=${includeInactive}`;
     if (includeDeadPatients) parametersString += `&includeDeadPatients=true`;
-  
+
+    // Function to make HTTP requests for a specific location
     const getRequest = (locationUuid?: string) => {
-      const locationParameter = locationUuid ? `locationUuid=${locationUuid}&` : '';
+      const locationParameter = locationUuid
+        ? `locationUuid=${locationUuid}&`
+        : "";
       const url = `icare/visit?${locationParameter}${parametersString}&startIndex=${startIndex}&limit=${limit}`;
-      return this.httpClient.get(url).pipe(
-        map((response: any) => response?.results || [])
-      );
+      return this.httpClient
+        .get(url)
+        .pipe(map((response: any) => response?.results || []));
     };
-  
-    const requests$ = locationUuids.length ? zip(...locationUuids.map(getRequest)) : getRequest();
-  
+
+    // If multiple locations, create multiple observables; otherwise, a single request
+    const requests$ = locationUuids.length
+      ? zip(...locationUuids.map(getRequest))
+      : getRequest();
+
+    // Use reduce to flatten the response array
     return requests$.pipe(
       map((visitResponses: any[]) => {
-        const results = flatten(visitResponses);
+        const results = visitResponses.reduce(
+          (acc, val) => acc.concat(val),
+          []
+        );
         return results
           .map((visitResult: any) => {
-            const paymentType = (visitResult?.attributes.some(attr =>
-              attr?.display?.includes("Insurance ID")) ? "Insurance" : "Cash");
-  
+            const paymentType = visitResult?.attributes?.some((attr: any) => {
+              // Ensure attr.display is a string before calling includes
+              if (typeof attr?.display !== "string") {
+                console.warn("Unexpected attr.display type:", attr?.display);
+                return false; // Skip attributes that are not strings
+              }
+              return attr.display.includes("Insurance ID");
+            })
+              ? "Insurance"
+              : "Cash";
+
             return new Visit({
               pager: visitResponses[0]?.links,
               ...visitResult,
               paymentType,
             });
           })
-          .filter((visit) => !onlyInsurance || visit.paymentType === "Insurance");
-      }),
-      catchError((error) => of(error))
-    );
-  
-  
-    // }
-    return (
-      locationUuids?.length > 0
-        ? zip(
-            ...locationUuids.map((locationUuid) => {
-              return from(
-                this.api.visit.getAllVisits({
-                  includeInactive:
-                    includeInactive === undefined ? false : includeInactive,
-                  location: locationUuid,
-                  v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,diagnoses,encounterDatetime,encounterType,location,obs,orders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
-                  q: queryParam,
-                  limit: limit ? limit : 100,
-                  startIndex: startIndex ? startIndex : 0,
-                } as any)
-              ).pipe(
-                map((result: any) => {
-                  return result;
-                })
-              );
-            })
-          )
-        : from(
-            this.api.visit.getAllVisits({
-              includeInactive:
-                includeInactive === undefined ? false : includeInactive,
-              v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,diagnoses,encounterDatetime,encounterType,location,obs,orders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
-              q: queryParam,
-              limit: limit ? limit : 100,
-              startIndex: startIndex ? startIndex : 0,
-            } as any)
-          ).pipe(
-            map((result: any) => {
-              return result;
-            })
-          )
-    ).pipe(
-      map((visitResponse: any) => {
-        const results =
-          locationUuids?.length > 0
-            ? flatten(visitResponse.map((visitData) => visitData?.results))
-            : visitResponse?.results;
-        return (
-          (flatten(results) || [])
-            .map((visitResult: any) => {
-              const formattedResult = {
-                pager:
-                  locationUuids?.length > 0
-                    ? visitResponse[0]?.links
-                    : visitResponse?.links,
-                ...visitResult,
-                paymentType:
-                  (
-                    visitResult?.attributes.filter(
-                      (attribute) =>
-                        attribute &&
-                        attribute.display &&
-                        attribute.display?.indexOf("Insurance ID") > -1
-                    ) || []
-                  ).length > 0
-                    ? "Insurance"
-                    : "Cash",
-              };
-              return new Visit(formattedResult);
-            })
-            .filter((visit) =>
-              !onlyInsurance ? visit : visit.paymentType === "Insurance"
-            ) || []
-        );
+          .filter(
+            (visit) => !onlyInsurance || visit.paymentType === "Insurance"
+          );
       }),
       catchError((error) => {
-        return of(error);
+        console.error("Error in getAllVisits:", error);
+        return of([]);
       })
     );
   }
@@ -990,7 +945,10 @@ export class VisitsService {
     Object.keys(parameters)?.map((key) => {
       queryParams = [...queryParams, key + "=" + parameters[key]];
     });
-    console.log("get sample by visit uuid url ......","lab/samples?visit=" + visitUuid + "&" + queryParams.join("&"))
+    console.log(
+      "get sample by visit uuid url ......",
+      "lab/samples?visit=" + visitUuid + "&" + queryParams.join("&")
+    );
     return this.httpClient
       .get("lab/samples?visit=" + visitUuid + "&" + queryParams.join("&"))
       ?.pipe(
