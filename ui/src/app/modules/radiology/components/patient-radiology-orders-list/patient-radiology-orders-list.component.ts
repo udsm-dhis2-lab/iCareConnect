@@ -66,6 +66,7 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
       this.currentBills,
       this.activeVisit
     );
+    console.log("formattedOrders...",this.activeVisit);
   }
 
   previewPDFData(pdfData) {
