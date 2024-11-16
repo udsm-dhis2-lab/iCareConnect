@@ -47,16 +47,14 @@
       dashboardParams?.consultationEncounterType
     "
   >
-    <div class="patient-dashboard-container mat-elevation-z1">
+    <div class="patient-dashboard-container ">
       <div class="patient-profile-sticky">
         <app-new-patient-profile
           [currentPatient]="dashboardParams?.currentPatient"
         ></app-new-patient-profile>
       </div>
       <div class="w-100 patient-other-details-padding">
-        <div
-          class="d-flex justify-content-between align-items-center pt-2 pl-3 pr-3"
-        >
+        <div class="d-flex justify-content-between align-items-center pl-3 pr-3">
           <div class="d-flex justify-content-left">
             <button
               mat-stroked-button
