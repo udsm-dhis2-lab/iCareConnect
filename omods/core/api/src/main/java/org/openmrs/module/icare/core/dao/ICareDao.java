@@ -519,37 +519,38 @@ public class ICareDao extends BaseDAO<Item> {
 
 		} else if (encounterTypeUuid != null && orderTypeUuid == null) {
 			queryStr += " INNER JOIN v.encounters e INNER JOIN e.encounterType et ";
-			queryStr += " WHERE et.uuid = :encounterTypeUuid ";
-			
-			if (!includeInactive) {
-				queryStr += " AND v.stopDatetime IS NULL ";
+
+			if (includeInactive != null && includeInactive) {
+				queryStr += " WHERE et.uuid = :encounterTypeUuid AND v.stopDatetime IS NOT NULL ";
 			} else {
-				queryStr += " AND v.stopDatetime IS NOT NULL ";
+				queryStr += " WHERE et.uuid = :encounterTypeUuid AND v.stopDatetime IS NULL ";
 			}
 		} else {
 			queryStr += " INNER JOIN v.encounters e ";
-			
-			if (!includeInactive) {
-				queryStr += " WHERE v.stopDatetime IS NULL ";
+
+			if (includeInactive != null && includeInactive) {
+				queryStr += " WHERE 1=1 ";
 			} else {
-				queryStr += " WHERE v.stopDatetime IS NOT NULL ";            
+				queryStr += " WHERE v.stopDatetime IS NULL ";
 			}
 		}
 
-		if (!includeInactive) {
+		if (includeInactive != null && includeInactive) {
+
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += "v.stopDatetime IS NOT NULL";
+		} else {
+
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
 			queryStr += " v.stopDatetime IS NULL";
-		} else {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
-			}
-			queryStr += " v.stopDatetime IS NOT NULL";
 		}
 
 		if (search != null) {
@@ -1223,19 +1224,19 @@ public class ICareDao extends BaseDAO<Item> {
 	
 	// return isSuccess;
 	// }
-
+	
 	public List<Visit> getPatientVisitsByIdentifier(String id, String idType, Integer numberOfVisits) throws Exception {
 		DbSession session = this.getSession();
-
-		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p LEFT JOIN p.identifiers pi " +
-		" LEFT JOIN pi.identifierType pitype ";
+		
+		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p LEFT JOIN p.identifiers pi "
+		        + " LEFT JOIN pi.identifierType pitype ";
 		queryStr += " WHERE pi.identifier=:id AND pitype.name =:idType";
 		Query query = session.createQuery(queryStr);
 		if (id != null && id != null) {
 			query.setParameter("id", id);
 			query.setParameter("idType", idType);
 		}
-
+		
 		if (numberOfVisits != null) {
 			query.setMaxResults(numberOfVisits);
 		}

@@ -283,11 +283,6 @@ export class CurrentPatientBillingComponent implements OnInit {
       );
       this.patientBillingDetails$
       .pipe(
-        map((data: any)=>{
-          console.log("data here .............",data.bills)
-        }));
-      this.patientBillingDetails$
-      .pipe(
         map((data: any) => data.payments.map((payment: any, index: number) => ({
           position: index + 1,
           receivedBy: payment.paymentDetails.receivedBy,
