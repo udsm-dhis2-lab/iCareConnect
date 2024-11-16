@@ -51,6 +51,7 @@ export function addBillStatusToOrders(orders, bills, visit) {
   const billedItems = flatten(
     (
       bills?.map((bill) => {
+        console.log("bills visit.....",visit)
         return {
           ...bill,
           items: bill?.items?.map((item) => {
