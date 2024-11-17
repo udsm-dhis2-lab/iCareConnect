@@ -85,7 +85,6 @@ export class InpatientHomeComponent implements OnInit {
 
     // console.log("this.currentLocation?.uuid", this.currentLocation);
     this.currentLocation = this.location;
-    console.log("currentLocation ....",this.currentLocation);
     this.bedsUnderCurrentWard$ = this.store.select(getAllBedsUnderCurrentWard, {
       id: this.currentLocation?.uuid,
       tagName: "Bed Location",
