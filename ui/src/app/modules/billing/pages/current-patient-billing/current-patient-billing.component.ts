@@ -106,9 +106,11 @@ export class CurrentPatientBillingComponent implements OnInit {
   dataSource: Payments[] = [];
   color: string = '';
   expandedElement: Payments | null;
-  // Method to toggle expanded row
-  toggleRow(row: Payments) {
-    this.expandedElement = this.expandedElement === row ? null : row;
+  onRowClick(row: any): void {
+    // Only expand if paymentType is 'Gepg'
+    if (row.paymentType === 'Gepg') {
+      this.expandedElement = this.expandedElement === row ? null : row;
+    }
   }
 
 
@@ -139,9 +141,6 @@ export class CurrentPatientBillingComponent implements OnInit {
     this.facilityDetails$ = this.store.select(getParentLocation);
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
     this.provider$ = this.store.select(getProviderDetails);
-    this.patientBillingDetails$.subscribe((payments)=>{
-      console.log("payments ....",payments)
-    })
 
     this.billingService
       .getAllPatientInvoices(this.patientId, false, "all")
