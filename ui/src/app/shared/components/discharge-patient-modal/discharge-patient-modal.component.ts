@@ -439,31 +439,25 @@ export class DischargePatientModalComponent implements OnInit {
 
         if (response) {
           this.savingData = false;
-          console.log("visit data ....",visitObject);
           this.store.dispatch(
             updateVisit({
               details: dischargeObjects?.visitDetails,
               visitUuid: dischargeObjects.visitDetails?.uuid,
             })
           );
-          // Subscribe to visit$ to get the uuid after update (if necessary)
+          // get the uuid after update
   this.visit$.pipe(take(1)).subscribe((visitResponse) => {
-    // Make sure visitResponse contains the expected uuid
     const visitUuid = visitResponse?.uuid;
-    console.log("response to close discharge", visitResponse);
 
     if (visitUuid) {
-      // Use visitUuid to update the visit details
       this.visitService
         .updateVisit(visitUuid, visitObject)
         .subscribe((response) => {
-          console.log("response to close discharge", response);
           if (response?.error) {
             console.log('Error closing discharge visit');
           }
         });
 
-      // Redirect after 200ms
       setTimeout(() => {
         this.store.dispatch(go({ path: ["/inpatient"] }));
       }, 200);
@@ -471,9 +465,6 @@ export class DischargePatientModalComponent implements OnInit {
       console.error("No visit UUID found");
     }
   });
-          // setTimeout(() => {
-          //   this.store.dispatch(go({ path: ["/inpatient"] }));
-          // }, 200);
         }
       });
       

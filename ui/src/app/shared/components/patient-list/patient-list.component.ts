@@ -142,7 +142,6 @@ export class PatientListComponent implements OnInit, OnChanges {
           )
           .pipe(
             tap((response: any) => {
-              console.log("response data .....",response);
               this.loadingPatients = false;
               if (response?.error) {
                 this.errors = [...this.errors, response?.error];
