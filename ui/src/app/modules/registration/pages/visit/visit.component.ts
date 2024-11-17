@@ -693,6 +693,7 @@ export class VisitComponent implements OnInit {
               });
           }
           if (key === "close") {
+            console.log("visit data ....",visitObject);
             this.visitService
               .updateVisit(activeVisit?.uuid, visitObject)
               .subscribe((response) => {
