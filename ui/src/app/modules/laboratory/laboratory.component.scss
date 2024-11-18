@@ -40,8 +40,13 @@
 //   border-radius: 0 16px 16px 0 !important;
 // }
 
-::ng-deep .mat-mdc-standard-chip .for-lis-chip:hover {
+::ng-deep .mat-mdc-standard-chip {
   border-radius: 0 !important;
+}
+
+.laboratory-header .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled) {
+  background-color: inherit !important;
+  border-bottom: solid 1px #fafafa;
 }
 
 .active-route {
@@ -50,11 +55,45 @@
   border-radius: 0 !important;
 }
 
-::ng-deep .mat-mdc-standard-chip {
+.laboratory-header .mdc-evolution-chip--selected,
+.laboratory-header .mat-mdc-chip-selected {
+  background-color: #2a8fd1 !important; // TODO use variable
+  color: #fff !important;
+  border-radius: 0 !important;
+}
+.laboratory-header .mat-chip-option.mat-mdc-chip-selected {
+  background-color: #2a8fd1 !important; /* Or any color you prefer */
+  color: #fff; /* Adjust text color if needed */
+}
+
+::ng-deep .mat-expansion-panel {
   border-radius: 0 !important;
 }
 
-::ng-deep .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled) {
-  background-color: transparent !important;
-  border-bottom: solid 1px #fafafa;
+::ng-deep .mat-expansion-panel-header.mat-expanded {
+  height: 48px;
+}
+
+::ng-deep .mat-expansion-panel-body {
+  padding: 0 !important;
+}
+
+.lis-menu .mat-expansion-panel-spacing {
+  margin: 0 !important;
+}
+
+.lis-menu .mat-expansion-panel-header {
+  padding: 24px 24px !important;
+  border-bottom: solid 1px #eee;
+}
+
+ul {
+  list-style-type: none;
+  margin-left: -24px;
+  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 1px 0px rgba(0, 0, 0, 0.12);
+}
+
+.lis-menu-items li {
+  padding: 12px 4px;
 }
