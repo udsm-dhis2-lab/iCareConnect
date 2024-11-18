@@ -30,7 +30,30 @@
             <td>
               {{ order?.display }}
             </td>
-            <td *ngIf="order?.value?.display">
+            <td *ngIf="order?.values?.length">
+              <div *ngFor="let link of order.values">
+                <a
+                  *ngIf="link?.links?.uri.split('openmrs').length > 2"
+                  href="{{ '/openmrs' + link?.links?.uri.split('openmrs')[2] }}"
+                >
+                  Download Result
+                </a>
+                <a
+                  *ngIf="link?.links?.uri.split('openmrs').length == 2"
+                  href="{{ '/openmrs' + link?.links?.uri.split('openmrs')[1] }}"
+                >
+                  Download Result
+                </a>
+                <button
+                  class="ml-2"
+                  mat-button
+                  (click)="previewUploadPDF($event, link?.links?.uri, 'iframe')"
+                >
+                  Preview
+                </button>
+              </div>
+            </td>
+            <!-- <td *ngIf="order?.value?.display">
               <a
                 *ngIf="order?.value?.links?.uri.split('openmrs').length > 2"
                 href="{{
@@ -56,8 +79,8 @@
               >
                 Preview 
               </button>
-            </td>
-            <td *ngIf="!order?.value?.display && !order?.value?.length">
+            </td> -->
+            <td *ngIf="!order?.value?.display && order?.values?.length <= 0">
               No results
             </td>
             <td *ngIf="!order?.value?.display && order?.value?.length">
