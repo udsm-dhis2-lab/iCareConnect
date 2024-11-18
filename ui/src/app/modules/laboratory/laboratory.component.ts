@@ -35,12 +35,13 @@ import { Title } from "@angular/platform-browser";
 import { LocationService } from "src/app/core/services";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
+import { LabMenu } from "./resources/models/lab-menu.model";
 
 @Component({
   selector: "lab-root",
   templateUrl: "./laboratory.component.html",
   styleUrls: ["./laboratory.component.scss"],
-  encapsulation: ViewEncapsulation.None 
+  encapsulation: ViewEncapsulation.None,
 })
 export class LaboratoryComponent implements OnInit {
   title = "Laboratory";
@@ -83,6 +84,82 @@ export class LaboratoryComponent implements OnInit {
   labs$: Observable<any[]>;
   errors: any[] = [];
   loadedSystemSettings$: Observable<boolean>;
+
+  laboratoryMenus: LabMenu[] = [
+    {
+      name: "Dashboard",
+      route: "dashboard-lab",
+      id: "dashboard",
+      icon: "dashboard",
+      subMenus: [],
+    },
+    {
+      name: "Sample Reception & Registration",
+      route: "sample-registration",
+      icon: "add_to_queue",
+      id: "registration",
+      subMenus: [
+        {
+          name: "Sample Registration",
+          route: "sample-registration",
+          id: "registration",
+          icon: "list",
+        },
+      ],
+    },
+    {
+      name: "Sample Acceptance and Results",
+      route: "sample-acceptance-and-results",
+      icon: "dvr",
+      id: "acceptance",
+      subMenus: [],
+    },
+    {
+      name: "Results",
+      route: "sample-results-list",
+      id: "results",
+      icon: "send",
+      subMenus: [],
+    },
+    {
+      name: "Sample Tracking",
+      route: "sample-tracking",
+      id: "tracking",
+      icon: "track_changes",
+      subMenus: [],
+    },
+    {
+      name: "Sample Storage",
+      route: "sample-storage",
+      id: "sample-storage",
+      icon: "storage",
+      subMenus: [],
+    },
+    {
+      name: "Reports",
+      route: "reports",
+      icon: "report",
+      id: "reports",
+      subMenus: [],
+    },
+    {
+      name: "Maintenance",
+      route: "settings",
+      id: "settings",
+      icon: "settings",
+      subMenus: [
+        {
+          name: "General",
+          route: "settings",
+          id: "general",
+          icon: "settings",
+        },
+      ],
+    },
+  ];
+  showSubMenu: boolean = false;
+  currentLabMenuId: string = "dashboard";
+  currentLabSubMenuId: string;
 
   constructor(
     private store: Store<AppState>,
@@ -278,6 +355,17 @@ export class LaboratoryComponent implements OnInit {
         ? navigationDetails?.path[0]?.replace("/laboratory/", "")
         : "";
     this.currentLocation$ = this.store.select(getCurrentLocation(false));
+  }
+
+  setOpenLabMenu(event: Event, id: string): void {
+    event.stopPropagation();
+    this.currentLabMenuId = id;
+    this.showSubMenu = true;
+  }
+
+  setOpenLabSubMenu(event: Event, id: string): void {
+    event.stopPropagation();
+    this.currentLabSubMenuId = id;
   }
 
   setCurrentLab(location: any): void {
