@@ -1,3 +1,4 @@
+import { LabPriceListHomeContainerComponent } from "./lab-price-list-home-container/lab-price-list-home-container.component";
 import { LabSystemSettingsComponent } from "./lab-system-settings/lab-system-settings.component";
 import { LabsAndSectionsManagementComponent } from "./labs-and-sections-management/labs-and-sections-management.component";
 import { OtherLabConfigurationsComponent } from "./other-lab-configurations/other-lab-configurations.component";
@@ -12,4 +13,5 @@ export const settingsContainers: any[] = [
   LabSystemSettingsComponent,
   WorksheetManagementComponent,
   SystemLogsComponent,
+  LabPriceListHomeContainerComponent,
 ];

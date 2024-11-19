@@ -12,9 +12,11 @@ import { ObservationService } from "../../resources/observation/services";
 import {
   formatDateToString,
   formatDateToYYMMDD,
+  toISOStringFormat,
 } from "../../helpers/format-date.helper";
 import { getAllDiagnosesFromVisitDetails } from "../../helpers/patient.helper";
 import { Diagnosis } from "../../resources/diagnosis/models/diagnosis.model";
+import { take } from "rxjs/operators";
 
 @Component({
   selector: "app-discharge-patient-modal",
@@ -431,6 +433,10 @@ export class DischargePatientModalComponent implements OnInit {
     this.visitService
       .dischargePatient(dischargeObjects?.encounterDetails)
       .subscribe((response) => {
+        let visitObject: any = {
+          stopDatetime: toISOStringFormat(),
+        };
+
         if (response) {
           this.savingData = false;
           this.store.dispatch(
@@ -439,11 +445,30 @@ export class DischargePatientModalComponent implements OnInit {
               visitUuid: dischargeObjects.visitDetails?.uuid,
             })
           );
-          setTimeout(() => {
-            this.store.dispatch(go({ path: ["/inpatient"] }));
-          }, 200);
+          // get the uuid after update
+  this.visit$.pipe(take(1)).subscribe((visitResponse) => {
+    const visitUuid = visitResponse?.uuid;
+
+    if (visitUuid) {
+      this.visitService
+        .updateVisit(visitUuid, visitObject)
+        .subscribe((response) => {
+          if (response?.error) {
+            console.log('Error closing discharge visit');
+          }
+        });
+
+      setTimeout(() => {
+        this.store.dispatch(go({ path: ["/inpatient"] }));
+      }, 200);
+    } else {
+      console.error("No visit UUID found");
+    }
+  });
         }
       });
+      
+            
     this.dialogRef.close(true);
   }
 

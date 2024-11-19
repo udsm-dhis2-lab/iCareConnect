@@ -19,7 +19,6 @@ export class PaymentService {
           .pipe(
             map((payments: any[]) =>
               (payments || []).map((payment, paymentIndex) => {
-                console.log('Payment-----:', payment); // Log each payment
                 return new Payment(payment, paymentIndex);
               })
             )

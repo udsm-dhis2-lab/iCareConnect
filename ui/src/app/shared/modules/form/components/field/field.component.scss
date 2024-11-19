@@ -32,9 +32,9 @@
   text-overflow: ellipsis !important;
   display: block !important;
   line-height: 30px !important;
-  padding: 0 16px !important;
-  padding-top: 2rem !important;
-  padding-bottom: 2rem !important;
+  // padding: 0 16px !important;
+  // padding-top: 2rem !important;
+  // padding-bottom: 2rem !important;
   text-align: left !important;
   text-decoration: none !important;
   max-width: 100% !important;
@@ -94,4 +94,9 @@ ng-deep .disabled-form-selection-option,
   flex: auto;
   min-width: 80px !important;
   width: auto !important;
+}
+
+.custom-height .mat-form-field-wrapper {
+  height: 60px; /* Adjust the height as needed */
+  align-items: center; /* Optional: centers input content */
 }

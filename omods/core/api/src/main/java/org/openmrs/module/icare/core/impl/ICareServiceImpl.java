@@ -257,7 +257,9 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		itemPrice.setPaymentType(paymentType);
 		if (itemPrice.getPayable() != null && itemPrice.getPayablePaymentMode() == null) {
 			throw new APIException("Payment mode for payable not provided");
-		} else {
+		} else if (itemPrice.getPayablePaymentMode() != null
+				&& itemPrice.getPayablePaymentMode().getUuid() != null
+				&& conceptService.getConceptByUuid(itemPrice.getPayablePaymentMode().getUuid()) != null) {
 			Concept payablePaymentMode = conceptService.getConceptByUuid(itemPrice.getPayablePaymentMode().getUuid());
 			itemPrice.setPayablePaymentMode(payablePaymentMode);
 		}
@@ -1272,6 +1274,21 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		return dataTemplateData;
 	}
 	
+	public List<Map<String,Object>> getPatientVisitsByIdentifier(String id, String idType, String referralNumber, Integer numberOfVisits) throws Exception {
+		// 1. Get client from OpenMRS
+		// TODO: Add support to search visits by referralNumber
+		List<Visit> visits = dao.getPatientVisitsByIdentifier(id, idType, numberOfVisits);
+		List<Map<String,Object>> visitsData = new ArrayList<>();
+		for(Visit visit: visits) {
+			Map<String,Object> templateData = new HashMap<>();
+			templateData.put("visitDetails", prepareVisitDetails(visit));
+			templateData.put("demographicDetails", prepareDemographicDetails(visit));
+			templateData.put("diagnosisDetails", prepareDiagnosisDetails(visit));
+			visitsData.add(templateData);
+		}
+		return visitsData;
+	}
+	
 	public Map<String,Object> sendReferralDataToMediator(String uuid) throws Exception {
 		Map<String,Object> visitData = new HashMap<>();
 		List<Visit> visits = dao.getVisitsByStartDateAndEndDate(null, null, uuid);
@@ -1408,23 +1425,28 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			AdministrationService adminService = Context.getService(AdministrationService.class);
 			String mediatorsConfigs = adminService.getGlobalProperty(ICareConfig.INTEROPERABILITY_MEDIATORS_LIST);
 			
-			JSONArray mediatorsList = new JSONArray(mediatorsConfigs);
-			ICareService iCareService = Context.getService(ICareService.class);
-			
-			for (int count = 0; count < mediatorsList.length(); count++) {
-				JSONObject mediator = mediatorsList.getJSONObject(count);
-				if (mediator.optBoolean("isActive") && mediatorKeyType.equals(mediator.getString("mediatorKey"))) {
-					String mediatorKey = mediator.getString("mediatorKey");
-					String mediatorUrlPath = mediator.getString("mediatorUrlPath");
-					String authenticationType = mediator.getString("authenticationType");
-					authReferenceKey = mediator.getString("") != null ? mediator.getString("authKeyReference") : mediator
-					        .getString("mediatorKey");
-					return iCareService.pushDataToExternalMediator(new JSONObject(dataTemplateData).toString(), mediatorKey,
-					    mediatorUrlPath, authenticationType, authReferenceKey);
+			if (mediatorsConfigs != null) {
+				JSONArray mediatorsList = new JSONArray(mediatorsConfigs);
+				ICareService iCareService = Context.getService(ICareService.class);
+				
+				if (!mediatorsList.isEmpty()) {
+					for (int count = 0; count < mediatorsList.length(); count++) {
+						JSONObject mediator = mediatorsList.getJSONObject(count);
+						if (mediator.optBoolean("isActive") && mediatorKeyType.equals(mediator.getString("mediatorKey"))) {
+							String mediatorKey = mediator.getString("mediatorKey");
+							String mediatorUrlPath = mediator.getString("mediatorUrlPath");
+							String authenticationType = mediator.getString("authenticationType");
+							authReferenceKey = mediator.getString("") != null ? mediator.getString("authKeyReference")
+							        : mediator.getString("mediatorKey");
+							return iCareService.pushDataToExternalMediator(new JSONObject(dataTemplateData).toString(),
+							    mediatorKey, mediatorUrlPath, authenticationType, authReferenceKey);
+						}
+					}
 				}
 			}
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			throw new Exception(e.getMessage());
 		}
 		return "";
@@ -1476,7 +1498,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 	@Override
 	public String getSharedRecordsFromExternalMediator(String hfrCode,
 													   String id,
-													   String idType) throws Exception {
+													   String idType,
+													   String referralNumber) throws Exception {
 		try {
 			Map<String,Object> responseData = new HashMap<>();
 			AdministrationService administrationService = Context.getAdministrationService();
@@ -1500,16 +1523,27 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 
 					if (id != null) {
 						mediatorUrl += "?id=" + id;
+						if (idType != null) {
+							if (mediatorUrl.contains("?")) {
+								mediatorUrl += "&idType="+ idType;
+							}
+						}
 					}
 
 					if (hfrCode != null) {
 						if (mediatorUrl.contains("?")) {
 							mediatorUrl += "&hfrCode="+ hfrCode;
+						} else {
+							mediatorUrl += "?hfrCode=" + hfrCode;
 						}
 					}
-					if (idType != null) {
+
+
+					if (referralNumber != null) {
 						if (mediatorUrl.contains("?")) {
-							mediatorUrl += "&idType="+ idType;
+							mediatorUrl += "&referralNumber="+ referralNumber;
+						} else {
+							mediatorUrl += "?referralNumber=" + referralNumber;
 						}
 					}
 					// Construct the URL for the GET request

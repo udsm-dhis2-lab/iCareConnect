@@ -28,6 +28,7 @@ import { PriceListItemsContainerComponent } from "./price-list-items-container/p
 import { StoreUserManagementComponent } from "./store-user-management/store-user-management.component";
 import { StoreUserManagementDashboardComponent } from "./store-user-management-dashboard/store-user-management-dashboard.component";
 import { StoreUsersListComponent } from "./store-users-list/store-users-list.component";
+import { SharedDynamicReportsComponent } from "./shared-dynamic-reports/shared-dynamic-reports.component";
 
 // export const stockComponents: any[] = [
 export const sharedStoreComponents: any[] = [
@@ -61,4 +62,5 @@ export const sharedStoreComponents: any[] = [
   StoreUserManagementComponent,
   StoreUserManagementDashboardComponent,
   StoreUsersListComponent,
+  SharedDynamicReportsComponent,
 ];

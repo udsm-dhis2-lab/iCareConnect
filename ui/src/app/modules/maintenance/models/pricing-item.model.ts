@@ -1,4 +1,4 @@
-import { kebabCase } from 'lodash';
+import { kebabCase } from "lodash";
 export interface PricingItemInterface {
   id: string;
   uuid: string;
@@ -18,7 +18,7 @@ export class PricingItem {
 
   get display(): string {
     return (
-      this.itemPriceDetails?.concept?.display ||
+      this.itemPriceDetails?.concept?.display?.replace("TEST_ORDERS:", "") ||
       this.itemPriceDetails?.drug?.display
     );
   }

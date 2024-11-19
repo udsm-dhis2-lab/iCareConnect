@@ -352,6 +352,9 @@ export class VisitsService {
     if (includeDeadPatients && includeDeadPatients === true) {
       parametersString += `&includeDeadPatients=true`;
     }
+    if (includeInactive && includeInactive === true) {
+      parametersString += `&includeInactive=true`;
+    }
     //
     return (
       locationUuids?.length > 0

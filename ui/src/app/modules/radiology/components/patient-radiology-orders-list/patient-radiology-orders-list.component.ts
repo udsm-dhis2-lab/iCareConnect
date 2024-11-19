@@ -66,6 +66,7 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
       this.currentBills,
       this.activeVisit
     );
+    console.log("formattedOrders...",this.activeVisit);
   }
 
   previewPDFData(pdfData) {
@@ -81,45 +82,55 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
     event.stopPropagation();
   
     const inputElement = event.target as HTMLInputElement;
-    console.log("Input Element:", inputElement);
   
     if (!inputElement.files || inputElement.files.length === 0) {
       console.error("No file selected.");
       return;
     }
   
-    console.log("File selected:", inputElement.files[0]);
+    // Initialize this.file as an array to store selected files
+    this.file = Array.from(inputElement.files);
   
-    this.file = inputElement.files[0];
-    if (this.file && this.file.type === "application/pdf") {
-      const reader = new FileReader();
-      reader.onload = (e: ProgressEvent<FileReader>) => {
-        if (e.target) {
-          const pdfData = new Uint8Array(e.target.result as ArrayBuffer);
+    // Iterate through the selected files
+    this.file.forEach((file) => {
+      console.log("Selected file:", file.name, file.type, file.size);
   
-          let binary = "";
-          const bytes = new Uint8Array(pdfData);
-          const len = bytes.byteLength;
-          for (let i = 0; i < len; i++) {
-            binary += String.fromCharCode(bytes[i]);
+      // Check if the file is a PDF
+      if (file.type === "application/pdf") {
+        const reader = new FileReader();
+  
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          if (e.target) {
+            const pdfData = new Uint8Array(e.target.result as ArrayBuffer);
+  
+            let binary = "";
+            const bytes = new Uint8Array(pdfData);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+              binary += String.fromCharCode(bytes[i]);
+            }
+            const base64PDF = btoa(binary);
+            // console.log("Base64 PDF Data:", base64PDF);
+  
+            // You can store base64 data if needed for further processing
+            this.base64FileData = base64PDF;
           }
-          const base64PDF = btoa(binary);
-          const doc = new jsPDF();
-          doc.addPage();
-          this.base64FileData = base64PDF;
-        }
-      };
+        };
   
-      reader.readAsArrayBuffer(this.file);
-      this.values[order?.uuid] = this.file;
-    } else {
-      console.error("Selected file is not a PDF.");
-    }
+        reader.readAsArrayBuffer(file);
+  
+        // Store the file in the `values` object associated with the order
+        this.values[order?.uuid] = file;
+      } else {
+        console.error(`Selected file "${file.name}" is not a PDF.`);
+      }
+    });
   }
+  
   
   previewUploadPDF(event: Event, data: any, rendererType: string): void {
     event.stopPropagation();
-    console.log("data preview ....................",data)
+    console.log("data preview ...................",data)
     this.dialog.open(SharedPdfPreviewComponent, {
       minWidth: '60%',
       maxHeight: '700px',
@@ -132,10 +143,10 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
   }
 
   onSave(event: Event, order: any): void {
-    console.log('Save triggered');
     event.stopPropagation();
     this.saving = true;
-    let data = new FormData();
+  
+    // Define observation metadata
     const jsonData = {
       concept: order?.concept?.uuid,
       person: this.patientId,
@@ -144,73 +155,89 @@ export class PatientRadiologyOrdersListComponent implements OnInit {
       voided: false,
       status: "PRELIMINARY",
       order: order?.uuid,
-      comment: this.values[order?.uuid + "-comment"],
+      comment: this.values[order?.uuid + "-comment"] || "", 
     };
-    data.append("file", this.file);
-    data.append("json", JSON.stringify(jsonData));
-
-    // void first the existing observation
-    if (
-      this.obsKeyedByConcepts[order?.concept?.uuid] &&
-      this.obsKeyedByConcepts[order?.concept?.uuid]?.value
-    ) {
-      const existingObs = {
-        concept: order?.concept?.uuid,
-        person: this.patientId,
-        obsDatetime:
-          this.obsKeyedByConcepts[order?.concept?.uuid]?.encounter?.obsDatetime,
-        encounter:
-          this.obsKeyedByConcepts[order?.concept?.uuid]?.encounter?.uuid,
-        status: "PRELIMINARY",
-        comment:
-          this.obsKeyedByConcepts[order?.concept?.uuid]?.encounter?.comment,
-      };
+  
+    // Check for existing observation to void
+    const existingObs = this.obsKeyedByConcepts[order?.concept?.uuid];
+    if (existingObs) {
       this.httpClient
-        .post(
-          `../../../openmrs/ws/rest/v1/obs/${
-            this.obsKeyedByConcepts[order?.concept?.uuid]?.uuid
-          }`,
-          {
-            ...existingObs,
-            voided: true,
-          }
-        )
-        .subscribe((response) => {
-          if (response) {
+        .post(`../../../openmrs/ws/rest/v1/obs/${existingObs.uuid}`, {
+          ...existingObs,
+          voided: true,
+        })
+        .subscribe({
+          next: (response) => {
+            console.log("Existing observation voided:", response);
+            // Proceed to file uploads or new observation creation
+            this.uploadFilesOrCreateObservation(order, jsonData);
+          },
+          error: (error) => {
+            console.error("Error voiding existing observation:", error);
             this.saving = false;
-          }
+          },
         });
+    } else {
+      // No existing observation, directly proceed to file uploads or observation creation
+      this.uploadFilesOrCreateObservation(order, jsonData);
     }
-
-    const orders = [
-      {
-        uuid: order?.uuid,
-        fulfillerStatus: "RECEIVED",
-        encounter: order?.encounterUuid,
-      },
-    ];
-
-    this.ordersService
-      .updateOrdersViaEncounter(orders)
-      .subscribe((response) => {
-        this.saving = false;
-      });
-
-    this.httpClient
-      .post(`../../../openmrs/ws/rest/v1/obs`, data)
-      .subscribe((response: any) => {
-        if (response) {
-          this.obsKeyedByConcepts[order?.concept?.uuid] = {
-            ...response,
-            uri: response?.value?.links
-              ? response?.value?.links?.uri?.replace("http", "https")
-              : null,
-          };
-        }
-      });
-      setTimeout(() => {
-        this.saving = false;
-        console.log('Save complete');
-      }, 2000);
   }
+  
+  // Helper method for file uploads or observation creation
+  private uploadFilesOrCreateObservation(order: any, jsonData: any): void {
+    if (this.file && this.file.length > 0) {
+      // Process each file individually
+      let completedUploads = 0;
+      this.file.forEach((file: File) => {
+        const data = new FormData();
+        data.append("file", file);
+        data.append("json", JSON.stringify(jsonData));
+  
+        this.httpClient.post(`../../../openmrs/ws/rest/v1/obs`, data).subscribe({
+          next: (response: any) => {
+            console.log("File uploaded successfully:", response);
+            // Update observation data with the latest response
+            this.obsKeyedByConcepts[order?.concept?.uuid] = response;
+          },
+          error: (error) => {
+            console.error("Error uploading file:", error);
+          },
+          complete: () => {
+            completedUploads++;
+            console.log(`Upload complete for file: ${file.name}`);
+            // Finalize only when all uploads are processed
+            if (completedUploads === this.file.length) {
+              this.finalizeSaveOperation();
+            }
+          },
+        });
+      });
+    } else {
+      console.error("No files selected for upload. Proceeding to create observation without files.");
+      // Create an observation without files
+      // const data = new FormData();
+      // data.append("json", JSON.stringify(jsonData));
+  
+      // this.httpClient.post(`../../../openmrs/ws/rest/v1/obs`, data).subscribe({
+      //   next: (response: any) => {
+      //     console.log("Observation created successfully without files:", response);
+      //     this.obsKeyedByConcepts[order?.concept?.uuid] = response;
+      //   },
+      //   error: (error) => {
+      //     console.error("Error creating observation:", error);
+      //   },
+      //   complete: () => {
+      //     this.finalizeSaveOperation();
+      //   },
+      // });
+    }
+  }
+  
+  // Helper method to finalize the save operation
+  private finalizeSaveOperation(): void {
+    this.saving = false; 
+    console.log("All operations completed successfully.");
+  }
+  
+  
 }

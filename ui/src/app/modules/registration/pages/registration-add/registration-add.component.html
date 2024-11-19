@@ -96,31 +96,38 @@
               <mat-form-field appearance="fill" class="w-100 mr-2">
                 <mat-label>Select Identification</mat-label>
                 <mat-select
+                  multiple="true"
                   placeholder="Select Identification"
-                  [ngModel]="selectedIdentifierType?.id"
+                  [ngModel]="definedIdentifierTypes"
                   [disabled]="disabledIDType"
+                  (selectionChange)="onSelectOtherIdentifier($event)"
                 >
                   <mat-option
                     *ngFor="let identifier of otherPatientIdentifierTypes"
-                    (click)="onSelectOtherIdentifier($event, identifier)"
-                    [value]="identifier.id"
+                    [value]="identifier"
                     >{{ identifier.name }}</mat-option
                   >
                 </mat-select>
               </mat-form-field>
-              <mat-form-field appearance="fill" class="w-100">
-                <mat-label>{{ selectedIdentifierType?.name }}</mat-label>
+              <!-- {{ definedIdentifierType | json }} -->
+              <mat-form-field
+                appearance="fill"
+                class="w-100 mr-2"
+                *ngFor="let definedIdentifierType of definedIdentifierTypes"
+              >
+                <mat-label>{{
+                  definedIdentifierType?.name
+                    ? definedIdentifierType?.name
+                    : definedIdentifierType?.display
+                }}</mat-label>
                 <input
                   matInput
                   id="patientTypeID"
-                  [pattern]="selectedIdentifierType?.format"
-                  [placeholder]="selectedIdFormat"
-                  [required]="selectedIdentifierType?.required"
-                  [disabled]="
-                    !selectedIdentifierType || selectedIdentifierType.disabled
-                  "
-                  [(ngModel)]="patient[selectedIdentifierType?.id]"
-                  [value]="patient[selectedIdentifierType?.id]"
+                  [pattern]="definedIdentifierType?.format"
+                  [placeholder]="definedIdentifierType?.format"
+                  [required]="definedIdentifierType?.required"
+                  [(ngModel)]="patient[definedIdentifierType?.id]"
+                  [value]="patient[definedIdentifierType?.id]"
                 />
               </mat-form-field>
             </div>

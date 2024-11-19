@@ -219,6 +219,7 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
         encounter: order?.encounterUuid,
       };
     });
+    
     this.ordersService.updateOrdersViaEncounter(orders).subscribe({
       next: (order) => {
         return order;

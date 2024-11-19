@@ -13,6 +13,7 @@ import { AppState } from "src/app/store/reducers";
 })
 export class StoreReportsComponent implements OnInit {
   standardReports$: Observable<any>;
+  selectedReportCategory: string = "standard";
   constructor(
     private systemSettingsService: SystemSettingsService,
     private store: Store<AppState>
@@ -41,5 +42,10 @@ export class StoreReportsComponent implements OnInit {
 
   onViewReport(report: any): void {
     this.store.dispatch(go({ path: ["/pharmacy/reports/" + report?.uuid] }));
+  }
+
+  onSelectReportCategory(event: Event, category: string): void {
+    event.stopPropagation();
+    this.selectedReportCategory = category;
   }
 }
