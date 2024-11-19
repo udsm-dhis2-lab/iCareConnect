@@ -9,6 +9,7 @@
           [isFormHorizontal]="true"
           [isReport]="isReport"
           [formId]="form?.uuid"
+          [ngClass]="isLIS ? 'col-md-2' : null"
           [fieldsData]="observations"
           [formValidationRules]="formValidationRules"
           (formUpdate)="onFormUpdate($event)"
@@ -48,7 +49,7 @@
                     [fields]="formField?.formFields"
                     [isFormHorizontal]="true"
                     [isReport]="isReport"
-                    [colClass]="isLIS ? 'col-4' : null"
+                    [colClass]="isLIS ? 'col-2' : null"
                     [formId]="form?.uuid"
                     [formValidationRules]="formValidationRules"
                     [fieldsData]="observations"
@@ -161,7 +162,6 @@
               member?.setMembers?.length == 0
             "
           >
-        
             <app-form
               [fields]="[member?.formField]"
               [dataType]="member?.dataType"
@@ -172,7 +172,6 @@
               (formUpdate)="onFormUpdate($event)"
             >
             </app-form>
-    
           </div>
           <div
             *ngIf="
