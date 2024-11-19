@@ -154,6 +154,12 @@ export class LaboratoryComponent implements OnInit {
           id: "general",
           icon: "settings",
         },
+        {
+          name: "Price list",
+          route: "settings/price-list",
+          id: "price-list",
+          icon: "money",
+        },
       ],
     },
   ];

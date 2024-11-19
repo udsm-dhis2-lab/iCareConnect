@@ -15,6 +15,7 @@ import { LabConfigurationsComponent } from "./lab-configurations/lab-configurati
 import { LabEditUserModalComponent } from "./lab-edit-user-modal/lab-edit-user-modal.component";
 import { LabOrdersManagementDashboardComponent } from "./lab-orders-management-dashboard/lab-orders-management-dashboard.component";
 import { LabOrdersManagementComponent } from "./lab-orders-management/lab-orders-management.component";
+import { LabPriceListHomeComponent } from "./lab-price-list-home/lab-price-list-home.component";
 import { LabsSectionManagementComponent } from "./labs-section-management/labs-section-management.component";
 import { LbPriceListContainerComponent } from "./lb-price-list-container/lb-price-list-container.component";
 import { LoggedinusersComponent } from "./loggedinusers/loggedinusers.component";
@@ -77,7 +78,8 @@ export const components: any[] = [
   AuditLogsComponent,
   TestInterpretationsComponent,
   TestTargetCreationComponent,
-  TestTargetListComponent
+  TestTargetListComponent,
+  LabPriceListHomeComponent,
 ];
 
 export const entrySettingComponents: any[] = [

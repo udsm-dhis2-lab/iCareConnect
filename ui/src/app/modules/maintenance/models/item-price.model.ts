@@ -18,7 +18,7 @@ export class ItemPrice {
   }
 
   get display(): string {
-    return this.itemPriceDetails?.item?.display;
+    return this.itemPriceDetails?.item?.display?.replace("TEST_ORDERS:", "");
   }
 
   get paymentType(): any {
