@@ -95,3 +95,8 @@ ng-deep .disabled-form-selection-option,
   min-width: 80px !important;
   width: auto !important;
 }
+
+.custom-height .mat-form-field-wrapper {
+  height: 60px; /* Adjust the height as needed */
+  align-items: center; /* Optional: centers input content */
+}
