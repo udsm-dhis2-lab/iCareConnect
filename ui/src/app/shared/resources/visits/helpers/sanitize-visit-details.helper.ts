@@ -43,36 +43,37 @@ export function getOrdersFromCurrentVisitEncounters(
               ? false
               : true;
 
-          const observation = encounter
-            ? (encounter?.obs?.filter(
-                (observation) =>
-                  observation?.concept?.uuid === order?.concept?.uuid
-              ) || [])[0]
-            : null;
-          const formattedItem = {
-            orderNumber: order?.orderNumber,
-            uuid: order?.uuid,
-            dateActivated: order?.dateActivated,
-            id: order?.uuid,
-            concept: {
-              uuid: order?.concept?.uuid,
-              display: order?.concept?.display,
-            },
-            encounterUuid: order?.encounter?.uuid,
-            orderer: {
-              uuid: order?.orderer?.uuid,
-              display: order?.orderer?.display,
-            },
-            value: observation ? observation?.value : null,
-            remarks: observation ? observation?.comment : null,
-            obsDatetime: observation ? observation?.obsDatetime : null,
-            paid,
-            orderReason: order?.orderReason,
-            orderType: order?.orderType.display,
-            display: order?.display,
-            instructions: order?.instructions,
-            type: order?.type,
-          };
+              const observations = encounter
+              ? encounter?.obs?.filter(
+                  (obs) => obs?.concept?.uuid === order?.concept?.uuid
+                ) || []
+              : [];
+            
+              const formattedItem = {
+                orderNumber: order?.orderNumber,
+                uuid: order?.uuid,
+                dateActivated: order?.dateActivated,
+                id: order?.uuid,
+                concept: {
+                  uuid: order?.concept?.uuid,
+                  display: order?.concept?.display,
+                },
+                encounterUuid: order?.encounter?.uuid,
+                orderer: {
+                  uuid: order?.orderer?.uuid,
+                  display: order?.orderer?.display,
+                },
+                values: observations.map((obs) => obs?.value), 
+                remarks: observations[0]?.comment || null, 
+                obsDatetime: observations[0]?.obsDatetime || null,
+                paid,
+                orderReason: order?.orderReason,
+                orderType: order?.orderType.display,
+                display: order?.display,
+                instructions: order?.instructions,
+                type: order?.type,
+              };
+              
           return formattedItem;
         }
       ),
