@@ -89,9 +89,12 @@ export class PricingItemComponent implements OnInit {
       paymentScheme: { uuid: this.paymentScheme?.concept?.uuid },
       price: this.priceObject[this.fieldId]?.value,
       payable: this.priceObject[this.fieldId + "-payable"]?.value,
-      payablePaymentMode: {
-        uuid: this.cashPaymentType?.uuid,
-      },
+      payablePaymentMode:
+        this.cashPaymentType && this.cashPaymentType?.uuid
+          ? {
+              uuid: this.cashPaymentType?.uuid,
+            }
+          : null,
     });
   }
 
