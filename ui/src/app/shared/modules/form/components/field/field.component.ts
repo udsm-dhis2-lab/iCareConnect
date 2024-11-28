@@ -51,6 +51,8 @@ export class FieldComponent implements AfterViewInit {
   @Output() fileFieldUpdate: EventEmitter<any> = new EventEmitter<any>();
 
   ngAfterViewInit() {
+
+    console.log("field?.key .....",this.field);
     if (typeof this.field?.value === "object") {
       this.value =
         this.field?.value && (this.field?.value as any)?.length > 0
@@ -175,7 +177,9 @@ export class FieldComponent implements AfterViewInit {
   }
 
   onListenKeyEvent(event: KeyboardEvent, fieldtype: any): void {
+    console.log("test in ----",fieldtype);
     if (fieldtype === "number") {
+
       if (
         event.key === "Backspace" ||
         event.key === "ArrowLeft" ||

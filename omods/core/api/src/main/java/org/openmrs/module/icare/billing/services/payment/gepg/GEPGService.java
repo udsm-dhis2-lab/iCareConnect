@@ -144,30 +144,6 @@ public class GEPGService {
         return resultMap;
     }
 
-    // private String fetchControlNumber(String requestId) {
-    //     String controlNumber = null;
-    //     long startTime = System.currentTimeMillis();
-    //     long timeout = 32000; 
-
-    //     while (System.currentTimeMillis() - startTime < timeout) {
-    //         controlNumber = paymentDAO.getReferenceNumberByRequestId(requestId);
-    //         AdministrationService administrationService = Context.getAdministrationService();
-    //         GlobalProperty globalProperty = new GlobalProperty();
-    //         globalProperty.setProperty("gepg.controlNumberRes.icareConnect");
-    //         globalProperty.setPropertyValue(controlNumber);
-    //         administrationService.saveGlobalProperty(globalProperty);
-    //         if (controlNumber != null) {
-    //             break;
-    //         }
-    //         try {
-    //             Thread.sleep(4000); 
-    //         } catch (InterruptedException e) {
-    //             Thread.currentThread().interrupt();
-    //         }
-    //     }
-    //     return controlNumber;
-    // }
-
     private void handleErrorResponse(HttpURLConnection con, Map<String, Object> responseMap) throws IOException {
         try (BufferedReader errorReader = new BufferedReader(new InputStreamReader(con.getErrorStream()))) {
             StringBuilder errorContent = new StringBuilder();

@@ -95,4 +95,6 @@ public interface BillingService extends OpenmrsService {
 	        String gepgAuthSignature, String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode,
 	        String serviceCode, String SpSysId, String subSpCode, String clientPrivateKey, String pkcs12Path,
 	        String pkcs12Password, String enginepublicKey, String billId) throws Exception;
+	
+	String signatureData(String rowData) throws Exception;
 }

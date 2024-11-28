@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.naming.ConfigurationException;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -807,7 +808,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 						response.put("SystemAuth", systemAuth);
 						response.put("AckData", ackData);
 
-					}else{
+					} else {
 						ackData.put("SystemAckCode", "0");
 						ackData.put("Description", "Fail, No Data with this RequestId");
 						ackData.put("RequestId", requestId);
@@ -876,7 +877,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 						int rowsUpdated = this.paymentDAO.setReferenceNumberByPaymentId(requestId_, payCntrNum);
 
 						if (rowsUpdated > 0) {
-							
+
 							ackData.put("SystemAckCode", "0");
 							ackData.put("Description", "Successfully Updated");
 						} else {
@@ -1172,5 +1173,23 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		result.put("signature", signature);
 
 		return result;
+	}
+	
+	@Override
+	public String signatureData(String rowData) throws Exception {
+		AdministrationService administrationService = Context.getAdministrationService();
+		String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
+		try {
+			GlobalProperty globalProperty = new GlobalProperty();
+			globalProperty.setProperty("gepg.callbackrowData.icareConnect");
+			globalProperty.setPropertyValue(rowData);
+			administrationService.saveGlobalProperty(globalProperty);
+			String signature = SignatureUtils.signData(rowData, clientPrivateKey);
+			return signature;
+		}
+		catch (IOException e) {
+			throw new Exception("Error signing data due to I/O: " + e.getMessage(), e);
+		}
+		
 	}
 }

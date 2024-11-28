@@ -63,7 +63,13 @@
       [disabled]="shouldDisable || field?.disabled"
       [placeholder]="field?.placeholder"
       class="{{ fieldClass || 'field-input' }}"
-      [type]="field?.type === 'number' ? 'text' : field?.type"
+      [type]="
+    (field?.label === 'Dose' || field?.label === 'Duration') 
+      ? 'number' 
+      : field?.type === 'number' 
+      ? 'text' 
+      : field?.type
+  "
       [required]="field?.required"
       matInput
       step="any"
