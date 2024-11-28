@@ -257,9 +257,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		itemPrice.setPaymentType(paymentType);
 		if (itemPrice.getPayable() != null && itemPrice.getPayablePaymentMode() == null) {
 			throw new APIException("Payment mode for payable not provided");
-		} else if (itemPrice.getPayablePaymentMode() != null
-				&& itemPrice.getPayablePaymentMode().getUuid() != null
-				&& conceptService.getConceptByUuid(itemPrice.getPayablePaymentMode().getUuid()) != null) {
+		} else if (itemPrice.getPayablePaymentMode() != null && itemPrice.getPayablePaymentMode().getUuid() != null
+		        && conceptService.getConceptByUuid(itemPrice.getPayablePaymentMode().getUuid()) != null) {
 			Concept payablePaymentMode = conceptService.getConceptByUuid(itemPrice.getPayablePaymentMode().getUuid());
 			itemPrice.setPayablePaymentMode(payablePaymentMode);
 		}

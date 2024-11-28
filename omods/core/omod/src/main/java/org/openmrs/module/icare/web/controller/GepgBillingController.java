@@ -164,8 +164,14 @@ public class GepgBillingController {
 	@RequestMapping(value = "/callback", method = RequestMethod.POST)
 	public ResponseEntity<?> handleCallback(HttpServletRequest request) {
 		try {
-			// Read the raw body from the request
+			
 			AdministrationService administrationService = Context.getAdministrationService();
+			// Retrieve GePG user credentials
+			String gepgUsername = administrationService.getGlobalProperty(ICareConfig.GEPG_USERNAME);
+			String gepgPassword = administrationService.getGlobalProperty(ICareConfig.GEPG_PASSWORD);
+			Context.authenticate(gepgUsername, gepgPassword);
+			// Read the raw body from the request
+			
 			String requestBody = new BufferedReader(new InputStreamReader(request.getInputStream())).lines().collect(
 			    Collectors.joining("\n"));
 			
@@ -184,9 +190,6 @@ public class GepgBillingController {
 				return generateErrorResponse("Empty content not allowed", "");
 			}
 			
-			// Retrieve GePG user credentials
-			String gepgUsername = administrationService.getGlobalProperty(ICareConfig.GEPG_USERNAME);
-			String gepgPassword = administrationService.getGlobalProperty(ICareConfig.GEPG_PASSWORD);
 			Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
 			if (status == null) {
 				return generateErrorResponse("Status is missing in callback data.", "");
@@ -206,10 +209,10 @@ public class GepgBillingController {
 			
 			try {
 				Context.authenticate(gepgUsername, gepgPassword);
-
+				
 				Map<String, Object> processResponse = billingService.processGepgCallbackResponse(callbackData);
 				return ResponseEntity.ok(processResponse);
-
+				
 			}
 			catch (ContextAuthenticationException e) {
 				return generateErrorResponse("Authentication failed please contact an Admin", requestId);
@@ -231,10 +234,12 @@ public class GepgBillingController {
         Map<String, Object> errorResponse = new HashMap<>();
         try {
             // AckData as per your requested format
+            AdministrationService administrationService = Context.getAdministrationService();
             Map<String, Object> ackData = new HashMap<>();
             ackData.put("Description", errorMessage);
             ackData.put("RequestId", requestId);
             ackData.put("SystemAckCode", "0");
+            String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
 
             // Serialize RequestData to JSON for signing
             String requestDataJson = new ObjectMapper().writeValueAsString(ackData);
@@ -242,8 +247,8 @@ public class GepgBillingController {
 
             // SystemAuth as per your requested format
             Map<String, Object> systemAuth = new HashMap<>();
-            systemAuth.put("SystemCode", "1001");
-            systemAuth.put("Signature",signature);
+            systemAuth.put("SystemCode", systemCode);
+            systemAuth.put("Signature", signature);
 
             errorResponse.put("AckData", ackData);
             errorResponse.put("SystemAuth", systemAuth);
