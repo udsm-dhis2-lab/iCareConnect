@@ -233,8 +233,13 @@ public class GepgBillingController {
 	private ResponseEntity<Map<String, Object>> generateErrorResponse(String errorMessage, String requestId) {
         Map<String, Object> errorResponse = new HashMap<>();
         try {
-            // AckData as per your requested format
+            
             AdministrationService administrationService = Context.getAdministrationService();
+            // Retrieve GePG user credentials
+			String gepgUsername = administrationService.getGlobalProperty(ICareConfig.GEPG_USERNAME);
+			String gepgPassword = administrationService.getGlobalProperty(ICareConfig.GEPG_PASSWORD);
+			Context.authenticate(gepgUsername, gepgPassword);
+            // AckData as per your requested format
             Map<String, Object> ackData = new HashMap<>();
             ackData.put("Description", errorMessage);
             ackData.put("RequestId", requestId);
