@@ -356,8 +356,7 @@ export class VisitsService {
       parametersString += `&includeInactive=true`;
     }
     //
-    
-    console.log("url fired  ...",`icare/visit?${parametersString.replace("&","" )}&startIndex=${startIndex}&limit=${limit}`);
+    // console.log("url fired  ...",`icare/visit?${parametersString.replace("&","" )}&startIndex=${startIndex}&limit=${limit}`);
     return (
       locationUuids?.length > 0
         ? zip(

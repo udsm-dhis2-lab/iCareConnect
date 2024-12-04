@@ -25,7 +25,7 @@ public class GEPGService {
     private PaymentDAO paymentDAO;
 
     @Autowired
-	private BillingService billingService;
+    private BillingService billingService;
 
     private final Map<String, Map<String, Object>> callbackResponses = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -46,7 +46,7 @@ public class GEPGService {
 
             // Write JSON payload
             try (OutputStream os = con.getOutputStream();
-                 BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"))) {
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"))) {
                 writer.write(jsonPayload);
                 writer.flush();
             }
@@ -81,7 +81,9 @@ public class GEPGService {
 
                 // Handle different ackCodes
                 if ("R3001".equals(ackCode)) {
-                    String controlNumber = billingService.fetchControlNumber(requestId);
+                    Integer requestpaymentId = null;
+                    requestpaymentId = Integer.parseInt(requestId);
+                    String controlNumber = billingService.fetchControlNumber(requestpaymentId);
                     // Save the payload in a global property
                     AdministrationService administrationService = Context.getAdministrationService();
                     GlobalProperty globalProperty = new GlobalProperty();
@@ -89,7 +91,8 @@ public class GEPGService {
                     globalProperty.setPropertyValue(controlNumber);
                     administrationService.saveGlobalProperty(globalProperty);
                     responseMap.put("status", "success");
-                    responseMap.put("controlNumber", controlNumber != null ? controlNumber : "Not found within timeout");
+                    responseMap.put("controlNumber",
+                            controlNumber != null ? controlNumber : "Not found within timeout");
                     responseMap.put("ackCode", ackCode);
                     responseMap.put("message", "Request processed successfully.");
                 } else if ("CONS9005".equals(ackCode)) {
