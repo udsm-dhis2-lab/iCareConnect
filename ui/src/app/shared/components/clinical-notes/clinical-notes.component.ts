@@ -61,7 +61,7 @@ export class ClinicalNotesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // console.log(this.clinicConfigurations);
+    
     this.clinicConfigurations = {
       ...this.clinicConfigurations,
       forms: keyBy(
@@ -87,6 +87,7 @@ export class ClinicalNotesComponent implements OnInit {
       (key) => this.clinicalObservations[key]?.latest
     );
     const concepts = identifyConceptsFromFormattedForm(this.currentCustomForm);
+    console.log("forms data",this.currentCustomForm);
     // this.currentFormHasRequiredData =
     //   (
     //     Object.keys(this.clinicalObservations).filter(
