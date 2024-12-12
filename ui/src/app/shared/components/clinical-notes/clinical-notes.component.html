@@ -29,6 +29,7 @@
       *ngIf="params?.savingObservations"
       mode="indeterminate"
     ></mat-progress-bar>
+    <!-- on observation use  useFilledObsData ? clinicalObservations :null in case populate data on form-->
     <app-capture-form-data
       *ngIf="
         currentCustomForm &&
@@ -41,7 +42,7 @@
           clinicConfigurations?.forms[currentCustomForm?.uuid]?.dependsOn
             ?.length == 0)
       "
-      [observations]="useFilledObsData ? clinicalObservations : null"
+      [observations]="useFilledObsData ? null : null"
       [form]="currentCustomForm"
       [visit]="visit"
       [patient]="patient"
