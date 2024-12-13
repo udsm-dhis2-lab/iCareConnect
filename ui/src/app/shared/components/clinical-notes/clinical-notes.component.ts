@@ -37,6 +37,7 @@ export class ClinicalNotesComponent implements OnInit {
   @Input() provider: any;
   @Input() clinicConfigurations: any;
   @Input() forms: any[];
+  @Input() clearingFormTime?: number;
   savingObservations$: Observable<boolean>;
   ordersUpdates$: Observable<any>;
 
@@ -46,7 +47,7 @@ export class ClinicalNotesComponent implements OnInit {
   currentCustomFormName: string;
   formData: any;
   searchingText: string;
-  clearingFormTime: number;
+  
   atLeastOneFieldHasData: boolean = false;
   currentFormHasRequiredData: boolean = false;
   dependedFormHasData: boolean = false;
@@ -64,7 +65,6 @@ export class ClinicalNotesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.clearingFormTime = 0.5;
     this.clinicConfigurations = {
       ...this.clinicConfigurations,
       forms: keyBy(
@@ -90,7 +90,7 @@ export class ClinicalNotesComponent implements OnInit {
       (key) => this.clinicalObservations[key]?.latest
     );
     const concepts = identifyConceptsFromFormattedForm(this.currentCustomForm);
-    this.loadGlobalProperty();
+    // this.loadGlobalProperty();
     // this.currentFormHasRequiredData =
     //   (
     //     Object.keys(this.clinicalObservations).filter(
@@ -184,17 +184,6 @@ export class ClinicalNotesComponent implements OnInit {
       ]?.dependsOn?.filter((depended) => depended?.type === "form")
     ) {
       this.showMessage = true;
-    }
-  }
-
-  async loadGlobalProperty() {
-    try {
-      const globalProperty = await this.globalSettingService.getSpecificGlobalProperties("ed9dac4a-5b2a-4a5f-8ee2-ca0d88b08506").toPromise();
-      const minutes = parseInt(globalProperty?.value ?? "0", 10);
-      this.clearingFormTime = isNaN(minutes / 60) ? 0.5 : minutes / 60;
-    } catch (error) {
-      console.error("Error occurred:", error);
-      this.clearingFormTime = 0.5; 
     }
   }
 
