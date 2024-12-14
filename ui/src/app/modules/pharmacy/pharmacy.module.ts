@@ -6,7 +6,6 @@ import { PharmacyComponent } from "./containers/pharmacy/pharmacy.component";
 
 @NgModule({
   declarations: [PharmacyComponent],
-  entryComponents: [],
   imports: [CommonModule, PharmacyRoutingModule, SharedModule],
   bootstrap: [PharmacyComponent],
 })

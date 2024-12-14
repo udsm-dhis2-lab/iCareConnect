@@ -352,7 +352,6 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		visitData = handle.getContentAsString();
 		visitMap = (new ObjectMapper()).readValue(visitData, Map.class);
 		visitDetails = (List<Map>) visitMap.get("results");
-		System.out.println(visitDetails.size());
 		assertThat("Should return a visit", visitDetails.size() == 0);
 		
 	}
@@ -971,13 +970,23 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testGetCommonlyOrderedItems() throws Exception {
 		MockHttpServletRequest drugs = newGetRequest("icare/commonlyordereditems", new Parameter("locationUuid",
-		        "44939999-d333-fff2-9bff-61d11117c22e"));
+		        "44939999-d333-fff2-9bff-61d11117c22e"), new Parameter("provider", "1010d442-e134-11de-babe-001e378eb67e"));
 		MockHttpServletResponse response = handle(drugs);
 		Map<String, Object> drugsMap = (new ObjectMapper()).readValue(response.getContentAsString(), Map.class);
 		List<Map<String, Object>> results = (List) drugsMap.get("results");
 		assertThat("Count of drugs ordered", results.size(), is(0));
 		
 		//		TODO: Add test for normal orders
+	}
+	
+	@Test
+	public void testGetTotalinvoiceamountbyitems() throws Exception {
+		MockHttpServletRequest drugs = newGetRequest("icare/totalinvoiceamountbyitems", new Parameter("startDate",
+		        "2024-09-24"), new Parameter("endDate", "2024-10-02"));
+		MockHttpServletResponse response = handle(drugs);
+		List<Map<String, Object>> invoiceItemsByAmount = (new ObjectMapper()).readValue(response.getContentAsString(),
+		    List.class);
+		assertThat("Count of items with total amount", invoiceItemsByAmount.size(), is(3));
 	}
 	
 	@Test
@@ -1008,6 +1017,7 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		// TODO: Make sure test is running sucessfully beforing using the API
 		assertThat("Order status shows drug dispensed", responseMap.get("orderStockStatus"), is("DISPENSED"));
 	}
+
 
 	//EnvayaSMS tests class
 	//for incoming sms
@@ -1069,6 +1079,40 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		MockHttpServletResponse response = handle(request);
 		Map<String, Object> responseMap = new ObjectMapper().readValue(response.getContentAsString(), Map.class);
 		assertThat(responseMap.containsKey("Error"), is(true));
+
+	
+	@Test
+	public void testReferralAPI() throws Exception {
+		Map<String,Object> referralVisit = new HashMap<>();
+		AdministrationService administrationService = Context.getAdministrationService();
+		String mediators = this.readFile("dto/core/mediators-list.json");
+		administrationService.setGlobalProperty(
+				ICareConfig.INTEROPERABILITY_MEDIATORS_LIST,
+				mediators);
+		referralVisit.put("uuid", "298b75eb-er45-12e8-9c7c-42b0yt63cfepi");
+		MockHttpServletRequest referralMockedRequest = newPostRequest("icare/referral", referralVisit);
+		MockHttpServletResponse mockedResponse = handle(referralMockedRequest);
+		Map<String, Object> responseMap = (new ObjectMapper()).readValue(mockedResponse.getContentAsString(), Map.class);
+		System.out.println(responseMap);
+	}
+	
+	@Test
+	public void testSharedRecordsAPI() throws Exception {
+		Map<String,Object> referralVisit = new HashMap<>();
+		AdministrationService administrationService = Context.getAdministrationService();
+		String mediators = this.readFile("dto/core/mediators-list.json");
+		administrationService.setGlobalProperty(
+				ICareConfig.INTEROPERABILITY_MEDIATORS_LIST,
+				mediators);
+		administrationService.setGlobalProperty("HDUAPI.instance","https://iadapter.dhis2.udsm.ac.tz");
+		administrationService.setGlobalProperty("HDUAPI.username","admin");
+		administrationService.setGlobalProperty("HDUAPI.password","AdminUser");
+		MockHttpServletRequest getSharedRecordMockedRequest = newGetRequest("icare/sharedRecords",
+				new Parameter("hfrCode","19209-2"),
+				new Parameter("id","19209-2/2024/004"));
+		MockHttpServletResponse mockedResponse = handle(getSharedRecordMockedRequest);
+		Map<String, Object> responseMap = (new ObjectMapper()).readValue(mockedResponse.getContentAsString(), Map.class);
+
 		System.out.println(responseMap);
 	}
 	
@@ -1096,6 +1140,15 @@ public class ICareControllerAPITest extends BaseResourceControllerTest {
 		assertEquals("Saved successfully", response.getContentAsString());
 		
 		System.out.println(response);
+	}
+
+
+	public void testGetPatientVisitsByIdentifier() throws Exception {
+		MockHttpServletRequest emrHealthRecordsRequest = newGetRequest("icare/emrHealthRecords", new Parameter("id",
+		        "110620-2/10891/21"), new Parameter("idType", "MRN"), new Parameter("count", "1"));
+		MockHttpServletResponse mockedResponse = handle(emrHealthRecordsRequest);
+		Map<String, Object> responseMap = (new ObjectMapper()).readValue(mockedResponse.getContentAsString(), Map.class);
+		System.out.println(responseMap);
 	}
 
 }

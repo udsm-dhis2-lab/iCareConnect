@@ -11,7 +11,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { EffectsModule } from "@ngrx/effects";
 import {
-  DefaultRouterStateSerializer,
+  MinimalRouterStateSerializer,
   RouterStateSerializer,
   StoreRouterConnectingModule,
 } from "@ngrx/router-store";
@@ -40,32 +40,31 @@ export function initializeDb(indexDbServiceConfig: IndexDbServiceConfig) {
 }
 
 @NgModule({
-  imports: [
-    CommonModule,
-    BrowserModule,
-    FormsModule,
-    BrowserAnimationsModule,
-    AppRoutingModule,
-    HttpClientModule,
-    ...materialModules,
-    StoreModule.forRoot(reducers, { metaReducers }),
-    EffectsModule.forRoot(effects),
-    StoreRouterConnectingModule.forRoot({
-      serializer: DefaultRouterStateSerializer,
-    }),
-    !environment.production ? StoreDevtoolsModule.instrument() : [],
-  ],
-  declarations: [
-    ...coreContainers,
-    ...coreComponents,
-    ...coreDialogs,
-    MenuComponent,
-    ModulesSelectorComponent,
-    UserAbbreviationComponent,
-  ],
-  entryComponents: [...coreDialogs],
-  providers: [{ provide: RouterStateSerializer, useClass: RouteSerializer }],
-  exports: [BrowserModule, AppRoutingModule, BrowserAnimationsModule],
+    imports: [
+        CommonModule,
+        BrowserModule,
+        FormsModule,
+        BrowserAnimationsModule,
+        AppRoutingModule,
+        HttpClientModule,
+        ...materialModules,
+        StoreModule.forRoot(reducers, { metaReducers }),
+        EffectsModule.forRoot(effects),
+        StoreRouterConnectingModule.forRoot({
+            serializer: MinimalRouterStateSerializer,
+        }),
+        !environment.production ? StoreDevtoolsModule.instrument() : [],
+    ],
+    declarations: [
+        ...coreContainers,
+        ...coreComponents,
+        ...coreDialogs,
+        MenuComponent,
+        ModulesSelectorComponent,
+        UserAbbreviationComponent,
+    ],
+    providers: [{ provide: RouterStateSerializer, useClass: RouteSerializer }],
+    exports: [BrowserModule, AppRoutingModule, BrowserAnimationsModule]
 })
 export class CoreModule {
   /* make sure CoreModule is imported only by one NgModule the AppModule */

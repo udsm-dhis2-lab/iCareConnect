@@ -29,7 +29,10 @@
     visitEndingControlStatusesConcept:
       visitEndingControlStatusesConcept$ | async,
     patientInvoice: patientInvoice$ | async,
-    latestRound: latestRound$ | async
+    latestRound: latestRound$ | async,
+    shouldAllowRemoteHistory: shouldAllowRemoteHistory$ | async,
+    dataExchangeLocations: dataExchangeLocations$ | async,
+    hfrCodeLocationAttribute: hfrCodeLocationAttribute$ | async
   } as dashboardParams"
 >
   <div
@@ -44,23 +47,15 @@
       dashboardParams?.consultationEncounterType
     "
   >
-    <div class="patient-dashboard-container mat-elevation-z1">
+    <div class="patient-dashboard-container ">
       <div class="patient-profile-sticky">
         <app-new-patient-profile
           [currentPatient]="dashboardParams?.currentPatient"
         ></app-new-patient-profile>
       </div>
+      
       <div class="w-100 patient-other-details-padding">
-        <div
-          class="
-            d-flex
-            justify-content-between
-            align-items-center
-            pt-2
-            pl-3
-            pr-3
-          "
-        >
+        <div class="d-flex justify-content-between align-items-center pl-3 pr-3">
           <div class="d-flex justify-content-left">
             <button
               mat-stroked-button
@@ -70,12 +65,34 @@
               <mat-icon>arrow_back</mat-icon>
               Back to Client List
             </button>
-            <a mat-icon-button class="mr-4" (click)="toggleSideBarMenu($event)">
+      
+            <div class="row">
+              <div *ngFor="let form of dashboardParams?.forms" class="form-button-wrapper">
+                <button
+                class="buttonstyle"
+                  mat-stroked-button
+                  [ngClass]="{
+                    'selected-form':
+                      (selectedForm &&
+                        !showHistoryDetails &&
+                        selectedForm?.uuid === form?.uuid) ||
+                      (!selectedForm &&
+                        !showHistoryDetails &&
+                        dashboardParams?.forms[0] &&
+                        dashboardParams?.forms[0]?.uuid === form?.uuid)
+                  }"
+                  (click)="getSelectedForm($event, form)"
+                >
+                  {{ form?.name }}
+                </button>
+              </div>
+            </div>
+            
+
+            <!-- <a mat-icon-button class="mr-4" (click)="toggleSideBarMenu($event)">
               <mat-icon>menu</mat-icon>
-            </a>
-            <ng-container *ngIf="!useSideBar">
-              
-            </ng-container>
+            </a> -->
+            <ng-container *ngIf="!useSideBar"> </ng-container>
           </div>
 
           <div class="w-50 d-flex justify-content-end">
@@ -272,6 +289,22 @@
               >
                 Refer
               </button>
+              <!-- <button
+                mat-menu-item
+                [disabled]="
+                  activeVisitDeathStatus || !dashboardParams?.provider
+                "
+                (click)="
+                  onOpenClientHistoryFromRemote(
+                    $event,
+                    dashboardParams?.currentPatient,
+                    activeVisit,
+                    dashboardParams?.provider
+                  )
+                "
+              >
+                Get remote history
+              </button> -->
               <button
                 mat-menu-item
                 [disabled]="
@@ -398,7 +431,35 @@
                         [activeVisit]="activeVisit"
                       ></app-shared-visit-history-summary> -->
                             <div class="w-100" *ngIf="showHistoryDetails">
-                              <mat-accordion>
+                              <mat-radio-group
+                                aria-label="History options"
+                                *ngIf="
+                                  dashboardParams?.shouldAllowRemoteHistory ==
+                                  'true'
+                                "
+                              >
+                                <mat-radio-button
+                                  color="primary"
+                                  [checked]="
+                                    selectedHistoryCategory === 'local'
+                                  "
+                                  [value]="'local'"
+                                  (change)="onToggleHistoryType($event)"
+                                  >Local</mat-radio-button
+                                >
+                                <mat-radio-button
+                                  color="primary"
+                                  [checked]="
+                                    selectedHistoryCategory === 'remote'
+                                  "
+                                  [value]="'remote'"
+                                  (change)="onToggleHistoryType($event)"
+                                  >Remote</mat-radio-button
+                                >
+                              </mat-radio-group>
+                              <mat-accordion
+                                *ngIf="selectedHistoryCategory === 'local'"
+                              >
                                 <mat-expansion-panel
                                   class="mb-2 border p-0"
                                   [expanded]="true"
@@ -416,6 +477,36 @@
                                       dashboardParams?.currentLocation
                                     "
                                   ></app-patient-history>
+                                </mat-expansion-panel>
+                              </mat-accordion>
+                              <mat-accordion
+                                *ngIf="selectedHistoryCategory === 'remote'"
+                              >
+                                <mat-expansion-panel
+                                  class="mb-2 border p-0"
+                                  [expanded]="true"
+                                >
+                                  <mat-expansion-panel-header>
+                                    <mat-panel-title
+                                      >Remote Patient History
+                                    </mat-panel-title>
+                                  </mat-expansion-panel-header>
+                                  <app-shared-remote-patient-history
+                                    *ngIf="
+                                      dashboardParams?.dataExchangeLocations &&
+                                      dashboardParams?.hfrCodeLocationAttribute
+                                    "
+                                    [patient]="
+                                      dashboardParams?.currentPatient?.patient
+                                    "
+                                    [activeVisit]="dashboardParams?.activeVisit"
+                                    [dataExchangeLocations]="
+                                      dashboardParams?.dataExchangeLocations
+                                    "
+                                    [hfrCodeLocationAttribute]="
+                                      dashboardParams?.hfrCodeLocationAttribute
+                                    "
+                                  ></app-shared-remote-patient-history>
                                 </mat-expansion-panel>
                               </mat-accordion>
                             </div>
@@ -442,6 +533,7 @@
                         [shouldUseOwnFormSelection]="false"
                         [clinicConfigurations]="clinicConfigurations"
                         [provider]="dashboardParams?.provider"
+                        [clearingFormTime]="clearingFormTime"
                         (updateConsultationOrder)="onUpdateConsultationOrder()"
                         [selectedForm]="
                           selectedForm
@@ -455,45 +547,45 @@
                       >
                       </app-clinical-notes>
                       <app-patient-observations-chart
-                          *ngIf="
-                            isInpatient &&
-                            !showHistoryDetails &&
-                            !dashboardParams.loadingForms &&
-                            dashboardParams.currentPatient &&
-                            dashboardParams?.forms &&
-                            dashboardParams?.forms?.length > 0 &&
-                            ((selectedForm &&
-                              dashboardParams?.observationChartForm ===
-                                selectedForm?.uuid) ||
-                              (!selectedForm?.uuid &&
-                                dashboardParams?.observationChartForm ===
-                                  dashboardParams?.forms[0].uuid))
-                          "
-                          [clinicalObservations]="
-                            dashboardParams?.observationsGroupedByConcept
-                          "
-                          [patient]="dashboardParams?.currentPatient"
-                          [location]="dashboardParams?.currentLocation"
-                          [visit]="activeVisit"
-                          [forms]="dashboardParams?.forms"
-                          [shouldUseOwnFormSelection]="false"
-                          [obsChartEncounterType]="
-                            dashboardParams?.observationChartEncounterType
-                          "
-                          [provider]="dashboardParams?.provider"
-                          [selectedForm]="
-                            selectedForm &&
+                        *ngIf="
+                          isInpatient &&
+                          !showHistoryDetails &&
+                          !dashboardParams.loadingForms &&
+                          dashboardParams.currentPatient &&
+                          dashboardParams?.forms &&
+                          dashboardParams?.forms?.length > 0 &&
+                          ((selectedForm &&
                             dashboardParams?.observationChartForm ===
-                              selectedForm?.uuid
-                              ? selectedForm
-                              : dashboardParams?.forms[0]?.uuid ===
-                                dashboardParams?.observationChartForm
-                              ? dashboardParams?.forms[0]
-                              : {}
-                          "
-                        >
-                        </app-patient-observations-chart>
-                      
+                              selectedForm?.uuid) ||
+                            (!selectedForm?.uuid &&
+                              dashboardParams?.observationChartForm ===
+                                dashboardParams?.forms[0].uuid))
+                        "
+                        [clinicalObservations]="
+                          dashboardParams?.observationsGroupedByConcept
+                        "
+                        [patient]="dashboardParams?.currentPatient"
+                        [location]="dashboardParams?.currentLocation"
+                        [visit]="activeVisit"
+                        [forms]="dashboardParams?.forms"
+                        [shouldUseOwnFormSelection]="false"
+                        [obsChartEncounterType]="
+                          dashboardParams?.observationChartEncounterType
+                        "
+                        [provider]="dashboardParams?.provider"
+                        [selectedForm]="
+                          selectedForm &&
+                          dashboardParams?.observationChartForm ===
+                            selectedForm?.uuid
+                            ? selectedForm
+                            : dashboardParams?.forms[0]?.uuid ===
+                              dashboardParams?.observationChartForm
+                            ? dashboardParams?.forms[0]
+                            : {}
+                        "
+                      >
+                      </app-patient-observations-chart>
+
                       <app-ipd-forms
                         *ngIf="
                           isInpatient &&
@@ -679,7 +771,7 @@
                                   onUpdateConsultationOrder()
                                 "
                               ></app-patient-investigations-and-procedures>
-                              
+
                               <div
                                 class="alert alert-warning"
                                 role="alert"

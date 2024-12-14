@@ -15,11 +15,11 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.icare.auditlog.AuditLog;
 import org.openmrs.module.icare.billing.ItemNotPayableException;
+import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.insurance.Claim;
 import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
-import org.openmrs.module.icare.core.models.CommonlyOrderedDrugs;
 import org.openmrs.module.icare.core.models.EncounterPatientProgram;
 import org.openmrs.module.icare.core.models.EncounterPatientState;
 import org.openmrs.module.icare.core.models.PasswordHistory;
@@ -127,7 +127,9 @@ public interface ICareService extends OpenmrsService {
 	        Integer limit, Integer startIndex);
 	
 	List<Object[]> getCommonlyOrderedItems(String visitUuid, String orderTypeUuid, Integer limit, Integer startIndex,
-	        Boolean isDrug);
+	        Boolean isDrug, String provider, Date startDate, Date endDate);
+	
+	// Boolean updateGepgControlNumber(String controlNumber, String uuid);
 	
 	Message sendMessage(Message message) throws MalformedURLException, IOException, Exception;
 	
@@ -208,8 +210,17 @@ public interface ICareService extends OpenmrsService {
 	
 	String pushEventWithoutRegistrationDataToDHIS2Instance(String eventData);
 	
-	String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType);
+	String pushDataToExternalMediator(String data, String mediatorKey, String mediatorUrl, String authenticationType,
+	        String authReferenceKey);
 	
+	Map<String, Object> generateVisitsData(Date startDate, Date endDate, Boolean sendToExternalMediator, String uuid)
+	        throws Exception;
+	
+	List<Map<String, Object>> getPatientVisitsByIdentifier(String id, String idType, String referralNumber,
+	        Integer numberOfVisits) throws Exception;
+	
+	Map<String, Object> sendReferralDataToMediator(String uuid) throws Exception;
+
 	Map<String, Object> generateVisitsData(Date startDate, Date endDate, Boolean sendToExternalMediator) throws Exception;
 
 	// Icaresms
@@ -220,5 +231,8 @@ public interface ICareService extends OpenmrsService {
 	String insertOutgoingMessages(String recipient, String message);
 	
 	Map<String, Object> handleOutgoingsms();
+
+	String getSharedRecordsFromExternalMediator(String hfrCode, String id, String idType, String referralNumber)
+	        throws Exception;
 
 }

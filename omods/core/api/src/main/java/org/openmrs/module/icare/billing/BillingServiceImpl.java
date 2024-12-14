@@ -7,6 +7,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.attribute.AttributeType;
 import org.openmrs.module.icare.ICareConfig;
+import org.openmrs.module.icare.billing.Utils.PaymentStatus;
 import org.openmrs.module.icare.billing.dao.DiscountDAO;
 import org.openmrs.module.icare.billing.dao.InvoiceDAO;
 import org.openmrs.module.icare.billing.dao.PaymentDAO;
@@ -15,16 +16,29 @@ import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.*;
 import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFConfig;
 import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFServiceImpl;
+import org.openmrs.module.icare.billing.services.payment.gepg.BillHdr;
+import org.openmrs.module.icare.billing.services.payment.gepg.BillItem;
+import org.openmrs.module.icare.billing.services.payment.gepg.BillItems;
+import org.openmrs.module.icare.billing.services.payment.gepg.BillSubmissionRequest;
+import org.openmrs.module.icare.billing.services.payment.gepg.BillTrxInf;
+import org.openmrs.module.icare.billing.services.payment.gepg.RequestData;
+import org.openmrs.module.icare.billing.services.payment.gepg.SignatureUtils;
+import org.openmrs.module.icare.billing.services.payment.gepg.SystemAuth;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.naming.ConfigurationException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class BillingServiceImpl extends BaseOpenmrsService implements BillingService {
@@ -79,7 +93,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			}
 		}
 		return invoices;
-		//return this.invoiceDAO.findByPatientUuid(patientUuid);
+		// return this.invoiceDAO.findByPatientUuid(patientUuid);
 	}
 	
 	@Override
@@ -97,7 +111,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			Prescription drugOrder = (Prescription) orderMetaData.getOrder();
 			invoiceItem.setQuantity(drugOrder.getQuantity());
 		} else if (orderMetaData.getOrder() instanceof TestOrder) {
-			//TestOrder testOrder = (TestOrder) orderMetaData.getOrder();
+			// TestOrder testOrder = (TestOrder) orderMetaData.getOrder();
 			invoiceItem.setQuantity(1.0);
 		} else {
 			invoiceItem.setQuantity(1.0);
@@ -125,7 +139,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			Prescription drugOrder = (Prescription) orderMetaData.getOrder();
 			invoiceItem.setQuantity(drugOrder.getQuantity());
 		} else if (orderMetaData.getOrder() instanceof TestOrder) {
-			//TestOrder testOrder = (TestOrder) orderMetaData.getOrder();
+			// TestOrder testOrder = (TestOrder) orderMetaData.getOrder();
 			invoiceItem.setQuantity(1.0);
 		} else {
 			invoiceItem.setQuantity(1.0);
@@ -217,7 +231,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 				}
 			}
 			
-			//Automatic discount creation for full exempted discounts
+			// Automatic discount creation for full exempted discounts
 			List<DiscountInvoiceItem> discountInvoiceItems = existingInvoice.getDiscountItems();
 			Boolean isFullExemptedCheck = false;
 			
@@ -233,7 +247,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			
 			if (isFullExemptedCheck) {
 				for (InvoiceItem invoiceItem : existingInvoice.getInvoiceItems()) {
-					//Find the coresponding discount item
+					// Find the coresponding discount item
 					boolean found = false;
 					for (DiscountInvoiceItem discountItem : discountInvoiceItems) {
 						if (discountItem.getItem().getUuid().equals(invoiceItem.getItem().getUuid())) {
@@ -303,7 +317,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	@Override
 	public Payment confirmPayment(Payment payment) throws Exception {
 		Invoice invoice = invoiceDAO.findByUuid(payment.getInvoice().getUuid());
-		//TODO Payments should address particular item prices in the invoice
+		// TODO Payments should address particular item prices in the invoice
 		payment.setInvoice(invoice);
 		Concept paymentType = Context.getService(ConceptService.class).getConceptByUuid(payment.getPaymentType().getUuid());
 		if (paymentType == null) {
@@ -328,8 +342,10 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			}
 			item.setItem(invoiceItem.getItem());
 			item.setOrder(invoiceItem.getOrder());
+			item.setStatus(PaymentStatus.PAID);
 		}
 		payment.setReceivedBy(Context.getAuthenticatedUser().getName());
+		payment.setStatus(PaymentStatus.PAID);
 		return this.paymentDAO.save(payment);
 	}
 	
@@ -373,7 +389,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			}
 			discount.setAttachment(obs);
 		}
-		//discount.setCreator(Context.getAuthenticatedUser());
+		// discount.setCreator(Context.getAuthenticatedUser());
 		
 		return discountDAO.save(discount);
 	}
@@ -430,7 +446,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			        + ICareConfig.CONSULTATION_ORDER_TYPE + "'");
 		}
 		
-		//Validate the visit with required attributes
+		// Validate the visit with required attributes
 		if (visit.getServiceConceptUuid() == null) {
 			throw new VisitInvalidException("Service has not been specified in the visit");
 		}
@@ -519,7 +535,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			        + "'.");
 		}
 		visitMetaData.setConsultationOrderType(consultationOrderType);
-		//Check the existance of Item Prices
+		// Check the existance of Item Prices
 		ICareService iCareService = Context.getService(ICareService.class);
 		ItemPrice serviceItemPrice = iCareService.getItemPriceByConceptId(serviceConcept.getId(), visit.getPaymentScheme()
 		        .getId(), paymentTypeConcept.getId());
@@ -546,13 +562,13 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	public void processVisit(VisitWrapper visitWrapper, VisitMetaData visitMetaData) throws VisitInvalidException,
 	        ConfigurationException {
 		
-		//Start Creating Invoice
+		// Start Creating Invoice
 		Patient patient = visitWrapper.getVisit().getPatient();
 		Invoice invoice = new Invoice();
 		invoice.setVisit(visitWrapper.getVisit());
-		//invoice.setPatient(patient);
+		// invoice.setPatient(patient);
 		
-		//Create a patient encounter at the registration
+		// Create a patient encounter at the registration
 		EncounterService encounterService = Context.getService(EncounterService.class);
 		Encounter encounter = new Encounter();
 		encounter.setVisit(visitWrapper.getVisit());
@@ -574,16 +590,18 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		visitWrapper.getVisit().addEncounter(encounter);
 		encounterService.saveEncounter(encounter);
 		
-		//Get concepts for payment type and payment scheme to assosciate with item price
+		// Get concepts for payment type and payment scheme to assosciate with item
+		// price
 		
 		OrderService orderService = Context.getService(OrderService.class);
 		VisitService visitService = Context.getService(VisitService.class);
-		//List<Visit> visits = visitService.getVisitsByPatient(patient);
+		// List<Visit> visits = visitService.getVisitsByPatient(patient);
 		Date newDate = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(Integer.valueOf("24")));
-		//If this is the first visit for this patient create a registration fee order
-		//Check if patient existed in the system to determine whether they should be billed for Registration Fee
+		// If this is the first visit for this patient create a registration fee order
+		// Check if patient existed in the system to determine whether they should be
+		// billed for Registration Fee
 		if (patient.getDateCreated().after(newDate)) {
-			//TODO Soft code the UUID for fee concept
+			// TODO Soft code the UUID for fee concept
 			Concept feeConcept = visitMetaData.getRegistrationFeeConcept();
 			
 			Order order = new Order();
@@ -595,13 +613,13 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			
 			OrderContext orderContext = new OrderContext();
 			
-			//TODO Softcode to get the current care setting of the visit
+			// TODO Softcode to get the current care setting of the visit
 			orderContext.setCareSetting(orderService.getCareSetting(1));
 			encounter.addOrder(order);
 			orderService.saveOrder(order, orderContext);
 		}
 		
-		//Get concepts for service
+		// Get concepts for service
 		Concept serviceConcept = visitMetaData.getServiceConcept();
 		
 		Order order = new Order();
@@ -612,7 +630,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		order.setOrderType(visitMetaData.getConsultationOrderType());
 		
 		OrderContext orderContext = new OrderContext();
-		//TODO Softcode to get the current care setting of the visit
+		// TODO Softcode to get the current care setting of the visit
 		orderContext.setCareSetting(orderService.getCareSetting(1));
 		encounter.addOrder(order);
 		orderService.saveOrder(order, orderContext);
@@ -620,8 +638,8 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	
 	@Override
 	public Visit createVisit(MethodInvocation invocation) throws Throwable {
-		//Visit visit = (Visit) invocation.getArguments()[0];
-		//VisitWrapper visit = new VisitWrapper((Visit) invocation.getArguments()[0]);
+		// Visit visit = (Visit) invocation.getArguments()[0];
+		// VisitWrapper visit = new VisitWrapper((Visit) invocation.getArguments()[0]);
 		VisitWrapper visitWrapper = new VisitWrapper((Visit) invocation.getArguments()[0]);
 		VisitService visitService = Context.getVisitService();
 		Visit existingVisit = visitService.getVisitByUuid(visitWrapper.getVisit().getUuid());
@@ -731,5 +749,699 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			newOrder = orderService.saveOrder(order, orderContext);
 		}
 		return newOrder;
+	}
+	
+	@Override
+	public List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) throws Exception {
+		return this.invoiceDAO.getTotalAmountFromPaidInvoices(startDate, endDate, provider);
+	}
+	
+	@Override
+	public Map<String, Object> processGepgCallbackResponse(Map<String, Object> callbackData) {
+
+		AdministrationService administrationService = Context.getAdministrationService();
+
+		// Initialize the response structure
+		Map<String, Object> response = new HashMap<>();
+		Map<String, Object> systemAuth = new HashMap<>();
+		Map<String, Object> ackData = new HashMap<>();
+		// SystemAuth setup
+		String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
+		String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
+
+		try {
+			// Check if Status and FeedbackData fields are present
+			if (callbackData.containsKey("Status") && callbackData.containsKey("FeedbackData")) {
+
+				Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
+				Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
+				GlobalProperty globalProperty = new GlobalProperty();
+				globalProperty.setProperty("gepg.callbackResponseData.icareConnect");
+				globalProperty.setPropertyValue(callbackData.toString());
+				administrationService.saveGlobalProperty(globalProperty);
+				if (feedbackData.containsKey("gepgPmtSpInfo")) {
+					Map<String, Object> gepgPmtSpInfo = (Map<String, Object>) feedbackData.get("gepgPmtSpInfo");
+					Map<String, Object> pymtTrxInf = (Map<String, Object>) gepgPmtSpInfo.get("PymtTrxInf");
+					String requestId = status.containsKey("RequestId") ? (String) status.get("RequestId") : null;
+					Payment payment = this.paymentDAO.getPaymentByRequestId(Integer.parseInt(requestId));
+
+					if (payment != null) {
+						payment.setReferenceNumber((String) pymtTrxInf.get("PayCtrNum"));
+						payment.setBillAmount(Double.parseDouble((String) pymtTrxInf.get("BillAmt")));
+						payment.setPaidAmount(Double.parseDouble((String) pymtTrxInf.get("PaidAmt")));
+						LocalDateTime localDateTime = LocalDateTime.parse((String) pymtTrxInf.get("TrxDtTm"));
+						Date paymentDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+						payment.setReceiptNumber((String) pymtTrxInf.get("PspReceiptNumber"));
+						payment.setPaymentDate(paymentDate);
+						payment.setPayerNumber((String) pymtTrxInf.get("PyrCellNum"));
+						payment.setPayerName((String) pymtTrxInf.get("PyrName"));
+						payment.setPspName((String) pymtTrxInf.get("PspName"));
+						payment.setAccountNumber((String) pymtTrxInf.get("CtrAccNum"));
+						payment.setStatus(PaymentStatus.PAID);
+
+						// Save the updated payment
+						paymentDAO.updatePayment(payment);
+						ackData.put("SystemAckCode", "0");
+						ackData.put("Description", "Payment Successfully Updated");
+						ackData.put("RequestId", requestId);
+						// Sign the ackData
+						String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
+						String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
+						systemAuth.put("Signature", signature);
+						systemAuth.put("SystemCode", systemCode);
+						response.put("SystemAuth", systemAuth);
+						response.put("AckData", ackData);
+
+					} else {
+						ackData.put("SystemAckCode", "0");
+						ackData.put("Description", "Fail, No Data with this RequestId");
+						ackData.put("RequestId", requestId);
+						// Sign the ackData
+						String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
+						String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
+						systemAuth.put("Signature", signature);
+						systemAuth.put("SystemCode", systemCode);
+						response.put("SystemAuth", systemAuth);
+						response.put("AckData", ackData);
+					}
+				} else if (feedbackData.containsKey("gepgBillSubResp")) {
+					Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
+					Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
+
+					String billIdString = (String) billTrxInf.get("BillId");
+
+					String payCntrNum = (String) billTrxInf.get("PayCntrNum");
+					String requestId = status.containsKey("RequestId") ? (String) status.get("RequestId") : null;
+
+					systemAuth.put("SystemCode", systemCode);
+					if (billIdString == null || payCntrNum == null || requestId == null) {
+						return buildErrorResponse(response, systemAuth, ackData, requestId,
+								"Invalid data in callbackData: missing BillId, PayCntrNum, or RequestId");
+					}
+
+					Integer billId = Integer.parseInt(billIdString);
+					Invoice invoice = invoiceDAO.findById(billId);
+					if (invoice == null) {
+						systemAuth.put("Signature", null);
+						return buildErrorResponse(response, systemAuth, ackData, requestId,
+								"Invoice of this Bill id " + billId + " is not valid");
+					}
+
+					String paymentTypeConceptUuid = administrationService
+							.getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
+					if (paymentTypeConceptUuid == null) {
+						systemAuth.put("Signature", null);
+						return buildErrorResponse(response, systemAuth, ackData, requestId,
+								"No default payment type based on control number");
+					}
+
+					Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
+					if (paymentType == null) {
+						systemAuth.put("Signature", null);
+						return buildErrorResponse(response, systemAuth, ackData, requestId,
+								"Payment type concept not found for UUID: " + paymentTypeConceptUuid);
+					}
+
+					Payment payment = new Payment();
+					// payment.setPaymentType(paymentType);
+					payment.setReferenceNumber(payCntrNum);
+					// payment.setInvoice(invoice);
+					// payment.setReceivedBy("SYSTEM");
+					// payment.setStatus(PaymentStatus.REQUESTED);
+					// payment.setCreator(Context.getAuthenticatedUser());
+					// payment.setUuid(requestId);
+					payment.setDateCreated(new Date());
+
+					// Prepare the ackData for signing
+					ackData.put("RequestId", requestId);
+					Integer paymentId = Integer.parseInt(requestId);
+					Payment existingPayment = this.paymentDAO.getPaymentByRequestId(paymentId);
+					if (existingPayment != null) {
+						// Update the existing payment reference number
+						Integer requestId_ = Integer.parseInt(requestId);
+						int rowsUpdated = this.paymentDAO.setReferenceNumberByPaymentId(requestId_, payCntrNum);
+
+						if (rowsUpdated > 0) {
+
+							ackData.put("SystemAckCode", "0");
+							ackData.put("Description", "Successfully Updated");
+						} else {
+							ackData.put("SystemAckCode", "0");
+							ackData.put("Description", "Fail to Update");
+						}
+
+					} else {
+						ackData.put("SystemAckCode", "0");
+						ackData.put("Description", "Fail to get Reference Payments");
+					}
+
+					// Sign the ackData
+					String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
+					String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
+					systemAuth.put("Signature", signature);
+
+					response.put("SystemAuth", systemAuth);
+					response.put("AckData", ackData);
+				} else {
+					String requestId = status.containsKey("RequestId") ? (String) status.get("RequestId") : null;
+					return buildErrorResponse(response, systemAuth, ackData, requestId,
+							"Encounter an Error on response");
+				}
+
+			} else {
+				return buildErrorResponse(response, systemAuth, ackData, null,
+						"Status or FeedbackData field not found in callback data");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return buildErrorResponse(response, systemAuth, ackData, null, "Internal server error: " + e.getMessage());
+		}
+		return response;
+	}
+	
+	// Helper method to build error response
+	private Map<String, Object> buildErrorResponse(Map<String, Object> response, Map<String, Object> systemAuth,
+	        Map<String, Object> ackData, String requestId, String errorMessage) {
+		ackData.put("RequestId", requestId != null ? requestId : "Unknown Request");
+		ackData.put("SystemAckCode", "0");
+		ackData.put("Description", errorMessage);
+		
+		response.put("SystemAuth", systemAuth);
+		response.put("AckData", ackData);
+		
+		return response;
+	}
+	
+	@Override
+	public List<Payment> getAllPaymentsWithStatus() throws Exception {
+		// Fetch the default payment type UUID from the administration service
+		AdministrationService administrationService = Context.getAdministrationService();
+		String paymentTypeConceptUuid = administrationService
+		        .getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
+		
+		if (paymentTypeConceptUuid == null || paymentTypeConceptUuid.isEmpty()) {
+			throw new Exception("No default payment type UUID configured for control number.");
+		}
+		
+		// Fetch the Concept by UUID
+		Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
+		if (paymentType == null) {
+			throw new Exception("Payment type concept not found for UUID: " + paymentTypeConceptUuid);
+		}
+		
+		// Use the concept ID to retrieve payments by payment type
+		Integer paymentTypeId = paymentType.getId();
+		return paymentDAO.findByPaymentTypeId(paymentTypeId);
+	}
+	
+	public String fetchControlNumber(Integer requestId) throws Exception {
+		String controlNumber = null;
+		long startTime = System.currentTimeMillis();
+		long timeout = 32000;
+		
+		while (System.currentTimeMillis() - startTime < timeout) {
+			controlNumber = paymentDAO.getReferenceNumberByRequestId(requestId);
+			AdministrationService administrationService = Context.getAdministrationService();
+			GlobalProperty globalProperty = new GlobalProperty();
+			globalProperty.setProperty("gepg.controlNumberRes.icareConnect");
+			globalProperty.setPropertyValue(controlNumber);
+			administrationService.saveGlobalProperty(globalProperty);
+			if (controlNumber != null) {
+				break;
+			}
+			try {
+				Thread.sleep(4000);
+			}
+			catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+		}
+		return controlNumber;
+	}
+	
+	// create payload for GePG Control Number Generation
+	// @Override
+	// public Map<String, Object> createGePGPayload(Patient patient,
+	// List<InvoiceItem> invoiceItems,
+	// Number totalBillAmount,
+	// Date billExpirlyDate, String personPhoneAttributeTypeUuid, String
+	// personEmailAttributeTypeUuid,
+	// String currency,
+	// String gepgAuthSignature, String GFSCodeConceptSourceMappingUuid, String
+	// spCode, String sytemCode,
+	// String serviceCode, String SpSysId, String subSpCode, String
+	// clientPrivateKey, String pkcs12Path,
+	// String pkcs12Password, String enginepublicKey, String billId) throws
+	// Exception {
+	// AdministrationService administrationService =
+	// Context.getAdministrationService();
+	// // Validate inputs
+	// if (patient == null) {
+	// throw new IllegalArgumentException("Patient cannot be null");
+	// }
+	// if (invoiceItems == null || invoiceItems.isEmpty()) {
+	// throw new IllegalArgumentException("Invoice items cannot be null or empty");
+	// }
+	// if (currency == null) {
+	// throw new IllegalArgumentException("Currency cannot be null");
+	// }
+	// if (gepgAuthSignature == null) {
+	// gepgAuthSignature = "";
+	// }
+	// if (GFSCodeConceptSourceMappingUuid == null) {
+	// throw new IllegalArgumentException("GFS Code Concept Source Mapping UUID
+	// cannot be null");
+	// }
+	// if (spCode == null || sytemCode == null || serviceCode == null || SpSysId ==
+	// null || subSpCode == null) {
+	// String missingParams = "";
+	// if (spCode == null)
+	// missingParams += "spCode ";
+	// if (sytemCode == null)
+	// missingParams += "systemCode ";
+	// if (serviceCode == null)
+	// missingParams += "serviceCode ";
+	// if (SpSysId == null)
+	// missingParams += "SpSysId ";
+	// if (subSpCode == null)
+	// missingParams += "subSpCode ";
+	// throw new IllegalArgumentException("Missing system parameters: " +
+	// missingParams.trim());
+	// }
+	
+	// // Retrieve patient attributes
+	// String patientNames = patient.getGivenName() + " " + patient.getFamilyName();
+	// String patientUuid = patient.getId().toString();
+	// String patientPhoneNumber = "";
+	// String email = "";
+	// for (PersonAttribute attribute : patient.getAttributes()) {
+	// if (personPhoneAttributeTypeUuid != null
+	// &&
+	// attribute.getAttributeType().getUuid().equals(personPhoneAttributeTypeUuid))
+	// {
+	// patientPhoneNumber = attribute.getValue();
+	// } else if (personEmailAttributeTypeUuid != null
+	// &&
+	// attribute.getAttributeType().getUuid().equals(personEmailAttributeTypeUuid))
+	// {
+	// email = attribute.getValue();
+	// }
+	// }
+	
+	// // BillItems generation
+	
+	// BillItems billItems = new BillItems();
+	
+	// for (InvoiceItem invoiceItem : invoiceItems) {
+	// Drug drug = invoiceItem.getItem().getDrug();
+	// Concept concept = invoiceItem.getItem().getConcept();
+	
+	// if (drug == null && concept == null) {
+	// throw new IllegalStateException("Concept can not be null for InvoiceItem" +
+	// drug + concept);
+	// } else if (concept != null) {
+	// for (ConceptMap conceptMap : concept.getConceptMappings()) {
+	// if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
+	// .equals(GFSCodeConceptSourceMappingUuid)) {
+	// String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
+	// billItems.getBillItem().add(
+	// new BillItem(invoiceItem.getItem().getId().toString(), "N",
+	// invoiceItem.getPrice().toString(),
+	// invoiceItem.getPrice().toString(), "0.0", GFSCode));
+	// } else {
+	// throw new IllegalStateException(
+	// "Please verify GFS CODE concept mapping if configured in a correct way");
+	// }
+	// }
+	// } else if (drug != null) {
+	// Concept drugConcept = drug.getConcept();
+	// GlobalProperty globalProperty = new GlobalProperty();
+	// for (ConceptMap conceptMap : drugConcept.getConceptMappings()) {
+	// if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
+	// .equals(GFSCodeConceptSourceMappingUuid)) {
+	// globalProperty.setProperty("iCare.gepg.DrugConcept.icareConnect");
+	// globalProperty.setPropertyValue("if condition meet");
+	// administrationService.saveGlobalProperty(globalProperty);
+	// String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
+	// billItems.getBillItem().add(
+	// new BillItem(invoiceItem.getItem().getId().toString(), "N",
+	// invoiceItem.getPrice().toString(),
+	// invoiceItem.getPrice().toString(), "0.0", GFSCode));
+	// } else {
+	// throw new IllegalStateException(
+	// "Please verify GFS CODE concept mapping if configured in a correct way");
+	// }
+	// }
+	// }
+	
+	// }
+	
+	// // Create and populate BillHdr
+	// BillHdr billHdr = new BillHdr();
+	// billHdr.setSpCode(spCode);
+	// billHdr.setRtrRespFlg("true");
+	
+	// // Create and populate BillTrxInf
+	// BillTrxInf billTrxInf = new BillTrxInf();
+	// billTrxInf.setBillId(billId);
+	// billTrxInf.setSubSpCode(subSpCode);
+	// billTrxInf.setSpSysId(SpSysId);
+	// billTrxInf.setBillAmt(totalBillAmount.toString());
+	// billTrxInf.setMiscAmt("0");
+	// LocalDateTime now = LocalDateTime.now();
+	// DateTimeFormatter formatter =
+	// DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+	// String formattedNow = now.format(formatter);
+	// billTrxInf.setBillGenDt(formattedNow);
+	
+	// LocalDateTime expirationTime = now.plusHours(24);
+	// String formattedExpirationTime = expirationTime.format(formatter);
+	// billTrxInf.setBillExprDt(formattedExpirationTime);
+	// billTrxInf.setPyrId("40");
+	// billTrxInf.setPyrName(patientNames.toUpperCase());
+	// billTrxInf.setBillDesc("Hospital Bill Payments");
+	// billTrxInf.setBillGenBy("UDSM Hospital");
+	// billTrxInf.setBillApprBy(patientNames.toUpperCase());
+	// billTrxInf.setPyrCellNum(patientPhoneNumber);
+	// billTrxInf.setPyrEmail(email);
+	// billTrxInf.setCcy(currency);
+	// billTrxInf.setBillEqvAmt(totalBillAmount.toString());
+	// billTrxInf.setRemFlag("false");
+	// billTrxInf.setBillPayOpt("2");
+	// billTrxInf.setBillItems(billItems);
+	// // Create and populate RequestData
+	// // Save PaymentData before Reference Number (Control Number)
+	// RequestData requestData = new RequestData();
+	// try {
+	// Integer billUuid = Integer.parseInt(billId);
+	// Invoice invoice = invoiceDAO.findById(billUuid);
+	// if (invoice == null) {
+	// throw new Exception("Invoice of this Bill id " + billId + " is not valid");
+	
+	// }
+	
+	// String paymentTypeConceptUuid = administrationService
+	// .getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
+	// if (paymentTypeConceptUuid == null) {
+	// throw new Exception("No default payment type based on control number");
+	// }
+	
+	// Concept paymentType =
+	// Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
+	// if (paymentType == null) {
+	// throw new Exception("Payment type concept not found for UUID: " +
+	// paymentTypeConceptUuid);
+	// }
+	
+	// Payment payment = new Payment();
+	// payment.setPaymentType(paymentType);
+	// payment.setReferenceNumber(null);
+	// payment.setInvoice(invoice);
+	// payment.setReceivedBy("SYSTEM");
+	// payment.setStatus(PaymentStatus.REQUESTED);
+	// payment.setCreator(Context.getAuthenticatedUser());
+	// payment.setDateCreated(new Date());
+	// this.paymentDAO.save(payment);
+	// Integer paymentId = payment.getId();
+	// requestData.setRequestId(paymentId.toString());
+	// } catch (Exception e) {
+	// throw new Exception("Failed to Save Payments Data: " + e.getMessage());
+	// }
+	
+	// requestData.setBillHdr(billHdr);
+	// requestData.setBillTrxInf(billTrxInf);
+	
+	// // Create and populate SystemAuth
+	// SystemAuth systemAuth = new SystemAuth();
+	// systemAuth.setSystemCode(sytemCode);
+	// systemAuth.setServiceCode(serviceCode);
+	
+	// // Create and return BillSubmissionRequest
+	// BillSubmissionRequest billRequest = new BillSubmissionRequest();
+	// billRequest.setSystemAuth(systemAuth);
+	// billRequest.setRequestData(requestData);
+	
+	// // Serialize RequestData to JSON for signing
+	// String requestDataJson = new ObjectMapper().writeValueAsString(requestData);
+	
+	// // Save the payload in a global property
+	// GlobalProperty globalProperty = new GlobalProperty();
+	// globalProperty.setProperty("gepg.requestDataJson.icareConnect");
+	// globalProperty.setPropertyValue(requestDataJson);
+	// administrationService.saveGlobalProperty(globalProperty);
+	
+	// // Sign the request data
+	// String signature = SignatureUtils.signData(requestDataJson,
+	// clientPrivateKey);
+	// systemAuth.setSignature(signature);
+	
+	// Map<String, Object> result = new HashMap<>();
+	// result.put("billRequest", billRequest);
+	// result.put("signature", signature);
+	
+	// return result;
+	// }
+	@Override
+	public Map<String, Object> createGePGPayload(Patient patient, List<InvoiceItem> invoiceItems,
+			Number totalBillAmount, Date billExpirlyDate, String personPhoneAttributeTypeUuid,
+			String personEmailAttributeTypeUuid, String currency, String gepgAuthSignature,
+			String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode, String serviceCode,
+			String SpSysId, String subSpCode, String clientPrivateKey, String pkcs12Path,
+			String pkcs12Password, String enginepublicKey, String billId) throws Exception {
+
+		// Validate inputs
+		validateInputs(patient, invoiceItems, currency, gepgAuthSignature, GFSCodeConceptSourceMappingUuid,
+				spCode, sytemCode, serviceCode, SpSysId, subSpCode);
+
+		// Retrieve patient attributes
+		String patientId = patient.getPatientId().toString();
+		String patientNames = patient.getGivenName() + " " + patient.getFamilyName();
+		String patientPhoneNumber = getPatientPhoneNumber(patient, personPhoneAttributeTypeUuid);
+		String email = getPatientEmail(patient, personEmailAttributeTypeUuid);
+
+		// BillItems generation
+		BillItems billItems = createBillItems(invoiceItems, GFSCodeConceptSourceMappingUuid);
+
+		// Create and populate BillHdr
+		BillHdr billHdr = createBillHdr(spCode);
+
+		// Create and populate BillTrxInf
+		BillTrxInf billTrxInf = createBillTrxInf(totalBillAmount, patientNames, patientPhoneNumber, email,
+				currency, billId, billExpirlyDate, billItems, subSpCode, SpSysId, patientId);
+
+		// Create and populate RequestData
+		RequestData requestData = createRequestData(billHdr, billTrxInf, billId);
+
+		// Create and populate SystemAuth
+		SystemAuth systemAuth = createSystemAuth(sytemCode, serviceCode);
+
+		// Create the BillSubmissionRequest
+		BillSubmissionRequest billRequest = new BillSubmissionRequest();
+		billRequest.setSystemAuth(systemAuth);
+		billRequest.setRequestData(requestData);
+
+		// Serialize RequestData to JSON for signing
+		String requestDataJson = new ObjectMapper().writeValueAsString(requestData);
+
+		// Sign the request data
+		String signature = SignatureUtils.signData(requestDataJson, clientPrivateKey);
+		systemAuth.setSignature(signature);
+
+		// Return the result
+		Map<String, Object> result = new LinkedHashMap<>();
+		result.put("billRequest", billRequest);
+		result.put("signature", signature);
+
+		return result;
+	}
+	
+	// Validate the inputs
+	private void validateInputs(Patient patient, List<InvoiceItem> invoiceItems, String currency, String gepgAuthSignature,
+	        String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode, String serviceCode, String SpSysId,
+	        String subSpCode) {
+		if (patient == null || invoiceItems == null || invoiceItems.isEmpty() || currency == null || spCode == null
+		        || sytemCode == null || serviceCode == null || SpSysId == null || subSpCode == null) {
+			throw new IllegalArgumentException("Invalid system inputs provided.");
+		}
+	}
+	
+	// Retrieve the patient phone number
+	private String getPatientPhoneNumber(Patient patient, String personPhoneAttributeTypeUuid) {
+		for (PersonAttribute attribute : patient.getAttributes()) {
+			if (attribute.getAttributeType().getUuid().equals(personPhoneAttributeTypeUuid)) {
+				return attribute.getValue();
+			}
+		}
+		return "";
+	}
+	
+	// Retrieve the patient email
+	private String getPatientEmail(Patient patient, String personEmailAttributeTypeUuid) {
+		for (PersonAttribute attribute : patient.getAttributes()) {
+			if (attribute.getAttributeType().getUuid().equals(personEmailAttributeTypeUuid)) {
+				return attribute.getValue();
+			}
+		}
+		return "";
+	}
+	
+	// Create BillItems
+	private BillItems createBillItems(List<InvoiceItem> invoiceItems, String GFSCodeConceptSourceMappingUuid) {
+		BillItems billItems = new BillItems();
+		for (InvoiceItem invoiceItem : invoiceItems) {
+			Drug drug = invoiceItem.getItem().getDrug();
+			Concept concept = invoiceItem.getItem().getConcept();
+			if (drug == null && concept == null) {
+				throw new IllegalStateException("Concept can not be null for InvoiceItem" + drug + concept);
+			} else if (concept != null) {
+				for (ConceptMap conceptMap : concept.getConceptMappings()) {
+					if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
+					        .equals(GFSCodeConceptSourceMappingUuid)) {
+						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
+						billItems.getBillItem().add(
+						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(),
+						            invoiceItem.getPrice().toString(), "0.0", GFSCode));
+					} else {
+						throw new IllegalStateException(
+						        "Please verify GFS CODE concept mapping if configured in a correct way");
+					}
+				}
+			} else if (drug != null) {
+				Concept drugConcept = drug.getConcept();
+				for (ConceptMap conceptMap : drugConcept.getConceptMappings()) {
+					if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
+					        .equals(GFSCodeConceptSourceMappingUuid)) {
+						
+						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
+						billItems.getBillItem().add(
+						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(),
+						            invoiceItem.getPrice().toString(), "0.0", GFSCode));
+					} else {
+						throw new IllegalStateException(
+						        "Please verify GFS CODE concept mapping if configured in a correct way");
+					}
+				}
+			}
+		}
+		return billItems;
+	}
+	
+	// Create BillHdr
+	private BillHdr createBillHdr(String spCode) {
+		BillHdr billHdr = new BillHdr();
+		billHdr.setSpCode(spCode);
+		billHdr.setRtrRespFlg("true");
+		return billHdr;
+	}
+	
+	// format Date
+	private String formatDate(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		return sdf.format(date);
+	}
+	
+	// Create BillTrxInf
+	private BillTrxInf createBillTrxInf(Number totalBillAmount, String patientNames, String patientPhoneNumber,
+	        String email, String currency, String billId, Date billExpirlyDate, BillItems billItems, String subSpCode,
+	        String SpSysId, String patientId) {
+		
+		Date now = new Date();
+		
+		// Calculate 24 hours from BillGenDt
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(now);
+		calendar.add(Calendar.HOUR_OF_DAY, 24);
+		Date billExpiryDate = calendar.getTime();
+		BillTrxInf billTrxInf = new BillTrxInf();
+		billTrxInf.setBillId(billId);
+		billTrxInf.setSubSpCode(subSpCode);
+		billTrxInf.setSpSysId(SpSysId);
+		billTrxInf.setBillAmt(totalBillAmount.toString());
+		billTrxInf.setMiscAmt("0");
+		billTrxInf.setBillGenDt(formatDate(new Date()));
+		billTrxInf.setBillExprDt(formatDate(billExpiryDate));
+		billTrxInf.setPyrId(patientId);
+		billTrxInf.setPyrName(patientNames);
+		billTrxInf.setBillDesc("Hospital Bill Payments");
+		billTrxInf.setBillGenBy("UDSM Hospital");
+		billTrxInf.setBillApprBy("UDSM");
+		billTrxInf.setPyrCellNum(patientPhoneNumber);
+		billTrxInf.setPyrEmail(email);
+		billTrxInf.setCcy(currency);
+		billTrxInf.setBillEqvAmt(totalBillAmount.toString());
+		billTrxInf.setRemFlag("false");
+		billTrxInf.setBillPayOpt("2");
+		billTrxInf.setBillItems(billItems);
+		return billTrxInf;
+	}
+	
+	// Create RequestData
+	private RequestData createRequestData(BillHdr billHdr, BillTrxInf billTrxInf, String billId) throws Exception {
+		AdministrationService administrationService = Context.getAdministrationService();
+		// Save PaymentData before Reference Number (Control Number)
+		RequestData requestData = new RequestData();
+		try {
+			Integer billUuid = Integer.parseInt(billId);
+			Invoice invoice = invoiceDAO.findById(billUuid);
+			if (invoice == null) {
+				throw new Exception("Invoice of this Bill id " + billId + " is not valid");
+				
+			}
+			
+			String paymentTypeConceptUuid = administrationService
+			        .getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
+			if (paymentTypeConceptUuid == null) {
+				throw new Exception("No default payment type based on control number");
+			}
+			
+			Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
+			if (paymentType == null) {
+				throw new Exception("Payment type concept not found for UUID: " + paymentTypeConceptUuid);
+			}
+			
+			Payment payment = new Payment();
+			payment.setPaymentType(paymentType);
+			payment.setReferenceNumber(null);
+			payment.setInvoice(invoice);
+			payment.setReceivedBy("SYSTEM");
+			payment.setStatus(PaymentStatus.REQUESTED);
+			payment.setCreator(Context.getAuthenticatedUser());
+			payment.setDateCreated(new Date());
+			this.paymentDAO.save(payment);
+			Integer paymentId = payment.getId();
+			requestData.setRequestId(paymentId.toString());
+		}
+		catch (Exception e) {
+			throw new Exception("Failed to Save Payments Data: " + e.getMessage());
+		}
+		requestData.setBillHdr(billHdr);
+		requestData.setBillTrxInf(billTrxInf);
+		return requestData;
+	}
+	
+	// Create SystemAuth
+	private SystemAuth createSystemAuth(String sytemCode, String serviceCode) {
+		SystemAuth systemAuth = new SystemAuth();
+		systemAuth.setSystemCode(sytemCode);
+		systemAuth.setServiceCode(serviceCode);
+		return systemAuth;
+	}
+	
+	@Override
+	public String signatureData(String rowData) throws Exception {
+		AdministrationService administrationService = Context.getAdministrationService();
+		String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
+		try {
+			GlobalProperty globalProperty = new GlobalProperty();
+			globalProperty.setProperty("gepg.signaturerowData.icareConnect");
+			globalProperty.setPropertyValue(rowData);
+			administrationService.saveGlobalProperty(globalProperty);
+			String signature = SignatureUtils.signData(rowData, clientPrivateKey);
+			return signature;
+		}
+		catch (IOException e) {
+			throw new Exception("Error signing data due to I/O: " + e.getMessage(), e);
+		}
+		
 	}
 }

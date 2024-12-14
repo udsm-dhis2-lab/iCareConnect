@@ -28,10 +28,9 @@ public class LoginLogoutListener implements UserSessionListener {
 			// Log the event or perform other actions
 		} else if (event == Event.LOGOUT) {
 			// User logged out successfully
-			System.out.println("User " + user.getUsername() + " logged out at " + new Date() + " and event " + event);
+			//			System.out.println("User " + user.getUsername() + " logged out at " + new Date() + " and event " + event);
 			AuditLog auditLog = new AuditLog(User.class, "LOGGED OUT", user, new Date());
 			iCareService.saveAuditLog(auditLog);
 		}
-		
 	}
 }

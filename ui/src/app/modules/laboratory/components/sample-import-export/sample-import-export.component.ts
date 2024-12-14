@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { FormGroup } from "@angular/forms";
+import { UntypedFormGroup } from "@angular/forms";
 import { MatRadioChange } from "@angular/material/radio";
 import { formulateHeadersFromExportTemplateReferences } from "../../resources/helpers/import-export.helper";
 import { Observable } from "rxjs";
@@ -29,7 +29,7 @@ export class SampleImportExportComponent implements OnInit {
   @Input() relatedMetadataAttributeUuid: string;
   @Input() hfrCodeAttributeUuid: string;
   exceltoJson: any;
-  formResource: FormGroup;
+  formResource: UntypedFormGroup;
   file: any;
   resourceType: any;
   actionCategory: string = "IMPORT";

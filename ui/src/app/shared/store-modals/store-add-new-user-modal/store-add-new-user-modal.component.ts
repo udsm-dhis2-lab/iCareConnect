@@ -6,9 +6,9 @@ import {
   ViewChild,
 } from "@angular/core";
 import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
   Validators,
 } from "@angular/forms";
 import { MatTable, MatTableDataSource } from "@angular/material/table";
@@ -34,7 +34,7 @@ export class StoreAddNewUserModalComponent implements OnInit {
   @ViewChild("table", { static: false }) table: MatTable<any>;
   @ViewChild("filter", { static: false }) filter: ElementRef;
   loading: boolean = true;
-  userForm: FormGroup;
+  userForm: UntypedFormGroup;
   hide: boolean = true;
   roles: RoleCreate[];
   selectedRoles: any[] = [];
@@ -79,7 +79,7 @@ export class StoreAddNewUserModalComponent implements OnInit {
 
   passwordStrengthMessage: string = "Password should match required settings";
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private service: SystemUsersService,
     private router: Router,
     private _snackBar: MatSnackBar,
@@ -109,24 +109,24 @@ export class StoreAddNewUserModalComponent implements OnInit {
 
   generateForm() {
     return this.fb.group({
-      username: new FormControl("", Validators.required),
+      username: new UntypedFormControl("", Validators.required),
       password: ["", [Validators.required, Validators.minLength(8)]],
-      gender: new FormControl(""),
-      middleName: new FormControl(""),
-      firstName: new FormControl("", Validators.required),
-      surname: new FormControl("", Validators.required),
-      confirmpassword: new FormControl(""),
-      addressDisplay: new FormControl(""),
-      country: new FormControl("", Validators.required),
-      district: new FormControl("", Validators.required),
-      city: new FormControl("", Validators.required),
-      postalCode: new FormControl(""),
-      addressDisplay2: new FormControl(""),
+      gender: new UntypedFormControl(""),
+      middleName: new UntypedFormControl(""),
+      firstName: new UntypedFormControl("", Validators.required),
+      surname: new UntypedFormControl("", Validators.required),
+      confirmpassword: new UntypedFormControl(""),
+      addressDisplay: new UntypedFormControl(""),
+      country: new UntypedFormControl("", Validators.required),
+      district: new UntypedFormControl("", Validators.required),
+      city: new UntypedFormControl("", Validators.required),
+      postalCode: new UntypedFormControl(""),
+      addressDisplay2: new UntypedFormControl(""),
       checked: false,
-      birthdate: new FormControl("", Validators.required),
-      MCTNumber: new FormControl(""),
-      phoneNumber: new FormControl(""),
-      qualification: new FormControl(""),
+      birthdate: new UntypedFormControl("", Validators.required),
+      MCTNumber: new UntypedFormControl(""),
+      phoneNumber: new UntypedFormControl(""),
+      qualification: new UntypedFormControl(""),
     });
   }
 

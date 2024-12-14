@@ -18,18 +18,18 @@
     </div>
   </div>
   <div>
-    <mat-chip-list
+    <mat-chip-listbox
       class="sub-menu-items mat-elevation-z1"
       *ngIf="!lisConfigurations?.isLIS && !lisConfigurations?.isPharmacy"
     >
-      <mat-chip
+      <mat-chip-option
         (click)="onSetLocation($event, userLocation)"
         *ngFor="let userLocation of userLocationsForTheCurrentModule"
         color="primary"
         [selected]="currentLocation?.uuid == userLocation?.id"
-        >{{ userLocation?.name }}</mat-chip
+        >{{ userLocation?.name }}</mat-chip-option
       >
-    </mat-chip-list>
+    </mat-chip-listbox>
     <!-- <mat-icon style="right: 0%">expand_more</mat-icon> -->
   </div>
 </div>

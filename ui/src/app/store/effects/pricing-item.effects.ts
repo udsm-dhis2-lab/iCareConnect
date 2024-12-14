@@ -68,6 +68,13 @@ export class PricingItemEffects {
                   prices: priceItem?.prices.map((price) => {
                     return {
                       ...price,
+                      item: {
+                        ...price?.item,
+                        display: price?.item?.display?.replace(
+                          "TEST_ORDERS:",
+                          ""
+                        ),
+                      },
                       paymentSchemeUuid: price?.paymentScheme?.uuid,
                     };
                   }),

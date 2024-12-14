@@ -198,20 +198,62 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
+	public SampleStatus saveSampleStatus(SampleStatus sampleStatus) throws Exception {
+		return this.sampleStatusDAO.save(sampleStatus);
+	}
+	
+	@Override
 	public SampleStatus updateSampleStatus(SampleStatus sampleStatus) throws Exception {
 		
+		// Retrieve the sample from the database by UUID
 		Sample sample = this.getSampleByUuid(sampleStatus.getSample().getUuid());
 		if (sample == null) {
 			throw new Exception("Sample with ID '" + sampleStatus.getSample().getUuid() + "' does not exist.");
 		}
-		User user = Context.getUserService().getUserByUuid(sampleStatus.getUser().getUuid());
-		if (user == null) {
-			throw new Exception("The user is not authenticated.");
+		
+		User user;
+		if (sampleStatus.getUser() != null && sampleStatus.getUser().getUuid() != null) {
+			// Retrieve the existing user by UUID if specified
+			user = Context.getUserService().getUserByUuid(sampleStatus.getUser().getUuid());
+			if (user == null) {
+				throw new Exception("User with UUID '" + sampleStatus.getUser().getUuid() + "' does not exist.");
+			}
+		} else {
+			// Otherwise, use the authenticated user
+			user = Context.getAuthenticatedUser();
+			if (user == null) {
+				throw new Exception("The user is not authenticated.");
+			}
 		}
+		
+		// Ensure that sample and user are set on the sampleStatus object
 		sampleStatus.setSample(sample);
 		sampleStatus.setUser(user);
+		
+		// Save the sampleStatus entity
 		return this.sampleStatusDAO.save(sampleStatus);
 	}
+	
+	// public SampleStatus updateSampleStatus(SampleStatus sampleStatus) throws Exception {
+	
+	// 	Sample sample = this.getSampleByUuid(sampleStatus.getSample().getUuid());
+	// 	if (sample == null) {
+	// 		throw new Exception("Sample with ID '" + sampleStatus.getSample().getUuid() + "' does not exist.");
+	// 	}
+	// 	User user = new User();
+	// 	if (sampleStatus.getUser() != null) {
+	// 		Context.getUserService().getUserByUuid(sampleStatus.getUser().getUuid());
+	// 	} else {
+	// 		user = Context.getAuthenticatedUser();
+	// 	}
+	
+	// 	if (user == null) {
+	// 		throw new Exception("The user is not authenticated.");
+	// 	}
+	// 	sampleStatus.setSample(sample);
+	// 	sampleStatus.setUser(user);
+	// 	return this.sampleStatusDAO.save(sampleStatus);
+	// }
 	
 	@Override
 	public TestAllocation allocateTestWithSample(TestAllocation testAllocation) throws Exception {

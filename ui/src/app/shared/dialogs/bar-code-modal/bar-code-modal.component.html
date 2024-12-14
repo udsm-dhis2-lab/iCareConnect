@@ -7,7 +7,7 @@
   <P></P>
   <div id="bar-code mb-4">
     <div *ngIf="!dialogData?.sampleLabelsUsedDetails">
-      <ngx-barcode
+      <!-- <ngx-barcode
         [bc-value]="barCodeValue"
         [bc-display-value]="true"
         [bc-element-type]="elementType"
@@ -19,7 +19,21 @@
         [bc-text-align]="bcTextAlign"
         [bc-text-position]="bcTextPosition"
         [bc-background]="'transparent'"
-      ></ngx-barcode>
+      ></ngx-barcode> -->
+      <ngx-barcode6
+        [bc-value]="barCodeValue"
+        [bc-display-value]="true"
+        [bc-element-type]="elementType"
+        [bc-format]="format"
+        [bc-line-color]="lineColor"
+        [bc-width]="width"
+        [bc-height]="height"
+        [bc-font-size]="fontSize"
+        [bc-text-align]="bcTextAlign"
+        [bc-text-position]="bcTextPosition"
+        [bc-background]="'transparent'"
+        ></ngx-barcode6>
+      
       <p class="sample-tests-list">
         <span *ngFor="let order of ordersToDisplay; let count = index">
           {{ order?.display }} - TEST

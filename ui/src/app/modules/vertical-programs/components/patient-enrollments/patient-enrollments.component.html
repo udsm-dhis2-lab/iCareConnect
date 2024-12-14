@@ -11,7 +11,7 @@
           *ngIf="!params?.enrolledPrograms"
           mode="indeterminate"
         ></mat-progress-bar>
-        <mat-card *ngIf="params?.enrolledPrograms">
+        <mat-card appearance="outlined" *ngIf="params?.enrolledPrograms">
           <span *ngIf="params?.enrolledPrograms?.results?.length == 0"
             >No data</span
           >
@@ -31,7 +31,7 @@
 
     <div class="col-4">
       <h4>New Enrollment</h4>
-      <mat-card>
+      <mat-card appearance="outlined">
         <!-- {{ programs | json }} -->
 
         <h4>Select Program</h4>

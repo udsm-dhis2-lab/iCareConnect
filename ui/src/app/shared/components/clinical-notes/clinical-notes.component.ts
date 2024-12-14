@@ -17,6 +17,7 @@ import { indexOf, keyBy, orderBy } from "lodash";
 
 import * as moment from "moment";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
+import { GlobalSettingService } from "../../resources/global-setting/services";
 
 @Component({
   selector: "app-clinical-notes",
@@ -36,6 +37,7 @@ export class ClinicalNotesComponent implements OnInit {
   @Input() provider: any;
   @Input() clinicConfigurations: any;
   @Input() forms: any[];
+  @Input() clearingFormTime?: number;
   savingObservations$: Observable<boolean>;
   ordersUpdates$: Observable<any>;
 
@@ -45,6 +47,7 @@ export class ClinicalNotesComponent implements OnInit {
   currentCustomFormName: string;
   formData: any;
   searchingText: string;
+  
   atLeastOneFieldHasData: boolean = false;
   currentFormHasRequiredData: boolean = false;
   dependedFormHasData: boolean = false;
@@ -57,11 +60,11 @@ export class ClinicalNotesComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private observationService: ObservationService,
+    private globalSettingService: GlobalSettingService,
     private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
-    // console.log(this.clinicConfigurations);
     this.clinicConfigurations = {
       ...this.clinicConfigurations,
       forms: keyBy(
@@ -87,6 +90,7 @@ export class ClinicalNotesComponent implements OnInit {
       (key) => this.clinicalObservations[key]?.latest
     );
     const concepts = identifyConceptsFromFormattedForm(this.currentCustomForm);
+    // this.loadGlobalProperty();
     // this.currentFormHasRequiredData =
     //   (
     //     Object.keys(this.clinicalObservations).filter(
@@ -117,7 +121,10 @@ export class ClinicalNotesComponent implements OnInit {
         moment(new Date()).diff(moment(latestObsTime))
       );
       // TODO: Add support to use configured time for the 2 hrs constant
-      this.useFilledObsData = duration.asHours() > 2 ? false : true;
+      console.log("clearingFormTime .....",this.clearingFormTime);
+      
+      this.useFilledObsData = duration.asHours() > this.clearingFormTime ? false : true;
+      console.log("useFilledObsData .....",this.useFilledObsData);
     }
 
     this.dependedFormHasData = this.evaluateFormDependency(
@@ -240,7 +247,7 @@ export class ClinicalNotesComponent implements OnInit {
       )?.length > 0;
   }
 
-  onConfirm(e: Event, visit: any,form:any): void {
+  onConfirm(e: Event, visit: any, form: any): void {
     e.stopPropagation();
     this.updateConsultationOrder.emit();
     let obs = getObservationsFromForm(
@@ -278,8 +285,7 @@ export class ClinicalNotesComponent implements OnInit {
           this.saveObservations.emit();
         }
 
-  this.trackActionForAnalytics(`${this.currentCustomForm?.name}: Save`);
-        
+        this.trackActionForAnalytics(`${this.currentCustomForm?.name}: Save`);
       });
     // this.saveObservations.emit(
     //   getObservationsFromForm(
@@ -297,13 +303,8 @@ export class ClinicalNotesComponent implements OnInit {
 
   trackActionForAnalytics(eventname: any) {
     // Send data to Google Analytics
-    this.googleAnalyticsService.sendAnalytics(
-      "Clinic",
-      eventname,
-      "Clinic"
-    );
+    this.googleAnalyticsService.sendAnalytics("Clinic", eventname, "Clinic");
   }
-  
 
   onClear(event: Event, form: any): void {
     event.stopPropagation();

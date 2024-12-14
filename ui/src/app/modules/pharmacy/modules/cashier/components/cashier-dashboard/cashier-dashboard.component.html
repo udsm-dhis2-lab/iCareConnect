@@ -20,7 +20,7 @@
           mode="indeterminate"
           *ngIf="!params?.currentLocation"
         ></mat-progress-bar>
-        <mat-card>
+        <mat-card appearance="outlined">
           <!-- <fieldset>
             <legend>Drug/Non-drug</legend> -->
           <div class="row mb-2 d-flex justify-content-left">
@@ -211,13 +211,38 @@
       </ng-container>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-12 col-sx-12">
-      <mat-card *ngIf="!saving">
+      <mat-card appearance="outlined" class="p-3" *ngIf="!saving">
         <div class="h5">Commonly sold items</div>
         <app-commonly-ordered-items
           [currentLocation]="currentLocation"
           (selectedDrug)="onSelectDrug($event)"
         ></app-commonly-ordered-items>
       </mat-card>
+      <div class="mt-1" *ngIf="!saving">
+        <mat-accordion class="p-3">
+          <mat-expansion-panel
+            class="border mat-elevation-z0 mt-2"
+            [expanded]="true"
+          >
+            <mat-expansion-panel-header class="d-flex justify-content-between">
+              <mat-panel-title>
+                <span>Income summary</span>
+                <!-- <span class="ml-4">Discount {{ bill?.discount }}</span> -->
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <!-- <app-exemption-item
+              [bill]="bill"
+              [criteria]="criteria?.results[0]"
+              (confirmExemption)="onConfirmExemption($event)"
+            >
+            </app-exemption-item> -->
+            <app-shared-collected-amount
+              [provider]="provider"
+            ></app-shared-collected-amount>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
     </div>
   </div>
 </div>

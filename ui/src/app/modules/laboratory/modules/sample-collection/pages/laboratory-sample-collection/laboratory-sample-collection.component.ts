@@ -94,6 +94,8 @@ export class LaboratorySampleCollectionComponent implements OnInit {
     this.visitLoadedState$ = this.store.select(getVisitLoadedState);
     this.loadingVisit$ = this.store.select(getVisitLoadingState);
     this.samplesCollected$ = this.store.select(getAllLabSamples);
+    
+    
     /**TODO: Filter samples collection for this patient */
     this.activeVisit$ = this.store.select(getActiveVisit);
     this.payments$ = this.store.select(getAllPayments);

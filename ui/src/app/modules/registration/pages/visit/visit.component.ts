@@ -42,6 +42,7 @@ import { ProgramEnrollment } from "src/app/modules/vertical-programs/models/prog
 import { ProgramGet, ProgramGetFull } from "src/app/shared/resources/openmrs";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 
 @Component({
   selector: "app-visit",
@@ -127,6 +128,7 @@ export class VisitComponent implements OnInit {
   selectedProgram: ProgramGetFull;
   visible: boolean = false;
   enrolledPrograms: ProgramGetFull[];
+  remoteReferralDetails$: Observable<any>;
 
   constructor(
     private store: Store<AppState>,
@@ -138,7 +140,8 @@ export class VisitComponent implements OnInit {
     private programsService: ProgramsService,
     private systemSettingsService: SystemSettingsService,
     private conceptsService: ConceptsService,
-    private googleAnalyticsService: GoogleAnalyticsService
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private httpClientService: OpenmrsHttpClientService
   ) {}
 
   dismissAlert() {
@@ -506,6 +509,13 @@ export class VisitComponent implements OnInit {
 
   getReferralNumber(refNumber) {
     this.visitDetails["referralNo"] = refNumber;
+  }
+
+  onGetReferralFromRemote(event: Event, referralNo: string): void {
+    event.stopPropagation();
+    this.remoteReferralDetails$ = this.httpClientService.get(
+      `icare/sharedrecords?referralNumber=${this.visitDetails["referralNo"]}`
+    );
   }
 
   setVisitMode(value: boolean, attribute?: string, type?) {

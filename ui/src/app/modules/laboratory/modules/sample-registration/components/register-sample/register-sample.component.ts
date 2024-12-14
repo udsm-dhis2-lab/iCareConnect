@@ -507,7 +507,7 @@ export class RegisterSampleComponent implements OnInit {
         required: false,
         type: "number",
         min: 0,
-        placeholder: "Mobile number",
+        placeholder: "Start with 0xxxxxxxxx",
         category: "phoneNumber",
       }),
       new Textbox({

@@ -18,6 +18,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.auditlog.AuditLog;
+import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.core.Item;
@@ -208,7 +209,6 @@ public class ICareDao extends BaseDAO<Item> {
 		DbSession session = getSession();
 		String queryStr;
 		queryStr = "SELECT item FROM Item item ";
-		System.out.println(conceptClass);
 		if (conceptClass != null) {
 			queryStr += "LEFT JOIN item.concept c INNER JOIN c.conceptClass cc WHERE lower(cc.name) like lower(:conceptClass) ";
 		}
@@ -378,9 +378,12 @@ public class ICareDao extends BaseDAO<Item> {
 	
 	public List<OrderStatus> getOrderStatusByOrderUuid(String orderUuid) {
 		DbSession session = this.getSession();
-		//String queryStr = "SELECT item FROM Item item \n"
-		//        + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
-		//String queryStr = "SELECT item FROM Item item, Stock stock WHERE item.stockable = true AND stock.item=item AND stock.location.uuid =:locationUuid";
+		// String queryStr = "SELECT item FROM Item item \n"
+		// + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid
+		// FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
+		// String queryStr = "SELECT item FROM Item item, Stock stock WHERE
+		// item.stockable = true AND stock.item=item AND stock.location.uuid
+		// =:locationUuid";
 		String queryStr = "SELECT os FROM OrderStatus os\n" + "INNER JOIN os.order o\n" + "WHERE o.uuid=:orderUuid";
 		
 		Query query = session.createQuery(queryStr);
@@ -405,7 +408,7 @@ public class ICareDao extends BaseDAO<Item> {
 		
 		String queryStr = "SELECT i FROM Item i " + "LEFT JOIN i.concept as c " + "LEFT JOIN i.drug as d "
 		        + "LEFT JOIN d.concept as c1 " + " WHERE c.uuid= :uuid OR c1.uuid= :uuid";
-		//String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid=:uuid";
+		// String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid=:uuid";
 		Query query = session.createQuery(queryStr);
 		query.setParameter("uuid", uuid);
 		List<Item> items = query.list();
@@ -420,7 +423,8 @@ public class ICareDao extends BaseDAO<Item> {
 	public Item getItemByDrugConceptUuid(String uuid) {
 		DbSession session = getSession();
 		
-		//String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid= :uuid OR a.drug.concept.uuid= :uuid";
+		// String queryStr = "SELECT a FROM Item a WHERE a.concept.uuid= :uuid OR
+		// a.drug.concept.uuid= :uuid";
 		String queryStr = "SELECT a FROM Item a WHERE a.drug.concept.uuid=:uuid";
 		Query query = session.createQuery(queryStr);
 		query.setParameter("uuid", uuid);
@@ -483,54 +487,72 @@ public class ICareDao extends BaseDAO<Item> {
 	}
 	
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
-                                            String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
-                                            Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy, VisitWrapper.OrderByDirection orderByDirection,
-                                            String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
-                                            String sampleCategory, String exclude, Boolean includeInactive, Boolean includeDeadPatients) {
-		//PatientIdentifier
+			String locationUuid, OrderStatus.OrderStatusCode orderStatusCode, Order.FulfillerStatus fulfillerStatus,
+			Integer limit, Integer startIndex, VisitWrapper.OrderBy orderBy,
+			VisitWrapper.OrderByDirection orderByDirection,
+			String attributeValueReference, VisitWrapper.PaymentStatus paymentStatus, String visitAttributeTypeUuid,
+			String sampleCategory, String exclude, Boolean includeInactive, Boolean includeDeadPatients) {
+		// PatientIdentifier
 		Query query = null;
 		DbSession session = this.getSession();
-		
+
 		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p" + " LEFT JOIN p.names pname "
-		        + "LEFT JOIN p.identifiers pi INNER JOIN v.attributes va LEFT JOIN va.attributeType vat ";
-		//				+ " INNER JOIN p.attributes pattr";
-		
+				+ "LEFT JOIN p.identifiers pi INNER JOIN v.attributes va LEFT JOIN va.attributeType vat ";
+		// + " INNER JOIN p.attributes pattr";
+
 		if (orderTypeUuid != null && encounterTypeUuid == null) {
 			queryStr = queryStr + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o" + " INNER JOIN o.orderType ot"
-			        + " WHERE ot.uuid=:orderTypeUuid " + "  ";
-			
+					+ " WHERE ot.uuid=:orderTypeUuid " + "  ";
+
 			if (fulfillerStatus != null) {
 				queryStr += " AND o.fulfillerStatus=:fulfillerStatus";
 			} else {
 				queryStr += " AND o.fulfillerStatus IS NULL";
 			}
-			
+
 			if (orderStatusCode != null) {
 				if (orderStatusCode == OrderStatus.OrderStatusCode.EMPTY) {
 					queryStr += " AND o NOT IN (SELECT o2 FROM OrderStatus os" + "	INNER JOIN os.order o2)";
 				} else {
 					queryStr += " AND o IN (SELECT o2 FROM OrderStatus os"
-					        + "	INNER JOIN os.order o2 WHERE os.status=:orderStatusCode)";
+							+ "	INNER JOIN os.order o2 WHERE os.status=:orderStatusCode)";
 				}
 			}
-			
+
 		} else if (encounterTypeUuid != null && orderTypeUuid == null) {
 			queryStr += " INNER JOIN v.encounters e INNER JOIN e.encounterType et ";
-			queryStr += " WHERE et.uuid = :encounterTypeUuid AND v.stopDatetime IS NULL ";
+
+			if (includeInactive != null && includeInactive) {
+				queryStr += " WHERE et.uuid = :encounterTypeUuid AND v.stopDatetime IS NOT NULL ";
+			} else {
+				queryStr += " WHERE et.uuid = :encounterTypeUuid AND v.stopDatetime IS NULL ";
+			}
 		} else {
-			queryStr = queryStr + " INNER JOIN v.encounters e WHERE v.stopDatetime IS NULL ";
-			
+			queryStr += " INNER JOIN v.encounters e ";
+
+			if (includeInactive != null && includeInactive) {
+				queryStr += " WHERE 1=1 ";
+			} else {
+				queryStr += " WHERE v.stopDatetime IS NULL ";
+			}
 		}
 
-		if(!includeInactive){
+		if (includeInactive != null && includeInactive) {
+
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
+			queryStr += "v.stopDatetime IS NOT NULL";
+		} else {
 
-			queryStr +=" v.stopDatetime IS NULL";
-
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += " v.stopDatetime IS NULL";
 		}
 
 		if (search != null) {
@@ -539,53 +561,52 @@ public class ICareDao extends BaseDAO<Item> {
 		if (locationUuid != null) {
 			queryStr += " AND v.location.uuid=:locationUuid ";
 		}
-		
+
 		if (attributeValueReference != null) {
 			queryStr += " AND v IN ( SELECT va.visit FROM VisitAttribute va WHERE va.valueReference=:attributeValueReference)";
 		}
-		
 		if (paymentStatus != null) {
 			if (paymentStatus == VisitWrapper.PaymentStatus.PAID) {
 				queryStr += " AND v IN (SELECT invoice.visit FROM Invoice invoice WHERE "
-				        + "(SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) <= ("
-				        + "(SELECT CASE WHEN SUM(pi.amount) IS NULL THEN 0 ELSE SUM(pi.amount) END FROM PaymentItem pi "
-				        + "WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM DiscountInvoiceItem di WHERE di.id.invoice = invoice)) AND v NOT IN( SELECT invoice.visit FROM Invoice invoice WHERE (SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) > ((SELECT CASE WHEN SUM(pi.amount) IS NULL THEN 0 ELSE SUM(pi.amount) END FROM PaymentItem pi WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM DiscountInvoiceItem di WHERE di.id.invoice = invoice ))"
-				        + ") ORDER BY v.startDatetime  ASC)";
-				
+						+ "(SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) <= ("
+						+ "(SELECT CASE WHEN SUM(pi.amount) IS NULL THEN 0 ELSE SUM(pi.amount) END FROM PaymentItem pi "
+						+ "WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM DiscountInvoiceItem di WHERE di.id.invoice = invoice)) AND v NOT IN( SELECT invoice.visit FROM Invoice invoice WHERE (SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) > ((SELECT CASE WHEN SUM(pi.amount) IS NULL THEN 0 ELSE SUM(pi.amount) END FROM PaymentItem pi WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM DiscountInvoiceItem di WHERE di.id.invoice = invoice ))"
+						+ ") ORDER BY v.startDatetime  ASC)";
+
 			}
-			
+
 			if (paymentStatus == VisitWrapper.PaymentStatus.PENDING) {
 				queryStr += " AND v IN (SELECT invoice.visit FROM Invoice invoice WHERE "
-				        + "(SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) > ("
-				        + "(SELECT CASE WHEN SUM(pi.amount) IS NULL THEN 0 ELSE SUM(pi.amount) END FROM PaymentItem pi "
-				        + "WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM DiscountInvoiceItem di WHERE di.id.invoice = invoice))"
-				        + ") ORDER BY v.startDatetime  ASC)";
-				
+						+ "(SELECT SUM(item.price*item.quantity) FROM InvoiceItem item WHERE item.id.invoice = invoice) > ("
+						+ "(SELECT CASE WHEN SUM(pi.amount) IS NULL THEN 0 ELSE SUM(pi.amount) END FROM PaymentItem pi "
+						+ "WHERE pi.id.payment.invoice = invoice)+(SELECT CASE WHEN SUM(di.amount) IS NULL THEN 0 ELSE SUM(di.amount) END FROM DiscountInvoiceItem di WHERE di.id.invoice = invoice))"
+						+ ") ORDER BY v.startDatetime  ASC)";
+
 			}
 		}
-		
+
 		if (visitAttributeTypeUuid != null) {
-			
+
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
-			
+
 			queryStr += " vat.uuid = :visitAttributeTypeUuid";
-			
+
 		}
-		
+
 		if (sampleCategory != null) {
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
-			
+
 			queryStr += " v IN (SELECT sp.visit FROM Sample sp WHERE sp IN (SELECT sst.sample FROM SampleStatus sst WHERE sst.category =:sampleCategory))";
 
-			if(exclude != null){
+			if (exclude != null) {
 
 				if (!queryStr.contains("WHERE")) {
 					queryStr += " WHERE ";
@@ -595,10 +616,8 @@ public class ICareDao extends BaseDAO<Item> {
 
 				queryStr += " v IN (SELECT sp.visit FROM Sample sp WHERE sp NOT IN (SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
 
-
 			}
 
-			
 		}
 
 		if (!queryStr.contains("WHERE")) {
@@ -607,8 +626,8 @@ public class ICareDao extends BaseDAO<Item> {
 			queryStr += " AND ";
 		}
 
-		queryStr +=" p.dead = :includeDeadPatients";
-		
+		queryStr += " p.dead = :includeDeadPatients";
+
 		if (orderBy == VisitWrapper.OrderBy.VISIT) {
 			queryStr += " ORDER BY v.startDatetime ";
 		} else if (orderBy == VisitWrapper.OrderBy.ENCOUNTER) {
@@ -618,7 +637,7 @@ public class ICareDao extends BaseDAO<Item> {
 		} else if (orderBy == VisitWrapper.OrderBy.OBSERVATION) {
 			queryStr += " ORDER BY e.dateChanged ";
 		}
-		
+
 		if (orderByDirection == VisitWrapper.OrderByDirection.ASC) {
 			queryStr += " ASC ";
 		} else if (orderByDirection == VisitWrapper.OrderByDirection.DESC) {
@@ -628,23 +647,23 @@ public class ICareDao extends BaseDAO<Item> {
 		if (orderTypeUuid != null) {
 			query.setParameter("orderTypeUuid", orderTypeUuid);
 		}
-		
+
 		if (fulfillerStatus != null) {
 			query.setParameter("fulfillerStatus", fulfillerStatus);
 		}
-		
+
 		if (orderStatusCode != null) {
 			if (orderStatusCode == OrderStatus.OrderStatusCode.EMPTY) {
-				
+
 			} else {
 				query.setParameter("orderStatusCode", orderStatusCode);
 			}
 		}
-		
+
 		if (encounterTypeUuid != null) {
 			query.setParameter("encounterTypeUuid", encounterTypeUuid);
 		}
-		
+
 		if (locationUuid != null) {
 			query.setParameter("locationUuid", locationUuid);
 		}
@@ -661,41 +680,69 @@ public class ICareDao extends BaseDAO<Item> {
 			query.setParameter("sampleCategory", sampleCategory);
 		}
 
-		query.setParameter("includeDeadPatients",includeDeadPatients);
+		query.setParameter("includeDeadPatients", includeDeadPatients);
 
-		if(exclude != null){
+		if (exclude != null) {
 			Pattern pattern = Pattern.compile("List:\\[(.*?)\\]");
 			Matcher matcher = pattern.matcher(exclude);
 			String excludedValue;
-			if(matcher.find()){
+			if (matcher.find()) {
 				excludedValue = matcher.group(1);
-			}else{
+			} else {
 				excludedValue = exclude;
 			}
 
 			String[] valuesArray = excludedValue.split(",");
 			List<String> valueList = new ArrayList<>(Arrays.asList(valuesArray));
-			query.setParameterList("statuses",valueList);
+			query.setParameterList("statuses", valueList);
 		}
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
 		return query.list();
-		
+
 	}
 	
 	public List<Object[]> getCommonlyOrderedItems(String visitUuid, String orderTypeUuid, Integer limit, Integer startIndex,
-	        Boolean isDrug) {
+	        Boolean isDrug, String provider, Date startDate, Date endDate) {
 		DbSession session = this.getSession();
 		String queryStr = "";
 		if (isDrug == null || isDrug == true) {
-			queryStr = "SELECT distinct pres.drug AS drug, COUNT(pres.orderId) AS count FROM Prescription pres "
-			        + "GROUP BY pres.drug ORDER BY COUNT(pres.orderId)  DESC";
+			queryStr = "SELECT distinct pres.drug AS drug, COUNT(pres.orderId) AS count FROM Prescription pres ";
+			if (provider != null) {
+				queryStr += " LEFT JOIN pres.orderer provider WHERE provider.uuid = :provider ";
+			}
+			if (startDate != null && endDate != null) {
+				if (queryStr.contains("WHERE")) {
+					queryStr += " AND ps.dateActivated BETWEEN :startDate AND :endDate";
+				} else {
+					queryStr += " WHERE ps.dateActivated BETWEEN :startDate AND :endDate";
+				}
+			}
+			queryStr += "GROUP BY pres.drug ORDER BY COUNT(pres.orderId)  DESC";
 		} else {
-			queryStr = "SELECT distinct order, COUNT(order.orderId) AS count FROM Order order "
-			        + "GROUP BY order.concept ORDER BY COUNT(order.orderId) DESC";
+			queryStr = "SELECT distinct order, COUNT(order.orderId) AS count FROM Order order ";
+			if (provider != null) {
+				queryStr += " LEFT JOIN pres.orderer provider WHERE provider.uuid = :provider ";
+			}
+			if (startDate != null && endDate != null) {
+				if (queryStr.contains("WHERE")) {
+					queryStr += " AND ps.dateActivated BETWEEN :startDate AND :endDate";
+				} else {
+					queryStr += " WHERE ps.dateActivated BETWEEN :startDate AND :endDate";
+				}
+			}
+			queryStr += "GROUP BY order.concept ORDER BY COUNT(order.orderId) DESC";
 		}
 		
 		Query query = session.createQuery(queryStr);
+		
+		if (provider != null) {
+			query.setParameter("provider", provider);
+		}
+		if (startDate != null && endDate != null) {
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
+		}
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
 		return query.list();
@@ -718,7 +765,7 @@ public class ICareDao extends BaseDAO<Item> {
 		if (fulfillerStatus != null) {
 			query.setParameter("fulfillerStatus", fulfillerStatus);
 		}
-		//query.setParameter("fulfillerStatus", fulfillerStatus);
+		// query.setParameter("fulfillerStatus", fulfillerStatus);
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
 		return query.list();
@@ -849,7 +896,7 @@ public class ICareDao extends BaseDAO<Item> {
 	
 	public List<ConceptReferenceTerm> getConceptReferenceTermsBySearchParams(String q, String source, Integer limit,
 	        Integer startIndex) {
-		//				new ConceptReferenceTerm();
+		// new ConceptReferenceTerm();
 		DbSession session = getSession();
 		String searchQueryStr = "SELECT DISTINCT crt FROM ConceptReferenceTerm crt INNER JOIN crt.conceptSource cs";
 		String where = "WHERE";
@@ -933,11 +980,11 @@ public class ICareDao extends BaseDAO<Item> {
 			queryStr += "AND p.uuid=:patientUUID";
 		}
 		
-		//		if (orderByDirection == PatientWrapper.OrderByDirection.ASC) {
-		//			queryStr += " ASC";
-		//		} else if (orderByDirection == PatientWrapper.OrderByDirection.DESC) {
-		//			queryStr += " DESC";
-		//		}
+		// if (orderByDirection == PatientWrapper.OrderByDirection.ASC) {
+		// queryStr += " ASC";
+		// } else if (orderByDirection == PatientWrapper.OrderByDirection.DESC) {
+		// queryStr += " DESC";
+		// }
 		
 		Query query = session.createQuery(queryStr);
 		
@@ -959,9 +1006,11 @@ public class ICareDao extends BaseDAO<Item> {
 			Visit visit = (Visit) patientData[1];
 			patientWrappers.add(new PatientWrapper(patient, visit));
 		}
-		/*for(Patient patient:(List<Patient>)query.list()){
-			patientWrappers.add(new PatientWrapper(patient));
-		}*/
+		/*
+		 * for(Patient patient:(List<Patient>)query.list()){
+		 * patientWrappers.add(new PatientWrapper(patient));
+		 * }
+		 */
 		return patientWrappers;
 		
 	}
@@ -981,17 +1030,17 @@ public class ICareDao extends BaseDAO<Item> {
 
 		queryStr = "SELECT l,COUNT(v) FROM Location l, Visit v WHERE v.stopDatetime IS NULL AND v.location=l AND l.retired=false GROUP BY l";
 		query = session.createQuery(queryStr);
-		//summary.setActiveVisits((long) query.list().get(0));
+		// summary.setActiveVisits((long) query.list().get(0));
 
-		Map<Location, Long> locationMap= new HashMap<>();
+		Map<Location, Long> locationMap = new HashMap<>();
 		for (Object[] locationData : (List<Object[]>) query.list()) {
 			Location location = (Location) locationData[0];
 			Long count = (long) locationData[1];
-			locationMap.put(location,count);
+			locationMap.put(location, count);
 		}
 		summary.setLocations(locationMap);
 		return summary;
-    }
+	}
 	
 	public List<Drug> getDrugs(String concept, Integer limit, Integer startIndex) {
 		DbSession session = getSession();
@@ -1036,7 +1085,7 @@ public class ICareDao extends BaseDAO<Item> {
 
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		String idFormat = adminService.getGlobalPropertyByUuid(globalPropertyUuid).getValue().toString();
-		if(idFormat == null){
+		if (idFormat == null) {
 			throw new Exception("The global property for generationg code is mot set. Please set ");
 		}
 		List<String> idLabels = new ArrayList<>();
@@ -1059,13 +1108,13 @@ public class ICareDao extends BaseDAO<Item> {
 				queryStr = "SELECT COUNT(sp) FROM Sample sp WHERE YEAR(sp.dateTime) = :year";
 			} else if (metadataType.equals("worksheetdefinition")) {
 				queryStr = "SELECT COUNT(wd) FROM WorksheetDefinition wd WHERE YEAR(wd.dateCreated) = :year";
-			} else if (metadataType.equals("worksheet")){
+			} else if (metadataType.equals("worksheet")) {
 				queryStr = "SELECT COUNT(ws) FROM Worksheet ws WHERE YEAR(ws.dateCreated) = :year";
-			} else if (metadataType.equals("batchset")){
+			} else if (metadataType.equals("batchset")) {
 				queryStr = "SELECT COUNT(bs) FROM BatchSet bs WHERE YEAR(bs.dateCreated) = :year";
-			} else if (metadataType.equals("batch")){
+			} else if (metadataType.equals("batch")) {
 				queryStr = "SELECT COUNT(b) FROM Batch b WHERE YEAR(b.dateCreated) = :year";
-			} else if(metadataType.equals("requisition")){
+			} else if (metadataType.equals("requisition")) {
 				queryStr = " SELECT COUNT(req) FROM Requisition req WHERE YEAR(req.dateCreated) = :year";
 			}
 
@@ -1076,10 +1125,11 @@ public class ICareDao extends BaseDAO<Item> {
 				long data = (long) query.list().get(0);
 				Integer countOfIdLabels = 1;
 				if (count != null) {
-					countOfIdLabels =  count;
+					countOfIdLabels = count;
 				}
-				for (Integer labelCount =1; labelCount <= countOfIdLabels; labelCount++) {
-					idLabels.add(idFormat.replace( "COUNT:" + idFormat.split(":")[1], "" + String.format("%0" + idFormat.split(":")[1] +"d", data + labelCount)));
+				for (Integer labelCount = 1; labelCount <= countOfIdLabels; labelCount++) {
+					idLabels.add(idFormat.replace("COUNT:" + idFormat.split(":")[1],
+							"" + String.format("%0" + idFormat.split(":")[1] + "d", data + labelCount)));
 
 				}
 			}
@@ -1097,37 +1147,50 @@ public class ICareDao extends BaseDAO<Item> {
 		return query.list();
 	}
 	
-	//	public String voidOrder(String uuid, String voidReason) {
-	//		DbSession session = getSession();
-	//		new Order();
-	//		String queryStr = "UPDATE Order SET voided = 1,voidReason=:voidReason WHERE uuid =:uuid";
-	//		Query sqlQuery = session.createQuery(queryStr);
+	// public String voidOrder(String uuid, String voidReason) {
+	// DbSession session = getSession();
+	// new Order();
+	// String queryStr = "UPDATE Order SET voided = 1,voidReason=:voidReason WHERE
+	// uuid =:uuid";
+	// Query sqlQuery = session.createQuery(queryStr);
 	//
-	//		if (uuid == null) {
-	//			return "";
-	//		} else {
-	//			sqlQuery.setParameter("uuid", uuid);
-	//		}
+	// if (uuid == null) {
+	// return "";
+	// } else {
+	// sqlQuery.setParameter("uuid", uuid);
+	// }
 	//
-	//		if (voidReason != null) {
-	//			sqlQuery.setParameter("voidReason", voidReason);
-	//		} else {
-	//			sqlQuery.setParameter("voidReason", "");
-	//		}
-	//		sqlQuery.executeUpdate();
+	// if (voidReason != null) {
+	// sqlQuery.setParameter("voidReason", voidReason);
+	// } else {
+	// sqlQuery.setParameter("voidReason", "");
+	// }
+	// sqlQuery.executeUpdate();
 	//
-	//		return uuid;
-	//	}
+	// return uuid;
+	// }
 	//
 	
-	public List<Visit> getVisitsByStartDateAndEndDate(Date startDate, Date endDate) {
+	public List<Visit> getVisitsByStartDateAndEndDate(Date startDate, Date endDate, String uuid) {
 		DbSession session = getSession();
-		String queryStr = " SELECT visit FROM Visit visit WHERE visit.startDatetime BETWEEN :startDate AND :endDate";
+		String queryStr = "";
+		if (uuid != null) {
+			queryStr = " SELECT visit FROM Visit visit WHERE visit.uuid = :uuid";
+		} else {
+			queryStr = " SELECT visit FROM Visit visit WHERE visit.startDatetime BETWEEN :startDate AND :endDate";
+		}
 		Query query = session.createQuery(queryStr);
-		query.setParameter("startDate", startDate);
-		query.setParameter("endDate", endDate);
+		if (startDate != null && endDate != null) {
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
+		}
+		
+		if (uuid != null) {
+			query.setParameter("uuid", uuid);
+		}
 		return query.list();
 	}
+
 
     //IcareSMS
 	//insert outgoing messages to outgoing message table to be sent later
@@ -1160,5 +1223,59 @@ public class ICareDao extends BaseDAO<Item> {
 		getSession().save(outgoingSMS);
 	}
 	
+
+	
+	// public boolean updateGepgControlNumber(String controlNumber, String uuid) {
+	// DbSession session = getSession();
+	// boolean isSuccess = false;
+	
+	// try {
+	// String queryStr = "UPDATE bl_invoice_item SET control_number = :controlNumber
+	// "
+	// + "WHERE invoice_id = (SELECT invoice_id FROM bl_invoice WHERE uuid =
+	// :uuid)";
+	// SQLQuery query = session.createSQLQuery(queryStr);
+	// query.setParameter("controlNumber", controlNumber);
+	// query.setParameter("uuid", uuid);
+	// int updateCount = query.executeUpdate();
+	
+	// if (updateCount > 0) {
+	// String selectQueryStr = "SELECT * FROM bl_invoice_item WHERE invoice_id =
+	// (SELECT invoice_id FROM bl_invoice WHERE uuid = :uuid)";
+	// SQLQuery selectQuery = session.createSQLQuery(selectQueryStr);
+	// selectQuery.addEntity(InvoiceItem.class);
+	// selectQuery.setParameter("uuid", uuid);
+	
+	// InvoiceItem updatedInvoiceItem = (InvoiceItem) selectQuery.uniqueResult();
+	// if (updatedInvoiceItem != null &&
+	// controlNumber.equals(updatedInvoiceItem.getControlNumber())) {
+	// isSuccess = true;
+	// }
+	// }
+	// }
+	// catch (Exception e) {
+	// e.printStackTrace();
+	// }
+	
+	// return isSuccess;
+	// }
+	
+	public List<Visit> getPatientVisitsByIdentifier(String id, String idType, Integer numberOfVisits) throws Exception {
+		DbSession session = this.getSession();
+		
+		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.patient p LEFT JOIN p.identifiers pi "
+		        + " LEFT JOIN pi.identifierType pitype ";
+		queryStr += " WHERE pi.identifier=:id AND pitype.name =:idType";
+		Query query = session.createQuery(queryStr);
+		if (id != null && id != null) {
+			query.setParameter("id", id);
+			query.setParameter("idType", idType);
+		}
+		
+		if (numberOfVisits != null) {
+			query.setMaxResults(numberOfVisits);
+		}
+		return query.list();
+	}
 
 }

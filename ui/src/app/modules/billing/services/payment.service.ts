@@ -17,10 +17,10 @@ export class PaymentService {
       ? this.httpClient
           .get(`billing/payment?patient=${patientUuid}`)
           .pipe(
-            map((payments) =>
-              (payments || []).map(
-                (payment, paymentIndex) => new Payment(payment, paymentIndex)
-              )
+            map((payments: any[]) =>
+              (payments || []).map((payment, paymentIndex) => {
+                return new Payment(payment, paymentIndex);
+              })
             )
           )
       : of([]);

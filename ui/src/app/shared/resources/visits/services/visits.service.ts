@@ -1,5 +1,4 @@
 import { query } from "@angular/animations";
-import { ClassGetter } from "@angular/compiler/src/output/output_ast";
 import { Injectable } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 import { isArray, omit, orderBy, flatten, groupBy, keyBy } from "lodash";
@@ -353,7 +352,11 @@ export class VisitsService {
     if (includeDeadPatients && includeDeadPatients === true) {
       parametersString += `&includeDeadPatients=true`;
     }
+    if (includeInactive && includeInactive === true) {
+      parametersString += `&includeInactive=true`;
+    }
     //
+    // console.log("url fired  ...",`icare/visit?${parametersString.replace("&","" )}&startIndex=${startIndex}&limit=${limit}`);
     return (
       locationUuids?.length > 0
         ? zip(

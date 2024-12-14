@@ -5,6 +5,11 @@ import { PaymentObject } from './payment-object.model';
 export class Payment {
   constructor(private paymentDetails, private paymentIndex?: number) {}
 
+  // Accessing controlNumber
+  get controlNumber(): string {
+    return this.paymentDetails?.controlNumber; 
+  }
+
   // TODO This may change provided payment is returned with uuid
   get id(): string {
     return this.paymentDetails?.uuid;
@@ -26,11 +31,9 @@ export class Payment {
     return this.paymentDetails?.referenceNumber;
   }
 
-  get status(): 'PENDING' | 'PAID' {
+  get status(): string  {
     //TODO: Find best way to get payment status
-    return BILLING_CONFIGURATION?.paymentType.GEPG === this.paymentType?.uuid
-      ? 'PENDING'
-      : 'PAID';
+    return this.paymentDetails?.status;
   }
   
 

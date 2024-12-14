@@ -20,20 +20,21 @@
 //   background-color: #fff;
 // }
 
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
 .mat-form-field-underline {
   display: none !important;
 }
 
-::ng-deep .mat-option {
+::ng-deep .mat-mdc-option {
   word-wrap: break-word !important;
   white-space: pre-line !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
   text-overflow: ellipsis !important;
   display: block !important;
   line-height: 30px !important;
-  padding: 0 16px !important;
-  padding-top: 2rem !important;
-  padding-bottom: 2rem !important;
+  // padding: 0 16px !important;
+  // padding-top: 2rem !important;
+  // padding-bottom: 2rem !important;
   text-align: left !important;
   text-decoration: none !important;
   max-width: 100% !important;
@@ -76,19 +77,26 @@ ng-deep .disabled-form-selection-option,
   .ngx-mat-timepicker-tbody
   tr
   td
-  .mat-form-field {
+  .mat-mdc-form-field {
   max-width: 50px;
   min-width: 50px;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
 ::ng-deep .mat-form-field-wrapper {
   padding-bottom: 0.375rem !important;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version.*/
 ::ng-deep .mat-form-field-infix {
   display: block;
   position: relative;
   flex: auto;
   min-width: 80px !important;
   width: auto !important;
+}
+
+.custom-height .mat-form-field-wrapper {
+  height: 60px; /* Adjust the height as needed */
+  align-items: center; /* Optional: centers input content */
 }

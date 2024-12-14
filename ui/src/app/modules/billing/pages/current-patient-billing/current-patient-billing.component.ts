@@ -37,11 +37,40 @@ import { MatDialog } from "@angular/material/dialog";
 import { ExemptionConfirmationComponent } from "../../components/exemption-confirmation/exemption-confirmation.component";
 import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
+import { animate, state, style, transition, trigger } from "@angular/animations";
+
+
+interface Payments {
+  position: number;
+  receivedBy: string;
+  creator: string;
+  paymentType: string;
+  referenceNumber: string;
+  status: string;
+  createdAt: string;
+  receiptNumber: string;
+  billAmount: number;
+  paidAmount: number;
+  gepgpaymentDate: string;
+  payerNumber: string;
+  payerName: string;
+  pspName: string;
+  accountNumber: string;
+}
+
+
 
 @Component({
   selector: "app-current-patient-billing",
   templateUrl: "./current-patient-billing.component.html",
   styleUrls: ["./current-patient-billing.component.scss"],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 export class CurrentPatientBillingComponent implements OnInit {
   loading: boolean;
@@ -73,6 +102,17 @@ export class CurrentPatientBillingComponent implements OnInit {
   hasOpenExemptionRequest: boolean;
   isBillCleared: boolean;
   errors: any[] = [];
+  displayedColumns: string[] = ['position','createdAt', 'receivedBy', 'creator', 'paymentType', 'referenceNumber', 'status','print'];
+  dataSource: Payments[] = [];
+  color: string = '';
+  expandedElement: Payments | null;
+  onRowClick(row: any): void {
+    // Only expand if paymentType is 'Gepg'
+    if (row.paymentType === 'Gepg') {
+      this.expandedElement = this.expandedElement === row ? null : row;
+    }
+  }
+
 
   constructor(
     private route: ActivatedRoute,
@@ -92,7 +132,6 @@ export class CurrentPatientBillingComponent implements OnInit {
   ngOnInit() {
     this.patientId = this.route?.snapshot?.params?.patientId;
     this._getPatientDetails();
-
     this.currentPatient$ = this.patientService.getPatient(this.patientId);
     this.store.dispatch(
       loadCurrentPatient({ uuid: this.patientId, isRegistrationPage: false })
@@ -241,8 +280,39 @@ export class CurrentPatientBillingComponent implements OnInit {
           }
         })
       );
+      this.patientBillingDetails$
+      .pipe(
+        map((data: any) => data.payments.map((payment: any, index: number) => ({
+          position: index + 1,
+          receivedBy: payment.paymentDetails.receivedBy,
+          creator: payment.paymentDetails.creator.display,
+          paymentType: payment.paymentDetails.paymentType.name,
+          referenceNumber: payment.paymentDetails.referenceNumber,
+          status: payment.status,
+          createdAt: new Date(payment.created).toLocaleDateString(),
+          receiptNumber: payment.paymentDetails.receiptNumber,
+          billAmount: payment.paymentDetails.billAmount,
+          paidAmount: payment.paymentDetails.paidAmount,
+          gepgpaymentDate: new Date(payment.paymentDetails.paymentDate).toLocaleDateString(),
+          payerNumber: payment.paymentDetails.payerNumber,
+          payerName: payment.paymentDetails.payerName,
+          pspName: payment.paymentDetails.pspName,
+          accountNumber: payment.paymentDetails.accountNumber,
+
+        })))
+      )
+      .subscribe((payments: Payments[]) => {
+        this.dataSource = payments;
+      });
+    
   }
 
+
+  printElement(element: any) {
+    console.log('Printing:', element);
+  }
+
+  
   private _getPatientDetails() {
     this.loading = true;
 

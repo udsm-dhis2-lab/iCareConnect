@@ -53,6 +53,19 @@ public abstract class BaseDAO<T> {
 		}
 	}
 	
+	public T findById(Integer id) {
+		DbSession session = this.getSession();
+		String queryStr = "SELECT i FROM " + getType() + " i WHERE i.id = :id";
+		Query query = session.createQuery(queryStr);
+		query.setParameter("id", id);
+		List<T> list = query.list();
+		if (list.size() > 0) {
+			return list.get(0);
+		} else {
+			return null;
+		}
+	}
+	
 	protected String getType() {
 		Type type = ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 		return type.toString().replace("class ", "");

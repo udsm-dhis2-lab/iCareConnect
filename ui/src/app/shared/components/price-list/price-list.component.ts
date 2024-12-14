@@ -90,7 +90,10 @@ export class PriceListComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.currentDepartmentId = this.departmentId;
-    this.isDrug = this.currentDepartmentId == "Drug" ? true : false;
+    this.isDrug =
+      this.currentDepartmentId && this.currentDepartmentId == "Drug"
+        ? true
+        : false;
 
     this.loadData();
     this.priceListDepartments$ =
@@ -153,7 +156,7 @@ export class PriceListComponent implements OnInit, OnChanges {
       panelClass: "custom-dialog-container",
       data: { pricingItems },
     });
-    this.trackActionForAnalytics('Add Price List: Open');
+    this.trackActionForAnalytics("Add Price List: Open");
     // TODO: Find best way in order to stop subscribing here
     dialog.afterClosed().subscribe((results) => {
       if (results) {
@@ -213,8 +216,6 @@ export class PriceListComponent implements OnInit, OnChanges {
                 (pricingItem: PricingItemInterface) => {
                   this.addingPricingItem = false;
                   this.store.dispatch(upsertPricingItem({ pricingItem }));
-
-                
                 },
                 () => {
                   this.addingPricingItem = false;

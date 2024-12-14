@@ -14,7 +14,7 @@ import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { ConceptGetFull } from "src/app/shared/resources/openmrs";
 import * as _ from "lodash";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 
 @Component({
   selector: "app-test-target-creation",
@@ -68,7 +68,7 @@ export class TestTargetCreationComponent implements OnInit, OnDestroy {
     },
   ];
 
-  dynamicControls: FormControl[] = [];
+  dynamicControls: UntypedFormControl[] = [];
   subscriptions: Subscription[] = [];
 
   constructor(
@@ -76,7 +76,7 @@ export class TestTargetCreationComponent implements OnInit, OnDestroy {
     private testTimeConfigService: TestTimeConfigService
   ) {
     this.turnaroundOptions.forEach((value) => {
-      this.dynamicControls.push(new FormControl(value));
+      this.dynamicControls.push(new UntypedFormControl(value));
     });
   }
   ngOnDestroy(): void {
