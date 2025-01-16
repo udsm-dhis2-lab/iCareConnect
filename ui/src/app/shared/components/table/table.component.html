@@ -5,7 +5,7 @@
     activeVisit: activeVisit$ | async
   } as params"
 >
-  <!-- TODO: Review the table for data display -->
+
   <div *ngIf="(params?.patientDrugOrdersStatuses && visit) || !visit">
     <p
       class="ml-2 text-left text-danger"
@@ -152,7 +152,7 @@
         </tr>
       </tbody>
     </table>
-    <!-- Rest of the code remains the same -->
+  
     <table
       *ngIf="!useNormalTable"
       class="w-100"
@@ -160,7 +160,7 @@
       [dataSource]="dataSource"
       matSort
     >
-      <!-- Existing mat-table code remains unchanged -->
+
     </table>
 
     <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
