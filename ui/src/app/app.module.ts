@@ -4,6 +4,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { GoogleAnalyticsService } from "./google-analytics.service";
 import { ServiceWorkerModule } from "@angular/service-worker";
 import { NgModule, isDevMode } from "@angular/core";
+
 export const config: any = {
   sizeUnit: "Octet",
 };
