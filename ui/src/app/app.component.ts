@@ -9,6 +9,7 @@ import { loadDHIS2ReportsConfigs } from "./store/actions";
 import { AppState } from "./store/reducers";
 import { getIfNonLoginRoute } from "./store/selectors";
 
+
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",

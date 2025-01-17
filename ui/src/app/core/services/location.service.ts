@@ -19,10 +19,14 @@ export class LocationService {
   getMainLocation(): Observable<any> {
     return this.httpClient
       .get(
-        "location?limit=100&tag=Main+Location&v=custom:(display,country,postalCode,stateProvince,uuid,tags,description,parentLocation:(uuid,display),attributes:(attributeType,uuid,value,voided))"
+        "location?limit=100&tag=Main+Location&v=custom:(display,country,postalCode,stateProvince,uuid,tags,description,parentLocation:(uuid,display),attributes:(attributeType,uuid,value,voided))('/api/location')"
       )
       .pipe(
         map((response) => {
+          const results = response?.results || [];
+          if (results.length === 0) {
+            throw new Error("No main location available.");
+          }
           return {
             results: response?.results.map((result) => {
               return {
