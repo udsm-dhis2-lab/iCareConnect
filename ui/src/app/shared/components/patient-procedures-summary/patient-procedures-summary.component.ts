@@ -31,7 +31,7 @@ export class PatientProceduresSummaryComponent implements OnInit {
   procedures$: Observable<any>;
   //Added a field called voided to checck whether the order is void (soft deleted or not)
   fields: string =
-    "custom:(uuid,encounters:(uuid,location:(uuid,display),encounterType,display,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,orderer,orderType,dateActivated,dateStopped,autoExpireDate,orderNumber,concept,display, voided)))";
+    "custom:(uuid,encounters:(uuid,location:(uuid,display),encounterType,display,encounterProviders,encounterDatetime,voided,obs,orders:(uuid,display,orderer,orderType,dateActivated,dateStopped,autoExpireDate,orderNumber,concept,display,voided)))";
   creatingProceduresResponse$: Observable<any>;
   addingProcedure: boolean = false;
   hasError: boolean = false;
