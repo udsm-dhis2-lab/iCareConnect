@@ -14,13 +14,16 @@ export function getOrdersFromCurrentVisitEncounters(
     orders = [
       ...orders,
       ..._.map(
+        //Added void check to filtering out procedure
         encounter?.orders?.filter(
           (order) =>
             !order.voided &&
             (order?.orderType?.display?.toLowerCase() === "procedure order" ||
               order?.orderType?.display?.toLowerCase() === "radiology order")
         ) || [],
+        //filtering our procedure
         (order) => {
+
           const paid =
             !bills || bills?.length === 0
               ? true
