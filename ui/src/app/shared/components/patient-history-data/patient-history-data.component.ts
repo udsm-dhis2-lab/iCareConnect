@@ -609,6 +609,7 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
 
     frameDoc.document.write(`</tbody></table>`);
 
+
     // -------------------Procedure orders-------------
     if (
       this.visitHistory?.visitOrderedData?.find(
@@ -630,8 +631,12 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
            </thead>
            <tbody>`);
     }
-    this.visitHistory?.visitOrderedData?.forEach((visitData) => {
-      if (visitData?.category === "PROCEDURE_ORDER") {
+
+     // Visit note.....
+
+
+     this.visitHistory?.visitOrderedData?.forEach((visitData) => {
+      if (visitData?.category === "OBSERVATIONS") {
         frameDoc.document.write(`
 <tr><td>
       ${visitData?.concept?.display}
@@ -670,6 +675,48 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
         </td>
 </tr>`);
       }
+    }); 
+
+    //end of visit note
+
+    this.visitHistory?.visitOrderedData?.forEach((visitData) => {
+      if (visitData?.category === "PROCEDURE_ORDER") {
+        frameDoc.document.write(`
+<tr><td>
+      ${visitData?.concept?.display}
+      </td>
+      <td>  ${visitData?.provider} on 
+      ${visitData?.date} ${visitData?.time}
+      </td> <td>
+      `);
+      //................Handle Empty or Undefined Data...............
+
+      if (visitData?.results?.length > 0) {
+        visitData.results.forEach((result) => {
+          if (!result?.value?.links?.uri) {
+            frameDoc.document.write(` ${result?.concept?.display || 'N/A'} - 
+                                      ${result?.value?.display || result?.value || 'N/A'}, &nbsp;&nbsp;`);
+          }
+        });
+      } else {
+        frameDoc.document.write(` Not Attended `);
+      }
+
+      //....................End of Handling Data..................
+        frameDoc.document.write(`</td>`);
+        frameDoc.document.write(`
+      <td>${
+        visitData?.results[0]?.provider?.display?.split("-")[1]
+          ? visitData?.results[0]?.provider?.display?.split("-")[1] + "on"
+          : "-"
+      } ${
+          visitData?.results[0]?.obsDatetime
+            ? formatDateToString(new Date(visitData?.results[0]?.obsDatetime))
+            : "-"
+        } 
+        </td>
+</tr>`);
+      }
     });
 
     frameDoc.document.write(`</tbody></table>`);
@@ -694,15 +741,21 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
            </thead>
            <tbody>`);
 
-          visitData?.obs?.forEach((ob) => {
-            frameDoc.document.write(`<tr><td> ${ob?.concept?.display} </td><td> 
-            ${ob?.value?.display ? ob?.value?.display : ob?.value}
-              </td></tr>`);
+         // .............Snippet to process observation..............
+        if (visitData?.obs?.length > 0) {
+          visitData.obs.forEach((ob) => {
+            frameDoc.document.write(`<tr><td>${ob?.concept?.display || 'N/A'}</td><td>
+                                     ${ob?.value?.display || ob?.value || 'N/A'}
+                                     </td></tr>`);
           });
+        } else {
+          frameDoc.document.write(`<tr><td colspan="2">No Observations Found</td></tr>`);
         }
-      });
-    }
 
+        frameDoc.document.write(`</tbody></table>`);
+      }
+    });
+  }
     // this.visitHistory?.visitOrderedData?.forEach((visitData) => {
     //   if (visitData?.category === "OBSERVATIONS") {
     //     frameDoc.document.write(`<tr`);
@@ -716,8 +769,9 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
     //   }
     // });
 
-    frameDoc.document.write(`</tbody></table>`);
-    if (this.visitHistory?.diagnoses?.PROVISIONAL?.length) {
+    //......Checking both provisional & confirmed are rendered.............
+
+    if (Array.isArray(this.visitHistory?.diagnoses?.PROVISIONAL) && this.visitHistory?.diagnoses?.PROVISIONAL.length) {
       frameDoc.document.write(`<div>
     <h4>Provisional Diagnoses</h4>
     `);
@@ -737,6 +791,8 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
       </div>`);
       });
     }
+
+// ......End of Rendering.............
 
     frameDoc.document.write(`
           <div class="footer">

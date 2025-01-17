@@ -19,8 +19,21 @@ export class PatientClinicalNotesSummaryComponent implements OnInit {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
-    this.observations$ = !this.forHistory
-      ? this.store.pipe(select(getGroupedObservationByConcept))
-      : of(groupObservationByConcept(this.patientVisit?.observations));
+    if (!this.forHistory) {
+      this.observations$ = this.store.pipe(select(getGroupedObservationByConcept));
+    } else {
+      const groupedObservations = groupObservationByConcept(
+        this.patientVisit?.observations
+      );
+      const notes = this.patientVisit?.visit?.notes || ["No notes available"];
+      const services = this.patientVisit?.visit?.services || ["No services available"];
+  
+      this.observations$ = of({
+        ...groupedObservations,
+        visitNotes: notes,
+        serviceRecords: services,
+      });
+    }
   }
+  
 }
