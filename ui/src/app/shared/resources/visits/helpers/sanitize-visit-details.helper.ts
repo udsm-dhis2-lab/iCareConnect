@@ -16,8 +16,9 @@ export function getOrdersFromCurrentVisitEncounters(
       ..._.map(
         encounter?.orders?.filter(
           (order) =>
-            order?.orderType?.display?.toLowerCase() === "procedure order" ||
-            order?.orderType?.display?.toLowerCase() === "radiology order"
+            !order.voided &&
+            (order?.orderType?.display?.toLowerCase() === "procedure order" ||
+              order?.orderType?.display?.toLowerCase() === "radiology order")
         ) || [],
         (order) => {
           const paid =
