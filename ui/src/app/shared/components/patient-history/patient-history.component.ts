@@ -170,7 +170,7 @@ export class PatientHistoryComponent implements OnInit {
                 visit: visit?.visit,
                 notes: visit?.visit?.notes || "No notes available", // Add visit notes
                 obs: obs,
-                serviceRecords: serviceRecords,
+                serviceRecords: visit?.visit?.serviceRecords ,
                 orders: [
                   ...visit?.visit?.encounters?.map((encounter) => {
                     return (encounter?.orders || []).map((order) => {

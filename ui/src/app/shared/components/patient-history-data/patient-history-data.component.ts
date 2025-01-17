@@ -244,10 +244,16 @@ export class PatientHistoryDataComponent implements OnInit {
     );
   }
 
+<<<<<<< HEAD
   onPrint(e: any, visitData: any): void {
     e.preventDefault();
     visitData.preventDefault();
 
+=======
+  onPrint(e: Event, visitData: any): void {
+    e.preventDefault()
+    visitData.preventDefault()
+>>>>>>> 5002630e4 (implement a logic to utilize the arguments onprint function)
     // console.log("Patient visit", this.visit);
     // console.log("Patient History", this.visitHistory);
     let contents: string;

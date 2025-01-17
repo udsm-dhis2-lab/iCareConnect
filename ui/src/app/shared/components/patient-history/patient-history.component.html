@@ -44,7 +44,7 @@
         <app-patient-history-data
           [visit]="visit"
           [forms]="params?.customForms"
-          [FacilityDetails]="params?.facilityDetails"
+          [facilityDetails]="params?.facilityDetails"
           [currentUser]="params?.currentUser"
           [generalPrescriptionOrderType]="params?.generalPrescriptionOrderType"
           [prescriptionArrangementFields]="
@@ -59,7 +59,7 @@
           *ngIf="params?.doctorsIPDRoundForm"
           [form]="params?.doctorsIPDRoundForm"
           [isLIS]="false"
-          [formValidationRules]=""
+          [formValidationRules]="null"
           (formDataUpdate)="onDoctorsIPDRoundCommentsFormUpdate($event)"
         ></app-capture-form-data>
 
@@ -76,7 +76,7 @@
   </div>
 
   <!-- No Visits Found Message -->
-  <div *ngIf="!params?.visits?.length && !loadingData">
+  <div *ngIf="(!params?.visits?.length )&& !loadingData">
     <h4 class="text-center">
       {{
         patient?.person
