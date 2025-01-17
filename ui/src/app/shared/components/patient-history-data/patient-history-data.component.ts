@@ -678,6 +678,7 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
     }); 
 
     //end of visit note
+
     this.visitHistory?.visitOrderedData?.forEach((visitData) => {
       if (visitData?.category === "PROCEDURE_ORDER") {
         frameDoc.document.write(`
@@ -688,22 +689,20 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
       ${visitData?.date} ${visitData?.time}
       </td> <td>
       `);
-        if (visitData?.results?.length > 0) {
-          visitData?.results?.forEach((result) => {
-            if (!result?.value?.links?.uri) {
-              frameDoc.document.write(` ${result?.concept?.display} - 
-                          ${
-                            result?.value?.display
-                              ? result?.value?.display
-                              : result?.value
-                          }, &nbsp;&nbsp;
-    `);
-            }
-          });
-        } else if (!visitData?.results?.length) {
-          frameDoc.document.write(` Not Attended
-    `);
-        }
+      //................Handle Empty or Undefined Data...............
+
+      if (visitData?.results?.length > 0) {
+        visitData.results.forEach((result) => {
+          if (!result?.value?.links?.uri) {
+            frameDoc.document.write(` ${result?.concept?.display || 'N/A'} - 
+                                      ${result?.value?.display || result?.value || 'N/A'}, &nbsp;&nbsp;`);
+          }
+        });
+      } else {
+        frameDoc.document.write(` Not Attended `);
+      }
+
+      //....................End of Handling Data..................
         frameDoc.document.write(`</td>`);
         frameDoc.document.write(`
       <td>${
