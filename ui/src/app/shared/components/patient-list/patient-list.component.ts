@@ -80,7 +80,9 @@ export class PatientListComponent implements OnInit, OnChanges {
     private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
-  ngOnChanges() {}
+  ngOnChanges() {
+    console.log('change.detected.in.component!');
+                }
 
   ngOnInit() {
     if (this.isDischarge === undefined) {
@@ -110,6 +112,7 @@ export class PatientListComponent implements OnInit, OnChanges {
 
 
   private getVisits(visits: Visit[]) {
+    console.log('Response:', .Response);
     this.loadingPatients = true;
     // this.service = "LABS";
 
@@ -273,6 +276,8 @@ export class PatientListComponent implements OnInit, OnChanges {
     const currentUrl = this.router.url.split("?")[0];
     const params = this.router.url.split("?")[1];
     this.isTabularList = type === "tabular" ? true : false;
+    console.log('Toggling.Patient.List.to:', .type);
+    console.log('Updated isTabularList:', .this.isTabularList);
     this.store.dispatch(
       go({ path: [currentUrl], query: { queryParams: { list: type } } })
     );
