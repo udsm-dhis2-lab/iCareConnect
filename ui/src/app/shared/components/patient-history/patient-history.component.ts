@@ -147,6 +147,7 @@ export class PatientHistoryComponent implements OnInit {
       .pipe(
         map((response) => {
           this.loadingData = false;
+          console.log('Fetched visits:',response);
           if (!response?.error) {
             return response?.map((visit) => {
               let obs = [];
@@ -167,6 +168,7 @@ export class PatientHistoryComponent implements OnInit {
               });
               return {
                 visit: visit?.visit,
+                notes: visit?.visit?.notes || "No notes available", //Add visit notes
                 obs: obs,
                 orders: [
                   ...visit?.visit?.encounters.map((encounter) => {
