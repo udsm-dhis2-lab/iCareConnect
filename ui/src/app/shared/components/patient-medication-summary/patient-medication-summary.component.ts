@@ -146,6 +146,7 @@ export class PatientMedicationSummaryComponent implements OnInit {
 
   onAddOrder(e: Event) {
     e.stopPropagation();
+    // function to trigger add prescription
     
     // Check for active orders before allowing new order
     const activeOrders = this.filteredDrugOrders$; // You already have the filtered drug orders
