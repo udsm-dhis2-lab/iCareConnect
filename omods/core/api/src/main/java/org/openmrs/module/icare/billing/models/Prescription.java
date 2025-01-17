@@ -23,6 +23,7 @@ import java.util.*;
 //@Transactional
 //@Table(name = "prescription")
 //@PrimaryKeyJoinColumn(name = "orderId")
+
 public class Prescription extends Order {
 	
 	public static final long serialVersionUID = 7231L;

@@ -85,7 +85,7 @@
             <artifactId>httpclient</artifactId>
             <version>4.5.12</version>
         </dependency>
-
+        
         <!-- //mvnrepository.com/artifact/org.xhtmlrenderer/flying-saucer-pdf-openpdf -->
         <dependency>
             <groupId>org.xhtmlrenderer</groupId>
@@ -107,6 +107,22 @@
             <artifactId>json</artifactId>
             <version>20210307</version>
         </dependency>
+        
+    <dependency>
+
+        <groupId>org.springframework</groupId>
+
+        <artifactId>spring-webmvc</artifactId>
+
+        <version>5.3.10</version>
+
+    </dependency>
+         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>5.3.10</version>
+        </dependency>
+    
     </dependencies>
     <parent>
         <groupId>com.icare.module</groupId>

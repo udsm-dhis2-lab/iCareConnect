@@ -9,36 +9,28 @@
  */
 package org.openmrs.module.icare.core.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.openmrs.*;
-import org.openmrs.api.*;
-import org.openmrs.api.context.Context;
-import org.openmrs.api.db.PatientDAO;
-import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.module.icare.ICareConfig;
-import org.openmrs.module.icare.auditlog.AuditLog;
-import org.openmrs.module.icare.billing.ItemNotPayableException;
-import org.openmrs.module.icare.billing.models.InvoiceItem;
-import org.openmrs.module.icare.billing.models.ItemPrice;
-import org.openmrs.module.icare.billing.models.Prescription;
-import org.openmrs.module.icare.billing.services.insurance.Claim;
-import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
-import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
-import org.openmrs.module.icare.billing.services.insurance.VerificationException;
-import org.openmrs.module.icare.core.*;
-import org.openmrs.module.icare.core.dao.*;
-import org.openmrs.module.icare.core.models.EncounterPatientProgram;
-import org.openmrs.module.icare.core.models.EncounterPatientState;
-import org.openmrs.module.icare.core.models.PasswordHistory;
-import org.openmrs.module.icare.core.utils.Dhis2EventWrapper;
-import org.openmrs.module.icare.core.utils.PatientWrapper;
-import org.openmrs.module.icare.core.utils.VisitWrapper;
-import org.openmrs.module.icare.report.dhis2.DHIS2Config;
-import org.openmrs.module.icare.store.models.OrderStatus;
-import org.openmrs.module.icare.store.services.StoreService;
-import org.openmrs.validator.ValidateUtil;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -47,18 +39,83 @@ import javax.mail.Authenticator;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.naming.ConfigurationException;
 import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import java.io.*;
-import java.net.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import javax.naming.ConfigurationException;
+
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.openmrs.Concept;
+import org.openmrs.ConceptReferenceTerm;
+import org.openmrs.ConceptSet;
+import org.openmrs.Diagnosis;
+import org.openmrs.Drug;
+import org.openmrs.Encounter;
+import org.openmrs.Location;
+import org.openmrs.Order;
+import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
+import org.openmrs.PatientProgram;
+import org.openmrs.Person;
+import org.openmrs.PersonAttribute;
+import org.openmrs.Privilege;
+import org.openmrs.Program;
+import org.openmrs.ProgramWorkflow;
+import org.openmrs.ProgramWorkflowState;
+import org.openmrs.Role;
+import org.openmrs.User;
+import org.openmrs.Visit;
+import org.openmrs.api.APIException;
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.ConceptService;
+import org.openmrs.api.OrderEntryException;
+import org.openmrs.api.ProgramWorkflowService;
+import org.openmrs.api.UserService;
+import org.openmrs.api.VisitService;
+import org.openmrs.api.context.Context;
+import org.openmrs.api.db.PatientDAO;
+import org.openmrs.api.impl.BaseOpenmrsService;
+import org.openmrs.module.icare.ICareConfig;
+import org.openmrs.module.icare.auditlog.AuditLog;
+import org.openmrs.module.icare.billing.ItemNotPayableException;
+import org.openmrs.module.icare.billing.models.ItemPrice;
+import org.openmrs.module.icare.billing.models.Prescription;
+import org.openmrs.module.icare.billing.services.insurance.Claim;
+import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
+import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
+import org.openmrs.module.icare.billing.services.insurance.VerificationException;
+import org.openmrs.module.icare.core.ICareService;
+import org.openmrs.module.icare.core.Item;
+import org.openmrs.module.icare.core.ListResult;
+import org.openmrs.module.icare.core.Message;
+import org.openmrs.module.icare.core.Pager;
+import org.openmrs.module.icare.core.Summary;
+import org.openmrs.module.icare.core.dao.AuditLogDAO;
+import org.openmrs.module.icare.core.dao.EncounterPatientProgramDAO;
+import org.openmrs.module.icare.core.dao.EncounterPatientStateDAO;
+import org.openmrs.module.icare.core.dao.ICareDao;
+import org.openmrs.module.icare.core.dao.PasswordHistoryDAO;
+import org.openmrs.module.icare.core.dao.PrivilegeDAO;
+import org.openmrs.module.icare.core.dao.ProgramWorkflowDAO;
+import org.openmrs.module.icare.core.dao.RoleDAO;
+import org.openmrs.module.icare.core.models.EncounterPatientProgram;
+import org.openmrs.module.icare.core.models.EncounterPatientState;
+import org.openmrs.module.icare.core.models.PasswordHistory;
+import org.openmrs.module.icare.core.utils.Dhis2EventWrapper;
+import org.openmrs.module.icare.core.utils.PatientWrapper;
+import org.openmrs.module.icare.core.utils.VisitWrapper;
+import org.openmrs.module.icare.prescription.services.NotificationService;
+import org.openmrs.module.icare.report.dhis2.DHIS2Config;
+import org.openmrs.module.icare.store.models.OrderStatus;
+import org.openmrs.module.icare.store.services.StoreService;
+import org.openmrs.validator.ValidateUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 //import org.openmrs.module.reporting.report.Report;
 //import org.springframework.stereotype.Component;
 
@@ -257,9 +314,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		itemPrice.setPaymentType(paymentType);
 		if (itemPrice.getPayable() != null && itemPrice.getPayablePaymentMode() == null) {
 			throw new APIException("Payment mode for payable not provided");
-		} else if (itemPrice.getPayablePaymentMode() != null
-				&& itemPrice.getPayablePaymentMode().getUuid() != null
-				&& conceptService.getConceptByUuid(itemPrice.getPayablePaymentMode().getUuid()) != null) {
+		} else if (itemPrice.getPayablePaymentMode() != null && itemPrice.getPayablePaymentMode().getUuid() != null
+		        && conceptService.getConceptByUuid(itemPrice.getPayablePaymentMode().getUuid()) != null) {
 			Concept payablePaymentMode = conceptService.getConceptByUuid(itemPrice.getPayablePaymentMode().getUuid());
 			itemPrice.setPayablePaymentMode(payablePaymentMode);
 		}
@@ -294,47 +350,69 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		return dao.getConceptStockableItems(search, limit, startIndex, type, stockable);
 	}
 	
-	@Override
-	public Prescription savePrescription(Prescription prescription, String status, String remarks) {
-		if (prescription.getUuid() != null) {
-			Prescription existingPrescription = (Prescription) Context.getOrderService().getOrderByUuid(
-			    prescription.getUuid());
-			if (existingPrescription != null) {
-				if (existingPrescription.getQuantity() != prescription.getQuantity()) {
-					List<OrderStatus> orderStatuses = this.dao.getOrderStatusByOrderUuid(prescription.getUuid());
-					for (OrderStatus orderStatus : orderStatuses) {
-						if (orderStatus.getStatus() == OrderStatus.OrderStatusCode.DISPENSED) {
-							throw new OrderEntryException("Order is already dispensed");
-						}
-					}
-				}
-				existingPrescription.updatePrescription(prescription);
-				
-				dao.updatePrescription(prescription);
-				prescription = existingPrescription;
-			}
-		}
-		
-		if (prescription.getPreviousOrder() != null) {
-			Double quantity = prescription.getQuantity();
-			Prescription previousOrder = (Prescription) Context.getOrderService().getOrderByUuid(
-			    prescription.getPreviousOrder().getUuid());
-			prescription.updatePrescription(previousOrder);
-			prescription.setQuantity(quantity);
-		}
-		AdministrationService administrationService = Context.getAdministrationService();
-		administrationService.setGlobalProperty("validation.disable", "true");
-		ValidateUtil.setDisableValidation(true);
-		prescription = (Prescription) Context.getOrderService().saveOrder(prescription, null);
-		// Set respective sOrderStatustatus
-		if (status != null) {
-			OrderStatus orderStatus = Context.getService(StoreService.class).setDrugOrderStatus(prescription.getUuid(),
-			    status, remarks);
-		}
-		administrationService.setGlobalProperty("validation.disable", "false");
-		return prescription;
-	}
-	
+@Autowired
+private NotificationService notificationService;
+
+@Override
+public Prescription savePrescription(Prescription prescription, String status, String remarks) {
+    Prescription savedPrescription = null;
+    try {
+        if (prescription.getUuid() != null) {
+            Prescription existingPrescription = (Prescription) Context.getOrderService().getOrderByUuid(
+                prescription.getUuid());
+            if (existingPrescription != null) {
+                if (existingPrescription.getQuantity() != prescription.getQuantity()) {
+                    List<OrderStatus> orderStatuses = this.dao.getOrderStatusByOrderUuid(prescription.getUuid());
+                    for (OrderStatus orderStatus : orderStatuses) {
+                        if (orderStatus.getStatus() == OrderStatus.OrderStatusCode.DISPENSED) {
+                            throw new OrderEntryException("Order is already dispensed");
+                        }
+                    }
+                }
+                existingPrescription.updatePrescription(prescription);
+                
+                dao.updatePrescription(prescription);
+                prescription = existingPrescription;
+            }
+        }
+        
+        if (prescription.getPreviousOrder() != null) {
+            Double quantity = prescription.getQuantity();
+            Prescription previousOrder = (Prescription) Context.getOrderService().getOrderByUuid(
+                prescription.getPreviousOrder().getUuid());
+            prescription.updatePrescription(previousOrder);
+            prescription.setQuantity(quantity);
+        }
+        AdministrationService administrationService = Context.getAdministrationService();
+        administrationService.setGlobalProperty("validation.disable", "true");
+        ValidateUtil.setDisableValidation(true);
+        savedPrescription = (Prescription) Context.getOrderService().saveOrder(prescription, null);
+        
+        // Set respective OrderStatus
+        if (status != null) {
+            OrderStatus orderStatus = Context.getService(StoreService.class).setDrugOrderStatus(savedPrescription.getUuid(),
+                status, remarks);
+        }
+        administrationService.setGlobalProperty("validation.disable", "false");
+
+        // Send notification after successful save
+        if (savedPrescription != null) {
+            try {
+                Patient patient = savedPrescription.getPatient();
+                notificationService.sendNotification(patient);
+            } catch (Exception e) {
+                // Log the error but don't throw it to prevent disrupting the main prescription flow
+            System.out.print("Error sending notification" + e);
+            }
+        }
+
+        return savedPrescription;
+    } catch (Exception e) {
+        // If anything fails during the save, ensure validation is re-enabled
+        Context.getAdministrationService().setGlobalProperty("validation.disable", "false");
+        throw e;
+    }
+}
 	@Override
 	public List<Visit> getVisitsByOrderType(String search, String orderTypeUuid, String encounterTypeUuid,
 	        String locationUuid, OrderStatus.OrderStatusCode prescriptionStatus, Order.FulfillerStatus fulfillerStatus,
