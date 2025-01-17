@@ -199,8 +199,9 @@
             <td>
               {{ drugOrder?.orderer?.display }}
             </td>
+<!-- trying to modify the date column to make it more impressive -->
             <td>
-              {{ drugOrder?.dateActivated | date: "medium" }}
+              {{ drugOrder?.dateActivated | date: "short" }}
             </td>
             <td>
               {{ drugOrder?.careSetting?.display }}
