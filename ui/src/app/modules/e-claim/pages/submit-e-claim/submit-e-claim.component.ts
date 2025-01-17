@@ -22,9 +22,10 @@ export class SubmitEClaimComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.patientUuid = params['patientId'];
+      this.loadPatientData();
     });
   }
-  
+
     loadPatientData(): void {
       this.activeVisitDetails$ = this.visitService.getActiveVisit(
         this.patientUuid,
