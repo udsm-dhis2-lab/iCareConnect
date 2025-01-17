@@ -113,13 +113,13 @@ export class ExemptionHomeComponent implements OnInit, OnDestroy {
 
   private determineExemptionCriteria(age: number): string {
     if (age < 5) {
-      return "Under 5"; // Children under 5
+      return "Under 5";
     } else if (age >= 60) {
-      return "Elderly"; // Seniors aged 60 and above
+      return "Elderly";
     } else if (age >= 18 && age <= 25) {
-      return "Student"; // Students (assumed age range: 18-25)
+      return "Student";
     } else {
-      return this.getRandomItem(this.additionalCriteria); // Default additional criteria
+      return this.getRandomItem(this.additionalCriteria);
     }
   }
   
