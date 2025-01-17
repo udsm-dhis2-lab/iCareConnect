@@ -245,6 +245,9 @@ export class PatientHistoryDataComponent implements OnInit {
   }
 
   onPrint(e: any, visitData: any): void {
+    e.preventDefault();
+    visitData.preventDefault();
+
     // console.log("Patient visit", this.visit);
     // console.log("Patient History", this.visitHistory);
     let contents: string;
