@@ -25,10 +25,15 @@
       <mat-date-range-picker #visitDatePicker></mat-date-range-picker>
     </mat-form-field>
   </div>
-  <mat-progress-bar
+ <mat-progress-bar
     mode="indeterminate"
-    *ngIf="!params?.samples && startDate && endDate"
+    *ngIf="isLoading && startDate && endDate"
   ></mat-progress-bar>
+  <div
+    class="row sample-filters d-flex justify-content-left"
+    *ngIf="startDate && endDate"
+  >
+  </div>
   <div
     class="row sample-filters d-flex justify-content-left"
     *ngIf="startDate && endDate"
