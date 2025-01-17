@@ -1,5 +1,6 @@
-import { Component, OnInit } from "@angular/core";
-import { Store } from "@ngrx/store";
+// Importing necessary modules, components, and actions
+import { Component, OnInit } from "@angular/core"; // Provides Angular component and lifecycle hook functionality.
+import { Store } from "@ngrx/store"; // Used to interact with the NgRx state management store.
 import {
   clearDrugOrdersStore,
   clearLabOrders,
@@ -12,9 +13,9 @@ import { AppState } from "../../../store/reducers";
 import { ICAREApp, ICARE_APPS } from "./modules.constants";
 
 import { map, filter } from "lodash";
-import { debounce } from "lodash";
 import { Observable } from "rxjs";
 import { getCurrentLocation } from "../../../store/selectors";
+import { debounce } from "lodash";
 import { clearBillItems } from "../../../store/actions/bill-item.actions";
 import { clearBills } from "../../../store/actions/bill.actions";
 import { clearDiagnosis } from "../../../store/actions/diagnosis.actions";
