@@ -480,3 +480,40 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
     }, 500);
   }
 }
+
+
+// Helper to simplify the print button condition
+shouldShowPrintButton(params: any, drugOrders: any[]): boolean {
+  return (
+    params?.specificDrugConceptUuid &&
+    params?.prescriptionArrangementFields &&
+    drugOrders?.length > 0 &&
+    params?.facilityDetails &&
+    params?.currentUser &&
+    params?.logo
+  );
+}
+
+// adding functionality to make it be able to group the dates together where the implemented method will assign specific date instead of the way it looks
+
+getDrugName(drugOrder: any, params: any): string {
+  if (!params?.specificDrugConceptUuid || !drugOrder?.obs) {
+    return "-";
+  }
+  return drugOrder.obs[params.specificDrugConceptUuid]?.comment || "-";
+}
+
+getDrugInstructions(drugOrder: any, params: any): string {
+  if (!params?.prescriptionArrangementFields || !drugOrder?.obs) {
+    return "-";
+  }
+  const instructions = [];
+  for (const key of ["2", "3", "4", "5", "6"]) {
+    const fieldUuid = params.prescriptionArrangementFields[key]?.uuid;
+    const value = drugOrder.obs[fieldUuid]?.value;
+    if (value) {
+      instructions.push(value?.display || value);
+    }
+  }
+  return instructions.join(" ") || "-";
+}
