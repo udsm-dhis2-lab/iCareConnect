@@ -166,6 +166,8 @@ export class PatientHistoryComponent implements OnInit {
                   ];
                 });
               });
+                   // Add service records
+          const serviceRecords = visit?.visit?.services || []; // Example service records
               return {
                 visit: visit?.visit,
                 obs: obs,
