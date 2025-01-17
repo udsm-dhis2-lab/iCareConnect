@@ -48,7 +48,6 @@ export class PatientHistoryComponent implements OnInit {
   @Input() patient: any;
   @Input() location: any;
   saving: boolean = false;
-
   formData: any;
   visits$: Observable<any>;
   customForms$: Observable<any>;
@@ -59,23 +58,11 @@ export class PatientHistoryComponent implements OnInit {
   allForms$: Observable<any>;
   loadingData: boolean = false;
   facilityDetails$: Observable<any>;
-  currentUser$: Observable<{
-    userPrivileges: any;
-    links?: { rel?: string; uri?: string }[];
-    uuid?: string;
-    display?: string;
-    username?: string;
-    systemId?: string;
-    userProperties?: object;
-
-    // person?: PersonGetRef;
-    // privileges?: PrivilegeGetRef[];
-    // roles?: RoleGetRef[];
-    provider?: { uuid?: string; display?: string };
-  }>;
+  currentUser$: Observable<any>;
   provider$: Observable<any>;
 
   doctorsIPDRoundForm$: Observable<any>;
+
   constructor(
     private visitsService: VisitsService,
     private store: Store<AppState>,
@@ -84,7 +71,15 @@ export class PatientHistoryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initForm();
     this.loadData();
+  }
+
+  private initForm(): void {
+    // Initialize the form with necessary fields and validators
+    this.form = new FormGroup({
+      fieldName: new FormControl('', Validators.required), // example field
+    });
   }
 
   private loadData(): void {
@@ -93,10 +88,13 @@ export class PatientHistoryComponent implements OnInit {
     this.facilityDetails$ = this.store.select(getParentLocation);
     this.currentUser$ = this.store.select(getCurrentUserDetails);
     this.provider$ = this.store.select(getProviderDetails);
+
+    // Fetch system settings for prescription types
     this.generalPrescriptionOrderType$ =
       this.systemSettingsService.getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.orderType"
       );
+
     this.prescriptionArrangementFields$ = this.systemSettingsService
       .getSystemSettingsByKey("iCare.clinic.prescription.arrangement")
       .pipe(
@@ -122,6 +120,7 @@ export class PatientHistoryComponent implements OnInit {
           };
         })
       );
+
     this.specificDrugConceptUuid$ = this.systemSettingsService
       .getSystemSettingsByKey(
         "iCare.clinic.genericPrescription.specificDrugConceptUuid"
@@ -142,16 +141,17 @@ export class PatientHistoryComponent implements OnInit {
           }
         })
       );
+
     this.visits$ = this.visitsService
       .getAllPatientVisits(this.patient?.uuid, true)
       .pipe(
         map((response) => {
           this.loadingData = false;
-          console.log('Fetched visits:',response);
+          console.log('Fetched visits:', response); // Debugging
           if (!response?.error) {
             return response?.map((visit) => {
               let obs = [];
-              visit?.visit?.encounters.forEach((encounter) => {
+              visit?.visit?.encounters?.forEach((encounter) => {
                 (encounter?.obs || []).forEach((observation) => {
                   obs = [
                     ...obs,
@@ -166,12 +166,17 @@ export class PatientHistoryComponent implements OnInit {
                   ];
                 });
               });
+
+              // Add service records
+              const serviceRecords = visit?.visit?.services || []; // Example service records
+
               return {
                 visit: visit?.visit,
-                notes: visit?.visit?.notes || "No notes available", //Add visit notes
+                notes: visit?.visit?.notes || "No notes available", // Add visit notes
                 obs: obs,
+                serviceRecords: serviceRecords,
                 orders: [
-                  ...visit?.visit?.encounters.map((encounter) => {
+                  ...visit?.visit?.encounters?.map((encounter) => {
                     return (encounter?.orders || []).map((order) => {
                       return {
                         ...order,
@@ -188,24 +193,7 @@ export class PatientHistoryComponent implements OnInit {
           }
         })
       );
-
-    // this.getIPDRoundDoctorsForm();
   }
-
-  // getIPDRoundDoctorsForm(): void {
-  //   this.systemSettingsService
-  //     .getSystemSettingsByKey("iCare.forms.doctorsIPDRound.uuid")
-  //     .subscribe((doctorsIPDRoundFormUuid: string) => {
-  //       if (doctorsIPDRoundFormUuid) {
-  //         this.store.dispatch(
-  //           loadCustomOpenMRSForm({ formUuid: doctorsIPDRoundFormUuid })
-  //         );
-  //         this.doctorsIPDRoundForm$ = this.store.select(
-  //           getCustomOpenMRSFormById(doctorsIPDRoundFormUuid)
-  //         );
-  //       }
-  //     });
-  // }
 
   onDoctorsIPDRoundCommentsFormUpdate(formValue: FormValue): void {
     console.log(formValue.getValues());
@@ -220,7 +208,8 @@ export class PatientHistoryComponent implements OnInit {
         value: this.formData[key]?.value,
       };
     });
-    let encounterObject = {
+
+    const encounterObject = {
       patient: this.patient?.uuid,
       encounterType: form?.encounterType?.uuid,
       location: this.location?.uuid,
@@ -241,7 +230,7 @@ export class PatientHistoryComponent implements OnInit {
       .saveEncounterWithObsDetails(encounterObject)
       .subscribe((res) => {
         if (res) {
-          this.loadData();
+          this.loadData(); // Reload data after saving
         }
       });
   }
