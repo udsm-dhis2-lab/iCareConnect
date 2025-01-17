@@ -183,7 +183,7 @@ export class OrderResultsRendererComponent implements OnInit {
 
   onDeleteTest(e: Event, labOrder): void {
     e.stopPropagation();
-    // this.store.dispatch(deleteLabOrder({ uuid: labOrder?.uuid }));
+    this.store.dispatch(deleteLabOrder({ uuid: labOrder?.uuid }));
     const confirmDialog = this.dialog.open(SharedConfirmationComponent, {
       minWidth: "25%",
       data: {
@@ -203,6 +203,9 @@ export class OrderResultsRendererComponent implements OnInit {
           })
           .subscribe((response) => {
             if (!response?.error) {
+              this.labOrdersResultsInformation = this.labOrdersResultsInformation.filter(
+                (order) => order.uuid !== labOrder.uuid
+              );
               this.reloadOrderComponent.emit();
             }
             if (response?.error) {

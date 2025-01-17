@@ -36,7 +36,7 @@
           *ngIf="
             testSetMembersKeyedByConceptUuid[labTest?.concept?.uuid] &&
             testSetMembersKeyedByConceptUuid[labTest?.concept?.uuid]['members']
-              .length > 0
+              .length > 0 && !labTest?.voided
           "
         >
           <tr *ngIf="!labTest?.voided">
@@ -100,13 +100,13 @@
                   />
                   <span>More details</span>
                 </button>
-                <!-- <button
+                <button
                     mat-menu-item
                     (click)="onDeleteTest($event, labTest)"
                   >
                     <mat-icon>delete</mat-icon>
                     <span>Delete</span>
-                  </button> -->
+                  </button>
               </mat-menu>
             </td>
           </tr>
@@ -160,10 +160,10 @@
           *ngIf="
             testSetMembersKeyedByConceptUuid[labTest?.concept?.uuid] &&
             testSetMembersKeyedByConceptUuid[labTest?.concept?.uuid]['members']
-              .length === 0
+              .length === 0 && !labTest?.voided
           "
         >
-          <tr *ngIf="!labTest?.voided">
+          <tr *ngIf="!labTest?.voided || !labTest?.delete">
             <td>
               {{ count + 1 }}
             </td>
@@ -226,13 +226,13 @@
                   />
                   <span>More details</span>
                 </button>
-                <!-- <button
+                <button
                     mat-menu-item
                     (click)="onDeleteTest($event, labTest)"
                   >
                     <mat-icon>delete</mat-icon>
                     <span>Delete</span>
-                  </button> -->
+                  </button>
               </mat-menu>
             </td>
           </tr>
