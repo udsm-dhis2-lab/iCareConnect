@@ -741,15 +741,21 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
            </thead>
            <tbody>`);
 
-          visitData?.obs?.forEach((ob) => {
-            frameDoc.document.write(`<tr><td> ${ob?.concept?.display} </td><td> 
-            ${ob?.value?.display ? ob?.value?.display : ob?.value}
-              </td></tr>`);
+         // .............Snippet to process observation..............
+        if (visitData?.obs?.length > 0) {
+          visitData.obs.forEach((ob) => {
+            frameDoc.document.write(`<tr><td>${ob?.concept?.display || 'N/A'}</td><td>
+                                     ${ob?.value?.display || ob?.value || 'N/A'}
+                                     </td></tr>`);
           });
+        } else {
+          frameDoc.document.write(`<tr><td colspan="2">No Observations Found</td></tr>`);
         }
-      });
-    }
 
+        frameDoc.document.write(`</tbody></table>`);
+      }
+    });
+  }
     // this.visitHistory?.visitOrderedData?.forEach((visitData) => {
     //   if (visitData?.category === "OBSERVATIONS") {
     //     frameDoc.document.write(`<tr`);
