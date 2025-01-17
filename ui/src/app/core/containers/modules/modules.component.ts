@@ -46,27 +46,6 @@ export class ModulesComponent implements OnInit {
     this.store.dispatch(loadRolesDetails());
     this.searchModules();
 
-<<<<<<< HEAD
-    this.currentLocation$.subscribe((resp) => {
-      let assignedApps = this.apps.filter((item: any) => {
-        return (
-          (
-            filter(resp?.attributes, (attribute) => {
-              return (
-                attribute?.value?.toLowerCase() == item?.id?.toLowerCase() &&
-                !attribute?.voided
-              );
-            }) || []
-          )?.length > 0 && item["id"]?.toLowerCase()?.includes("")
-        );
-      });
-
-      if (assignedApps.length > 0 && assignedApps[0].path) {
-        // NB: Navigation has to be moved to module selector
-        this.navigateToApp(assignedApps[0].path);
-      }
-    });
-=======
     this.currentLocation$.pipe(take(1)).subscribe(
       (location) => {
         if (location?.attributes) {
@@ -78,7 +57,6 @@ export class ModulesComponent implements OnInit {
       },
       (error) => this.handleError("Error fetching current location.", error)
     );
->>>>>>> d48d116749576c4557a7bf4f7f1559beb4c5c65c
   }
 
   private filterAppsByLocation(attributes: any[]): void {
@@ -91,14 +69,6 @@ export class ModulesComponent implements OnInit {
         )
       );
 
-<<<<<<< HEAD
-      /**
-       * Navigation has been moved to module selector
-       */
-         this.store.dispatch(
-         go({ path: [basePath], extras: { queryParams: formattedParam } })
-       );
-=======
       if (assignedApps.length > 0) {
         const defaultApp = assignedApps[0];
         this.appsByLocation = assignedApps;
@@ -116,29 +86,40 @@ export class ModulesComponent implements OnInit {
       this.handleError("Error filtering applications.", error);
     } finally {
       this.loading = false;
->>>>>>> d48d116749576c4557a7bf4f7f1559beb4c5c65c
     }
   }
-
   navigateToApp(path: string): void {
-    if (!path) {
-      this.handleError("Invalid path: Navigation aborted.");
-      return;
+    if (!path || typeof path !== "string") {
+        this.handleError("Invalid path provided: Navigation aborted.");
+        return;
     }
 
     try {
-      this.clearAllStoreData();
+        // Clear all stored data
+        this.clearAllStoreData();
 
-      const [basePath, queryString] = path.split("?");
-      const queryParams = this.parseQueryParams(queryString);
+        // Separate base path and query string
+        const [basePath, queryString] = path.split("?");
+        if (!basePath) {
+            throw new Error("Base path is missing in the navigation path.");
+        }
 
-      this.store.dispatch(
-        go({ path: [basePath], extras: { queryParams } })
-      );
+        // Parse query parameters
+        const queryParams = queryString ? this.parseQueryParams(queryString) : null;
+
+        // Dispatch navigation action
+        this.store.dispatch(
+            go({
+                path: [basePath],
+                extras: { queryParams },
+            })
+        );
     } catch (error) {
-      this.handleError("Error during navigation.", error);
+        // Handle any unexpected errors during navigation
+        this.handleError("An error occurred during navigation.", error);
     }
-  }
+}
+
 
   private clearAllStoreData(): void {
     this.store.dispatch(clearBillItems());
