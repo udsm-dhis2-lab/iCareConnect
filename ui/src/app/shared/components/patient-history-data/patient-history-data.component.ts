@@ -609,6 +609,7 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
 
     frameDoc.document.write(`</tbody></table>`);
 
+
     // -------------------Procedure orders-------------
     if (
       this.visitHistory?.visitOrderedData?.find(
@@ -630,6 +631,53 @@ ${this.visitHistory?.visitStopDateTime?.date} at ${this.visitHistory?.visitStopD
            </thead>
            <tbody>`);
     }
+
+     // Visit note.....
+
+
+     this.visitHistory?.visitOrderedData?.forEach((visitData) => {
+      if (visitData?.category === "OBSERVATIONS") {
+        frameDoc.document.write(`
+<tr><td>
+      ${visitData?.concept?.display}
+      </td>
+      <td>  ${visitData?.provider} on 
+      ${visitData?.date} ${visitData?.time}
+      </td> <td>
+      `);
+        if (visitData?.results?.length > 0) {
+          visitData?.results?.forEach((result) => {
+            if (!result?.value?.links?.uri) {
+              frameDoc.document.write(` ${result?.concept?.display} - 
+                          ${
+                            result?.value?.display
+                              ? result?.value?.display
+                              : result?.value
+                          }, &nbsp;&nbsp;
+    `);
+            }
+          });
+        } else if (!visitData?.results?.length) {
+          frameDoc.document.write(` Not Attended
+    `);
+        }
+        frameDoc.document.write(`</td>`);
+        frameDoc.document.write(`
+      <td>${
+        visitData?.results[0]?.provider?.display?.split("-")[1]
+          ? visitData?.results[0]?.provider?.display?.split("-")[1] + "on"
+          : "-"
+      } ${
+          visitData?.results[0]?.obsDatetime
+            ? formatDateToString(new Date(visitData?.results[0]?.obsDatetime))
+            : "-"
+        } 
+        </td>
+</tr>`);
+      }
+    }); 
+
+    //end of visit note
     this.visitHistory?.visitOrderedData?.forEach((visitData) => {
       if (visitData?.category === "PROCEDURE_ORDER") {
         frameDoc.document.write(`
