@@ -187,13 +187,12 @@ export class PatientHistoryDataComponent implements OnInit {
     this.labOrders = visit.labOrders.map((order) => {
       return {
         ...order,
-        results: this.visit?.obs
-          ?.filter((ob) => {
-            if (order?.uuid == ob?.order?.uuid) {
-              return ob;
-            }
-          })
-          ?.filter((ob) => ob),
+          results: this.visit?.obs
+              ?.filter((ob) => order?.uuid === ob?.order?.uuid) // Match observations with the order's UUID
+              ?.map((ob) => ({
+                  ...ob,
+                  provider: ob?.fedBy || ob?.provider, // Prefer technician (fedBy) over doctor (provider)
+              })),
       };
     });
     this.radiologyOrders = visit.radiologyOrders.map((order) => {
