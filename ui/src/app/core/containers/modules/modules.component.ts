@@ -8,24 +8,24 @@ import {
   clearStockMetrics,
   go,
   loadRolesDetails,
-} from "../../../store/actions"; // Importing specific actions to manage state updates.
-import { AppState } from "../../../store/reducers"; // Defines the structure of the application state.
-import { ICAREApp, ICARE_APPS } from "./modules.constants"; // Importing constants and interface definitions for the application modules.
+} from "../../../store/actions";
+import { AppState } from "../../../store/reducers";
+import { ICAREApp, ICARE_APPS } from "./modules.constants";
 
-import { map, filter, } from "lodash"; // Importing utility functions for data manipulation.
+import { map, filter } from "lodash";
+import { Observable } from "rxjs";
+import { getCurrentLocation } from "../../../store/selectors";
 import { debounce } from "lodash";
-import { Observable } from "rxjs"; // Importing RxJS Observable for handling asynchronous data streams.
-import { getCurrentLocation } from "../../../store/selectors"; // Selector to fetch the current location from the state.
-import { clearBillItems } from "../../../store/actions/bill-item.actions"; // Clearing bill item-related data from the store.
-import { clearBills } from "../../../store/actions/bill.actions"; // Clearing bill-related data from the store.
-import { clearDiagnosis } from "../../../store/actions/diagnosis.actions"; // Clearing diagnosis-related data from the store.
-import { clearObservations } from "../../../store/actions/observation.actions"; // Clearing observation-related data from the store.
-import { clearPayments } from "../../../store/actions/payment.actions"; // Clearing payment-related data from the store.
-import { clearVisits } from "../../../store/actions/visit.actions"; // Clearing visit-related data from the store.
-import { clearSamples } from "src/app/modules/laboratory/store/actions"; // Clearing lab sample-related data.
-import { clearStockData } from "src/app/store/actions/stock.actions"; // Clearing stock-related data from the store.
-import { Router } from "@angular/router"; // Angular Router for navigating between routes.
-import { take } from "rxjs/operators"; // Importing RxJS operator for controlling observable emissions.
+import { clearBillItems } from "../../../store/actions/bill-item.actions";
+import { clearBills } from "../../../store/actions/bill.actions";
+import { clearDiagnosis } from "../../../store/actions/diagnosis.actions";
+import { clearObservations } from "../../../store/actions/observation.actions";
+import { clearPayments } from "../../../store/actions/payment.actions";
+import { clearVisits } from "../../../store/actions/visit.actions";
+import { clearSamples } from "src/app/modules/laboratory/store/actions";
+import { clearStockData } from "src/app/store/actions/stock.actions";
+import { Router } from "@angular/router";
+import { take } from "rxjs/operators";
 
 @Component({
   selector: "app-modules",
