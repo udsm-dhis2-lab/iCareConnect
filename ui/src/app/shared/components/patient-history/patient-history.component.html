@@ -13,9 +13,12 @@
     provider: provider$ | async
   } as params"
 >
+  <!-- Loading Indicator -->
   <div *ngIf="!params?.visits?.length && loadingData || !params?.provider">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>
+
+  <!-- Visits Display -->
   <div *ngIf="params?.visits?.length && !loadingData && params?.provider">
     <mat-vertical-stepper [linear]="false" #stepper>
       <mat-step *ngFor="let visit of params?.visits">
@@ -26,16 +29,18 @@
             to {{ visit?.visit?.stopDatetime | date: "dd-MM-yyyy HH:mm:ss" }}
           </span>
           <span *ngIf="!visit?.visit?.stopDatetime">
-            <i>(On going visit)</i>
+            <i>(On-going visit)</i>
           </span>
         </ng-template>
 
-        <!-- <div *ngFor="let form of params?.customForms">
+        <!-- Visit Notes Section -->
+        <div class="visit-notes">
+          <strong>Visit Notes:</strong>
+          <p>{{ visit?.notes || "No notes available" }}</p>
+        </div>
+        <!-- End of Visit Notes Section -->
 
-  <div>{{ form.name }}</div>
-
-</div> -->
-
+        <!-- Patient History Data -->
         <app-patient-history-data
           [visit]="visit"
           [forms]="params?.customForms"
@@ -49,8 +54,7 @@
           [specificDrugConceptUuid]="params?.specificDrugConceptUuid"
         ></app-patient-history-data>
 
-        
-        
+        <!-- Capture Form Data -->
         <app-capture-form-data
           *ngIf="params?.doctorsIPDRoundForm"
           [form]="params?.doctorsIPDRoundForm"
@@ -59,37 +63,19 @@
           (formDataUpdate)="onDoctorsIPDRoundCommentsFormUpdate($event)"
         ></app-capture-form-data>
 
-
+        <!-- Saved Form Data (Optional Display) -->
         <ng-container *ngIf="savedFormData">
           <p>Saved Form Data: {{ savedFormData | json }}</p>
         </ng-container>
-        
-        <div class="mt-2 w-100 d-flex justify-content-end">
-          <!-- <button
-            mat-flat-button
-            color="primary"
-            (click)="onSave($event, params?.doctorsIPDRoundForm,params?.provider, visit)"
-          >
-            Save
-          </button> -->
-        </div>
 
-        
+        <div class="mt-2 w-100 d-flex justify-content-end">
+          <!-- Optional Save Button -->
+        </div>
       </mat-step>
     </mat-vertical-stepper>
-    <!-- <div class="history overflow-auto">
-        <ng-container *ngFor="let visit of params?.visits">
-          <app-patient-history-data 
-            
-            [visit]="visit" 
-            [forms]="params?.customForms" 
-            [generalPrescriptionOrderType]="params?.generalPrescriptionOrderType"
-            [prescriptionArrangementFields]="params?.prescriptionArrangementFields"
-            [specificDrugConceptUuid]="params?.specificDrugConceptUuid"
-            ></app-patient-history-data>
-        </ng-container>
-      </div> -->
   </div>
+
+  <!-- No Visits Found Message -->
   <div *ngIf="!params?.visits?.length && !loadingData">
     <h4 class="text-center">
       {{
