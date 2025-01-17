@@ -80,7 +80,9 @@ export class PatientListComponent implements OnInit, OnChanges {
     private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
-  ngOnChanges() {}
+  ngOnChanges() {
+    console.log('Change detected in component!');
+  }
 
   ngOnInit() {
     if (this.isDischarge === undefined) {
@@ -93,6 +95,7 @@ export class PatientListComponent implements OnInit, OnChanges {
       .pipe(
         tap((response: any) => {
           this.loadingPatients = false;
+          console.log('Patient Data:', response);
           if (response?.error) {
             this.errors = [...this.errors, response?.error];
           }
@@ -110,6 +113,7 @@ export class PatientListComponent implements OnInit, OnChanges {
 
 
   private getVisits(visits: Visit[]) {
+    console.log('Response:', Response);
     this.loadingPatients = true;
     // this.service = "LABS";
 
@@ -273,9 +277,12 @@ export class PatientListComponent implements OnInit, OnChanges {
     const currentUrl = this.router.url.split("?")[0];
     const params = this.router.url.split("?")[1];
     this.isTabularList = type === "tabular" ? true : false;
+    console.log('Toggling Patient List to:', type);
+    console.log('Updated isTabularList:', this.isTabularList);
     this.store.dispatch(
       go({ path: [currentUrl], query: { queryParams: { list: type } } })
     );
+    console.log('Updated URL after dispatch:', this.router.url);
   }
 
   getPaymentTypeSelected(event: any) {
