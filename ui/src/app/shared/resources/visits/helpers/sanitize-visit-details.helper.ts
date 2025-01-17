@@ -14,9 +14,10 @@ export function getOrdersFromCurrentVisitEncounters(
     orders = [
       ...orders,
       ..._.map(
+        //Added a check to see if order is voided or no
         encounter?.orders?.filter(
           (order) =>
-            !order.voided &&
+            !order.voided&&
             (order?.orderType?.display?.toLowerCase() === "procedure order" ||
               order?.orderType?.display?.toLowerCase() === "radiology order")
         ) || [],
