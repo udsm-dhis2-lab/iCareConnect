@@ -19,8 +19,9 @@
       mode="indeterminate"
     ></mat-progress-bar>
     
-    <!-- Patient list -->
+    <!-- This div is conditionally displayed if visitsLength is greater than 0 -->
     <div *ngIf="visitsLength > 0" class="mat-elevation-z1">
+      <!-- The app-table component is used to display the visit data in a table format -->
       <app-table
         [columns]="billingColumns"
         [loading]="loadingVisits"
