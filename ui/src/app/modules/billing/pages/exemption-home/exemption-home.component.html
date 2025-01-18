@@ -10,10 +10,12 @@
         <mat-icon>arrow_back</mat-icon>
       </button>
       <button class="ml-4 bg-primary btn text-white rounded-pill" (click)="getExemptionVisits()"><span >Exemption</span></button>
+       <!-- Button to trigger fetching of granted exemptions -->
       <button class="ml-4 bg-success btn text-white rounded-pill" (click)="getGrantedExemptions()"><span >Granted</span></button>
+       <!-- Button to trigger fetching of denied exemptions -->
       <button class="ml-4 bg-danger btn text-white rounded-pill" (click)="getDeniedExemptions()"><span >Denial</span></button>
     </mat-toolbar>
-    
+   
     <!-- Progress bar -->
     <mat-progress-bar
       *ngIf="loading || !params?.exemptionOrderType"
