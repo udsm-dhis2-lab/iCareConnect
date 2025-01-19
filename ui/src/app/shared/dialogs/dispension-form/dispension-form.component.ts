@@ -30,7 +30,7 @@ import { DrugsService } from "../../resources/drugs/services/drugs.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { VisitsService } from "../../resources/visits/services";
 import { LocationService } from "src/app/core/services";
-import { map, tap } from "rxjs/operators";
+import { map, tap, filter } from "rxjs/operators";
 import { ConceptGet } from "../../resources/openmrs";
 import { SharedConfirmationDialogComponent } from "../../components/shared-confirmation-dialog/shared-confirmation-dialog.component";
 import { ItemPriceService } from "../../services/item-price.service";
@@ -146,10 +146,16 @@ export class DispensingFormComponent implements OnInit {
 
   ngOnInit() {
     this.getVisitByUuid(this.data?.visit?.uuid);
+
     this.previousVisit$ = this.visitService
       .getLastPatientVisit(this.data?.patientUuid, false)
       .pipe(
-        map((response) => (response?.length > 0 ? response[0]?.visit : {}))
+        map((response) =>
+          response?.length > 0
+            ? response[0]?.visit &&
+              console.log(`Last Patient Visit: ${response[0]?.visit}`)
+            : {}
+        )
       );
     this.drugOrder = this.data?.drugOrder;
     this.dispensingLocations$ = this.locationService
@@ -333,6 +339,7 @@ export class DispensingFormComponent implements OnInit {
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
     this.currentVisit$ = this.store.pipe(select(getActiveVisit));
+
     this.provider$ = this.store.select(getProviderDetails);
 
     this.drugOrderConceptDetails$ = this.data?.drugOrder
@@ -426,16 +433,19 @@ export class DispensingFormComponent implements OnInit {
   }
 
   getVisitByUuid(uuid: string): void {
-    this.intermediateVisit$ = this.visitService
+    this.visitService
       .getVisitDetailsByVisitUuid(uuid, {
         v: "custom:(uuid,display,patient,encounters:(uuid,display,obs,orders),attributes)",
       })
       .pipe(
         map((response) => {
-          return response;
+          console.log("Here are the visits by Uuid:", response);
+          return response; 
         })
-      );
+      )
+      .subscribe();
   }
+  
 
   onUpdateOrder(
     e: Event,
@@ -445,6 +455,9 @@ export class DispensingFormComponent implements OnInit {
     if (e) {
       e.stopPropagation();
     }
+
+    // check if the drug uuid is present in the visits orders from the current visits
+
     this.dialog
       .open(SharedConfirmationDialogComponent, {
         width: "20%",
