@@ -617,7 +617,7 @@ export class DispensingFormComponent implements OnInit {
                         detail: errorResponse?.error || "",
                       },
                     },
-                  ];
+                  ]; 
                 } else {
                   this.errors = [
                     ...this.errors,
