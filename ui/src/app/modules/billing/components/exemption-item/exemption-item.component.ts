@@ -140,6 +140,11 @@ export class ExemptionItemComponent implements OnInit {
     };
 
     if (this.exemptionDetails?.exemptionType?.value === "FULL_EXEMPTION") {
+      //update is full exempted
+      this.exemptionDetails = {
+        ...this.exemptionDetails,
+        isFullExempted: true,
+      };
       const billItemObjects = this.billItems
         .map((item) => item.toJson())
         .map((itemObject) => ({
@@ -164,6 +169,7 @@ export class ExemptionItemComponent implements OnInit {
           },
         };
       });
+
     }
   }
 

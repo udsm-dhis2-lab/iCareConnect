@@ -103,6 +103,7 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
     // });
     this.samplesToCollect$.subscribe((data) => {
       if (data) {
+        console.log("sample collected -----",data)
         this.samplesToCollect.emit(data?.length);
       }
     });
