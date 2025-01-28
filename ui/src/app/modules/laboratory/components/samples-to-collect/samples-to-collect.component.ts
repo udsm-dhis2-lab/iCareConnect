@@ -20,7 +20,7 @@ import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import { ConceptCreateFull } from "src/app/shared/resources/openmrs";
 import { SampleObject } from "../../resources/models";
-import { getPatientPendingBillStatus } from "src/app/store/selectors/bill.selectors";
+import { getActiveVisitPendingVisitServiceBillStatus, getPatientPendingBillStatus } from "src/app/store/selectors/bill.selectors";
 import { collectSample } from "src/app/store/actions";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { BarCodeModalComponent } from "../../../../shared/dialogs/bar-code-modal/bar-code-modal.component";
@@ -28,6 +28,7 @@ import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { MatDialog } from "@angular/material/dialog";
 import { LabOrdersService } from "../../resources/services/lab-orders.service";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
+import { getPatientsSamplesToCollect } from "src/app/store/selectors/new-lab-samples.selectors";
 
 @Component({
   selector: "app-samples-to-collect",
@@ -76,13 +77,13 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
       select(getPatientPendingBillStatus)
     );
 
+
     _.each(this.payments, (payment) => {
       _.each(payment?.items, (item) => {
         this.paidItems[item?.name] = item;
         this.paidItems[item?.paymentItem?.order?.uuid] = item;
       });
     });
-
     this.store.dispatch(
       loadSamplesByVisit({
         visitUuid: this.visit?.uuid,
@@ -96,14 +97,17 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
         visit: this.visit,
       })
     );
-    this.samplesToCollect$ = this.store.select(getSamplesToCollect);
 
+    this.samplesToCollect$ = this.store.select(getSamplesToCollect);
+    console.log("patient uuid......",this.patient.personUuid)
+    console.log("patient visit ...",this.visit)
     // this.samplesToCollect$ = this.store.select(getPatientsSamplesToCollect, {
     //   patient_uuid: this.patient.personUuid,
     // });
+
     this.samplesToCollect$.subscribe((data) => {
       if (data) {
-        console.log("sample collected -----",data)
+        console.log("sample collected -----",data);
         this.samplesToCollect.emit(data?.length);
       }
     });

@@ -146,12 +146,12 @@
               [attr.rowspan]="specimenSourceWithOrders?.orders?.length"
             >
               <button
-                [disabled]="
-                  !specimenSourceWithOrders?.atLeastOnePaid &&
-                  !specimenSourceWithOrders?.isAdmitted &&
-                  !specimenSourceWithOrders?.isEmergency &&
-                  !specimenSourceWithOrders?.isEnsured
-                "
+              [disabled]="
+              !(specimenSourceWithOrders?.atLeastOnePaid ||
+                specimenSourceWithOrders?.isAdmitted ||
+                specimenSourceWithOrders?.isEmergency ||
+                specimenSourceWithOrders?.isEnsured)
+            "
                 (click)="
                   generateSampleId(
                     $event,

@@ -51,7 +51,8 @@ export class ExemptionItemComponent implements OnInit {
   ngOnInit(): void {
     this.billItems = this.bill?.items;
     this.exemptionDetails = {};
-
+    console.log("Bill checked",this.bill)
+    
     this.criteriaObject = {
       id: this.criteria["display"],
       key: this.criteria["display"],

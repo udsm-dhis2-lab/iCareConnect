@@ -214,6 +214,7 @@ export class SamplesService {
         let collectedSamples = [];
         samples && samples?.length > 0
           ? _.each(samples, (sample) => {
+           
               this.api.concept
                 .getConcept(sample?.concept?.uuid)
                 .then((response) => {

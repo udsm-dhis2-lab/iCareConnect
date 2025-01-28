@@ -103,7 +103,7 @@
         (click)="onConfirmExemption($event)"
         mat-flat-button
         color="primary"
-        [disabled]="bill?.discounted"
+        [disabled]="item?.discounted"
       >
         {{ bill.confirming ? "Confirming Exemption..." : "Confirm Exemption" }}
       </button>
