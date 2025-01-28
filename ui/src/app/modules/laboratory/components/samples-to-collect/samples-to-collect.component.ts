@@ -69,20 +69,25 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
     private ordersService: OrdersService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.samplesToCollect$.subscribe((sample)=>{
+      console.log("samplesToCollect.........................",sample);
+    })
+  }
 
   ngOnChanges() {
     this.patientHasPendingBills$ = this.store.pipe(
       select(getPatientPendingBillStatus)
     );
 
+    
     _.each(this.payments, (payment) => {
       _.each(payment?.items, (item) => {
         this.paidItems[item?.name] = item;
         this.paidItems[item?.paymentItem?.order?.uuid] = item;
       });
     });
-
+    console.log(this.payments)
     this.store.dispatch(
       loadSamplesByVisit({
         visitUuid: this.visit?.uuid,
@@ -98,12 +103,15 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
     );
     this.samplesToCollect$ = this.store.select(getSamplesToCollect);
 
+    
+
     // this.samplesToCollect$ = this.store.select(getPatientsSamplesToCollect, {
     //   patient_uuid: this.patient.personUuid,
     // });
     this.samplesToCollect$.subscribe((data) => {
       if (data) {
         this.samplesToCollect.emit(data?.length);
+        console.log(data)
       }
     });
     this.labSamplesLoadingState$ = this.store.select(getLabSamplesLoadingState);
@@ -176,6 +184,7 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
         encounter: order?.encounterUuid,
       };
     });
+    
     this.updateLabOrderResponse$ =
       this.labOrdersService.updateLabOrders(orders);
 
