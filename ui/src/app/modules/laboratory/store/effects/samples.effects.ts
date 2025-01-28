@@ -292,6 +292,7 @@ export class SamplesEffects {
                   });
                   sample["orders"] = formattedOrders;
                   // console.log("formattedOrders",action.paidItems)
+                  
                   console.log("formattedOrders ...paidItems..",formattedOrders)
                   samplesToCollect = [
                     ...samplesToCollect,

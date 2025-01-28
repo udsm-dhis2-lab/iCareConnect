@@ -9,7 +9,7 @@ import {
 import { select, Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { loadSamplesByVisit } from "../../store/actions";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import {
   getLabSamplesLoadingState,
   getSamplesToCollect,
@@ -29,6 +29,9 @@ import { MatDialog } from "@angular/material/dialog";
 import { LabOrdersService } from "../../resources/services/lab-orders.service";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
 import { getPatientsSamplesToCollect } from "src/app/store/selectors/new-lab-samples.selectors";
+import { BillingService } from "src/app/modules/billing/services/billing.service";
+import { map, tap } from "rxjs/operators";
+import { Bill } from "src/app/modules/billing/models/bill.model";
 
 @Component({
   selector: "app-samples-to-collect",
@@ -51,10 +54,11 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
   currentSamplesToCollect = {};
   samplesPriorityDetails = {};
   collectionStatus = {};
+  bills$:Observable<any>;
   samplesToCollect$: Observable<SampleObject[]>;
   labSamplesLoadingState$: Observable<boolean>;
   samplePriority: any = {};
-
+  isdiscounted:boolean = false;
   patientHasPendingBills$: Observable<boolean>;
   paidItems = {};
   thereIsUnSavedSample: boolean = false;
@@ -66,6 +70,7 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
     private store: Store<AppState>,
     private sampleService: SamplesService,
     private dialog: MatDialog,
+    private billingService: BillingService,
     private labOrdersService: LabOrdersService,
     private ordersService: OrdersService
   ) {}
@@ -77,7 +82,7 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
       select(getPatientPendingBillStatus)
     );
 
-
+    console.log("payments response ......",this.payments);
     _.each(this.payments, (payment) => {
       _.each(payment?.items, (item) => {
         this.paidItems[item?.name] = item;
@@ -112,6 +117,24 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
       }
     });
     this.labSamplesLoadingState$ = this.store.select(getLabSamplesLoadingState);
+
+    console.log("this.patient.personUuid ....",this.patient.personUuid);
+    // this.bills$ = this.billingService.getAllPatientInvoices(this.patient.personUuid,false);
+   
+    this.billingService.getAllPatientInvoices(this.patient.personUuid, false).subscribe((bills: Bill[]) => {
+      
+      if (bills.length > 0) {
+        const lastBill = bills[bills.length - 1];
+        if (lastBill && lastBill.discounted) {
+          this.isdiscounted = true;
+        }
+        if (lastBill.discounted) {
+          this.isdiscounted = true;
+          console.log("Last bill is discounted:", lastBill.discounted);
+        }
+      }
+      this.bills$ = of(bills);
+    });
   }
 
   saveAsSample(
