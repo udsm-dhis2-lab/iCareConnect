@@ -75,7 +75,11 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
     private ordersService: OrdersService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.samplesToCollect$.subscribe((sample)=>{
+      console.log("samplesToCollect.........................",sample);
+    })
+  }
 
   ngOnChanges() {
     this.patientHasPendingBills$ = this.store.pipe(
@@ -114,6 +118,7 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
       if (data) {
         console.log("sample collected -----",data);
         this.samplesToCollect.emit(data?.length);
+        console.log(data)
       }
     });
     this.labSamplesLoadingState$ = this.store.select(getLabSamplesLoadingState);
@@ -204,6 +209,7 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
         encounter: order?.encounterUuid,
       };
     });
+    
     this.updateLabOrderResponse$ =
       this.labOrdersService.updateLabOrders(orders);
 
