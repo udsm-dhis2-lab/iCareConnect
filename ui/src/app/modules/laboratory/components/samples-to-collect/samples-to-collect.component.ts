@@ -131,6 +131,7 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
       if (bills.length > 0) {
         const lastBill = bills[bills.length - 1];
         if (lastBill && lastBill.discounted) {
+          console.log("last bills: ....",lastBill)
           this.isdiscounted = true;
         }
         if (lastBill.discounted) {

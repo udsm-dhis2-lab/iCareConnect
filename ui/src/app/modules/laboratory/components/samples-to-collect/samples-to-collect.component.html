@@ -60,18 +60,18 @@
               {{ specimenSourceWithOrders.specimenSourceName }}
             </td>
             <td
-              [ngClass]="{
-                'text-danger':
-                  !order?.paid && !order?.isAdmitted && !order?.isEnsured
-              }"
+            [ngClass]="{
+              'text-danger': 
+                !(isdiscounted || order?.paid || order?.isAdmitted || order?.isEnsured)
+            }"
             >
               {{ order?.display }}
             </td>
             <td
-              [ngClass]="{
-                'text-danger':
-                  !order?.paid && !order?.isAdmitted && !order?.isEnsured
-              }"
+            [ngClass]="{
+              'text-danger': 
+                !(isdiscounted || order?.paid || order?.isAdmitted || order?.isEnsured)
+            }"
             >
               {{ order?.orderNumber }}
             </td>
@@ -147,7 +147,7 @@
             >
               <button
               [disabled]="
-              !(specimenSourceWithOrders?.atLeastOnePaid ||
+              !(isdiscounted || specimenSourceWithOrders?.atLeastOnePaid ||
                 specimenSourceWithOrders?.isAdmitted ||
                 specimenSourceWithOrders?.isEmergency ||
                 specimenSourceWithOrders?.isEnsured)
