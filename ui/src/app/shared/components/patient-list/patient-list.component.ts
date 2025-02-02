@@ -111,7 +111,6 @@ export class PatientListComponent implements OnInit, OnChanges {
 
   private getVisits(visits: Visit[]) {
     this.loadingPatients = true;
-    console.log("visit ----- ")
     // this.service = "LABS";
     this.visits$ = visits
       ? of(visits)

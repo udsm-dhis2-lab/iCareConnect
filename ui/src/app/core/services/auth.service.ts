@@ -83,6 +83,10 @@ export class AuthService {
       switchMap((loginResponse) => {
         const { authenticated, user } = loginResponse;
         this._session.next(loginResponse);
+        if(!authenticated){
+          //Handle this gracefull by check authenticated to avoid default Popup Login
+          return throwError("Authentication failed ,PLease check your Credentials")
+        }
         return this.currentUserService.get(user?.uuid).pipe(
           map((userDetails) => {
             localStorage.setItem(

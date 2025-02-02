@@ -55,8 +55,6 @@ export class BillConfirmationComponent implements OnInit {
       totalBill: this.data.totalPayableBill
     };
     
-    
-    // Construct the request payload
   const requestPayload = this.data.billItems.map((item: any) => ({
     uuid: item.bill, 
     currency: "TZS" 
@@ -171,7 +169,7 @@ export class BillConfirmationComponent implements OnInit {
 
   onGepgConfirmation(e): void {
     e.stopPropagation();
-    this.savingPayment = false;
+    this.savingPayment = true;
     this.billingService
       .payBill(this.data?.bill, {
         confirmedItems: this.data?.billItems,

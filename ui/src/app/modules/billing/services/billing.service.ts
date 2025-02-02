@@ -100,7 +100,6 @@ export class BillingService {
 
   payBill(bill: BillObject, paymentInput: PaymentInput): Observable<Payment> {
     const billPayment = Bill.createPayment(bill, paymentInput);
-
     return this.httpClient
       .post("billing/payment", billPayment)
       .pipe(map(() => new Payment(billPayment)));
