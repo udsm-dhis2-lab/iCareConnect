@@ -123,7 +123,7 @@ export class ExemptionHomeComponent implements OnInit {
         null,
         null,
         this.orderBy ? this.orderBy : "ENCOUNTER",
-        this.orderByDirection ? this.orderByDirection : "ASC",
+        this.orderByDirection ? this.orderByDirection : "DESC",
         this.filterBy ? this.filterBy : ""
       )
       .pipe(
