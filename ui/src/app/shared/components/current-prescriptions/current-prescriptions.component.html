@@ -2,7 +2,7 @@
   [ngClass]="drugsPrescribed.length > 0 ? 'current-prescriptions' : ''"
   *ngIf="{ 
     specificDrugConceptUuid: specificDrugConceptUuid$ | async,
-    prescriptionArrangementFields: prescriptionArrangementFields$ | async
+    prescriptionArrangementFields: prescriptionArrangementFields$ | async 
   } as params"
 >
   <div *ngIf="errors.length > 0">

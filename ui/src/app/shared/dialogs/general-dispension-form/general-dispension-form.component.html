@@ -25,6 +25,12 @@
         "
       ></app-form>
     </div>
+    <!-- Add the alert here -->
+    <div *ngIf="isDrugPrescriptionActive" class="alert alert-warning">
+      <mat-icon class="warning-icon">warning</mat-icon>
+      Drug prescription is still active.
+    </div>
+
     <div class="row" *ngIf="params?.conceptFields">
       <div class="col-4">
         <app-concepts-form
