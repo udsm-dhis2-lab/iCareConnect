@@ -64,7 +64,7 @@ export class BillConfirmationComponent implements OnInit {
 
   
     console.log("Formatted payload:", requestPayload);
-    //Calling Controll number Generation Function
+    //Calling Controll number Generation Function 
     this.generatingControlNumber = true;
     if(this.data?.paymentType?.code === 'GePG'){
       this.onConntrollNumbGen(requestPayload);

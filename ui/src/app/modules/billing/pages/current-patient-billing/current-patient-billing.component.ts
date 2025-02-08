@@ -106,6 +106,9 @@ export class CurrentPatientBillingComponent implements OnInit {
   dataSource: Payments[] = [];
   color: string = '';
   expandedElement: Payments | null;
+  itemuuid: any;
+  controlNumber: any;
+  savingPaymentError: any;
   onRowClick(row: any): void {
     // Only expand if paymentType is 'Gepg'
     if (row.paymentType === 'Gepg') {
@@ -349,7 +352,42 @@ export class CurrentPatientBillingComponent implements OnInit {
       })
     );
   }
+  RequestControlNumber(events, bills) {
+    events.stopPropagation();
 
+    const requestPayloads = bills.map((bill) => {
+        return bill.items.map((billItem) => ({
+            uuid: billItem.bill, 
+            currency: "TZS"
+        }));
+    }).flat(); 
+
+    this.onConntrollNumbGen(JSON.stringify(requestPayloads)); 
+}
+
+
+onConntrollNumbGen(payload: any) {
+
+  this.billingService.gepgpayBill(payload).subscribe(
+    (response: any) => {
+      if (response && response.controlNumber) {
+        this.controlNumber = response.controlNumber;
+        console.log("Successfully generated control number:", this.controlNumber);
+      } else if (response.error) {
+        this.savingPaymentError = response.error;
+        console.log("Error in response:", response.error);
+      } else {
+        this.savingPaymentError = 'Server Error Please Contact an Admin !';
+        console.log("Unexpected response:", response);
+      }
+    },
+    (error) => {
+      this.savingPaymentError = error;
+      console.log("Failed to generate control number:", error);
+    }
+  );
+}
+  
   onConfirmBillPayment(results: {
     bill: BillObject;
     paymentInput: PaymentInput;
