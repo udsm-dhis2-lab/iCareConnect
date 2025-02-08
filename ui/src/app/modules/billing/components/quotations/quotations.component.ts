@@ -66,7 +66,8 @@ export class QuotationsComponent implements OnInit {
 
   ngOnInit(): void {
     // console.log("************************")
-    // console.log(this.patientBillingDetails);
+    console.log("Patience Bills ",this.bills);
+
     this.bills.reverse();
     // console.log(this.bills);
     if (this.exemptionOrderType) {
