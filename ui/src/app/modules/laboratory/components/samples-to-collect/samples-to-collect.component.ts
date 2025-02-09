@@ -108,15 +108,12 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
     );
 
     this.samplesToCollect$ = this.store.select(getSamplesToCollect);
-    console.log("patient uuid......",this.patient.personUuid)
-    console.log("patient visit ...",this.visit)
     // this.samplesToCollect$ = this.store.select(getPatientsSamplesToCollect, {
     //   patient_uuid: this.patient.personUuid,
     // });
 
     this.samplesToCollect$.subscribe((data) => {
       if (data) {
-        console.log("sample collected -----",data);
         this.samplesToCollect.emit(data?.length);
         console.log(data)
       }

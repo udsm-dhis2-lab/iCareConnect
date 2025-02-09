@@ -113,7 +113,6 @@ export class BillingService {
           throw new Error(response.error);
         }
 
-        console.log("API Response : ", response);
         return new Payment({
           controlNumber: response.controlNumber, 
           ...response, 
