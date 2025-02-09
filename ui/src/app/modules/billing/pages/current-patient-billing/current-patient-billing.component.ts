@@ -354,14 +354,13 @@ export class CurrentPatientBillingComponent implements OnInit {
   }
   RequestControlNumber(events, bills) {
     events.stopPropagation();
-
-    const requestPayloads = bills.map((bill) => {
-        return bill.items.map((billItem) => ({
-            uuid: billItem.bill, 
+    console.log("Bill clicked ..",bills.currentPayments)
+    const requestPayloads = bills.currentPayments.map((bill) => {
+        return bill.paymentDetails.items.map((billItem) => ({
+            uuid: billItem.item.uuid, 
             currency: "TZS"
         }));
-    }).flat(); 
-
+    }).flat();
     this.onConntrollNumbGen(JSON.stringify(requestPayloads)); 
 }
 
@@ -370,13 +369,9 @@ onConntrollNumbGen(payload: any) {
 
   this.billingService.gepgpayBill(payload).subscribe(
     (response: any) => {
-      if (response && response.controlNumber) {
-        this.controlNumber = response.controlNumber;
-        console.log("Successfully generated control number:", this.controlNumber);
-      } else if (response.error) {
-        this.savingPaymentError = response.error;
-        console.log("Error in response:", response.error);
-      } else {
+      if (response && response.ackCode === "CONS9005") {
+console.log("Authentication Failed")
+      }else {
         this.savingPaymentError = 'Server Error Please Contact an Admin !';
         console.log("Unexpected response:", response);
       }
