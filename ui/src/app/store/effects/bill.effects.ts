@@ -160,6 +160,9 @@ export class BillEffects {
               }),
             });
 
+            console.log(bill)
+
+
             return discountPatientBillSuccess({ bill });
           }),
           catchError((error) => of(discountBillFail({ error, bill })))

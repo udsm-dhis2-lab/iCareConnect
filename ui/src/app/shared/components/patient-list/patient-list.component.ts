@@ -112,7 +112,6 @@ export class PatientListComponent implements OnInit, OnChanges {
   private getVisits(visits: Visit[]) {
     this.loadingPatients = true;
     // this.service = "LABS";
-
     this.visits$ = visits
       ? of(visits)
       : this.service && this.service === "LABS"
@@ -148,6 +147,9 @@ export class PatientListComponent implements OnInit, OnChanges {
               }
             })
           );
+          this.visits$.subscribe((visit)=>{
+            console.log("visit data .....",visit)
+          });
   }
 
 

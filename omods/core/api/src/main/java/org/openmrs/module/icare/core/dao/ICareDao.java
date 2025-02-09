@@ -563,7 +563,6 @@ public class ICareDao extends BaseDAO<Item> {
 		if (attributeValueReference != null) {
 			queryStr += " AND v IN ( SELECT va.visit FROM VisitAttribute va WHERE va.valueReference=:attributeValueReference)";
 		}
-
 		if (paymentStatus != null) {
 			if (paymentStatus == VisitWrapper.PaymentStatus.PAID) {
 				queryStr += " AND v IN (SELECT invoice.visit FROM Invoice invoice WHERE "

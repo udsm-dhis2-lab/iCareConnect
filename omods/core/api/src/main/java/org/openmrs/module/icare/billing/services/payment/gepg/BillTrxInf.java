@@ -1,7 +1,11 @@
 package org.openmrs.module.icare.billing.services.payment.gepg;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonPropertyOrder({ "BillId", "SubSpCode", "SpSysId", "BillAmt", "MiscAmt", "BillExprDt", "PyrId", "PyrName", "BillDesc",
+        "BillGenDt", "BillGenBy", "BillApprBy", "PyrCellNum", "PyrEmail", "Ccy", "BillEqvAmt", "RemFlag", "BillPayOpt",
+        "BillItems" })
 public class BillTrxInf {
 	
 	private String BillId;

@@ -37,6 +37,7 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   constructor( private visitService: VisitsService,) {}
 
   ngOnInit(): void {
+    // console.log("payment type passed .....",this.paymentTypeSelected)
     this.dataSource = new MatTableDataSource(
       sanitizePatientsVisitsForTabularPatientListing(
         this.visits,

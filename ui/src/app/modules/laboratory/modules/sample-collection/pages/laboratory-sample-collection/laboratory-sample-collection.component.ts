@@ -25,7 +25,11 @@ import { getAllPayments } from "src/app/store/selectors/payment.selector";
 import { SampleTypesService } from "src/app/shared/services/sample-types.service";
 import { ActivatedRoute } from "@angular/router";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
-
+import {
+  getLoadingBillStatus,
+  getPatientBills,
+} from 'src/app/store/selectors/bill.selectors';
+import { BillingService } from "src/app/modules/billing/services/billing.service";
 @Component({
   selector: "app-laboratory-sample-collection",
   templateUrl: "./laboratory-sample-collection.component.html",
@@ -42,6 +46,7 @@ export class LaboratorySampleCollectionComponent implements OnInit {
   activeVisit$: Observable<VisitObject>;
   currentPatient: Patient;
   payments$: Observable<any>;
+  bills$:Observable<any>;
   patientId: string;
   visitId: string;
   containers$: Observable<any>;
@@ -51,6 +56,7 @@ export class LaboratorySampleCollectionComponent implements OnInit {
   sampledOrdersByVisit$: Observable<any[]>;
   constructor(
     private store: Store<AppState>,
+    private billingService: BillingService,
     private sampleTypesService: SampleTypesService,
     private route: ActivatedRoute
   ) {}
@@ -80,6 +86,7 @@ export class LaboratorySampleCollectionComponent implements OnInit {
     this.samplesCollected$ = this.store.select(getAllLabSamples);
     this.activeVisit$ = this.store.select(getActiveVisit);
     this.payments$ = this.store.select(getAllPayments);
+    
   }
 
   onSaveSampleCollection(event: Event): void {
