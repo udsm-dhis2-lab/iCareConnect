@@ -466,11 +466,10 @@ public class LaboratoryController {
 		// Extract sample and test info
 		Sample sample = getSampleFromPayload(machinePayload);
 		System.out.println("Sample Payload :" + sample);
-
 		Map<String, Object> test = (Map<String, Object>) machinePayload.get("test");
 		List<Map<String, Object>> observations = (List<Map<String, Object>>) machinePayload.getOrDefault("observations",
 				new ArrayList<>());
-		System.out.println("Sample Payload --- :" + sample);
+		System.out.println("Sample observations --- :" + observations);
 		if (sample != null) {
 			processSampleOrders(sample, test, observations, mappedParameters, formattedResults, obsWithIssues);
 		} else {
@@ -517,14 +516,12 @@ public class LaboratoryController {
 	private void processSampleOrders(Sample sample, Map<String, Object> test, List<Map<String, Object>> observations,
 	        List<Map<String, Object>> mappedParameters, List<Result> formattedResults,
 	        List<Map<String, Object>> obsWithIssues) throws Exception {
-		
 		List<SampleOrder> sampleOrders = sample.getSampleOrders();
 		ConceptSource mappingConceptSource = getConceptSource();
-		System.out.println("test sampleOrders : " + sampleOrders);
 		for (SampleOrder sampleOrder : sampleOrders) {
 			Concept concept = sampleOrder.getOrder().getConcept();
 			boolean mapped = isConceptMapped(concept, test, mappingConceptSource);
-			
+			System.out.println("concept----" + mapped);
 			if (mapped) {
 				processTestAllocations(sampleOrder, observations, concept, mappedParameters, formattedResults,
 				    obsWithIssues, mappingConceptSource);
@@ -551,8 +548,8 @@ public class LaboratoryController {
 	private boolean isConceptMapped(Concept concept, Map<String, Object> test, ConceptSource mappingConceptSource) {
 		if (!concept.getConceptMappings().isEmpty()) {
 			for (ConceptMap conceptMap : concept.getConceptMappings()) {
-				if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(mappingConceptSource.getUuid())
-				        && conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))) {
+				System.out.println("Codding " + conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(mappingConceptSource.getUuid() +conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code")));
+				if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(mappingConceptSource.getUuid())&& conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))) {
 					return true;
 				}
 			}
@@ -603,11 +600,10 @@ public class LaboratoryController {
 			for (ConceptMap parameterConceptMap : parameter.getConceptMappings()) {
 				System.out.println("Match parameter concept map :"
 				        + (parameterConceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
-				                .equals(mappingConceptSource.getUuid()) && parameterConceptMap.getConceptReferenceTerm()
-				                .getCode().equals(code)));
+				                .equals(mappingConceptSource.getUuid())));
+				// && parameterConceptMap.getConceptReferenceTerm().getCode().equals(code)
 				if (parameterConceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
-				        .equals(mappingConceptSource.getUuid())
-				        && parameterConceptMap.getConceptReferenceTerm().getCode().equals(code)) {
+				        .equals(mappingConceptSource.getUuid())&& parameterConceptMap.getConceptReferenceTerm().getCode().equals(code) ) {
 					saveResults(testAllocations, parameter, observation, formattedResults, mappedParameters);
 					return;
 				}
@@ -619,7 +615,7 @@ public class LaboratoryController {
 	
 	private void saveResults(List<TestAllocation> testAllocations, Concept parameter, Map<String, Object> observation,
 	        List<Result> formattedResults, List<Map<String, Object>> mappedParameters) throws ParseException {
-		
+		;
 		for (TestAllocation testAllocation : testAllocations) {
 			if (testAllocation.getTestConcept().getUuid().equals(parameter.getUuid())) {
 				Map<String, Object> result = createResultMap(parameter, observation, testAllocation);
