@@ -548,8 +548,16 @@ public class LaboratoryController {
 	private boolean isConceptMapped(Concept concept, Map<String, Object> test, ConceptSource mappingConceptSource) {
 		if (!concept.getConceptMappings().isEmpty()) {
 			for (ConceptMap conceptMap : concept.getConceptMappings()) {
-				System.out.println("Codding " + conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(mappingConceptSource.getUuid() +conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code")));
-				if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(mappingConceptSource.getUuid())&& conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))) {
+				System.out.println("Codding "
+				        + conceptMap
+				                .getConceptReferenceTerm()
+				                .getConceptSource()
+				                .getUuid()
+				                .equals(
+				                    mappingConceptSource.getUuid()
+				                            + conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))));
+				if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(mappingConceptSource.getUuid())
+				        && conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))) {
 					return true;
 				}
 			}
@@ -603,7 +611,8 @@ public class LaboratoryController {
 				                .equals(mappingConceptSource.getUuid())));
 				// && parameterConceptMap.getConceptReferenceTerm().getCode().equals(code)
 				if (parameterConceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
-				        .equals(mappingConceptSource.getUuid())&& parameterConceptMap.getConceptReferenceTerm().getCode().equals(code) ) {
+				        .equals(mappingConceptSource.getUuid())
+				        && parameterConceptMap.getConceptReferenceTerm().getCode().equals(code)) {
 					saveResults(testAllocations, parameter, observation, formattedResults, mappedParameters);
 					return;
 				}
