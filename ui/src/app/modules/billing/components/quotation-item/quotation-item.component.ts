@@ -88,6 +88,7 @@ export class QuotationItemComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log("this.billItems :....",this.billItems);
     this.dataSource = new MatTableDataSource(this.billItems);
 
     this.columns = [
@@ -226,7 +227,6 @@ export class QuotationItemComponent implements OnInit {
   }
 
   onConntrollNumbGen(payload) {
-    console.log("Callback API Fired.........",payload);
     this.billingService.gepgpayCallBack(payload).subscribe(
       (response: any) => {
         console.log("Callback Response:", response);

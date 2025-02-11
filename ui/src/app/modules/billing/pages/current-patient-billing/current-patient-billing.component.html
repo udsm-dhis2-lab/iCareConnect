@@ -167,7 +167,12 @@
                         <button mat-icon-button *ngIf="element.referenceNumber" (click)="printElement(element)">
                           <mat-icon>print</mat-icon>
                         </button>
+                        <button mat-button *ngIf="element.status === 'REQUESTED'" (click)="RequestControlNumber($event,patientBillingDetails)" style="color: white;">
+                          Request
+                        </button>
+                        
                       </td>
+                      
                     </ng-container>
               
                     <!-- Expanded Content for Gepg Details -->
