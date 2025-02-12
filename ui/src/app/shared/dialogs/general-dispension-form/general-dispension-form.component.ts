@@ -158,47 +158,56 @@ export class GeneralDispensingFormComponent implements OnInit {
     });
   }
 
-  isPrescriptionActive(dosageID: string) {
-    // Find the prescription with the given dosageID
-    const prescription = this.drugsPrescribedList.find(p => p.obs[this.specificDrugConceptUuid].value === dosageID);
+  isPrescriptionActive(dosageID: string, selectedDosageUnit: string): boolean {
+    // Find all prescriptions that match the given dosageID
+    const prescriptions = this.drugsPrescribedList.filter(p => 
+        p.obs[this.specificDrugConceptUuid]?.value === dosageID
+    );
 
-    if (!prescription) {
+    if (!prescriptions.length) {
         return false;
     }
 
-    // Extract the prescription date, duration, and dosage unit
-    const prescriptionDate = new Date(prescription.dateActivated);
-    const duration = parseInt(prescription.obs[this.prescriptionArrangementFields['4']?.uuid].value);
-    const durationUnit = prescription.obs[this.prescriptionArrangementFields['5']?.uuid].value.display;
-
-    // Calculate the end date of the prescription
-    let endDate = new Date(prescriptionDate);
-
-    switch (durationUnit.toLowerCase()) {
-        case 'days':
-            endDate.setDate(prescriptionDate.getDate() + duration);
-            break;
-        case 'weeks':
-            endDate.setDate(prescriptionDate.getDate() + duration * 7);
-            break;
-        case 'months':
-            endDate.setMonth(prescriptionDate.getMonth() + duration);
-            break;
-        case 'years':
-            endDate.setFullYear(prescriptionDate.getFullYear() + duration);
-            break;
-        default:
-            return false;
-    }
 
     const currentDate = new Date();
 
-    if (currentDate > endDate) {
-        return false; // over
-    } else {
-        return true; //active
+    for (const prescription of prescriptions) {
+        const prescriptionDate = new Date(prescription.dateActivated);
+        const duration = parseInt(prescription.obs[this.prescriptionArrangementFields['4']?.uuid]?.value);
+        const durationUnit = prescription.obs[this.prescriptionArrangementFields['5']?.uuid]?.value.display;
+        const dosageUnit = prescription.obs[this.prescriptionArrangementFields['2']?.uuid]?.value?.uuid;
+
+        if (!duration || !durationUnit) {
+            continue; // Skip invalid prescriptions
+        }
+
+        let endDate = new Date(prescriptionDate);
+        
+        switch (durationUnit.toLowerCase()) {
+            case 'days':
+                endDate.setDate(prescriptionDate.getDate() + duration);
+                break;
+            case 'weeks':
+                endDate.setDate(prescriptionDate.getDate() + duration * 7);
+                break;
+            case 'months':
+                endDate.setMonth(prescriptionDate.getMonth() + duration);
+                break;
+            case 'years':
+                endDate.setFullYear(prescriptionDate.getFullYear() + duration);
+                break;
+            default:
+                continue; // Skip invalid duration units
+        }
+
+        if (currentDate < endDate && selectedDosageUnit === dosageUnit) {
+            return true;
+        }
     }
+
+    return false; // No active prescription found
 }
+
 
   onFormUpdate(
     formValues: FormValue,
@@ -221,13 +230,12 @@ export class GeneralDispensingFormComponent implements OnInit {
         ? true
         : false;
     if (
-      formValues.getValues()?.drug?.value?.length > 0 ||
-      (formValues.getValues()?.drug?.value as any)?.display
+      this.formValues?.dosingUnit?.value?.length > 0
     ) {
-      this.selectedDrug = formValues.getValues()?.drug?.value;
-      console.log("The selected Drug: ",this.selectedDrug)
-      this.isDrugPrescriptionActive =  this.isPrescriptionActive(this.selectedDrug.uuid)
+      this.selectedDrug = this.formValues?.drug?.value
+      this.isDrugPrescriptionActive =  this.isPrescriptionActive(this.selectedDrug.uuid,this.formValues?.dosingUnit?.value )
     }
+    
     if (fieldItem == "drug" && !this.specificDrugConceptUuid) {
       this.drugService
         .getDrugsUsingConceptUuid(this.formValues?.drug?.value)
@@ -352,7 +360,6 @@ export class GeneralDispensingFormComponent implements OnInit {
         },
       ].filter((ob) => ob?.value && ob?.value !== "");
   
-      // console.log(JSON.stringify(obs));
       this.ordersService
         .createOrdersViaCreatingEncounter(encounterObject)
         .subscribe((response) => {
