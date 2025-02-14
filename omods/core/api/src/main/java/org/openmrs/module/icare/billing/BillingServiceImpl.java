@@ -1258,10 +1258,14 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		BillSubmissionRequest billRequest = new BillSubmissionRequest();
 		billRequest.setSystemAuth(systemAuth);
 		billRequest.setRequestData(requestData);
-
+		AdministrationService administrationService = Context.getAdministrationService();
+		
 		// Serialize RequestData to JSON for signing
 		String requestDataJson = new ObjectMapper().writeValueAsString(requestData);
-
+        GlobalProperty globalProperty = new GlobalProperty();
+	     globalProperty.setProperty("gepg.requestDataJson.icareConnect");
+	     globalProperty.setPropertyValue(requestDataJson);
+	     administrationService.saveGlobalProperty(globalProperty);
 		// Sign the request data
 		String signature = SignatureUtils.signData(requestDataJson, clientPrivateKey);
 		systemAuth.setSignature(signature);
