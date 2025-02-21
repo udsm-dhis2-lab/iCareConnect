@@ -9,6 +9,11 @@ import { Observable } from "rxjs";
 import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
 import { MatDialog } from "@angular/material/dialog";
 import { getGenericDrugPrescriptionsFromVisit } from "../../helpers/visits.helper";
+import {
+  setDrugsPrescribedList,
+  setPrescriptionArrangementFields,
+  setSpecificDrugConceptUuid,
+} from "src/app/store/actions";
 
 @Component({
   selector: "app-current-prescriptions",
@@ -30,7 +35,8 @@ export class CurrentPrescriptionComponent implements OnInit {
   constructor(
     private systemSettingsService: SystemSettingsService,
     private encounterService: EncountersService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit(): void {
@@ -79,13 +85,29 @@ export class CurrentPrescriptionComponent implements OnInit {
             keys: Object.keys(response).length,
           };
         })
-      );
+      ); 
+
+    this.specificDrugConceptUuid$.subscribe((data) =>
+      this.store.dispatch(
+        setSpecificDrugConceptUuid({ specificDrugConceptUuid: data })
+      )
+    );
+    this.prescriptionArrangementFields$.subscribe((data) =>
+      this.store.dispatch(
+        setPrescriptionArrangementFields({prescriptionArrangementFields: data})
+      )
+    );
   }
 
   getDrugsPrescribed() {
     this.drugsPrescribed = getGenericDrugPrescriptionsFromVisit(
       this.visit,
       this.genericPrescriptionOrderType
+    );
+
+    // Dispatch action to store drugsPrescribed in the state
+    this.store.dispatch(
+      setDrugsPrescribedList({ drugsPrescribedList: this.drugsPrescribed })
     );
   }
 

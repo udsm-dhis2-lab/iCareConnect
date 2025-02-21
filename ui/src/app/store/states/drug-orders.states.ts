@@ -4,6 +4,10 @@ import { BaseState, initialBaseState } from './base.state';
 
 export interface DrugOrdersState extends EntityState<any>, BaseState {
   drugOrdeEncounterUuid: string;
+  drugsPrescribedList: any[]
+  prescriptionArrangementFields: any[]
+  specificDrugConceptUuid: string
+
 }
 
 export const drugOrderAdapter: EntityAdapter<DrugOrder> = createEntityAdapter<
@@ -12,5 +16,9 @@ export const drugOrderAdapter: EntityAdapter<DrugOrder> = createEntityAdapter<
 
 export const initialDrugsOrdersState = drugOrderAdapter.getInitialState({
   drugOrdeEncounterUuid: undefined,
+  drugsPrescribedList: [],
+  specificDrugConceptUuid: '',
+  prescriptionArrangementFields: [],
   ...initialBaseState,
 });
+

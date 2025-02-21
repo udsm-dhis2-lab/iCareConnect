@@ -25,6 +25,8 @@
         "
       ></app-form>
     </div>
+    
+
     <div class="row" *ngIf="params?.conceptFields">
       <div class="col-4">
         <app-concepts-form
@@ -41,7 +43,7 @@
       <div class="col-4" *ngIf="dosingUnits$ | async as dosingUnits">
         <app-unit-field
           [dosingUnits]="dosingUnits"
-          (formUpdate)="onFormUpdate($event)"
+          (formUpdate)="onFormUpdate($event, 'dosingUnit')"
         ></app-unit-field>
       </div>
       <div
@@ -53,6 +55,11 @@
           (formUpdate)="onFormUpdate($event)"
         ></app-unit-field>
       </div>
+    </div>
+    <!-- Add the alert here -->
+    <div *ngIf="isDrugPrescriptionActive" class="alert alert-warning">
+      <mat-icon class="warning-icon">warning</mat-icon>
+      Tablet prescription for this dosage is still active.
     </div>
     <div class="row" *ngIf="params?.conceptFields">
       <div class="col-5">
@@ -101,7 +108,7 @@
         (click)="saveOrder($event, params?.conceptFields)"
         mat-flat-button
         [color]="savingError ? 'warn' : 'primary'"
-        [disabled]="savingOrder || !isFormValid"
+        [disabled]="!(isFormValid && !isDrugPrescriptionActive && !savingOrder)"
       >
         <mat-icon *ngIf="savingError" class="mr-2">error</mat-icon>
         <mat-spinner
