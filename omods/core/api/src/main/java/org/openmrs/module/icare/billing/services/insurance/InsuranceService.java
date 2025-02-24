@@ -1,5 +1,7 @@
 package org.openmrs.module.icare.billing.services.insurance;
 
+import java.util.Map;
+
 import org.openmrs.Concept;
 import org.openmrs.Visit;
 import org.openmrs.module.icare.billing.VisitInvalidException;
@@ -33,4 +35,5 @@ public interface InsuranceService {
 	ClaimResult claim(Visit visit) throws Exception;
 	
 	Claim getClaim(Visit visit) throws Exception;
+	
 }
