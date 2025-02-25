@@ -132,8 +132,10 @@ import { UnitsOfMeasureSettingsComponent } from "./units-of-measure-settings/uni
 import { SharedDisplayOrderedTestsNamesComponent } from "./shared-display-ordered-tests-names/shared-display-ordered-tests-names.component";
 import { SharedCollectedAmountComponent } from "./shared-collected-amount/shared-collected-amount.component";
 import { SharedRemotePatientHistoryComponent } from "./shared-remote-patient-history/shared-remote-patient-history.component";
+import { FingerPrintComponent } from "./finger-print/finger-print.component";
 
 export const components: any[] = [
+  FingerPrintComponent,
   PatientAddressComponent,
   PatientSearchComponent,
   PatientProfileComponent,

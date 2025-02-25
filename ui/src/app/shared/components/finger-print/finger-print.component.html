@@ -1,0 +1,42 @@
+ <!-- Modal -->
+ <div class="modal-overlay" (click)="closeModal()">
+    <div
+      class="modal-content"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Close button -->
+      <button
+        mat-icon-button
+        class="close-btn"
+        (click)="closeModal()"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <div class="fingerprint-container">
+        <div class="thumb-scan-container">
+          <video
+            loading="lazy"
+            muted="muted"
+            src="assets/video/finger-print.mp4"
+            type="video/mp4"
+            autoplay="autoplay"
+            loop="loop"
+            class="thumb-video"
+          ></video>
+        </div>
+
+        <style>
+          .thumb-video {
+            width: 100px;
+            height: auto;
+          }
+        </style>
+
+        <p class="modal-label">
+          Scan the patient's index finger on the scanning
+          device to authenticate
+        </p>
+      </div>
+    </div>
+  </div>

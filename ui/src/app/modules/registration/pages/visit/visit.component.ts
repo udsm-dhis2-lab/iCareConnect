@@ -130,6 +130,15 @@ export class VisitComponent implements OnInit {
   enrolledPrograms: ProgramGetFull[];
   remoteReferralDetails$: Observable<any>;
 
+  showModal = false;
+  openModal() {
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
+  }
+
   constructor(
     private store: Store<AppState>,
     public dialog: MatDialog,

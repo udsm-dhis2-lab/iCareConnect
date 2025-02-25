@@ -659,19 +659,36 @@
                       visitDetails['Insurance'])
                   "
                 >
-                  <mat-form-field
-                    class="w-100"
-                    appearance="fill"
-                    floatLabel="always"
-                  >
-                    <mat-label>Insurance ID</mat-label>
-                    <input
-                      matInput
-                      pattern="\d{12}"
-                      placeholder="Enter Text"
-                      [(ngModel)]="visitDetails['InsuranceID']"
-                    />
-                  </mat-form-field>
+                  <div class="input-container">
+                    <mat-form-field
+                      class="w-100"
+                      appearance="fill"
+                      floatLabel="always"
+                    >
+                      <mat-label>Insurance ID</mat-label>
+                      <input
+                        matInput
+                        pattern="\d{12}"
+                        placeholder="Enter Text"
+                        [(ngModel)]="visitDetails['InsuranceID']"
+                      />
+                    </mat-form-field>
+
+
+                    <div class="fingerprint-box">
+                      <button
+                        mat-icon-button
+                        class="fingerprint-btn"
+                        (click)="openModal()"
+                      >
+                        <mat-icon>fingerprint</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+
+                  <ng-container *ngIf="showModal">
+                    <app-finger-print (modalClosed)="closeModal()"> </app-finger-print>
+                  </ng-container>
 
                   <mat-form-field
                     class="w-100"
