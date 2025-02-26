@@ -16,6 +16,9 @@ import org.openmrs.module.icare.billing.services.insurance.InsurancesServices;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -37,8 +40,241 @@ public class InsuranceController {
             throws Exception {
         Map<String, Object> authorizecardObject = new HashMap<>();
         System.out.println("Payload received: " + requestPayload);
-        return authorizecardObject;
+
+        for (Map<String, Object> payload : requestPayload) {
+            String validationError = validatePayload(payload);
+            if (validationError != null) {
+                authorizecardObject.put("status", 400);
+                authorizecardObject.put("error", validationError);
+                return authorizecardObject;
+            }
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonPayload = objectMapper.writeValueAsString(requestPayload);
+
+        return insurancesservice.getAuthorization(jsonPayload);
     }
+	
+	private String validatePayload(Map<String, Object> payload) {
+		if (payload.get("cardNo") == null || ((String) payload.get("cardNo")).isEmpty()) {
+			return "Card number is required and cannot be empty.";
+		}
+		
+		if (payload.get("biometricMethod") == null || ((String) payload.get("biometricMethod")).isEmpty()) {
+			return "Biometric method is required and cannot be empty.";
+		}
+		
+		if (payload.get("nationalID") == null || ((String) payload.get("nationalID")).isEmpty()) {
+			return "National ID is required and cannot be empty.";
+		}
+		
+		if (payload.get("fpCode") == null || ((String) payload.get("fpCode")).isEmpty()) {
+			return "FP code is required and cannot be empty.";
+		}
+		
+		if (payload.get("imageData") == null || ((String) payload.get("imageData")).isEmpty()) {
+			return "Image data is required and cannot be empty.";
+		}
+		
+		if (payload.get("visitTypeID") == null || !(payload.get("visitTypeID") instanceof Integer)) {
+			return "Visit Type ID must be a valid integer.";
+		}
+		
+		if (payload.get("referralNo") == null || ((String) payload.get("referralNo")).isEmpty()) {
+			return "Referral number is required and cannot be empty.";
+		}
+		
+		if (payload.get("remarks") == null || ((String) payload.get("remarks")).isEmpty()) {
+			return "Remarks are required and cannot be empty.";
+		}
+		
+		return null;
+	}
+	
+	@RequestMapping(value = "/preapproval", method = RequestMethod.POST)
+    public Map<String, Object> servicePreApproval(@RequestBody List<Map<String, Object>> requestPayload)
+            throws Exception {
+
+        for (Map<String, Object> payload : requestPayload) {
+            if (!isValidPreApprovalRequest(payload)) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("message", "Invalid data in the request payload");
+                errorResponse.put("status", "error");
+                return errorResponse;
+            }
+        }
+
+        Map<String, Object> servicePreApprovalObject = new HashMap<>();
+        System.out.println("Payload received: " + requestPayload);
+
+        servicePreApprovalObject = insurancesservice.getPreapproval(requestPayload);
+
+        return servicePreApprovalObject;
+    }
+	
+	private boolean isValidPreApprovalRequest(Map<String, Object> payload) {
+		
+		if (payload.get("authorizationNo") == null || payload.get("authorizationNo").toString().trim().isEmpty()) {
+			return false;
+		}
+		if (payload.get("firstName") == null || payload.get("firstName").toString().trim().isEmpty()) {
+			return false;
+		}
+		if (payload.get("lastName") == null || payload.get("lastName").toString().trim().isEmpty()) {
+			return false;
+		}
+		if (payload.get("gender") == null || payload.get("gender").toString().trim().isEmpty()) {
+			return false;
+		}
+		if (payload.get("dateOfBirth") == null || payload.get("dateOfBirth").toString().trim().isEmpty()) {
+			return false;
+		}
+		if (payload.get("clinicalNotes") == null || payload.get("clinicalNotes").toString().trim().isEmpty()) {
+			return false;
+		}
+		if (payload.get("practitionerNo") == null || payload.get("practitionerNo").toString().trim().isEmpty()) {
+			return false;
+		}
+		
+		if (payload.get("diseases") != null) {
+			List<Map<String, Object>> diseases = (List<Map<String, Object>>) payload.get("diseases");
+			if (diseases.isEmpty()) {
+				return false;
+			}
+			for (Map<String, Object> disease : diseases) {
+				if (disease.get("diseaseCode") == null || disease.get("diseaseCode").toString().trim().isEmpty()) {
+					return false;
+				}
+				if (disease.get("status") == null || disease.get("status").toString().trim().isEmpty()) {
+					return false;
+				}
+			}
+		}
+		
+		if (payload.get("requestedServices") != null) {
+			List<Map<String, Object>> requestedServices = (List<Map<String, Object>>) payload.get("requestedServices");
+			if (requestedServices.isEmpty()) {
+				return false;
+			}
+			for (Map<String, Object> service : requestedServices) {
+				if (service.get("itemCode") == null || service.get("itemCode").toString().trim().isEmpty()) {
+					return false;
+				}
+				if (service.get("usage") == null || service.get("usage").toString().trim().isEmpty()) {
+					return false;
+				}
+				if (service.get("effectiveDate") == null || service.get("effectiveDate").toString().trim().isEmpty()) {
+					return false;
+				}
+				if (service.get("endDate") == null || service.get("endDate").toString().trim().isEmpty()) {
+					return false;
+				}
+				if (service.get("quantityRequested") == null
+				        || Integer.parseInt(service.get("quantityRequested").toString()) <= 0) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
+	@RequestMapping(value = "/beneficialydetails", method = RequestMethod.POST)
+    public Map<String, Object> serviceIssuing(@RequestBody List<Map<String, Object>> requestPayload)
+            throws Exception {
+        Map<String, Object> serviceIssuingObject = new HashMap<>();
+        System.out.println("Payload received: " + requestPayload);
+
+        for (Map<String, Object> payload : requestPayload) {
+            String validationError = validateBeneficialyPayload(payload);
+            if (validationError != null) {
+                serviceIssuingObject.put("status", 400);
+                serviceIssuingObject.put("error", validationError);
+                return serviceIssuingObject;
+            }
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonPayload = objectMapper.writeValueAsString(requestPayload);
+
+        return insurancesservice.getBeneficialyDetails(jsonPayload);
+    }
+	
+	private String validateBeneficialyPayload(Map<String, Object> payload) {
+		if (payload.get("cardNo") == null || ((String) payload.get("cardNo")).isEmpty()) {
+			return "Card number is required and cannot be empty.";
+		}
+		if (payload.get("cardTypeID") == null || ((String) payload.get("cardTypeID")).isEmpty()) {
+			return "Card type ID is required and cannot be empty.";
+		}
+		
+		if (payload.get("verifierID") == null || ((String) payload.get("verifierID")).isEmpty()) {
+			return "Verifier ID is required and cannot be empty.";
+		}
+		
+		return null;
+	}
+	
+	@RequestMapping(value = "/pocrefgeneration", method = RequestMethod.POST)
+    public Map<String, Object> pocRefGeneration(@RequestBody List<Map<String, Object>> requestPayload)
+            throws Exception {
+        Map<String, Object> response = new HashMap<>();
+        System.out.println("Payload received: " + requestPayload);
+
+        for (Map<String, Object> payload : requestPayload) {
+            String validationError = validatePOCRefPayload(payload);
+            if (validationError != null) {
+                response.put("status", 400);
+                response.put("error", validationError);
+                return response;
+            }
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonPayload = objectMapper.writeValueAsString(requestPayload);
+
+        return insurancesservice.pocNotification(jsonPayload);
+    }
+	
+	private String validatePOCRefPayload(Map<String, Object> payload) {
+		if (!payload.containsKey("pointOfCareID") || !(payload.get("pointOfCareID") instanceof Number)) {
+			return "pointOfCareID is required and must be a number.";
+		}
+		
+		if (!payload.containsKey("authorizationNo") || !(payload.get("authorizationNo") instanceof String)
+		        || ((String) payload.get("authorizationNo")).isEmpty()) {
+			return "authorizationNo is required and must be a non-empty string.";
+		}
+		
+		if (!payload.containsKey("practitionerNo") || !(payload.get("practitionerNo") instanceof String)) {
+			return "practitionerNo is required and must be a string.";
+		}
+		
+		if (!payload.containsKey("biometricMethod") || !(payload.get("biometricMethod") instanceof String)) {
+			return "biometricMethod is required and must be a string.";
+		}
+		
+		if (!payload.containsKey("fpCode") || !(payload.get("fpCode") instanceof String)) {
+			return "fpCode is required and must be a string.";
+		}
+		
+		if (!payload.containsKey("imageData") || !(payload.get("imageData") instanceof String)) {
+			return "imageData is required and must be a string.";
+		}
+		
+		return null;
+	}
+	
+	@RequestMapping(value = "/getpoc", method = RequestMethod.GET)
+	public Map<String, Object> getPOC() throws Exception {
+		return insurancesservice.getPocOfCare();
+	}
+	
+	@RequestMapping(value = "/getvisittype", method = RequestMethod.GET)
+	public Map<String, Object> getVisityType() throws Exception {
+		return insurancesservice.getVisitTypes();
+	}
 	
 	@RequestMapping(value = "/cardverification", method = RequestMethod.POST)
     public Map<String, Object> cardVerification(@RequestBody List<Map<String, Object>> requestPayload)
@@ -46,29 +282,5 @@ public class InsuranceController {
         Map<String, Object> cardVerificationObject = new HashMap<>();
         System.out.println("Payload received: " + requestPayload);
         return cardVerificationObject;
-    }
-	
-	@RequestMapping(value = "/pocrefgeneration", method = RequestMethod.POST)
-    public Map<String, Object> pocRefGeneration(@RequestBody List<Map<String, Object>> requestPayload)
-            throws Exception {
-        Map<String, Object> pocRefGenerationObject = new HashMap<>();
-        System.out.println("Payload received: " + requestPayload);
-        return pocRefGenerationObject;
-    }
-	
-	@RequestMapping(value = "/preapproval", method = RequestMethod.POST)
-    public Map<String, Object> servicePreApproval(@RequestBody List<Map<String, Object>> requestPayload)
-            throws Exception {
-        Map<String, Object> servicePreApprovalObject = new HashMap<>();
-        System.out.println("Payload received: " + requestPayload);
-        return servicePreApprovalObject;
-    }
-	
-	@RequestMapping(value = "/issuing", method = RequestMethod.POST)
-    public Map<String, Object> serviceIssuing(@RequestBody List<Map<String, Object>> requestPayload)
-            throws Exception {
-        Map<String, Object> serviceIssuingObject = new HashMap<>();
-        System.out.println("Payload received: " + requestPayload);
-        return serviceIssuingObject;
     }
 }
