@@ -100,22 +100,22 @@ public class InsuranceController {
 	}
 	
 	@RequestMapping(value = "/preapproval", method = RequestMethod.POST)
-public ResponseEntity<Map<String, Object>> servicePreApproval(@RequestBody Map<String, Object> requestPayload)
-        throws Exception {
+    public ResponseEntity<Map<String, Object>> servicePreApproval(@RequestBody Map<String, Object> requestPayload)
+            throws Exception {
 
-    if (!isValidPreApprovalRequest(requestPayload)) {
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("message", "Invalid data in the request payload");
-        errorResponse.put("status", "error");
-        return ResponseEntity.badRequest().body(errorResponse);
+        if (!isValidPreApprovalRequest(requestPayload)) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Invalid data in the request payload");
+            errorResponse.put("status", "error");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+
+        System.out.println("Payload received: " + requestPayload);
+
+        Map<String, Object> servicePreApprovalObject = insurancesservice.getPreapproval(requestPayload);
+
+        return ResponseEntity.ok(servicePreApprovalObject);
     }
-
-    System.out.println("Payload received: " + requestPayload);
-
-    Map<String, Object> servicePreApprovalObject = insurancesservice.getPreapproval(requestPayload);
-
-    return ResponseEntity.ok(servicePreApprovalObject);
-}
 	
 	private boolean isValidPreApprovalRequest(Map<String, Object> payload) {
 		
@@ -291,6 +291,58 @@ public ResponseEntity<Map<String, Object>> servicePreApproval(@RequestBody Map<S
 	public ResponseEntity<List<Map<String, Object>>> getVisityType() {
 		List<Map<String, Object>> visitTypes = insurancesservice.getVisitTypes();
 		return ResponseEntity.ok(visitTypes);
+	}
+	
+	@RequestMapping(value = "/loginpractitioner", method = RequestMethod.POST)
+    public ResponseEntity<Map<String, Object>> practitioner(@RequestBody Map<String, Object> requestPayload)
+            throws Exception {
+        Map<String, Object> practitionerObject = new HashMap<>();
+
+        String validationError = validatePractionerPayload(requestPayload);
+        if (validationError != null) {
+            practitionerObject.put("status", 400);
+            practitionerObject.put("error", validationError);
+            return ResponseEntity.badRequest().body(practitionerObject);
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonPayload = objectMapper.writeValueAsString(requestPayload);
+
+        Map<String, Object> responseMap = insurancesservice.practionerLogin(jsonPayload);
+
+        String body = (String) responseMap.get("body");
+        if (body != null) {
+            Map<String, Object> bodyMap = objectMapper.readValue(body, Map.class);
+
+            responseMap.put("body", bodyMap);
+        }
+        return ResponseEntity.ok(responseMap);
+    }
+	
+	private String validatePractionerPayload(Map<String, Object> payload) {
+		
+		if (!payload.containsKey("nationalID") || !(payload.get("nationalID") instanceof String)
+		        || ((String) payload.get("nationalID")).isEmpty()) {
+			return "nationalID is required and must be a non-empty string.";
+		}
+		
+		if (!payload.containsKey("practitionerNo") || !(payload.get("practitionerNo") instanceof String)) {
+			return "practitionerNo is required and must be a string.";
+		}
+		
+		if (!payload.containsKey("biometricMethod") || !(payload.get("biometricMethod") instanceof String)) {
+			return "biometricMethod is required and must be a string.";
+		}
+		
+		if (!payload.containsKey("fpCode") || !(payload.get("fpCode") instanceof String)) {
+			return "fpCode is required and must be a string.";
+		}
+		
+		if (!payload.containsKey("imageData") || !(payload.get("imageData") instanceof String)) {
+			return "imageData is required and must be a string.";
+		}
+		
+		return null;
 	}
 	
 	@RequestMapping(value = "/cardverification", method = RequestMethod.POST)

@@ -36,6 +36,10 @@ public class InsurancesServices {
 	
 	private static final String BENEFICIALY_DETAILS_API = "https://test.nhif.or.tz/servicehub/api/Verification/GetBeneficiaryDetails";
 	
+	private static final String PRACTITIONER_LOGIN = "https://test.nhif.or.tz/servicehub/api/Attendance/LoginPractitioner";
+	
+	private static final String PRACTITIONER_LOGOUT = "https://test.nhif.or.tz/servicehub/api/Attendance/LogoutPractitioner";
+	
 	private static final String CLIENT_ID = "04626";
 	
 	private static final String CLIENT_SECRET = "mXW2OcsZMBCLpWFMX6/I5A==";
@@ -398,6 +402,61 @@ public class InsurancesServices {
         HttpURLConnection connection = null;
         try {
             URL url = new URL(BENEFICIALY_DETAILS_API);
+            connection = (HttpURLConnection) url.openConnection();
+
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+            connection.setDoOutput(true);
+
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonPayload.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int responseCode = connection.getResponseCode();
+            responseMap.put("status", responseCode);
+
+            InputStream responseStream = (responseCode < 400) ? connection.getInputStream()
+                    : connection.getErrorStream();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(responseStream))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                responseMap.put("body", response.toString());
+            }
+        } catch (Exception e) {
+            responseMap.put("error", e.getMessage());
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return responseMap;
+    }
+	
+	public Map<String, Object> practionerLogin(String jsonPayload) {
+        Map<String, Object> responseMap = new HashMap<>();
+
+        // String validationError = validatePayload(jsonPayload);
+        if (jsonPayload == null) {
+            responseMap.put("status", 400);
+            responseMap.put("error", "Payload Error");
+            return responseMap;
+        }
+
+        String token = getAuthToken();
+        if (token == null) {
+            responseMap.put("status", 401);
+            responseMap.put("error", "Failed to obtain authentication token");
+            return responseMap;
+        }
+
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(PRACTITIONER_LOGIN);
             connection = (HttpURLConnection) url.openConnection();
 
             connection.setRequestMethod("POST");
