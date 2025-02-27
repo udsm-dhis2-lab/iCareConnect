@@ -36,24 +36,31 @@ public class InsuranceController {
 	private InsurancesServices insurancesservice;
 	
 	@RequestMapping(value = "/authorizecard", method = RequestMethod.POST)
-    public Map<String, Object> authorizecard(@RequestBody List<Map<String, Object>> requestPayload)
+    public ResponseEntity<Map<String, Object>> authorizecard(@RequestBody Map<String, Object> requestPayload)
             throws Exception {
-        Map<String, Object> authorizecardObject = new HashMap<>();
+        Map<String, Object> responseObject = new HashMap<>();
+
         System.out.println("Payload received: " + requestPayload);
 
-        for (Map<String, Object> payload : requestPayload) {
-            String validationError = validatePayload(payload);
-            if (validationError != null) {
-                authorizecardObject.put("status", 400);
-                authorizecardObject.put("error", validationError);
-                return authorizecardObject;
-            }
+        String validationError = validatePayload(requestPayload);
+        if (validationError != null) {
+            responseObject.put("status", 400);
+            responseObject.put("error", validationError);
+            return ResponseEntity.badRequest().body(responseObject);
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonPayload = objectMapper.writeValueAsString(requestPayload);
 
-        return insurancesservice.getAuthorization(jsonPayload);
+        Map<String, Object> responseMap = insurancesservice.getAuthorization(jsonPayload);
+
+        String body = (String) responseMap.get("body");
+        if (body != null) {
+            Map<String, Object> bodyMap = objectMapper.readValue(body, Map.class);
+            responseMap.put("body", bodyMap);
+        }
+
+        return ResponseEntity.ok(responseMap);
     }
 	
 	private String validatePayload(Map<String, Object> payload) {
@@ -181,24 +188,29 @@ public class InsuranceController {
 	}
 	
 	@RequestMapping(value = "/beneficialydetails", method = RequestMethod.POST)
-    public Map<String, Object> serviceIssuing(@RequestBody List<Map<String, Object>> requestPayload)
+    public ResponseEntity<Map<String, Object>> beneficialydetails(@RequestBody Map<String, Object> requestPayload)
             throws Exception {
-        Map<String, Object> serviceIssuingObject = new HashMap<>();
-        System.out.println("Payload received: " + requestPayload);
+        Map<String, Object> beneficialydetailsObject = new HashMap<>();
 
-        for (Map<String, Object> payload : requestPayload) {
-            String validationError = validateBeneficialyPayload(payload);
-            if (validationError != null) {
-                serviceIssuingObject.put("status", 400);
-                serviceIssuingObject.put("error", validationError);
-                return serviceIssuingObject;
-            }
+        String validationError = validateBeneficialyPayload(requestPayload);
+        if (validationError != null) {
+            beneficialydetailsObject.put("status", 400);
+            beneficialydetailsObject.put("error", validationError);
+            return ResponseEntity.badRequest().body(beneficialydetailsObject);
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonPayload = objectMapper.writeValueAsString(requestPayload);
 
-        return insurancesservice.getBeneficialyDetails(jsonPayload);
+        Map<String, Object> responseMap = insurancesservice.getBeneficialyDetails(jsonPayload);
+
+        String body = (String) responseMap.get("body");
+        if (body != null) {
+            Map<String, Object> bodyMap = objectMapper.readValue(body, Map.class);
+
+            responseMap.put("body", bodyMap);
+        }
+        return ResponseEntity.ok(responseMap);
     }
 	
 	private String validateBeneficialyPayload(Map<String, Object> payload) {
@@ -217,24 +229,31 @@ public class InsuranceController {
 	}
 	
 	@RequestMapping(value = "/pocrefgeneration", method = RequestMethod.POST)
-    public Map<String, Object> pocRefGeneration(@RequestBody List<Map<String, Object>> requestPayload)
+    public ResponseEntity<Map<String, Object>> pocRefGeneration(@RequestBody Map<String, Object> requestPayload)
             throws Exception {
         Map<String, Object> response = new HashMap<>();
+
         System.out.println("Payload received: " + requestPayload);
 
-        for (Map<String, Object> payload : requestPayload) {
-            String validationError = validatePOCRefPayload(payload);
-            if (validationError != null) {
-                response.put("status", 400);
-                response.put("error", validationError);
-                return response;
-            }
+        String validationError = validatePOCRefPayload(requestPayload);
+        if (validationError != null) {
+            response.put("status", 400);
+            response.put("error", validationError);
+            return ResponseEntity.badRequest().body(response);
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
         String jsonPayload = objectMapper.writeValueAsString(requestPayload);
 
-        return insurancesservice.pocNotification(jsonPayload);
+        Map<String, Object> responseMap = insurancesservice.pocNotification(jsonPayload);
+
+        String body = (String) responseMap.get("body");
+        if (body != null) {
+            Map<String, Object> bodyMap = objectMapper.readValue(body, Map.class);
+            responseMap.put("body", bodyMap);
+        }
+
+        return ResponseEntity.ok(responseMap);
     }
 	
 	private String validatePOCRefPayload(Map<String, Object> payload) {
@@ -267,13 +286,14 @@ public class InsuranceController {
 	}
 	
 	@RequestMapping(value = "/getpoc", method = RequestMethod.GET)
-	public Map<String, Object> getPOC() throws Exception {
-		return insurancesservice.getPocOfCare();
+	public ResponseEntity<List<Map<String, Object>>> getPOC() {
+		return ResponseEntity.ok(insurancesservice.getPocOfCare());
 	}
 	
 	@RequestMapping(value = "/getvisittype", method = RequestMethod.GET)
-	public Map<String, Object> getVisityType() throws Exception {
-		return insurancesservice.getVisitTypes();
+	public ResponseEntity<List<Map<String, Object>>> getVisityType() {
+		List<Map<String, Object>> visitTypes = insurancesservice.getVisitTypes();
+		return ResponseEntity.ok(visitTypes);
 	}
 	
 	@RequestMapping(value = "/cardverification", method = RequestMethod.POST)

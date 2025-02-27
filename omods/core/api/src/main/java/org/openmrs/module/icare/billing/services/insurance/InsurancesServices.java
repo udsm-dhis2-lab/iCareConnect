@@ -1,6 +1,7 @@
 package org.openmrs.module.icare.billing.services.insurance;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -9,11 +10,16 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class InsurancesServices {
 	
 	private static final String API_URL = "https://test.nhif.or.tz/servicehub/api/Verification/AuthorizeCard";
@@ -55,12 +61,12 @@ public class InsurancesServices {
             connection.setRequestProperty("User-Agent", "Java-Client");
             connection.setDoOutput(true);
 
-            String requestBody = "grant_type=" + URLEncoder.encode("client_credentials", StandardCharsets.UTF_8) +
-                    "&client_id=" + URLEncoder.encode(CLIENT_ID, StandardCharsets.UTF_8) +
-                    "&client_secret=" + URLEncoder.encode(CLIENT_SECRET, StandardCharsets.UTF_8) +
-                    "&scope=" + URLEncoder.encode(SCOPE, StandardCharsets.UTF_8) +
-                    "&username=" + URLEncoder.encode(USERNAME, StandardCharsets.UTF_8) +
-                    "&password=" + URLEncoder.encode(CLIENT_SECRET, StandardCharsets.UTF_8);
+            String requestBody = "grant_type=" + URLEncoder.encode("client_credentials", "UTF-8") +
+                    "&client_id=" + URLEncoder.encode(CLIENT_ID, "UTF-8") +
+                    "&client_secret=" + URLEncoder.encode(CLIENT_SECRET, "UTF-8") +
+                    "&scope=" + URLEncoder.encode(SCOPE, "UTF-8") +
+                    "&username=" + URLEncoder.encode(USERNAME, "UTF-8") +
+                    "&password=" + URLEncoder.encode(CLIENT_SECRET, "UTF-8");
 
             try (OutputStream os = connection.getOutputStream()) {
                 os.write(requestBody.getBytes(StandardCharsets.UTF_8));
@@ -99,14 +105,6 @@ public class InsurancesServices {
 	 */
 	public Map<String, Object> getAuthorization(String jsonPayload) {
         Map<String, Object> responseMap = new HashMap<>();
-
-        String validationError = validatePayload(jsonPayload);
-        if (validationError != null) {
-            responseMap.put("status", 400);
-            responseMap.put("error", validationError);
-            return responseMap;
-        }
-
         String token = getAuthToken();
         if (token == null) {
             responseMap.put("status", 401);
@@ -231,13 +229,16 @@ public class InsurancesServices {
         return responseMap;
     }
 	
-	public Map<String, Object> getPocOfCare() {
-        Map<String, Object> responseMap = new HashMap<>();
+	public List<Map<String, Object>> getPocOfCare() {
+        List<Map<String, Object>> responseList = new ArrayList<>();
         String token = getAuthToken();
+
         if (token == null) {
-            responseMap.put("status", 401);
-            responseMap.put("error", "Failed to obtain authentication token");
-            return responseMap;
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", 401);
+            errorResponse.put("error", "Failed to obtain authentication token");
+            responseList.add(errorResponse);
+            return responseList;
         }
 
         try {
@@ -259,30 +260,34 @@ public class InsurancesServices {
                 reader.close();
 
                 ObjectMapper objectMapper = new ObjectMapper();
-                responseMap = objectMapper.readValue(response.toString(), Map.class);
+                responseList = objectMapper.readValue(response.toString(), List.class);
             } else {
-                responseMap.put("error", "Failed to fetch data. HTTP Code: " + responseCode);
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("error", "Failed to fetch data. HTTP Code: " + responseCode);
+                responseList.add(errorResponse);
             }
         } catch (Exception e) {
-            responseMap.put("exception", e.getMessage());
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("exception", e.getMessage());
+            responseList.add(errorResponse);
         }
 
-        return responseMap;
+        return responseList;
     }
 	
-	public Map<String, Object> getVisitTypes() {
-        Map<String, Object> responseMap = new HashMap<>();
+	public List<Map<String, Object>> getVisitTypes() {
+        List<Map<String, Object>> visitTypes = new ArrayList<>();
         String token = getAuthToken();
+
         if (token == null) {
-            responseMap.put("status", 401);
-            responseMap.put("error", "Failed to obtain authentication token");
-            return responseMap;
+            return Collections.singletonList(
+                Map.of("status", 401, "error", "Failed to obtain authentication token")
+            );
         }
 
         try {
             URL url = new URL(VISITYPE_API_URL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Authorization", "Bearer " + token);
             conn.setRequestProperty("Accept", "application/json");
@@ -298,15 +303,20 @@ public class InsurancesServices {
                 reader.close();
 
                 ObjectMapper objectMapper = new ObjectMapper();
-                responseMap = objectMapper.readValue(response.toString(), Map.class);
+                visitTypes = objectMapper.readValue(response.toString(), new TypeReference<List<Map<String, Object>>>() {});
+
             } else {
-                responseMap.put("error", "Failed to fetch data. HTTP Code: " + responseCode);
+                return Collections.singletonList(
+                    Map.of("status", responseCode, "error", "Failed to fetch data. HTTP Code: " + responseCode)
+                );
             }
         } catch (Exception e) {
-            responseMap.put("exception", e.getMessage());
+            return Collections.singletonList(
+                Map.of("status", 500, "error", "Internal Server Error", "exception", e.getMessage())
+            );
         }
 
-        return responseMap;
+        return visitTypes;
     }
 	
 	public Map<String, Object> getPreapproval(List<Map<String, Object>> requestPayload) {
@@ -374,15 +384,8 @@ public class InsurancesServices {
         return responseMap;
     }
 	
-	public Map<String, Object> getBeneficialyDetails(String jsonPayload){
+	public Map<String, Object> getBeneficialyDetails(String jsonPayload) {
         Map<String, Object> responseMap = new HashMap<>();
-
-        String validationError = validatePayload(jsonPayload);
-        if (validationError != null) {
-            responseMap.put("status", 400);
-            responseMap.put("error", validationError);
-            return responseMap;
-        }
 
         String token = getAuthToken();
         if (token == null) {
