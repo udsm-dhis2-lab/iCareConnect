@@ -100,25 +100,22 @@ public class InsuranceController {
 	}
 	
 	@RequestMapping(value = "/preapproval", method = RequestMethod.POST)
-    public Map<String, Object> servicePreApproval(@RequestBody List<Map<String, Object>> requestPayload)
-            throws Exception {
+public ResponseEntity<Map<String, Object>> servicePreApproval(@RequestBody Map<String, Object> requestPayload)
+        throws Exception {
 
-        for (Map<String, Object> payload : requestPayload) {
-            if (!isValidPreApprovalRequest(payload)) {
-                Map<String, Object> errorResponse = new HashMap<>();
-                errorResponse.put("message", "Invalid data in the request payload");
-                errorResponse.put("status", "error");
-                return errorResponse;
-            }
-        }
-
-        Map<String, Object> servicePreApprovalObject = new HashMap<>();
-        System.out.println("Payload received: " + requestPayload);
-
-        servicePreApprovalObject = insurancesservice.getPreapproval(requestPayload);
-
-        return servicePreApprovalObject;
+    if (!isValidPreApprovalRequest(requestPayload)) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("message", "Invalid data in the request payload");
+        errorResponse.put("status", "error");
+        return ResponseEntity.badRequest().body(errorResponse);
     }
+
+    System.out.println("Payload received: " + requestPayload);
+
+    Map<String, Object> servicePreApprovalObject = insurancesservice.getPreapproval(requestPayload);
+
+    return ResponseEntity.ok(servicePreApprovalObject);
+}
 	
 	private boolean isValidPreApprovalRequest(Map<String, Object> payload) {
 		

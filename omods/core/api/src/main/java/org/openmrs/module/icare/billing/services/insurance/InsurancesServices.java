@@ -319,9 +319,9 @@ public class InsurancesServices {
         return visitTypes;
     }
 	
-	public Map<String, Object> getPreapproval(List<Map<String, Object>> requestPayload) {
+	public Map<String, Object> getPreapproval(Map<String, Object> requestPayload) {
         Map<String, Object> responseMap = new HashMap<>();
-
+    
         if (requestPayload == null || requestPayload.isEmpty()) {
             responseMap.put("status", 400);
             responseMap.put("error", "Payload cannot be null or empty");
@@ -334,7 +334,7 @@ public class InsurancesServices {
             responseMap.put("error", "Failed to obtain authentication token");
             return responseMap;
         }
-
+    
         String jsonPayload;
         try {
             jsonPayload = new ObjectMapper().writeValueAsString(requestPayload);
@@ -343,7 +343,7 @@ public class InsurancesServices {
             responseMap.put("error", "Failed to convert payload to JSON");
             return responseMap;
         }
-
+    
         HttpURLConnection connection = null;
         try {
             URL url = new URL(PREAPPROVAL_API);
@@ -352,26 +352,27 @@ public class InsurancesServices {
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
-
+    
             try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonPayload.getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
+                os.write(jsonPayload.getBytes(StandardCharsets.UTF_8));
             }
-
+    
             int responseCode = connection.getResponseCode();
             responseMap.put("status", responseCode);
-
-            InputStream responseStream = (responseCode < 400) ? connection.getInputStream()
-                    : connection.getErrorStream();
+    
+            InputStream responseStream = (responseCode < 400) ? connection.getInputStream() : connection.getErrorStream();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(responseStream))) {
                 StringBuilder response = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
                     response.append(line);
                 }
-                responseMap.put("body", response.toString());
+    
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseBody = objectMapper.readValue(response.toString(), Map.class);
+                responseMap.put("body", responseBody);
             }
-
+    
         } catch (Exception e) {
             responseMap.put("status", 500);
             responseMap.put("error", "Internal server error: " + e.getMessage());
@@ -380,7 +381,7 @@ public class InsurancesServices {
                 connection.disconnect();
             }
         }
-
+    
         return responseMap;
     }
 	
