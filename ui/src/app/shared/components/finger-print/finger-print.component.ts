@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-
+import { FingerprintService } from '../../services';
 @Component({
   selector: 'app-finger-print',
   templateUrl: './finger-print.component.html',
@@ -10,16 +10,22 @@ export class FingerPrintComponent implements OnInit{
 
   @Output() modalClosed = new EventEmitter<void>();
 
-  // @Output() verificationSuccess = new EventEmitter<void>();
 
-
-
-  constructor(){
+  constructor(private fingerprint:FingerprintService){
 
   }
+
   ngOnInit(): void {
+    this.fingerprint.captureFingerprint().subscribe(
+      (result) => {
+        console.log('Fingerprint captured successfully:', result);
+        
+      },
+      (error) => {
+        console.error('Error capturing fingerprint:', error);
     
-  }
+  });
+}
 
    closeModal() {
     this.modalClosed.emit();  
