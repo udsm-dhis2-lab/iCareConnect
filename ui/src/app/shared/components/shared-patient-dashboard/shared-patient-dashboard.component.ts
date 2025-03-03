@@ -103,6 +103,12 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Input() visitEndingControlStatusesConceptUuid: string;
   @Input() observations: any;
   @Input() moduleName: any;
+
+  showModal:boolean=false;
+ 
+  closeModal() {
+    this.showModal = false;
+  }
   currentPatient$: Observable<Patient>;
   vitalSignObservations$: Observable<any>;
   loadingVisit$: Observable<boolean>;
@@ -363,7 +369,6 @@ export class SharedPatientDashboardComponent implements OnInit {
       );
     this.showHistoryDetails = this.activeVisit?.isAdmitted;
   }
-
   toggleSideBarMenu(event: Event): void {
     event.stopPropagation();
     this.useSideBar = !this.useSideBar;
@@ -396,6 +401,13 @@ export class SharedPatientDashboardComponent implements OnInit {
     }
     this.selectedForm = form;
     this.showHistoryDetails = false;
+  
+    if (form.name === '1.Vitals') {
+      this.showModal = true;
+    } else {
+      this.showModal = false; 
+    }
+
     setTimeout(() => {
       this.readyForClinicalNotes = true;
     }, 50);

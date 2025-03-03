@@ -139,6 +139,8 @@ export class VisitComponent implements OnInit {
     this.showModal = false;
   }
 
+ 
+
   constructor(
     private store: Store<AppState>,
     public dialog: MatDialog,

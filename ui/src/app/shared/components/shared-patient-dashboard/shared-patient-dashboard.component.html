@@ -47,15 +47,17 @@
       dashboardParams?.consultationEncounterType
     "
   >
-    <div class="patient-dashboard-container ">
+    <div class="patient-dashboard-container">
       <div class="patient-profile-sticky">
         <app-new-patient-profile
           [currentPatient]="dashboardParams?.currentPatient"
         ></app-new-patient-profile>
       </div>
-      
+
       <div class="w-100 patient-other-details-padding">
-        <div class="d-flex justify-content-between align-items-center pl-3 pr-3">
+        <div
+          class="d-flex justify-content-between align-items-center pl-3 pr-3"
+        >
           <div class="d-flex justify-content-left">
             <button
               mat-stroked-button
@@ -65,11 +67,14 @@
               <mat-icon>arrow_back</mat-icon>
               Back to Client List
             </button>
-      
+
             <div class="row">
-              <div *ngFor="let form of dashboardParams?.forms" class="form-button-wrapper">
+              <div
+                *ngFor="let form of dashboardParams?.forms"
+                class="form-button-wrapper"
+              >
                 <button
-                class="buttonstyle"
+                  class="buttonstyle"
                   mat-stroked-button
                   [ngClass]="{
                     'selected-form':
@@ -87,7 +92,10 @@
                 </button>
               </div>
             </div>
-            
+            <ng-container *ngIf="showModal">
+              <app-finger-print detail="Patient's" (modalClosed)="closeModal()">
+              </app-finger-print>
+            </ng-container>
 
             <!-- <a mat-icon-button class="mr-4" (click)="toggleSideBarMenu($event)">
               <mat-icon>menu</mat-icon>

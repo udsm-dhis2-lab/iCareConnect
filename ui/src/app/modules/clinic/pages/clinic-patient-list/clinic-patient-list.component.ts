@@ -30,6 +30,12 @@ export class ClinicPatientListComponent implements OnInit {
   labTestOrderType$: Observable<any>;
   showAllPatientsTab$: Observable<any>;
   userPrivileges$: Observable<any>;
+  showModal:boolean=false;
+ 
+  closeModal() {
+    this.showModal = false;
+  }
+
   constructor(
     private store: Store<AppState>,
     private systemSettingsService: SystemSettingsService,
@@ -38,6 +44,7 @@ export class ClinicPatientListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.showModal =true;
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
     this.settingCurrentLocationStatus$ = this.store.select(
       getSettingCurrentLocationStatus

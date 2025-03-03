@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'app-finger-print',
@@ -6,8 +6,13 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
   styleUrl: './finger-print.component.scss'
 })
 export class FingerPrintComponent implements OnInit{
+ @Input() detail:String;
 
   @Output() modalClosed = new EventEmitter<void>();
+
+  // @Output() verificationSuccess = new EventEmitter<void>();
+
+
 
   constructor(){
 
@@ -15,10 +20,12 @@ export class FingerPrintComponent implements OnInit{
   ngOnInit(): void {
     
   }
- 
 
- 
    closeModal() {
     this.modalClosed.emit();  
   }
+  
+// verify() {
+//   this.verificationSuccess.emit(); 
+// }
 }
