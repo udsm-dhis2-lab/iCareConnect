@@ -64,3 +64,20 @@ export const setDrugOrderEncounter = createAction(
   '[Drug orders] set drug order encounter',
   props<{ drugOrderEncounter: any }>()
 );
+
+export const setDrugsPrescribedList = createAction(
+  '[Drug orders] set drugs prescribed',
+  props<{ drugsPrescribedList: any[] }>()
+);
+
+export const setSpecificDrugConceptUuid = createAction(
+  '[Drug orders] set specific drugConcept UUID',
+  props<{ specificDrugConceptUuid: string }>()
+);
+
+export const setPrescriptionArrangementFields = createAction(
+  '[Drug orders] set prescription arrangement field',
+  props<{ prescriptionArrangementFields: any[] }>()
+);
+
+
