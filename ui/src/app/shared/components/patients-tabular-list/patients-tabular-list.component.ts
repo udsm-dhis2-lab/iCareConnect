@@ -47,11 +47,14 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
         this.page
       )
     );
+
+
     this.dataSource.paginator = this.paginator;
   }
 
   ngOnChanges() {
     this.dataSource = new MatTableDataSource(
+     
       sanitizePatientsVisitsForTabularPatientListing(
         this.visits,  
         this.shouldShowParentLocation,
@@ -60,7 +63,7 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
         this.page
       )
     );
-  
+ 
     this.dataSource.paginator = this.paginator;
   }
   

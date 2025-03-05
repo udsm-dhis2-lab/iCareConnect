@@ -22,9 +22,6 @@ export class FingerprintService {
       Quality: 80,
       TimeOut: 20,
     };
-
-    // const fing = this.http.post<any>(this.apiUrl, requestBody, httpOptions);
-    // return fing;
     return this.http.post<any>(this.apiUrl, requestBody, httpOptions);
   }
 }

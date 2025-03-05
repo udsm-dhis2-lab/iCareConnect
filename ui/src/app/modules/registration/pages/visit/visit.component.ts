@@ -43,13 +43,15 @@ import { ProgramGet, ProgramGetFull } from "src/app/shared/resources/openmrs";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
-
+import { InsuranceService } from "src/app/shared/services";
+import { InsuranceResponse } from "src/app/modules/billing/models/insurance-response.model";
 @Component({
   selector: "app-visit",
   templateUrl: "./visit.component.html",
   styleUrls: ["./visit.component.scss"],
 })
 export class VisitComponent implements OnInit {
+  selectedId: string = "insuranceId";
   params: any;
   name: string;
   dob: string;
@@ -129,8 +131,10 @@ export class VisitComponent implements OnInit {
   visible: boolean = false;
   enrolledPrograms: ProgramGetFull[];
   remoteReferralDetails$: Observable<any>;
-
+  InsuranceID: string = "";
   showModal = false;
+  authorizationNo: string;
+
   openModal() {
     this.showModal = true;
   }
@@ -138,9 +142,7 @@ export class VisitComponent implements OnInit {
   closeModal() {
     this.showModal = false;
   }
-
  
-
   constructor(
     private store: Store<AppState>,
     public dialog: MatDialog,
@@ -152,7 +154,8 @@ export class VisitComponent implements OnInit {
     private systemSettingsService: SystemSettingsService,
     private conceptsService: ConceptsService,
     private googleAnalyticsService: GoogleAnalyticsService,
-    private httpClientService: OpenmrsHttpClientService
+    private httpClientService: OpenmrsHttpClientService,
+    private insuranceService: InsuranceService
   ) {}
 
   dismissAlert() {
@@ -185,6 +188,9 @@ export class VisitComponent implements OnInit {
           : data?.length > 0
           ? data
           : null;
+
+      // console.log("chargerrrrrrrr",this.visitDetails["InsuranceID"]);
+      // this.InsuranceID = this.visitDetails["InsuranceID"];
     });
     this.verticalPrograms$ = this.programsService.getAllPrograms(["v=full"]);
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
@@ -224,6 +230,11 @@ export class VisitComponent implements OnInit {
           ? response["results"][0]["setMembers"]
           : [];
     });
+  }
+
+  onNationalIdInput(event: any): void {
+    const inputValue = event.target.value;
+    event.target.value = inputValue.replace(/\D/g, "");
   }
 
   openDialog(locations) {
@@ -1041,4 +1052,49 @@ export class VisitComponent implements OnInit {
     event.stopPropagation();
     this.editPatient.emit(path + patientUuid);
   }
+
+  onInsuranceIDChange(newValue: string): void {
+    this.authorizationData.cardNo = newValue;
+  }
+
+  onNationalIDChange(newValue: string): void {
+    this.authorizationData.nationalID = newValue;
+  }
+
+
+  authorizationData = {
+    cardNo: "",
+    biometricMethod: "string",
+    nationalID: "",
+    fpCode: "R1",
+    imageData: "string",
+    visitTypeID: 1,
+    referralNo: "string",
+    remarks: "Authorization",
+  };
+  authorizeInsurance() {
+    if (!this.authorizationData.nationalID) {
+      this.authorizationData.nationalID = "string";
+    }
+  
+    if (!this.authorizationData.cardNo) {
+      this.authorizationData.cardNo = "string";
+    }
+  
+    this.insuranceService
+      .authorizeInsuranceCard(this.authorizationData)
+      .subscribe({
+        next: (response) => {
+          const typedResponse = response;
+        this.authorizationNo = typedResponse.body.AuthorizationNo; 
+        
+        this.visitDetails['InsuranceAuthNo'] = this.authorizationNo;
+        },
+        error: (error) => {
+          console.error("Error during authorization:", error);
+        },
+      });
+  }
+
+
 }
