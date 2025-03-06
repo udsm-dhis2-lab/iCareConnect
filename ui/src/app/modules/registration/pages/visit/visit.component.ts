@@ -43,7 +43,7 @@ import { ProgramGet, ProgramGetFull } from "src/app/shared/resources/openmrs";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
-import { InsuranceService } from "src/app/shared/services";
+import { FingerprintService, InsuranceService } from "src/app/shared/services";
 import { InsuranceResponse } from "src/app/modules/billing/models/insurance-response.model";
 @Component({
   selector: "app-visit",
@@ -89,6 +89,7 @@ export class VisitComponent implements OnInit {
   currentPaymentCategory: any;
   missingBillingConceptError: string;
   allProgarm: Observable<any>;
+  private rawData: string;
 
   @Input() visitTypes: any;
   @Input() servicesConfigs: any;
@@ -104,7 +105,11 @@ export class VisitComponent implements OnInit {
   @Input() patientVisitsCount: number;
   @Output() editPatient = new EventEmitter<any>();
   @Output() startVisitEvent = new EventEmitter<any>();
-
+  @Output() fingerprintCaptured = new EventEmitter<string>();
+  @Output() modalClosed = new EventEmitter<void>();
+  showMessage: boolean = false;
+  showLoader: boolean = false;
+  // rawData: string;
   searchTerm: string;
   currentRoom: any;
   atLeastOneItemToEditSelected: boolean = false;
@@ -134,13 +139,19 @@ export class VisitComponent implements OnInit {
   InsuranceID: string = "";
   showModal = false;
   authorizationNo: string;
+  // showMessage: boolean = false;
+  // showLoader: boolean = false;
 
   openModal() {
     this.showModal = true;
   }
 
   closeModal() {
+ 
     this.showModal = false;
+    this.showMessage = false;
+    this.showLoader = false;
+
   }
  
   constructor(
@@ -1067,11 +1078,12 @@ export class VisitComponent implements OnInit {
     biometricMethod: "string",
     nationalID: "",
     fpCode: "R1",
-    imageData: "string",
+    imageData: "",
     visitTypeID: 1,
     referralNo: "string",
     remarks: "Authorization",
   };
+
   authorizeInsurance() {
     if (!this.authorizationData.nationalID) {
       this.authorizationData.nationalID = "string";
@@ -1080,6 +1092,15 @@ export class VisitComponent implements OnInit {
     if (!this.authorizationData.cardNo) {
       this.authorizationData.cardNo = "string";
     }
+    if (!this.authorizationData.imageData) {
+      this.authorizationData.imageData = "string";
+    }
+
+if (this.rawData){
+  this.authorizationData.imageData = this.rawData; 
+  this.showLoader = true;
+}
+     
   
     this.insuranceService
       .authorizeInsuranceCard(this.authorizationData)
@@ -1087,14 +1108,26 @@ export class VisitComponent implements OnInit {
         next: (response) => {
           const typedResponse = response;
         this.authorizationNo = typedResponse.body.AuthorizationNo; 
-        
         this.visitDetails['InsuranceAuthNo'] = this.authorizationNo;
-        },
+        this.showLoader = false; 
+        // this.showMessage = true; 
+        this.closeModal();
+     
+      },
         error: (error) => {
           console.error("Error during authorization:", error);
+          this.showLoader = false; 
         },
       });
   }
-
+  
+  onFingerprintCaptured(rawData: string) {
+    this.rawData = rawData;
+    setTimeout(() => {
+      this.authorizeInsurance();
+    }, 2000);
+ 
+  }
+ 
 
 }

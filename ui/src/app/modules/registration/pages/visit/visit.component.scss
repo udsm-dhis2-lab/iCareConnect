@@ -126,3 +126,24 @@
 .modal-label {
   margin: 0; 
 }
+
+
+.message {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 18px;
+  color: green;
+}
+
+.loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(43, 38, 38, 0.8); 
+  z-index: 1000; 
+}

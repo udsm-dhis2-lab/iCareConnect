@@ -21,6 +21,7 @@ import { sharedStorePages } from "./store-pages";
 import { sharedStoreComponents } from "./store-components";
 import { NgxMatSelectSearchModule } from "ngx-mat-select-search";
 import { FingerPrintComponent } from './components/finger-print/finger-print.component';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -59,6 +60,7 @@ import { FingerPrintComponent } from './components/finger-print/finger-print.com
     SearchTestDetailsPipe,
     FormatLabelCharCountDisplayPipe,
     FingerPrintComponent,
+  
   ],
   providers: [...sharedServices],
 })

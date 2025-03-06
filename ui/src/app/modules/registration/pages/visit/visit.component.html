@@ -725,24 +725,18 @@
                       </button>
                     </div>
 
-                    <button
-                      mat-raised-button
-                      color="primary"
-
-
-                      (click)="authorizeInsurance()"
-                    >
-                      Authorize Insurance Card
-                    </button>
-
-
                   </div>
-
                   <ng-container *ngIf="showModal">
-                    <app-finger-print (modalClosed)="closeModal()">
+                    <app-finger-print (modalClosed)="closeModal()"
+                    (fingerprintCaptured)="onFingerprintCaptured($event)"
+          
+                    >
                     </app-finger-print>
                   </ng-container>
+               
+                  
 
+                  
                   <mat-form-field
                     class="w-100"
                     *ngIf="
