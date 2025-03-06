@@ -13,7 +13,7 @@ public interface InsuranceService {
 	
 	static InsuranceService getInsuranceInstance(String insuranceName) {
         InsuranceService insuranceService = null;
-        if (insuranceName.toLowerCase().equals("nhif")) {
+        if (insuranceName.toLowerCase().equals("nhif")){
             insuranceService = new NHIFServiceImpl();
 
         } else if (insuranceName.toLowerCase().equals("jubilee")) {

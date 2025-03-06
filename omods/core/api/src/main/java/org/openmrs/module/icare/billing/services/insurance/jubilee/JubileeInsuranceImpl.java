@@ -121,8 +121,8 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		urlString = serverUrl + "/" + authToken.getServer().getEndPoint() + urlString;
 		URL url = new URL(urlString);
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		//con.setReadTimeout(15000);
-		//con.setConnectTimeout(15000);
+		// con.setReadTimeout(15000);
+		// con.setConnectTimeout(15000);
 		con.setRequestMethod("POST");
 		String bearer = String.format("Bearer %1s", authToken.getAccessToken());
 		con.addRequestProperty("Authorization", bearer);
@@ -178,13 +178,13 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		verificationResponse.setId(verificationRequest.getId());
 		verificationResponse.setAuthorizationNumber(verificationRequest.getAuthorizationNumber());
 		verificationResponse.setRemarks("Verified OK");
-		//TODO Should be provided by the user
+		// TODO Should be provided by the user
 		verificationResponse.setPaymentScheme(conceptService.getConceptByUuid(verificationRequest.getPaymentScheme()));
 		return verificationResponse;
 	}
 	
 	public Concept getPaymentSchemePackages(Map<String, Object> pricePackage) {
-		//Get Scheme for this product
+		// Get Scheme for this product
 		ConceptService conceptService = Context.getService(ConceptService.class);
 		ConceptSource NHIFConceptSource = conceptService.getConceptSourceByName("NHIF");
 		ConceptReferenceTerm conceptReferenceTerm = conceptService.getConceptReferenceTermByCode(
@@ -326,29 +326,34 @@ public class JubileeInsuranceImpl implements InsuranceService {
 			folioEntities.getEntities().add(folio);
 			ObjectMapper oMapper = new ObjectMapper();
 			final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-			//final DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+			// final DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 			oMapper.setDateFormat(df);
-			//oMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+			// oMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 			AuthToken authToken = getAuthToken(NHIFServer.CLAIM);
-			String results = this.postRequest(urlString, oMapper.convertValue(folioEntities, Map.class), authToken);
+			// String results = this.postRequest(urlString,
+			// oMapper.convertValue(folioEntities, Map.class), authToken);
 			ObjectMapper mapper = new ObjectMapper();
-			Map<String, Object> resultMap = mapper.readValue(String.valueOf(results), Map.class);
-			//TODO add status to invoice on whether is claimed
+			// Map<String, Object> resultMap = mapper.readValue(String.valueOf(""),
+			// Map.class);
+			// TODO add status to invoice on whether is claimed
 			VisitWrapper visitWrapper = new VisitWrapper(visit);
 			visitWrapper.setInsuranceClaimStatus(ClaimStatus.CLAIMED);
 		} else {
 			visit.setStopDatetime(new Date());
 			Context.getVisitService().saveVisit(visit);
 		}
-		/*VisitService visitService = Context.getVisitService();
-		VisitAttribute serviceVisitAttribute = new VisitAttribute();
-		serviceVisitAttribute.setAttributeType(visitService.getVisitAttributeTypeByUuid(adminService
-		        .getGlobalProperty(ICareConfig.INSURANCE_CLAIM_STATUS)));
-		serviceVisitAttribute.setValue("CLAIMED");
-		serviceVisitAttribute.setValueReferenceInternal(visit.getUuid());
-		serviceVisitAttribute.setVisit(visit);
-		visit.addAttribute(serviceVisitAttribute);*/
-		//visitService..saveVisit(visit);
+		/*
+		 * VisitService visitService = Context.getVisitService();
+		 * VisitAttribute serviceVisitAttribute = new VisitAttribute();
+		 * serviceVisitAttribute.setAttributeType(visitService.
+		 * getVisitAttributeTypeByUuid(adminService
+		 * .getGlobalProperty(ICareConfig.INSURANCE_CLAIM_STATUS)));
+		 * serviceVisitAttribute.setValue("CLAIMED");
+		 * serviceVisitAttribute.setValueReferenceInternal(visit.getUuid());
+		 * serviceVisitAttribute.setVisit(visit);
+		 * visit.addAttribute(serviceVisitAttribute);
+		 */
+		// visitService..saveVisit(visit);
 		return result;
 	}
 	
@@ -361,7 +366,7 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		}
 		
 		Folio folio = new Folio();
-		//TODO set the actual phone number
+		// TODO set the actual phone number
 		folio.setTelephoneNo(visitWrapper.getPatient().getPhoneNumber());
 		folio.setPatientFileNo(visitWrapper.getPatient().getFileNumber());
 		ProviderWrapper providerWrapper = visitWrapper.getConsultationProvider();
@@ -370,16 +375,18 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		}
 		folio.setFacilityCode(facilityCode);
 		folio.setFolioID(visit.getUuid());
-		/*if (visit.getStopDatetime() == null) {
-			throw new Exception("To Claim the visit has to be closed");
-		}*/
+		/*
+		 * if (visit.getStopDatetime() == null) {
+		 * throw new Exception("To Claim the visit has to be closed");
+		 * }
+		 */
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(visit.getStartDatetime());
 		folio.setClaimYear(calendar.get(Calendar.YEAR));
 		folio.setClaimMonth(calendar.get(Calendar.MONTH) + 1);
 		
 		ICareService iCareService = Context.getService(ICareService.class);
-		//folio.setFolioNo(iCareService.getVisitSerialNumber(visit));
+		// folio.setFolioNo(iCareService.getVisitSerialNumber(visit));
 		folio.setFolioNo(visit.getId());
 		String serialString = "00000";
 		serialString = serialString.substring(String.valueOf(folio.getFolioNo()).length()) + folio.getFolioNo();
@@ -546,7 +553,8 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		}
 		grandtotal += consultationsubtotal + medicinesubtotal + testssubtotal;
 		
-		//consultation += "<tr><td colspan='4'>GRAND TOTAL</td><td class='blue' align='right' style='font-weight:bold'>" + grandtotal + "</td></tr>";
+		// consultation += "<tr><td colspan='4'>GRAND TOTAL</td><td class='blue'
+		// align='right' style='font-weight:bold'>" + grandtotal + "</td></tr>";
 		String content = new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
 		        .getResource("nhif/form2B-A.html").toURI())));
 		content = content.replace("{ConsultationFees}", consultationFees);
@@ -558,7 +566,7 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		content = content.replace("{Medicine}", medicine);
 		content = content.replace("{FacilityName}", adminService.getGlobalProperty(ICareConfig.FACILITY_NAME));
 		content = content.replace("{Address}", "");
-		//TODO Add consulation fee {ConsultationFees}
+		// TODO Add consulation fee {ConsultationFees}
 		
 		content = content.replace("{DateOfAttendance}", dt.format(visit.getStartDatetime()));
 		content = content.replace("{Department}", visit.getVisitType().getName());
@@ -585,7 +593,7 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		
 		content = content.replace("{PatientSignature}", visitWrapper.getSignature());
 		
-		//Signature
+		// Signature
 		String claimantName = adminService.getGlobalProperty(NHIFConfig.CLAIMANT_NAME);
 		if (claimantName != null) {
 			content = content.replace("{ClaimantName}", claimantName);
@@ -593,7 +601,7 @@ public class JubileeInsuranceImpl implements InsuranceService {
 			content = content.replace("{ClaimantName}", "[Not Set]");
 		}
 		
-		//Claimant Name
+		// Claimant Name
 		String claimantSignature = adminService.getGlobalProperty(NHIFConfig.CLAIMANT_SIGNATURE);
 		if (claimantSignature != null) {
 			content = content.replace("{ClaimantSignature}", claimantSignature);
@@ -640,7 +648,7 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		
 		File output = new File(tempPDFFile);
 		ITextRenderer renderer = new ITextRenderer();
-		//renderer.setDocument(input);
+		// renderer.setDocument(input);
 		renderer.setDocumentFromString(template);
 		
 		renderer.layout();
@@ -649,12 +657,16 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		renderer.createPDF(outputStream);
 		outputStream.close();
 		/*
-		Document document = new Document(new Rectangle(Utilities.millimetersToPoints(470),
-		        Utilities.millimetersToPoints(288)), 0, 0, 0, 0);
-		PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(tempFile));
-		document.open();
-		XMLWorkerHelper.getInstance().parseXHtml(writer, document, new ByteArrayInputStream(template.getBytes()));
-		document.close();*/
+		 * Document document = new Document(new
+		 * Rectangle(Utilities.millimetersToPoints(470),
+		 * Utilities.millimetersToPoints(288)), 0, 0, 0, 0);
+		 * PdfWriter writer = PdfWriter.getInstance(document, new
+		 * FileOutputStream(tempFile));
+		 * document.open();
+		 * XMLWorkerHelper.getInstance().parseXHtml(writer, document, new
+		 * ByteArrayInputStream(template.getBytes()));
+		 * document.close();
+		 */
 		byte[] inFileBytes = Files.readAllBytes(Paths.get(tempPDFFile));
 		return new String(org.apache.commons.codec.binary.Base64.encodeBase64(inFileBytes));
 	}

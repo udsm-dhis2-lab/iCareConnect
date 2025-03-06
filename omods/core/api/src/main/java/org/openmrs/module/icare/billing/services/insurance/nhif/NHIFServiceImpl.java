@@ -715,7 +715,9 @@ public class NHIFServiceImpl implements InsuranceService {
 			oMapper.setDateFormat(df);
 			//oMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 			AuthToken authToken = getAuthToken(NHIFServer.CLAIM);
-			String results = this.postRequest(urlString, oMapper.convertValue(folioEntities, Map.class), authToken);
+			System.out.println("Potfolio data payload:" + folioEntities);
+			String results = "";
+			// String results = this.postRequest(urlString, oMapper.convertValue(folioEntities, Map.class), authToken);
 			ObjectMapper mapper = new ObjectMapper();
 			Map<String, Object> resultMap = mapper.readValue(String.valueOf(results), Map.class);
 			//TODO add status to invoice on whether is claimed

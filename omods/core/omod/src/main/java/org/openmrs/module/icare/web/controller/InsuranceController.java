@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.openmrs.Visit;
+import org.openmrs.api.VisitService;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
 import org.openmrs.module.icare.billing.services.insurance.InsurancesServices;
@@ -36,32 +40,32 @@ public class InsuranceController {
 	private InsurancesServices insurancesservice;
 	
 	@RequestMapping(value = "/authorizecard", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> authorizecard(@RequestBody Map<String, Object> requestPayload)
-            throws Exception {
-        Map<String, Object> responseObject = new HashMap<>();
+	public ResponseEntity<Map<String, Object>> authorizecard(@RequestBody Map<String, Object> requestPayload)
+			throws Exception {
+		Map<String, Object> responseObject = new HashMap<>();
 
-        System.out.println("Payload received: " + requestPayload);
+		System.out.println("Payload received: " + requestPayload);
 
-        String validationError = validatePayload(requestPayload);
-        if (validationError != null) {
-            responseObject.put("status", 400);
-            responseObject.put("error", validationError);
-            return ResponseEntity.badRequest().body(responseObject);
-        }
+		String validationError = validatePayload(requestPayload);
+		if (validationError != null) {
+			responseObject.put("status", 400);
+			responseObject.put("error", validationError);
+			return ResponseEntity.badRequest().body(responseObject);
+		}
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonPayload = objectMapper.writeValueAsString(requestPayload);
+		ObjectMapper objectMapper = new ObjectMapper();
+		String jsonPayload = objectMapper.writeValueAsString(requestPayload);
 
-        Map<String, Object> responseMap = insurancesservice.getAuthorization(jsonPayload);
+		Map<String, Object> responseMap = insurancesservice.getAuthorization(jsonPayload);
 
-        String body = (String) responseMap.get("body");
-        if (body != null) {
-            Map<String, Object> bodyMap = objectMapper.readValue(body, Map.class);
-            responseMap.put("body", bodyMap);
-        }
+		String body = (String) responseMap.get("body");
+		if (body != null) {
+			Map<String, Object> bodyMap = objectMapper.readValue(body, Map.class);
+			responseMap.put("body", bodyMap);
+		}
 
-        return ResponseEntity.ok(responseMap);
-    }
+		return ResponseEntity.ok(responseMap);
+	}
 	
 	private String validatePayload(Map<String, Object> payload) {
 		if (payload.get("cardNo") == null || ((String) payload.get("cardNo")).isEmpty()) {
@@ -100,22 +104,22 @@ public class InsuranceController {
 	}
 	
 	@RequestMapping(value = "/preapproval", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> servicePreApproval(@RequestBody Map<String, Object> requestPayload)
-            throws Exception {
+	public ResponseEntity<Map<String, Object>> servicePreApproval(@RequestBody Map<String, Object> requestPayload)
+			throws Exception {
 
-        if (!isValidPreApprovalRequest(requestPayload)) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("message", "Invalid data in the request payload");
-            errorResponse.put("status", "error");
-            return ResponseEntity.badRequest().body(errorResponse);
-        }
+		if (!isValidPreApprovalRequest(requestPayload)) {
+			Map<String, Object> errorResponse = new HashMap<>();
+			errorResponse.put("message", "Invalid data in the request payload");
+			errorResponse.put("status", "error");
+			return ResponseEntity.badRequest().body(errorResponse);
+		}
 
-        System.out.println("Payload received: " + requestPayload);
+		System.out.println("Payload received: " + requestPayload);
 
-        Map<String, Object> servicePreApprovalObject = insurancesservice.getPreapproval(requestPayload);
+		Map<String, Object> servicePreApprovalObject = insurancesservice.getPreapproval(requestPayload);
 
-        return ResponseEntity.ok(servicePreApprovalObject);
-    }
+		return ResponseEntity.ok(servicePreApprovalObject);
+	}
 	
 	private boolean isValidPreApprovalRequest(Map<String, Object> payload) {
 		
@@ -185,30 +189,30 @@ public class InsuranceController {
 	}
 	
 	@RequestMapping(value = "/beneficialydetails", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> beneficialydetails(@RequestBody Map<String, Object> requestPayload)
-            throws Exception {
-        Map<String, Object> beneficialydetailsObject = new HashMap<>();
+	public ResponseEntity<Map<String, Object>> beneficialydetails(@RequestBody Map<String, Object> requestPayload)
+			throws Exception {
+		Map<String, Object> beneficialydetailsObject = new HashMap<>();
 
-        String validationError = validateBeneficialyPayload(requestPayload);
-        if (validationError != null) {
-            beneficialydetailsObject.put("status", 400);
-            beneficialydetailsObject.put("error", validationError);
-            return ResponseEntity.badRequest().body(beneficialydetailsObject);
-        }
+		String validationError = validateBeneficialyPayload(requestPayload);
+		if (validationError != null) {
+			beneficialydetailsObject.put("status", 400);
+			beneficialydetailsObject.put("error", validationError);
+			return ResponseEntity.badRequest().body(beneficialydetailsObject);
+		}
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonPayload = objectMapper.writeValueAsString(requestPayload);
+		ObjectMapper objectMapper = new ObjectMapper();
+		String jsonPayload = objectMapper.writeValueAsString(requestPayload);
 
-        Map<String, Object> responseMap = insurancesservice.getBeneficialyDetails(jsonPayload);
+		Map<String, Object> responseMap = insurancesservice.getBeneficialyDetails(jsonPayload);
 
-        String body = (String) responseMap.get("body");
-        if (body != null) {
-            Map<String, Object> bodyMap = objectMapper.readValue(body, Map.class);
+		String body = (String) responseMap.get("body");
+		if (body != null) {
+			Map<String, Object> bodyMap = objectMapper.readValue(body, Map.class);
 
-            responseMap.put("body", bodyMap);
-        }
-        return ResponseEntity.ok(responseMap);
-    }
+			responseMap.put("body", bodyMap);
+		}
+		return ResponseEntity.ok(responseMap);
+	}
 	
 	private String validateBeneficialyPayload(Map<String, Object> payload) {
 		if (payload.get("cardNo") == null || ((String) payload.get("cardNo")).isEmpty()) {
@@ -226,32 +230,32 @@ public class InsuranceController {
 	}
 	
 	@RequestMapping(value = "/pocrefgeneration", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> pocRefGeneration(@RequestBody Map<String, Object> requestPayload)
-            throws Exception {
-        Map<String, Object> response = new HashMap<>();
+	public ResponseEntity<Map<String, Object>> pocRefGeneration(@RequestBody Map<String, Object> requestPayload)
+			throws Exception {
+		Map<String, Object> response = new HashMap<>();
 
-        System.out.println("Payload received: " + requestPayload);
+		System.out.println("Payload received: " + requestPayload);
 
-        String validationError = validatePOCRefPayload(requestPayload);
-        if (validationError != null) {
-            response.put("status", 400);
-            response.put("error", validationError);
-            return ResponseEntity.badRequest().body(response);
-        }
+		String validationError = validatePOCRefPayload(requestPayload);
+		if (validationError != null) {
+			response.put("status", 400);
+			response.put("error", validationError);
+			return ResponseEntity.badRequest().body(response);
+		}
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonPayload = objectMapper.writeValueAsString(requestPayload);
+		ObjectMapper objectMapper = new ObjectMapper();
+		String jsonPayload = objectMapper.writeValueAsString(requestPayload);
 
-        Map<String, Object> responseMap = insurancesservice.pocNotification(jsonPayload);
+		Map<String, Object> responseMap = insurancesservice.pocNotification(jsonPayload);
 
-        String body = (String) responseMap.get("body");
-        if (body != null) {
-            Map<String, Object> bodyMap = objectMapper.readValue(body, Map.class);
-            responseMap.put("body", bodyMap);
-        }
+		String body = (String) responseMap.get("body");
+		if (body != null) {
+			Map<String, Object> bodyMap = objectMapper.readValue(body, Map.class);
+			responseMap.put("body", bodyMap);
+		}
 
-        return ResponseEntity.ok(responseMap);
-    }
+		return ResponseEntity.ok(responseMap);
+	}
 	
 	private String validatePOCRefPayload(Map<String, Object> payload) {
 		if (!payload.containsKey("pointOfCareID") || !(payload.get("pointOfCareID") instanceof Number)) {
@@ -294,30 +298,30 @@ public class InsuranceController {
 	}
 	
 	@RequestMapping(value = "/loginpractitioner", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> practitioner(@RequestBody Map<String, Object> requestPayload)
-            throws Exception {
-        Map<String, Object> practitionerObject = new HashMap<>();
+	public ResponseEntity<Map<String, Object>> practitioner(@RequestBody Map<String, Object> requestPayload)
+			throws Exception {
+		Map<String, Object> practitionerObject = new HashMap<>();
 
-        String validationError = validatePractionerPayload(requestPayload);
-        if (validationError != null) {
-            practitionerObject.put("status", 400);
-            practitionerObject.put("error", validationError);
-            return ResponseEntity.badRequest().body(practitionerObject);
-        }
+		String validationError = validatePractionerPayload(requestPayload);
+		if (validationError != null) {
+			practitionerObject.put("status", 400);
+			practitionerObject.put("error", validationError);
+			return ResponseEntity.badRequest().body(practitionerObject);
+		}
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonPayload = objectMapper.writeValueAsString(requestPayload);
+		ObjectMapper objectMapper = new ObjectMapper();
+		String jsonPayload = objectMapper.writeValueAsString(requestPayload);
 
-        Map<String, Object> responseMap = insurancesservice.practionerLogin(jsonPayload);
+		Map<String, Object> responseMap = insurancesservice.practionerLogin(jsonPayload);
 
-        String body = (String) responseMap.get("body");
-        if (body != null) {
-            Map<String, Object> bodyMap = objectMapper.readValue(body, Map.class);
+		String body = (String) responseMap.get("body");
+		if (body != null) {
+			Map<String, Object> bodyMap = objectMapper.readValue(body, Map.class);
 
-            responseMap.put("body", bodyMap);
-        }
-        return ResponseEntity.ok(responseMap);
-    }
+			responseMap.put("body", bodyMap);
+		}
+		return ResponseEntity.ok(responseMap);
+	}
 	
 	private String validatePractionerPayload(Map<String, Object> payload) {
 		
@@ -346,10 +350,73 @@ public class InsuranceController {
 	}
 	
 	@RequestMapping(value = "/cardverification", method = RequestMethod.POST)
-    public Map<String, Object> cardVerification(@RequestBody List<Map<String, Object>> requestPayload)
-            throws Exception {
-        Map<String, Object> cardVerificationObject = new HashMap<>();
-        System.out.println("Payload received: " + requestPayload);
-        return cardVerificationObject;
-    }
+	public Map<String, Object> cardVerification(@RequestBody List<Map<String, Object>> requestPayload)
+			throws Exception {
+		Map<String, Object> cardVerificationObject = new HashMap<>();
+		System.out.println("Payload received: " + requestPayload);
+		return cardVerificationObject;
+	}
+	
+	@RequestMapping(value = "/sendpotfolio", method = RequestMethod.POST)
+	public ResponseEntity<Map<String, Object>> sentPortfolio(@RequestBody Map<String, Object> requestPayload) {
+		Map<String, Object> response = new HashMap<>();
+
+		String visitUuid = (String) requestPayload.get("visit");
+		String signatory = (String) requestPayload.get("Signatory");
+		String signatoryID = (String) requestPayload.get("SignatoryID");
+		String signatureData = (String) requestPayload.get("SignatureData");
+
+		if (visitUuid == null || visitUuid.isEmpty()) {
+			response.put("error", "Visit UUID is not specified");
+			return ResponseEntity.badRequest().body(response);
+		}
+
+		Visit visit = Context.getService(VisitService.class).getVisitByUuid(visitUuid);
+		if (visit == null) {
+			response.put("error", "Visit not found");
+			return ResponseEntity.badRequest().body(response);
+		}
+		Map<String, Object> responseMap = insurancesservice.potfoliosubmission(visit, signatory, signatoryID,
+				signatureData);
+		System.out.println("Payload received: " + requestPayload);
+		response.put("message", "Portfolio received successfully");
+		response.put("visitUuid", visitUuid);
+		response.put("signatory", signatory);
+		response.put("signatoryID", signatoryID);
+		response.put("signatureData", signatureData);
+
+		return ResponseEntity.ok(responseMap);
+	}
+	
+	@RequestMapping(value = "/GetCardDetailsByNIN", method = RequestMethod.POST)
+	public ResponseEntity<Map<String, Object>> getCardDetailsByNin(@RequestBody Map<String, Object> requestPayload) {
+		Map<String, Object> response = new HashMap<>();
+
+		String nationalID = (String) requestPayload.get("nationalID");
+
+		if (nationalID == null || nationalID.isEmpty()) {
+			response.put("error", "NiN is not specified");
+			return ResponseEntity.badRequest().body(response);
+		}
+
+		Map<String, Object> responseMap = insurancesservice.getCardDetailsByNIN(nationalID);
+
+		return ResponseEntity.ok(responseMap);
+	}
+	
+	@RequestMapping(value = "/submitMonthlyclaim", method = RequestMethod.POST)
+	public ResponseEntity<Map<String, Object>> claimingRequest(@RequestBody Map<String, Object> requestPayload)
+			throws Exception {
+		Map<String, Object> claimingRequestObject = new HashMap<>();
+		System.out.println("Payload received: " + requestPayload);
+		return ResponseEntity.ok(claimingRequestObject);
+	}
+	
+	@RequestMapping(value = "/sendconfirmationcode", method = RequestMethod.POST)
+	public ResponseEntity<Map<String, Object>> sendconfirmationCode(@RequestBody Map<String, Object> requestPayload)
+			throws Exception {
+		Map<String, Object> sendconfirmationCodeObject = new HashMap<>();
+		System.out.println("Payload received: " + requestPayload);
+		return ResponseEntity.ok(sendconfirmationCodeObject);
+	}
 }

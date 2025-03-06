@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.openmrs.Visit;
+import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFServiceImpl;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -47,6 +49,8 @@ public class InsurancesServices {
 	private static final String SCOPE = "OnlineServices";
 	
 	private static final String USERNAME = "hmis_username";
+	
+	private static final String GETBYNIN_API_URL = "https://test.nhif.or.tz/servicehub/api/Verification/GetCardDetailsByNIN";
 	
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
@@ -495,4 +499,70 @@ public class InsurancesServices {
 	public Map<String, Object> getissueRequest(String jsonPayload) {
 		return null;
 	}
+	
+	public Map<String, Object> potfoliosubmission(Visit visit, String signatory, String signatoryID, String signatureData) {
+		InsuranceService insuranceService = null;
+		insuranceService = new NHIFServiceImpl();
+		try {
+			insuranceService.claim(visit);
+		}
+		catch (Exception e) {
+			
+		}
+		return null;
+	}
+	
+	public Map<String, Object> getCardDetailsByNIN(String nationalID) {
+        Map<String, Object> responseMap = new HashMap<>();
+        
+
+        if (nationalID == null || nationalID.trim().isEmpty()) {
+            responseMap.put("status", 400);
+            responseMap.put("error", "Null or empty nationalID is not allowed");
+            return responseMap;
+        }
+
+        String token = getAuthToken();
+        if (token == null) {
+            responseMap.put("status", 401);
+            responseMap.put("error", "Failed to obtain authentication token");
+            return responseMap;
+        }
+        try {
+            String fullUrl = GETBYNIN_API_URL + "?nationalID=" + nationalID;
+            System.out.println("API URL: " + fullUrl);
+
+            URL url = new URL(fullUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", "Bearer " + token);
+            conn.setRequestProperty("Accept", "application/json");
+
+            int responseCode = conn.getResponseCode();
+            responseMap.put("status", responseCode);
+
+            if (responseCode == HttpURLConnection.HTTP_OK) { 
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                // Parse JSON response
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseBody = objectMapper.readValue(response.toString(), Map.class);
+
+                responseMap.put("body", responseBody);
+            } else {
+                responseMap.put("error", "Failed to fetch data. HTTP Code: " + responseCode);
+            }
+        } catch (Exception e) {
+            responseMap.put("status", 500);
+            responseMap.put("error", "Exception occurred: " + e.getMessage());
+        }
+
+        return responseMap;
+    }
 }
