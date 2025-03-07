@@ -7,7 +7,8 @@ import { OpenmrsHttpClientService } from '../modules/openmrs-http-client/service
 })
 export class InsuranceService {
 
-  private apiUrl = "insurance/authorizecard";
+  private authorizeCardUrl = "insurance/authorizecard";
+  private getBeneficiaryDetailsUrl = "insurance/GetCardDetailsByNIN";
 
   constructor(
     private httpClient: OpenmrsHttpClientService
@@ -19,7 +20,14 @@ export class InsuranceService {
     if (!authorizationData || Object.keys(authorizationData).length === 0) {
       console.error('No authorizationData provided for authorization');
     }
-    return this.httpClient.post(this.apiUrl, authorizationData);
+    return this.httpClient.post(this.authorizeCardUrl, authorizationData);
   }
+
+  getCardNumberByNida(nidaData: any): Observable<any> {
+    if (!nidaData || Object.keys(nidaData).length === 0) {
+      console.error('No authorizationData provided for authorization');
+    }
+    return this.httpClient.post(this.getBeneficiaryDetailsUrl, nidaData);
+  } 
   
 }

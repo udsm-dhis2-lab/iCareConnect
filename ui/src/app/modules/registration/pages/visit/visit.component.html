@@ -711,6 +711,7 @@
                         maxlength="20"
                         placeholder="Enter National ID"
                         (input)="onNationalIdInput($event)"
+                        [(ngModel)]="NationalID"
                         (ngModelChange)="onNationalIDChange($event)"
                       />
                     </mat-form-field>
@@ -733,7 +734,12 @@
                     >
                     </app-finger-print>
                   </ng-container>
-               
+
+                  
+               <!-- Add this button where you want it to appear in your HTML -->
+<!-- <button mat-raised-button color="primary" (click)="getCardNumber()">
+  Get Card Number
+</button> -->
                   
 
                   

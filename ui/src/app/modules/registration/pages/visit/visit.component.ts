@@ -66,6 +66,7 @@ export class VisitComponent implements OnInit {
   editMode: boolean = false;
   disableEditingPayments: boolean = false;
   isEmergencyVisit: boolean = false;
+  CardNo: string;
 
   existingVisitUuid: string;
 
@@ -139,6 +140,7 @@ export class VisitComponent implements OnInit {
   InsuranceID: string = "";
   showModal = false;
   authorizationNo: string;
+  cardNumber: string = "";
   // showMessage: boolean = false;
   // showLoader: boolean = false;
 
@@ -147,13 +149,11 @@ export class VisitComponent implements OnInit {
   }
 
   closeModal() {
- 
     this.showModal = false;
     this.showMessage = false;
     this.showLoader = false;
-
   }
- 
+
   constructor(
     private store: Store<AppState>,
     public dialog: MatDialog,
@@ -243,10 +243,10 @@ export class VisitComponent implements OnInit {
     });
   }
 
-  onNationalIdInput(event: any): void {
-    const inputValue = event.target.value;
-    event.target.value = inputValue.replace(/\D/g, "");
-  }
+  // onNationalIdInput(event: any): void {
+  //   const inputValue = event.target.value;
+  //   event.target.value = inputValue.replace(/\D/g, "");
+  // }
 
   openDialog(locations) {
     const dialogRef = this.dialog.open(SelectRoomComponent, {
@@ -1058,7 +1058,22 @@ export class VisitComponent implements OnInit {
             visitType?.name.toLowerCase().indexOf("ipd") > -1
         ) || [];
   }
-
+  getCardNumber() {
+    this.insuranceService.getCardNumberByNida(this.nidaData).subscribe({
+      next: (response) => {
+        const nidaResponse = response;
+        this.authorizationData.cardNo = nidaResponse.body.CardNo;
+        setTimeout(() => {
+          this.authorizeInsurance();
+        }, 2000);
+        console.log("Payload Sent",this.authorizationData);
+      },
+      error: (error) => {
+        console.error("Error during authorization:", error);
+        this.showLoader = false;
+      },
+    });
+  }
   onSetEditPatient(event, path, patientUuid) {
     event.stopPropagation();
     this.editPatient.emit(path + patientUuid);
@@ -1066,12 +1081,14 @@ export class VisitComponent implements OnInit {
 
   onInsuranceIDChange(newValue: string): void {
     this.authorizationData.cardNo = newValue;
+    console.log(this.authorizationData.cardNo);
   }
 
   onNationalIDChange(newValue: string): void {
-    this.authorizationData.nationalID = newValue;
+    // this.nidaData.nationalID = newValue;
+    this.nidaData.nationalID = newValue;
+    console.log("National ID", this.nidaData.nationalID);
   }
-
 
   authorizationData = {
     cardNo: "",
@@ -1084,11 +1101,20 @@ export class VisitComponent implements OnInit {
     remarks: "Authorization",
   };
 
+  nidaData = {
+    nationalID: "",
+  };
+
+  onNationalIdInput(event: any): void {
+    const inputValue = event.target.value;
+    event.target.value = inputValue.replace(/\D/g, "");
+  }
+
   authorizeInsurance() {
     if (!this.authorizationData.nationalID) {
       this.authorizationData.nationalID = "string";
     }
-  
+
     if (!this.authorizationData.cardNo) {
       this.authorizationData.cardNo = "string";
     }
@@ -1096,38 +1122,55 @@ export class VisitComponent implements OnInit {
       this.authorizationData.imageData = "string";
     }
 
-if (this.rawData){
-  this.authorizationData.imageData = this.rawData; 
-  this.showLoader = true;
-}
-     
-  
+    if (this.rawData) {
+      this.authorizationData.imageData = this.rawData;
+      this.showLoader = true;
+    }
+
     this.insuranceService
       .authorizeInsuranceCard(this.authorizationData)
       .subscribe({
         next: (response) => {
           const typedResponse = response;
-        this.authorizationNo = typedResponse.body.AuthorizationNo; 
-        this.visitDetails['InsuranceAuthNo'] = this.authorizationNo;
-        this.showLoader = false; 
-        // this.showMessage = true; 
-        this.closeModal();
-     
-      },
+          this.authorizationNo = typedResponse.body.AuthorizationNo;
+          this.visitDetails["InsuranceAuthNo"] = this.authorizationNo;
+          this.showLoader = false;
+          // this.showMessage = true;
+          this.closeModal();
+        },
         error: (error) => {
           console.error("Error during authorization:", error);
-          this.showLoader = false; 
+          this.showLoader = false;
         },
       });
   }
-  
+
   onFingerprintCaptured(rawData: string) {
     this.rawData = rawData;
-    setTimeout(() => {
-      this.authorizeInsurance();
-    }, 2000);
- 
+    if (this.nidaData.nationalID && this.rawData) {
+      console.log("NIDA ---", this.nidaData.nationalID);
+      this.getCardNumber();
+    } else {
+      console.log("Card Number ---", this.nidaData.nationalID);
+      setTimeout(() => {
+        this.authorizeInsurance();
+      }, 2000);
+    }
   }
- 
 
+  // onFingerprintCaptured(rawData: string) {
+  //   this.rawData = rawData;
+  //   if (this.nidaData.nationalID) {
+  //     setTimeout(() => {
+  //       this.getCardNumber();
+  //       setTimeout(() => {
+  //         this.authorizeInsurance();
+  //       }, 2000);
+  //     }, 2000);
+  //   } else {
+  //     setTimeout(() => {
+  //       this.authorizeInsurance();
+  //     }, 2000);
+  //   }
+  // }
 }
