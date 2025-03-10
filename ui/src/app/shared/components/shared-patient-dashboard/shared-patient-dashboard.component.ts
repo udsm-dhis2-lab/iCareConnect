@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { select, Store } from "@ngrx/store";
+import { getActiveVisit } from "src/app/store/selectors/visit.selectors"; 
 import { Observable } from "rxjs";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { DiagnosisObject } from "src/app/shared/resources/diagnosis/models/diagnosis-object.model";
@@ -105,6 +106,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Input() moduleName: any;
 
   showModal:boolean=false;
+  patientVisitDetails: any;
  
   closeModal() {
     this.showModal = false;
@@ -187,6 +189,8 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log("activae,,,,,,,,,",this.activeVisit)
+   
     if (
       this.visitEndingControlStatusesConceptUuid &&
       this.visitEndingControlStatusesConceptUuid !== "none"
@@ -368,6 +372,17 @@ export class SharedPatientDashboardComponent implements OnInit {
         })
       );
     this.showHistoryDetails = this.activeVisit?.isAdmitted;
+
+  // Define visit$ observable
+  this.activeVisit$ = this.store.pipe(select(getActiveVisit));
+
+  // Subscribe to visit$ observable and log the value
+  this.activeVisit$.subscribe((visit) => {
+    console.log("Active Visit:....>>>.", visit);
+  });
+
+
+
   }
   toggleSideBarMenu(event: Event): void {
     event.stopPropagation();
@@ -393,6 +408,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
 
   getSelectedForm(event: Event, form: any): void {
+     console.log("form", form);
     this.trackActionForAnalytics(`${form?.name}: Open`);
     this.loadGlobalProperty();
     this.readyForClinicalNotes = false;
@@ -402,11 +418,27 @@ export class SharedPatientDashboardComponent implements OnInit {
     this.selectedForm = form;
     this.showHistoryDetails = false;
   
-    if (form.name === '1.Vitals') {
+    // if (form.id === 'a000cb34-9ec1-4344-a1c8-f692232f6edd') {
+    //   this.showModal = true;
+    // } else {
+    //   this.showModal = false; 
+    // }
+     // Define visit$ observable
+
+  this.activeVisit$ = this.store.pipe(select(getActiveVisit));
+  // Subscribe to visit$ observable and log the value
+  this.activeVisit$.subscribe((visit) => {
+    console.log("Active Visit:....>>>.", visit);
+    //  const visits = visit.billDetails.paymentDetails.paymentType.name;
+    // Existing logic to show/hide modal
+    if (this.selectedForm && this.selectedForm.id === 'a000cb34-9ec1-4344-a1c8-f692232f6edd') {
       this.showModal = true;
     } else {
-      this.showModal = false; 
+      this.showModal = false;
     }
+  });
+
+  
 
     setTimeout(() => {
       this.readyForClinicalNotes = true;
@@ -662,4 +694,12 @@ export class SharedPatientDashboardComponent implements OnInit {
   onToggleHistoryType(event: MatRadioChange): void {
     this.selectedHistoryCategory = event?.value;
   }
+
+
+
+  handlePatientVisitDetails(patientVisitDetails: any): void {
+    this.patientVisitDetails = patientVisitDetails;
+    console.log("Received patient visit details in parent:", patientVisitDetails);
+  }
+  
 }

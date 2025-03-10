@@ -182,6 +182,11 @@ export class PatientDashboardComponent implements OnInit {
         );
       }
     });
+    
+  // Subscribe to visit$ observable and log the value
+  this.patientBillingDetails$.subscribe((visit) => {
+    console.log("Testermmm....>>>.", visit);
+  });
   }
 
   dischargePatient(
@@ -218,5 +223,9 @@ export class PatientDashboardComponent implements OnInit {
         invoice: dischargeInfo?.invoice,
       },
     });
+  }
+
+  handlePatientVisitDetails(event, patientVisitDetails): void { 
+    console.log("patient visit details..kallll", patientVisitDetails);
   }
 }
