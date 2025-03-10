@@ -38,7 +38,7 @@ public class FolioDisease {
 	
 	public static FolioDisease fromDiagnosis(Folio folio, Diagnosis diagnosis) {
 		FolioDisease folioDisease = new FolioDisease();
-		folioDisease.setFolioID(folio.getFolioID());
+		// folioDisease.setFolioID(folio.getFolioID());
 		folioDisease.setFolioDiseaseID(diagnosis.getUuid());
 		//diagnosis.getDiagnosis().
 		String diagnosisString = diagnosis.getDiagnosis().getCoded().getDisplayString();

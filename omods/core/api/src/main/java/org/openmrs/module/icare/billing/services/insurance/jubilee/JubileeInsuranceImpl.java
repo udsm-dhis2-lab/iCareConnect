@@ -371,10 +371,10 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		folio.setPatientFileNo(visitWrapper.getPatient().getFileNumber());
 		ProviderWrapper providerWrapper = visitWrapper.getConsultationProvider();
 		if (providerWrapper != null) {
-			folio.setPractitionerNo(providerWrapper.getPhoneNumber());
+			// folio.setPractitionerNo(providerWrapper.getPhoneNumber());
 		}
 		folio.setFacilityCode(facilityCode);
-		folio.setFolioID(visit.getUuid());
+		// folio.setFolioID(visit.getUuid());
 		/*
 		 * if (visit.getStopDatetime() == null) {
 		 * throw new Exception("To Claim the visit has to be closed");
@@ -392,8 +392,8 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		serialString = serialString.substring(String.valueOf(folio.getFolioNo()).length()) + folio.getFolioNo();
 		folio.setAttendanceDate(visit.getStartDatetime());
 		
-		folio.setSerialNo(facilityCode + "\\" + (folio.getClaimMonth() < 10 ? "0" : "") + folio.getClaimMonth() + "\\"
-		        + calendar.get(Calendar.YEAR) + "\\" + serialString);
+		// folio.setSerialNo(facilityCode + "\\" + (folio.getClaimMonth() < 10 ? "0" : "") + folio.getClaimMonth() + "\\"
+		//         + calendar.get(Calendar.YEAR) + "\\" + serialString);
 		folio.setAuthorizationNo(visitWrapper.getInsuranceAuthorizationNumber());
 		folio.setCardNo(visitWrapper.getInsuranceID());
 		folio.setPatientFileNo(visitWrapper.getPatient().getFileNumber());
@@ -405,7 +405,7 @@ public class JubileeInsuranceImpl implements InsuranceService {
 			folio.setGender("Female");
 		}
 		folio.setDateOfBirth(visit.getPatient().getBirthdate());
-		folio.setAge(visit.getPatient().getAge());
+		// folio.setAge(visit.getPatient().getAge());
 		
 		folio.setPatientTypeCode("OUT");
 		
@@ -463,9 +463,9 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		patientFile = patientFile.replace("{Observation}", observations);
 		patientFile = patientFile.replace("{Name}", visit.getPatient().getPersonName().getFullName());
 		String content = getForm2B_A(visit, folio);
-		folio.setClaimFile(convertToPDFEncodedString("claim", content));
+		// folio.setClaimFile(convertToPDFEncodedString("claim", content));
 		
-		folio.setPatientFile(convertToPDFEncodedString("file", patientFile));
+		// folio.setPatientFile(convertToPDFEncodedString("file", patientFile));
 		
 		return folio;
 	}
@@ -560,7 +560,7 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		content = content.replace("{ConsultationFees}", consultationFees);
 		content = content.replace("{GrandTotal}", String.valueOf(grandtotal));
 		content = content.replace("{AuthNo}", folio.getAuthorizationNo());
-		content = content.replace("{SerialNumber}", folio.getSerialNo());
+		// content = content.replace("{SerialNumber}", folio.getSerialNo());
 		content = content.replace("{Consultation}", consultation);
 		content = content.replace("{Tests}", tests);
 		content = content.replace("{Medicine}", medicine);

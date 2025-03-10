@@ -688,14 +688,64 @@ public class NHIFServiceImpl implements InsuranceService {
 		return false;
 	}
 	
+	// @Override
+	// public ClaimResult claim(Visit visit) throws Exception {
+	// 	ClaimResult result = new ClaimResult();
+	// 	AdministrationService adminService = Context.getService(AdministrationService.class);
+	// 	String facilityCode = adminService.getGlobalProperty(NHIFConfig.FACILITY_CODE);
+	// 	if (facilityCode == null) {
+	// 		result.setStatus("ERROR");
+	// 		result.setMessage("Facility code not configured. Please Configure " + NHIFConfig.FACILITY_CODE + ".");
+	// 		return result;
+	// 	}
+	
+	// 	String allowOnlineVerification = adminService.getGlobalProperty(NHIFConfig.ALLOW_ONLINE_CLAIM);
+	// 	if (allowOnlineVerification == null || allowOnlineVerification.trim().equals("")) {
+	// 		throw new VerificationException("Allowing Online Claim is not set. Please set " + NHIFConfig.ALLOW_ONLINE_CLAIM
+	// 		        + ".");
+	// 	}
+	// 	if (allowOnlineVerification.equals("true")) {
+	// 		Folio folio = getFolioFromVisit(visit);
+	// 		FolioEntities folioEntities = new FolioEntities();
+	// 		folioEntities.getEntities().add(folio);
+	// 		ObjectMapper oMapper = new ObjectMapper();
+	// 		final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	// 		//final DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+	// 		oMapper.setDateFormat(df);
+	// 		//oMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+	// 		AuthToken authToken = getAuthToken(NHIFServer.CLAIM);
+	// 		System.out.println("Potfolio data payload:" + folioEntities);
+	// 		String results = "";
+	// 		// String results = this.postRequest(urlString, oMapper.convertValue(folioEntities, Map.class), authToken);
+	// 		ObjectMapper mapper = new ObjectMapper();
+	// 		//TODO add status to invoice on whether is claimed
+	// 		VisitWrapper visitWrapper = new VisitWrapper(visit);
+	// 		visitWrapper.setInsuranceClaimStatus(ClaimStatus.CLAIMED);
+	// 	} else {
+	// 		visit.setStopDatetime(new Date());
+	// 		Context.getVisitService().saveVisit(visit);
+	// 	}
+	// 	/*VisitService visitService = Context.getVisitService();
+	// 	VisitAttribute serviceVisitAttribute = new VisitAttribute();
+	// 	serviceVisitAttribute.setAttributeType(visitService.getVisitAttributeTypeByUuid(adminService
+	// 	        .getGlobalProperty(ICareConfig.INSURANCE_CLAIM_STATUS)));
+	// 	serviceVisitAttribute.setValue("CLAIMED");
+	// 	serviceVisitAttribute.setValueReferenceInternal(visit.getUuid());
+	// 	serviceVisitAttribute.setVisit(visit);
+	// 	visit.addAttribute(serviceVisitAttribute);*/
+	// 	//visitService..saveVisit(visit);
+	// 	return result;
+	// }
+	
 	@Override
 	public ClaimResult claim(Visit visit) throws Exception {
 		ClaimResult result = new ClaimResult();
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		String facilityCode = adminService.getGlobalProperty(NHIFConfig.FACILITY_CODE);
+		
 		if (facilityCode == null) {
 			result.setStatus("ERROR");
-			result.setMessage("Facility code not configured. Please Configure " + NHIFConfig.FACILITY_CODE + ".");
+			result.setMessage("Facility code is not configured. Please Configure " + NHIFConfig.FACILITY_CODE + ".");
 			return result;
 		}
 		
@@ -704,38 +754,20 @@ public class NHIFServiceImpl implements InsuranceService {
 			throw new VerificationException("Allowing Online Claim is not set. Please set " + NHIFConfig.ALLOW_ONLINE_CLAIM
 			        + ".");
 		}
+		
 		if (allowOnlineVerification.equals("true")) {
-			String urlString = "/api/v1/Claims/SubmitFolios";
+			// Get the folio and set it in the result
 			Folio folio = getFolioFromVisit(visit);
-			FolioEntities folioEntities = new FolioEntities();
-			folioEntities.getEntities().add(folio);
-			ObjectMapper oMapper = new ObjectMapper();
-			final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-			//final DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-			oMapper.setDateFormat(df);
-			//oMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-			AuthToken authToken = getAuthToken(NHIFServer.CLAIM);
-			System.out.println("Potfolio data payload:" + folioEntities);
-			String results = "";
-			// String results = this.postRequest(urlString, oMapper.convertValue(folioEntities, Map.class), authToken);
-			ObjectMapper mapper = new ObjectMapper();
-			Map<String, Object> resultMap = mapper.readValue(String.valueOf(results), Map.class);
-			//TODO add status to invoice on whether is claimed
-			VisitWrapper visitWrapper = new VisitWrapper(visit);
-			visitWrapper.setInsuranceClaimStatus(ClaimStatus.CLAIMED);
+			result.setFolio(folio);
+			result.setStatus("SUCCESS");
+			result.setMessage("Claim processed successfully.");
 		} else {
 			visit.setStopDatetime(new Date());
 			Context.getVisitService().saveVisit(visit);
+			result.setStatus("ERROR");
+			result.setMessage("Claim submission is not allowed.");
 		}
-		/*VisitService visitService = Context.getVisitService();
-		VisitAttribute serviceVisitAttribute = new VisitAttribute();
-		serviceVisitAttribute.setAttributeType(visitService.getVisitAttributeTypeByUuid(adminService
-		        .getGlobalProperty(ICareConfig.INSURANCE_CLAIM_STATUS)));
-		serviceVisitAttribute.setValue("CLAIMED");
-		serviceVisitAttribute.setValueReferenceInternal(visit.getUuid());
-		serviceVisitAttribute.setVisit(visit);
-		visit.addAttribute(serviceVisitAttribute);*/
-		//visitService..saveVisit(visit);
+		
 		return result;
 	}
 	
@@ -748,47 +780,41 @@ public class NHIFServiceImpl implements InsuranceService {
 		}
 		
 		Folio folio = new Folio();
-		//TODO set the actual phone number
+		
+		// Basic patient and facility details
 		folio.setTelephoneNo(visitWrapper.getPatient().getPhoneNumber());
 		folio.setPatientFileNo(visitWrapper.getPatient().getFileNumber());
-		ProviderWrapper providerWrapper = visitWrapper.getConsultationProvider();
-		if (providerWrapper != null) {
-			folio.setPractitionerNo(providerWrapper.getPhoneNumber());
-		}
 		folio.setFacilityCode(facilityCode);
-		folio.setFolioID(visit.getUuid());
-		/*if (visit.getStopDatetime() == null) {
-			throw new Exception("To Claim the visit has to be closed");
-		}*/
+		
+		// Set claim year, month, folio number, and attendance date based on visit start datetime
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(visit.getStartDatetime());
 		folio.setClaimYear(calendar.get(Calendar.YEAR));
 		folio.setClaimMonth(calendar.get(Calendar.MONTH) + 1);
-		
-		ICareService iCareService = Context.getService(ICareService.class);
-		//folio.setFolioNo(iCareService.getVisitSerialNumber(visit));
 		folio.setFolioNo(visit.getId());
-		String serialString = "00000";
-		serialString = serialString.substring(String.valueOf(folio.getFolioNo()).length()) + folio.getFolioNo();
 		folio.setAttendanceDate(visit.getStartDatetime());
 		
-		folio.setSerialNo(facilityCode + "\\" + (folio.getClaimMonth() < 10 ? "0" : "") + folio.getClaimMonth() + "\\"
-		        + calendar.get(Calendar.YEAR) + "\\" + serialString);
+		// Set insurance and personal details
 		folio.setAuthorizationNo(visitWrapper.getInsuranceAuthorizationNumber());
 		folio.setCardNo(visitWrapper.getInsuranceID());
-		folio.setPatientFileNo(visitWrapper.getPatient().getFileNumber());
 		folio.setFirstName(visit.getPatient().getGivenName());
 		folio.setLastName(visit.getPatient().getFamilyName());
-		if (visit.getPatient().getGender().equals("M")) {
+		
+		// Set gender based on patient information
+		String gender = visit.getPatient().getGender();
+		if ("M".equalsIgnoreCase(gender)) {
 			folio.setGender("Male");
-		} else if (visit.getPatient().getGender().equals("F")) {
+		} else if ("F".equalsIgnoreCase(gender)) {
 			folio.setGender("Female");
+		} else {
+			folio.setGender(gender);
 		}
 		folio.setDateOfBirth(visit.getPatient().getBirthdate());
-		folio.setAge(visit.getPatient().getAge());
 		
+		// Default patient type is outpatient ("OUT")
 		folio.setPatientTypeCode("OUT");
 		
+		// Audit fields
 		folio.setCreatedBy(visit.getCreator().getDisplayString());
 		folio.setDateCreated(visit.getDateCreated());
 		if (visit.getChangedBy() != null) {
@@ -802,29 +828,32 @@ public class NHIFServiceImpl implements InsuranceService {
 			folio.setLastModified(visit.getDateCreated());
 		}
 		
-		String bedOrderType = adminService.getGlobalProperty(ICareConfig.BED_ORDER_TYPE);
-		String patientFile = new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
-		        .getResource("nhif/patientFile.html").toURI())));
-		String observations = "";
-		SimpleDateFormat dt = new SimpleDateFormat("dd-MM-yyyy HH:MM");
+		// Process encounters to add diseases, items, and capture observations
+		StringBuilder observationsBuilder = new StringBuilder();
+		SimpleDateFormat dt = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 		for (Encounter encounter : visit.getEncounters()) {
+			// Build an HTML table row for each observation
 			for (Obs obs : encounter.getObs()) {
-				observations += "<tr><td>" + dt.format(obs.getObsDatetime()) + "</td><td>" + dt.format(obs.getObsDatetime())
-				        + "</td><td>" + obs.getConcept().getName().getName() + "</td><td>"
-				        + obs.getValueAsString(Locale.ENGLISH) + "</td></tr>";
-				
+				observationsBuilder.append("<tr><td>").append(dt.format(obs.getObsDatetime())).append("</td><td>")
+				        .append(dt.format(obs.getObsDatetime())).append("</td><td>")
+				        .append(obs.getConcept().getName().getName()).append("</td><td>")
+				        .append(obs.getValueAsString(Locale.ENGLISH)).append("</td></tr>");
 			}
 			
+			// Add diagnoses to folio diseases
 			if (encounter.getDiagnoses() != null) {
 				for (Diagnosis diagnosis : encounter.getDiagnoses()) {
 					FolioDisease folioDisease = FolioDisease.fromDiagnosis(folio, diagnosis);
 					folio.getFolioDiseases().add(folioDisease);
 				}
 			}
+			
+			// Process orders to add folio items and check for bed orders (which indicate an inpatient)
 			for (Order order : encounter.getOrders()) {
 				FolioItem folioItem = FolioItem.fromOrder(order);
 				if (folioItem != null) {
 					folio.getFolioItems().add(folioItem);
+					String bedOrderType = adminService.getGlobalProperty(ICareConfig.BED_ORDER_TYPE);
 					if (order.getOrderType().getUuid().equals(bedOrderType)) {
 						folio.setPatientTypeCode("IN");
 						folio.setDateAdmitted(order.getEffectiveStartDate());
@@ -837,28 +866,47 @@ public class NHIFServiceImpl implements InsuranceService {
 				}
 			}
 		}
-		if (observations.equals("")) {
+		String observations = observationsBuilder.toString();
+		if (observations.isEmpty()) {
 			observations = "<tr><td colspan='5' align='center'>There are no observations</td></tr>";
 		}
+		
+		// Generate clinical notes using a patient file template
+		String patientFileTemplate = new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
+		        .getResource("nhif/patientFile.html").toURI())));
 		PatientWrapper patientWrapper = new PatientWrapper(visit.getPatient());
-		patientFile = patientFile.replace("{Observation}", observations);
-		patientFile = patientFile.replace("{Name}", patientWrapper.getPatient().getPersonName().getFullName());
-		patientFile = patientFile.replace("{Gender}", patientWrapper.getPatient().getGender());
-		patientFile = patientFile.replace("{Years}", patientWrapper.getPatient().getAge().toString());
-		
+		patientFileTemplate = patientFileTemplate.replace("{Observation}", observations)
+		        .replace("{Name}", patientWrapper.getPatient().getPersonName().getFullName())
+		        .replace("{Gender}", patientWrapper.getPatient().getGender())
+		        .replace("{Years}", patientWrapper.getPatient().getAge().toString());
 		if (visit.getPatient().getBirthDateTime() != null) {
-			patientFile = patientFile.replace("{BirthDate}", visit.getPatient().getBirthDateTime().toString());
+			patientFileTemplate = patientFileTemplate.replace("{BirthDate}", visit.getPatient().getBirthDateTime()
+			        .toString());
 		} else {
-			patientFile = patientFile.replace("{BirthDate}", "");
+			patientFileTemplate = patientFileTemplate.replace("{BirthDate}", "");
 		}
-		patientFile = patientFile.replace("{PhoneNumber}", patientWrapper.getPhoneNumber());
-		patientFile = patientFile.replace("{Email}", patientWrapper.getEmail());
-		patientFile = patientFile.replace("{Identifier}", patientWrapper.getFileNumber());
-		String content = getForm2B_A(visit, folio);
-		folio.setClaimFile(convertToPDFEncodedString("claim", content));
+		patientFileTemplate = patientFileTemplate.replace("{PhoneNumber}", patientWrapper.getPhoneNumber())
+		        .replace("{Email}", patientWrapper.getEmail()).replace("{Identifier}", patientWrapper.getFileNumber());
 		
-		folio.setPatientFile(convertToPDFEncodedString("file", patientFile));
+		// In the updated Folio, we use the ClinicalNotes field to hold the patient file content.
+		folio.setClinicalNotes(patientFileTemplate);
 		
+		// Set BillNo (if applicable). Here we leave it empty; update as needed.
+		folio.setBillNo("");
+		
+		// Set additional fields as necessary
+		folio.setVisitTypeID(0);
+		folio.setLateSubmissionReason("");
+		folio.setAmountClaimed(0);
+		folio.setConfirmationCode("");
+		
+		// Add the consultation provider as an attending practitioner if available
+		ProviderWrapper consultationProvider = visitWrapper.getConsultationProvider();
+		if (consultationProvider != null) {
+			folio.getAttendingPractitioners().add(consultationProvider.toString());
+		}
+		
+		// The Signatures list remains empty unless set elsewhere.
 		return folio;
 	}
 	
@@ -986,7 +1034,7 @@ public class NHIFServiceImpl implements InsuranceService {
 		content = content.replace("{ConsultationFees}", consultationFees);
 		content = content.replace("{GrandTotal}", String.valueOf(grandtotal));
 		content = content.replace("{AuthNo}", folio.getAuthorizationNo());
-		content = content.replace("{SerialNumber}", folio.getSerialNo());
+		// content = content.replace("{SerialNumber}", folio.getSerialNo());
 		content = content.replace("{Consultation}", consultation);
 		content = content.replace("{Tests}", tests);
 		content = content.replace("{Medicine}", medicine);

@@ -13,12 +13,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.openmrs.Visit;
 import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFServiceImpl;
+import org.openmrs.module.icare.billing.services.insurance.nhif.claim.Folio;
+import org.openmrs.module.icare.billing.services.insurance.nhif.claim.Signature;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -501,16 +504,47 @@ public class InsurancesServices {
 	}
 	
 	public Map<String, Object> potfoliosubmission(Visit visit, String signatory, String signatoryID, String signatureData) {
-		InsuranceService insuranceService = null;
-		insuranceService = new NHIFServiceImpl();
-		try {
-			insuranceService.claim(visit);
-		}
-		catch (Exception e) {
-			
-		}
-		return null;
-	}
+        InsuranceService insuranceService = new NHIFServiceImpl();
+        Map<String, Object> responseMap = new HashMap<>();
+        
+        try {
+            // Call the claim method and store the returned ClaimResult
+            ClaimResult result = insuranceService.claim(visit);
+            
+            // Log the ClaimResult details
+            System.out.println("Claim Result Status: " + result.getStatus());
+            System.out.println("Claim Result Message: " + result.getMessage());
+            
+            if (result.getFolio() != null) {
+                Folio folio = result.getFolio();
+                
+                // Create and add a Signatures
+                Signature signature = new Signature();
+                signature.setSignatory(signatory);
+                signature.setSignatoryID(signatoryID);
+                signature.setSignatureData(signatureData);
+                Date now = new Date();
+                signature.setDateCreated(now);
+                signature.setCreatedBy("system"); 
+                signature.setLastModified(now);
+                signature.setLastModifiedBy("system");
+            
+                folio.getSignatures().add(signature);
+                
+                responseMap.put("folio", folio);
+            }
+            
+            responseMap.put("status", result.getStatus());
+            responseMap.put("message", result.getMessage());
+            
+        } catch (Exception e) {
+            e.printStackTrace(); // Log exception details if any
+            responseMap.put("status", "ERROR");
+            responseMap.put("message", "An error occurred: " + e.getMessage());
+        }
+        
+        return responseMap;
+    }
 	
 	public Map<String, Object> getCardDetailsByNIN(String nationalID) {
         Map<String, Object> responseMap = new HashMap<>();
