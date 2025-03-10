@@ -901,9 +901,10 @@ public class NHIFServiceImpl implements InsuranceService {
 		folio.setConfirmationCode("");
 		
 		// Add the consultation provider as an attending practitioner if available
-		ProviderWrapper consultationProvider = visitWrapper.getConsultationProvider();
-		if (consultationProvider != null) {
-			folio.getAttendingPractitioners().add(consultationProvider.toString());
+		ProviderWrapper providerWrapper = visitWrapper.getConsultationProvider();
+		// ProviderWrapper consultationProvider = visitWrapper.getConsultationProvider();
+		if (providerWrapper != null) {
+			folio.getAttendingPractitioners().add(providerWrapper.getProvider().getProviderId().toString());
 		}
 		
 		// The Signatures list remains empty unless set elsewhere.
