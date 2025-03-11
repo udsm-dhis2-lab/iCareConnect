@@ -25,6 +25,12 @@ export class NursingHomeComponent implements OnInit {
   loadingVisit$: Observable<boolean>;
   isPatientListTabular: boolean;
   settingCurrentLocationStatus$: Observable<boolean>;
+  showModal:boolean=false;
+ 
+  closeModal() {
+    this.showModal = false;
+  }
+
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
@@ -35,6 +41,8 @@ export class NursingHomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    
+    this.showModal =true;
     this.settingCurrentLocationStatus$ = this.store.select(
       getSettingCurrentLocationStatus
     );

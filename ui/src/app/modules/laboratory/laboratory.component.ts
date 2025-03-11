@@ -69,6 +69,14 @@ export class LaboratoryComponent implements OnInit {
   userRoles$: Observable<any>;
   currentRoutePath: string = "";
   showMenuItems: boolean = true;
+  showModal:boolean=false;
+ 
+  closeModal() {
+    this.showModal = false;
+  }
+
+
+
   /**
    *
    * @param store
@@ -262,6 +270,7 @@ export class LaboratoryComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.showModal =true;
     this.systemSettingsService
       .getSystemSettingsByKey(`icare.general.selectedSystemSettings`)
       .subscribe((response) => {

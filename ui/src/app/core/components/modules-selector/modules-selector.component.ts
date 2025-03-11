@@ -41,7 +41,7 @@ export class ModulesSelectorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.showModal=true;
+    // this.showModal=true;
 
     const storedNavigationDetails =
       localStorage.getItem("navigationDetails") != "undefined"

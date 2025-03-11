@@ -189,7 +189,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log("activae,,,,,,,,,",this.activeVisit)
+    // console.log("activae,,,,,,,,,",this.activeVisit)
    
     if (
       this.visitEndingControlStatusesConceptUuid &&
@@ -373,13 +373,13 @@ export class SharedPatientDashboardComponent implements OnInit {
       );
     this.showHistoryDetails = this.activeVisit?.isAdmitted;
 
-  // Define visit$ observable
-  this.activeVisit$ = this.store.pipe(select(getActiveVisit));
+  // // Define visit$ observable
+  // this.activeVisit$ = this.store.pipe(select(getActiveVisit));
 
-  // Subscribe to visit$ observable and log the value
-  this.activeVisit$.subscribe((visit) => {
-    console.log("Active Visit:....>>>.", visit);
-  });
+  // // Subscribe to visit$ observable and log the value
+  // this.activeVisit$.subscribe((visit) => {
+  //   console.log("Active Visit:....>>>.", visit);
+  // });
 
 
 
@@ -418,27 +418,25 @@ export class SharedPatientDashboardComponent implements OnInit {
     this.selectedForm = form;
     this.showHistoryDetails = false;
   
-    // if (form.id === 'a000cb34-9ec1-4344-a1c8-f692232f6edd') {
-    //   this.showModal = true;
-    // } else {
-    //   this.showModal = false; 
-    // }
-     // Define visit$ observable
-
-  this.activeVisit$ = this.store.pipe(select(getActiveVisit));
-  // Subscribe to visit$ observable and log the value
-  this.activeVisit$.subscribe((visit) => {
-    console.log("Active Visit:....>>>.", visit);
-    //  const visits = visit.billDetails.paymentDetails.paymentType.name;
-    // Existing logic to show/hide modal
-    if (this.selectedForm && this.selectedForm.id === 'a000cb34-9ec1-4344-a1c8-f692232f6edd') {
+    if (form.uuid === 'a000cb34-9ec1-4344-a1c8-f692232f6edd') {
       this.showModal = true;
     } else {
-      this.showModal = false;
+      this.showModal = false; 
     }
-  });
+     // Define visit$ observable
 
-  
+  // this.activeVisit$ = this.store.pipe(select(getActiveVisit));
+  // // Subscribe to visit$ observable and log the value
+  // this.activeVisit$.subscribe((visit) => {
+  //   console.log("Active Visit:....>>>.", visit);
+  //   //  const visits = visit.billDetails.paymentDetails.paymentType.name;
+  //   // Existing logic to show/hide modal
+  //   if (this.selectedForm && this.selectedForm.uuid === "ccf60297-55ae-4aef-98e4-c6d155d2e0fe") {
+  //     this.showModal = true;
+  //   } else {
+  //     this.showModal = false;
+  //   }
+  // });
 
     setTimeout(() => {
       this.readyForClinicalNotes = true;

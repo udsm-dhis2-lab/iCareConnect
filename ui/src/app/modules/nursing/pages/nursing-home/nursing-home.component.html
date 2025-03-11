@@ -24,4 +24,9 @@
       [isTabularList]="isPatientListTabular"
     ></app-patient-list>
   </div>
+
+
+  <ng-container *ngIf="showModal">
+    <app-finger-print detail="Nurse" (modalClosed)="closeModal()"> </app-finger-print>
+  </ng-container>
 </div>

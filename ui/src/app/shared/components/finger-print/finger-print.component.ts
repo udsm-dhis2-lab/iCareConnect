@@ -27,7 +27,7 @@ export class FingerPrintComponent implements OnInit {
           setTimeout(() => {
             this.fingerprintCapturedMessage = false;
             this.showLoader = true;
-          }, 1000);
+          }, 2000);
         }
       },
       (error) => {
