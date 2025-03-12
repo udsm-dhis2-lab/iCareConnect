@@ -20,7 +20,7 @@ export class PointOfCareEffects {
     this.actions$.pipe(
       ofType(loadPointOfCare), // Listens for the action
       switchMap((action) => {
-        return this.insuranceService.GetListOfPointOfcare().pipe(
+        return this.insuranceService.getListOfPointOfcare().pipe(
           map((data) => {
             return loadPointOfCareSuccess({ data });
           }), // Dispatch success action

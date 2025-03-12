@@ -8,8 +8,7 @@ export interface NHIFPointOfCareI {
     LastModified: null | string
 }
 
-
-export enum NHIFPointOfCareCode {
+export enum NHIFPointOfCareCodeE {
   REGISTRATION = "REG",
   CONSULTATION = "CON",
   LABORATORY = "LAB",
@@ -24,4 +23,13 @@ export enum NHIFPointOfCareCode {
   RADIOTHERAPY = "RAT",
   MAJOR_THEATRE = "MJT",
   MINOR_THEATRE = "MNT"
+}
+
+export interface PatientPOCVerificationI{
+  pointOfCareID: number,
+  authorizationNo: string,
+  practitionerNo: string,
+  biometricMethod: string,
+  fpCode: string,
+  imageData: string
 }

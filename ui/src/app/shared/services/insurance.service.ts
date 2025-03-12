@@ -1,15 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { OpenmrsHttpClientService } from '../modules/openmrs-http-client/services/openmrs-http-client.service';
-import { NHIFPointOfCareI } from '../resources/store/models/insurance.model';
+import { NHIFPointOfCareI, PatientPOCVerificationI } from '../resources/store/models/insurance.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class InsuranceService {
-
-  private authorizeCardUrl = "insurance/authorizecard";
-  private getBeneficiaryDetailsUrl = "insurance/GetCardDetailsByNIN";
 
   private modal = 'insurance/'
 
@@ -23,19 +20,23 @@ export class InsuranceService {
     if (!authorizationData || Object.keys(authorizationData).length === 0) {
       console.error('No authorizationData provided for authorization');
     }
-    return this.httpClient.post(this.authorizeCardUrl, authorizationData);
+    return this.httpClient.post(`${this.modal}` + 'authorizecard', authorizationData);
   }
 
   getCardNumberByNida(nidaData: any): Observable<any> {
     if (!nidaData || Object.keys(nidaData).length === 0) {
       console.error('No authorizationData provided for authorization');
     }
-    return this.httpClient.post(this.getBeneficiaryDetailsUrl, nidaData);
+    return this.httpClient.post(`${this.modal}` + 'GetCardDetailsByNIN', nidaData);
   } 
   
 
-  GetListOfPointOfcare(): Observable<NHIFPointOfCareI[]> {
+  getListOfPointOfcare(): Observable<NHIFPointOfCareI[]> {
     return this.httpClient.get(`${this.modal}` + 'getpoc');
+  } 
+
+  requestPatientPOCVerification(data: PatientPOCVerificationI): Observable<PatientPOCVerificationI> {
+    return this.httpClient.post(`${this.modal}` + 'pocrefgeneration', data);
   } 
   
 }
