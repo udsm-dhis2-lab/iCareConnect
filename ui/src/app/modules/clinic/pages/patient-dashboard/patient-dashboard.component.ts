@@ -88,7 +88,14 @@ export class PatientDashboardComponent implements OnInit {
     this.pointOfCares$ = this.store.select(getListofPointOfCare);
     this.isLoading$ = this.store.select(getPointOfCareLoading);
 
-  
+    // Subscribe and log values
+    this.pointOfCares$.subscribe((data) => {
+      console.log("NHIF Point of Care Data:", data);
+    });
+
+    this.isLoading$.subscribe((isLoading) => {
+      console.log("Loading State:", isLoading);
+    });
     this.showDoctorModal = true;
     this.showPatientModal = false;
     this.IPDRoundConceptUuid$ = this.systemSettingsService
