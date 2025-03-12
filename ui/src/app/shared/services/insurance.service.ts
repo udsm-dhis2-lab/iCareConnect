@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { OpenmrsHttpClientService } from '../modules/openmrs-http-client/services/openmrs-http-client.service';
+import { NHIFPointOfCare } from '../resources/store/models/insurance.model';
 
 @Injectable({
   providedIn: 'root',
@@ -9,6 +10,8 @@ export class InsuranceService {
 
   private authorizeCardUrl = "insurance/authorizecard";
   private getBeneficiaryDetailsUrl = "insurance/GetCardDetailsByNIN";
+
+  private modal = 'insurance/'
 
   constructor(
     private httpClient: OpenmrsHttpClientService
@@ -28,6 +31,11 @@ export class InsuranceService {
       console.error('No authorizationData provided for authorization');
     }
     return this.httpClient.post(this.getBeneficiaryDetailsUrl, nidaData);
+  } 
+  
+
+  GetListOfPointOfcare(): Observable<NHIFPointOfCare[]> {
+    return this.httpClient.get(`${this.modal}` + 'getpoc');
   } 
   
 }

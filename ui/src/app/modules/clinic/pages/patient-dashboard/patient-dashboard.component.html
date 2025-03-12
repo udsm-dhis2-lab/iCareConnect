@@ -103,3 +103,16 @@
     "
   ></mat-progress-bar>
 </div>
+<ng-container *ngIf="showDoctorModal">
+  <app-finger-print
+    detail="Doctor's"
+    (modalClosed)="closeDoctorModal()">
+  </app-finger-print>
+</ng-container>
+
+<ng-container *ngIf="showPatientModal">
+  <app-finger-print
+    detail="Patient's"
+    (modalClosed)="closePatientModal()">
+  </app-finger-print>
+</ng-container>

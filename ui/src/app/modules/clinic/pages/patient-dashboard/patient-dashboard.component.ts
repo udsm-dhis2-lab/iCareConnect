@@ -33,6 +33,14 @@ import { getCurrentPatient } from "src/app/store/selectors/current-patient.selec
 import { BillingService } from "src/app/modules/billing/services/billing.service";
 import { PaymentService } from "src/app/modules/billing/services/payment.service";
 import { VisitsService } from "src/app/shared/resources/visits/services";
+import { FingerPrintComponent } from "src/app/shared/components/finger-print/finger-print.component";
+import { InsuranceService } from "src/app/shared/services";
+import { NHIFPointOfCare } from "src/app/shared/resources/store/models/insurance.model";
+import {
+  getListofPointOfCare,
+  getPointOfCareLoading,
+} from "src/app/store/selectors/insurance.selectors";
+import { loadPointOfCare } from "src/app/store/actions/insurance.actions";
 
 @Component({
   selector: "app-patient-dashboard",
@@ -57,6 +65,11 @@ export class PatientDashboardComponent implements OnInit {
   IPDRoundConceptUuid$: Observable<any>;
   patient$: Observable<any>;
   patientBillingDetails$: Observable<any>;
+  showDoctorModal = false;
+  showPatientModal = false;
+  pointOfCares$: Observable<NHIFPointOfCare[]>; // Observable to hold NHIFPointOfCare data
+  isLoading$: Observable<boolean>; // Observable to track loading state
+
   constructor(
     private store: Store<AppState>,
     private route: ActivatedRoute,
@@ -64,10 +77,20 @@ export class PatientDashboardComponent implements OnInit {
     private dialog: MatDialog,
     private visitService: VisitsService,
     private billingService: BillingService,
-    private paymentService: PaymentService
+    private paymentService: PaymentService,
+    private insuranceService: InsuranceService
   ) {}
 
   ngOnInit(): void {
+    // Dispatch the action to fetch data from API
+    this.store.dispatch(loadPointOfCare());
+
+    this.pointOfCares$ = this.store.select(getListofPointOfCare);
+    this.isLoading$ = this.store.select(getPointOfCareLoading);
+
+  
+    this.showDoctorModal = true;
+    this.showPatientModal = false;
     this.IPDRoundConceptUuid$ = this.systemSettingsService
       .getSystemSettingsByKey("iCare.ipd.settings.IPDRoundConceptUuid")
       .pipe(
@@ -182,11 +205,11 @@ export class PatientDashboardComponent implements OnInit {
         );
       }
     });
-    
-  // Subscribe to visit$ observable and log the value
-  this.patientBillingDetails$.subscribe((visit) => {
-    console.log("Testermmm....>>>.", visit);
-  });
+
+    // Subscribe to visit$ observable and log the value
+    this.patientBillingDetails$.subscribe((visit) => {
+      console.log("Testermmm....>>>.", visit);
+    });
   }
 
   dischargePatient(
@@ -225,7 +248,34 @@ export class PatientDashboardComponent implements OnInit {
     });
   }
 
-  handlePatientVisitDetails(event, patientVisitDetails): void { 
+  handlePatientVisitDetails(event, patientVisitDetails): void {
     console.log("patient visit details..kallll", patientVisitDetails);
+  }
+
+  // openAuthorizationModal() {
+  //   const dialogRef = this.dialog.open(FingerPrintComponent, {
+  //     width: "400px",
+  //     disableClose: true,
+  //     data: {
+  //       detail: 'Patient 12'
+  //     }
+  //   });
+
+  //   dialogRef.afterClosed().subscribe((result) => {
+  //     if (result) {
+  //       console.log("Authorization Number:", result);
+  //       // Handle authorization number (e.g., store, validate, etc.)
+  //     }
+  //   });
+  // }
+  closePatientModal() {
+    this.showDoctorModal = false; // Start with doctor scan
+    this.showPatientModal = false;
+  }
+
+  closeDoctorModal(success: boolean) {
+    this.showDoctorModal = false;
+
+    this.showPatientModal = true; // Move to patient scan
   }
 }
