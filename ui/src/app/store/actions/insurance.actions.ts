@@ -1,11 +1,11 @@
 import { createAction, props } from '@ngrx/store';
-import { NHIFPointOfCare } from 'src/app/shared/resources/store/models/insurance.model';
+import { NHIFPointOfCareI } from 'src/app/shared/resources/store/models/insurance.model';
 
 export const loadPointOfCare = createAction('[Point of Care] Load Data');
 
 export const loadPointOfCareSuccess = createAction(
   '[Point of Care] Load Data Success',
-  props<{ data: NHIFPointOfCare[] }>()
+  props<{ data: NHIFPointOfCareI[] }>()
 );
 
 export const loadPointOfCareFailure = createAction(

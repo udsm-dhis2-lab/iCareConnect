@@ -35,7 +35,7 @@ import { PaymentService } from "src/app/modules/billing/services/payment.service
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { FingerPrintComponent } from "src/app/shared/components/finger-print/finger-print.component";
 import { InsuranceService } from "src/app/shared/services";
-import { NHIFPointOfCare } from "src/app/shared/resources/store/models/insurance.model";
+import { NHIFPointOfCareI } from "src/app/shared/resources/store/models/insurance.model";
 import {
   getListofPointOfCare,
   getPointOfCareLoading,
@@ -67,7 +67,7 @@ export class PatientDashboardComponent implements OnInit {
   patientBillingDetails$: Observable<any>;
   showDoctorModal = false;
   showPatientModal = false;
-  pointOfCares$: Observable<NHIFPointOfCare[]>; // Observable to hold NHIFPointOfCare data
+  pointOfCares$: Observable<NHIFPointOfCareI[]>; // Observable to hold NHIFPointOfCare data
   isLoading$: Observable<boolean>; // Observable to track loading state
 
   constructor(

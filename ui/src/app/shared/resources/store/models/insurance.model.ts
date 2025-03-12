@@ -1,4 +1,4 @@
-export interface NHIFPointOfCare {
+export interface NHIFPointOfCareI {
   PointOfCareID: number,
     PointOfCareCode: string,
     PointOfCareName: string,
@@ -9,7 +9,7 @@ export interface NHIFPointOfCare {
 }
 
 
-export enum PointOfCareCode {
+export enum NHIFPointOfCareCode {
   REGISTRATION = "REG",
   CONSULTATION = "CON",
   LABORATORY = "LAB",

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { OpenmrsHttpClientService } from '../modules/openmrs-http-client/services/openmrs-http-client.service';
-import { NHIFPointOfCare } from '../resources/store/models/insurance.model';
+import { NHIFPointOfCareI } from '../resources/store/models/insurance.model';
 
 @Injectable({
   providedIn: 'root',
@@ -34,7 +34,7 @@ export class InsuranceService {
   } 
   
 
-  GetListOfPointOfcare(): Observable<NHIFPointOfCare[]> {
+  GetListOfPointOfcare(): Observable<NHIFPointOfCareI[]> {
     return this.httpClient.get(`${this.modal}` + 'getpoc');
   } 
   
