@@ -79,6 +79,8 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   allCurrentPatientSamplesSelected: boolean = false;
   currentPatientSelectedSamples: any = {};
   currentPatientSelectedSamplesCount: number = 0;
+  showModal: boolean = false;
+
   constructor(
     private sampleService: SamplesService,
     private dialog: MatDialog,
@@ -87,6 +89,8 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     private cdr: ChangeDetectorRef
   ) {}
 
+
+  
   ngAfterViewInit(): void {
     this.connection = webSocket(this.barcodeSettings?.socketUrl);
     this.connection.subscribe({
@@ -271,8 +275,10 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   }
 
   getSamplesListByVisit(event: Event, visit: any, parameters: any): void {
+ 
     event.stopPropagation();
     this.currentVisit = visit;
+    this.showModal=true;
     this.currentSamplesByVisits$ = this.visitsService.getSamplesByVisitUuid(
       visit?.uuid,
       parameters
@@ -518,5 +524,9 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
           });
         }
       });
+  }
+
+  closeModal(){
+    this.showModal = false;
   }
 }

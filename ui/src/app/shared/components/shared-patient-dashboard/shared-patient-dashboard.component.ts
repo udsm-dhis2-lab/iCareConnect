@@ -107,6 +107,7 @@ export class SharedPatientDashboardComponent implements OnInit {
 
   showModal:boolean=false;
   patientVisitDetails: any;
+  
  
   closeModal() {
     this.showModal = false;
