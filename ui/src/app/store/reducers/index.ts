@@ -80,6 +80,8 @@ import { LISConfigsReducer } from "./lis-configurations.reducer";
 import { LISConfigsState } from "../states/lis-configurations.states";
 import { systemSettingsReducer } from "./selected-system-settings.reducer";
 import { dataValuesReducer } from "./datavalues.reducer";
+import { NHIFPointOfCareState } from "../states/insurance-nhif-point-of-care.states";
+import { NHIFPointOfCareReducer } from "./insurance-nhif-point-of-care.reducer";
 
 export interface AppState {
   router: RouterReducerState;
@@ -123,6 +125,7 @@ export interface AppState {
   lisConfigs: LISConfigsState;
   systemSettings: SelectedSystemSettingsState;
   dataValues: DataValueState;
+  NHIFPointOfCares: NHIFPointOfCareState
 }
 
 export const reducers: ActionReducerMap<AppState> = {
@@ -167,6 +170,7 @@ export const reducers: ActionReducerMap<AppState> = {
   lisConfigs: LISConfigsReducer,
   systemSettings: systemSettingsReducer,
   dataValues: dataValuesReducer,
+  NHIFPointOfCares: NHIFPointOfCareReducer
 };
 
 export const metaReducers: MetaReducer<AppState>[] = !environment.production

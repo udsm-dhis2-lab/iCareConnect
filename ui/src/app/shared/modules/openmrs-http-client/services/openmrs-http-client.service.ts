@@ -44,7 +44,7 @@ export class OpenmrsHttpClientService {
     return this._getFromServer(url, newHttpConfig, httpOptions);
   }
 
-  post(url: string, data: any, httpConfig?: HttpConfig) {
+  post(url: string, data: any, httpConfig?: HttpConfig): Observable<any> {
     const newHttpConfig = this._getHttpConfig(httpConfig);
 
     const httpOptions = this._getHttpOptions(newHttpConfig.httpHeaders);
@@ -55,7 +55,7 @@ export class OpenmrsHttpClientService {
       : this.httpClient.post(rootUrl + url, data);
   }
 
-  put(url: string, data: any, httpConfig?: HttpConfig) {
+  put(url: string, data: any, httpConfig?: HttpConfig): Observable<any> {
     const newHttpConfig = this._getHttpConfig(httpConfig);
 
     const httpOptions = this._getHttpOptions(newHttpConfig.httpHeaders);
