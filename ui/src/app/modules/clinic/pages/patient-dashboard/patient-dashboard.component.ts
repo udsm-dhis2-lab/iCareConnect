@@ -39,8 +39,8 @@ import { NHIFPointOfCareI } from "src/app/shared/resources/store/models/insuranc
 import {
   getListofPointOfCare,
   getPointOfCareLoading,
-} from "src/app/store/selectors/insurance.selectors";
-import { loadPointOfCare } from "src/app/store/actions/insurance.actions";
+} from "src/app/store/selectors/insurance-nhif-point-of-care.selectors";
+import { loadPointOfCare } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
 
 @Component({
   selector: "app-patient-dashboard",

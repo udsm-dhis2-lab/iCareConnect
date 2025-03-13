@@ -33,7 +33,7 @@ import { FormPrivilegesConfigsEffects } from "./form-privileges-configs.effects"
 import { ConsultationEffects } from "./consultation.effects";
 import { LISEffects } from "./lis-configurations.effects";
 import { SystemSettingsEffect } from "./selected-system-settings.effects";
-import { PointOfCareEffects } from "./insurance.effects";
+import { PointOfCareEffects } from "./insurance-nhif-point-of-care.effects";
 
 export const effects: any[] = [
   RouterEffects,

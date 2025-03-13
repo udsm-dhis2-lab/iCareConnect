@@ -80,8 +80,8 @@ import { LISConfigsReducer } from "./lis-configurations.reducer";
 import { LISConfigsState } from "../states/lis-configurations.states";
 import { systemSettingsReducer } from "./selected-system-settings.reducer";
 import { dataValuesReducer } from "./datavalues.reducer";
-import { NHIFPointOfCareState } from "../states/insurance.states";
-import { NHIFPointOfCareReducer } from "./insurance.reducer";
+import { NHIFPointOfCareState } from "../states/insurance-nhif-point-of-care.states";
+import { NHIFPointOfCareReducer } from "./insurance-nhif-point-of-care.reducer";
 
 export interface AppState {
   router: RouterReducerState;

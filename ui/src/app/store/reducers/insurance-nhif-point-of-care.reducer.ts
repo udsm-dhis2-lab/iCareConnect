@@ -1,6 +1,6 @@
 import { createReducer, on, Action } from '@ngrx/store';
-import { loadPointOfCare, loadPointOfCareFailure, loadPointOfCareSuccess } from '../actions/insurance.actions';
-import { initialNHIFPointOfCareState, NHIFPointOfCareState, NHIFPointOfCareAdapter } from '../states/insurance.states';
+import { loadPointOfCare, loadPointOfCareFailure, loadPointOfCareSuccess } from '../actions/insurance-nhif-point-of-care.actions';
+import { initialNHIFPointOfCareState, NHIFPointOfCareState, NHIFPointOfCareAdapter } from '../states/insurance-nhif-point-of-care.states';
 import { errorBaseState, loadingBaseState, loadedBaseState } from '../states/base.state';
 
 const reducer = createReducer(

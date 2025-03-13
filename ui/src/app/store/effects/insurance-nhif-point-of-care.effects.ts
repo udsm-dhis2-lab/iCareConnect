@@ -5,7 +5,7 @@ import {
   loadPointOfCare,
   loadPointOfCareFailure,
   loadPointOfCareSuccess,
-} from "../actions/insurance.actions";
+} from "../actions/insurance-nhif-point-of-care.actions";
 import { catchError, map, switchMap } from "rxjs/operators";
 import { of } from "rxjs";
 
