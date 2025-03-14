@@ -40,6 +40,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class JubileeInsuranceImpl implements InsuranceService {
@@ -390,7 +393,7 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		folio.setFolioNo(visit.getId());
 		String serialString = "00000";
 		serialString = serialString.substring(String.valueOf(folio.getFolioNo()).length()) + folio.getFolioNo();
-		folio.setAttendanceDate(visit.getStartDatetime());
+		folio.setAttendanceDate(formatDate(visit.getStartDatetime()));
 		
 		// folio.setSerialNo(facilityCode + "\\" + (folio.getClaimMonth() < 10 ? "0" : "") + folio.getClaimMonth() + "\\"
 		//         + calendar.get(Calendar.YEAR) + "\\" + serialString);
@@ -404,22 +407,22 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		} else if (visit.getPatient().getGender().equals("F")) {
 			folio.setGender("Female");
 		}
-		folio.setDateOfBirth(visit.getPatient().getBirthdate());
+		folio.setDateOfBirth(formatDate(visit.getPatient().getBirthdate()));
 		// folio.setAge(visit.getPatient().getAge());
 		
 		folio.setPatientTypeCode("OUT");
 		
 		folio.setCreatedBy(visit.getCreator().getDisplayString());
-		folio.setDateCreated(visit.getDateCreated());
+		folio.setDateCreated(formatDate(visit.getDateCreated()));
 		if (visit.getChangedBy() != null) {
 			folio.setLastModifiedBy(visit.getChangedBy().getDisplayString());
 		} else {
 			folio.setLastModifiedBy(visit.getCreator().getDisplayString());
 		}
 		if (visit.getDateChanged() != null) {
-			folio.setLastModified(visit.getDateChanged());
+			folio.setLastModified(formatDate(visit.getDateChanged()));
 		} else {
-			folio.setLastModified(visit.getDateCreated());
+			folio.setLastModified(formatDate(visit.getDateCreated()));
 		}
 		
 		String bedOrderType = adminService.getGlobalProperty(ICareConfig.BED_ORDER_TYPE);
@@ -447,11 +450,11 @@ public class JubileeInsuranceImpl implements InsuranceService {
 					folio.getFolioItems().add(folioItem);
 					if (order.getOrderType().getUuid().equals(bedOrderType)) {
 						folio.setPatientTypeCode("IN");
-						folio.setDateAdmitted(order.getEffectiveStartDate());
+						folio.setDateAdmitted(formatDate(order.getEffectiveStartDate()));
 						if (visit.getStopDatetime() == null) {
-							folio.setDateDischarged(new Date());
+							folio.setDateDischarged((formatDate(new Date())));
 						} else {
-							folio.setDateDischarged(visit.getStopDatetime());
+							folio.setDateDischarged(formatDate(visit.getStopDatetime()));
 						}
 					}
 				}
@@ -468,6 +471,14 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		// folio.setPatientFile(convertToPDFEncodedString("file", patientFile));
 		
 		return folio;
+	}
+	
+	private static String formatDate(Date date) {
+		if (date == null) {
+			return null;
+		}
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
+		return formatter.format(Instant.ofEpochMilli(date.getTime()));
 	}
 	
 	public void getReferral(Visit visit) throws Exception {

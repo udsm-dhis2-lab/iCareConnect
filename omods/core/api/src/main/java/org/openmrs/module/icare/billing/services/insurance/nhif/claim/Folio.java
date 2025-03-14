@@ -38,7 +38,7 @@ public class Folio implements Claim {
     private String gender;
 
     @JsonProperty("DateOfBirth")
-    private Date dateOfBirth;
+    private String dateOfBirth;
 
     @JsonProperty("TelephoneNo")
     private String telephoneNo;
@@ -56,7 +56,7 @@ public class Folio implements Claim {
     private String authorizationNo;
 
     @JsonProperty("AttendanceDate")
-    private Date attendanceDate;
+    private String attendanceDate;
 
     @JsonProperty("VisitTypeID")
     private int visitTypeID;
@@ -65,10 +65,10 @@ public class Folio implements Claim {
     private String patientTypeCode;
 
     @JsonProperty("DateAdmitted")
-    private Date dateAdmitted;
+    private String dateAdmitted;
 
     @JsonProperty("DateDischarged")
-    private Date dateDischarged;
+    private String dateDischarged;
 
     @JsonProperty("AttendingPractitioners")
     private List<String> attendingPractitioners = new ArrayList<>();
@@ -92,13 +92,13 @@ public class Folio implements Claim {
     private List<Signature> signatures = new ArrayList<>();
 
     @JsonProperty("DateCreated")
-    private Date dateCreated;
+    private String dateCreated;
 
     @JsonProperty("CreatedBy")
     private String createdBy;
 
     @JsonProperty("LastModified")
-    private Date lastModified;
+    private String lastModified;
 
     @JsonProperty("LastModifiedBy")
     private String lastModifiedBy;
@@ -169,11 +169,11 @@ public class Folio implements Claim {
         this.gender = gender;
     }
 
-    public Date getDateOfBirth() {
+    public String getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -217,11 +217,11 @@ public class Folio implements Claim {
         this.authorizationNo = authorizationNo;
     }
 
-    public Date getAttendanceDate() {
+    public String getAttendanceDate() {
         return attendanceDate;
     }
 
-    public void setAttendanceDate(Date attendanceDate) {
+    public void setAttendanceDate(String attendanceDate) {
         this.attendanceDate = attendanceDate;
     }
 
@@ -241,19 +241,19 @@ public class Folio implements Claim {
         this.patientTypeCode = patientTypeCode;
     }
 
-    public Date getDateAdmitted() {
+    public String getDateAdmitted() {
         return dateAdmitted;
     }
 
-    public void setDateAdmitted(Date dateAdmitted) {
+    public void setDateAdmitted(String dateAdmitted) {
         this.dateAdmitted = dateAdmitted;
     }
 
-    public Date getDateDischarged() {
+    public String getDateDischarged() {
         return dateDischarged;
     }
 
-    public void setDateDischarged(Date dateDischarged) {
+    public void setDateDischarged(String dateDischarged) {
         this.dateDischarged = dateDischarged;
     }
 
@@ -313,11 +313,11 @@ public class Folio implements Claim {
         this.signatures = signatures;
     }
 
-    public Date getDateCreated() {
+    public String getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(Date dateCreated) {
+    public void setDateCreated(String dateCreated) {
         this.dateCreated = dateCreated;
     }
 
@@ -329,11 +329,11 @@ public class Folio implements Claim {
         this.createdBy = createdBy;
     }
 
-    public Date getLastModified() {
+    public String getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(Date lastModified) {
+    public void setLastModified(String lastModified) {
         this.lastModified = lastModified;
     }
 

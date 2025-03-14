@@ -32,6 +32,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -193,7 +196,7 @@ public class NHIFServiceTest extends BillingTestBase {
 		//Given
 		Folio folio = new Folio();
 		// folio.setFolioID("folioid");
-		folio.setDateDischarged(new Date());
+		folio.setDateDischarged(formatDate(new Date()));
 		
 		//When
 		ObjectMapper oMapper = new ObjectMapper();
@@ -201,6 +204,14 @@ public class NHIFServiceTest extends BillingTestBase {
 		
 		//Then
 		assertThat("folioid", is(result.get("FolioID")));
+	}
+	
+	private static String formatDate(Date date) {
+		if (date == null) {
+			return null; // Handle null dates properly
+		}
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
+		return formatter.format(Instant.ofEpochMilli(date.getTime())); // Convert Date to Instant and format it
 	}
 	
 	@Test

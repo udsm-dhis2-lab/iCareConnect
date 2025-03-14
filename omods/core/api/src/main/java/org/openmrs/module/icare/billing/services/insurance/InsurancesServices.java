@@ -10,6 +10,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -54,6 +57,8 @@ public class InsurancesServices {
 	private static final String USERNAME = "hmis_username";
 	
 	private static final String GETBYNIN_API_URL = "https://test.nhif.or.tz/servicehub/api/Verification/GetCardDetailsByNIN";
+	
+	private static final String POTFOLIO_API_URL = "https://test.nhif.or.tz/ocs/api/Claims/SubmitFolio";
 	
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
@@ -503,48 +508,103 @@ public class InsurancesServices {
 		return null;
 	}
 	
-	public Map<String, Object> potfoliosubmission(Visit visit, String signatory, String signatoryID, String signatureData) {
+	public Map<String, Object> potfoliosubmission(Visit visit, String signatory, String signatoryID,
+            String signatureData) {
         InsuranceService insuranceService = new NHIFServiceImpl();
         Map<String, Object> responseMap = new HashMap<>();
-        
+
         try {
             // Call the claim method and store the returned ClaimResult
             ClaimResult result = insuranceService.claim(visit);
-            
+
             // Log the ClaimResult details
             System.out.println("Claim Result Status: " + result.getStatus());
             System.out.println("Claim Result Message: " + result.getMessage());
-            
+
             if (result.getFolio() != null) {
                 Folio folio = result.getFolio();
-                
-                // Create and add a Signatures
+
+                // Create and add a Signature
                 Signature signature = new Signature();
                 signature.setSignatory(signatory);
                 signature.setSignatoryID(signatoryID);
                 signature.setSignatureData(signatureData);
                 Date now = new Date();
-                signature.setDateCreated(now);
+                signature.setDateCreated(formatDate(now));
                 signature.setCreatedBy("system"); 
-                signature.setLastModified(now);
+                signature.setLastModified(formatDate(now));
                 signature.setLastModifiedBy("system");
-            
+
                 folio.getSignatures().add(signature);
-                
-                responseMap.put("folio", folio);
+
+                // Get Auth Token
+                String token = getAuthToken();
+                if (token == null) {
+                    responseMap.put("status", 401);
+                    responseMap.put("error", "Failed to obtain authentication token");
+                    return responseMap;
+                }
+
+                HttpURLConnection connection = null;
+                try {
+                    URL url = new URL(POTFOLIO_API_URL);
+                    connection = (HttpURLConnection) url.openConnection();
+
+                    connection.setRequestMethod("POST");
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    connection.setRequestProperty("Authorization", "Bearer " + token);
+                    connection.setDoOutput(true);
+
+                    // Convert folio to JSON
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    String folioJson = objectMapper.writeValueAsString(folio);
+
+                    try (OutputStream os = connection.getOutputStream()) {
+                        byte[] input = folioJson.getBytes("utf-8");
+                        os.write(input, 0, input.length);
+                    }
+
+                    int responseCode = connection.getResponseCode();
+                    responseMap.put("status", responseCode);
+
+                    InputStream responseStream = (responseCode < 400) ? connection.getInputStream()
+                            : connection.getErrorStream();
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(responseStream))) {
+                        StringBuilder response = new StringBuilder();
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            response.append(line);
+                        }
+                        responseMap.put("body", response.toString());
+                    }
+                } catch (Exception e) {
+                    responseMap.put("error", e.getMessage());
+                } finally {
+                    if (connection != null) {
+                        connection.disconnect();
+                    }
+                }
             }
-            
+
             responseMap.put("status", result.getStatus());
             responseMap.put("message", result.getMessage());
-            
+
         } catch (Exception e) {
-            e.printStackTrace(); // Log exception details if any
+            e.printStackTrace();
             responseMap.put("status", "ERROR");
             responseMap.put("message", "An error occurred: " + e.getMessage());
         }
-        
+
         return responseMap;
     }
+	
+	private static String formatDate(Date date) {
+		if (date == null) {
+			return null;
+		}
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
+		return formatter.format(Instant.ofEpochMilli(date.getTime()));
+	}
 	
 	public Map<String, Object> getCardDetailsByNIN(String nationalID) {
         Map<String, Object> responseMap = new HashMap<>();

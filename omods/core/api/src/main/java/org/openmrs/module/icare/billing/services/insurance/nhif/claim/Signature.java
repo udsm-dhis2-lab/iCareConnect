@@ -15,13 +15,13 @@ public class Signature {
 	private String signatureData;
 	
 	@JsonProperty("DateCreated")
-	private Date dateCreated;
+	private String dateCreated;
 	
 	@JsonProperty("CreatedBy")
 	private String createdBy;
 	
 	@JsonProperty("LastModified")
-	private Date lastModified;
+	private String lastModified;
 	
 	@JsonProperty("LastModifiedBy")
 	private String lastModifiedBy;
@@ -52,11 +52,11 @@ public class Signature {
 		this.signatureData = signatureData;
 	}
 	
-	public Date getDateCreated() {
+	public String getDateCreated() {
 		return dateCreated;
 	}
 	
-	public void setDateCreated(Date dateCreated) {
+	public void setDateCreated(String dateCreated) {
 		this.dateCreated = dateCreated;
 	}
 	
@@ -68,11 +68,11 @@ public class Signature {
 		this.createdBy = createdBy;
 	}
 	
-	public Date getLastModified() {
+	public String getLastModified() {
 		return lastModified;
 	}
 	
-	public void setLastModified(Date lastModified) {
+	public void setLastModified(String lastModified) {
 		this.lastModified = lastModified;
 	}
 	
