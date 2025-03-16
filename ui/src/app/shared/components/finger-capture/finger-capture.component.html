@@ -1,0 +1,65 @@
+<div class="fingerprint-container">
+      
+    <ng-container *ngIf="!fingerprintCapturedMessage && !showLoader">
+      <div class="thumb-scan-container">
+        <video
+          loading="lazy"
+          muted="muted"
+          src="assets/video/finger-print.mp4"
+          type="video/mp4"
+          autoplay="autoplay"
+          loop="loop"
+          class="thumb-video"
+        ></video>
+      </div>
+
+      <style>
+        .thumb-video {
+          width: 100px;
+          height: auto;
+        }
+      </style>
+
+      <p class="modal-label">
+        Scan the  {{ labels }}  index finger on the scanning device to authenticate
+      </p>
+    </ng-container>
+
+    <ng-container *ngIf="fingerprintCapturedMessage">
+      <div class="thumb-scan-container">
+        <video
+          loading="lazy"
+          muted="muted"
+          src="assets/video/finger-success.mp4"
+          type="video/mp4"
+          autoplay="autoplay"
+          loop="loop"
+          class="thumb-video"
+        ></video>
+      </div>
+      <div class="thumb-scan-container">
+        <ng-container *ngIf="showLoader">
+            <mat-spinner style="width: 40px; height: 40px;"></mat-spinner>
+        </ng-container>
+      </div>
+      
+      <style>
+        .thumb-video {
+          width: 100px;
+          height: auto;
+        }
+      </style>
+      <p class="modal-label">
+        Fingerprint captured successfully.
+      </p>
+    </ng-container>
+    <ng-container *ngIf="showLoader">
+      <div class="loader-container">
+        <mat-spinner style="width: 50px; height: 50px;"></mat-spinner> 
+    
+      </div>
+      <p class="modal-label">
+        Processing Authorization...
+      </p>
+    </ng-container>
+  </div>

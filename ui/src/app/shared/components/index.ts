@@ -133,6 +133,8 @@ import { SharedDisplayOrderedTestsNamesComponent } from "./shared-display-ordere
 import { SharedCollectedAmountComponent } from "./shared-collected-amount/shared-collected-amount.component";
 import { SharedRemotePatientHistoryComponent } from "./shared-remote-patient-history/shared-remote-patient-history.component";
 import { FingerPrintComponent } from "./finger-print/finger-print.component";
+import { FingerDialogComponent } from "./finger-dialog/finger-dialog.component";
+import { FingerCaptureComponent } from "./finger-capture/finger-capture.component";
 
 export const components: any[] = [
   FingerPrintComponent,
@@ -270,6 +272,8 @@ export const components: any[] = [
   SharedDisplayOrderedTestsNamesComponent,
   SharedCollectedAmountComponent,
   SharedRemotePatientHistoryComponent,
+  FingerDialogComponent,
+  FingerCaptureComponent
 ];
 
 export const sharedEntryComponents: any[] = [
