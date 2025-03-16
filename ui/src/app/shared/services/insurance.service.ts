@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { OpenmrsHttpClientService } from '../modules/openmrs-http-client/services/openmrs-http-client.service';
-import { NHIFPointOfCareI, PatientPOCVerificationI } from '../resources/store/models/insurance.model';
+import { NHIFPointOfCareI, PatientPOCVerificationI } from '../resources/store/models/insurance-nhif.model';
 
 @Injectable({
   providedIn: 'root',

@@ -6,7 +6,7 @@ export const go = createAction(
   props<{
     path: any;
     query?: any;
-    extras?: NavigationExtras;
+    extras?: NavigationExtras  & { state?: any };
   }>()
 );
 

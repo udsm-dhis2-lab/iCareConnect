@@ -35,12 +35,13 @@ import { PaymentService } from "src/app/modules/billing/services/payment.service
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { FingerPrintComponent } from "src/app/shared/components/finger-print/finger-print.component";
 import { InsuranceService } from "src/app/shared/services";
-import { NHIFPointOfCareI } from "src/app/shared/resources/store/models/insurance.model";
+import { NHIFPointOfCareI } from "src/app/shared/resources/store/models/insurance-nhif.model";
 import {
   getListofPointOfCare,
   getPointOfCareLoading,
 } from "src/app/store/selectors/insurance-nhif-point-of-care.selectors";
 import { loadPointOfCare } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
+import { selectNHIFPractitionerDetails } from "src/app/store/selectors/insurance-nhif-practitioner.selectors";
 
 @Component({
   selector: "app-patient-dashboard",
@@ -82,6 +83,9 @@ export class PatientDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
+      console.log('Practitioner Details in State:', data);
+    });
     // Dispatch the action to fetch data from API
     this.store.dispatch(loadPointOfCare());
 
@@ -275,10 +279,7 @@ export class PatientDashboardComponent implements OnInit {
   //     }
   //   });
   // }
-  closePatientModal() {
-    this.showDoctorModal = false; // Start with doctor scan
-    this.showPatientModal = false;
-  }
+
 
   closeDoctorModal(success: boolean) {
     this.showDoctorModal = false;
