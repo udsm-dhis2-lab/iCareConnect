@@ -82,6 +82,8 @@ import { systemSettingsReducer } from "./selected-system-settings.reducer";
 import { dataValuesReducer } from "./datavalues.reducer";
 import { NHIFPointOfCareState } from "../states/insurance-nhif-point-of-care.states";
 import { NHIFPointOfCareReducer } from "./insurance-nhif-point-of-care.reducer";
+import { NHIFPractitionerDetailsState } from "../states/insurance-nhif-practitioner.states";
+import { NHIFPractitionerDetailsReducer } from "./insurance-nhif-practitioner.reducer";
 
 export interface AppState {
   router: RouterReducerState;
@@ -126,6 +128,7 @@ export interface AppState {
   systemSettings: SelectedSystemSettingsState;
   dataValues: DataValueState;
   NHIFPointOfCares: NHIFPointOfCareState
+  NHIFPractitionerDetails: NHIFPractitionerDetailsState
 }
 
 export const reducers: ActionReducerMap<AppState> = {
@@ -170,7 +173,8 @@ export const reducers: ActionReducerMap<AppState> = {
   lisConfigs: LISConfigsReducer,
   systemSettings: systemSettingsReducer,
   dataValues: dataValuesReducer,
-  NHIFPointOfCares: NHIFPointOfCareReducer
+  NHIFPointOfCares: NHIFPointOfCareReducer,
+  NHIFPractitionerDetails: NHIFPractitionerDetailsReducer
 };
 
 export const metaReducers: MetaReducer<AppState>[] = !environment.production

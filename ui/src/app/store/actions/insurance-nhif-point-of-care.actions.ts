@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { NHIFPointOfCareI } from 'src/app/shared/resources/store/models/insurance.model';
+import { NHIFPointOfCareI } from 'src/app/shared/resources/store/models/insurance-nhif.model';
 
 export const loadPointOfCare = createAction('[Point of Care] Load Data');
 

@@ -1,6 +1,6 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
 import { BaseState, initialBaseState } from './base.state';
-import { NHIFPointOfCareI } from 'src/app/shared/resources/store/models/insurance.model';
+import { NHIFPointOfCareI } from 'src/app/shared/resources/store/models/insurance-nhif.model';
 
 export interface NHIFPointOfCareState extends EntityState<NHIFPointOfCareI>, BaseState {}
 

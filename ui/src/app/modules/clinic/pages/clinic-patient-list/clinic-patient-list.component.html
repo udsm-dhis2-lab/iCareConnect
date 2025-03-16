@@ -176,7 +176,13 @@
         </mat-tab-group>
       </div>
     </div>
-    
+    <ng-container *ngIf="showDoctorModal">
+      <app-finger-print
+        detail="Doctor's"
+        (modalClosed)="closeDoctorModal($event)"
+        (fingerprintCaptured)="setCapturedFingerPrint($event)">
+      </app-finger-print>
+    </ng-container>
    
   
   </div>

@@ -8,10 +8,6 @@ import { AppState, getRootState } from "../reducers";
   (state: AppState) => state.NHIFPointOfCares
 );
 
-// export const getListofPointOfCare = createSelector(
-//     getNHIFPointOfCareState,
-//   (state: NHIFPointOfCareState) => state.data
-// );
 
 export const { selectAll: getListofPointOfCare } = NHIFPointOfCareAdapter.getSelectors(
   getNHIFPointOfCareState
