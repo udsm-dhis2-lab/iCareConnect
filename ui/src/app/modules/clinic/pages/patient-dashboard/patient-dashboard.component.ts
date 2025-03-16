@@ -70,6 +70,7 @@ export class PatientDashboardComponent implements OnInit {
   showPatientModal = false;
   pointOfCares$: Observable<NHIFPointOfCareI[]>; // Observable to hold NHIFPointOfCare data
   isLoading$: Observable<boolean>; // Observable to track loading state
+  patientData: any;
 
   constructor(
     private store: Store<AppState>,
@@ -83,6 +84,8 @@ export class PatientDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.patientData = history.state.patientData;  // Access patient data
+    console.log("Received patient data: ", this.patientData);
     this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
       console.log('Practitioner Details in State:', data);
     });
