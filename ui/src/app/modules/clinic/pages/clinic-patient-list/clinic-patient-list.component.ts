@@ -5,6 +5,7 @@ import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
+import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
 import { PatientHistoryDialogComponent } from "src/app/shared/dialogs/patient-history-dialog/patient-history-dialog.component";
 import { ProviderAttributeGet } from "src/app/shared/resources/openmrs";
 import { NHIFPractitionerDetailsI } from "src/app/shared/resources/store/models/insurance-nhif.model";
@@ -68,6 +69,15 @@ export class ClinicPatientListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+
+    this.dialog
+    .open(FingerCaptureComponent, {
+      width: "45%",
+      data: { 
+        detail: 'Doctor', 
+      }
+      
+    });
     // get provider details
     this.store.select(getProviderDetails).subscribe((data) => {
      if (data){
