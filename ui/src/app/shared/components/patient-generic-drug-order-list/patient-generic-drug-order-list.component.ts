@@ -27,6 +27,7 @@ import { arrangeDrugDetails } from "../../helpers/drugs.helper";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import { formatDateToString } from "../../helpers/format-date.helper";
 import { ConfigsService } from "../../services/configs.service";
+import { FingerCaptureComponent } from "../finger-capture/finger-capture.component";
 
 @Component({
   selector: "app-patient-generic-drug-order-list",
@@ -53,7 +54,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   isThereDiagnosisProvided$: Observable<boolean>;
   drugOrders$: Observable<any>;
   drugOrders: any[];
-
+  selectedPatientData:string[];
   drugOrdersKeyedByEncounter: any = {};
 
   @Output() orderSelectAction = new EventEmitter<TableSelectAction>();
@@ -216,38 +217,86 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
     );
   }
 
+  // onVerify(
+  //   order: any,
+  //   specificDrugConceptUuid: any,
+  //   prescriptionArrangementFields: any
+  // ) {
+  //   console.log("Patient Data kk:", this.visit?.visit?.patient);
+   
+
+    
+  //   const dialog = this.dialog.open(DispensingFormComponent, {
+  //     width: "100%",
+  //     disableClose: true,
+  //     data: {
+  //       drugOrder: order,
+  //       patient: this.visit?.visit?.patient,
+  //       visit: this.visit,
+  //       location: this.currentLocation,
+  //       encounterUuid: this.encounterUuid,
+  //       drugInstructions: arrangeDrugDetails(
+  //         order,
+  //         specificDrugConceptUuid,
+  //         prescriptionArrangementFields
+  //       )?.description,
+  //       fromDispensing: true,
+  //       showAddButton: false,
+  //       useGenericPrescription: this.useGenericPrescription,
+  //     },
+  //   });
+
+  //   dialog.afterClosed().subscribe(() => {
+  //     // this.store.dispatch(
+  //     //   loadActiveVisit({ patientId: this.visit?.visit?.patient?.uuid })
+  //     // );
+  //     this.loadPatientVisit.emit();
+  //   });
+
+  
+  // }
   onVerify(
     order: any,
     specificDrugConceptUuid: any,
     prescriptionArrangementFields: any
   ) {
-    const dialog = this.dialog.open(DispensingFormComponent, {
-      width: "100%",
-      disableClose: true,
+    console.log("Patient Data kk:", this.visit?.visit?.patient);
+  
+    const fingerCaptureDialog = this.dialog.open(FingerCaptureComponent, {
+      width: "45%",
       data: {
-        drugOrder: order,
-        patient: this.visit?.visit?.patient,
-        visit: this.visit,
-        location: this.currentLocation,
-        encounterUuid: this.encounterUuid,
-        drugInstructions: arrangeDrugDetails(
-          order,
-          specificDrugConceptUuid,
-          prescriptionArrangementFields
-        )?.description,
-        fromDispensing: true,
-        showAddButton: false,
-        useGenericPrescription: this.useGenericPrescription,
+        labels: 'Patient',
       },
     });
-
-    dialog.afterClosed().subscribe(() => {
-      // this.store.dispatch(
-      //   loadActiveVisit({ patientId: this.visit?.visit?.patient?.uuid })
-      // );
-      this.loadPatientVisit.emit();
+  
+    fingerCaptureDialog.afterClosed().subscribe(() => {
+      const dispensingDialog = this.dialog.open(DispensingFormComponent, {
+        width: "100%",
+        disableClose: true,
+        data: {
+          drugOrder: order,
+          patient: this.visit?.visit?.patient,
+          visit: this.visit,
+          location: this.currentLocation,
+          encounterUuid: this.encounterUuid,
+          drugInstructions: arrangeDrugDetails(
+            order,
+            specificDrugConceptUuid,
+            prescriptionArrangementFields
+          )?.description,
+          fromDispensing: true,
+          showAddButton: false,
+          useGenericPrescription: this.useGenericPrescription,
+        },
+      });
+  
+      dispensingDialog.afterClosed().subscribe(() => {
+        // This logic runs after the DispensingFormComponent dialog is closed
+        this.loadPatientVisit.emit();
+      });
     });
   }
+  
 
   onPrintPrescriptions(
     event: Event,

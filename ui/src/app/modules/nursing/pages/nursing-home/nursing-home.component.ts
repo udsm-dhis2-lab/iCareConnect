@@ -30,9 +30,9 @@ export class NursingHomeComponent implements OnInit {
   showModal: boolean = false;
   showModalPatient: boolean = false;
   isPointofCareVerified: boolean = false;
-  labels = {
-    nurse: 'Nurse',
-  };
+  // labels = {
+  //   patient: 'Patient',
+  // };
   closeModal() {
     this.showModal = false;
     this.showModalPatient = false;
@@ -45,7 +45,15 @@ export class NursingHomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.showModal = true;
+    // this.showModal = true;
+    this.dialog
+    .open(FingerCaptureComponent, {
+      width: "45%",
+      // data: { 
+      //   labels: this.labels, 
+      // }
+      
+    })
     this.settingCurrentLocationStatus$ = this.store.select(
       getSettingCurrentLocationStatus
     );
@@ -101,7 +109,7 @@ export class NursingHomeComponent implements OnInit {
     if (e) {
       e.stopPropagation();
     }
-
+console.log("testing123",patient)
     this.store.dispatch(addCurrentPatient({ patient }));
 
     if (patient?.paymentTypeDetails === "Cash") {
@@ -114,10 +122,10 @@ export class NursingHomeComponent implements OnInit {
     } else {
       this.dialog
         .open(FingerCaptureComponent, {
-          width: "50%",
-          data: { 
-            labels: this.labels, 
-          }
+          width: "45%",
+          // data: { 
+          //   labels: this.labels, 
+          // }
           
         })
         .afterClosed()

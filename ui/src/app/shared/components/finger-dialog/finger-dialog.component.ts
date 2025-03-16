@@ -17,8 +17,7 @@ export class FingerDialogComponent {
 
     this.dialog.open(FingerCaptureComponent,
       {
-        width:'50%' ,
-      
+        width:'40%' ,
       }
     );
 

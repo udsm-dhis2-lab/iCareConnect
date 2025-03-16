@@ -2,9 +2,9 @@ import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { FingerprintService } from '../../services';
 import {  MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-interface FingerCaptureDialogData {
-  nameNurse: string;
-}
+// interface FingerCaptureDialogData {
+//   nameNurse: string;
+// }
 
 
 @Component({
@@ -24,7 +24,7 @@ labels: any;
  
  
   ) {
-    this.labels = data.labels.nurse;
+    // this.labels = data.labels.patient;
   }
 
   ngOnInit(): void {
@@ -35,12 +35,13 @@ labels: any;
         this.fingerprintCaptured.emit(result.RawData);
         if(!result.RawData) {
           this.fingerprintCapturedMessage = false;
-          this.dialogRef.close({ success: true })
+          // this.dialogRef.close({ success: true })
         }else{
           this.fingerprintCapturedMessage = true;
           setTimeout(() => {
             this.fingerprintCapturedMessage = false;
             this.showLoader = true;
+            this.dialogRef.close({ success: true })
           }, 2000);
         }
       },
