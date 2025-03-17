@@ -70,7 +70,7 @@ export class ClinicPatientListComponent implements OnInit {
       if (!data || !data.isNHIFPractitionerLogedIn) {
         const loginData = {
           practitionerNo: this.currentProviderDetails[1]["value"],
-          nationalID: "NIDA12345",
+          nationalID: "19891031141300000223",
           biometricMethod: NHIFBiometricMethodE.fingerprint,
           fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
           imageData: "base 64",
