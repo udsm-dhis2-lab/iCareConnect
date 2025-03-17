@@ -15,7 +15,7 @@ import {
 } from "src/app/store/selectors/current-user.selectors";
 import { select, Store } from "@ngrx/store";
 import { ActivatedRoute } from "@angular/router";
-import { loadCurrentPatient, loadRolesDetails } from "src/app/store/actions";
+import { go, loadCurrentPatient, loadRolesDetails } from "src/app/store/actions";
 import {
   getActiveVisit,
   getVisitLoadingState,
@@ -42,6 +42,8 @@ import {
 } from "src/app/store/selectors/insurance-nhif-point-of-care.selectors";
 import { loadPointOfCare } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
 import { selectNHIFPractitionerDetails } from "src/app/store/selectors/insurance-nhif-practitioner.selectors";
+import { PatientI } from "src/app/shared/resources/store/models/patient.model";
+import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
 
 @Component({
   selector: "app-patient-dashboard",
@@ -70,7 +72,7 @@ export class PatientDashboardComponent implements OnInit {
   showPatientModal = false;
   pointOfCares$: Observable<NHIFPointOfCareI[]>; // Observable to hold NHIFPointOfCare data
   isLoading$: Observable<boolean>; // Observable to track loading state
-  patientData: any;
+  patientData: PatientI;
 
   constructor(
     private store: Store<AppState>,
@@ -84,10 +86,36 @@ export class PatientDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.patientData = history.state.patientData;  // Access patient data
+    this.patientData = history.state.patientData;
+
+     if (!this.patientData) {
+    setTimeout(() => {
+          this.store.dispatch(
+            go({
+              path: [`clinic/patient-list`]
+            })
+          );
+        }, 200);
+  }
+
+    if (this.patientData.paymentTypeDetails === "Insurance") {
+      this.dialog
+        .open(FingerCaptureComponent, {
+          width: "45%",
+          data: {
+            detail: "patient's",
+          },
+        })
+        .afterClosed()
+        .subscribe((result) => {
+          if (result) {
+            console.log("Fingerprint data received:", result);
+          }
+        });
+    }
     console.log("Received patient data: ", this.patientData);
     this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
-      console.log('Practitioner Details in State:', data);
+      console.log("Practitioner Details in State:", data);
     });
     // Dispatch the action to fetch data from API
     this.store.dispatch(loadPointOfCare());
@@ -103,7 +131,6 @@ export class PatientDashboardComponent implements OnInit {
     this.isLoading$.subscribe((isLoading) => {
       console.log("Loading State:", isLoading);
     });
-    this.showDoctorModal = true;
     this.showPatientModal = false;
     this.IPDRoundConceptUuid$ = this.systemSettingsService
       .getSystemSettingsByKey("iCare.ipd.settings.IPDRoundConceptUuid")
@@ -282,7 +309,6 @@ export class PatientDashboardComponent implements OnInit {
   //     }
   //   });
   // }
-
 
   closeDoctorModal(success: boolean) {
     this.showDoctorModal = false;

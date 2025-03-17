@@ -62,7 +62,7 @@ export enum NHIFFingerPrintCodeE{
 }
 
 
-export interface NHIFPractitionerLogin{
+export interface NHIFPractitionerLoginI{
   practionerID: string,
   practionerNIDA: string,
   biometricMethod: NHIFBiometricMethodE,

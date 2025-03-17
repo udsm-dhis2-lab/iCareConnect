@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { OpenmrsHttpClientService } from '../modules/openmrs-http-client/services/openmrs-http-client.service';
-import { NHIFPointOfCareI, PatientPOCVerificationI } from '../resources/store/models/insurance-nhif.model';
+import { NHIFPointOfCareI, NHIFPractitionerLoginI, PatientPOCVerificationI } from '../resources/store/models/insurance-nhif.model';
 
 @Injectable({
   providedIn: 'root',
@@ -35,8 +35,12 @@ export class InsuranceService {
     return this.httpClient.get(`${this.modal}` + 'getpoc');
   } 
 
-  requestPatientPOCVerification(data: PatientPOCVerificationI): Observable<PatientPOCVerificationI> {
+  requestPatientPOCVerification(data: PatientPOCVerificationI): Observable<any> {
     return this.httpClient.post(`${this.modal}` + 'pocrefgeneration', data);
+  } 
+
+  loginNHIFPractitioner(data: NHIFPractitionerLoginI): Observable<any> {
+    return this.httpClient.post(`${this.modal}` + 'loginpractitioner', data);
   } 
   
 }
