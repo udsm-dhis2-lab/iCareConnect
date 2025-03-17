@@ -13,8 +13,9 @@ export const updateNHIFPractitionerDetails = createAction(
 
 export const loginNHIFPractitioner = createAction(
   "[NHIF Practitioner] Login",
-  props<NHIFPractitionerLoginI >()
+  props<{ data: NHIFPractitionerLoginI }>() // ✅ Requires a "data" property
 );
+
 
 export const loginNHIFPractitionerSuccess = createAction(
   "[NHIF Practitioner] Login Success",

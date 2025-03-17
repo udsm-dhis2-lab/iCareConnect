@@ -34,6 +34,7 @@ import { ConsultationEffects } from "./consultation.effects";
 import { LISEffects } from "./lis-configurations.effects";
 import { SystemSettingsEffect } from "./selected-system-settings.effects";
 import { PointOfCareEffects } from "./insurance-nhif-point-of-care.effects";
+import { NHIFPractitionerEffects } from "./insurance-nhif-practitioner.effects";
 
 export const effects: any[] = [
   RouterEffects,
@@ -71,5 +72,6 @@ export const effects: any[] = [
   ConsultationEffects,
   LISEffects,
   SystemSettingsEffect,
-  PointOfCareEffects
+  PointOfCareEffects,
+  NHIFPractitionerEffects
 ];

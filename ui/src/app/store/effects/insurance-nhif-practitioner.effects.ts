@@ -20,13 +20,14 @@ export class NHIFPractitionerEffects {
     private insuranceService: InsuranceService
   ) {}
 
-  // ✅ Effect for NHIF Practitioner Login
+  //Effect for NHIF Practitioner Login
   loginNHIFPractitioner$ = createEffect(() =>
     this.actions$.pipe(
       ofType(loginNHIFPractitioner),
-      switchMap((data ) => {
+      switchMap(({ data } ) => {
+        console.log('action for login in practioner received')
         return this.insuranceService.loginNHIFPractitioner(data).pipe(
-          map((practitioner: NHIFPractitionerDetailsI) =>
+          map((practitioner: any) =>
             loginNHIFPractitionerSuccess({ practitioner })
           ),
           catchError((error) =>
