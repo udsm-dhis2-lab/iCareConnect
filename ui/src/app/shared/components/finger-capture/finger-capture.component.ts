@@ -38,7 +38,7 @@ export class FingerCaptureComponent {
           setTimeout(() => {
             this.fingerprintCapturedMessage = false;
             this.showLoader = true;
-            this.dialogRef.close({ success: true });
+            this.dialogRef.close(btoa(result.RawData));
           }, 2000);
         }
       },

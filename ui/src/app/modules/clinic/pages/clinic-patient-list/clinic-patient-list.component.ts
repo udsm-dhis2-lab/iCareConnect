@@ -68,16 +68,16 @@ export class ClinicPatientListComponent implements OnInit {
     this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
       // if the doctor is not logged in to NHIF, prompt the doctor to login
       if (!data || !data.isNHIFPractitionerLogedIn) {
-        const loginData = {
-          practitionerNo: this.currentProviderDetails[1]["value"],
-          nationalID: this.currentProviderDetails[3]["value"],
-          biometricMethod: NHIFBiometricMethodE.fingerprint,
-          fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
-          imageData: "base 64",
-        };
+        // const loginData = {
+        //   practitionerNo: this.currentProviderDetails[1]["value"],
+        //   nationalID: this.currentProviderDetails[3]["value"],
+        //   biometricMethod: NHIFBiometricMethodE.fingerprint,
+        //   fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
+        //   imageData: "base 64",
+        // };
 
         // ✅ Dispatch the login action
-        this.store.dispatch(loginNHIFPractitioner({ data: loginData }));
+        // this.store.dispatch(loginNHIFPractitioner({ data: loginData }));
 
         this.dialog
           .open(FingerCaptureComponent, {
@@ -106,7 +106,7 @@ export class ClinicPatientListComponent implements OnInit {
                 nationalID: this.currentProviderDetails[3]["value"],
                 biometricMethod: NHIFBiometricMethodE.fingerprint,
                 fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
-                imageData: result.fingerprintCaptured,
+                imageData: result
               };
 
               // ✅ Dispatch the login action

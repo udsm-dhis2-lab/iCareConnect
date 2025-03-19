@@ -308,7 +308,7 @@ export class PatientDashboardComponent implements OnInit {
             practitionerNo: this.currentProviderDetails[1]["value"],
             biometricMethod: NHIFBiometricMethodE.fingerprint,
             fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
-            imageData: result.fingerprintCaptured,
+            imageData: result
           };
 
           // Dispatch login action
