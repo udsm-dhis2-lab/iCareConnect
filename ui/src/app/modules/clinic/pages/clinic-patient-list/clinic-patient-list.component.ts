@@ -56,7 +56,7 @@ export class ClinicPatientListComponent implements OnInit {
     private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
-  ngOnInit() {
+  ngOnInit() { 
     // get provider details
     this.store.select(getProviderDetails).subscribe((data) => {
       if (data) {
@@ -70,7 +70,7 @@ export class ClinicPatientListComponent implements OnInit {
       if (!data || !data.isNHIFPractitionerLogedIn) {
         const loginData = {
           practitionerNo: this.currentProviderDetails[1]["value"],
-          nationalID: "19891031141300000223",
+          nationalID: this.currentProviderDetails[3]["value"],
           biometricMethod: NHIFBiometricMethodE.fingerprint,
           fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
           imageData: "base 64",
@@ -91,8 +91,8 @@ export class ClinicPatientListComponent implements OnInit {
             if (result) {
               console.log("Fingerprint data received:", result);
               const practitionerData: NHIFPractitionerDetailsI = {
-                practionerID: this.currentProviderDetails[1]["value"], // MCT Registration number index
-                practionerNIDA: "NIDA-67890",
+                practitionerNo: this.currentProviderDetails[1]["value"], // MCT Registration number index
+                nationalID: this.currentProviderDetails[3]["value"],
                 isNHIFPractitionerLogedIn: true,
               };
 
@@ -103,7 +103,7 @@ export class ClinicPatientListComponent implements OnInit {
 
               const loginData = {
                 practitionerNo: this.currentProviderDetails[1]["value"],
-                nationalID: "NIDA12345",
+                nationalID: this.currentProviderDetails[3]["value"],
                 biometricMethod: NHIFBiometricMethodE.fingerprint,
                 fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
                 imageData: result.fingerprintCaptured,

@@ -45,6 +45,7 @@ import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { FingerprintService, InsuranceService } from "src/app/shared/services";
 import { InsuranceResponse } from "src/app/modules/billing/models/insurance-response.model";
+import { NHIFBiometricMethodE, NHIFFingerPrintCodeE } from "src/app/shared/resources/store/models/insurance-nhif.model";
 @Component({
   selector: "app-visit",
   templateUrl: "./visit.component.html",
@@ -1092,9 +1093,9 @@ export class VisitComponent implements OnInit {
 
   authorizationData = {
     cardNo: "",
-    biometricMethod: "string",
+    biometricMethod: NHIFBiometricMethodE.fingerprint,
     nationalID: "",
-    fpCode: "R1",
+    fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
     imageData: "",
     visitTypeID: 1,
     referralNo: "string",

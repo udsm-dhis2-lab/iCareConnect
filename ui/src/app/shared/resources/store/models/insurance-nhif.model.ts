@@ -35,8 +35,8 @@ export interface PatientPOCVerificationI {
 }
 
 export interface NHIFPractitionerDetailsI {
-  practionerID: string;
-  practionerNIDA: string;
+  practitionerNo: string;
+  nationalID: string;
   isNHIFPractitionerLogedIn: boolean;
 }
 

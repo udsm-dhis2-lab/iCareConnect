@@ -19,7 +19,7 @@ export const loginNHIFPractitioner = createAction(
 
 export const loginNHIFPractitionerSuccess = createAction(
   "[NHIF Practitioner] Login Success",
-  props<{ practitioner: any }>()
+  props<{ response: any }>()
 );
 
 export const loginNHIFPractitionerFailure = createAction(

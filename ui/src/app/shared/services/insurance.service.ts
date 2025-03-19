@@ -35,7 +35,7 @@ export class InsuranceService {
     return this.httpClient.get(`${this.modal}` + 'getpoc');
   } 
 
-  requestPatientPOCVerification(data: PatientPOCVerificationI): Observable<any> {
+  verifyPointOfCare(data: PatientPOCVerificationI): Observable<any> {
     return this.httpClient.post(`${this.modal}` + 'pocrefgeneration', data);
   } 
 
