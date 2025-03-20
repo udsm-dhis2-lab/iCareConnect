@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -297,8 +298,7 @@ public class InsurancesServices {
 
         if (token == null) {
             return Collections.singletonList(
-                Map.of("status", 401, "error", "Failed to obtain authentication token")
-            );
+                    Map.of("status", 401, "error", "Failed to obtain authentication token"));
         }
 
         try {
@@ -319,17 +319,17 @@ public class InsurancesServices {
                 reader.close();
 
                 ObjectMapper objectMapper = new ObjectMapper();
-                visitTypes = objectMapper.readValue(response.toString(), new TypeReference<List<Map<String, Object>>>() {});
+                visitTypes = objectMapper.readValue(response.toString(),
+                        new TypeReference<List<Map<String, Object>>>() {
+                        });
 
             } else {
                 return Collections.singletonList(
-                    Map.of("status", responseCode, "error", "Failed to fetch data. HTTP Code: " + responseCode)
-                );
+                        Map.of("status", responseCode, "error", "Failed to fetch data. HTTP Code: " + responseCode));
             }
         } catch (Exception e) {
             return Collections.singletonList(
-                Map.of("status", 500, "error", "Internal Server Error", "exception", e.getMessage())
-            );
+                    Map.of("status", 500, "error", "Internal Server Error", "exception", e.getMessage()));
         }
 
         return visitTypes;
@@ -337,7 +337,7 @@ public class InsurancesServices {
 	
 	public Map<String, Object> getPreapproval(Map<String, Object> requestPayload) {
         Map<String, Object> responseMap = new HashMap<>();
-    
+
         if (requestPayload == null || requestPayload.isEmpty()) {
             responseMap.put("status", 400);
             responseMap.put("error", "Payload cannot be null or empty");
@@ -350,7 +350,7 @@ public class InsurancesServices {
             responseMap.put("error", "Failed to obtain authentication token");
             return responseMap;
         }
-    
+
         String jsonPayload;
         try {
             jsonPayload = new ObjectMapper().writeValueAsString(requestPayload);
@@ -359,7 +359,7 @@ public class InsurancesServices {
             responseMap.put("error", "Failed to convert payload to JSON");
             return responseMap;
         }
-    
+
         HttpURLConnection connection = null;
         try {
             URL url = new URL(PREAPPROVAL_API);
@@ -368,27 +368,28 @@ public class InsurancesServices {
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Authorization", "Bearer " + token);
             connection.setDoOutput(true);
-    
+
             try (OutputStream os = connection.getOutputStream()) {
                 os.write(jsonPayload.getBytes(StandardCharsets.UTF_8));
             }
-    
+
             int responseCode = connection.getResponseCode();
             responseMap.put("status", responseCode);
-    
-            InputStream responseStream = (responseCode < 400) ? connection.getInputStream() : connection.getErrorStream();
+
+            InputStream responseStream = (responseCode < 400) ? connection.getInputStream()
+                    : connection.getErrorStream();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(responseStream))) {
                 StringBuilder response = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
                     response.append(line);
                 }
-    
+
                 ObjectMapper objectMapper = new ObjectMapper();
                 Map<String, Object> responseBody = objectMapper.readValue(response.toString(), Map.class);
                 responseMap.put("body", responseBody);
             }
-    
+
         } catch (Exception e) {
             responseMap.put("status", 500);
             responseMap.put("error", "Internal server error: " + e.getMessage());
@@ -397,7 +398,7 @@ public class InsurancesServices {
                 connection.disconnect();
             }
         }
-    
+
         return responseMap;
     }
 	
@@ -531,7 +532,7 @@ public class InsurancesServices {
                 signature.setSignatureData(signatureData);
                 Date now = new Date();
                 signature.setDateCreated(formatDate(now));
-                signature.setCreatedBy("system"); 
+                signature.setCreatedBy("system");
                 signature.setLastModified(formatDate(now));
                 signature.setLastModifiedBy("system");
 
@@ -557,6 +558,7 @@ public class InsurancesServices {
 
                     // Convert folio to JSON
                     ObjectMapper objectMapper = new ObjectMapper();
+                    objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
                     String folioJson = objectMapper.writeValueAsString(folio);
 
                     try (OutputStream os = connection.getOutputStream()) {
@@ -575,7 +577,7 @@ public class InsurancesServices {
                         while ((line = reader.readLine()) != null) {
                             response.append(line);
                         }
-                        responseMap.put("body", response.toString());
+                        responseMap.put("body", response);
                     }
                 } catch (Exception e) {
                     responseMap.put("error", e.getMessage());
@@ -608,7 +610,6 @@ public class InsurancesServices {
 	
 	public Map<String, Object> getCardDetailsByNIN(String nationalID) {
         Map<String, Object> responseMap = new HashMap<>();
-        
 
         if (nationalID == null || nationalID.trim().isEmpty()) {
             responseMap.put("status", 400);
@@ -635,7 +636,7 @@ public class InsurancesServices {
             int responseCode = conn.getResponseCode();
             responseMap.put("status", responseCode);
 
-            if (responseCode == HttpURLConnection.HTTP_OK) { 
+            if (responseCode == HttpURLConnection.HTTP_OK) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 StringBuilder response = new StringBuilder();
                 String line;

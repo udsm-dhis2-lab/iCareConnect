@@ -1340,8 +1340,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(),
 						            invoiceItem.getPrice().toString(), "0.0", GFSCode));
 					} else {
-						throw new IllegalStateException(
-						        "Please verify GFS CODE concept mapping if configured in a correct way");
+						throw new IllegalStateException("Please verify GFS CODE concept mapping if configured in a correct way");
 					}
 				}
 			}
