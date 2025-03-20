@@ -16,7 +16,6 @@ import {
 } from "src/app/shared/resources/store/models/insurance-nhif.model";
 import { go } from "src/app/store/actions";
 import {
-  loginNHIFPractitioner,
   setNHIFPractitionerDetails,
 } from "src/app/store/actions/insurance-nhif-practitioner.actions";
 import { AppState } from "src/app/store/reducers";

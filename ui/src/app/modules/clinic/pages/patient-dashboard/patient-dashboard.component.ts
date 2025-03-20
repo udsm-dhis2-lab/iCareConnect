@@ -107,7 +107,6 @@ export class PatientDashboardComponent implements OnInit {
     this.store.select(getProviderDetails).subscribe((data) => {
       if (data) {
         this.currentProviderDetails = data.attributes;
-        console.log('888888888888888888888888', data.attributes)
       }
     });
 
@@ -208,7 +207,6 @@ export class PatientDashboardComponent implements OnInit {
     this.observations$ = this.store.select(getAllObservations);
     this.activeVisit$.subscribe((response: any) => {
       // if is insurance patient, show verify point of care
-      console.log('active visit object:', response)
       if (response && response?.isEnsured) {
         this.openPatientFingerprintModal(
           response.attributes[4]["visitAttributeDetails"]["value"]
