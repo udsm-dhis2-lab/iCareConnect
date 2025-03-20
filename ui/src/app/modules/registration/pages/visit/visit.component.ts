@@ -45,7 +45,8 @@ import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { FingerprintService, InsuranceService } from "src/app/shared/services";
 import { InsuranceResponse } from "src/app/modules/billing/models/insurance-response.model";
-import { NHIFBiometricMethodE, NHIFFingerPrintCodeE } from "src/app/shared/resources/store/models/insurance-nhif.model";
+import { FingerPrintPaylodTypeE, NHIFBiometricMethodE, NHIFFingerPrintCodeE } from "src/app/shared/resources/store/models/insurance-nhif.model";
+import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
 @Component({
   selector: "app-visit",
   templateUrl: "./visit.component.html",
@@ -1096,7 +1097,6 @@ export class VisitComponent implements OnInit {
     biometricMethod: NHIFBiometricMethodE.fingerprint,
     nationalID: "",
     fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
-    imageData: "",
     visitTypeID: 1,
     referralNo: "string",
     remarks: "Authorization",
@@ -1119,14 +1119,16 @@ export class VisitComponent implements OnInit {
     if (!this.authorizationData.cardNo) {
       this.authorizationData.cardNo = "string";
     }
-    if (!this.authorizationData.imageData) {
-      this.authorizationData.imageData = "string";
-    }
+   
 
-    if (this.rawData) {
-      this.authorizationData.imageData = this.rawData;
-      this.showLoader = true;
-    }
+    this.dialog
+          .open(FingerCaptureComponent, {
+            width: "45%",
+            data: { detail: "patient's", data: {
+              type: FingerPrintPaylodTypeE.Patient_card_authorization,
+              payload: this.authorizationData
+            } },
+          })
 
     this.insuranceService
       .authorizeInsuranceCard(this.authorizationData)
@@ -1146,32 +1148,7 @@ export class VisitComponent implements OnInit {
       });
   }
 
-  onFingerprintCaptured(rawData: string) {
-    this.rawData = rawData;
-    if (this.nidaData.nationalID && this.rawData) {
-      console.log("NIDA ---", this.nidaData.nationalID);
-      this.getCardNumber();
-    } else {
-      console.log("Card Number ---", this.nidaData.nationalID);
-      setTimeout(() => {
-        this.authorizeInsurance();
-      }, 2000);
-    }
-  }
 
-  // onFingerprintCaptured(rawData: string) {
-  //   this.rawData = rawData;
-  //   if (this.nidaData.nationalID) {
-  //     setTimeout(() => {
-  //       this.getCardNumber();
-  //       setTimeout(() => {
-  //         this.authorizeInsurance();
-  //       }, 2000);
-  //     }, 2000);
-  //   } else {
-  //     setTimeout(() => {
-  //       this.authorizeInsurance();
-  //     }, 2000);
-  //   }
-  // }
+
+
 }

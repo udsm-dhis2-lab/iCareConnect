@@ -9,6 +9,7 @@ import { FingerCaptureComponent } from "src/app/shared/components/finger-capture
 import { PatientHistoryDialogComponent } from "src/app/shared/dialogs/patient-history-dialog/patient-history-dialog.component";
 import { ProviderAttributeGet } from "src/app/shared/resources/openmrs";
 import {
+  FingerPrintPaylodTypeE,
   NHIFBiometricMethodE,
   NHIFFingerPrintCodeE,
   NHIFPractitionerDetailsI,
@@ -56,7 +57,7 @@ export class ClinicPatientListComponent implements OnInit {
     private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
-  ngOnInit() { 
+  ngOnInit() {
     // get provider details
     this.store.select(getProviderDetails).subscribe((data) => {
       if (data) {
@@ -68,28 +69,27 @@ export class ClinicPatientListComponent implements OnInit {
     this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
       // if the doctor is not logged in to NHIF, prompt the doctor to login
       if (!data || !data.isNHIFPractitionerLogedIn) {
-        // const loginData = {
-        //   practitionerNo: this.currentProviderDetails[1]["value"],
-        //   nationalID: this.currentProviderDetails[3]["value"],
-        //   biometricMethod: NHIFBiometricMethodE.fingerprint,
-        //   fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
-        //   imageData: "base 64",
-        // };
-
-        // ✅ Dispatch the login action
-        // this.store.dispatch(loginNHIFPractitioner({ data: loginData }));
+        const loginData = {
+          practitionerNo: this.currentProviderDetails[1]["value"],
+          nationalID: this.currentProviderDetails[3]["value"],
+          biometricMethod: NHIFBiometricMethodE.fingerprint,
+          fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
+        };
 
         this.dialog
           .open(FingerCaptureComponent, {
             width: "45%",
             data: {
               detail: "doctor's",
+              data: {
+                type: FingerPrintPaylodTypeE.Practitioner_login,
+                payload: loginData,
+              },
             },
           })
           .afterClosed()
           .subscribe((result) => {
             if (result) {
-              console.log("Fingerprint data received:", result);
               const practitionerData: NHIFPractitionerDetailsI = {
                 practitionerNo: this.currentProviderDetails[1]["value"], // MCT Registration number index
                 nationalID: this.currentProviderDetails[3]["value"],
@@ -100,17 +100,6 @@ export class ClinicPatientListComponent implements OnInit {
               this.store.dispatch(
                 setNHIFPractitionerDetails({ data: practitionerData })
               );
-
-              const loginData = {
-                practitionerNo: this.currentProviderDetails[1]["value"],
-                nationalID: this.currentProviderDetails[3]["value"],
-                biometricMethod: NHIFBiometricMethodE.fingerprint,
-                fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
-                imageData: result
-              };
-
-              // ✅ Dispatch the login action
-              this.store.dispatch(loginNHIFPractitioner({ data: loginData }));
             }
           });
       }

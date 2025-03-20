@@ -42,6 +42,7 @@ import { PaymentService } from "src/app/modules/billing/services/payment.service
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { InsuranceService } from "src/app/shared/services";
 import {
+  FingerPrintPaylodTypeE,
   NHIFBiometricMethodE,
   NHIFFingerPrintCodeE,
   NHIFPointOfCareCodeE,
@@ -106,6 +107,7 @@ export class PatientDashboardComponent implements OnInit {
     this.store.select(getProviderDetails).subscribe((data) => {
       if (data) {
         this.currentProviderDetails = data.attributes;
+        console.log('888888888888888888888888', data.attributes)
       }
     });
 
@@ -206,6 +208,7 @@ export class PatientDashboardComponent implements OnInit {
     this.observations$ = this.store.select(getAllObservations);
     this.activeVisit$.subscribe((response: any) => {
       // if is insurance patient, show verify point of care
+      console.log('active visit object:', response)
       if (response && response?.isEnsured) {
         this.openPatientFingerprintModal(
           response.attributes[4]["visitAttributeDetails"]["value"]
@@ -288,34 +291,25 @@ export class PatientDashboardComponent implements OnInit {
 
   // Separate method to open the doctor fingerprint modal
   openPatientFingerprintModal(patientAuthorization: string): void {
+    const patientPointOfCareData = {
+      pointOfCareID:
+        this.pointOfCares.find(
+          (item) =>
+            (item.PointOfCareCode = NHIFPointOfCareCodeE.CONSULTATION)
+        ).PointOfCareID || null,
+      authorizationNo: patientAuthorization,
+      practitionerNo: this.currentProviderDetails[1]["value"],
+      biometricMethod: NHIFBiometricMethodE.fingerprint,
+      fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
+    };
     this.dialog
       .open(FingerCaptureComponent, {
         width: "45%",
-        data: { detail: "patient's" },
+        data: { detail: "patient's", data: {
+          type: FingerPrintPaylodTypeE.Patient_POC_Verification,
+          payload: patientPointOfCareData
+        } },
       })
-      .afterClosed()
-      .subscribe((result) => {
-        if (result) {
-          console.log("Fingerprint data received:", result);
-
-          const patientPointOfCareData = {
-            pointOfCareID:
-              this.pointOfCares.find(
-                (item) =>
-                  (item.PointOfCareCode = NHIFPointOfCareCodeE.CONSULTATION)
-              ).PointOfCareID || null,
-            authorizationNo: patientAuthorization,
-            practitionerNo: this.currentProviderDetails[1]["value"],
-            biometricMethod: NHIFBiometricMethodE.fingerprint,
-            fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
-            imageData: result
-          };
-
-          // Dispatch login action
-          this.store.dispatch(
-            verifyPointOfCare({ data: patientPointOfCareData })
-          );
-        }
-      });
+      
   }
 }

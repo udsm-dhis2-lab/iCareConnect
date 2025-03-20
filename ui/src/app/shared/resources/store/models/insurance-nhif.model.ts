@@ -65,3 +65,13 @@ export interface NHIFPractitionerLoginI {
   fpCode: NHIFFingerPrintCodeE;
   imageData: string;
 }
+
+export enum FingerPrintPaylodTypeE {
+  Patient_POC_Verification = "Patient Point of care Verification",
+  Practitioner_login = "Practitioner Login",
+  Patient_card_authorization= 'Patient'
+}
+export interface FingerPrintPaylodI {
+  type:FingerPrintPaylodTypeE
+  data: NHIFPractitionerLoginI | PatientPOCVerificationI;
+}

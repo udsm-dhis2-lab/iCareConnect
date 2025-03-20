@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { OpenmrsHttpClientService } from '../modules/openmrs-http-client/services/openmrs-http-client.service';
 import { NHIFPointOfCareI, NHIFPractitionerLoginI, PatientPOCVerificationI } from '../resources/store/models/insurance-nhif.model';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -40,7 +41,14 @@ export class InsuranceService {
   } 
 
   loginNHIFPractitioner(data: NHIFPractitionerLoginI): Observable<any> {
-    return this.httpClient.post(`${this.modal}` + 'loginpractitioner', data);
+       // Set the headers
+       const httpConfig = {
+        httpHeaders: {
+          'Content-Type': 'application/json',
+        }
+      };
+  
+    return this.httpClient.post(`${this.modal}` + 'loginpractitioner', data,httpConfig );
   } 
   
 }
