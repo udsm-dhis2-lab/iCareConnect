@@ -75,3 +75,30 @@ export interface FingerPrintPaylodI {
   type:FingerPrintPaylodTypeE
   data: NHIFPractitionerLoginI | PatientPOCVerificationI;
 }
+
+export interface NHIFVisitTypeI
+{
+  VisitTypeID: number,
+  VisitTypeName: string,
+  RequiredInput: string,
+  Alias:string,
+  RequiresRemarks: boolean,
+  RequiresReferralNo: boolean,
+  Description: string,
+  MaximumVisitPerMonth: number,
+  CreatedBy: any
+}
+
+export enum VisitTypeAliasE {
+  NORMAL_VISIT = "NORMAL_VISIT",
+  EMERGENCY_CASE = "EMERGENCY_CASE",
+  REFERRAL = "REFERRAL",
+  FOLLOW_UP_VISIT = "FOLLOW_UP_VISIT",
+  INVESTIGATION_ONLY = "INVESTIGATION_ONLY",
+  OCCUPATIONAL_VISIT = "OCCUPATIONAL_VISIT",
+  MEDICINE_ONLY = "MEDICINE_ONLY",
+  REPETITIVE_VISIT = "REPETITIVE_VISIT",
+  NEW_CASE_VISIT = "NEW_CASE_VISIT",
+  AMBULANCE_EVACUATION = "AMBULANCE_EVACUATION"
+}
+    

@@ -17,23 +17,22 @@ export class InsuranceService {
 
 
   authorizeInsuranceCard(authorizationData: any): Observable<any> {
-    console.log('Authorization authorizationData:', authorizationData);
-    if (!authorizationData || Object.keys(authorizationData).length === 0) {
-      console.error('No authorizationData provided for authorization');
-    }
+   
     return this.httpClient.post(`${this.modal}` + 'authorizecard', authorizationData);
   }
 
   getCardNumberByNida(nidaData: any): Observable<any> {
-    if (!nidaData || Object.keys(nidaData).length === 0) {
-      console.error('No authorizationData provided for authorization');
-    }
+    
     return this.httpClient.post(`${this.modal}` + 'GetCardDetailsByNIN', nidaData);
   } 
   
 
   getListOfPointOfcare(): Observable<NHIFPointOfCareI[]> {
     return this.httpClient.get(`${this.modal}` + 'getpoc');
+  } 
+
+  getListOfVisitTypes(): Observable<NHIFPointOfCareI[]> {
+    return this.httpClient.get(`${this.modal}` + 'getvisittype');
   } 
 
   verifyPointOfCare(data: PatientPOCVerificationI): Observable<any> {

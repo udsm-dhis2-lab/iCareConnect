@@ -14,6 +14,7 @@ import {
   NHIFFingerPrintCodeE,
   NHIFPractitionerDetailsI,
 } from "src/app/shared/resources/store/models/insurance-nhif.model";
+import { InsuranceService } from "src/app/shared/services";
 import { go } from "src/app/store/actions";
 import {
   setNHIFPractitionerDetails,
@@ -53,7 +54,8 @@ export class ClinicPatientListComponent implements OnInit {
     private store: Store<AppState>,
     private systemSettingsService: SystemSettingsService,
     private dialog: MatDialog,
-    private googleAnalyticsService: GoogleAnalyticsService
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private service: InsuranceService
   ) {}
 
   ngOnInit() {
@@ -63,6 +65,10 @@ export class ClinicPatientListComponent implements OnInit {
         this.currentProviderDetails = data.attributes;
       }
     });
+  console.log('here below')
+    this.service.getListOfVisitTypes().subscribe((data)=>{
+      console.log('the NHIF visit types are', data)
+    })
 
     // get practitioner details
     this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
