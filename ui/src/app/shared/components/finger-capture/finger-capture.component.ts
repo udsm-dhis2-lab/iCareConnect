@@ -1,13 +1,13 @@
-import { Component, EventEmitter, Inject, Input, Output, OnInit } from "@angular/core";
+import { Component, Inject, OnInit } from "@angular/core";
 import { FingerprintService } from "../../services";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {
-  FingerPrintPaylodI,
   FingerPrintPaylodTypeE,
+  NHIFCardAuthorizationI,
   NHIFPractitionerLoginI,
   PatientPOCVerificationI,
 } from "../../resources/store/models/insurance-nhif.model";
-import { verifyPointOfCare } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
+import { authorizeNHIFCard, verifyPointOfCare } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { loginNHIFPractitioner } from "src/app/store/actions/insurance-nhif-practitioner.actions";
@@ -36,7 +36,6 @@ export class FingerCaptureComponent implements OnInit {
       if (this.data) {
         this.labels = this.data.detail;
         this.payload = this.data.data;
-        console.log("Dialog Data:", this.labels, this.payload);
 
         // Now, trigger the fingerprint capture
         this.fingerprint.captureFingerprint().subscribe(
@@ -51,8 +50,7 @@ export class FingerCaptureComponent implements OnInit {
               if (this.payload.payload){
                 this.payload["payload"]["imageData"] = result.RawData;
               }
-              console.log('Reach here 1',this.payload)
-              console.log('Reach here 2')
+            
               // dispatch actions depending on the requesting component
               if (
                 this.payload.type === FingerPrintPaylodTypeE.Patient_POC_Verification
@@ -64,6 +62,10 @@ export class FingerCaptureComponent implements OnInit {
               ) {
                 const loginData = this.payload.payload as NHIFPractitionerLoginI;
                 this.store.dispatch(loginNHIFPractitioner({ data: loginData }));
+              }
+              else if ( this.payload.type === FingerPrintPaylodTypeE.Patient_card_authorization){
+                const cardAuthorizationData = this.payload.payload as NHIFCardAuthorizationI
+                this.store.dispatch(authorizeNHIFCard({data: cardAuthorizationData}))
               }
     
               setTimeout(() => {
@@ -81,8 +83,5 @@ export class FingerCaptureComponent implements OnInit {
     }, 0); // 0ms delay ensures that the data is available before executing the code
   }
 
-  captureFingerprint(): void {
-    
-   
-  }
+
 }

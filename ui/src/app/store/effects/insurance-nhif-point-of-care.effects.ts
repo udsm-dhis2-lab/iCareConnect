@@ -2,12 +2,21 @@ import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { InsuranceService } from "src/app/shared/services";
 import {
+  getNHIFCardDetailsByNIN,
+  authorizeNHIFCardFailure,
+  authorizeNHIFCardSuccess,
   loadPointOfCare,
   loadPointOfCareFailure,
   loadPointOfCareSuccess,
   verifyPointOfCare,
   verifyPointOfCareFailure,
   verifyPointOfCareSuccess,
+  authorizeNHIFCard,
+  getNHIFCardDetailsByNINSuccess,
+  getNHIFCardDetailsByNINFailure,
+  getNHIFCardDetailsByCardNumber,
+  getNHIFCardDetailsByCardNumberSuccess,
+  getNHIFCardDetailsByCardNumberFailure,
 } from "../actions/insurance-nhif-point-of-care.actions";
 import { catchError, map, switchMap } from "rxjs/operators";
 import { of } from "rxjs";
@@ -15,6 +24,7 @@ import {
   Notification,
   NotificationService,
 } from "src/app/shared/services/notification.service";
+import { NHIFCardAuthorizationResponseI, NHIFGetCardDEtailByNationalIDResponseI } from "src/app/shared/resources/store/models/insurance-nhif.model";
 
 @Injectable()
 export class PointOfCareEffects {
@@ -45,7 +55,7 @@ export class PointOfCareEffects {
       switchMap(({ data }) => {
         return this.insuranceService.verifyPointOfCare(data).pipe(
           map((response: { status: number; body: object }) => {
-            if ((response.status = 400)) {
+            if ((response.status === 400)) {
               this.notificationService.show(
                 new Notification({
                   message: response.body["message"],
@@ -66,6 +76,114 @@ export class PointOfCareEffects {
             return of(
               verifyPointOfCareFailure({
                 error: error.message || "Login failed",
+              })
+            );
+          })
+        );
+      })
+    )
+  );
+
+  //Effect for NHIF card authorization
+  authorizeNHIFCard$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(authorizeNHIFCard),
+      switchMap(({ data }) => {
+        return this.insuranceService.authorizeInsuranceCard(data).pipe(
+          map((response: { status: number; body: NHIFCardAuthorizationResponseI }) => {
+            if ((response.status === 400)) {
+              this.notificationService.show(
+                new Notification({
+                  message: response.body["message"],
+                  type: "ERROR",
+                })
+              );
+            }
+            return authorizeNHIFCardSuccess({ response});
+          }),
+          catchError((error) => {
+            this.notificationService.show(
+              new Notification({
+                message: "Problem authorizing NHIF card",
+                type: "ERROR",
+              })
+            );
+
+            return of(
+              authorizeNHIFCardFailure({
+                error: error.message || "Failed to authorize NHIF card",
+              })
+            );
+          })
+        );
+      })
+    )
+  );
+
+  //Effect for NHIF to get card details by NIDA
+  getNHIFCardDetailsByNIN$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(getNHIFCardDetailsByNIN),
+      switchMap(({ data }) => {
+        return this.insuranceService.getCardDetailsByNIN(data).pipe(
+          map((response: { status: number; body: NHIFGetCardDEtailByNationalIDResponseI }) => {
+            if ((response.status === 400)) {
+              this.notificationService.show(
+                new Notification({
+                  message: response.body["message"],
+                  type: "ERROR",
+                })
+              );
+            }
+            return getNHIFCardDetailsByNINSuccess({ response });
+          }),
+          catchError((error) => {
+            this.notificationService.show(
+              new Notification({
+                message: "Problem getting NHIF card by NIN",
+                type: "ERROR",
+              })
+            );
+
+            return of(
+              getNHIFCardDetailsByNINFailure({
+                error: error.message || "Failed to get NHIF card by NIN",
+              })
+            );
+          })
+        );
+      })
+    )
+  );
+
+  //Effect for NHIF to get card details by carrd number
+  getNHIFCardDetailsByCardNumber$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(getNHIFCardDetailsByCardNumber),
+      switchMap(({ data }) => {
+        return this.insuranceService.getCardDetailsByCardNumber(data).pipe(
+          map((response: { status: number; body: object }) => {
+            if ((response.status === 400)) {
+              this.notificationService.show(
+                new Notification({
+                  message: response.body["message"],
+                  type: "ERROR",
+                })
+              );
+            }
+            return getNHIFCardDetailsByCardNumberSuccess({ response });
+          }),
+          catchError((error) => {
+            this.notificationService.show(
+              new Notification({
+                message: "Problem getting NHIF card by card number",
+                type: "ERROR",
+              })
+            );
+
+            return of(
+              getNHIFCardDetailsByCardNumberFailure({
+                error: error.message || "Failed to get NHIF card by card number",
               })
             );
           })

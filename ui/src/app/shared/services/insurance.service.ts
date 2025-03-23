@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { OpenmrsHttpClientService } from '../modules/openmrs-http-client/services/openmrs-http-client.service';
-import { NHIFPointOfCareI, NHIFPractitionerLoginI, PatientPOCVerificationI } from '../resources/store/models/insurance-nhif.model';
-import { HttpHeaders } from '@angular/common/http';
+import { GetCardNumberDetailsI, NationalIDI, NHIFPointOfCareI, NHIFPractitionerLoginI, NHIFVisitTypeI, PatientPOCVerificationI } from '../resources/store/models/insurance-nhif.model';
 
 @Injectable({
   providedIn: 'root',
@@ -21,9 +20,14 @@ export class InsuranceService {
     return this.httpClient.post(`${this.modal}` + 'authorizecard', authorizationData);
   }
 
-  getCardNumberByNida(nidaData: any): Observable<any> {
+  getCardDetailsByNIN(data: NationalIDI): Observable<any> {
     
-    return this.httpClient.post(`${this.modal}` + 'GetCardDetailsByNIN', nidaData);
+    return this.httpClient.post(`${this.modal}` + 'GetCardDetailsByNIN', data);
+  } 
+
+  getCardDetailsByCardNumber(data: GetCardNumberDetailsI): Observable<any> {
+    
+    return this.httpClient.post(`${this.modal}` + 'beneficialydetails', data);
   } 
   
 
@@ -31,7 +35,7 @@ export class InsuranceService {
     return this.httpClient.get(`${this.modal}` + 'getpoc');
   } 
 
-  getListOfVisitTypes(): Observable<NHIFPointOfCareI[]> {
+  getListOfVisitTypes(): Observable<NHIFVisitTypeI[]> {
     return this.httpClient.get(`${this.modal}` + 'getvisittype');
   } 
 

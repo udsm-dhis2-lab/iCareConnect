@@ -37,12 +37,20 @@
 .input-container {
   display: flex;
   align-items: center;
+  justify-content: center;
   width: 100%;
   gap: 20px;
 }
 
 .input-field {
-  flex: 1;
+  flex-grow: 1; /* Allow the input to take up available space */
+  min-width: 200px; /* Prevent it from shrinking too much */
+}
+
+.get-data-button {
+  flex-shrink: 0; /* Prevent button from shrinking */
+  padding: 10px 16px;
+  font-weight: bold;
 }
 
 .fingerprint-box {
@@ -116,17 +124,16 @@
 
 .fingerprint-container {
   display: flex;
-  align-items: center; 
+  align-items: center;
 }
 
 .gift {
-  margin-right: 50px; 
+  margin-right: 50px;
 }
 
 .modal-label {
-  margin: 0; 
+  margin: 0;
 }
-
 
 .message {
   text-align: center;
@@ -135,15 +142,143 @@
   color: green;
 }
 
-.loader {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+// ferched data styles
+.fetched-data-card {
+  margin-top: 20px;
+  padding: 20px;
+  max-width: 600px;
+  margin-bottom: 20px;
+}
+
+.fetched-data-card h2 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  color: #333;
+  
+  padding-bottom: 5px;
+}
+
+.fetched-data-card-active {
+  border: 1px solid #5cb85c;
+}
+.fetched-data-card-active h2 {
+  border-bottom: 2px solid #5cb85c;
+}
+
+.fetched-data-card-inactive {
+  border: 1px solid #ff0000;
+}
+
+.fetched-data-card-inactive h2 {
+  border-bottom: 2px solid #ff0000;
+}
+
+/* Grid layout to arrange data in two columns */
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Two columns */
+  gap: 10px 20px; /* Row and column gap */
+}
+
+.data-item {
+  font-size: 16px;
+  padding: 5px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.data-item strong {
+  color: #555;
+}
+
+.active {
+  color: green;
+  font-weight: bold;
+}
+
+.inactive {
+  color: red;
+  font-weight: bold;
+}
+
+/* Dependents Section */
+.dependents-section {
+  margin-top: 15px;
+}
+
+.dependents-section h3 {
+  color: #007bff;
+  font-size: 18px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.dependents-list {
+  list-style: none;
+  padding: 0;
+}
+
+.dependents-list li {
+  font-size: 16px;
+  padding: 5px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+
+.dependent-name {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.not-found {
+  text-align: center;
+  padding: 20px;
+  background: #ffeded;
+  border: 1px solid #ff4d4d;
+  max-width: 500px;
+  margin-bottom: 20px;
+}
+
+.not-found p {
+  color: #d9534f;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.not-found button {
+  margin-top: 10px;
+}
+
+// loader
+.loader-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  background-color: rgba(43, 38, 38, 0.8); 
-  z-index: 1000; 
+  justify-content: center;
+  padding: 20px;
+}
+
+.loader-container mat-spinner {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.loader-container p {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #555;
+}
+
+// authorization component
+.authorization-options {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.authorization-options button {
+  width: 45%;
+  font-size: 16px;
 }
