@@ -151,3 +151,29 @@ button {
   flex-direction: column;
   align-items: center;
 }
+
+
+// processing dots
+@keyframes pulse-dots {
+  0% { content: "Processing"; }
+  33% { content: "Processing."; }
+  66% { content: "Processing.."; }
+  100% { content: "Processing..."; }
+}
+
+@keyframes glow {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+.processing-message::after {
+  content: "Processing";
+  animation: pulse-dots 1.5s infinite steps(1);
+}
+
+.processing-message {
+  font-size: 18px;
+  color: #007bff;
+  animation: glow 1.5s infinite ease-in-out;
+}

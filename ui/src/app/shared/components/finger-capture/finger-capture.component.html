@@ -32,13 +32,14 @@
     <p class="modal-label">Fingerprint captured successfully.</p>
   </ng-container>
 
-  <!-- Authorization Processing -->
-  <ng-container *ngIf="showLoader">
-    <div class="loader-container">
-      <mat-spinner style="width: 50px; height: 50px;"></mat-spinner>
-    </div>
-    <p class="modal-label">Processing Authorization...</p>
-  </ng-container>
+<!-- Authorization Processing -->
+<ng-container *ngIf="showLoader">
+  <div class="loader-container">
+    <mat-spinner style="width: 50px; height: 50px;"></mat-spinner>
+  </div>
+  <p class="modal-label processing-message"></p> <!-- Fancy processing effect here -->
+</ng-container>
+
 
   <!-- Success Message -->
   <ng-container *ngIf="authorizationSuccess">
