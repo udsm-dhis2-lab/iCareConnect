@@ -97,7 +97,7 @@ export enum VisitTypeAliasE {
   OCCUPATIONAL_VISIT = "OCCUPATIONAL_VISIT",
   MEDICINE_ONLY = "MEDICINE_ONLY",
   REPETITIVE_VISIT = "REPETITIVE_VISIT",
-  NEW_CASE_VISIT = "NEW_CASE_VISIT",
+  NEW_CASE_VISIT = "NEW_CASE_VISIT", 
   AMBULANCE_EVACUATION = "AMBULANCE_EVACUATION",
 }
 
@@ -170,6 +170,7 @@ export interface NHIFCardAuthorizationResponseI {
   LastModified: string;
   AuthorizationDateSerial: number;
   IsProvisional: boolean;
+  message?: string
 }
 
 export interface NHIFGetCardDEtailByNationalIDResponseI {
@@ -204,4 +205,5 @@ export interface NHIFGetCardDEtailByNationalIDResponseI {
   RequiresFacialRecognition: boolean;
   SchemeID: number;
   StatusDescription: string;
+  
 }

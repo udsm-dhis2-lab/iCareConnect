@@ -30,12 +30,13 @@ import {
   getPatientBills,
 } from "src/app/store/selectors/bill.selectors";
 import { BillingService } from "src/app/modules/billing/services/billing.service";
-import { NHIFBiometricMethodE, NHIFFingerPrintCodeE, NHIFPointOfCareCodeE, NHIFPointOfCareI, NHIFPractitionerDetailsI } from "src/app/shared/resources/store/models/insurance-nhif.model";
+import { FingerPrintPaylodTypeE, NHIFBiometricMethodE, NHIFFingerPrintCodeE, NHIFPointOfCareCodeE, NHIFPointOfCareI, NHIFPractitionerDetailsI } from "src/app/shared/resources/store/models/insurance-nhif.model";
 import { PatientI } from "src/app/shared/resources/store/models/patient.model";
 import { ProviderAttributeGet } from "src/app/shared/resources/openmrs";
 import { MatDialog } from "@angular/material/dialog";
 import { verifyPointOfCare } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
 import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
+import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
 @Component({
   selector: "app-laboratory-sample-collection",
   templateUrl: "./laboratory-sample-collection.component.html",
@@ -75,6 +76,12 @@ export class LaboratorySampleCollectionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+     // get provider details
+        this.store.select(getProviderDetails).subscribe((data) => {
+          if (data) {
+            this.currentProviderDetails = data.attributes;
+          }
+        });
     this.patientId = this.route.snapshot.params["patientId"];
     this.visitId = this.route.snapshot.params["visitId"];
     this.store.dispatch(loadCurrentPatient({ uuid: this.patientId }));
@@ -118,6 +125,7 @@ export class LaboratorySampleCollectionComponent implements OnInit {
     this.activeVisit$ = this.store.select(getActiveVisit);
     this.payments$ = this.store.select(getAllPayments);
     this.activeVisit$.subscribe((response: any) => {
+      console.log('active visit data', response)
       if (response && response?.isEnsured) {
         this.openPatientFingerprintModal(
           response.attributes[4]["visitAttributeDetails"]["value"]
@@ -130,36 +138,28 @@ export class LaboratorySampleCollectionComponent implements OnInit {
     this.countOfSamplesToCollect = count;
   }
 
-  // Separate method to open the doctor fingerprint modal
+// Separate method to open the patient fingerprint modal
   openPatientFingerprintModal(patientAuthorization: string): void {
+    console.log('Open modal called', patientAuthorization)
+    const patientPointOfCareData = {
+      pointOfCareID:
+        this.pointOfCares.find(
+          (item) =>
+            (item.PointOfCareCode === NHIFPointOfCareCodeE.CONSULTATION)
+        ).PointOfCareID || null,
+      authorizationNo: patientAuthorization,
+      practitionerNo: this.currentProviderDetails[1]["value"],
+      biometricMethod: NHIFBiometricMethodE.fingerprint,
+      fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
+    };
     this.dialog
       .open(FingerCaptureComponent, {
         width: "45%",
-        data: { detail: "patient's" },
+        data: { detail: "patient's", data: {
+          type: FingerPrintPaylodTypeE.Patient_POC_Verification,
+          payload: patientPointOfCareData
+        } },
       })
-      .afterClosed()
-      .subscribe((result) => {
-        if (result) {
-          console.log("Fingerprint data received:", result);
-
-          const patientPointOfCareData = {
-            pointOfCareID:
-              this.pointOfCares.find(
-                (item) =>
-                  (item.PointOfCareCode = NHIFPointOfCareCodeE.CONSULTATION)
-              ).PointOfCareID || null,
-            authorizationNo: patientAuthorization,
-            practitionerNo: this.currentProviderDetails[1]["value"],
-            biometricMethod: NHIFBiometricMethodE.fingerprint,
-            fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
-            imageData: result.fingerprintCaptured,
-          };
-
-          // Dispatch login action
-          this.store.dispatch(
-            verifyPointOfCare({ data: patientPointOfCareData })
-          );
-        }
-      });
+      
   }
 }

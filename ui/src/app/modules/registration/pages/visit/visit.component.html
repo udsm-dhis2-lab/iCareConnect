@@ -796,8 +796,8 @@
                     </div>
 
                     <!-- Not Found Message -->
-                    <ng-template #notFoundTemplate>
-                      <div class="not-found"  *ngIf="!isLoading">
+                    <ng-template #notFoundTemplate  *ngIf="fetchAttempted">
+                      <div class="not-found">
                         <p>
                           {{nhifRemark}}
                         </p>

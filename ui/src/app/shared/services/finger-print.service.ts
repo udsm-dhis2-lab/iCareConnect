@@ -13,7 +13,7 @@ const httpOptions = {
 })
 
 export class FingerprintService {
-  private apiUrl = "http://localhost:8004/mfs100/capture";
+  model = 'http://localhost:8004/mfs100/'
 
   constructor(private http: HttpClient) {}
 
@@ -22,6 +22,11 @@ export class FingerprintService {
       Quality: 80,
       TimeOut: 20,
     };
-    return this.http.post<any>(this.apiUrl, requestBody, httpOptions);
+    return this.http.post<any>( `${this.model}capture`, requestBody, httpOptions);
+  }
+
+  getFingerprintDeviceInfo(): Observable<any> {
+   
+    return this.http.get<any>( `${this.model}info`, httpOptions);
   }
 }

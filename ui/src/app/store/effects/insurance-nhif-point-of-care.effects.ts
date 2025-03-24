@@ -24,7 +24,10 @@ import {
   Notification,
   NotificationService,
 } from "src/app/shared/services/notification.service";
-import { NHIFCardAuthorizationResponseI, NHIFGetCardDEtailByNationalIDResponseI } from "src/app/shared/resources/store/models/insurance-nhif.model";
+import {
+  NHIFCardAuthorizationResponseI,
+  NHIFGetCardDEtailByNationalIDResponseI,
+} from "src/app/shared/resources/store/models/insurance-nhif.model";
 
 @Injectable()
 export class PointOfCareEffects {
@@ -55,7 +58,7 @@ export class PointOfCareEffects {
       switchMap(({ data }) => {
         return this.insuranceService.verifyPointOfCare(data).pipe(
           map((response: { status: number; body: object }) => {
-            if ((response.status === 400)) {
+            if (response.status === 400) {
               this.notificationService.show(
                 new Notification({
                   message: response.body["message"],
@@ -90,17 +93,14 @@ export class PointOfCareEffects {
       ofType(authorizeNHIFCard),
       switchMap(({ data }) => {
         return this.insuranceService.authorizeInsuranceCard(data).pipe(
-          map((response: { status: number; body: NHIFCardAuthorizationResponseI }) => {
-            if ((response.status === 400)) {
-              this.notificationService.show(
-                new Notification({
-                  message: response.body["message"],
-                  type: "ERROR",
-                })
-              );
+          map(
+            (response: {
+              status: number;
+              body: NHIFCardAuthorizationResponseI;
+            }) => {
+              return authorizeNHIFCardSuccess({ response });
             }
-            return authorizeNHIFCardSuccess({ response});
-          }),
+          ),
           catchError((error) => {
             this.notificationService.show(
               new Notification({
@@ -126,17 +126,14 @@ export class PointOfCareEffects {
       ofType(getNHIFCardDetailsByNIN),
       switchMap(({ data }) => {
         return this.insuranceService.getCardDetailsByNIN(data).pipe(
-          map((response: { status: number; body: NHIFGetCardDEtailByNationalIDResponseI }) => {
-            if ((response.status === 400)) {
-              this.notificationService.show(
-                new Notification({
-                  message: response.body["message"],
-                  type: "ERROR",
-                })
-              );
+          map(
+            (response: {
+              status: number;
+              body: NHIFGetCardDEtailByNationalIDResponseI;
+            }) => {
+              return getNHIFCardDetailsByNINSuccess({ response });
             }
-            return getNHIFCardDetailsByNINSuccess({ response });
-          }),
+          ),
           catchError((error) => {
             this.notificationService.show(
               new Notification({
@@ -163,14 +160,6 @@ export class PointOfCareEffects {
       switchMap(({ data }) => {
         return this.insuranceService.getCardDetailsByCardNumber(data).pipe(
           map((response: { status: number; body: object }) => {
-            if ((response.status === 400)) {
-              this.notificationService.show(
-                new Notification({
-                  message: response.body["message"],
-                  type: "ERROR",
-                })
-              );
-            }
             return getNHIFCardDetailsByCardNumberSuccess({ response });
           }),
           catchError((error) => {
@@ -183,7 +172,8 @@ export class PointOfCareEffects {
 
             return of(
               getNHIFCardDetailsByCardNumberFailure({
-                error: error.message || "Failed to get NHIF card by card number",
+                error:
+                  error.message || "Failed to get NHIF card by card number",
               })
             );
           })

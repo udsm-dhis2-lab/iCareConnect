@@ -207,6 +207,7 @@ export class PatientDashboardComponent implements OnInit {
     this.observations$ = this.store.select(getAllObservations);
     this.activeVisit$.subscribe((response: any) => {
       // if is insurance patient, show verify point of care
+      console.log('Visit active', response)
       if (response && response?.isEnsured) {
         this.openPatientFingerprintModal(
           response.attributes[4]["visitAttributeDetails"]["value"]
@@ -287,13 +288,14 @@ export class PatientDashboardComponent implements OnInit {
   handlePatientVisitDetails(event, patientVisitDetails): void {
   }
 
-  // Separate method to open the doctor fingerprint modal
+  // Separate method to open the patient fingerprint modal
   openPatientFingerprintModal(patientAuthorization: string): void {
+    console.log('Open modal called', patientAuthorization)
     const patientPointOfCareData = {
       pointOfCareID:
         this.pointOfCares.find(
           (item) =>
-            (item.PointOfCareCode = NHIFPointOfCareCodeE.CONSULTATION)
+            (item.PointOfCareCode === NHIFPointOfCareCodeE.CONSULTATION)
         ).PointOfCareID || null,
       authorizationNo: patientAuthorization,
       practitionerNo: this.currentProviderDetails[1]["value"],

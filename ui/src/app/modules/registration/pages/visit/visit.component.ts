@@ -161,7 +161,7 @@ export class VisitComponent implements OnInit {
   remoteReferralDetails$: Observable<any>;
   NHIFVisitTypes: NHIFVisitTypeI[];
 
-  // NHIF variables
+  // NHIF auth data
   authorizationData: NHIFCardAuthorizationI = {
     cardNo: this.visitDetails["InsuranceID"],
     biometricMethod: NHIFBiometricMethodE.fingerprint,
@@ -172,20 +172,8 @@ export class VisitComponent implements OnInit {
     remarks: "Authorization",
   };
 
-  //   name: "John Doe",
-  //   insuranceType: "Comprehensive Health Cover",
-  //   scheme: "NHIF Supa Cover",
-  //   policyNumber: "INS-123456789",
-  //   expirationDate: "2025-12-31",
-  //   hospital: "Nairobi General Hospital",
-  //   eligibilityStatus: "Active",
-  //   coverageAmount: "Ksh 1,000,000",
-  //   dependents: [
-  //     { name: "Jane Doe", relation: "Spouse", age: 34 },
-  //     { name: "Tom Doe", relation: "Son", age: 10 }
-  //   ]
-  // };
 
+// NHIF variables
   fetchedData = null;
   isLoading = false;
   fetchAttempted = true;
@@ -1110,24 +1098,6 @@ export class VisitComponent implements OnInit {
     this.editPatient.emit(path + patientUuid);
   }
 
-  // NHIF
-  // getCardNumber() {
-  //   this.insuranceService.getCardNumberByNida(this.nidaData).subscribe({
-  //     next: (response) => {
-  //       const nidaResponse = response;
-  //       this.authorizationData.cardNo = nidaResponse.body.CardNo;
-  //       setTimeout(() => {
-  //         this.authorizeInsurance();
-  //       }, 2000);
-  //       console.log("Payload Sent",this.authorizationData);
-  //     },
-  //     error: (error) => {
-  //       console.error("Error during authorization:", error);
-  //       this.showLoader = false;
-  //     },
-  //   });
-  // }
-
   getPatientData(selectedId: "insuranceId" | "nationalId") {
     this.fetchAttempted = true; // Indicates a fetch attempt has been made
     this.isLoading = true; // Show loader
@@ -1173,7 +1143,7 @@ export class VisitComponent implements OnInit {
             };
 
             // set card number in state
-            this.authorizationData.cardNo = response.body.CardNo
+            this.authorizationData.cardNo = response.body.CardNo;
           } else {
             console.log("GEt detail by NIN Response:", response);
           }
@@ -1181,28 +1151,6 @@ export class VisitComponent implements OnInit {
           this.isLoading = false;
         });
     }
-
-    // Simulating an API request
-    //   setTimeout(() => {
-    //     const isFound = Math.random() > 0.3; // Simulate 70% success rate
-
-    //     if (isFound) {
-    //       this.fetchedData = {
-    //         name: "John Doe",
-    //         insuranceType: "Health Cover",
-    //         scheme: "Premium Plan",
-    //         policyNumber: "INS-123456789",
-    //         expirationDate: "2025-12-31",
-    //         hospital: "City Medical Center",
-    //         eligibilityStatus: "Active",
-    //         coverageAmount: "TSH 10,000"
-
-    //       };
-    //     } else {
-    //       this.fetchedData = null; // Patient not found
-    //     }
-    //     this.isLoading = false;
-    //   }, 5000);
   }
 
   retryFetch(data) {
@@ -1277,31 +1225,9 @@ export class VisitComponent implements OnInit {
             response.body.IsValidCard &&
             response.body.IsActive
           ) {
-            this.visitDetails["InsuranceAuthNo"] =
-              response.body.AuthorizationNo;
-          } else {
-            this.visitDetails["InsuranceAuthNo"] = "Sina Hii No";
-            this.nhifRemark = response.body.Remarks || "Invalid NHIF Card";
-          }
-          console.log("Authorization Response:", response);
+            this.visitDetails["InsuranceAuthNo"] =  response.body.AuthorizationNo? response.body.AuthorizationNo : 'Null authorization in response';
+          } 
         });
     }
-
-    // this.insuranceService
-    //   .authorizeInsuranceCard(this.authorizationData)
-    //   .subscribe({
-    //     next: (response) => {
-    //       const typedResponse = response;
-    //       this.authorizationNo = typedResponse.body.AuthorizationNo;
-    //       this.visitDetails["InsuranceAuthNo"] = this.authorizationNo;
-    //       this.showLoader = false;
-    //       // this.showMessage = true;
-    //       this.closeModal();
-    //     },
-    //     error: (error) => {
-    //       console.error("Error during authorization:", error);
-    //       this.showLoader = false;
-    //     },
-    //   });
   }
 }

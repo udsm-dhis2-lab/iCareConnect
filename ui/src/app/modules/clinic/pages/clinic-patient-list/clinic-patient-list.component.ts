@@ -65,9 +65,7 @@ export class ClinicPatientListComponent implements OnInit {
         this.currentProviderDetails = data.attributes;
       }
     });
-  console.log('here below')
     this.service.getListOfVisitTypes().subscribe((data)=>{
-      console.log('the NHIF visit types are', data)
     })
 
     // get practitioner details
