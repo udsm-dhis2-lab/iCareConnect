@@ -28,14 +28,7 @@ export class NHIFPractitionerEffects {
         console.log("action for login in practioner received");
         return this.insuranceService.loginNHIFPractitioner(data).pipe(
           map((response: { status: number; body: object }) => {
-            if ((response.status = 400)) {
-              this.notificationService.show(
-                new Notification({
-                  message: response.body["message"],
-                  type: "ERROR",
-                })
-              );
-            }
+           
             return loginNHIFPractitionerSuccess({ response });
           }),
           catchError((error) => {

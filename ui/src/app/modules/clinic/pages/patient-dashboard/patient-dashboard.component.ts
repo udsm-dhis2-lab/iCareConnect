@@ -290,7 +290,6 @@ export class PatientDashboardComponent implements OnInit {
 
   // Separate method to open the patient fingerprint modal
   openPatientFingerprintModal(patientAuthorization: string): void {
-    console.log('Open modal called', patientAuthorization)
     const patientPointOfCareData = {
       pointOfCareID:
         this.pointOfCares.find(

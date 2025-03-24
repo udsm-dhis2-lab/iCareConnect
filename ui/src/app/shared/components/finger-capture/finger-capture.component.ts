@@ -1,11 +1,26 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { FingerprintService } from "../../services";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
-import { FingerPrintPaylodTypeE, NHIFCardAuthorizationI, NHIFPractitionerLoginI, PatientPOCVerificationI } from "../../resources/store/models/insurance-nhif.model";
-import { authorizeNHIFCard, authorizeNHIFCardSuccess, verifyPointOfCare } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
+import {
+  FingerPrintPaylodTypeE,
+  NHIFCardAuthorizationI,
+  NHIFPractitionerDetailsI,
+  NHIFPractitionerLoginI,
+  PatientPOCVerificationI,
+} from "../../resources/store/models/insurance-nhif.model";
+import {
+  authorizeNHIFCard,
+  authorizeNHIFCardSuccess,
+  verifyPointOfCare,
+  verifyPointOfCareSuccess,
+} from "src/app/store/actions/insurance-nhif-point-of-care.actions";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
-import { loginNHIFPractitioner } from "src/app/store/actions/insurance-nhif-practitioner.actions";
+import {
+  loginNHIFPractitioner,
+  loginNHIFPractitionerSuccess,
+  setNHIFPractitionerDetails,
+} from "src/app/store/actions/insurance-nhif-practitioner.actions";
 import { Subscription } from "rxjs";
 import { Actions, ofType } from "@ngrx/effects";
 import { take } from "rxjs/operators";
@@ -88,23 +103,72 @@ export class FingerCaptureComponent implements OnInit {
     this.showLoader = true;
 
     if (this.payload.type === FingerPrintPaylodTypeE.Patient_POC_Verification) {
+      // Dispatch action to verify point of care and listen to the success action
       this.store.dispatch(verifyPointOfCare({ data: this.payload.payload }));
-    } else if (this.payload.type === FingerPrintPaylodTypeE.Practitioner_login) {
-      this.store.dispatch(loginNHIFPractitioner({ data: this.payload.payload }));
-    } else if (this.payload.type === FingerPrintPaylodTypeE.Patient_card_authorization) {
+      this.actions$
+        .pipe(ofType(verifyPointOfCareSuccess), take(1))
+        .subscribe(({ response }) => {
+          this.showLoader = false;
+
+          if (response.status === 400) {
+            this.authorizationFailed = true;
+            this.errorMessage = response.body.message;
+          } else {
+            this.authorizationSuccess = true;
+            this.successMessage = "Point of Care verified successful!";
+          }
+        });
+    } else if (
+      this.payload.type === FingerPrintPaylodTypeE.Practitioner_login
+    ) {
+      // Dispatch action to login practitioner and wait for response
+      this.store.dispatch(
+        loginNHIFPractitioner({ data: this.payload.payload })
+      );
+      this.actions$
+        .pipe(ofType(loginNHIFPractitionerSuccess), take(1))
+        .subscribe(({ response }) => {
+          this.showLoader = false;
+
+          if (response.status === 400) {
+            this.authorizationFailed = true;
+            this.errorMessage = response.body.message;
+          } else {
+            this.authorizationSuccess = true;
+            this.successMessage = "Practitioner logged in successful!";
+
+            // store the practitioner data in state
+            const practitionerData: NHIFPractitionerDetailsI = {
+              practitionerNo: this.payload.payload.practitionerNo, // MCT Registration number index
+              nationalID: this.payload.payload.nationalID,
+              isNHIFPractitionerLogedIn: true,
+            };
+
+            // Dispatch the action to set the practioner details to state
+            this.store.dispatch(
+              setNHIFPractitionerDetails({ data: practitionerData })
+            );
+          }
+        });
+    } else if (
+      this.payload.type === FingerPrintPaylodTypeE.Patient_card_authorization
+    ) {
+      // dispatch authorization and wait listen to success message
       this.store.dispatch(authorizeNHIFCard({ data: this.payload.payload }));
 
-      this.actions$.pipe(ofType(authorizeNHIFCardSuccess), take(1)).subscribe(({ response }) => {
-        this.showLoader = false;
+      this.actions$
+        .pipe(ofType(authorizeNHIFCardSuccess), take(1))
+        .subscribe(({ response }) => {
+          this.showLoader = false;
 
-        if (response.status === 400) {
-          this.authorizationFailed = true;
-          this.errorMessage = response.body.message;
-        } else {
-          this.authorizationSuccess = true;
-          this.successMessage = "Authorization successful!";
-        }
-      });
+          if (response.status === 400) {
+            this.authorizationFailed = true;
+            this.errorMessage = response.body.message;
+          } else {
+            this.authorizationSuccess = true;
+            this.successMessage = "Authorization successful!";
+          }
+        });
     }
   }
 

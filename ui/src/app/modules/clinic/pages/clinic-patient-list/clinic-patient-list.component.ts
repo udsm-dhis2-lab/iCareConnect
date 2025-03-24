@@ -16,9 +16,7 @@ import {
 } from "src/app/shared/resources/store/models/insurance-nhif.model";
 import { InsuranceService } from "src/app/shared/services";
 import { go } from "src/app/store/actions";
-import {
-  setNHIFPractitionerDetails,
-} from "src/app/store/actions/insurance-nhif-practitioner.actions";
+import { setNHIFPractitionerDetails } from "src/app/store/actions/insurance-nhif-practitioner.actions";
 import { AppState } from "src/app/store/reducers";
 import {
   getCurrentLocation,
@@ -65,46 +63,29 @@ export class ClinicPatientListComponent implements OnInit {
         this.currentProviderDetails = data.attributes;
       }
     });
-    this.service.getListOfVisitTypes().subscribe((data)=>{
-    })
+    this.service.getListOfVisitTypes().subscribe((data) => {});
 
     // get practitioner details
     this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
       // if the doctor is not logged in to NHIF, prompt the doctor to login
       if (!data || !data.isNHIFPractitionerLogedIn) {
         const loginData = {
-          practitionerNo: this.currentProviderDetails[1]["value"],
-          nationalID: this.currentProviderDetails[3]["value"],
+          practitionerNo: this.currentProviderDetails[1]?.["value"] || null, 
+          nationalID: this.currentProviderDetails[3]?.["value"] || null,
           biometricMethod: NHIFBiometricMethodE.fingerprint,
           fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
         };
 
-        this.dialog
-          .open(FingerCaptureComponent, {
-            width: "45%",
+        this.dialog.open(FingerCaptureComponent, {
+          width: "45%",
+          data: {
+            detail: "doctor's",
             data: {
-              detail: "doctor's",
-              data: {
-                type: FingerPrintPaylodTypeE.Practitioner_login,
-                payload: loginData,
-              },
+              type: FingerPrintPaylodTypeE.Practitioner_login,
+              payload: loginData,
             },
-          })
-          .afterClosed()
-          .subscribe((result) => {
-            if (result) {
-              const practitionerData: NHIFPractitionerDetailsI = {
-                practitionerNo: this.currentProviderDetails[1]["value"], // MCT Registration number index
-                nationalID: this.currentProviderDetails[3]["value"],
-                isNHIFPractitionerLogedIn: true,
-              };
-
-              // Dispatch the action to update state
-              this.store.dispatch(
-                setNHIFPractitionerDetails({ data: practitionerData })
-              );
-            }
-          });
+          },
+        });
       }
     });
 

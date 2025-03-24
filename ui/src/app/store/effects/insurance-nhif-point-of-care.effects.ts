@@ -58,14 +58,6 @@ export class PointOfCareEffects {
       switchMap(({ data }) => {
         return this.insuranceService.verifyPointOfCare(data).pipe(
           map((response: { status: number; body: object }) => {
-            if (response.status === 400) {
-              this.notificationService.show(
-                new Notification({
-                  message: response.body["message"],
-                  type: "ERROR",
-                })
-              );
-            }
             return verifyPointOfCareSuccess({ response });
           }),
           catchError((error) => {
