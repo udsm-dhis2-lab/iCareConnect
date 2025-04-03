@@ -30,13 +30,22 @@ import {
   getPatientBills,
 } from "src/app/store/selectors/bill.selectors";
 import { BillingService } from "src/app/modules/billing/services/billing.service";
-import { FingerPrintPaylodTypeE, NHIFBiometricMethodE, NHIFFingerPrintCodeE, NHIFPointOfCareCodeE, NHIFPointOfCareI, NHIFPractitionerDetailsI } from "src/app/shared/resources/store/models/insurance-nhif.model";
+import {
+  FingerPrintPaylodTypeE,
+  NHIFBiometricMethodE,
+  NHIFFingerPrintCodeE,
+  NHIFPointOfCareCodeE,
+  NHIFPointOfCareI,
+  NHIFPractitionerDetailsI,
+} from "src/app/shared/resources/store/models/insurance-nhif.model";
 import { PatientI } from "src/app/shared/resources/store/models/patient.model";
 import { ProviderAttributeGet } from "src/app/shared/resources/openmrs";
 import { MatDialog } from "@angular/material/dialog";
-import { verifyPointOfCare } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
+import { loadPointOfCare, verifyPointOfCare } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
 import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { selectNHIFPractitionerDetails } from "src/app/store/selectors/insurance-nhif-practitioner.selectors";
+import { getListofPointOfCare } from "src/app/store/selectors/insurance-nhif-point-of-care.selectors";
 @Component({
   selector: "app-laboratory-sample-collection",
   templateUrl: "./laboratory-sample-collection.component.html",
@@ -62,25 +71,34 @@ export class LaboratorySampleCollectionComponent implements OnInit {
   visitReferences$: Observable<any>;
   sampledOrdersByVisit$: Observable<any[]>;
   pointOfCares$: Observable<NHIFPointOfCareI[]>; // Observable to hold NHIFPointOfCare data
-    isLoading$: Observable<boolean>; // Observable to track loading state
-    patientData: PatientI;
-    selectedPractitionerDetails: NHIFPractitionerDetailsI;
-    pointOfCares: NHIFPointOfCareI[];
-    currentProviderDetails: ProviderAttributeGet[];
+  patientData: PatientI;
+  selectedPractitionerDetails: NHIFPractitionerDetailsI;
+  pointOfCares: NHIFPointOfCareI[];
+  currentProviderDetails: ProviderAttributeGet[];
   constructor(
     private store: Store<AppState>,
     private billingService: BillingService,
     private sampleTypesService: SampleTypesService,
     private route: ActivatedRoute,
-    private dialog: MatDialog,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
-     // get provider details
-        this.store.select(getProviderDetails).subscribe((data) => {
-          if (data) {
-            this.currentProviderDetails = data.attributes;
-          }
+    // get provider details
+    this.store.select(getProviderDetails).subscribe((data) => {
+      if (data) {
+        this.currentProviderDetails = data.attributes;
+      }
+    });
+     // get nhif practitioner details
+        this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
+          this.selectedPractitionerDetails = data;
+        });
+        // Fetch point of care
+        this.store.dispatch(loadPointOfCare());
+    
+        this.store.select(getListofPointOfCare).subscribe((data) => {
+          this.pointOfCares = data;
         });
     this.patientId = this.route.snapshot.params["patientId"];
     this.visitId = this.route.snapshot.params["visitId"];
@@ -106,6 +124,13 @@ export class LaboratorySampleCollectionComponent implements OnInit {
     this.samplesCollected$ = this.store.select(getAllLabSamples);
     this.activeVisit$ = this.store.select(getActiveVisit);
     this.payments$ = this.store.select(getAllPayments);
+    this.activeVisit$.subscribe((response: any) => {
+      if (response && response?.isEnsured) {
+        this.openPatientFingerprintModal(
+          response.attributes[4]["visitAttributeDetails"]["value"]
+        );
+      }
+    });
   }
 
   onSaveSampleCollection(event: Event): void {
@@ -124,42 +149,33 @@ export class LaboratorySampleCollectionComponent implements OnInit {
     /**TODO: Filter samples collection for this patient */
     this.activeVisit$ = this.store.select(getActiveVisit);
     this.payments$ = this.store.select(getAllPayments);
-    this.activeVisit$.subscribe((response: any) => {
-      console.log('active visit data', response)
-      if (response && response?.isEnsured) {
-        this.openPatientFingerprintModal(
-          response.attributes[4]["visitAttributeDetails"]["value"]
-        );
-      }
-    });
+    
   }
 
   onGetSamplesToCollect(count: number): void {
     this.countOfSamplesToCollect = count;
   }
 
-// Separate method to open the patient fingerprint modal
+  // Separate method to open the patient fingerprint modal
   openPatientFingerprintModal(patientAuthorization: string): void {
-    console.log('Open modal called', patientAuthorization)
     const patientPointOfCareData = {
       pointOfCareID:
         this.pointOfCares.find(
-          (item) =>
-            (item.PointOfCareCode === NHIFPointOfCareCodeE.CONSULTATION)
+          (item) => item.PointOfCareCode === NHIFPointOfCareCodeE.CONSULTATION
         ).PointOfCareID || null,
       authorizationNo: patientAuthorization,
       practitionerNo: this.currentProviderDetails[1]["value"],
       biometricMethod: NHIFBiometricMethodE.fingerprint,
       fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
     };
-    this.dialog
-      .open(FingerCaptureComponent, {
-        width: "45%",
-        data: { detail: "patient's", data: {
+    this.dialog.open(FingerCaptureComponent, {
+      width: "45%",
+      data: {
+        data: {
           type: FingerPrintPaylodTypeE.Patient_POC_Verification,
-          payload: patientPointOfCareData
-        } },
-      })
-      
+          payload: patientPointOfCareData,
+        },
+      },
+    });
   }
 }
