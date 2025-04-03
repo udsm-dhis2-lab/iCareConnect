@@ -86,6 +86,7 @@ export class FingerCaptureComponent implements OnInit {
 
           if (this.payload.payload) {
             this.payload["payload"]["imageData"] = result.RawData;
+            this.payload['payload']['practitionerNo'] = '198910311413323' 
           }
 
           setTimeout(() => {
