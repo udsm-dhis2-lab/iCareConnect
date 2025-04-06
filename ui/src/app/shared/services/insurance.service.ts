@@ -127,6 +127,7 @@ export class InsuranceService {
     );
   }
 
+  
   logoutNHIFPractitioner(data: any): Observable<any> {
     return this.getToken().pipe(
       switchMap(token =>

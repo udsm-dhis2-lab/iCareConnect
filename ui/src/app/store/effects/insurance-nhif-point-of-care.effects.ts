@@ -57,20 +57,14 @@ export class PointOfCareEffects {
       ofType(verifyPointOfCare),
       switchMap(({ data }) => {
         return this.insuranceService.verifyPointOfCare(data).pipe(
-          map((response: { status: number; body: object }) => {
+          map((response: object) => {
             return verifyPointOfCareSuccess({ response });
           }),
           catchError((error) => {
-            this.notificationService.show(
-              new Notification({
-                message: "Problem Verifying point of care",
-                type: "ERROR",
-              })
-            );
-
+            const serverMessage = error?.error?.message;
             return of(
               verifyPointOfCareFailure({
-                error: error.message || "Login failed",
+                error: serverMessage || error.message || "Login failed",
               })
             );
           })
@@ -85,19 +79,18 @@ export class PointOfCareEffects {
       ofType(authorizeNHIFCard),
       switchMap(({ data }) => {
         return this.insuranceService.authorizeInsuranceCard(data).pipe(
-          map(
-            (response:  NHIFCardAuthorizationResponseI
-            ) => {
-              return authorizeNHIFCardSuccess({ response });
-            }
-          ),
+          map((response: NHIFCardAuthorizationResponseI) => {
+            return authorizeNHIFCardSuccess({ response });
+          }),
           catchError((error) => {
-            
             const serverMessage = error?.error?.message;
 
             return of(
               authorizeNHIFCardFailure({
-                error: serverMessage || error.message || 'Failed to authorize NHIF card',
+                error:
+                  serverMessage ||
+                  error.message ||
+                  "Failed to authorize NHIF card",
               })
             );
           })
@@ -113,14 +106,17 @@ export class PointOfCareEffects {
       switchMap(({ data }) => {
         return this.insuranceService.getCardDetailsByNIN(data).pipe(
           map((response: NHIFGetCardDEtailByNationalIDResponseI) => {
-            return getNHIFCardDetailsByNINSuccess({response});
+            return getNHIFCardDetailsByNINSuccess({ response });
           }),
           catchError((error) => {
             const serverMessage = error?.error?.message;
 
             return of(
               getNHIFCardDetailsByNINFailure({
-                error: serverMessage || error.message  || "Failed to get NHIF card by NIN",
+                error:
+                  serverMessage ||
+                  error.message ||
+                  "Failed to get NHIF card by NIN",
               })
             );
           })

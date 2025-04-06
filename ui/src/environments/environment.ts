@@ -4,9 +4,6 @@
 
 export const environment = {
   production: false,
-  NHIF_TOKEN_URL: 'https://verification.nhif.or.tz',
-  NHIF_API_URL: 'https://test.nhif.or.tz/servicehub/api',
-  NHIF_PORTIFOLIO_URL: 'https://test.nhif.or.tz/ocs/api',
   NHIF_CLIENT_ID :"04626",
   NHIF_CLIENT_SECRET : "mXW2OcsZMBCLpWFMX6/I5A==",
   NHIF_USERNAME : "hmis_username",

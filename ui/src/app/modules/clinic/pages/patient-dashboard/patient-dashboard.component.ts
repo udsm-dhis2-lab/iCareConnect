@@ -296,7 +296,7 @@ export class PatientDashboardComponent implements OnInit {
             (item.PointOfCareCode === NHIFPointOfCareCodeE.CONSULTATION)
         ).PointOfCareID || null,
       authorizationNo: patientAuthorization,
-      practitionerNo: this.currentProviderDetails[1]["value"],
+      practitionerNo: this.currentProviderDetails[1]["value"], 
       biometricMethod: NHIFBiometricMethodE.fingerprint,
       fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
     };

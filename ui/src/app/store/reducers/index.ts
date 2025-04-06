@@ -86,6 +86,7 @@ import { NHIFPractitionerDetailsState } from "../states/insurance-nhif-practitio
 import { NHIFPractitionerDetailsReducer } from "./insurance-nhif-practitioner.reducer";
 import { NHIFVisitTypeState } from "../states/insurance-nhif-visit-types.states";
 import { NHIFVisitTypeReducer } from "./insurance-nhif-visit-types.reducers";
+import { localStorageSyncReducer } from "./meta.reducer";
 
 export interface AppState {
   router: RouterReducerState;
@@ -182,8 +183,9 @@ export const reducers: ActionReducerMap<AppState> = {
 };
 
 export const metaReducers: MetaReducer<AppState>[] = !environment.production
-  ? [storeFreeze]
-  : [];
+  ? [storeFreeze, localStorageSyncReducer]
+  : [localStorageSyncReducer];
+
 
 /**
  * Root state selector

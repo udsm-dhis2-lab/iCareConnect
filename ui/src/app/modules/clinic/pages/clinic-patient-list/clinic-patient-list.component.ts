@@ -79,6 +79,7 @@ export class ClinicPatientListComponent implements OnInit {
         this.dialog.open(FingerCaptureComponent, {
           width: "45%",
           data: {
+            detail: "doctor's",
             data: {
               type: FingerPrintPaylodTypeE.Practitioner_login,
               payload: loginData,

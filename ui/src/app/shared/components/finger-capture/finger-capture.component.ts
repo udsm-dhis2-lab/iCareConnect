@@ -13,12 +13,14 @@ import {
   authorizeNHIFCardFailure,
   authorizeNHIFCardSuccess,
   verifyPointOfCare,
+  verifyPointOfCareFailure,
   verifyPointOfCareSuccess,
 } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
 import { Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import {
   loginNHIFPractitioner,
+  loginNHIFPractitionerFailure,
   loginNHIFPractitionerSuccess,
   setNHIFPractitionerDetails,
 } from "src/app/store/actions/insurance-nhif-practitioner.actions";
@@ -107,19 +109,28 @@ export class FingerCaptureComponent implements OnInit {
     if (this.payload.type === FingerPrintPaylodTypeE.Patient_POC_Verification) {
       // Dispatch action to verify point of care and listen to the success action
       this.store.dispatch(verifyPointOfCare({ data: this.payload.payload }));
-      this.actions$
-        .pipe(ofType(verifyPointOfCareSuccess), take(1))
-        .subscribe(({ response }) => {
-          this.showLoader = false;
-
-          if (response.status === 400) {
+      merge(
+        this.actions$.pipe(ofType(verifyPointOfCareSuccess), take(1)),
+        this.actions$.pipe(ofType(verifyPointOfCareFailure), take(1))
+      ).subscribe((action) => {
+        this.showLoader = false;
+      
+        if (action.type === verifyPointOfCareSuccess.type) {
+          const response = action.response;
+      
+          if (response?.authorizationStatus === 'REJECTED') {
             this.authorizationFailed = true;
-            this.errorMessage = response.body.message;
+            this.errorMessage = response.message || 'Verification rejected';
           } else {
             this.authorizationSuccess = true;
-            this.successMessage = "Point of Care verified successful!";
+            this.successMessage = 'Point of Care verified successfully!';
           }
-        });
+        } else {
+          // Failure case
+          this.authorizationFailed = true;
+          this.errorMessage = action.error || 'Failed to verify point of care';
+        }
+      });
     } else if (
       this.payload.type === FingerPrintPaylodTypeE.Practitioner_login
     ) {
@@ -127,31 +138,51 @@ export class FingerCaptureComponent implements OnInit {
       this.store.dispatch(
         loginNHIFPractitioner({ data: this.payload.payload })
       );
-      this.actions$
-        .pipe(ofType(loginNHIFPractitionerSuccess), take(1))
-        .subscribe(({ response }) => {
-          this.showLoader = false;
+      merge(
+        this.actions$.pipe(ofType(loginNHIFPractitionerSuccess), take(1)),
+        this.actions$.pipe(ofType(loginNHIFPractitionerFailure), take(1))
+      ).subscribe((action) => {
+        this.showLoader = false;
+        
 
-          if (response.status === 400) {
+        if (action.type === loginNHIFPractitionerSuccess.type) {
+          const response = action.response;
+
+          if (response?.authorizationStatus === "REJECTED") {
             this.authorizationFailed = true;
-            this.errorMessage = response.body.message;
+            this.errorMessage = response.message || "Login was rejected";
           } else {
             this.authorizationSuccess = true;
             this.successMessage = "Practitioner logged in successful!";
-
-            // store the practitioner data in state
+            // what is the response if sucessfull? 
             const practitionerData: NHIFPractitionerDetailsI = {
-              practitionerNo: this.payload.payload.practitionerNo, // MCT Registration number index
+              practitionerNo: this.payload.payload.practitionerNo,
               nationalID: this.payload.payload.nationalID,
               isNHIFPractitionerLogedIn: true,
             };
 
-            // Dispatch the action to set the practioner details to state
             this.store.dispatch(
               setNHIFPractitionerDetails({ data: practitionerData })
             );
           }
-        });
+        } else {
+          // loginNHIFPractitionerFailure
+          this.authorizationFailed = true;
+          this.errorMessage =
+            action.error || "Failed to login NHIF practitioner";
+
+          
+            const practitionerData: NHIFPractitionerDetailsI = {
+              practitionerNo: this.payload.payload.practitionerNo,
+              nationalID: this.payload.payload.nationalID,
+              isNHIFPractitionerLogedIn: false,
+            };
+
+            this.store.dispatch(
+              setNHIFPractitionerDetails({ data: practitionerData })
+            );
+        }
+      });
     } else if (
       this.payload.type === FingerPrintPaylodTypeE.Patient_card_authorization
     ) {
