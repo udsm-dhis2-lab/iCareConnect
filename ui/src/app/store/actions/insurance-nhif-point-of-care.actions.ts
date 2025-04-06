@@ -44,7 +44,7 @@ export const authorizeNHIFCard = createAction(
 
 export const authorizeNHIFCardSuccess = createAction(
   "Authorize NHIF Card] Authorize NHIF Card Success",
-  props<{ response:  { status: number; body: NHIFCardAuthorizationResponseI } }>()
+  props<{ response:  NHIFCardAuthorizationResponseI }>()
 );
 
 
@@ -63,7 +63,7 @@ export const getNHIFCardDetailsByNIN = createAction(
 
 export const getNHIFCardDetailsByNINSuccess = createAction(
   "[Get NHIF card details by NIN] Success",
-  props<{ response:{ status: number; body: NHIFGetCardDEtailByNationalIDResponseI } }>()
+  props<{ response:NHIFGetCardDEtailByNationalIDResponseI }>()
 );
 
 

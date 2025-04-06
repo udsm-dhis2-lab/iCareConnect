@@ -86,24 +86,18 @@ export class PointOfCareEffects {
       switchMap(({ data }) => {
         return this.insuranceService.authorizeInsuranceCard(data).pipe(
           map(
-            (response: {
-              status: number;
-              body: NHIFCardAuthorizationResponseI;
-            }) => {
+            (response:  NHIFCardAuthorizationResponseI
+            ) => {
               return authorizeNHIFCardSuccess({ response });
             }
           ),
           catchError((error) => {
-            this.notificationService.show(
-              new Notification({
-                message: "Problem authorizing NHIF card",
-                type: "ERROR",
-              })
-            );
+            
+            const serverMessage = error?.error?.message;
 
             return of(
               authorizeNHIFCardFailure({
-                error: error.message || "Failed to authorize NHIF card",
+                error: serverMessage || error.message || 'Failed to authorize NHIF card',
               })
             );
           })
@@ -118,25 +112,15 @@ export class PointOfCareEffects {
       ofType(getNHIFCardDetailsByNIN),
       switchMap(({ data }) => {
         return this.insuranceService.getCardDetailsByNIN(data).pipe(
-          map(
-            (response: {
-              status: number;
-              body: NHIFGetCardDEtailByNationalIDResponseI;
-            }) => {
-              return getNHIFCardDetailsByNINSuccess({ response });
-            }
-          ),
+          map((response: NHIFGetCardDEtailByNationalIDResponseI) => {
+            return getNHIFCardDetailsByNINSuccess({response});
+          }),
           catchError((error) => {
-            this.notificationService.show(
-              new Notification({
-                message: "Problem getting NHIF card by NIN",
-                type: "ERROR",
-              })
-            );
+            const serverMessage = error?.error?.message;
 
             return of(
               getNHIFCardDetailsByNINFailure({
-                error: error.message || "Failed to get NHIF card by NIN",
+                error: serverMessage || error.message  || "Failed to get NHIF card by NIN",
               })
             );
           })

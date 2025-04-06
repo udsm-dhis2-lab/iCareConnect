@@ -10,6 +10,7 @@ import {
 } from "../../resources/store/models/insurance-nhif.model";
 import {
   authorizeNHIFCard,
+  authorizeNHIFCardFailure,
   authorizeNHIFCardSuccess,
   verifyPointOfCare,
   verifyPointOfCareSuccess,
@@ -21,7 +22,7 @@ import {
   loginNHIFPractitionerSuccess,
   setNHIFPractitionerDetails,
 } from "src/app/store/actions/insurance-nhif-practitioner.actions";
-import { Subscription } from "rxjs";
+import { merge, Subscription } from "rxjs";
 import { Actions, ofType } from "@ngrx/effects";
 import { take } from "rxjs/operators";
 
@@ -86,7 +87,7 @@ export class FingerCaptureComponent implements OnInit {
 
           if (this.payload.payload) {
             this.payload["payload"]["imageData"] = result.RawData;
-            this.payload['payload']['practitionerNo'] = '198910311413323' 
+            this.payload["payload"]["practitionerNo"] = "198910311413323";
           }
 
           setTimeout(() => {
@@ -157,19 +158,28 @@ export class FingerCaptureComponent implements OnInit {
       // dispatch authorization and wait listen to success message
       this.store.dispatch(authorizeNHIFCard({ data: this.payload.payload }));
 
-      this.actions$
-        .pipe(ofType(authorizeNHIFCardSuccess), take(1))
-        .subscribe(({ response }) => {
-          this.showLoader = false;
+      merge(
+        this.actions$.pipe(ofType(authorizeNHIFCardSuccess), take(1)),
+        this.actions$.pipe(ofType(authorizeNHIFCardFailure), take(1))
+      ).subscribe((action) => {
+        this.showLoader = false;
 
-          if (response.status === 400) {
+        if (action.type === authorizeNHIFCardSuccess.type) {
+          const status = action.response.AuthorizationStatus;
+
+          if (status === "REJECTED") {
             this.authorizationFailed = true;
-            this.errorMessage = response.body.message;
+            this.errorMessage =
+              action.response.Remarks || "Authorization was rejected by NHIF.";
           } else {
             this.authorizationSuccess = true;
             this.successMessage = "Authorization successful!";
           }
-        });
+        } else {
+          this.authorizationFailed = true;
+          this.errorMessage = action.error || "Failed to authorize NHIF card";
+        }
+      });
     }
   }
 
