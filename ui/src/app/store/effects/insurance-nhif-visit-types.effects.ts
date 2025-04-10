@@ -31,39 +31,5 @@ export class NHIFVisitTypeEffects {
     )
   );
 
-  //Effect for NHIF Practitioner Login
-//   verifyPointOfCare$ = createEffect(() =>
-//     this.actions$.pipe(
-//       ofType(verifyPointOfCare),
-//       switchMap(({ data }) => {
-//         return this.insuranceService.verifyPointOfCare(data).pipe(
-//           map((response: { status: number; body: object }) => {
-//             if ((response.status = 400)) {
-//               this.notificationService.show(
-//                 new Notification({
-//                   message: response.body["message"],
-//                   type: "ERROR",
-//                 })
-//               );
-//             }
-//             return verifyPointOfCareSuccess({ response });
-//           }),
-//           catchError((error) => {
-//             this.notificationService.show(
-//               new Notification({
-//                 message: "Problem Verifying point of care",
-//                 type: "ERROR",
-//               })
-//             );
 
-//             return of(
-//               verifyPointOfCareFailure({
-//                 error: error.message || "Login failed",
-//               })
-//             );
-//           })
-//         );
-//       })
-//     )
-//   );
 }

@@ -17,6 +17,9 @@ import {
   getNHIFCardDetailsByCardNumber,
   getNHIFCardDetailsByCardNumberSuccess,
   getNHIFCardDetailsByCardNumberFailure,
+  submitNHIFServiceNotificationSuccess,
+  submitNHIFServiceNotification,
+  submitNHIFServiceNotificationFailure,
 } from "../actions/insurance-nhif-point-of-care.actions";
 import { catchError, map, switchMap } from "rxjs/operators";
 import { of } from "rxjs";
@@ -51,7 +54,7 @@ export class PointOfCareEffects {
     )
   );
 
-  //Effect for NHIF Practitioner Login
+  //Effect for NHIF poc VERIFICATION
   verifyPointOfCare$ = createEffect(() =>
     this.actions$.pipe(
       ofType(verifyPointOfCare),
@@ -151,6 +154,24 @@ export class PointOfCareEffects {
           })
         );
       })
+    )
+  );
+
+
+  // service notification
+
+  submitNHIFServiceNotification$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(submitNHIFServiceNotification),
+      switchMap(({ data }) =>
+        this.insuranceService.submitServiceNotification(data).pipe(
+          map((response) => submitNHIFServiceNotificationSuccess({ response })),
+          catchError((error) => {
+            const serverMessage = error?.error?.message || 'Service Notification failed';
+            return of(submitNHIFServiceNotificationFailure({ error: serverMessage }));
+          })
+        )
+      )
     )
   );
 }

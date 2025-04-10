@@ -4,9 +4,12 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import {
   GetCardNumberDetailsI,
-  NationalIDI,
+  NationalIdI,
   NHIFPointOfCareI,
   NHIFPractitionerLoginI,
+  NHIFPractitionerLogoutI,
+  NHIFRequestApprovalI,
+  NHIFServiceNotificationI,
   NHIFVisitTypeI,
   PatientPOCVerificationI
 } from '../resources/store/models/insurance-nhif.model';
@@ -67,7 +70,7 @@ export class InsuranceService {
     );
   }
 
-  getCardDetailsByNIN(data: NationalIDI): Observable<any> {
+  getCardDetailsByNIN(data: NationalIdI): Observable<any> {
     return this.getToken().pipe(
       switchMap(token =>
         this.http.get(`${this.baseUrl}/Verification/GetCardDetailsByNIN?nationalID=${data.nationalID}`, {
@@ -125,10 +128,10 @@ export class InsuranceService {
         })
       )
     );
-  }
+  } 
 
   
-  logoutNHIFPractitioner(data: any): Observable<any> {
+  logoutNHIFPractitioner(data: NHIFPractitionerLogoutI): Observable<any> {
     return this.getToken().pipe(
       switchMap(token =>
         this.http.post(`${this.baseUrl}/Attendance/LogoutPractitioner`, data, {
@@ -138,7 +141,17 @@ export class InsuranceService {
     );
   }
 
-  getPreapproval(data: any): Observable<any> {
+  requestApproval(data: NHIFRequestApprovalI): Observable<any> {
+    return this.getToken().pipe(
+      switchMap(token =>
+        this.http.post(`${this.baseUrl}/Approvals/RequestApproval`, data, {
+          headers: this.getAuthorizedHeaders(token)
+        })
+      )
+    );
+  }
+
+  submitServiceNotification(data: NHIFServiceNotificationI): Observable<any> {
     return this.getToken().pipe(
       switchMap(token =>
         this.http.post(`${this.baseUrl}/PreApprovals/RequestServices`, data, {
@@ -157,4 +170,28 @@ export class InsuranceService {
       )
     );
   }
+
+
+  getNHIFCodeFromConcept(selectedTest: any): string | null {
+    const testUuid = selectedTest?.value;
+    const options = selectedTest?.options || [];
+
+    const matchedTest = options.find((opt: any) => opt?.uuid === testUuid);
+    if (!matchedTest || !matchedTest.concept?.mappings) return null;
+
+    const nhifMapping = matchedTest.concept.mappings.find((map: any) =>
+      map.display?.toUpperCase().startsWith("NHIF:")
+    );
+
+    if (nhifMapping?.conceptReferenceTerm?.display) {
+      // Extract the code using regex: match digits after "NHIF:"
+      const match =
+        nhifMapping.conceptReferenceTerm.display.match(/NHIF:\s?(\d+)/);
+      return match ? match[1] : null;
+    }
+
+    return null;
+  }
+  
+  
 }

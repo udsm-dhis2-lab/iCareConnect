@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { GetCardNumberDetailsI, NationalIDI, NHIFCardAuthorizationI, NHIFCardAuthorizationResponseI, NHIFGetCardDEtailByNationalIDResponseI, NHIFPointOfCareI, PatientPOCVerificationI } from 'src/app/shared/resources/store/models/insurance-nhif.model';
+import { GetCardNumberDetailsI, NationalIdI, NHIFCardAuthorizationI, NHIFCardAuthorizationResponseI, NHIFGetCardDEtailByNationalIDResponseI, NHIFPointOfCareI, NHIFServiceNotificationI, PatientPOCVerificationI } from 'src/app/shared/resources/store/models/insurance-nhif.model';
 
 // loading point of care
 export const loadPointOfCare = createAction('[Point of Care] Load Data');
@@ -57,7 +57,7 @@ export const authorizeNHIFCardFailure = createAction(
 
 export const getNHIFCardDetailsByNIN = createAction(
   "[Get NHIF card details by NIN] action",
-  props<{ data: NationalIDI }>() 
+  props<{ data: NationalIdI }>() 
 );
 
 
@@ -89,4 +89,23 @@ export const getNHIFCardDetailsByCardNumberSuccess = createAction(
 export const getNHIFCardDetailsByCardNumberFailure = createAction(
   "[Get NHIF card details by Card number] Failure",
   props<{ error: any }>()
+);
+
+
+
+
+// Service notification
+export const submitNHIFServiceNotification = createAction(
+  '[NHIF] Submit Service Notification',
+  props<{ data: NHIFServiceNotificationI }>()
+);
+
+export const submitNHIFServiceNotificationSuccess = createAction(
+  '[NHIF] Submit Service Notification Success',
+  props<{ response: any }>()
+);
+
+export const submitNHIFServiceNotificationFailure = createAction(
+  '[NHIF] Submit Service Notification Failure',
+  props<{ error: string }>()
 );

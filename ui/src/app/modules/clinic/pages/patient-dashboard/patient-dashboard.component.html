@@ -21,9 +21,9 @@
     patient: patient$ | async
   } as params"
 >
-
   <app-shared-patient-dashboard
     *ngIf="
+      isNHIFPractitionerLogedIn &&
       params?.currentUser &&
       !params?.rolesLoadingState &&
       params?.privilegesConfigs &&
@@ -67,8 +67,8 @@
       )
     "
     (patientVisitDetails)="handlePatientVisitDetails($event)"
-
-  ></app-shared-patient-dashboard> 
+   
+  ></app-shared-patient-dashboard>
   <div *ngIf="errors">
     <app-shared-error [errors]="errors"></app-shared-error>
   </div>
@@ -102,7 +102,18 @@
       !params?.IPDRoundConceptUuid
     "
   ></mat-progress-bar>
+
+  <div
+    *ngIf="!isNHIFPractitionerLogedIn"
+    class="alert alert-danger mt-4 ml-2 mr-2"
+    role="alert"
+  >
+    <span>
+      NHIF Practitioner must be logged in to continue with patient Point of Care
+      activities.
+    </span>
+    <button mat-button color="primary" (click)="retryNHIFPractitionerLogin()">
+      Retry Login
+    </button>
+  </div>
 </div>
-
-
-

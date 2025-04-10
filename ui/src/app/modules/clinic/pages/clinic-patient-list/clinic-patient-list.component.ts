@@ -45,8 +45,7 @@ export class ClinicPatientListComponent implements OnInit {
   labTestOrderType$: Observable<any>;
   showAllPatientsTab$: Observable<any>;
   userPrivileges$: Observable<any>;
-  showDoctorModal: boolean = true;
-  isNHIFPractitionerLogedIn: boolean = false;
+
 
   constructor(
     private store: Store<AppState>,
@@ -66,28 +65,28 @@ export class ClinicPatientListComponent implements OnInit {
     this.service.getListOfVisitTypes().subscribe((data) => {});
 
     // get practitioner details
-    this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
-      // if the doctor is not logged in to NHIF, prompt the doctor to login
-      if (!data || !data.isNHIFPractitionerLogedIn) {
-        const loginData = {
-          practitionerNo: this.currentProviderDetails[1]?.["value"] || null, 
-          nationalID: this.currentProviderDetails[3]?.["value"] || null,
-          biometricMethod: NHIFBiometricMethodE.fingerprint,
-          fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
-        };
+    // this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
+    //   // if the doctor is not logged in to NHIF, prompt the doctor to login
+    //   if (!data || !data.isNHIFPractitionerLogedIn) {
+    //     const loginData = {
+    //       practitionerNo: this.currentProviderDetails[1]?.["value"] || null, 
+    //       nationalID: this.currentProviderDetails[3]?.["value"] || null,
+    //       biometricMethod: NHIFBiometricMethodE.fingerprint,
+    //       fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
+    //     };
 
-        this.dialog.open(FingerCaptureComponent, {
-          width: "45%",
-          data: {
-            detail: "doctor's",
-            data: {
-              type: FingerPrintPaylodTypeE.Practitioner_login,
-              payload: loginData,
-            },
-          },
-        });
-      }
-    });
+    //     this.dialog.open(FingerCaptureComponent, {
+    //       width: "45%",
+    //       data: {
+    //         detail: "doctor's",
+    //         data: {
+    //           type: FingerPrintPaylodTypeE.Practitioner_login,
+    //           payload: loginData,
+    //         },
+    //       },
+    //     });
+    //   }
+    // });
 
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
     this.settingCurrentLocationStatus$ = this.store.select(

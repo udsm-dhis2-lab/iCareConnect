@@ -777,7 +777,7 @@
                                 [isInpatient]="isInpatient"
                                 [tabToShow]="tabToShow"
                                 (updateConsultationOrder)="
-                                  onUpdateConsultationOrder()
+                                  onUpdateConsultationOrder($event)
                                 "
                               ></app-patient-investigations-and-procedures>
 
@@ -854,7 +854,7 @@
                             [fromConsultation]="true"
                             [isInpatient]="isInpatient"
                             (updateConsultationOrder)="
-                              onUpdateConsultationOrder()
+                              onUpdateConsultationOrder($event)
                             "
                           ></app-patient-investigations-and-procedures>
 

@@ -35,8 +35,8 @@ export interface PatientPOCVerificationI {
 }
 
 export interface NHIFPractitionerDetailsI {
-  practitionerNo: string;
-  nationalID: string;
+  practitionerNo: any;
+  nationalID: any;
   isNHIFPractitionerLogedIn: boolean;
 }
 
@@ -64,6 +64,11 @@ export interface NHIFPractitionerLoginI {
   biometricMethod: NHIFBiometricMethodE;
   fpCode: NHIFFingerPrintCodeE;
   imageData: string;
+}
+
+export interface NHIFPractitionerLogoutI {
+  practitionerNo: string;
+  facilityCode: string
 }
 
 export enum FingerPrintPaylodTypeE {
@@ -101,7 +106,7 @@ export enum VisitTypeAliasE {
   AMBULANCE_EVACUATION = "AMBULANCE_EVACUATION",
 }
 
-export interface NationalIDI {
+export interface NationalIdI {
   nationalID: string;
 }
 
@@ -206,4 +211,127 @@ export interface NHIFGetCardDEtailByNationalIDResponseI {
   SchemeID: number;
   StatusDescription: string;
   
+}
+
+
+export interface NHIFServiceNotificationI {
+  authorizationNo: string;
+  firstName: string;
+  lastName: string;
+  gender: string;
+  dateOfBirth: string;
+  patientFileNo: string;
+  clinicalNotes: string;
+  practitionerNo: string;
+  practitionersRemarks: string;
+  telephoneNo: string;
+  diseases: {
+    diseaseCode: string;
+    status: string;
+  }[];
+  requestedServices: {
+    itemCode: string;
+    usage: string;
+    effectiveDate: string;
+    endDate: string;
+    quantityRequested: number;
+    remarks: string;
+  }[];
+}
+
+
+
+export interface NHIFApprovalDisease {
+  diseaseCode: string;
+  notes: string;
+  createdBy: string;
+  dateCreated: string; // ISO Date string
+}
+
+
+
+// aproval
+export interface NHIFAuthorizedItem {
+  serviceTypeID: number;
+  itemCode: string;
+  description: string;
+  quantityRequested: number;
+  unitPrice: number;
+  percentCovered: number;
+  createdBy: string;
+  dateCreated: string; // ISO Date string
+}
+
+export interface NHIFApprovalSupportingDocument {
+  documentTypeID: number;
+  documentDetails: string;
+  filePath: string;
+  documentData: string; // Base64 or raw string
+  fileType: string;
+}
+
+export interface NHIFRequestApprovalI {
+  firstName: string;
+  lastName: string;
+  gender: string;
+  telephoneNo: string;
+  clinicalNotes: string;
+  dateOfBirth: string; // ISO Date string
+  authorizationNo: string;
+  facilityPatientFileNumber: string;
+  attendanceDate: string; // ISO Date string
+  serviceDate: string;    // ISO Date string
+  expiryDate: string;     // ISO Date string
+  sourceFacilityCode: string;
+  practitionerNo: string;
+  prescribedBy: string;
+  requestedBy: string;
+  createdBy: string;
+  approvalDiseases: NHIFApprovalDisease[];
+  authorizedItems: NHIFAuthorizedItem[];
+  approvalSupportingDocuments: NHIFApprovalSupportingDocument[];
+}
+
+
+export interface NHIFServiceNotificationResponseI {
+  requestID: string;
+  requestNo: string;
+  cardNo: string | null;
+  schemeID: string | null;
+  productCode: string | null;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  gender: string;
+  practitionerNo: string;
+  authorizationNo: string | null;
+  facilityCode: string;
+  clinicalNotes: string;
+  createdBy: string;
+  dateCreated: string;
+  lastModifiedBy: string;
+  lastModified: string;
+  services:NHIFServiceResponseItemI[];
+}
+
+export interface NHIFServiceResponseItemI {
+  requestedServiceID: string;
+  requestID: string;
+  itemCode: string;
+  usage: string;
+  quantityRequested: number;
+  effectiveDate: string;
+  endDate: string;
+  availableAfterDate: string | null;
+  status: string;
+  requiresApproval: boolean;
+  remarks: string;
+  rejectionDetails: string;
+  rejectionReasonCode: string | null;
+  authorizationNo: string | null;
+  createdBy: string;
+  dateCreated: string;
+  lastModifiedBy: string;
+  lastModified: string;
+  itemName: string | null;
 }

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { getActiveVisit } from "src/app/store/selectors/visit.selectors"; 
+import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { Observable } from "rxjs";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { DiagnosisObject } from "src/app/shared/resources/diagnosis/models/diagnosis-object.model";
@@ -85,6 +85,7 @@ import { SharedRemotePatientHistoryModalComponent } from "../../dialogs/shared-r
 import { MatRadioChange } from "@angular/material/radio";
 import { LocationService } from "src/app/core/services";
 import { GlobalSettingService } from "../../resources/global-setting/services";
+import { submitNHIFServiceNotification } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -105,14 +106,14 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Input() observations: any;
   @Input() moduleName: any;
 
-  showModal:boolean=false;
+  showModal: boolean = false;
   patientVisitDetails: any;
-  
- 
+
   closeModal() {
     this.showModal = false;
   }
   currentPatient$: Observable<Patient>;
+  currentPatient: any;
   vitalSignObservations$: Observable<any>;
   loadingVisit$: Observable<boolean>;
   loadingForms$: Observable<boolean>;
@@ -133,6 +134,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   ordersUpdates$: Observable<any>;
   currentLocation$: Observable<Location>;
   provider$: Observable<ProviderGetFull>;
+  provider: any;
   menus: any[];
   privileges$: Observable<any>;
   forms$: Observable<any>;
@@ -191,7 +193,7 @@ export class SharedPatientDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     // console.log("activae,,,,,,,,,",this.activeVisit)
-   
+
     if (
       this.visitEndingControlStatusesConceptUuid &&
       this.visitEndingControlStatusesConceptUuid !== "none"
@@ -211,10 +213,14 @@ export class SharedPatientDashboardComponent implements OnInit {
     );
     this.privileges$ = this.store.select(getCurrentUserPrivileges);
     this.provider$ = this.store.select(getProviderDetails);
+    this.provider$.subscribe((provider) => (this.provider = provider));
     this.store.dispatch(
       loadForms({ formConfigs: ICARE_CONFIG?.consultation?.forms })
     );
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
+    this.currentPatient$.subscribe(
+      (patient) => (this.currentPatient = patient)
+    );
 
     this.vitalSignObservations$ = this.store.pipe(
       select(getVitalSignObservations)
@@ -374,16 +380,13 @@ export class SharedPatientDashboardComponent implements OnInit {
       );
     this.showHistoryDetails = this.activeVisit?.isAdmitted;
 
-  // // Define visit$ observable
-  // this.activeVisit$ = this.store.pipe(select(getActiveVisit));
+    // // Define visit$ observable
+    // this.activeVisit$ = this.store.pipe(select(getActiveVisit));
 
-  // // Subscribe to visit$ observable and log the value
-  // this.activeVisit$.subscribe((visit) => {
-  //   console.log("Active Visit:....>>>.", visit);
-  // });
-
-
-
+    // // Subscribe to visit$ observable and log the value
+    // this.activeVisit$.subscribe((visit) => {
+    //   console.log("Active Visit:....>>>.", visit);
+    // });
   }
   toggleSideBarMenu(event: Event): void {
     event.stopPropagation();
@@ -391,13 +394,15 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
   async loadGlobalProperty() {
     try {
-      const globalProperty = await this.globalSettingService.getSpecificGlobalProperties("ed9dac4a-5b2a-4a5f-8ee2-ca0d88b08506").toPromise();
+      const globalProperty = await this.globalSettingService
+        .getSpecificGlobalProperties("ed9dac4a-5b2a-4a5f-8ee2-ca0d88b08506")
+        .toPromise();
       const minutes = parseInt(globalProperty?.value ?? "0", 10);
       this.clearingFormTime = isNaN(minutes / 60) ? 0.5 : minutes / 60;
-      console.log("time received :",this.clearingFormTime);
+      console.log("time received :", this.clearingFormTime);
     } catch (error) {
       console.error("Error occurred:", error);
-      this.clearingFormTime = 0.5; 
+      this.clearingFormTime = 0.5;
     }
   }
 
@@ -409,7 +414,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
 
   getSelectedForm(event: Event, form: any): void {
-     console.log("form", form);
+    console.log("form", form);
     this.trackActionForAnalytics(`${form?.name}: Open`);
     this.loadGlobalProperty();
     this.readyForClinicalNotes = false;
@@ -418,26 +423,26 @@ export class SharedPatientDashboardComponent implements OnInit {
     }
     this.selectedForm = form;
     this.showHistoryDetails = false;
-  
-    if (form.uuid === 'a000cb34-9ec1-4344-a1c8-f692232f6edd') {
+
+    if (form.uuid === "a000cb34-9ec1-4344-a1c8-f692232f6edd") {
       this.showModal = true;
     } else {
-      this.showModal = false; 
+      this.showModal = false;
     }
-     // Define visit$ observable
+    // Define visit$ observable
 
-  // this.activeVisit$ = this.store.pipe(select(getActiveVisit));
-  // // Subscribe to visit$ observable and log the value
-  // this.activeVisit$.subscribe((visit) => {
-  //   console.log("Active Visit:....>>>.", visit);
-  //   //  const visits = visit.billDetails.paymentDetails.paymentType.name;
-  //   // Existing logic to show/hide modal
-  //   if (this.selectedForm && this.selectedForm.uuid === "ccf60297-55ae-4aef-98e4-c6d155d2e0fe") {
-  //     this.showModal = true;
-  //   } else {
-  //     this.showModal = false;
-  //   }
-  // });
+    // this.activeVisit$ = this.store.pipe(select(getActiveVisit));
+    // // Subscribe to visit$ observable and log the value
+    // this.activeVisit$.subscribe((visit) => {
+    //   console.log("Active Visit:....>>>.", visit);
+    //   //  const visits = visit.billDetails.paymentDetails.paymentType.name;
+    //   // Existing logic to show/hide modal
+    //   if (this.selectedForm && this.selectedForm.uuid === "ccf60297-55ae-4aef-98e4-c6d155d2e0fe") {
+    //     this.showModal = true;
+    //   } else {
+    //     this.showModal = false;
+    //   }
+    // });
 
     setTimeout(() => {
       this.readyForClinicalNotes = true;
@@ -608,7 +613,79 @@ export class SharedPatientDashboardComponent implements OnInit {
     this.trackActionForAnalytics(`Transfer WithIn: Open`);
   }
 
-  onUpdateConsultationOrder() {
+  private mapToNHIFServiceNotification(selectedOrders: any[]): any {
+    const getAttributeValue = (attributes: any[], display: string): string => {
+      return (
+        attributes?.find(
+          (attr) =>
+            attr?.attributeType?.display?.toLowerCase() ===
+            display.toLowerCase()
+        )?.value || ""
+      );
+    };
+
+    const extractMRN = (patientData: any): string => {
+      return (
+        patientData?.patient?.identifiers?.find(
+          (id) => id?.identifierType?.display?.toLowerCase() === "mrn"
+        )?.identifier || ""
+      );
+    };
+
+    const practitionerNo = getAttributeValue(
+      this.provider?.attributes,
+      "MCT Registration Number"
+    );
+    const telephoneNo = getAttributeValue(
+      this.currentPatient?.patient?.person?.attributes,
+      "phone"
+    );
+    const diseases = selectedOrders.reduce((acc, order) => {
+      if (Array.isArray(order?.diseases)) {
+        const formatted = order.diseases.map((disease) => ({
+          diseaseCode: disease.code || disease.diseaseCode,
+          notes: disease.notes || "",
+          createdBy: this.currentUser?.uuid || "",
+          dateCreated: new Date().toISOString(),
+        }));
+        return [...acc, ...formatted];
+      }
+      return acc;
+    }, []);
+
+    const requestedServices = selectedOrders.map((order) => ({
+      itemCode: order.nhif_item_code,
+      usage: "Routine",
+      effectiveDate: new Date().toISOString(),
+      endDate: new Date().toISOString(),
+      quantityRequested: 1,
+      remarks: order?.instructions,
+    }));
+    const mrn = extractMRN(this.currentPatient);
+    return {
+      authorizationNo: this.activeVisit?.authorizationNo, //not yet
+      practitionerNo: practitionerNo,
+      patientFileNo: extractMRN(this.currentPatient),
+      clinicalNotes: selectedOrders?.[0]?.instructions || "",
+      practitionersRemarks: selectedOrders?.[0]?.instructions || "",
+      firstName: this.currentPatient?.patient?.person?.preferredName?.givenName,
+      lastName: this.currentPatient?.patient?.person?.preferredName?.familyName,
+      gender: this.currentPatient?.patient?.person?.gender,
+      telephoneNo,
+      dateOfBirth: this.currentPatient?.patient?.person?.birthdate
+        ? new Date(this.currentPatient.patient.person.birthdate)
+            .toISOString()
+            .split("T")[0]
+        : null,
+      diseases, //not yet
+      requestedServices,
+    };
+  }
+
+  onUpdateConsultationOrder(selectedOrders: any) {
+    // if is NHIF visit dispatch NHIF service notification (simon add this condition later)
+    const nhifPayload = this.mapToNHIFServiceNotification(selectedOrders);
+    this.store.dispatch(submitNHIFServiceNotification({ data: nhifPayload }));
     if (!this.activeVisit.consultationStarted) {
       const orders = [
         {
@@ -619,11 +696,14 @@ export class SharedPatientDashboardComponent implements OnInit {
           encounter: this.activeVisit.consultationStatusOrder?.encounter?.uuid,
         },
       ];
+      console.log("orders ", orders);
       this.ordersService.updateOrdersViaEncounter(orders).subscribe((order) => {
         if (!order.error) {
           // console.log("==> Order results: ", order);
         }
       });
+
+      // call the method to submit NHIF service notification if ensured
     }
   }
 
@@ -694,11 +774,11 @@ export class SharedPatientDashboardComponent implements OnInit {
     this.selectedHistoryCategory = event?.value;
   }
 
-
-
   handlePatientVisitDetails(patientVisitDetails: any): void {
     this.patientVisitDetails = patientVisitDetails;
-    console.log("Received patient visit details in parent:", patientVisitDetails);
+    console.log(
+      "Received patient visit details in parent:",
+      patientVisitDetails
+    );
   }
-  
 }

@@ -175,7 +175,7 @@ export class FingerCaptureComponent implements OnInit {
             const practitionerData: NHIFPractitionerDetailsI = {
               practitionerNo: this.payload.payload.practitionerNo,
               nationalID: this.payload.payload.nationalID,
-              isNHIFPractitionerLogedIn: false,
+              isNHIFPractitionerLogedIn: false,   // (Put this true for testing purposes)
             };
 
             this.store.dispatch(

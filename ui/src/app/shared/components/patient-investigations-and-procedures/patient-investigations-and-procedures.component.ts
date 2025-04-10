@@ -24,7 +24,7 @@ export class PatientInvestigationsAndProceduresComponent implements OnInit {
   selectedTab = new UntypedFormControl(0);
 
   shouldShowLabSection: boolean = false;
-  @Output() updateConsultationOrder = new EventEmitter();
+  @Output() updateConsultationOrder = new EventEmitter<any>();
   constructor() {}
 
   ngOnInit(): void {
@@ -43,9 +43,9 @@ export class PatientInvestigationsAndProceduresComponent implements OnInit {
     this.selectedTab.setValue(val);
   }
 
-  onUpdateConsultationOrder() {
+  onUpdateConsultationOrder(data: any) {
     if (this.fromConsultation) {
-      this.updateConsultationOrder.emit();
+      this.updateConsultationOrder.emit(data);
     }
   }
 }

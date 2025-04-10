@@ -84,7 +84,7 @@
           [provider]="params?.provider"
           [visit]="patientVisit"
           [iCareGeneralConfigurations]="iCareGeneralConfigurations"
-          (updateConsultationOrder)="onUpdateConsultationOrder()"
+          (updateConsultationOrder)="onUpdateConsultationOrder($event)"
           (reloadOrderComponent)="loadLabResultsComponent()"
         ></app-order-results-renderer>
         

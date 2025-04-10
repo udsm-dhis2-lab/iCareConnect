@@ -19,6 +19,7 @@ import { OrdersService } from "../../resources/order/services/orders.service";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { DeleteConfirmationComponent } from "../delete-confirmation/delete-confirmation.component";
 import { SharedConfirmationComponent } from "../shared-confirmation/shared-confirmation.component";
+import { InsuranceService } from "../../services";
 
 @Component({
   selector: "app-order-results-renderer",
@@ -53,14 +54,15 @@ export class OrderResultsRendererComponent implements OnInit {
   voidingLabOrderState$: Observable<boolean>;
 
   isFormValid: boolean = false;
-  @Output() updateConsultationOrder = new EventEmitter();
+  @Output() updateConsultationOrder = new EventEmitter<any>();
   @Output() reloadOrderComponent = new EventEmitter();
   errors: any[] = [];
   constructor(
     private store: Store<AppState>,
     private dialog: MatDialog,
     private investigationPrecedureService: InvestigationProcedureService,
-    private ordersService: OrdersService
+    private ordersService: OrdersService,
+    private insuranceService: InsuranceService
   ) {}
 
   ngOnInit(): void {
@@ -101,8 +103,8 @@ export class OrderResultsRendererComponent implements OnInit {
     this.showParameters[labTest?.uuid] = this.showParameters[labTest?.uuid]
       ? null
       : labTest;
-      // console.log("after table click toggle ----------------------------",this.showParameters[labTest?.uuid]);
-      // console.log("also visit ---------------------------------------->",this.visit);
+    // console.log("after table click toggle ----------------------------",this.showParameters[labTest?.uuid]);
+    // console.log("also visit ---------------------------------------->",this.visit);
   }
 
   setCurrentOrderedItemForOtherDetailsView(event: Event, labTest) {
@@ -153,6 +155,7 @@ export class OrderResultsRendererComponent implements OnInit {
       "concept"
     );
     if (this.formValuesData["order"]) {
+      console.log('lab tests', this.formValuesData["order"])
       labOrders = [
         ...labOrders,
         {
@@ -168,6 +171,9 @@ export class OrderResultsRendererComponent implements OnInit {
           urgency: "ROUTINE",
           instructions: this.formValuesData["remarks"]?.value,
           type: "testorder",
+          nhif_item_code: this.insuranceService.getNHIFCodeFromConcept(
+            this.formValuesData["order"]
+          ),
         },
       ];
     }
@@ -178,7 +184,7 @@ export class OrderResultsRendererComponent implements OnInit {
       })
     );
 
-    this.updateConsultationOrder.emit();
+    this.updateConsultationOrder.emit(labOrders);
   }
 
   onDeleteTest(e: Event, labOrder): void {

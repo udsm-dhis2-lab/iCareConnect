@@ -31,7 +31,7 @@ import {
   ProviderAttributeGet,
 } from "src/app/shared/resources/openmrs";
 import { getCurrentLocation } from "src/app/store/selectors";
-import { catchError, map } from "rxjs/operators";
+import { catchError, map, take } from "rxjs/operators";
 import { getAllObservations } from "src/app/store/selectors/observation.selectors";
 import { MatDialog } from "@angular/material/dialog";
 import { DischargePatientModalComponent } from "src/app/shared/components/discharge-patient-modal/discharge-patient-modal.component";
@@ -60,6 +60,8 @@ import {
 import { selectNHIFPractitionerDetails } from "src/app/store/selectors/insurance-nhif-practitioner.selectors";
 import { PatientI } from "src/app/shared/resources/store/models/patient.model";
 import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
+import { loginNHIFPractitionerSuccess } from "src/app/store/actions/insurance-nhif-practitioner.actions";
+import { Actions, ofType } from "@ngrx/effects";
 
 @Component({
   selector: "app-patient-dashboard",
@@ -91,9 +93,12 @@ export class PatientDashboardComponent implements OnInit {
   selectedPractitionerDetails: NHIFPractitionerDetailsI;
   pointOfCares: NHIFPointOfCareI[];
   currentProviderDetails: ProviderAttributeGet[];
+  isNHIFPractitionerLogedIn: boolean = false;
+  private activePatientAuthorization: string = null;
 
   constructor(
     private store: Store<AppState>,
+    private actions$: Actions,
     private route: ActivatedRoute,
     private systemSettingsService: SystemSettingsService,
     private dialog: MatDialog,
@@ -103,6 +108,15 @@ export class PatientDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Listen for successful practitioner login to retry patient fingerprint
+    this.actions$.pipe(ofType(loginNHIFPractitionerSuccess)).subscribe(() => {
+      this.isNHIFPractitionerLogedIn = true;
+      if (this.activePatientAuthorization) {
+        this.launchPatientFingerprintModal(this.activePatientAuthorization);
+      }
+    });
+    
+
     // get user provider details
     this.store.select(getProviderDetails).subscribe((data) => {
       if (data) {
@@ -208,9 +222,12 @@ export class PatientDashboardComponent implements OnInit {
     this.activeVisit$.subscribe((response: any) => {
       // if is insurance patient, show verify point of care
       if (response && response?.isEnsured) {
-        this.openPatientFingerprintModal(
-          response.attributes[4]["visitAttributeDetails"]["value"]
-        );
+        this.activePatientAuthorization =
+          response.attributes?.[4]?.visitAttributeDetails?.value; //authorization number
+
+        this.openPatientFingerprintModal(this.activePatientAuthorization);
+      }else{
+        this.isNHIFPractitionerLogedIn = true //if not ensured, means is cash patient, just show the form
       }
 
       if (response && response?.isAdmitted) {
@@ -284,30 +301,69 @@ export class PatientDashboardComponent implements OnInit {
     });
   }
 
-  handlePatientVisitDetails(event, patientVisitDetails): void {
-  }
+  handlePatientVisitDetails(event, patientVisitDetails): void {}
 
   // Separate method to open the patient fingerprint modal
-  openPatientFingerprintModal(patientAuthorization: string): void {
-    const patientPointOfCareData = {
-      pointOfCareID:
-        this.pointOfCares.find(
-          (item) =>
-            (item.PointOfCareCode === NHIFPointOfCareCodeE.CONSULTATION)
-        ).PointOfCareID || null,
-      authorizationNo: patientAuthorization,
-      practitionerNo: this.currentProviderDetails[1]["value"], 
+  retryNHIFPractitionerLogin(): void {
+    const loginData = {
+      practitionerNo: this.currentProviderDetails[1]?.["value"] || null,
+      nationalID: this.currentProviderDetails[3]?.["value"] || null,
       biometricMethod: NHIFBiometricMethodE.fingerprint,
       fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
     };
-    this.dialog
-      .open(FingerCaptureComponent, {
-        width: "45%",
-        data: { detail: "patient's", data: {
-          type: FingerPrintPaylodTypeE.Patient_POC_Verification,
-          payload: patientPointOfCareData
-        } },
-      })
-      
+
+    this.dialog.open(FingerCaptureComponent, {
+      width: "45%",
+      data: {
+        detail: "doctor's",
+        data: {
+          type: FingerPrintPaylodTypeE.Practitioner_login,
+          payload: loginData,
+        },
+      },
+    });
   }
+
+  private launchPatientFingerprintModal(authNo: string): void {
+    const patientPointOfCareData = {
+      pointOfCareID:
+        this.pointOfCares.find(
+          (item) => item.PointOfCareCode === NHIFPointOfCareCodeE.CONSULTATION
+        )?.PointOfCareID || null,
+      authorizationNo: authNo,
+      practitionerNo: this.currentProviderDetails[1]?.["value"],
+      biometricMethod: NHIFBiometricMethodE.fingerprint,
+      fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
+    };
+
+    this.dialog.open(FingerCaptureComponent, {
+      width: "45%",
+      data: {
+        detail: "patient's",
+        data: {
+          type: FingerPrintPaylodTypeE.Patient_POC_Verification,
+          payload: patientPointOfCareData,
+        },
+      },
+    });
+  }
+
+  openPatientFingerprintModal(patientAuthorization?: string): void {
+    const authKey = patientAuthorization || this.activePatientAuthorization;
+    if (!authKey) return;
+  
+    this.store.select(selectNHIFPractitionerDetails).pipe(take(1)).subscribe((data) => {
+      console.log('Practitioner: ', data)
+      const isLoggedIn = data?.isNHIFPractitionerLogedIn;
+  
+      if (!isLoggedIn) {
+        this.isNHIFPractitionerLogedIn = false; // explicitly false
+        this.retryNHIFPractitionerLogin();
+      } else {
+        this.isNHIFPractitionerLogedIn = true; // ✅ login confirmed, now show form
+        this.launchPatientFingerprintModal(authKey);
+      }
+    });
+  }
+  
 }
