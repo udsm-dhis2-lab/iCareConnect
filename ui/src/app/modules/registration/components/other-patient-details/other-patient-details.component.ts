@@ -36,8 +36,8 @@ export class OtherPatientDetailsComponent implements OnInit {
       ([patientVisit, allpatientVisit]) => {
         // Handle patientVisit$
         // console.log("Patient Visit----------------------------:", patientVisit);
-        const visit = patientVisit[0].visit;
-        const attributes = visit.attributes;
+        const visit = (patientVisit[0] ?? {}).visit;
+        const attributes = (visit ?? {}).attributes ?? [];
         for (const attribute of attributes) {
           if (attribute.display.includes("Insurance ID")) {
             const insuranceID = attribute.value;

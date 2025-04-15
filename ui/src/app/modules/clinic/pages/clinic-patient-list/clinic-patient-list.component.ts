@@ -12,11 +12,9 @@ import {
   FingerPrintPaylodTypeE,
   NHIFBiometricMethodE,
   NHIFFingerPrintCodeE,
-  NHIFPractitionerDetailsI,
 } from "src/app/shared/resources/store/models/insurance-nhif.model";
 import { InsuranceService } from "src/app/shared/services";
 import { go } from "src/app/store/actions";
-import { setNHIFPractitionerDetails } from "src/app/store/actions/insurance-nhif-practitioner.actions";
 import { AppState } from "src/app/store/reducers";
 import {
   getCurrentLocation,
@@ -63,14 +61,13 @@ export class ClinicPatientListComponent implements OnInit {
         this.currentProviderDetails = data.attributes;
       }
     });
-    this.service.getListOfVisitTypes().subscribe((data) => {});
 
     // get practitioner details
     this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
       // if the doctor is not logged in to NHIF, prompt the doctor to login
       if (!data || !data.isNHIFPractitionerLogedIn) {
         const loginData = {
-          practitionerNo: this.currentProviderDetails[1]?.["value"] || null, 
+          practitionerNo: this.currentProviderDetails[1]?.["value"] || null,
           nationalID: this.currentProviderDetails[3]?.["value"] || null,
           biometricMethod: NHIFBiometricMethodE.fingerprint,
           fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
