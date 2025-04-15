@@ -3,7 +3,11 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  NHIF_CLIENT_ID :"04626",
+  NHIF_CLIENT_SECRET : "mXW2OcsZMBCLpWFMX6/I5A==",
+  NHIF_USERNAME : "hmis_username",
+  NHIF_SCOPE: "OnlineServices"
 };
 
 /*

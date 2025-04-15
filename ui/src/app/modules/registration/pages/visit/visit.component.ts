@@ -4,7 +4,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
 import { select, Store } from "@ngrx/store";
 import * as _ from "lodash";
-import { Observable, of } from "rxjs";
+import { merge, Observable, of } from "rxjs";
 import { patientObj } from "src/app/shared/models/patient";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
@@ -45,8 +45,28 @@ import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { FingerprintService, InsuranceService } from "src/app/shared/services";
 import { InsuranceResponse } from "src/app/modules/billing/models/insurance-response.model";
-import { FingerPrintPaylodTypeE, NHIFBiometricMethodE, NHIFFingerPrintCodeE } from "src/app/shared/resources/store/models/insurance-nhif.model";
+import {
+  FingerPrintPaylodTypeE,
+  NHIFBiometricMethodE,
+  NHIFCardAuthorizationI,
+  NHIFFingerPrintCodeE,
+  NHIFVisitTypeI,
+  VisitTypeAliasE,
+} from "src/app/shared/resources/store/models/insurance-nhif.model";
 import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
+import { loadVisitType } from "src/app/store/actions/insurance-nhif-visit-types.actions";
+import { getListOfVisitTypes } from "src/app/store/selectors/insurance-nhif-visit-types.selectors";
+import { Subscription } from "rxjs";
+import { Actions, ofType } from "@ngrx/effects";
+import { take } from "rxjs/operators";
+import {
+  authorizeNHIFCardSuccess,
+  getNHIFCardDetailsByCardNumber,
+  getNHIFCardDetailsByCardNumberSuccess,
+  getNHIFCardDetailsByNIN,
+  getNHIFCardDetailsByNINFailure,
+  getNHIFCardDetailsByNINSuccess,
+} from "src/app/store/actions/insurance-nhif-point-of-care.actions";
 @Component({
   selector: "app-visit",
   templateUrl: "./visit.component.html",
@@ -68,6 +88,7 @@ export class VisitComponent implements OnInit {
   editMode: boolean = false;
   disableEditingPayments: boolean = false;
   isEmergencyVisit: boolean = false;
+  isReferralVisit: boolean = false;
   CardNo: string;
 
   existingVisitUuid: string;
@@ -92,7 +113,6 @@ export class VisitComponent implements OnInit {
   currentPaymentCategory: any;
   missingBillingConceptError: string;
   allProgarm: Observable<any>;
-  private rawData: string;
 
   @Input() visitTypes: any;
   @Input() servicesConfigs: any;
@@ -120,7 +140,7 @@ export class VisitComponent implements OnInit {
   // Insurance Scheme
   insuranceSchemes$: Observable<any>;
   servicesConcepts$: Observable<any>;
-  isReferralVisit: boolean = false;
+
   currentServiceConfigsSelected: any;
   authorizationNumberAvailable: boolean = true;
   patientVisist$: Observable<any>;
@@ -139,36 +159,40 @@ export class VisitComponent implements OnInit {
   visible: boolean = false;
   enrolledPrograms: ProgramGetFull[];
   remoteReferralDetails$: Observable<any>;
-  InsuranceID: string = "";
-  showModal = false;
-  authorizationNo: string;
-  cardNumber: string = "";
-  // showMessage: boolean = false;
-  // showLoader: boolean = false;
+  NHIFVisitTypes: NHIFVisitTypeI[];
 
-  openModal() {
-    this.showModal = true;
-  }
+  // NHIF auth data
+  authorizationData: NHIFCardAuthorizationI = {
+    cardNo: this.visitDetails["InsuranceID"],
+    biometricMethod: NHIFBiometricMethodE.fingerprint,
+    nationalID: "",
+    fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
+    visitTypeID: null,
+    referralNo: "string",
+    remarks: "Authorization",
+  };
 
-  closeModal() {
-    this.showModal = false;
-    this.showMessage = false;
-    this.showLoader = false;
-  }
+  // NHIF variables
+  fetchedData = null;
+  isLoading = false;
+  fetchAttempted = false;
+  getNHIFCardInfoSuccess = true;
+  nhifFailedRemark = "";
+  private actionNHIFAuthorizationSubscription: Subscription;
+  private actionNHIFGetCardByCardNoSubscription: Subscription;
 
   constructor(
     private store: Store<AppState>,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private registrationService: RegistrationService,
-    private router: Router,
     private visitService: VisitsService,
     private programsService: ProgramsService,
     private systemSettingsService: SystemSettingsService,
     private conceptsService: ConceptsService,
     private googleAnalyticsService: GoogleAnalyticsService,
     private httpClientService: OpenmrsHttpClientService,
-    private insuranceService: InsuranceService
+    private actions$: Actions
   ) {}
 
   dismissAlert() {
@@ -176,6 +200,12 @@ export class VisitComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.store.dispatch(loadVisitType());
+    this.store.select(getListOfVisitTypes).subscribe((data) => {
+      this.NHIFVisitTypes = data;
+      console.log("NHIF visit types", this.NHIFVisitTypes);
+    });
+
     this.patientVisist$ = this.visitService
       .getLastPatientVisit(this.patientDetails?.uuid)
       .pipe(
@@ -478,7 +508,7 @@ export class VisitComponent implements OnInit {
     this.cancelVisitChanges.emit(this.visitDetails);
   }
 
-  setVisitTypeOption(option, verticalProgamUuid?, isEmergency?) {
+  setVisitTypeOption(option, verticalProgamUuid?) {
     this.isVerticalProgram = verticalProgamUuid === option?.uuid;
     const matchedServiceConfigs = (this.servicesConfigs.filter(
       (config) => config.uuid === option?.uuid
@@ -546,7 +576,7 @@ export class VisitComponent implements OnInit {
     this.visitDetails["referralNo"] = refNumber;
   }
 
-  onGetReferralFromRemote(event: Event, referralNo: string): void {
+  onGetReferralFromRemote(event: Event): void {
     event.stopPropagation();
     this.remoteReferralDetails$ = this.httpClientService.get(
       `icare/sharedrecords?referralNumber=${this.visitDetails["referralNo"]}`
@@ -1031,19 +1061,9 @@ export class VisitComponent implements OnInit {
     }
   }
 
-  getClaimForm(event, visitDetails): void {
+  getClaimForm(event): void {
     event.stopPropagation();
     this.visitUpdate.emit(null);
-    const dialogRef = this.dialog
-      .open(VisitClaimComponent, {
-        width: "80%",
-        maxHeight: "90vh",
-        data: visitDetails,
-      })
-      .afterClosed()
-      .subscribe((response) => {
-        this.visitUpdate.emit(visitDetails);
-      });
   }
 
   get applicableVisitTypes() {
@@ -1060,95 +1080,172 @@ export class VisitComponent implements OnInit {
             visitType?.name.toLowerCase().indexOf("ipd") > -1
         ) || [];
   }
-  getCardNumber() {
-    this.insuranceService.getCardNumberByNida(this.nidaData).subscribe({
-      next: (response) => {
-        const nidaResponse = response;
-        this.authorizationData.cardNo = nidaResponse.body.CardNo;
-        setTimeout(() => {
-          this.authorizeInsurance();
-        }, 2000);
-        console.log("Payload Sent",this.authorizationData);
-      },
-      error: (error) => {
-        console.error("Error during authorization:", error);
-        this.showLoader = false;
-      },
-    });
-  }
+
   onSetEditPatient(event, path, patientUuid) {
     event.stopPropagation();
     this.editPatient.emit(path + patientUuid);
   }
 
+  getPatientData(selectedId: "insuranceId" | "nationalId") {
+    this.fetchAttempted = true; // Indicates a fetch attempt has been made
+    this.isLoading = true; // Show loader
+    this.fetchedData = null; // Reset previous data
+    this.getNHIFCardInfoSuccess = false;
+
+    if (selectedId === "insuranceId") {
+      // get patient card details by carn number
+      const cardData = {
+        cardNo: this.visitDetails["InsuranceID"],
+        cardTypeID: "NHIFCard",
+        verifierID: "NHIF",
+      };
+
+      this.store.dispatch(getNHIFCardDetailsByCardNumber({ data: cardData }));
+      this.actionNHIFGetCardByCardNoSubscription = this.actions$
+        .pipe(ofType(getNHIFCardDetailsByCardNumberSuccess), take(1))
+        .subscribe(({ response }) => {
+          if (response.status === 200) {
+          } else {
+          }
+          console.log("Get detail by Card Response:", response);
+        });
+    } else {
+      // get patient card details  by NIDA number
+      this.store.dispatch(
+        getNHIFCardDetailsByNIN({
+          data: { nationalID: this.authorizationData.nationalID },
+        })
+      );
+
+      merge(
+        this.actions$.pipe(ofType(getNHIFCardDetailsByNINSuccess), take(1)),
+        this.actions$.pipe(ofType(getNHIFCardDetailsByNINFailure), take(1))
+      ).subscribe((action) => {
+        this.isLoading = false;
+        this.getNHIFCardInfoSuccess = true;
+        if (action.type === getNHIFCardDetailsByNINSuccess.type) {
+          const { response } = action;
+
+          this.fetchedData = {
+            name: response.FullName,
+            gender: response.Gender,
+            productName: response.ProductName,
+            pfnumber: response.PFNumber,
+            expirationDate: response.ExpiryDate,
+            eligibilityStatus: response.IsActive === 1 ? "Active" : "Inactive",
+          };
+
+          // set card number in state
+          this.authorizationData.cardNo = response.CardNo;
+        } else {
+          console.log(action.error);
+          // Error case
+          this.nhifFailedRemark =
+            action.error || "Failed to fetch card details by NIN";
+          this.getNHIFCardInfoSuccess = false;
+        }
+      });
+    }
+  }
+
+  retryFetch(data) {
+    this.getPatientData(data);
+  }
+
   onInsuranceIDChange(newValue: string): void {
-    this.authorizationData.cardNo = newValue;
-    console.log(this.authorizationData.cardNo);
+    this.authorizationData = {
+      ...this.authorizationData,
+      cardNo : newValue
+    };
   }
 
   onNationalIDChange(newValue: string): void {
-    // this.nidaData.nationalID = newValue;
-    this.nidaData.nationalID = newValue;
-    console.log("National ID", this.nidaData.nationalID);
+    this.authorizationData = {
+      ...this.authorizationData,
+      nationalID : newValue
+    };
   }
-
-  authorizationData = {
-    cardNo: "",
-    biometricMethod: NHIFBiometricMethodE.fingerprint,
-    nationalID: "",
-    fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
-    visitTypeID: 1,
-    referralNo: "string",
-    remarks: "Authorization",
-  };
-
-  nidaData = {
-    nationalID: "",
-  };
 
   onNationalIdInput(event: any): void {
     const inputValue = event.target.value;
     event.target.value = inputValue.replace(/\D/g, "");
   }
 
-  authorizeInsurance() {
+  getVisitTypeIDBasedOnVisit(): number | null {
+    if (this.isReferralVisit) {
+      return (
+        this.NHIFVisitTypes.find(
+          (item) => item.Alias === VisitTypeAliasE.REFERRAL
+        )?.VisitTypeID || null
+      );
+    } else if (this.isEmergencyVisit) {
+      return (
+        this.NHIFVisitTypes.find(
+          (item) => item.Alias === VisitTypeAliasE.EMERGENCY_CASE
+        )?.VisitTypeID || null
+      );
+    } else {
+      return (
+        this.NHIFVisitTypes.find(
+          (item) => item.Alias === VisitTypeAliasE.NORMAL_VISIT
+        )?.VisitTypeID || null
+      );
+    }
+  }
+
+  authorizeInsurance(authorizationType: "Face" | "Fingerprint") {
     if (!this.authorizationData.nationalID) {
-      this.authorizationData.nationalID = "string";
+      this.authorizationData = {
+        ...this.authorizationData,
+        nationalID : "string"
+      };
     }
 
     if (!this.authorizationData.cardNo) {
-      this.authorizationData.cardNo = "string";
+      this.authorizationData = {
+        ...this.authorizationData,
+        cardNo :"string"
+      };
     }
-   
 
-    this.dialog
-          .open(FingerCaptureComponent, {
-            width: "45%",
-            data: { detail: "patient's", data: {
-              type: FingerPrintPaylodTypeE.Patient_card_authorization,
-              payload: this.authorizationData
-            } },
-          })
+    // update NHIF visit type (For now, any other visit apart from referal and emergency is put as a normal visit) (Follow up with analysts to kuweka sawa issue ya visit types)
 
-    this.insuranceService
-      .authorizeInsuranceCard(this.authorizationData)
-      .subscribe({
-        next: (response) => {
-          const typedResponse = response;
-          this.authorizationNo = typedResponse.body.AuthorizationNo;
-          this.visitDetails["InsuranceAuthNo"] = this.authorizationNo;
-          this.showLoader = false;
-          // this.showMessage = true;
-          this.closeModal();
-        },
-        error: (error) => {
-          console.error("Error during authorization:", error);
-          this.showLoader = false;
+    this.authorizationData = {
+      ...this.authorizationData,
+      visitTypeID: this.getVisitTypeIDBasedOnVisit(),
+    };
+
+    if (authorizationType === "Face") {
+      alert("Cudos!!!! Face authorization is coming soon! 🚀");
+      // unmute this if use facial
+      //this.authorizationData.biometricMethod =NHIFBiometricMethodE.facial
+      return;
+    } else {
+      // fingerprint
+      this.dialog.open(FingerCaptureComponent, {
+        width: "45%",
+        data: {
+          detail: "patient's",
+          data: {
+            type: FingerPrintPaylodTypeE.Patient_card_authorization,
+            payload: this.authorizationData,
+          },
         },
       });
+
+      // wait for the verification action to complete
+      this.actionNHIFAuthorizationSubscription = this.actions$
+        .pipe(ofType(authorizeNHIFCardSuccess), take(1))
+        .subscribe(({ response }) => {
+          if (response.IsValidCard && response.IsActive) {
+            // check if card authorization is valid
+            if (response.AuthorizationStatus === "REJECTED") {
+              // show that card autholization failed (This message will be raised by the fingerprint component)
+            } else {
+              this.visitDetails["InsuranceAuthNo"] = response.AuthorizationNo;
+            }
+          }
+        });
+    }
   }
-
-
-
-
 }

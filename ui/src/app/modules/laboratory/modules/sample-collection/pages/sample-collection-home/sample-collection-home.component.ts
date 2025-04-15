@@ -1,10 +1,16 @@
 import { Component, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
+import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
+import { ProviderAttributeGet } from "src/app/shared/resources/openmrs";
+import { NHIFBiometricMethodE, NHIFFingerPrintCodeE, FingerPrintPaylodTypeE, NHIFPractitionerDetailsI } from "src/app/shared/resources/store/models/insurance-nhif.model";
 import { addCurrentPatient, go } from "src/app/store/actions";
+import { setNHIFPractitionerDetails } from "src/app/store/actions/insurance-nhif-practitioner.actions";
 import { loadPatientPayments } from "src/app/store/actions/payment.actions";
 import { AppState } from "src/app/store/reducers";
-import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.selectors";
+import { getCurrentUserPrivileges, getProviderDetails } from "src/app/store/selectors/current-user.selectors";
+import { selectNHIFPractitionerDetails } from "src/app/store/selectors/insurance-nhif-practitioner.selectors";
 import { getVisitLoadingState } from "src/app/store/selectors/visit.selectors";
 
 @Component({
@@ -15,9 +21,17 @@ import { getVisitLoadingState } from "src/app/store/selectors/visit.selectors";
 export class SampleCollectionHomeComponent implements OnInit {
   loadingVisit$: Observable<boolean>;
   privileges$: Observable<any>;
-  constructor(private store: Store<AppState>) {}
+  currentProviderDetails: ProviderAttributeGet[];
+  constructor(private store: Store<AppState>,private dialog: MatDialog,) {}
 
   ngOnInit(): void {
+     // get provider details
+        this.store.select(getProviderDetails).subscribe((data) => {
+          console.log('curren provider', data)
+          if (data) {
+            this.currentProviderDetails = data.attributes;
+          }
+        });
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));
 
     this.privileges$ = this.store.select(getCurrentUserPrivileges);
@@ -86,6 +100,48 @@ export class SampleCollectionHomeComponent implements OnInit {
         }
       }
     }); // laboratory/settings/tests-control
+
+
+
+     // get practitioner details
+     this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
+      // if the doctor is not logged in to NHIF, prompt the doctor to login
+      if (!data || !data.isNHIFPractitionerLogedIn) {
+        const loginData = {
+          practitionerNo: this.currentProviderDetails[1]["value"],
+          nationalID: this.currentProviderDetails[3]?.["value"] ?this.currentProviderDetails[3]?.["value"] : 'Add  NIDA to OPENMRS',
+          biometricMethod: NHIFBiometricMethodE.fingerprint,
+          fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
+        };
+
+        this.dialog
+          .open(FingerCaptureComponent, {
+            width: "45%",
+            data: {
+              detail: "Practitioner's",
+              data: {
+                type: FingerPrintPaylodTypeE.Practitioner_login,
+                payload: loginData,
+              },
+            },
+          })
+          .afterClosed()
+          .subscribe((result) => {
+            if (result) {
+              const practitionerData: NHIFPractitionerDetailsI = {
+                practitionerNo: this.currentProviderDetails[1]["value"], // MCT Registration number index
+                nationalID: this.currentProviderDetails[3]?.["value"] ?this.currentProviderDetails[3]?.["value"] : 'Add  NIDA to OPENMRS',
+                isNHIFPractitionerLogedIn: true,
+              };
+
+              // Dispatch the action to update state
+              this.store.dispatch(
+                setNHIFPractitionerDetails({ data: practitionerData })
+              );
+            }
+          });
+      }
+    });
   }
 
   onSelectPatient(patient) {
@@ -98,4 +154,7 @@ export class SampleCollectionHomeComponent implements OnInit {
       })
     );
   }
+
+
+     
 }
