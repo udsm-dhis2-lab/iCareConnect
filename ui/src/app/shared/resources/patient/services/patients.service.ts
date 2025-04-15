@@ -33,7 +33,7 @@ export class PatientService {
   }
 
   searchPatients(searchTerm): Observable<Patient[]> {
-    const url = `patient?identifier=${searchTerm}&v=full&limit=10`;
+    const url = `patient?identifier=${searchTerm}&v=full&limit=100`;
     return this.httpClient.get(url).pipe(
       map((res: any) =>
         (res?.results || []).map((patient) => new Patient(patient))
