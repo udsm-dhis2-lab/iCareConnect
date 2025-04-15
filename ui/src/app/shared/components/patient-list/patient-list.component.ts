@@ -83,7 +83,6 @@ export class PatientListComponent implements OnInit, OnChanges {
   ngOnChanges() {}
 
   ngOnInit() {
-    console.log('Items per page:', this.itemsPerPage);
     if (this.isDischarge === undefined) {
       this.isDischarge = false;
     }
