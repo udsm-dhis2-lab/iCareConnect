@@ -1,58 +1,102 @@
 package org.openmrs.module.icare.web.controller;
 
-import org.openmrs.*;
-import org.openmrs.api.*;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.openmrs.Concept;
+import org.openmrs.ConceptMap;
+import org.openmrs.ConceptSource;
+import org.openmrs.Location;
+import org.openmrs.User;
+import org.openmrs.Visit;
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.ConceptService;
+import org.openmrs.api.LocationService;
+import org.openmrs.api.OrderService;
+import org.openmrs.api.ProviderService;
+import org.openmrs.api.UserService;
+import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
-import org.openmrs.module.icare.laboratory.models.*;
+import org.openmrs.module.icare.laboratory.models.AssociatedField;
+import org.openmrs.module.icare.laboratory.models.AssociatedFieldResult;
+import org.openmrs.module.icare.laboratory.models.Batch;
+import org.openmrs.module.icare.laboratory.models.BatchSample;
+import org.openmrs.module.icare.laboratory.models.BatchSet;
+import org.openmrs.module.icare.laboratory.models.BatchSetStatus;
+import org.openmrs.module.icare.laboratory.models.BatchStatus;
+import org.openmrs.module.icare.laboratory.models.Result;
+import org.openmrs.module.icare.laboratory.models.Sample;
+import org.openmrs.module.icare.laboratory.models.SampleExt;
+import org.openmrs.module.icare.laboratory.models.SampleLable;
+import org.openmrs.module.icare.laboratory.models.SampleOrder;
+import org.openmrs.module.icare.laboratory.models.SampleStatus;
+import org.openmrs.module.icare.laboratory.models.TestAllocation;
+import org.openmrs.module.icare.laboratory.models.TestAllocationAssociatedField;
+import org.openmrs.module.icare.laboratory.models.TestAllocationStatus;
+import org.openmrs.module.icare.laboratory.models.TestOrderLocation;
+import org.openmrs.module.icare.laboratory.models.TestRangeConfig;
+import org.openmrs.module.icare.laboratory.models.TestTimeConfig;
+import org.openmrs.module.icare.laboratory.models.WorkloadSummary;
+import org.openmrs.module.icare.laboratory.models.Worksheet;
+import org.openmrs.module.icare.laboratory.models.WorksheetControl;
+import org.openmrs.module.icare.laboratory.models.WorksheetDefinition;
+import org.openmrs.module.icare.laboratory.models.WorksheetSample;
+import org.openmrs.module.icare.laboratory.models.WorksheetSampleStatus;
+import org.openmrs.module.icare.laboratory.models.WorksheetStatus;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
-import org.openmrs.module.icare.store.models.Requisition;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.io.StreamCorruptedException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/lab")
 public class LaboratoryController {
-	
+
 	@Autowired
 	LaboratoryService laboratoryService;
-	
+
 	@Autowired
 	ICareService iCareService;
-	
+
 	@Autowired
 	VisitService visitService;
-	
+
 	@Autowired
 	ConceptService conceptService;
-	
+
 	@Autowired
 	OrderService orderService;
-	
+
 	@Autowired
 	ProviderService providerService;
-	
+
 	@Autowired
 	UserService userService;
-	
+
 	@Autowired
 	LocationService locationService;
-	
+
 	@RequestMapping(value = "visit", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getPendingVisit(@RequestParam(defaultValue = "100") Integer limit,
@@ -72,7 +116,7 @@ public class LaboratoryController {
 		retults.put("results", responseSamplesObject);
 		return retults;
 	}
-	
+
 	@RequestMapping(value = "sample", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> createNewSample(@RequestBody Map<String, Object> sample) throws IOException {
@@ -168,48 +212,54 @@ public class LaboratoryController {
 		response.put("uuid", createdSample.getUuid());
 		return response;
 	}
-	
+
 	@RequestMapping(value = "sample", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getSamplesByVisit(@RequestParam(value = "visit", required = false) String visitId,
-	        @RequestParam(value = "patient", required = false) String patient,
-	        @RequestParam(value = "startDate", required = false) String startDate,
-	        @RequestParam(value = "endDate", required = false) String endDate) throws Exception {
-		
+	public List<Map<String, Object>> getSamplesByVisit(
+			@RequestParam(value = "visit", required = false) String visitId,
+			@RequestParam(value = "patient", required = false) String patient,
+			@RequestParam(value = "startDate", required = false) String startDate,
+			@RequestParam(value = "endDate", required = false) String endDate) throws Exception {
+
 		Date sampleCreatedStartDate = null;
 		Date sampleCreatedEndDate = null;
-		
-		if ((startDate != null || endDate != null) && (startDate.length() > 0 || endDate.length() > 0)) {
-			
+
+		if ((startDate != null || endDate != null)
+				&& ((startDate != null && startDate.length() > 0) || (endDate != null && endDate.length() > 0))) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			try {
-				sampleCreatedStartDate = formatter.parse(startDate);
-				if (endDate != null) {
-					sampleCreatedEndDate = formatter.parse(endDate);
+				sampleCreatedStartDate = startDate != null && !startDate.isEmpty() ? formatter.parse(startDate) : null;
+				sampleCreatedEndDate = endDate != null && !endDate.isEmpty() ? formatter.parse(endDate) : null;
+			} catch (Exception e) {
+				System.out.println(
+						"Dates provided were not in correct format, please format as yyyy-MM-dd. Example: 1990-01-05");
+			}
+		}
+
+		List<Sample> samples = laboratoryService.getSamplesByVisitOrPatientAndOrDates(
+				visitId, patient, sampleCreatedStartDate, sampleCreatedEndDate);
+
+		List<Map<String, Object>> responseSamplesObject = new ArrayList<>();
+
+		for (Sample sample : samples) {
+			if (sample != null) {
+				try {
+					Map<String, Object> sampleObject = sample.toMap();
+					responseSamplesObject.add(sampleObject);
+				} catch (NullPointerException npe) {
+					System.out.println(
+							"Skipping a sample due to null reference in nested structure: " + npe.getMessage());
+					npe.printStackTrace(); // optional, for detailed trace in logs
+				} catch (Exception e) {
+					System.out.println("Unexpected error converting sample to map: " + e.getMessage());
+					e.printStackTrace(); // optional
 				}
 			}
-			catch (Exception e) {
-				System.out
-				        .println("Dates provided were not in correct format, please format in year-month-date e.g 1990-01-05");
-			}
 		}
-		
-		List<Sample> samples = laboratoryService.getSamplesByVisitOrPatientAndOrDates(visitId, patient,
-		    sampleCreatedStartDate, sampleCreatedEndDate);
-		
-		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
-		for (Sample sample : samples) {
-			
-			Map<String, Object> sampleObject = sample.toMap();
-			
-			// add the sample after creating its object
-			responseSamplesObject.add(sampleObject);
-			
-		}
-		
+
 		return responseSamplesObject;
 	}
-	
+
 	@RequestMapping(value = "sample/{sampleIdentification}", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getSamplesByIdentification(@PathVariable String sampleIdentification) throws Exception {
@@ -221,57 +271,59 @@ public class LaboratoryController {
 		}
 		return sample.toMap();
 	}
-	
+
 	@RequestMapping(value = "samples", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getAllSamples(@RequestParam(value = "startDate", required = false) String startDate,
-	        @RequestParam(value = "endDate", required = false) String endDate,
-	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
-	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
-	        @RequestParam(value = "location", required = false) String locationUuid,
-	        @RequestParam(value = "sampleCategory", required = false) String sampleCategory,
-	        @RequestParam(value = "testCategory", required = false) String testCategory,
-	        @RequestParam(value = "hasStatus", required = false) String hasStatus,
-	        @RequestParam(value = "q", required = false) String q,
-	        @RequestParam(value = "excludeAllocations", required = false) boolean excludeAllocations,
-	        @RequestParam(value = "acceptedBy", required = false) String acceptedByUuid,
-	        @RequestParam(value = "test", required = false) String testConceptUuid,
-	        @RequestParam(value = "department", required = false) String departmentUuid,
-	        @RequestParam(value = "specimen", required = false) String specimenSourceUuid,
-	        @RequestParam(value = "instrument", required = false) String instrumentUuid,
-	        @RequestParam(value = "visit", required = false) String visitUuid,
-	        @RequestParam(value = "excludeStatus", required = false) String excludeStatus) throws Exception {
-		
+			@RequestParam(value = "endDate", required = false) String endDate,
+			@RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+			@RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+			@RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+			@RequestParam(value = "location", required = false) String locationUuid,
+			@RequestParam(value = "sampleCategory", required = false) String sampleCategory,
+			@RequestParam(value = "testCategory", required = false) String testCategory,
+			@RequestParam(value = "hasStatus", required = false) String hasStatus,
+			@RequestParam(value = "q", required = false) String q,
+			@RequestParam(value = "excludeAllocations", required = false) boolean excludeAllocations,
+			@RequestParam(value = "acceptedBy", required = false) String acceptedByUuid,
+			@RequestParam(value = "test", required = false) String testConceptUuid,
+			@RequestParam(value = "department", required = false) String departmentUuid,
+			@RequestParam(value = "specimen", required = false) String specimenSourceUuid,
+			@RequestParam(value = "instrument", required = false) String instrumentUuid,
+			@RequestParam(value = "visit", required = false) String visitUuid,
+			@RequestParam(value = "excludeStatus", required = false) String excludeStatus) throws Exception {
+
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-			
+
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			
+
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
-			
+
 		}
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 		if (!excludeAllocations) {
-			ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
-			    testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid,
-			    instrumentUuid, visitUuid, excludeStatus);
+			ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid,
+					sampleCategory,
+					testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid,
+					instrumentUuid, visitUuid, excludeStatus);
 			return sampleResults.toMap();
 		}
 		if (excludeAllocations) {
 			ListResult<SampleExt> sampleResults = laboratoryService.getSamplesWithoutAllocations(start, end, pager,
-			    locationUuid, sampleCategory, testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid,
-			    specimenSourceUuid, instrumentUuid, visitUuid, excludeStatus);
+					locationUuid, sampleCategory, testCategory, q, hasStatus, acceptedByUuid, testConceptUuid,
+					departmentUuid,
+					specimenSourceUuid, instrumentUuid, visitUuid, excludeStatus);
 			return sampleResults.toMap();
 		}
 		return null;
 	}
-	
+
 	@RequestMapping(value = "sampleaccept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> acceptSample(@RequestBody Map<String, Object> sampleStatusWithAllocations)
@@ -313,18 +365,18 @@ public class LaboratoryController {
 		response.put("allocations", savedAllocationsListMap);
 		return response;
 	}
-	
+
 	@RequestMapping(value = "samplestatus", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addSampleStatus(@RequestBody Map<String, Object> sampleStatusObject) throws Exception {
-		
+
 		SampleStatus sampleStatus = SampleStatus.fromMap(sampleStatusObject);
-		
+
 		SampleStatus savedSampleStatus = laboratoryService.updateSampleStatus(sampleStatus);
-		
+
 		return savedSampleStatus.toMap();// sampleStatusResponse;
 	}
-	
+
 	@RequestMapping(value = "sampleorder", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> createsampleorder(@RequestBody Map<String, Object> sampleOrderObject) throws Exception {
@@ -335,7 +387,7 @@ public class LaboratoryController {
 		// save the sampleorder
 		return newSampleOrder.toMap(false);
 	}
-	
+
 	@RequestMapping(value = "sample/{sampleUuid}/orders", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getSampleOrdersBySampleUuid(@PathVariable String sampleUuid) throws Exception {
@@ -348,7 +400,7 @@ public class LaboratoryController {
 		}
 		return orders;
 	}
-	
+
 	@RequestMapping(value = "sampledorders/{visitUuid}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getSampledOrdersByVisit(@PathVariable String visitUuid) throws Exception {
@@ -361,7 +413,7 @@ public class LaboratoryController {
 		}
 		return orders;
 	}
-	
+
 	@RequestMapping(value = "assign", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateSampleOrder(@RequestBody Map<String, Object> sampleOrderObject) throws Exception {
@@ -371,34 +423,35 @@ public class LaboratoryController {
 		// save the sampleorder
 		return newSampleOrder.toMap(false);
 	}
-	
+
 	@RequestMapping(value = "allocation", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> addTestAllocation(@RequestBody Map<String, Object> testAllocationObject) throws Exception {
+	public Map<String, Object> addTestAllocation(@RequestBody Map<String, Object> testAllocationObject)
+			throws Exception {
 		TestAllocation testAllocation = TestAllocation.fromMap(testAllocationObject);
 		TestAllocation createdTestAllocation = laboratoryService.allocateTestWithSample(testAllocation);
 		return createdTestAllocation.toMap();
 	}
-	
+
 	@RequestMapping(value = "allocations", method = RequestMethod.GET)
 	@ResponseBody
 	public List<TestAllocation> getAllocation() {
 		return laboratoryService.getAllAllocations();
-		
+
 	}
-	
+
 	@RequestMapping(value = "allocation", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getAllocation(@RequestParam(value = "uuid", required = true) String uuid) {
 		return laboratoryService.getAllocationByUuid(uuid).toMap();
 	}
-	
+
 	@RequestMapping(value = "allocationsbyorder", method = RequestMethod.GET)
 	@ResponseBody
 	public List<TestAllocation> getAllocationsByOrder(@RequestParam(value = "uuid", required = true) String uuid) {
 		return laboratoryService.getAllocationsByOrder(uuid);
 	}
-	
+
 	@RequestMapping(value = "allocationsbysample", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getAllocationsBySample(
@@ -426,7 +479,7 @@ public class LaboratoryController {
 
 		return allocations;
 	}
-	
+
 	@RequestMapping(value = "results", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addTestAllocationResult(@RequestBody Map<String, Object> resultObject) throws Exception {
@@ -435,7 +488,7 @@ public class LaboratoryController {
 		Result savedResults = laboratoryService.recordTestAllocationResults(result);
 		return savedResults.toMap();
 	}
-	
+
 	@RequestMapping(value = "multipleresults", method = RequestMethod.POST)
 	@ResponseBody
 	public List<Map<String, Object>> saveMultipleResults(@RequestBody List<Map<String, Object>> results)
@@ -449,7 +502,7 @@ public class LaboratoryController {
 		List<Map<String, Object>> savedResultsResponse = laboratoryService.saveMultipleResults(formattedResults);
 		return savedResultsResponse;
 	}
-	
+
 	@RequestMapping(value = "machineobs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> saveMachineObservations(@RequestBody Map<String, Object> machinePayload)
@@ -487,7 +540,7 @@ public class LaboratoryController {
 		response.put("obsWithIssues", obsWithIssues);
 		return response;
 	}
-	
+
 	private void validateMachinePayload(Map<String, Object> machinePayload) {
 		if (machinePayload.get("sampleUuid") == null && machinePayload.get("sampleId") == null) {
 			throw new RuntimeException("Sample identification is missing");
@@ -500,7 +553,7 @@ public class LaboratoryController {
 			throw new RuntimeException("Key `code` on test object is missing");
 		}
 	}
-	
+
 	private Sample getSampleFromPayload(Map<String, Object> machinePayload) {
 		String sampleIdentification = null;
 		if (machinePayload.get("sampleUuid") != null) {
@@ -512,10 +565,10 @@ public class LaboratoryController {
 		}
 		return null;
 	}
-	
+
 	private void processSampleOrders(Sample sample, Map<String, Object> test, List<Map<String, Object>> observations,
-	        List<Map<String, Object>> mappedParameters, List<Result> formattedResults,
-	        List<Map<String, Object>> obsWithIssues) throws Exception {
+			List<Map<String, Object>> mappedParameters, List<Result> formattedResults,
+			List<Map<String, Object>> obsWithIssues) throws Exception {
 		List<SampleOrder> sampleOrders = sample.getSampleOrders();
 		ConceptSource mappingConceptSource = getConceptSource();
 		for (SampleOrder sampleOrder : sampleOrders) {
@@ -524,51 +577,54 @@ public class LaboratoryController {
 			System.out.println("concept----" + mapped);
 			if (mapped) {
 				processTestAllocations(sampleOrder, observations, concept, mappedParameters, formattedResults,
-				    obsWithIssues, mappingConceptSource);
+						obsWithIssues, mappingConceptSource);
 			}
 		}
 	}
-	
+
 	private ConceptSource getConceptSource() throws Exception {
 		AdministrationService administrationService = Context.getAdministrationService();
 		String globalPropertyValue = administrationService
-		        .getGlobalProperty(ICareConfig.MACHINE_INTEGRATION_PRIMARY_CONCEPT_SOURCE);
+				.getGlobalProperty(ICareConfig.MACHINE_INTEGRATION_PRIMARY_CONCEPT_SOURCE);
 		if (globalPropertyValue == null) {
 			throw new RuntimeException("Reference concept source is missing");
 		}
-		
+
 		ConceptSource mappingConceptSource = Context.getConceptService().getConceptSourceByUuid(globalPropertyValue);
 		if (mappingConceptSource == null) {
 			throw new RuntimeException("The configured concept source is not valid");
 		}
-		
+
 		return mappingConceptSource;
 	}
-	
+
 	private boolean isConceptMapped(Concept concept, Map<String, Object> test, ConceptSource mappingConceptSource) {
 		if (!concept.getConceptMappings().isEmpty()) {
 			for (ConceptMap conceptMap : concept.getConceptMappings()) {
 				System.out.println("Codding "
-				        + conceptMap
-				                .getConceptReferenceTerm()
-				                .getConceptSource()
-				                .getUuid()
-				                .equals(
-				                    mappingConceptSource.getUuid()
-				                            + conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))));
-				if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(mappingConceptSource.getUuid())
-				        && conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))) {
+						+ conceptMap
+								.getConceptReferenceTerm()
+								.getConceptSource()
+								.getUuid()
+								.equals(
+										mappingConceptSource.getUuid()
+												+ conceptMap.getConceptReferenceTerm().getCode()
+														.equals(test.get("code"))));
+				if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
+						.equals(mappingConceptSource.getUuid())
+						&& conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))) {
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-	
-	private void processTestAllocations(SampleOrder sampleOrder, List<Map<String, Object>> observations, Concept concept,
-	        List<Map<String, Object>> mappedParameters, List<Result> formattedResults,
-	        List<Map<String, Object>> obsWithIssues, ConceptSource mappingConceptSource) throws ParseException {
-		
+
+	private void processTestAllocations(SampleOrder sampleOrder, List<Map<String, Object>> observations,
+			Concept concept,
+			List<Map<String, Object>> mappedParameters, List<Result> formattedResults,
+			List<Map<String, Object>> obsWithIssues, ConceptSource mappingConceptSource) throws ParseException {
+
 		List<TestAllocation> testAllocations = sampleOrder.getTestAllocations();
 		List<Concept> parameters = concept.getSetMembers();
 		System.out.println("Parameters :" + parameters);
@@ -577,14 +633,14 @@ public class LaboratoryController {
 				String code = extractObservationCode(observation);
 				if (code != null) {
 					processParameters(parameters, code, mappedParameters, formattedResults, obsWithIssues, observation,
-					    testAllocations, mappingConceptSource);
+							testAllocations, mappingConceptSource);
 				} else {
 					obsWithIssues.add(observation);
 				}
 			}
 		}
 	}
-	
+
 	private String extractObservationCode(Map<String, Object> observation) {
 		if (observation.get("loinc") != null) {
 			return observation.get("loinc").toString();
@@ -599,31 +655,31 @@ public class LaboratoryController {
 		}
 		return null;
 	}
-	
+
 	private void processParameters(List<Concept> parameters, String code, List<Map<String, Object>> mappedParameters,
-	        List<Result> formattedResults, List<Map<String, Object>> obsWithIssues, Map<String, Object> observation,
-	        List<TestAllocation> testAllocations, ConceptSource mappingConceptSource) throws ParseException {
-		
+			List<Result> formattedResults, List<Map<String, Object>> obsWithIssues, Map<String, Object> observation,
+			List<TestAllocation> testAllocations, ConceptSource mappingConceptSource) throws ParseException {
+
 		for (Concept parameter : parameters) {
 			for (ConceptMap parameterConceptMap : parameter.getConceptMappings()) {
 				System.out.println("Match parameter concept map :"
-				        + (parameterConceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
-				                .equals(mappingConceptSource.getUuid())));
+						+ (parameterConceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
+								.equals(mappingConceptSource.getUuid())));
 				// && parameterConceptMap.getConceptReferenceTerm().getCode().equals(code)
 				if (parameterConceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
-				        .equals(mappingConceptSource.getUuid())
-				        && parameterConceptMap.getConceptReferenceTerm().getCode().equals(code)) {
+						.equals(mappingConceptSource.getUuid())
+						&& parameterConceptMap.getConceptReferenceTerm().getCode().equals(code)) {
 					saveResults(testAllocations, parameter, observation, formattedResults, mappedParameters);
 					return;
 				}
-				
+
 			}
 		}
 		obsWithIssues.add(observation);
 	}
-	
+
 	private void saveResults(List<TestAllocation> testAllocations, Concept parameter, Map<String, Object> observation,
-	        List<Result> formattedResults, List<Map<String, Object>> mappedParameters) throws ParseException {
+			List<Result> formattedResults, List<Map<String, Object>> mappedParameters) throws ParseException {
 		;
 		for (TestAllocation testAllocation : testAllocations) {
 			if (testAllocation.getTestConcept().getUuid().equals(parameter.getUuid())) {
@@ -635,7 +691,7 @@ public class LaboratoryController {
 		System.out.println("formatted Results :---" + formattedResults);
 		System.out.println("mappedParameters  :---" + mappedParameters);
 	}
-	
+
 	private Map<String, Object> createResultMap(Concept parameter, Map<String, Object> observation,
 			TestAllocation testAllocation) {
 		Map<String, Object> result = new HashMap<>();
@@ -655,9 +711,9 @@ public class LaboratoryController {
 		}
 		return result;
 	}
-	
+
 	private void saveSampleStatus(Sample sample, User user) throws Exception {
-		
+
 		SampleStatus sampleStatus = new SampleStatus();
 		sampleStatus.setUser(user);
 		sampleStatus.setSample(sample);
@@ -666,142 +722,147 @@ public class LaboratoryController {
 		sampleStatus.setCategory("HAS_RESULTS");
 		laboratoryService.saveSampleStatus(sampleStatus);
 	}
-	
+
 	@RequestMapping(value = "voidmultipleresults", method = RequestMethod.PUT)
 	@ResponseBody
-	public List<Map<String, Object>> voidMultipleResults(@RequestBody Map<String, Object> resultsToVoid) throws Exception {
+	public List<Map<String, Object>> voidMultipleResults(@RequestBody Map<String, Object> resultsToVoid)
+			throws Exception {
 		List<Map<String, Object>> savedResultsResponse = laboratoryService.voidMultipleResults(resultsToVoid);
 		return savedResultsResponse;
 	}
-	
+
 	@RequestMapping(value = "resultsinstrument", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> saveResultsInstrument(@RequestBody Map<String, Object> resultsInstrument) throws Exception {
+	public Map<String, Object> saveResultsInstrument(@RequestBody Map<String, Object> resultsInstrument)
+			throws Exception {
 		Map<String, Object> savedResultsInstrumentResponse = laboratoryService.saveResultsInstrument(resultsInstrument);
 		return savedResultsInstrumentResponse;
 	}
-	
+
 	@RequestMapping(value = "results", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Result> getResults() {
 		return laboratoryService.getResults();
 	}
-	
+
 	@RequestMapping(value = "allocationstatus", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addTestAllocationStatus(@RequestBody HashMap<String, Object> testAllocationStatusObject)
-	        throws Exception {
+			throws Exception {
 		TestAllocationStatus testAllocationStatus = TestAllocationStatus.fromMap(testAllocationStatusObject);
-		TestAllocationStatus savedTestAllocationStatus = laboratoryService.updateTestAllocationStatus(testAllocationStatus);
+		TestAllocationStatus savedTestAllocationStatus = laboratoryService
+				.updateTestAllocationStatus(testAllocationStatus);
 		return savedTestAllocationStatus.toMap();
-		
+
 	}
-	
+
 	@RequestMapping(value = "allocationstatuses", method = RequestMethod.POST)
 	@ResponseBody
 	public List<Map<String, Object>> saveTestAllocationStatuses(
-	        @RequestBody List<Map<String, Object>> testAllocationStatusesObject) throws Exception {
+			@RequestBody List<Map<String, Object>> testAllocationStatusesObject) throws Exception {
 		List<TestAllocationStatus> testAllocationStatuses = new ArrayList<TestAllocationStatus>();
 		for (Map<String, Object> testAllocationStatusObject : testAllocationStatusesObject) {
 			System.out.println(testAllocationStatusesObject);
 			TestAllocationStatus testAllocationStatus = TestAllocationStatus.fromMap(testAllocationStatusObject);
 			testAllocationStatuses.add(testAllocationStatus);
 		}
-		
+
 		return laboratoryService.updateTestAllocationStatuses(testAllocationStatuses);
-		
+
 	}
-	
+
 	@RequestMapping(value = "testtime", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addTestTimeConfiguration(@RequestBody HashMap<String, Object> testTimeConfigurationMap) {
-		
+
 		TestTimeConfig testTimeConfig = TestTimeConfig.fromMap(testTimeConfigurationMap);
-		
+
 		Concept testConcept = conceptService.getConceptByUuid(testTimeConfig.getConcept().getUuid());
-		
+
 		testTimeConfig.setConcept(testConcept);
-		
+
 		TestTimeConfig savedTestTimeConfig = laboratoryService.createTestTimeConfig(testTimeConfig);
-		
+
 		return savedTestTimeConfig.toMap();
-		
+
 	}
-	
+
 	@RequestMapping(value = "testtime/{configUUid}", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateTestTimeConfiguration(@PathVariable String configUUid,
-	        @RequestBody Map<String, Object> testTimeConfigurationMap) {
-		
+			@RequestBody Map<String, Object> testTimeConfigurationMap) {
+
 		TestTimeConfig testTimeConfig = TestTimeConfig.fromMap(testTimeConfigurationMap);
-		
+
 		TestTimeConfig oldTestTimeConfig = laboratoryService.getTestTimeConfig(configUUid);
-		
+
 		testTimeConfig.setDateCreated(oldTestTimeConfig.getDateCreated());
-		
+
 		testTimeConfig.setCreator(oldTestTimeConfig.getCreator());
-		
+
 		Concept testConcept = conceptService.getConceptByUuid(testTimeConfig.getConcept().getUuid());
-		
+
 		testTimeConfig.setConcept(testConcept);
-		
+
 		User userUpdating = Context.getAuthenticatedUser();
-		
+
 		testTimeConfig.setChangedBy(userUpdating);
-		
+
 		testTimeConfig.setDateChanged(new Date());
-		
+
 		TestTimeConfig savedTestTimeConfig = laboratoryService.updateTestTimeConfig(testTimeConfig);
-		
+
 		return savedTestTimeConfig.toMap();
-		
+
 	}
-	
+
 	@RequestMapping(value = "testtime", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getTestTimeConfigurations(
-	        @RequestParam(value = "concept", required = false) String conceptUuid, @RequestParam(required = false) String q) {
-		
+			@RequestParam(value = "concept", required = false) String conceptUuid,
+			@RequestParam(required = false) String q) {
+
 		if (conceptUuid == null) {
 			List<TestTimeConfig> testTimeConfigs = this.laboratoryService.getTestTimeConfigs(q);
-			
+
 			List<Map<String, Object>> configsMapList = new ArrayList<Map<String, Object>>();
-			
+
 			for (TestTimeConfig config : testTimeConfigs) {
 				configsMapList.add(config.toMap());
 			}
 			return configsMapList;
-			
+
 		} else {
 			List<TestTimeConfig> testTimeConfigs = this.laboratoryService.getTestTimeConfigByConcept(conceptUuid);
-			
+
 			List<Map<String, Object>> configsMapList = new ArrayList<Map<String, Object>>();
-			
+
 			for (TestTimeConfig config : testTimeConfigs) {
 				configsMapList.add(config.toMap());
 			}
 			return configsMapList;
-			
+
 		}
-		
+
 	}
-	
+
 	@RequestMapping(value = "testtime/{testConfigUuid}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public Map<String, Object> deletetestTimeConfiguration(@PathVariable("testConfigUuid") String testConfigUuid) {
 		TestTimeConfig testTimeConfig = laboratoryService.deleteTestTimeConfiguration(testConfigUuid);
 		return testTimeConfig.toMap();
 	}
-	
+
 	@RequestMapping(value = "testrange", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String, Object> addTestRangeConfiguration(@RequestBody HashMap<String, Object> testRangeConfigurationMap) {
-		
+	public Map<String, Object> addTestRangeConfiguration(
+			@RequestBody HashMap<String, Object> testRangeConfigurationMap) {
+
 		TestRangeConfig testRangeConfig = TestRangeConfig.fromMap(testRangeConfigurationMap);
-		
+
 		List<TestRangeConfig> testRangeConfigs = laboratoryService.getTestRangeByConceptAndGender(testRangeConfig
-		        .getConcept().getUuid(), testRangeConfig.getGender());
-		
+				.getConcept().getUuid(), testRangeConfig.getGender());
+
 		// if(testRangeConfigs.size() > 0){
 		//
 		// Map<String, Object> configsExistNotification = new HashMap<>();
@@ -812,73 +873,73 @@ public class LaboratoryController {
 		// return configsExistNotification;
 		//
 		// }
-		
+
 		Concept testConcept = conceptService.getConceptByUuid(testRangeConfig.getConcept().getUuid());
-		
+
 		testRangeConfig.setConcept(testConcept);
-		
+
 		TestRangeConfig savedTestRangeConfig = laboratoryService.createTestRangeConfig(testRangeConfig);
-		
+
 		return savedTestRangeConfig.toMap();
-		
+
 	}
-	
+
 	@RequestMapping(value = "testrange/{configUuid}", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateTestRangeConfiguration(@PathVariable String configUuid,
-	        @RequestBody HashMap<String, Object> testRangeConfigurationMap) {
-		
+			@RequestBody HashMap<String, Object> testRangeConfigurationMap) {
+
 		TestRangeConfig testRangeConfig = TestRangeConfig.fromMap(testRangeConfigurationMap);
-		
+
 		TestRangeConfig oldTestRangeConfig = laboratoryService.getTestRangeConfig(configUuid);
-		
+
 		testRangeConfig.setDateCreated(oldTestRangeConfig.getDateCreated());
-		
+
 		testRangeConfig.setCreator(oldTestRangeConfig.getCreator());
-		
+
 		Concept testConcept = conceptService.getConceptByUuid(testRangeConfig.getConcept().getUuid());
-		
+
 		testRangeConfig.setConcept(testConcept);
-		
+
 		User userUpdating = Context.getAuthenticatedUser();
-		
+
 		testRangeConfig.setChangedBy(userUpdating);
-		
+
 		testRangeConfig.setDateChanged(new Date());
-		
+
 		TestRangeConfig updatedTestRangeConfig = laboratoryService.updateTestRangeConfig(testRangeConfig);
-		
+
 		return updatedTestRangeConfig.toMap();
-		
+
 	}
-	
+
 	@RequestMapping(value = "testrange", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getTestRangeConfigurations(
-	        @RequestParam(value = "concept", required = false) String conceptUuid) {
-		
+			@RequestParam(value = "concept", required = false) String conceptUuid) {
+
 		if (conceptUuid == null) {
 			List<TestRangeConfig> testRangeConfigs = this.laboratoryService.getTestRangeConfigs();
-			
+
 			List<Map<String, Object>> configsMapList = new ArrayList<Map<String, Object>>();
-			
+
 			for (TestRangeConfig config : testRangeConfigs) {
 				configsMapList.add(config.toMap());
 			}
 			return configsMapList;
-			
+
 		} else {
 			List<TestRangeConfig> testRangeConfigs = this.laboratoryService.getTestRangeConfigByConcept(conceptUuid);
-			
+
 			List<Map<String, Object>> configsMapList = new ArrayList<Map<String, Object>>();
-			
+
 			for (TestRangeConfig config : testRangeConfigs) {
 				configsMapList.add(config.toMap());
 			}
 			return configsMapList;
 		}
 	}
-	
+
 	@RequestMapping(value = "sampleidgen", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> generateSampleLabel() {
@@ -887,151 +948,152 @@ public class LaboratoryController {
 		label.put("label", sampleLabel);
 		return label;
 	}
-	
+
 	@RequestMapping(value = "labidgen", method = RequestMethod.GET)
 	@ResponseBody
 	public List<String> generateLaboratoryIdLabels(
-	        @RequestParam(value = "globalProperty", required = true) String globalProperty,
-	        @RequestParam(value = "metadataType", required = true) String metadataType,
-	        @RequestParam(value = "count", required = false) Integer count) {
+			@RequestParam(value = "globalProperty", required = true) String globalProperty,
+			@RequestParam(value = "metadataType", required = true) String metadataType,
+			@RequestParam(value = "count", required = false) Integer count) {
 		List<String> labLabels = laboratoryService.generateLaboratoryIdLabels(globalProperty, metadataType, count);
 		return labLabels;
 	}
-	
+
 	@RequestMapping(value = "samplelable", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> geenerateSampleLable() {
-		
+
 		// check if there is a lable existing
 		List<SampleLable> sampleLables = laboratoryService.getSampleLables();
-		
+
 		if (sampleLables.size() > 0) {
-			
+
 			SampleLable existingSampleLable = sampleLables.get(0);
 			Date lastDate = existingSampleLable.getTime();
-			
+
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(lastDate);
-			
+
 			Integer existingMonth = calendar.get(Calendar.MONTH);
 			Integer existingDate = calendar.get(Calendar.DATE);
-			
+
 			Date now = new Date();
 			Calendar calendar1 = Calendar.getInstance();
 			Integer currentMonth = calendar1.get(Calendar.MONTH);
 			Integer currentDate = calendar1.get(Calendar.DATE);
-			
+
 			if (currentDate == existingDate && currentMonth == existingMonth) {
 				SampleLable sampleLable = new SampleLable();
 				sampleLable.setTime(now);
 				sampleLable.setCurrentLable(existingSampleLable.getCurrentLable() + 1);
 				sampleLable.setId(existingSampleLable.getId());
-				
+
 				SampleLable savedSampleLable = laboratoryService.updateSampleLable(sampleLable,
-				    existingSampleLable.getCurrentLable());
-				
+						existingSampleLable.getCurrentLable());
+
 				return savedSampleLable.toMap();
 			} else {
-				
+
 				SampleLable sampleLable = new SampleLable();
 				sampleLable.setTime(now);
 				sampleLable.setCurrentLable(1);
 				sampleLable.setId(existingSampleLable.getId());
-				
+
 				SampleLable savedSampleLable = laboratoryService.updateSampleLable(sampleLable,
-				    existingSampleLable.getCurrentLable());
-				
+						existingSampleLable.getCurrentLable());
+
 				return savedSampleLable.toMap();
-				
+
 			}
 		} else {
-			
+
 			SampleLable sampleLable = new SampleLable();
 			sampleLable.setCurrentLable(1);
-			
+
 			Date currentTime = new Date();
 			sampleLable.setTime(currentTime);
-			
+
 			SampleLable savedSampleLable = laboratoryService.addSampleLable(sampleLable);
-			
+
 			return savedSampleLable.toMap();
-			
+
 		}
-		
+
 	}
-	
+
 	@RequestMapping(value = "testorderlocation", method = RequestMethod.POST)
 	@ResponseBody
 	public TestOrderLocation createTestOrderWithLocation(@RequestBody Map<String, Object> testOrderLocation) {
-		
+
 		return laboratoryService.addTestOrderWithLocation(TestOrderLocation.fromMap(testOrderLocation));
-		
+
 	}
-	
+
 	@RequestMapping(value = "workloadsummary", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> onGetWorkloadSummary(@RequestParam(value = "startDate", required = false) String startDate,
-	        @RequestParam(value = "endDate", required = false) String endDate) throws ParseException {
-		
+	public Map<String, Object> onGetWorkloadSummary(
+			@RequestParam(value = "startDate", required = false) String startDate,
+			@RequestParam(value = "endDate", required = false) String endDate) throws ParseException {
+
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-			
+
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-			
+
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
-			
+
 		}
-		
+
 		WorkloadSummary workloadSummary = laboratoryService.getWorkLoadSummary(start, end);
-		
+
 		return workloadSummary.toMap();
 	}
-	
+
 	@RequestMapping(value = "batches", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addBatch(@RequestBody List<Map<String, Object>> batchesObject) throws Exception {
-		
+
 		Batch batch = new Batch();
 		List<Map<String, Object>> newBatches = new ArrayList<Map<String, Object>>();
-		
+
 		for (Map<String, Object> batchObject : batchesObject) {
-			
+
 			batch = Batch.fromMap(batchObject);
-			
+
 			if ((batchObject.get("batchSet")) != null) {
-				
+
 				BatchSet batchSet = laboratoryService.getBatchSetByUuid(((Map) batchObject.get("batchSet")).get("uuid")
-				        .toString());
+						.toString());
 				batch.setBatchSet(batchSet);
 			}
-			
+
 			Batch newBatch = laboratoryService.addBatch(batch);
 			newBatches.add(newBatch.toMap());
 		}
 		return newBatches;
 	}
-	
+
 	@RequestMapping(value = "batches", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getbatches(@RequestParam(value = "startDate", required = false) String startDate,
-	        @RequestParam(value = "endDate", required = false) String endDate,
-	        @RequestParam(value = "uuid", required = false) String uuid,
-	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
-	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
-		
+			@RequestParam(value = "endDate", required = false) String endDate,
+			@RequestParam(value = "uuid", required = false) String uuid,
+			@RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+			@RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-			
+
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
 		}
-		
+
 		List<Batch> batches = laboratoryService.getBatches(start, end, uuid, q, startIndex, limit);
-		
+
 		List<Map<String, Object>> responseBatchesObject = new ArrayList<Map<String, Object>>();
 		for (Batch batch : batches) {
 			Map<String, Object> batchObject = batch.toMap();
@@ -1039,16 +1101,16 @@ public class LaboratoryController {
 		}
 		return responseBatchesObject;
 	}
-	
+
 	@RequestMapping(value = "batchSample", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getBatchSampleByUuid(@RequestParam(value = "uuid", required = true) String uuid)
-	        throws Exception {
-		
+			throws Exception {
+
 		BatchSample batchSample = laboratoryService.getBatchSampleByUuid(uuid);
 		return batchSample.toMap();
 	}
-	
+
 	@RequestMapping(value = "batchsamples", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addBatchSamples(@RequestBody List<Map<String, Object>> batchSamplesObject)
@@ -1066,7 +1128,7 @@ public class LaboratoryController {
 
 		return newBatchSamples;
 	}
-	
+
 	@RequestMapping(value = "batchsamples", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getBatchSamples(
@@ -1096,53 +1158,53 @@ public class LaboratoryController {
 		return responseBatchSampleObject;
 
 	}
-	
+
 	@RequestMapping(value = "batchsets", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addBatchSet(@RequestBody List<Map<String, Object>> batchSetsObject) {
-		
+
 		BatchSet batchSet = new BatchSet();
 		List<Map<String, Object>> newBatchSets = new ArrayList<Map<String, Object>>();
-		
+
 		for (Map<String, Object> batchSetObject : batchSetsObject) {
-			
+
 			batchSet = BatchSet.fromMap(batchSetObject);
 			BatchSet newBatchSet = laboratoryService.addBatchSet(batchSet);
 			newBatchSets.add(newBatchSet.toMap());
 		}
-		
+
 		return newBatchSets;
-		
+
 	}
-	
+
 	@RequestMapping(value = "batchstatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> addBatchStatus(@RequestBody Map<String, Object> batchStatusObject) throws Exception {
-		
+
 		BatchStatus batchStatus = BatchStatus.fromMap(batchStatusObject);
 		BatchStatus savedBatchStatus = laboratoryService.addBatchStatus(batchStatus);
-		
+
 		return savedBatchStatus.toMap();
 	}
-	
+
 	@RequestMapping(value = "batchsets", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getbatchsets(@RequestParam(value = "startDate", required = false) String startDate,
-	        @RequestParam(value = "endDate", required = false) String endDate,
-	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
-	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
-		
+			@RequestParam(value = "endDate", required = false) String endDate,
+			@RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+			@RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-			
+
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
 		}
-		
+
 		List<BatchSet> batchsets = laboratoryService.getBatchSets(start, end, q, startIndex, limit);
-		
+
 		List<Map<String, Object>> responseBatchSetsObject = new ArrayList<Map<String, Object>>();
 		for (BatchSet batchSet : batchsets) {
 			Map<String, Object> batchObject = batchSet.toMap();
@@ -1150,45 +1212,47 @@ public class LaboratoryController {
 		}
 		return responseBatchSetsObject;
 	}
-	
+
 	@RequestMapping(value = "batchsetstatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public Map<String, Object> addBatchSetStatus(@RequestBody Map<String, Object> batchSetStatusObject) throws Exception {
-		
+	public Map<String, Object> addBatchSetStatus(@RequestBody Map<String, Object> batchSetStatusObject)
+			throws Exception {
+
 		BatchSetStatus batchSetStatus = BatchSetStatus.fromMap(batchSetStatusObject);
 		BatchSetStatus savedbatchSetStatus = laboratoryService.addBatchSetStatus(batchSetStatus);
-		
+
 		return savedbatchSetStatus.toMap();
-		
+
 	}
-	
+
 	@RequestMapping(value = "worksheets", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getWorkSheets(@RequestParam(value = "startDate", required = false) String startDate,
-	        @RequestParam(value = "endDate", required = false) String endDate,
-	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
-	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
-		
+	public List<Map<String, Object>> getWorkSheets(
+			@RequestParam(value = "startDate", required = false) String startDate,
+			@RequestParam(value = "endDate", required = false) String endDate,
+			@RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+			@RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-			
+
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
 		}
-		
+
 		List<Worksheet> worksheets = laboratoryService.getWorksheets(start, end, q, startIndex, limit);
-		
+
 		List<Map<String, Object>> responseWorkSheetsObject = new ArrayList<Map<String, Object>>();
 		for (Worksheet worksheet : worksheets) {
 			Map<String, Object> worksheetObject = worksheet.toMap();
 			responseWorkSheetsObject.add(worksheetObject);
 		}
-		
+
 		return responseWorkSheetsObject;
 	}
-	
+
 	@RequestMapping(value = "worksheets", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addWorksheet(@RequestBody List<Map<String, Object>> worksheetsObject) {
@@ -1218,35 +1282,36 @@ public class LaboratoryController {
 		return newWorksheets;
 
 	}
-	
+
 	@RequestMapping(value = "worksheetcontrols", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getWorkSheetControls(
-	        @RequestParam(value = "startDate", required = false) String startDate,
-	        @RequestParam(value = "endDate", required = false) String endDate,
-	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
-	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
-		
+			@RequestParam(value = "startDate", required = false) String startDate,
+			@RequestParam(value = "endDate", required = false) String endDate,
+			@RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+			@RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-			
+
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
 		}
-		
-		List<WorksheetControl> worksheetControls = laboratoryService.getWorksheetControls(start, end, q, startIndex, limit);
-		
+
+		List<WorksheetControl> worksheetControls = laboratoryService.getWorksheetControls(start, end, q, startIndex,
+				limit);
+
 		List<Map<String, Object>> responseWorkSheetControlsObject = new ArrayList<Map<String, Object>>();
 		for (WorksheetControl worksheetControl : worksheetControls) {
 			Map<String, Object> worksheetControlObject = worksheetControl.toMap();
 			responseWorkSheetControlsObject.add(worksheetControlObject);
 		}
-		
+
 		return responseWorkSheetControlsObject;
 	}
-	
+
 	@RequestMapping(value = "worksheetcontrols", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addWorksheetControl(
@@ -1270,16 +1335,16 @@ public class LaboratoryController {
 		return newWorksheetControls;
 
 	}
-	
+
 	@RequestMapping(value = "worksheetdefinition", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getWorksheetDefinitionByUuid(@RequestParam(value = "uuid", required = true) String uuid)
-	        throws ParseException {
-		
+			throws ParseException {
+
 		Map<String, Object> worksheetDefinition = laboratoryService.getWorksheetDefinitionByUuid(uuid);
 		return worksheetDefinition;
 	}
-	
+
 	@RequestMapping(value = "worksheetdefinitions", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getWorksheetDefinitions(
@@ -1315,7 +1380,7 @@ public class LaboratoryController {
 		}
 		return worksheetDefinitionsObject;
 	}
-	
+
 	@RequestMapping(value = "worksheetdefinitions", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addWorksheetDefinitions(
@@ -1333,7 +1398,7 @@ public class LaboratoryController {
 		}
 		return newWorksheetDefinitions;
 	}
-	
+
 	@RequestMapping(value = "worksheetsamples", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getWorksheetSamples(
@@ -1363,7 +1428,7 @@ public class LaboratoryController {
 		}
 		return worksheetSamplesObject;
 	}
-	
+
 	@RequestMapping(value = "worksheetsamples", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addWorksheetSamples(@RequestBody List<Map<String, Object>> worksheetSamplesObject)
@@ -1381,28 +1446,30 @@ public class LaboratoryController {
 		}
 		return newWorksheetSamples;
 	}
-	
+
 	@RequestMapping(value = "worksheetstatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public Map<String, Object> addWorksheetStatus(@RequestBody Map<String, Object> worksheetStatusObject) throws Exception {
-		
+	public Map<String, Object> addWorksheetStatus(@RequestBody Map<String, Object> worksheetStatusObject)
+			throws Exception {
+
 		WorksheetStatus worksheetStatus = WorksheetStatus.fromMap(worksheetStatusObject);
 		WorksheetStatus newWorksheetStatus = laboratoryService.addWorksheetStatus(worksheetStatus);
 		return newWorksheetStatus.toMap();
-		
+
 	}
-	
+
 	@RequestMapping(value = "worksheetsamplestatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> addWorksheetSampleStatus(@RequestBody Map<String, Object> worksheetSampleObject)
-	        throws Exception {
-		
+			throws Exception {
+
 		WorksheetSampleStatus worksheetSampleStatus = WorksheetSampleStatus.fromMap(worksheetSampleObject);
-		WorksheetSampleStatus newWorksheetSampleStatus = laboratoryService.addWorksheetSampleStatus(worksheetSampleStatus);
-		
+		WorksheetSampleStatus newWorksheetSampleStatus = laboratoryService
+				.addWorksheetSampleStatus(worksheetSampleStatus);
+
 		return newWorksheetSampleStatus.toMap();
 	}
-	
+
 	@RequestMapping(value = "associatedfields", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addAssociatedFields(
@@ -1421,7 +1488,7 @@ public class LaboratoryController {
 		return createdAssociatedFieldsListMap;
 
 	}
-	
+
 	@RequestMapping(value = "associatedfields", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getAssociatedFields(@RequestParam(required = false, value = "q") String q,
@@ -1437,27 +1504,27 @@ public class LaboratoryController {
 
 		return responseAssociatedFields;
 	}
-	
+
 	@RequestMapping(value = "associatedfield/{associatedFieldUuid}", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getAssociatedFieldByUuid(@PathVariable String associatedFieldUuid) {
-		
+
 		AssociatedField associatedField = laboratoryService.getAssociatedFieldByUuid(associatedFieldUuid);
 		return associatedField.toMap();
 	}
-	
+
 	@RequestMapping(value = "associatedfield/{associatedFieldUuid}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> updateAssociatedField(@PathVariable String associatedFieldUuid,
-	        @RequestBody Map<String, Object> associatedFieldMap) {
-		
+			@RequestBody Map<String, Object> associatedFieldMap) {
+
 		AssociatedField associatedField = AssociatedField.fromMap(associatedFieldMap);
 		AssociatedField updatedAssociatedField = laboratoryService.updateAssociatedField(associatedFieldUuid,
-		    associatedField);
-		
+				associatedField);
+
 		return updatedAssociatedField.toMap();
 	}
-	
+
 	@RequestMapping(value = "testallocationassociatedfields", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addTestAllocationAssociatedFields(
@@ -1478,7 +1545,7 @@ public class LaboratoryController {
 
 		return createdAllocationAssociatedField;
 	}
-	
+
 	@RequestMapping(value = "testallocationassociatedfields", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getTestAllocationAssociatedField(
@@ -1499,7 +1566,7 @@ public class LaboratoryController {
 
 		return testAllocationAssociatedFieldsListMap;
 	}
-	
+
 	@RequestMapping(value = "associatedfieldresults", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addAssociatedFieldResult(
@@ -1516,7 +1583,7 @@ public class LaboratoryController {
 		}
 		return createdAssociatedFieldResultListMap;
 	}
-	
+
 	@RequestMapping(value = "associatedfieldresults", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getAssociatedFieldResults(

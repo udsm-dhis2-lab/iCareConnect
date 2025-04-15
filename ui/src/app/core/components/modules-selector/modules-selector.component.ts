@@ -210,7 +210,6 @@ export class ModulesSelectorComponent implements OnInit {
         !navigationDetails?.path[0])
         ? false
         : true;
-    // console.log("navigationDetails", navigationDetails);
 
     this.store.dispatch(
       go({
@@ -233,7 +232,7 @@ export class ModulesSelectorComponent implements OnInit {
                 ? navigationDetails?.path[0]
                 : this.currentModule?.id,
             ],
-        query: { queryParams: navigationDetails["queryParams"] },
+        query: { queryParams: (navigationDetails??{})["queryParams"] },
       })
     );
     this.locationStatusControl();
