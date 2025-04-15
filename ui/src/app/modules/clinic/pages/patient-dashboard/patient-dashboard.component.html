@@ -66,7 +66,9 @@
         params?.currentUser
       )
     "
-  ></app-shared-patient-dashboard>
+    (patientVisitDetails)="handlePatientVisitDetails($event)"
+
+  ></app-shared-patient-dashboard> 
   <div *ngIf="errors">
     <app-shared-error [errors]="errors"></app-shared-error>
   </div>
@@ -101,3 +103,11 @@
     "
   ></mat-progress-bar>
 </div>
+
+
+<ng-container *ngIf="showPatientModal">
+  <app-finger-print
+    detail="Patient's"
+    (modalClosed)="closePatientModal()">
+  </app-finger-print>
+</ng-container>

@@ -43,13 +43,15 @@ import { ProgramGet, ProgramGetFull } from "src/app/shared/resources/openmrs";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
-
+import { FingerprintService, InsuranceService } from "src/app/shared/services";
+import { InsuranceResponse } from "src/app/modules/billing/models/insurance-response.model";
 @Component({
   selector: "app-visit",
   templateUrl: "./visit.component.html",
   styleUrls: ["./visit.component.scss"],
 })
 export class VisitComponent implements OnInit {
+  selectedId: string = "insuranceId";
   params: any;
   name: string;
   dob: string;
@@ -64,6 +66,7 @@ export class VisitComponent implements OnInit {
   editMode: boolean = false;
   disableEditingPayments: boolean = false;
   isEmergencyVisit: boolean = false;
+  CardNo: string;
 
   existingVisitUuid: string;
 
@@ -87,6 +90,7 @@ export class VisitComponent implements OnInit {
   currentPaymentCategory: any;
   missingBillingConceptError: string;
   allProgarm: Observable<any>;
+  private rawData: string;
 
   @Input() visitTypes: any;
   @Input() servicesConfigs: any;
@@ -102,7 +106,11 @@ export class VisitComponent implements OnInit {
   @Input() patientVisitsCount: number;
   @Output() editPatient = new EventEmitter<any>();
   @Output() startVisitEvent = new EventEmitter<any>();
-
+  @Output() fingerprintCaptured = new EventEmitter<string>();
+  @Output() modalClosed = new EventEmitter<void>();
+  showMessage: boolean = false;
+  showLoader: boolean = false;
+  // rawData: string;
   searchTerm: string;
   currentRoom: any;
   atLeastOneItemToEditSelected: boolean = false;
@@ -129,6 +137,22 @@ export class VisitComponent implements OnInit {
   visible: boolean = false;
   enrolledPrograms: ProgramGetFull[];
   remoteReferralDetails$: Observable<any>;
+  InsuranceID: string = "";
+  showModal = false;
+  authorizationNo: string;
+  cardNumber: string = "";
+  // showMessage: boolean = false;
+  // showLoader: boolean = false;
+
+  openModal() {
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
+    this.showMessage = false;
+    this.showLoader = false;
+  }
 
   constructor(
     private store: Store<AppState>,
@@ -141,7 +165,8 @@ export class VisitComponent implements OnInit {
     private systemSettingsService: SystemSettingsService,
     private conceptsService: ConceptsService,
     private googleAnalyticsService: GoogleAnalyticsService,
-    private httpClientService: OpenmrsHttpClientService
+    private httpClientService: OpenmrsHttpClientService,
+    private insuranceService: InsuranceService
   ) {}
 
   dismissAlert() {
@@ -174,6 +199,9 @@ export class VisitComponent implements OnInit {
           : data?.length > 0
           ? data
           : null;
+
+      // console.log("chargerrrrrrrr",this.visitDetails["InsuranceID"]);
+      // this.InsuranceID = this.visitDetails["InsuranceID"];
     });
     this.verticalPrograms$ = this.programsService.getAllPrograms(["v=full"]);
     this.currentPatient$ = this.store.pipe(select(getCurrentPatient));
@@ -214,6 +242,11 @@ export class VisitComponent implements OnInit {
           : [];
     });
   }
+
+  // onNationalIdInput(event: any): void {
+  //   const inputValue = event.target.value;
+  //   event.target.value = inputValue.replace(/\D/g, "");
+  // }
 
   openDialog(locations) {
     const dialogRef = this.dialog.open(SelectRoomComponent, {
@@ -1025,9 +1058,119 @@ export class VisitComponent implements OnInit {
             visitType?.name.toLowerCase().indexOf("ipd") > -1
         ) || [];
   }
-
+  getCardNumber() {
+    this.insuranceService.getCardNumberByNida(this.nidaData).subscribe({
+      next: (response) => {
+        const nidaResponse = response;
+        this.authorizationData.cardNo = nidaResponse.body.CardNo;
+        setTimeout(() => {
+          this.authorizeInsurance();
+        }, 2000);
+        console.log("Payload Sent",this.authorizationData);
+      },
+      error: (error) => {
+        console.error("Error during authorization:", error);
+        this.showLoader = false;
+      },
+    });
+  }
   onSetEditPatient(event, path, patientUuid) {
     event.stopPropagation();
     this.editPatient.emit(path + patientUuid);
   }
+
+  onInsuranceIDChange(newValue: string): void {
+    this.authorizationData.cardNo = newValue;
+    console.log(this.authorizationData.cardNo);
+  }
+
+  onNationalIDChange(newValue: string): void {
+    // this.nidaData.nationalID = newValue;
+    this.nidaData.nationalID = newValue;
+    console.log("National ID", this.nidaData.nationalID);
+  }
+
+  authorizationData = {
+    cardNo: "",
+    biometricMethod: "string",
+    nationalID: "",
+    fpCode: "R1",
+    imageData: "",
+    visitTypeID: 1,
+    referralNo: "string",
+    remarks: "Authorization",
+  };
+
+  nidaData = {
+    nationalID: "",
+  };
+
+  onNationalIdInput(event: any): void {
+    const inputValue = event.target.value;
+    event.target.value = inputValue.replace(/\D/g, "");
+  }
+
+  authorizeInsurance() {
+    if (!this.authorizationData.nationalID) {
+      this.authorizationData.nationalID = "string";
+    }
+
+    if (!this.authorizationData.cardNo) {
+      this.authorizationData.cardNo = "string";
+    }
+    if (!this.authorizationData.imageData) {
+      this.authorizationData.imageData = "string";
+    }
+
+    if (this.rawData) {
+      this.authorizationData.imageData = this.rawData;
+      this.showLoader = true;
+    }
+
+    this.insuranceService
+      .authorizeInsuranceCard(this.authorizationData)
+      .subscribe({
+        next: (response) => {
+          const typedResponse = response;
+          this.authorizationNo = typedResponse.body.AuthorizationNo;
+          this.visitDetails["InsuranceAuthNo"] = this.authorizationNo;
+          this.showLoader = false;
+          // this.showMessage = true;
+          this.closeModal();
+        },
+        error: (error) => {
+          console.error("Error during authorization:", error);
+          this.showLoader = false;
+        },
+      });
+  }
+
+  onFingerprintCaptured(rawData: string) {
+    this.rawData = rawData;
+    if (this.nidaData.nationalID && this.rawData) {
+      console.log("NIDA ---", this.nidaData.nationalID);
+      this.getCardNumber();
+    } else {
+      console.log("Card Number ---", this.nidaData.nationalID);
+      setTimeout(() => {
+        this.authorizeInsurance();
+      }, 2000);
+    }
+  }
+
+  // onFingerprintCaptured(rawData: string) {
+  //   this.rawData = rawData;
+  //   if (this.nidaData.nationalID) {
+  //     setTimeout(() => {
+  //       this.getCardNumber();
+  //       setTimeout(() => {
+  //         this.authorizeInsurance();
+  //       }, 2000);
+  //     }, 2000);
+  //   } else {
+  //     setTimeout(() => {
+  //       this.authorizeInsurance();
+  //     }, 2000);
+  //   }
+  // }
 }

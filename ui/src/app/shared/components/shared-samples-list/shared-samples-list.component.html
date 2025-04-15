@@ -654,6 +654,10 @@
                   >
                     View samples
                   </button>
+                  <ng-container *ngIf="showModal">
+                    <app-finger-print detail="Patient's" (modalClosed)="closeModal()"> </app-finger-print>
+                  </ng-container>
+              
                 </div>
               </td>
             </tr>
@@ -867,6 +871,10 @@
                                     >
                                       Accept
                                     </button>
+                                    
+                                    <ng-container *ngIf="showModal">
+                                      <app-finger-print detail="Patient's" (modalClosed)="closeModal()"></app-finger-print>
+                                    </ng-container>
 
                                     <button
                                       mat-stroked-button

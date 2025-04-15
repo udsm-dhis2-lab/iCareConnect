@@ -33,6 +33,15 @@ import { getCurrentPatient } from "src/app/store/selectors/current-patient.selec
 import { BillingService } from "src/app/modules/billing/services/billing.service";
 import { PaymentService } from "src/app/modules/billing/services/payment.service";
 import { VisitsService } from "src/app/shared/resources/visits/services";
+import { FingerPrintComponent } from "src/app/shared/components/finger-print/finger-print.component";
+import { InsuranceService } from "src/app/shared/services";
+import { NHIFPointOfCareI } from "src/app/shared/resources/store/models/insurance-nhif.model";
+import {
+  getListofPointOfCare,
+  getPointOfCareLoading,
+} from "src/app/store/selectors/insurance-nhif-point-of-care.selectors";
+import { loadPointOfCare } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
+import { selectNHIFPractitionerDetails } from "src/app/store/selectors/insurance-nhif-practitioner.selectors";
 
 @Component({
   selector: "app-patient-dashboard",
@@ -57,6 +66,12 @@ export class PatientDashboardComponent implements OnInit {
   IPDRoundConceptUuid$: Observable<any>;
   patient$: Observable<any>;
   patientBillingDetails$: Observable<any>;
+  showDoctorModal = false;
+  showPatientModal = false;
+  pointOfCares$: Observable<NHIFPointOfCareI[]>; // Observable to hold NHIFPointOfCare data
+  isLoading$: Observable<boolean>; // Observable to track loading state
+  patientData: any;
+
   constructor(
     private store: Store<AppState>,
     private route: ActivatedRoute,
@@ -64,10 +79,32 @@ export class PatientDashboardComponent implements OnInit {
     private dialog: MatDialog,
     private visitService: VisitsService,
     private billingService: BillingService,
-    private paymentService: PaymentService
+    private paymentService: PaymentService,
+    private insuranceService: InsuranceService
   ) {}
 
   ngOnInit(): void {
+    this.patientData = history.state.patientData;  // Access patient data
+    console.log("Received patient data: ", this.patientData);
+    this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
+      console.log('Practitioner Details in State:', data);
+    });
+    // Dispatch the action to fetch data from API
+    this.store.dispatch(loadPointOfCare());
+
+    this.pointOfCares$ = this.store.select(getListofPointOfCare);
+    this.isLoading$ = this.store.select(getPointOfCareLoading);
+
+    // Subscribe and log values
+    this.pointOfCares$.subscribe((data) => {
+      console.log("NHIF Point of Care Data:", data);
+    });
+
+    this.isLoading$.subscribe((isLoading) => {
+      console.log("Loading State:", isLoading);
+    });
+    this.showDoctorModal = true;
+    this.showPatientModal = false;
     this.IPDRoundConceptUuid$ = this.systemSettingsService
       .getSystemSettingsByKey("iCare.ipd.settings.IPDRoundConceptUuid")
       .pipe(
@@ -182,6 +219,11 @@ export class PatientDashboardComponent implements OnInit {
         );
       }
     });
+
+    // Subscribe to visit$ observable and log the value
+    this.patientBillingDetails$.subscribe((visit) => {
+      console.log("Testermmm....>>>.", visit);
+    });
   }
 
   dischargePatient(
@@ -218,5 +260,33 @@ export class PatientDashboardComponent implements OnInit {
         invoice: dischargeInfo?.invoice,
       },
     });
+  }
+
+  handlePatientVisitDetails(event, patientVisitDetails): void {
+    console.log("patient visit details..kallll", patientVisitDetails);
+  }
+
+  // openAuthorizationModal() {
+  //   const dialogRef = this.dialog.open(FingerPrintComponent, {
+  //     width: "400px",
+  //     disableClose: true,
+  //     data: {
+  //       detail: 'Patient 12'
+  //     }
+  //   });
+
+  //   dialogRef.afterClosed().subscribe((result) => {
+  //     if (result) {
+  //       console.log("Authorization Number:", result);
+  //       // Handle authorization number (e.g., store, validate, etc.)
+  //     }
+  //   });
+  // }
+
+
+  closeDoctorModal(success: boolean) {
+    this.showDoctorModal = false;
+
+    this.showPatientModal = true; // Move to patient scan
   }
 }

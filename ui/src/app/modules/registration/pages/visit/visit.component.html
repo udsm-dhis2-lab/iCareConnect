@@ -659,20 +659,90 @@
                       visitDetails['Insurance'])
                   "
                 >
-                  <mat-form-field
+                  <mat-radio-group [(ngModel)]="selectedId">
+                    <mat-radio-button value="insuranceId" color="primary">
+                      Insurance ID
+                    </mat-radio-button>
+                    <mat-radio-button value="nationalId" color="primary">
+                      National ID
+                    </mat-radio-button>
+                  </mat-radio-group>
+
+                  <div class="input-container">
+                    <!-- <mat-form-field
+                      class="w-100"
+                      appearance="fill"
+                      floatLabel="always"
+                    > -->
+                    <mat-form-field
+                      *ngIf="selectedId === 'insuranceId'"
+                      class="w-100"
+                      appearance="fill"
+                      floatLabel="always"
+                    >
+                      <mat-label>Insurance ID</mat-label>
+                      <input
+                        matInput
+                        pattern="\d{12}"
+                        placeholder="Enter Text"
+                        [(ngModel)]="visitDetails['InsuranceID']"
+                        (ngModelChange)="onInsuranceIDChange($event)"
+                     
+                        
+                      />
+                    </mat-form-field>
+
+                    <!-- <mat-form-field
                     class="w-100"
                     appearance="fill"
                     floatLabel="always"
-                  >
-                    <mat-label>Insurance ID</mat-label>
-                    <input
-                      matInput
-                      pattern="\d{12}"
-                      placeholder="Enter Text"
-                      [(ngModel)]="visitDetails['InsuranceID']"
-                    />
-                  </mat-form-field>
+                  > -->
+                    <mat-form-field
+                      *ngIf="selectedId === 'nationalId'"
+                      class="w-100"
+                      appearance="fill"
+                      floatLabel="always"
+                    >
+                      <mat-label>National ID</mat-label>
+                      <input
+                        matInput
+                        type="text"
+                        pattern="\d{20}"
+                        maxlength="20"
+                        placeholder="Enter National ID"
+                        (input)="onNationalIdInput($event)"
+                        [(ngModel)]="NationalID"
+                        (ngModelChange)="onNationalIDChange($event)"
+                      />
+                    </mat-form-field>
 
+                    <div class="fingerprint-box">
+                      <button
+                        mat-icon-button
+                        class="fingerprint-btn"
+                        (click)="openModal()"
+                      >
+                        <mat-icon>fingerprint</mat-icon>
+                      </button>
+                    </div>
+
+                  </div>
+                  <ng-container *ngIf="showModal">
+                    <app-finger-print (modalClosed)="closeModal()"
+                    (fingerprintCaptured)="onFingerprintCaptured($event)"
+          
+                    >
+                    </app-finger-print>
+                  </ng-container>
+
+                  
+               <!-- Add this button where you want it to appear in your HTML -->
+<!-- <button mat-raised-button color="primary" (click)="getCardNumber()">
+  Get Card Number
+</button> -->
+                  
+
+                  
                   <mat-form-field
                     class="w-100"
                     *ngIf="
@@ -711,7 +781,7 @@
                     >
                     <input
                       matInput
-                      placeholder="Enter Text"
+                      placeholder="Automatic captured insurance authorization number"
                       [(ngModel)]="visitDetails['InsuranceAuthNo']"
                     />
                   </mat-form-field>

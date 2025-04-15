@@ -30,7 +30,7 @@ export class CurrentUserService {
   getProviderByUserDetails(userUuid: string): Observable<any> {
     return this.httpClient
       .get(
-        `provider?user=${userUuid}&v=custom:(uuid,display,person:(uuid,display))`
+        `provider?user=${userUuid}&v=custom:(uuid,display,person:(uuid,display),attributes)`
       )
       .pipe(
         map((response) =>

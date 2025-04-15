@@ -21,6 +21,7 @@
       </button>
       <span class="ml-2">Patients</span>
     </mat-toolbar>
+
     <div *ngIf="!params?.settingCurrentLocationStatus">
       <div class="w-100 text-center">
         <!-- <div class="text-muted h6 mb-4">Search for a patient</div> -->
@@ -69,7 +70,7 @@
             </ng-template>
             <!-- </div> -->
           </mat-tab>
-  
+
           <!-- <mat-tab label="Patient With Lab Orders Not Received at LAB">
             <div class="p-2" *ngIf="selectedTab.value === 3">
               <app-patient-list
@@ -83,7 +84,7 @@
           </mat-tab> -->
           <mat-tab label="With Laboratory Tests">
             <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
-  
+
             <ng-template matTabContent>
               <app-patient-list
                 [currentLocation]="(currentLocation$ | async)?.id"
@@ -98,7 +99,7 @@
           </mat-tab>
           <mat-tab label="With Radiology Orders">
             <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
-  
+
             <ng-template matTabContent>
               <app-patient-list
                 [shouldShowParentLocation]="true"
@@ -112,7 +113,7 @@
           </mat-tab>
           <mat-tab label="With Medications">
             <!-- <div class="p-2" *ngIf="selectedTab.value === 2"> -->
-  
+
             <ng-template matTabContent>
               <app-patient-list
                 [shouldShowParentLocation]="true"
@@ -124,7 +125,7 @@
             </ng-template>
             <!-- </div> -->
           </mat-tab>
-  
+
           <mat-tab label="Admitted Patients">
             <ng-template matTabContent>
               <app-patient-list
@@ -137,7 +138,7 @@
               ></app-patient-list>
             </ng-template>
           </mat-tab>
-          
+
           <mat-tab
             label="All Patients"
             *ngIf="
@@ -175,5 +176,15 @@
         </mat-tab-group>
       </div>
     </div>
+    <!-- <ng-container *ngIf="showDoctorModal">
+      <app-finger-print
+        detail="Doctor's"
+        (modalClosed)="closeDoctorModal($event)"
+        (fingerprintCaptured)="setCapturedFingerPrint($event)">
+      </app-finger-print>
+    </ng-container> -->
+   
+  
   </div>
+  
 </div>
