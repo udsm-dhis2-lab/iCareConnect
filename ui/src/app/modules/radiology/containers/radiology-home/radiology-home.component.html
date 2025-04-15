@@ -23,10 +23,17 @@
       [isTabularList]="isPatientListTabular"
     ></app-patient-list> -->
 
+
+
+    <ng-container *ngIf="showModal">
+      <app-finger-print detail="Doctor's" (modalClosed)="closeModal()"> </app-finger-print>
+    </ng-container>
+
     <app-patient-list
       [orderType]="'8189dbdd-3f10-11e4-adec-0800271c1b75'"
       [itemsPerPage]="10"
       [isTabularList]="true"
+      [orderByDirection]="'DESC'"
       (selectPatient)="onSelectPatient($event)"
     ></app-patient-list>
   </div>

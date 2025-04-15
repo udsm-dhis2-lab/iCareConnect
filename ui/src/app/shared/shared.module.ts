@@ -20,12 +20,17 @@ import { sharedStoreModals } from "./store-modals";
 import { sharedStorePages } from "./store-pages";
 import { sharedStoreComponents } from "./store-components";
 import { NgxMatSelectSearchModule } from "ngx-mat-select-search";
+import { FingerPrintComponent } from './components/finger-print/finger-print.component';
+import { FingerDialogComponent } from './components/finger-dialog/finger-dialog.component';
+import { FingerCaptureComponent } from './components/finger-capture/finger-capture.component';
+
 @NgModule({
   imports: [
     CommonModule,
     ...materialModules,
     ...modules,
     NgxMatSelectSearchModule,
+    
   ],
   exports: [
     CommonModule,
@@ -57,6 +62,10 @@ import { NgxMatSelectSearchModule } from "ngx-mat-select-search";
     FilterItemsBySelectionsPipe,
     SearchTestDetailsPipe,
     FormatLabelCharCountDisplayPipe,
+    FingerPrintComponent,
+    FingerDialogComponent,
+    FingerCaptureComponent,
+  
   ],
   providers: [...sharedServices],
 })

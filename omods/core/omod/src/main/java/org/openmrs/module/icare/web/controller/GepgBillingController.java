@@ -1,29 +1,43 @@
 package org.openmrs.module.icare.web.controller;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.openmrs.GlobalProperty;
-import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.openmrs.api.AdministrationService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.ContextAuthenticationException;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
-import org.openmrs.module.icare.billing.models.Payment;
+import org.openmrs.module.icare.billing.models.RequestDto;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.payment.gepg.BillSubmissionRequest;
 import org.openmrs.module.icare.billing.services.payment.gepg.GEPGService;
 import org.openmrs.module.icare.billing.services.payment.gepg.SignatureUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.openmrs.module.webservices.rest.web.RestConstants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/gepg")
@@ -44,7 +58,7 @@ public class GepgBillingController {
         Visit visit = null;
         Double totalBillAmount = 0.0;
         String currency = null;
-        String billId= null;
+        String billId = null;
         List<InvoiceItem> invoiceItems = new ArrayList<>();
 
         for (Map<String, Object> invoiceReference : requestPayload) {
@@ -58,7 +72,7 @@ public class GepgBillingController {
             }
 
             Invoice invoice = billingService.getInvoiceDetailsByUuid(uuid);
-            billId =  invoice.getId().toString();
+            billId = invoice.getId().toString();
             System.out.println("Invoice: " + invoice);
 
             if (invoice == null) {
@@ -95,7 +109,6 @@ public class GepgBillingController {
         String enginepublicKey = administrationService.getGlobalProperty(ICareConfig.ENGINE_PUBLIC_KEY);
         String pkcs12Path = administrationService.getGlobalProperty(ICareConfig.PKCS12_PATH);
         String pkcs12Password = administrationService.getGlobalProperty(ICareConfig.PKCS12_PASSWORD);
-         
 
         if (currency == null) {
             throw new IllegalArgumentException("Currency cannot be null");
@@ -124,7 +137,7 @@ public class GepgBillingController {
                 clientPrivateKey,
                 pkcs12Path,
                 pkcs12Password,
-                enginepublicKey,billId);
+                enginepublicKey, billId);
 
         try {
             // billRequest from the gepgPayloadResponse map
@@ -149,70 +162,110 @@ public class GepgBillingController {
     }
 	
 	@RequestMapping(value = "/callback", method = RequestMethod.POST)
-    public ResponseEntity<Map<String, Object>> handleCallback(
-    @RequestBody(required = false) Map<String, Object> callbackData,
-    @RequestParam(required = false) String fallback) throws Exception {
-        AdministrationService administrationService = Context.getAdministrationService();
-        
-        if (callbackData == null || callbackData.isEmpty()) {
-            Map<String, Object> response = new HashMap<>();
+	public ResponseEntity<?> handleCallback(HttpServletRequest request) {
+		try {
+			
+			AdministrationService administrationService = Context.getAdministrationService();
+			// Retrieve GePG user credentials
+			String gepgUsername = administrationService.getGlobalProperty(ICareConfig.GEPG_USERNAME);
+			String gepgPassword = administrationService.getGlobalProperty(ICareConfig.GEPG_PASSWORD);
+			Context.authenticate(gepgUsername, gepgPassword);
+			// Read the raw body from the request
+			
+			String requestBody = new BufferedReader(new InputStreamReader(request.getInputStream())).lines().collect(
+			    Collectors.joining("\n"));
+			
+			// Parse the body as JSON into a Map
+			ObjectMapper objectMapper = new ObjectMapper();
+			Map<String, Object> requestDto = objectMapper.readValue(requestBody, Map.class);
+			
+			// Validate and process the data
+			// if (requestDto == null || !requestDto.containsKey("callbackData")) {
+			// return generateErrorResponse("Invalid or missing callback data.");
+			// }
+			
+			Map<String, Object> callbackData = (Map<String, Object>) requestDto;
+			
+			if (callbackData == null || callbackData.isEmpty()) {
+				return generateErrorResponse("Empty content not allowed", "");
+			}
+			
+			Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
+			if (status == null) {
+				return generateErrorResponse("Status is missing in callback data.", "");
+			}
+			String requestId = (String) status.get("RequestId");
+			
+			Map<String, Object> systemAuth = (Map<String, Object>) callbackData.get("SystemAuth");
+			if (systemAuth == null || !systemAuth.containsKey("Signature")) {
+				return generateErrorResponse("Missing or invalid signature in callback data.", requestId);
+			}
+			String signature = (String) systemAuth.get("Signature");
+			
+			Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
+			if (feedbackData == null) {
+				return generateErrorResponse("FeedbackData is missing in callback data.", requestId);
+			}
+			
+			try {
+				Context.authenticate(gepgUsername, gepgPassword);
+				
+				Map<String, Object> processResponse = billingService.processGepgCallbackResponse(callbackData);
+				return ResponseEntity.ok(processResponse);
+				
+			}
+			catch (ContextAuthenticationException e) {
+				return generateErrorResponse("Authentication failed please contact an Admin", requestId);
+			}
+			finally {
+				Context.logout();
+			}
+			
+		}
+		catch (IOException e) {
+			return generateErrorResponse("Error reading request body for this request", "");
+		}
+		catch (Exception ex) {
+			return generateErrorResponse("Error processing callback body for this request", "");
+		}
+	}
+	
+	private ResponseEntity<Map<String, Object>> generateErrorResponse(String errorMessage, String requestId) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        try {
             
-            String serviceCode = administrationService.getGlobalProperty(ICareConfig.SERVICE_CODE);
-            String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
-    
-            // Initialize response parts
+            AdministrationService administrationService = Context.getAdministrationService();
+            // Retrieve GePG user credentials
+			String gepgUsername = administrationService.getGlobalProperty(ICareConfig.GEPG_USERNAME);
+			String gepgPassword = administrationService.getGlobalProperty(ICareConfig.GEPG_PASSWORD);
+			Context.authenticate(gepgUsername, gepgPassword);
+            // AckData as per your requested format
             Map<String, Object> ackData = new HashMap<>();
-            ackData.put("Description", "Empty content not allowed");
-            ackData.put("RequestId", null);
+            ackData.put("Description", errorMessage);
+            ackData.put("RequestId", requestId);
             ackData.put("SystemAckCode", "0");
-    
-            Map<String, Object> systemAuth = new HashMap<>();
-            systemAuth.put("SystemCode", serviceCode);
-            systemAuth.put("Signature", "");
-    
-            // Build final response
-            response.put("AckData", ackData);
-            response.put("SystemAuth", systemAuth);
-            
-            // Return response with 200 OK
-            return ResponseEntity.ok(response);
-        }
-	
-	     // GePG user credentials
-	     String gepgUsername = administrationService.getGlobalProperty(ICareConfig.GEPG_USERNAME);
-	     String gepgPassword = administrationService.getGlobalProperty(ICareConfig.GEPG_PASSWORD);
-	
-	     String signature = (String) ((Map<String, Object>) callbackData.get("SystemAuth")).get("Signature");
-	
-	     Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
-	
-	     String payload = new ObjectMapper().writeValueAsString(feedbackData);
-	
-	     String enginePublicKey = administrationService.getGlobalProperty(ICareConfig.ENGINE_PUBLIC_KEY);
-	
-	     try {
-	
-	         Context.authenticate(gepgUsername, gepgPassword);
-	         //TODOO
-	         //Agreed to proceed with verification after UUCC insuring lenght of signature
-	         // boolean isVerified = SignatureUtils.verifyData(payload, signature, enginePublicKey);
-	
-	         // if (!isVerified) {
-	         //     Map<String, Object> errorResponse = new HashMap<>();
-	         //     errorResponse.put("status", "error");
-	         //     errorResponse.put("message", "Signature verification failed");
-	         //     return errorResponse;
-	         // }
-	         return ResponseEntity.ok(billingService.processGepgCallbackResponse(callbackData)) ;
-	
-	     } catch (ContextAuthenticationException e) {
-	         Map<String, Object> errorResponse = new HashMap<>();
+            String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
 
-	         errorResponse.put("status", "error");
-	         errorResponse.put("message", "Authentication failed: " + e.getMessage());
-	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse) ;
-	     } finally {
-	         Context.logout();
-	     }
-	 }
+            // Serialize RequestData to JSON for signing
+            String requestDataJson = new ObjectMapper().writeValueAsString(ackData);
+            String signature = billingService.signatureData(requestDataJson);
+
+            // SystemAuth as per your requested format
+            Map<String, Object> systemAuth = new HashMap<>();
+            systemAuth.put("SystemCode", systemCode);
+            systemAuth.put("Signature", signature);
+
+            errorResponse.put("AckData", ackData);
+            errorResponse.put("SystemAuth", systemAuth);
+
+            return ResponseEntity.badRequest().body(errorResponse);
+
+        } catch (Exception e) {
+            // Handle the error without using Map.of()
+            Map<String, Object> errorMap = new HashMap<>();
+            errorMap.put("error", "Failed to sign data: " + e.getMessage());
+
+            return ResponseEntity.badRequest().body(errorMap);
+        }
+    }
 }

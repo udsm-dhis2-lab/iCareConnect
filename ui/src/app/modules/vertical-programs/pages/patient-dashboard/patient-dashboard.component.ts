@@ -48,9 +48,9 @@ export class PatientDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+
     this.enrollmentUuid = this.activatedRoute.snapshot.params["id"];
     this.patientUuid = this.activatedRoute.snapshot.params["patient"];
-
     this.currentUser$ = this.store.select(getCurrentUserDetails);
     this.store.dispatch(loadCurrentPatient({ uuid: this.patientUuid }));
     this.patient$ = this.store.select(getCurrentPatient);

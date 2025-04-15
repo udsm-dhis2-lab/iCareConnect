@@ -21,6 +21,18 @@ export class ModulesSelectorComponent implements OnInit {
   @Input() lisConfigurations: any;
   modulesReferences: string[];
   currentModule: any;
+
+
+  showModal = false;
+
+  // openModal() {
+  //   this.showModal = true;
+  // }
+
+  // closeModal() {
+  //   this.showModal = false;
+  // }
+
   @Input() currentLocation: any;
   userLocationsForTheCurrentModule: Location[];
   constructor(
@@ -29,6 +41,8 @@ export class ModulesSelectorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // this.showModal=true;
+
     const storedNavigationDetails =
       localStorage.getItem("navigationDetails") != "undefined"
         ? JSON.parse(localStorage.getItem("navigationDetails"))
@@ -197,6 +211,7 @@ export class ModulesSelectorComponent implements OnInit {
         ? false
         : true;
     // console.log("navigationDetails", navigationDetails);
+
     this.store.dispatch(
       go({
         path: !isNavigationDetailsAvailable
@@ -222,10 +237,19 @@ export class ModulesSelectorComponent implements OnInit {
       })
     );
     this.locationStatusControl();
+
+    // console.log("dynasty",this.modulesReferences)
+
+    // if (this.modulesReferences[2]) {
+    //   if (this.modulesReferences[2] && !this.isDoctorLoggedIn) {
+    //     this.openModal();
+    //   }
+    // }
   }
 
   onSelectModuleLocation(event: Event, module: any): void {
     // module?.app?.name
+    console.log("wzzzzzzzzzz......",module);
     event.stopPropagation();
     this.currentModule = module;
     this.userLocationsForTheCurrentModule =
@@ -260,9 +284,16 @@ export class ModulesSelectorComponent implements OnInit {
     this.locationStatusControl();
     this.trackActionForAnalytics(module);
   }
+
+
+
   trackActionForAnalytics(module: any) {
     // Send data to Google Analytics
-    this.googleAnalyticsService.sendAnalytics(module?.app?.name,`${module?.app?.name}: Open`,module?.app?.name)
+    this.googleAnalyticsService.sendAnalytics(
+      module?.app?.name,
+      `${module?.app?.name}: Open`,
+      module?.app?.name
+    );
   }
 
   onSetLocation(event: Event, location): void {

@@ -1725,12 +1725,11 @@ public class ICareController {
 	
 	@RequestMapping(value = "sharedrecords", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public String getClientDataFromExternalMediator(
-			@RequestParam(value = "hfrCode", required = false) String hfrCode,
+	public String getClientDataFromExternalMediator(@RequestParam(value = "hfrCode", required = false) String hfrCode,
 	        @RequestParam(value = "id", required = true) String id,
-			@RequestParam(value ="referralNumber", required = false) String referralNumber,
+	        @RequestParam(value = "referralNumber", required = false) String referralNumber,
 	        @RequestParam(value = "idType", required = false) String idType) throws Exception {
-		return iCareService.getSharedRecordsFromExternalMediator(hfrCode, id, idType,referralNumber);
+		return iCareService.getSharedRecordsFromExternalMediator(hfrCode, id, idType, referralNumber);
 	}
 	
 	@RequestMapping(value = "emrHealthRecords", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

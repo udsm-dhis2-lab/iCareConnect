@@ -257,7 +257,8 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 		itemPrice.setPaymentType(paymentType);
 		if (itemPrice.getPayable() != null && itemPrice.getPayablePaymentMode() == null) {
 			throw new APIException("Payment mode for payable not provided");
-		} else {
+		} else if (itemPrice.getPayablePaymentMode() != null && itemPrice.getPayablePaymentMode().getUuid() != null
+		        && conceptService.getConceptByUuid(itemPrice.getPayablePaymentMode().getUuid()) != null) {
 			Concept payablePaymentMode = conceptService.getConceptByUuid(itemPrice.getPayablePaymentMode().getUuid());
 			itemPrice.setPayablePaymentMode(payablePaymentMode);
 		}
@@ -1426,7 +1427,7 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 			if (mediatorsConfigs != null) {
 				JSONArray mediatorsList = new JSONArray(mediatorsConfigs);
 				ICareService iCareService = Context.getService(ICareService.class);
-
+				
 				if (!mediatorsList.isEmpty()) {
 					for (int count = 0; count < mediatorsList.length(); count++) {
 						JSONObject mediator = mediatorsList.getJSONObject(count);
@@ -1434,10 +1435,10 @@ public class ICareServiceImpl extends BaseOpenmrsService implements ICareService
 							String mediatorKey = mediator.getString("mediatorKey");
 							String mediatorUrlPath = mediator.getString("mediatorUrlPath");
 							String authenticationType = mediator.getString("authenticationType");
-							authReferenceKey = mediator.getString("") != null ? mediator.getString("authKeyReference") : mediator
-									.getString("mediatorKey");
-							return iCareService.pushDataToExternalMediator(new JSONObject(dataTemplateData).toString(), mediatorKey,
-									mediatorUrlPath, authenticationType, authReferenceKey);
+							authReferenceKey = mediator.getString("") != null ? mediator.getString("authKeyReference")
+							        : mediator.getString("mediatorKey");
+							return iCareService.pushDataToExternalMediator(new JSONObject(dataTemplateData).toString(),
+							    mediatorKey, mediatorUrlPath, authenticationType, authReferenceKey);
 						}
 					}
 				}

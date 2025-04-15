@@ -1,5 +1,6 @@
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -78,13 +79,18 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   allCurrentPatientSamplesSelected: boolean = false;
   currentPatientSelectedSamples: any = {};
   currentPatientSelectedSamplesCount: number = 0;
+  showModal: boolean = false;
+
   constructor(
     private sampleService: SamplesService,
     private dialog: MatDialog,
     private store: Store<AppState>,
-    private visitsService: VisitsService
+    private visitsService: VisitsService,
+    private cdr: ChangeDetectorRef
   ) {}
 
+
+  
   ngAfterViewInit(): void {
     this.connection = webSocket(this.barcodeSettings?.socketUrl);
     this.connection.subscribe({
@@ -92,7 +98,9 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       error: (err) => console.log(err), // Called if at any point WebSocket API signals some kind of error.
       complete: () => console.log("complete"), // Called when connection is closed (for whatever reason).
     });
+    // [tabType]="'completed-samples'"
     if (this.listType === "samples") {
+      
       this.getSamples({
         category: this.category,
         hasStatus: this.hasStatus,
@@ -102,11 +110,12 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     } else {
       this.getPatients();
     }
+    this.cdr.detectChanges(); 
   }
 
   ngOnInit(): void {
     this.listType = !this.LISConfigurations?.isLIS ? "patients" : "samples";
-
+    this.pageSize = this.tabType == "completed-samples"?200:100;
     this.sampleVisitParameters = {
       hasStatus: this.hasStatus,
       sampleCategory:
@@ -114,6 +123,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
           ? "NOT ACCEPTED"
           : this.category,
     };
+    
     this.searchingTestField = new Dropdown({
       id: "test",
       key: "test",
@@ -238,11 +248,11 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     this.samples$ = this.visitsService
       .getAllVisits(
         null,
-        true,
+        false,
         false,
         null,
         0,
-        10,
+        this.pageSize,
         null,
         null,
         null,
@@ -259,17 +269,21 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
             pager: null,
             results: response?.map((visitData) => visitData?.visit),
           };
-        })
+        })  
       );
+      
   }
 
   getSamplesListByVisit(event: Event, visit: any, parameters: any): void {
+ 
     event.stopPropagation();
     this.currentVisit = visit;
+    this.showModal=true;
     this.currentSamplesByVisits$ = this.visitsService.getSamplesByVisitUuid(
       visit?.uuid,
       parameters
     );
+    
   }
 
   getSamples(params?: any): void {
@@ -510,5 +524,9 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
           });
         }
       });
+  }
+
+  closeModal(){
+    this.showModal = false;
   }
 }

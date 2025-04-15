@@ -87,3 +87,15 @@ export const getDrugOrderLoadingStatus = createSelector(
   getDrugOrdersState,
   (state) => state.loading
 );
+
+
+export const getDrugsPrescribedList = createSelector(
+  getDrugOrdersState,
+  (state) => state.drugsPrescribedList
+);
+
+
+export const getPrescriptionArrangementFields = createSelector(
+  getDrugOrdersState,
+  (state) => state.prescriptionArrangementFields
+);

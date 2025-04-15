@@ -9,7 +9,7 @@
 >
   <mat-form-field
     [ngSwitch]="field?.controlType"
-    appearance="fill"
+    appearance="outline"
     class="w-100 no-padding"
   >
     <mat-label [attr.for]="field?.key">{{ field?.label }} </mat-label>
@@ -63,7 +63,13 @@
       [disabled]="shouldDisable || field?.disabled"
       [placeholder]="field?.placeholder"
       class="{{ fieldClass || 'field-input' }}"
-      [type]="field?.type === 'number' ? 'text' : field?.type"
+      [type]="
+    (field?.label === 'Dose' || field?.label === 'Duration') 
+      ? 'number' 
+      : field?.type === 'number' 
+      ? 'text' 
+      : field?.type
+  "
       [required]="field?.required"
       matInput
       step="any"
@@ -254,7 +260,7 @@
     !field?.multiple
   "
 >
-  <mat-form-field class="w-100" appearance="fill">
+  <mat-form-field class="w-100" appearance="outline">
     <mat-label>{{ field?.label }}</mat-label>
     <input
       type="text"
@@ -318,7 +324,7 @@
     field?.multiple
   "
 >
-  <mat-form-field class="w-100" appearance="fill">
+  <mat-form-field class="w-100" appearance="outline">
     <mat-label>{{ field?.label }}</mat-label>
     <mat-select
       [formControlName]="field?.key"
@@ -372,7 +378,7 @@
   <mat-form-field
     [hidden]="field?.hidden"
     [ngSwitch]="field?.controlType"
-    appearance="fill"
+    appearance="outline"
     class="w-100"
   >
     <mat-label [attr.for]="field?.key">{{ field?.label }}</mat-label>
@@ -401,7 +407,7 @@
   <mat-form-field
     [hidden]="field?.hidden"
     [ngSwitch]="field?.controlType"
-    appearance="fill"
+    appearance="outline"
     class="w-100"
   >
     <mat-label [attr.for]="field?.key">{{ field?.label }}</mat-label>

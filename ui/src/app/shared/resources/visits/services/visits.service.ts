@@ -352,7 +352,11 @@ export class VisitsService {
     if (includeDeadPatients && includeDeadPatients === true) {
       parametersString += `&includeDeadPatients=true`;
     }
+    if (includeInactive && includeInactive === true) {
+      parametersString += `&includeInactive=true`;
+    }
     //
+    // console.log("url fired  ...",`icare/visit?${parametersString.replace("&","" )}&startIndex=${startIndex}&limit=${limit}`);
     return (
       locationUuids?.length > 0
         ? zip(

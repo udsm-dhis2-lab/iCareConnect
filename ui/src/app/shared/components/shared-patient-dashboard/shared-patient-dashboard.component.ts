@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { select, Store } from "@ngrx/store";
+import { getActiveVisit } from "src/app/store/selectors/visit.selectors"; 
 import { Observable } from "rxjs";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { DiagnosisObject } from "src/app/shared/resources/diagnosis/models/diagnosis-object.model";
@@ -83,6 +84,7 @@ import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { SharedRemotePatientHistoryModalComponent } from "../../dialogs/shared-remote-patient-history-modal/shared-remote-patient-history-modal.component";
 import { MatRadioChange } from "@angular/material/radio";
 import { LocationService } from "src/app/core/services";
+import { GlobalSettingService } from "../../resources/global-setting/services";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -102,6 +104,14 @@ export class SharedPatientDashboardComponent implements OnInit {
   @Input() visitEndingControlStatusesConceptUuid: string;
   @Input() observations: any;
   @Input() moduleName: any;
+
+  showModal:boolean=false;
+  patientVisitDetails: any;
+  
+ 
+  closeModal() {
+    this.showModal = false;
+  }
   currentPatient$: Observable<Patient>;
   vitalSignObservations$: Observable<any>;
   loadingVisit$: Observable<boolean>;
@@ -156,6 +166,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   tabsToShow: string[] = ["LABORATORY", "PROCEDURE", "RADIOLOGY"];
   currentFormDetails: any = {};
   useSideBar: boolean = false;
+  clearingFormTime: number = 0.5;
 
   selectedHistoryCategory: string = "local";
 
@@ -171,6 +182,7 @@ export class SharedPatientDashboardComponent implements OnInit {
     private userService: UserService,
     private conceptService: ConceptsService,
     private billingService: BillingService,
+    private globalSettingService: GlobalSettingService,
     private googleAnalyticsService: GoogleAnalyticsService,
     private locationService: LocationService
   ) {
@@ -178,6 +190,8 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // console.log("activae,,,,,,,,,",this.activeVisit)
+   
     if (
       this.visitEndingControlStatusesConceptUuid &&
       this.visitEndingControlStatusesConceptUuid !== "none"
@@ -187,7 +201,6 @@ export class SharedPatientDashboardComponent implements OnInit {
           obs?.concept?.uuid === this.visitEndingControlStatusesConceptUuid
       ) || [])[0]?.valueObject;
     }
-    // console.log("Active visit are .............................................",this.activeVisit);
     this.onStartConsultation(this.activeVisit);
     this.store.dispatch(loadOrderTypes());
     this.orderTypes$ = this.store.select(getAllOrderTypes);
@@ -360,15 +373,35 @@ export class SharedPatientDashboardComponent implements OnInit {
         })
       );
     this.showHistoryDetails = this.activeVisit?.isAdmitted;
-  }
 
+  // // Define visit$ observable
+  // this.activeVisit$ = this.store.pipe(select(getActiveVisit));
+
+  // // Subscribe to visit$ observable and log the value
+  // this.activeVisit$.subscribe((visit) => {
+  //   console.log("Active Visit:....>>>.", visit);
+  // });
+
+
+
+  }
   toggleSideBarMenu(event: Event): void {
     event.stopPropagation();
     this.useSideBar = !this.useSideBar;
   }
+  async loadGlobalProperty() {
+    try {
+      const globalProperty = await this.globalSettingService.getSpecificGlobalProperties("ed9dac4a-5b2a-4a5f-8ee2-ca0d88b08506").toPromise();
+      const minutes = parseInt(globalProperty?.value ?? "0", 10);
+      this.clearingFormTime = isNaN(minutes / 60) ? 0.5 : minutes / 60;
+      console.log("time received :",this.clearingFormTime);
+    } catch (error) {
+      console.error("Error occurred:", error);
+      this.clearingFormTime = 0.5; 
+    }
+  }
 
   onToggleVitalsSummary(event: Event): void {
-    console.log("data tracing ...............");
     console.log(event);
     event.stopPropagation();
     this.trackActionForAnalytics(`View Vitals: Open`);
@@ -376,13 +409,36 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
 
   getSelectedForm(event: Event, form: any): void {
+     console.log("form", form);
     this.trackActionForAnalytics(`${form?.name}: Open`);
+    this.loadGlobalProperty();
     this.readyForClinicalNotes = false;
     if (event) {
       event.stopPropagation();
     }
     this.selectedForm = form;
     this.showHistoryDetails = false;
+  
+    if (form.uuid === 'a000cb34-9ec1-4344-a1c8-f692232f6edd') {
+      this.showModal = true;
+    } else {
+      this.showModal = false; 
+    }
+     // Define visit$ observable
+
+  // this.activeVisit$ = this.store.pipe(select(getActiveVisit));
+  // // Subscribe to visit$ observable and log the value
+  // this.activeVisit$.subscribe((visit) => {
+  //   console.log("Active Visit:....>>>.", visit);
+  //   //  const visits = visit.billDetails.paymentDetails.paymentType.name;
+  //   // Existing logic to show/hide modal
+  //   if (this.selectedForm && this.selectedForm.uuid === "ccf60297-55ae-4aef-98e4-c6d155d2e0fe") {
+  //     this.showModal = true;
+  //   } else {
+  //     this.showModal = false;
+  //   }
+  // });
+
     setTimeout(() => {
       this.readyForClinicalNotes = true;
     }, 50);
@@ -637,4 +693,12 @@ export class SharedPatientDashboardComponent implements OnInit {
   onToggleHistoryType(event: MatRadioChange): void {
     this.selectedHistoryCategory = event?.value;
   }
+
+
+
+  handlePatientVisitDetails(patientVisitDetails: any): void {
+    this.patientVisitDetails = patientVisitDetails;
+    console.log("Received patient visit details in parent:", patientVisitDetails);
+  }
+  
 }

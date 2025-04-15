@@ -1,0 +1,238 @@
+{
+    "patient": {
+      "id": "1",
+      "name": "MZIRAY SHAMSA",
+      "gender": "Female",
+      "reference": 226
+    },
+    "test": {
+      "testDescription": "01001 Automated Count 99MRC",
+      "testDate": "2025-01-21T18:26:14",
+      "tester": "admin",
+      "orderDate": "2025-01-21T09:20:00",
+      "completionDate": "2025-01-21T18:26:14",
+      "department": "HM",
+      "orderedBy": "admin",
+      "code": "24318-8"
+    },
+    "observations": [
+      {
+        "testCode": "02001 Take Mode 99MRC",
+        "testValue": "A",
+        "unit": "",
+        "status": "",
+        "loinc": "02001"
+      },
+      {
+        "testCode": "02002 Blood Mode 99MRC",
+        "testValue": "W",
+        "unit": "",
+        "status": "",
+        "loinc": "02002"
+      },
+      {
+        "testCode": "02003 Test Mode 99MRC",
+        "testValue": "CBC+DIFF",
+        "unit": "",
+        "status": "",
+        "loinc": "02003"
+      },
+      {
+        "testCode": "30525-0 Age LN",
+        "testValue": "39",
+        "unit": "yr",
+        "status": "",
+        "loinc": "30525-0"
+      },
+      {
+        "testCode": "09001 Remark 99MRC",
+        "testValue": "",
+        "unit": "",
+        "status": "",
+        "loinc": "09001"
+      },
+      {
+        "testCode": "03001 Ref Group 99MRC",
+        "testValue": "Woman",
+        "unit": "",
+        "status": "",
+        "loinc": "03001"
+      },
+      {
+        "testCode": "6690-2 WBC LN",
+        "testValue": "5.28",
+        "unit": "10*3/uL",
+        "status": "4.00-10.00",
+        "loinc": "6690-2"
+      },
+      {
+        "testCode": "770-8 NEU% LN",
+        "testValue": "57.6",
+        "unit": "%",
+        "status": "50.0-70.0",
+        "loinc": "770-8"
+      },
+      {
+        "testCode": "736-9 LYM% LN",
+        "testValue": "33.4",
+        "unit": "%",
+        "status": "20.0-40.0",
+        "loinc": "736-9"
+      },
+      {
+        "testCode": "5905-5 MON% LN",
+        "testValue": "7.3",
+        "unit": "%",
+        "status": "3.0-12.0",
+        "loinc": "5905-5"
+      },
+      {
+        "testCode": "713-8 EOS% LN",
+        "testValue": "1.3",
+        "unit": "%",
+        "status": "0.5-5.0",
+        "loinc": "713-8"
+      },
+      {
+        "testCode": "706-2 BAS% LN",
+        "testValue": "0.4",
+        "unit": "%",
+        "status": "0.0-1.0",
+        "loinc": "706-2"
+      },
+      {
+        "testCode": "751-8 NEU# LN",
+        "testValue": "3.05",
+        "unit": "10*3/uL",
+        "status": "2.00-7.00",
+        "loinc": "751-8"
+      },
+      {
+        "testCode": "731-0 LYM# LN",
+        "testValue": "1.77",
+        "unit": "10*3/uL",
+        "status": "0.80-4.00",
+        "loinc": "731-0"
+      },
+      {
+        "testCode": "742-7 MON# LN",
+        "testValue": "0.38",
+        "unit": "10*3/uL",
+        "status": "0.12-1.20",
+        "loinc": "742-7"
+      },
+      {
+        "testCode": "711-2 EOS# LN",
+        "testValue": "0.06",
+        "unit": "10*3/uL",
+        "status": "0.02-0.50",
+        "loinc": "711-2"
+      },
+      {
+        "testCode": "704-7 BAS# LN",
+        "testValue": "0.02",
+        "unit": "10*3/uL",
+        "status": "0.00-0.10",
+        "loinc": "704-7"
+      },
+      {
+        "testCode": "789-8 RBC LN",
+        "testValue": "4.29",
+        "unit": "10*6/uL",
+        "status": "3.50-5.00",
+        "loinc": "789-8"
+      },
+      {
+        "testCode": "718-7 HGB LN",
+        "testValue": "11.9",
+        "unit": "g/dL",
+        "status": "11.0-15.0",
+        "loinc": "718-7"
+      },
+      {
+        "testCode": "4544-3 HCT LN",
+        "testValue": "36.1",
+        "unit": "%",
+        "status": "37.0-47.0",
+        "loinc": "4544-3"
+      },
+      {
+        "testCode": "787-2 MCV LN",
+        "testValue": "84.2",
+        "unit": "fL",
+        "status": "80.0-100.0",
+        "loinc": "787-2"
+      },
+      {
+        "testCode": "785-6 MCH LN",
+        "testValue": "27.8",
+        "unit": "pg",
+        "status": "27.0-34.0",
+        "loinc": "785-6"
+      },
+      {
+        "testCode": "786-4 MCHC LN",
+        "testValue": "33.0",
+        "unit": "g/dL",
+        "status": "32.0-36.0",
+        "loinc": "786-4"
+      },
+      {
+        "testCode": "788-0 RDW-CV LN",
+        "testValue": "21.4",
+        "unit": "%",
+        "status": "11.0-16.0",
+        "loinc": "788-0"
+      },
+      {
+        "testCode": "21000-5 RDW-SD LN",
+        "testValue": "63.8",
+        "unit": "fL",
+        "status": "35.0-56.0",
+        "loinc": "21000-5"
+      },
+      {
+        "testCode": "777-3 PLT LN",
+        "testValue": "204",
+        "unit": "10*3/uL",
+        "status": "100-300",
+        "loinc": "777-3"
+      },
+      {
+        "testCode": "32623-1 MPV LN",
+        "testValue": "8.9",
+        "unit": "fL",
+        "status": "6.5-12.0",
+        "loinc": "32623-1"
+      },
+      {
+        "testCode": "32207-3 PDW LN",
+        "testValue": "12.2",
+        "unit": "fL",
+        "status": "9.0-17.0",
+        "loinc": "32207-3"
+      },
+      {
+        "testCode": "11003 PCT 99MRC",
+        "testValue": "0.181",
+        "unit": "%",
+        "status": "0.108-0.282",
+        "loinc": "11003"
+      },
+      {
+        "testCode": "48386-7 P-LCR LN",
+        "testValue": "20.6",
+        "unit": "%",
+        "status": "11.0-45.0",
+        "loinc": "48386-7"
+      },
+      {
+        "testCode": "34167-7 P-LCC LN",
+        "testValue": "42",
+        "unit": "10*9/L",
+        "status": "30-90",
+        "loinc": "34167-7"
+      }
+    ],
+    "sampleUuid": "9d02438d-b703-43a8-98eb-16832f6ca4af"
+  }

@@ -9,7 +9,7 @@ import {
 import { select, Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { loadSamplesByVisit } from "../../store/actions";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import {
   getLabSamplesLoadingState,
   getSamplesToCollect,
@@ -20,7 +20,7 @@ import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import { ConceptCreateFull } from "src/app/shared/resources/openmrs";
 import { SampleObject } from "../../resources/models";
-import { getPatientPendingBillStatus } from "src/app/store/selectors/bill.selectors";
+import { getActiveVisitPendingVisitServiceBillStatus, getPatientPendingBillStatus } from "src/app/store/selectors/bill.selectors";
 import { collectSample } from "src/app/store/actions";
 import { SamplesService } from "src/app/shared/services/samples.service";
 import { BarCodeModalComponent } from "../../../../shared/dialogs/bar-code-modal/bar-code-modal.component";
@@ -28,6 +28,10 @@ import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { MatDialog } from "@angular/material/dialog";
 import { LabOrdersService } from "../../resources/services/lab-orders.service";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
+import { getPatientsSamplesToCollect } from "src/app/store/selectors/new-lab-samples.selectors";
+import { BillingService } from "src/app/modules/billing/services/billing.service";
+import { map, tap } from "rxjs/operators";
+import { Bill } from "src/app/modules/billing/models/bill.model";
 
 @Component({
   selector: "app-samples-to-collect",
@@ -50,10 +54,11 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
   currentSamplesToCollect = {};
   samplesPriorityDetails = {};
   collectionStatus = {};
+  bills$:Observable<any>;
   samplesToCollect$: Observable<SampleObject[]>;
   labSamplesLoadingState$: Observable<boolean>;
   samplePriority: any = {};
-
+  isdiscounted:boolean = false;
   patientHasPendingBills$: Observable<boolean>;
   paidItems = {};
   thereIsUnSavedSample: boolean = false;
@@ -65,24 +70,29 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
     private store: Store<AppState>,
     private sampleService: SamplesService,
     private dialog: MatDialog,
+    private billingService: BillingService,
     private labOrdersService: LabOrdersService,
     private ordersService: OrdersService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.samplesToCollect$.subscribe((sample)=>{
+      console.log("samplesToCollect.........................",sample);
+    })
+  }
 
   ngOnChanges() {
     this.patientHasPendingBills$ = this.store.pipe(
       select(getPatientPendingBillStatus)
     );
 
+    console.log("payments response ......",this.payments);
     _.each(this.payments, (payment) => {
       _.each(payment?.items, (item) => {
         this.paidItems[item?.name] = item;
         this.paidItems[item?.paymentItem?.order?.uuid] = item;
       });
     });
-
     this.store.dispatch(
       loadSamplesByVisit({
         visitUuid: this.visit?.uuid,
@@ -96,17 +106,38 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
         visit: this.visit,
       })
     );
-    this.samplesToCollect$ = this.store.select(getSamplesToCollect);
 
+    this.samplesToCollect$ = this.store.select(getSamplesToCollect);
     // this.samplesToCollect$ = this.store.select(getPatientsSamplesToCollect, {
     //   patient_uuid: this.patient.personUuid,
     // });
+
     this.samplesToCollect$.subscribe((data) => {
       if (data) {
         this.samplesToCollect.emit(data?.length);
+        console.log(data)
       }
     });
     this.labSamplesLoadingState$ = this.store.select(getLabSamplesLoadingState);
+
+    console.log("this.patient.personUuid ....",this.patient.personUuid);
+    // this.bills$ = this.billingService.getAllPatientInvoices(this.patient.personUuid,false);
+   
+    this.billingService.getAllPatientInvoices(this.patient.personUuid, false).subscribe((bills: Bill[]) => {
+      
+      if (bills.length > 0) {
+        const lastBill = bills[bills.length - 1];
+        if (lastBill && lastBill.discounted) {
+          console.log("last bills: ....",lastBill)
+          this.isdiscounted = true;
+        }
+        if (lastBill.discounted) {
+          this.isdiscounted = true;
+          console.log("Last bill is discounted:", lastBill.discounted);
+        }
+      }
+      this.bills$ = of(bills);
+    });
   }
 
   saveAsSample(
@@ -176,6 +207,7 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
         encounter: order?.encounterUuid,
       };
     });
+    
     this.updateLabOrderResponse$ =
       this.labOrdersService.updateLabOrders(orders);
 
@@ -219,6 +251,7 @@ export class SamplesToCollectComponent implements OnInit, OnChanges {
         encounter: order?.encounterUuid,
       };
     });
+    
     this.ordersService.updateOrdersViaEncounter(orders).subscribe({
       next: (order) => {
         return order;

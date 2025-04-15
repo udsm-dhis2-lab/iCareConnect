@@ -8,6 +8,7 @@ import {
   getAllUSerRoles,
   getCurrentUserInfo,
   getCurrentUserPrivileges,
+  getProviderDetails,
   getUserAssignedLocations,
 } from "src/app/store/selectors/current-user.selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
@@ -35,12 +36,18 @@ import { Title } from "@angular/platform-browser";
 import { LocationService } from "src/app/core/services";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
-
+import { LabMenu } from "./resources/models/lab-menu.model";
+import { ProviderAttributeGet } from "src/app/shared/resources/openmrs";
+import { selectNHIFPractitionerDetails } from "src/app/store/selectors/insurance-nhif-practitioner.selectors";
+import { NHIFBiometricMethodE, NHIFFingerPrintCodeE, NHIFPractitionerDetailsI } from "src/app/shared/resources/store/models/insurance-nhif.model";
+import { loginNHIFPractitioner, setNHIFPractitionerDetails } from "src/app/store/actions/insurance-nhif-practitioner.actions";
+import { MatDialog } from "@angular/material/dialog";
+import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
 @Component({
   selector: "lab-root",
   templateUrl: "./laboratory.component.html",
   styleUrls: ["./laboratory.component.scss"],
-  encapsulation: ViewEncapsulation.None 
+  encapsulation: ViewEncapsulation.None,
 })
 export class LaboratoryComponent implements OnInit {
   title = "Laboratory";
@@ -68,6 +75,13 @@ export class LaboratoryComponent implements OnInit {
   userRoles$: Observable<any>;
   currentRoutePath: string = "";
   showMenuItems: boolean = true;
+  currentProviderDetails: ProviderAttributeGet[];
+  isNHIFPractitionerLogedIn: boolean = false;
+ 
+
+
+
+
   /**
    *
    * @param store
@@ -84,13 +98,96 @@ export class LaboratoryComponent implements OnInit {
   errors: any[] = [];
   loadedSystemSettings$: Observable<boolean>;
 
+  laboratoryMenus: LabMenu[] = [
+    {
+      name: "Dashboard",
+      route: "dashboard-lab",
+      id: "dashboard",
+      icon: "dashboard",
+      subMenus: [],
+    },
+    {
+      name: "Sample Reception & Registration",
+      route: "sample-registration",
+      icon: "add_to_queue",
+      id: "registration",
+      subMenus: [
+        {
+          name: "Sample Registration",
+          route: "sample-registration",
+          id: "registration",
+          icon: "list",
+        },
+      ],
+    },
+    {
+      name: "Sample Acceptance and Results",
+      route: "sample-acceptance-and-results",
+      icon: "dvr",
+      id: "acceptance",
+      subMenus: [],
+    },
+    {
+      name: "Results",
+      route: "sample-results-list",
+      id: "results",
+      icon: "send",
+      subMenus: [],
+    },
+    {
+      name: "Sample Tracking",
+      route: "sample-tracking",
+      id: "tracking",
+      icon: "track_changes",
+      subMenus: [],
+    },
+    {
+      name: "Sample Storage",
+      route: "sample-storage",
+      id: "sample-storage",
+      icon: "storage",
+      subMenus: [],
+    },
+    {
+      name: "Reports",
+      route: "reports",
+      icon: "report",
+      id: "reports",
+      subMenus: [],
+    },
+    {
+      name: "Maintenance",
+      route: "settings",
+      id: "settings",
+      icon: "settings",
+      subMenus: [
+        {
+          name: "General",
+          route: "settings",
+          id: "general",
+          icon: "settings",
+        },
+        {
+          name: "Price list",
+          route: "settings/price-list",
+          id: "price-list",
+          icon: "money",
+        },
+      ],
+    },
+  ];
+  showSubMenu: boolean = false;
+  currentLabMenuId: string = "dashboard";
+  currentLabSubMenuId: string;
+
   constructor(
     private store: Store<AppState>,
     private router: Router,
     private route: ActivatedRoute,
     private titleService: Title,
     private locationService: LocationService,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private dialog: MatDialog,
   ) {
     this.store.dispatch(loadRolesDetails());
     this.store.dispatch(loadOrderTypes());
@@ -179,6 +276,65 @@ export class LaboratoryComponent implements OnInit {
   }
 
   ngOnInit() {
+        // get provider details
+        this.store.select(getProviderDetails).subscribe((data) => {
+          if (data) {
+            this.currentProviderDetails = data.attributes;
+          }
+        });
+    
+      // get practitioner details
+    this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
+      // if the doctor is not logged in to NHIF, prompt the doctor to login
+      if (!data || !data.isNHIFPractitionerLogedIn) {
+        const loginData = {
+          practitionerNo: this.currentProviderDetails[1]["value"],
+          nationalID: this.currentProviderDetails[3]["value"],
+          biometricMethod: NHIFBiometricMethodE.fingerprint,
+          fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
+          imageData: "base 64",
+        };
+
+        // ✅ Dispatch the login action
+        this.store.dispatch(loginNHIFPractitioner({ data: loginData }));
+
+        this.dialog
+          .open(FingerCaptureComponent, {
+            width: "45%",
+            data: {
+              detail: "doctor's",
+            },
+          })
+          .afterClosed()
+          .subscribe((result) => {
+            if (result) {
+              console.log("Fingerprint data received:", result);
+              const practitionerData: NHIFPractitionerDetailsI = {
+                practitionerNo: this.currentProviderDetails[1]["value"], // MCT Registration number index
+                nationalID: this.currentProviderDetails[3]["value"],
+                isNHIFPractitionerLogedIn: true,
+              };
+
+              // Dispatch the action to update state
+              this.store.dispatch(
+                setNHIFPractitionerDetails({ data: practitionerData })
+              );
+
+              const loginData = {
+                practitionerNo: this.currentProviderDetails[1]["value"],
+                nationalID: this.currentProviderDetails[3]["value"],
+                biometricMethod: NHIFBiometricMethodE.fingerprint,
+                fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
+                imageData: result.fingerprintCaptured,
+              };
+
+              // ✅ Dispatch the login action
+              this.store.dispatch(loginNHIFPractitioner({ data: loginData }));
+            }
+          });
+      }
+    });
+
     this.systemSettingsService
       .getSystemSettingsByKey(`icare.general.selectedSystemSettings`)
       .subscribe((response) => {
@@ -278,6 +434,17 @@ export class LaboratoryComponent implements OnInit {
         ? navigationDetails?.path[0]?.replace("/laboratory/", "")
         : "";
     this.currentLocation$ = this.store.select(getCurrentLocation(false));
+  }
+
+  setOpenLabMenu(event: Event, id: string): void {
+    event.stopPropagation();
+    this.currentLabMenuId = id;
+    this.showSubMenu = true;
+  }
+
+  setOpenLabSubMenu(event: Event, id: string): void {
+    event.stopPropagation();
+    this.currentLabSubMenuId = id;
   }
 
   setCurrentLab(location: any): void {

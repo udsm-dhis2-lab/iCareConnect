@@ -7,7 +7,7 @@
       <div
         class="menu-item"
         [ngClass]="{ 'selected-module': currentModule?.id === module?.id }"
-        (click)="onSelectModuleLocation($event, module)"
+        (click)="onSelectModuleLocation($event, module) || openModal()"
         *ngFor="let module of modulesReferences"
       >
         <div>
@@ -32,4 +32,5 @@
     </mat-chip-listbox>
     <!-- <mat-icon style="right: 0%">expand_more</mat-icon> -->
   </div>
+ 
 </div>

@@ -9,6 +9,9 @@ import {
   dispenseDrugFail,
   loadDrugOrders,
   loadDrugOrdersFail,
+  setDrugsPrescribedList,
+  setSpecificDrugConceptUuid,
+  setPrescriptionArrangementFields
 } from '../actions';
 import {
   errorBaseState,
@@ -53,7 +56,22 @@ const reducer = createReducer(
       { id: drugOrder.uuid, changes: { loading: false } as any },
       state
     )
-  )
+  ),
+
+  on(setDrugsPrescribedList, (state, { drugsPrescribedList }) => ({
+    ...state,
+    drugsPrescribedList, 
+  })),
+
+  on(setSpecificDrugConceptUuid, (state, { specificDrugConceptUuid }) => ({
+    ...state,
+    specificDrugConceptUuid, 
+  })),
+
+  on(setPrescriptionArrangementFields, (state, { prescriptionArrangementFields }) => ({
+    ...state,
+    prescriptionArrangementFields, 
+  })),
 );
 
 export function drugOrdersReducer(state, action) {

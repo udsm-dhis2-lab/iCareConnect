@@ -19,11 +19,15 @@ button {
   color: #666666;
 }
 .pale-green {
-  background-color: palegreen;
+  background-color: #cfedd7;
+}
+
+.white-background {
+  background-color: white;
 }
 
 .pale-orange {
-  background-color: #EAA343; 
+  background-color: rgba(255, 166, 0, 0.527); 
 }
 
 table {
@@ -34,9 +38,7 @@ tr.example-detail-row {
   height: 0;
 }
 
-tr.example-element-row:not(.example-expanded-row):hover {
-  background: whitesmoke;
-}
+tr.example-element-row:not(.example-expanded-row)
 
 tr.example-element-row:not(.example-expanded-row):active {
   background: #efefef;
