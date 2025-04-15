@@ -8,16 +8,23 @@ import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
 import { PatientHistoryDialogComponent } from "src/app/shared/dialogs/patient-history-dialog/patient-history-dialog.component";
 import { ProviderAttributeGet } from "src/app/shared/resources/openmrs";
-import { NHIFPractitionerDetailsI } from "src/app/shared/resources/store/models/insurance-nhif.model";
+import {
+  FingerPrintPaylodTypeE,
+  NHIFBiometricMethodE,
+  NHIFFingerPrintCodeE,
+  NHIFPractitionerDetailsI,
+} from "src/app/shared/resources/store/models/insurance-nhif.model";
+import { InsuranceService } from "src/app/shared/services";
 import { go } from "src/app/store/actions";
-import { setNHIFPractitionerDetails } from "src/app/store/actions/insurance-nhif-practitioner.actions";
+import {
+  setNHIFPractitionerDetails,
+} from "src/app/store/actions/insurance-nhif-practitioner.actions";
 import { AppState } from "src/app/store/reducers";
 import {
   getCurrentLocation,
   getSettingCurrentLocationStatus,
 } from "src/app/store/selectors";
 import {
-  getCurrentUserDetails,
   getCurrentUserPrivileges,
   getProviderDetails,
 } from "src/app/store/selectors/current-user.selectors";
@@ -41,65 +48,68 @@ export class ClinicPatientListComponent implements OnInit {
   showAllPatientsTab$: Observable<any>;
   userPrivileges$: Observable<any>;
   showDoctorModal: boolean = true;
-  isNHIFPractitionerLogedIn: boolean = false
-  capturedFingerPrintBase64: string = null
+  isNHIFPractitionerLogedIn: boolean = false;
 
-
-  setCapturedFingerPrint(event: string){
-    this.capturedFingerPrintBase64 = event
-  }
-
-  closeDoctorModal(event) {
-    console.log('data from the device', event)
-    this.showDoctorModal = false;
-    const practitionerData: NHIFPractitionerDetailsI = {
-      practionerID: this.currentProviderDetails[1]['value'], // MCT Registration number index 
-      practionerNIDA: "NIDA-67890",
-      isNHIFPractitionerLogedIn: true,
-    };
-
-    // Dispatch the action to update state
-    this.store.dispatch(setNHIFPractitionerDetails({ data: practitionerData }));
-  }
   constructor(
     private store: Store<AppState>,
     private systemSettingsService: SystemSettingsService,
     private dialog: MatDialog,
-    private googleAnalyticsService: GoogleAnalyticsService
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private service: InsuranceService
   ) {}
 
   ngOnInit() {
-
-    this.dialog
-    .open(FingerCaptureComponent, {
-      width: "45%",
-      data: { 
-        detail: 'Doctor', 
-      }
-      
-    });
     // get provider details
     this.store.select(getProviderDetails).subscribe((data) => {
-     if (data){
-      this.currentProviderDetails = data.attributes;
-      console.log('The current provider atrr ', data.attributes)
-     }
+      if (data) {
+        this.currentProviderDetails = data.attributes;
+      }
     });
-    // get provider details
-    this.store.select(getCurrentUserDetails).subscribe((data) => {
-      console.log('The current user details are ', data)
-    });
+  console.log('here below')
+    this.service.getListOfVisitTypes().subscribe((data)=>{
+      console.log('the NHIF visit types are', data)
+    })
 
     // get practitioner details
-     this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
-          console.log('Practitioner Details in State:', data);
-          // if the doctor is not logged in to NHIF, prompt the doctor to login
-          if(!data || !data.isNHIFPractitionerLogedIn){
-            
-            this.showDoctorModal = true
-          }
-        });
-    
+    this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
+      // if the doctor is not logged in to NHIF, prompt the doctor to login
+      if (!data || !data.isNHIFPractitionerLogedIn) {
+        const loginData = {
+          practitionerNo: this.currentProviderDetails[1]["value"],
+          nationalID: this.currentProviderDetails[3]["value"],
+          biometricMethod: NHIFBiometricMethodE.fingerprint,
+          fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
+        };
+
+        this.dialog
+          .open(FingerCaptureComponent, {
+            width: "45%",
+            data: {
+              detail: "doctor's",
+              data: {
+                type: FingerPrintPaylodTypeE.Practitioner_login,
+                payload: loginData,
+              },
+            },
+          })
+          .afterClosed()
+          .subscribe((result) => {
+            if (result) {
+              const practitionerData: NHIFPractitionerDetailsI = {
+                practitionerNo: this.currentProviderDetails[1]["value"], // MCT Registration number index
+                nationalID: this.currentProviderDetails[3]["value"],
+                isNHIFPractitionerLogedIn: true,
+              };
+
+              // Dispatch the action to update state
+              this.store.dispatch(
+                setNHIFPractitionerDetails({ data: practitionerData })
+              );
+            }
+          });
+      }
+    });
+
     this.currentLocation$ = this.store.pipe(select(getCurrentLocation(false)));
     this.settingCurrentLocationStatus$ = this.store.select(
       getSettingCurrentLocationStatus
@@ -132,10 +142,12 @@ export class ClinicPatientListComponent implements OnInit {
   }
 
   onSelectPatient(patient: any) {
-    console.log("The selected patients details are: ", patient);
     setTimeout(() => {
       this.store.dispatch(
-        go({ path: [`/clinic/patient-dashboard/${patient?.patient?.uuid}`], extras: { state: { patientData: patient} } })
+        go({
+          path: [`/clinic/patient-dashboard/${patient?.patient?.uuid}`],
+          extras: { state: { patientData: patient } },
+        })
       );
     }, 200);
     this.trackActionForAnalytics(`Patients Search: View`);

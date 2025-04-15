@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { OpenmrsHttpClientService } from '../modules/openmrs-http-client/services/openmrs-http-client.service';
-import { NHIFPointOfCareI, PatientPOCVerificationI } from '../resources/store/models/insurance-nhif.model';
+import { NHIFPointOfCareI, NHIFPractitionerLoginI, PatientPOCVerificationI } from '../resources/store/models/insurance-nhif.model';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -16,17 +17,12 @@ export class InsuranceService {
 
 
   authorizeInsuranceCard(authorizationData: any): Observable<any> {
-    console.log('Authorization authorizationData:', authorizationData);
-    if (!authorizationData || Object.keys(authorizationData).length === 0) {
-      console.error('No authorizationData provided for authorization');
-    }
+   
     return this.httpClient.post(`${this.modal}` + 'authorizecard', authorizationData);
   }
 
   getCardNumberByNida(nidaData: any): Observable<any> {
-    if (!nidaData || Object.keys(nidaData).length === 0) {
-      console.error('No authorizationData provided for authorization');
-    }
+    
     return this.httpClient.post(`${this.modal}` + 'GetCardDetailsByNIN', nidaData);
   } 
   
@@ -35,8 +31,23 @@ export class InsuranceService {
     return this.httpClient.get(`${this.modal}` + 'getpoc');
   } 
 
-  requestPatientPOCVerification(data: PatientPOCVerificationI): Observable<PatientPOCVerificationI> {
+  getListOfVisitTypes(): Observable<NHIFPointOfCareI[]> {
+    return this.httpClient.get(`${this.modal}` + 'getvisittype');
+  } 
+
+  verifyPointOfCare(data: PatientPOCVerificationI): Observable<any> {
     return this.httpClient.post(`${this.modal}` + 'pocrefgeneration', data);
+  } 
+
+  loginNHIFPractitioner(data: NHIFPractitionerLoginI): Observable<any> {
+       // Set the headers
+       const httpConfig = {
+        httpHeaders: {
+          'Content-Type': 'application/json',
+        }
+      };
+  
+    return this.httpClient.post(`${this.modal}` + 'loginpractitioner', data,httpConfig );
   } 
   
 }
