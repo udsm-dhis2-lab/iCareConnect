@@ -1,24 +1,40 @@
 package org.openmrs.module.icare.store.models;
 
-import org.openmrs.BaseOpenmrsData;
-import org.openmrs.module.icare.billing.models.InvoiceItem;
-import org.openmrs.module.icare.core.JSONConverter;
-
-import javax.persistence.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
+
+import org.openmrs.BaseOpenmrsData;
+import org.openmrs.module.icare.core.JSONConverter;
 
 @Entity
-@Table(name = "st_stock_invoice", uniqueConstraints = {@UniqueConstraint(columnNames = {"invoice_number","supplier_id"})})
+@Table(name = "st_stock_invoice", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "invoice_number", "supplier_id" }) })
 public class StockInvoice extends BaseOpenmrsData implements java.io.Serializable, JSONConverter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "stock_invoice_id",unique= true, nullable = false)
+    @Column(name = "stock_invoice_id", unique = true, nullable = false)
     private Integer id;
 
-    @Column(name = "invoice_number", length=20)
+    @Column(name = "invoice_number", length = 20)
     private String invoiceNumber;
 
     @ManyToOne
@@ -41,7 +57,6 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
     @Transient
     private Double totalAmount;
 
-
     @Override
     public Integer getId() {
         return id;
@@ -49,7 +64,7 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
 
     @Override
     public void setId(Integer id) {
-        this.id =id;
+        this.id = id;
     }
 
     public void setInvoiceNumber(String invoiceNumber) {
@@ -108,85 +123,85 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
         this.totalAmount = totalAmount;
     }
 
-    public static StockInvoice fromMap(Map<String,Object> stockInvoiceMap) throws ParseException {
+    public static StockInvoice fromMap(Map<String, Object> stockInvoiceMap) throws ParseException {
 
         StockInvoice stockInvoice = new StockInvoice();
-        if(stockInvoiceMap.get("invoiceNumber") != null) {
+        if (stockInvoiceMap.get("invoiceNumber") != null) {
             stockInvoice.setInvoiceNumber(stockInvoiceMap.get("invoiceNumber").toString());
         }
 
-        if(stockInvoiceMap.get("receivingDate") != null) {
+        if (stockInvoiceMap.get("receivingDate") != null) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             if (stockInvoiceMap.get("receivingDate").toString().length() == 10) {
                 stockInvoice.setReceivingDate(dateFormat.parse(stockInvoiceMap.get("receivingDate").toString()));
             } else {
-                stockInvoice.setReceivingDate(dateFormat.parse(stockInvoiceMap.get("receivingDate").toString().substring(0, stockInvoiceMap.get("receivingDate").toString().indexOf("T"))));
+                stockInvoice.setReceivingDate(dateFormat.parse(stockInvoiceMap.get("receivingDate").toString()
+                        .substring(0, stockInvoiceMap.get("receivingDate").toString().indexOf("T"))));
             }
         }
 
-        if(stockInvoiceMap.get("uuid") != null){
+        if (stockInvoiceMap.get("uuid") != null) {
             stockInvoice.setUuid(stockInvoiceMap.get("uuid").toString());
         }
 
-        if(stockInvoiceMap.get("supplier") != null) {
+        if (stockInvoiceMap.get("supplier") != null) {
             Supplier supplier = new Supplier();
             supplier.setUuid(((Map) stockInvoiceMap.get("supplier")).get("uuid").toString());
             stockInvoice.setSupplier(supplier);
         }
-        if(stockInvoiceMap.get("purchaseOrder") != null){
+        if (stockInvoiceMap.get("purchaseOrder") != null) {
             PurchaseOrder purchaseOrder = new PurchaseOrder();
-            purchaseOrder.setUuid(((Map)stockInvoiceMap.get("purchaseOrder")).get("uuid").toString());
+            purchaseOrder.setUuid(((Map) stockInvoiceMap.get("purchaseOrder")).get("uuid").toString());
             stockInvoice.setPurchaseOrder(purchaseOrder);
         }
 
-        if(stockInvoiceMap.get("stockInvoiceStatus") != null){
+        if (stockInvoiceMap.get("stockInvoiceStatus") != null) {
             List<StockInvoiceStatus> stockInvoiceStatusesList = new ArrayList<>();
-           for(Map<String,Object> stockInvoiceMapObject :(List<Map<String, Object>>) stockInvoiceMap.get("stockInvoiceStatus")) {
-               StockInvoiceStatus stockInvoiceStatus = new StockInvoiceStatus();
-               stockInvoiceStatus.setStatus(stockInvoiceMapObject.get("status").toString());
-               stockInvoiceStatusesList.add(stockInvoiceStatus);
-           }
-           stockInvoice.setStockInvoiceStatuses(stockInvoiceStatusesList);
+            for (Map<String, Object> stockInvoiceMapObject : (List<Map<String, Object>>) stockInvoiceMap
+                    .get("stockInvoiceStatus")) {
+                StockInvoiceStatus stockInvoiceStatus = new StockInvoiceStatus();
+                stockInvoiceStatus.setStatus(stockInvoiceMapObject.get("status").toString());
+                stockInvoiceStatusesList.add(stockInvoiceStatus);
+            }
+            stockInvoice.setStockInvoiceStatuses(stockInvoiceStatusesList);
         }
 
-        if(stockInvoiceMap.get("voided") != null){
+        if (stockInvoiceMap.get("voided") != null) {
             stockInvoice.setVoided((boolean) stockInvoiceMap.get("voided"));
         }
 
-         return stockInvoice;
+        return stockInvoice;
     }
-
 
     public Map<String, Object> toMap() {
 
-        HashMap<String,Object> stockInvoiceObject = new HashMap<String,Object>();
-        stockInvoiceObject.put("invoiceNumber",this.getInvoiceNumber());
+        HashMap<String, Object> stockInvoiceObject = new HashMap<String, Object>();
+        stockInvoiceObject.put("invoiceNumber", this.getInvoiceNumber());
         stockInvoiceObject.put("receivingDate", this.getReceivingDate());
-        stockInvoiceObject.put("uuid",this.getUuid());
+        stockInvoiceObject.put("uuid", this.getUuid());
 
-        if(this.getSupplier() != null){
-            Map<String,Object> supplierObject = new HashMap<>();
-            supplierObject.put("uuid",this.getSupplier().getUuid());
+        if (this.getSupplier() != null) {
+            Map<String, Object> supplierObject = new HashMap<>();
+            supplierObject.put("uuid", this.getSupplier().getUuid());
             supplierObject.put("name", this.getSupplier().getName());
-            stockInvoiceObject.put("supplier",supplierObject);
+            stockInvoiceObject.put("supplier", supplierObject);
         }
 
-        if(this.purchaseOrder != null){
-            Map<String,Object> purchaseOrderObject = new HashMap<String,Object>();
-            purchaseOrderObject.put("uuid",this.getPurchaseOrder().getUuid());
-            purchaseOrderObject.put("display",this.getPurchaseOrder().getCode());
-            stockInvoiceObject.put("purchaseOrder",purchaseOrderObject);
+        if (this.purchaseOrder != null) {
+            Map<String, Object> purchaseOrderObject = new HashMap<String, Object>();
+            purchaseOrderObject.put("uuid", this.getPurchaseOrder().getUuid());
+            purchaseOrderObject.put("display", this.getPurchaseOrder().getCode());
+            stockInvoiceObject.put("purchaseOrder", purchaseOrderObject);
         }
 
-//        if(this.getStockInvoiceItems() != null) {
-//                List<Map<String, Object>> stockInvoiceItems = new ArrayList<>();
-//                for (StockInvoiceItem stockInvoiceItem : this.getStockInvoiceItems()) {
-//                    stockInvoiceItems.add(stockInvoiceItem.toMap());
-//                }
-//                stockInvoiceObject.put("InvoiceItems", stockInvoiceItems);
-//
-//        }
-
+        // if(this.getStockInvoiceItems() != null) {
+        // List<Map<String, Object>> stockInvoiceItems = new ArrayList<>();
+        // for (StockInvoiceItem stockInvoiceItem : this.getStockInvoiceItems()) {
+        // stockInvoiceItems.add(stockInvoiceItem.toMap());
+        // }
+        // stockInvoiceObject.put("InvoiceItems", stockInvoiceItems);
+        //
+        // }
 
         if (this.getCreator() != null) {
             Map<String, Object> creatorObject = new HashMap<String, Object>();
@@ -195,34 +210,34 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
             stockInvoiceObject.put("creator", creatorObject);
         }
 
-        if(this.getStockInvoiceStatuses() != null){
-            List<Map<String,Object>> stockInvoiceStatusesMapList = new ArrayList<>();
-            Map<String,Object> stockInvoiceStatusesMap = new HashMap<>();
-            for (StockInvoiceStatus stockInvoiceStatus : this.getStockInvoiceStatuses()){
-                stockInvoiceStatusesMap.put("status",stockInvoiceStatus.getStatus());
+        if (this.getStockInvoiceStatuses() != null) {
+            List<Map<String, Object>> stockInvoiceStatusesMapList = new ArrayList<>();
+            Map<String, Object> stockInvoiceStatusesMap = new HashMap<>();
+            for (StockInvoiceStatus stockInvoiceStatus : this.getStockInvoiceStatuses()) {
+                stockInvoiceStatusesMap.put("status", stockInvoiceStatus.getStatus());
             }
             stockInvoiceStatusesMapList.add(stockInvoiceStatusesMap);
-            stockInvoiceObject.put("stockInvoiceStatus",stockInvoiceStatusesMapList);
+            stockInvoiceObject.put("stockInvoiceStatus", stockInvoiceStatusesMapList);
 
         }
 
-        if(this.getVoided() != null){
-            stockInvoiceObject.put("voided",this.getVoided());
+        if (this.getVoided() != null) {
+            stockInvoiceObject.put("voided", this.getVoided());
         }
 
-        if(this.getTotalAmount() != null){
-            stockInvoiceObject.put("totalAmount",this.getTotalAmount());
+        if (this.getTotalAmount() != null) {
+            stockInvoiceObject.put("totalAmount", this.getTotalAmount());
         }
 
         return stockInvoiceObject;
     }
 
     // Added this function to optimize performance when getting stock invoices
-    public Map<String, Object> toMapWithItems(){
+    public Map<String, Object> toMapWithItems() {
 
-        Map<String,Object> stockInvoiceObject = this.toMap();
+        Map<String, Object> stockInvoiceObject = this.toMap();
 
-        if(this.getStockInvoiceItems() != null) {
+        if (this.getStockInvoiceItems() != null) {
             List<Map<String, Object>> stockInvoiceItems = new ArrayList<>();
             for (StockInvoiceItem stockInvoiceItem : this.getStockInvoiceItems()) {
                 stockInvoiceItems.add(stockInvoiceItem.toMap());
@@ -230,7 +245,7 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
             stockInvoiceObject.put("InvoiceItems", stockInvoiceItems);
 
         }
-        return  stockInvoiceObject;
+        return stockInvoiceObject;
     }
 
 }

@@ -1,6 +1,5 @@
-import { DIALOG_DATA } from "@angular/cdk/dialog";
-import { Component, Inject, OnInit } from "@angular/core";
-import { MAT_DIALOG_DATA, MatDialog } from "@angular/material/dialog";
+import { Component, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from "@angular/router";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
@@ -8,12 +7,7 @@ import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
 import { PatientListDialogComponent } from "src/app/shared/dialogs";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
-import {
-  addCurrentPatient,
-  authenticateUser,
-  go,
-  loadRolesDetails,
-} from "src/app/store/actions";
+import { addCurrentPatient, go } from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
 import { getSettingCurrentLocationStatus } from "src/app/store/selectors";
 import { getVisitLoadingState } from "src/app/store/selectors/visit.selectors";
@@ -41,19 +35,19 @@ export class NursingHomeComponent implements OnInit {
     private store: Store<AppState>,
     private dialog: MatDialog,
     private route: ActivatedRoute,
-    private googleAnalyticsService: GoogleAnalyticsService,
+    private googleAnalyticsService: GoogleAnalyticsService
   ) {}
 
   ngOnInit(): void {
     // this.showModal = true;
-    this.dialog
+    /*this.dialog
     .open(FingerCaptureComponent, {
       width: "45%",
       // data: { 
       //   labels: this.labels, 
       // }
       
-    })
+    })*/
     this.settingCurrentLocationStatus$ = this.store.select(
       getSettingCurrentLocationStatus
     );
@@ -109,7 +103,7 @@ export class NursingHomeComponent implements OnInit {
     if (e) {
       e.stopPropagation();
     }
-console.log("testing123",patient)
+    console.log("testing123", patient);
     this.store.dispatch(addCurrentPatient({ patient }));
 
     if (patient?.paymentTypeDetails === "Cash") {
@@ -120,13 +114,20 @@ console.log("testing123",patient)
         })
       );
     } else {
-      this.dialog
+      //!TODO: Return Insurance verification
+
+      this.store.dispatch(
+        go({
+          path: ["/nursing/consult"],
+          query: { queryParams: { patient: patient?.patient?.uuid } },
+        })
+      );
+      /*this.dialog
         .open(FingerCaptureComponent, {
           width: "45%",
-          // data: { 
-          //   labels: this.labels, 
+          // data: {
+          //   labels: this.labels,
           // }
-          
         })
         .afterClosed()
         .subscribe((result) => {
@@ -138,7 +139,7 @@ console.log("testing123",patient)
               })
             );
           }
-        });
+        });*/
     }
 
     this.trackActionForAnalytics(`Nursing Search: View`);

@@ -17,13 +17,13 @@ import org.openmrs.module.icare.auditlog.api.db.DAOUtils;
 import org.openmrs.module.icare.auditlog.util.AuditLogUtil;
 
 final class InterceptorUtil {
-
+	
 	private static final Log log = LogFactory.getLog(InterceptorUtil.class);
-
+	
 	private static AuditLogDAO auditLogDao;
-
+	
 	private static AuditLogHelper helper;
-
+	
 	/**
 	 * @return the dao
 	 */
@@ -33,7 +33,7 @@ final class InterceptorUtil {
 		}
 		return auditLogDao;
 	}
-
+	
 	/**
 	 * @return the helper
 	 */
@@ -43,11 +43,11 @@ final class InterceptorUtil {
 		}
 		return helper;
 	}
-
+	
 	static void saveAuditLog(AuditLog auditLog) {
 		getAuditLogDao().save(auditLog);
 	}
-
+	
 	/**
 	 * Checks if a class is marked as audited or is explicitly audited
 	 * 
@@ -57,7 +57,7 @@ final class InterceptorUtil {
 	static boolean isAudited(Class<?> clazz) {
 		return getHelper().isAudited(clazz) || getHelper().isImplicitlyAudited(clazz);
 	}
-
+	
 	/**
 	 * Serializes mapped hibernate objects
 	 * 
@@ -90,18 +90,18 @@ final class InterceptorUtil {
 				}
 			}
 		}
-
+		
 		return AuditLogUtil.serializeToJson(propertyNameValueMap);
 	}
-
+	
 	static SessionFactory getSessionFactory() {
 		return Context.getRegisteredComponents(SessionFactory.class).get(0);
 	}
-
+	
 	static boolean storeLastStateOfDeletedItems() {
 		return getAuditLogDao().storeLastStateOfDeletedItems();
 	}
-
+	
 	static Serializable getId(Object object) {
 		return getAuditLogDao().getId(object);
 	}

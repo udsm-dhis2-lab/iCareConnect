@@ -1,5 +1,13 @@
 package org.openmrs.module.icare.web.controller;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
@@ -7,24 +15,13 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.LocationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
-import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.store.models.IssueStatus;
 import org.openmrs.module.icare.store.models.RequisitionStatus;
 import org.openmrs.module.icare.store.services.StoreService;
 import org.openmrs.module.icare.web.controller.core.BaseResourceControllerTest;
-import org.powermock.core.classloader.annotations.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class StoreControllerAPITest extends BaseResourceControllerTest {
 	
@@ -42,15 +39,15 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testCreatingReorderLevelAndGettingAllReorderLevels() throws Exception {
 		
-		//gien
+		// gien
 		String dto = this.readFile("dto/store/reorder-level-create.json");
 		Map<String, Object> reorderLevel = (new ObjectMapper()).readValue(dto, Map.class);
 		
-		//when
+		// when
 		MockHttpServletRequest newPostRequest = newPostRequest("store/reorderlevel", reorderLevel);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		
-		//then
+		// then
 		
 		Map<String, Object> createdReorderLevelMap = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("created reorder level location uuid is 44939999-d333-fff2-9bff-61d11117c22e",
@@ -61,8 +58,8 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("created reorder level item uuid is 8777d43571-yy77-11ff-2244-08002007777",
 		    ((Map) createdReorderLevelMap.get("item")).get("uuid").toString(), is("8777d43571-yy77-11ff-2244-08002007777"));
 		
-		//test by fetching
-		//given
+		// test by fetching
+		// given
 		MockHttpServletRequest newGetRequest = newGetRequest("store/reorderlevels");
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
@@ -123,15 +120,15 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testCreatingALedgerEntryAndGettingAllLedgers() throws Exception {
 		
-		//Given
+		// Given
 		String dto = this.readFile("dto/store/ledger-add.json");
 		Map<String, Object> ledgerEntry = (new ObjectMapper()).readValue(dto, Map.class);
 		
-		//When
+		// When
 		MockHttpServletRequest newPostRequest = newPostRequest("store/ledger", ledgerEntry);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		
-		//Then
+		// Then
 		Map<String, Object> ledger = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		MockHttpServletRequest newGetRequest = newGetRequest("store/ledgers");
 		MockHttpServletResponse handleGet = handle(newGetRequest);
@@ -152,19 +149,19 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testCreatingALedgerEntrySameBatch() throws Exception {
 		
-		//Given
+		// Given
 		String dto = this.readFile("dto/store/ledger-add.json");
 		Map<String, Object> ledgerEntry = (new ObjectMapper()).readValue(dto, Map.class);
 		MockHttpServletRequest newPostRequest = newPostRequest("store/ledger", ledgerEntry);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		
-		//When
+		// When
 		ledgerEntry.put("expiryDate", "2021-07-27");
 		ledgerEntry.put("buyingPrice", 0);
 		newPostRequest = newPostRequest("store/ledger", ledgerEntry);
 		handle = handle(newPostRequest);
 		
-		//Then
+		// Then
 		Map<String, Object> ledger = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		MockHttpServletRequest newGetRequest = newGetRequest("store/ledgers");
 		MockHttpServletResponse handleGet = handle(newGetRequest);
@@ -190,7 +187,8 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		System.out.println(handleGet1.getContentAsString());
 		assertThat("Only two stock items", ((Map) ((List) stocks.get("results")).get(3)).get("quantity").toString(),
 		    is("100.0"));
-		//		assertThat("Only two stock items", stocks.get(3).get("quantity").toString(), is("10.0"));
+		// assertThat("Only two stock items", stocks.get(3).get("quantity").toString(),
+		// is("10.0"));
 		
 	}
 	
@@ -216,7 +214,8 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("The requested location id store A", ((Map) requestObject.get(0).get("requestedLocation")).get("display")
 		        .toString(), is("store A"));
 		
-		//assertThat("The request has one request item", ((List) requestObject.get(0).get("requisitionItems")).size(), is(1));
+		// assertThat("The request has one request item", ((List)
+		// requestObject.get(0).get("requisitionItems")).size(), is(1));
 		
 		assertThat("The requesting location id store B",
 		    ((Map) requestObject.get(0).get("requestingLocation")).get("display").toString(), is("store B"));
@@ -246,7 +245,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testIssueingAnItemAndViewingIssues() throws Exception {
 		
-		//Given request
+		// Given request
 		Map<String, Object> requisitionMap = createRequisition();
 		
 		String dto = this.readFile("dto/store/issue-create.json");
@@ -257,14 +256,14 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		issue.put("requisition", requsition);
 		
-		//When post an issue
+		// When post an issue
 		MockHttpServletRequest newPostRequest = newPostRequest("store/issue", issue);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		
 		System.out.println("the output");
 		System.out.println(handle.getContentAsString());
 		
-		//Then get issues
+		// Then get issues
 		MockHttpServletRequest newGetRequest = newGetRequest("store/issues", new Parameter("issuedLocationUuid",
 		        "44938888-e444-ggg3-8aee-61d22227c22e"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
@@ -283,7 +282,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testIssueingMoreThanAvailableStock() throws Exception {
-		//Given request
+		// Given request
 		Map<String, Object> requisitionMap = createRequisition();
 		
 		String dto = this.readFile("dto/store/issue-create-30.json");
@@ -294,12 +293,12 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		issue.put("requisition", requsition);
 		
-		//When post an issue
+		// When post an issue
 		MockHttpServletRequest newPostRequest = newPostRequest("store/issue", issue);
 		
 		MockHttpServletResponse handle;
 		String response;
-		//The request should throw an exception
+		// The request should throw an exception
 		try {
 			handle = handle(newPostRequest);
 			response = handle.getContentAsString();
@@ -315,7 +314,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testIssueingFromSeveralBatches() throws Exception {
 		
-		//Given request
+		// Given request
 		Map<String, Object> requisitionMap = createRequisition();
 		
 		String dto = this.readFile("dto/store/issue-create-15.json");
@@ -326,7 +325,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		issue.put("requisition", requsition);
 		
-		//When post an issue
+		// When post an issue
 		MockHttpServletRequest newPostRequest = newPostRequest("store/issue", issue);
 		
 		MockHttpServletResponse handle = handle(newPostRequest);
@@ -358,11 +357,11 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		receipt.put("issue", issue);
 		
-		//post receipt
+		// post receipt
 		MockHttpServletRequest newPostRequest = newPostRequest("store/receive", receipt);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		
-		//get receipts
+		// get receipts
 		MockHttpServletRequest newGetRequest = newGetRequest("store/receipts", new Parameter("issueingLocationUuid",
 		        "44939999-d333-fff2-9bff-61d11117c22e"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
@@ -372,10 +371,10 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testAddingStatusToRequest() throws Exception {
 		
-		//create a request
+		// create a request
 		Map<String, Object> createdRequistionMap = createRequisition();
 		
-		//add status
+		// add status
 		String dto = this.readFile("dto/store/requisition-status-create.json");
 		Map<String, Object> requisitionStatus = (new ObjectMapper()).readValue(dto, Map.class);
 		
@@ -391,9 +390,10 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		StoreService storeService = Context.getService(StoreService.class);
 		List<RequisitionStatus> list = storeService.getRequisitionStatuses();
 		
-		//List<Requisition> reqs = storeService.getRequestsByRequestingLocation("44938888-e444-ggg3-8aee-61d22227c22e");
+		// List<Requisition> reqs =
+		// storeService.getRequestsByRequestingLocation("44938888-e444-ggg3-8aee-61d22227c22e");
 		
-		//get the requests
+		// get the requests
 		
 		MockHttpServletRequest newGetRequest = newGetRequest("store/requests", new Parameter("requestingLocationUuid",
 		        "44938888-e444-ggg3-8aee-61d22227c22e"), new Parameter("page", "1"), new Parameter("pageSize", "1"));
@@ -407,14 +407,14 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Page is 1", (Integer) pagerObject.get("page") == 1, is(true));
 		assertThat("List count is 1", ((List) requests.get("results")).size() == 1, is(true));
 		
-		//		assertThat("requisition statuses are more than one for the request",
-		//		    ((List) requests.get("requisitionStatuses")).size(), is(1));
+		// assertThat("requisition statuses are more than one for the request",
+		// ((List) requests.get("requisitionStatuses")).size(), is(1));
 		
 	}
 	
 	@Test
 	public void testAddingStatusToIssue() throws Exception {
-		//request
+		// request
 		Map<String, Object> requisitionMap = createRequisition();
 		
 		String dto = this.readFile("dto/store/issue-create.json");
@@ -425,7 +425,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		issue.put("requisition", requsition);
 		
-		//post an issue
+		// post an issue
 		MockHttpServletRequest newPostRequest = newPostRequest("store/issue", issue);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		
@@ -441,7 +441,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		issueStatus.put("issue", issueObject);
 		issueStatus.put("status", IssueStatus.IssueStatusCode.ISSUED);
 		
-		//post an issue status
+		// post an issue status
 		MockHttpServletRequest issueStatusPostRequest = newPostRequest("store/issuestatus", issueStatus);
 		MockHttpServletResponse handleIssueStatusPostRequest = handle(issueStatusPostRequest);
 		
@@ -460,7 +460,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testGettingAllStock() throws Exception {
 		
-		//get stock status
+		// get stock status
 		MockHttpServletRequest newGetRequest = newGetRequest("store/stock");
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
@@ -468,14 +468,15 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		assertThat("stock listing has 6 entries:", ((List) stockList.get("results")).size(), is(5));
 		
-		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
+		// assertThat("The stock quantity is 100",
+		// (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
 	}
 	
 	@Test
 	public void testGettingStockByLocation() throws Exception {
 		
-		//get stock status
+		// get stock status
 		MockHttpServletRequest newGetRequest = newGetRequest("store/stock", new Parameter("locationUuid",
 		        "44939999-d333-fff2-9bff-61d11117c22e"), new Parameter("paging", "true"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
@@ -486,14 +487,15 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		assertThat("stock listing has 6 entries:", ((List) stockList.get("results")).size(), is(5));
 		
-		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
+		// assertThat("The stock quantity is 100",
+		// (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
 	}
 	
 	@Test
 	public void testGettingStockByUnknownLocation() throws Exception {
 		
-		//get stock status
+		// get stock status
 		MockHttpServletRequest newGetRequest = newGetRequest("store/stock", new Parameter("locationUuid",
 		        "55555999-d333-fff2-9bff-61d11117c22e"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
@@ -506,7 +508,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testGettingStockByItemAndLocation() throws Exception {
-		//get stock status
+		// get stock status
 		MockHttpServletRequest newGetRequest = newGetRequest("store/item/8o00d43570-8y37-11f3-1234-08002007777/stock",
 		    new Parameter("locationUuid", "44939999-d333-fff2-9bff-61d11117c22e"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
@@ -515,13 +517,14 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		assertThat("stock listing has 4 entries:", stockList.size(), is(4));
 		
-		//assertThat("The stock quantity is 100", (stockList.get(0).get("quantity")).toString(), is("100.0"));
+		// assertThat("The stock quantity is 100",
+		// (stockList.get(0).get("quantity")).toString(), is("100.0"));
 		
 	}
 	
 	@Test
 	public void testGettingStockByItem() throws Exception {
-		//get stock status
+		// get stock status
 		MockHttpServletRequest newGetRequest = newGetRequest("store/item/8o00d43570-8y37-11f3-1234-08002007777/stock");
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
@@ -546,7 +549,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	public void testGettingStockout() throws Exception {
 		// Given
 		
-		//get stock status
+		// get stock status
 		MockHttpServletRequest newGetRequest = newGetRequest("store/stockout");
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
@@ -563,14 +566,14 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testGettingStockoutByLocationWithStock() throws Exception {
-		//Given
+		// Given
 		LocationService locationService = Context.getLocationService();
-		//When
+		// When
 		MockHttpServletRequest newGetRequest = newGetRequest("store/stockout", new Parameter("location",
 		        "44939999-d333-fff2-9bff-61d11117c22e"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
-		//Then
+		// Then
 		String result = handleGet.getContentAsString();
 		Map<String, Object> stockoutList = (new ObjectMapper()).readValue(result, Map.class);
 		System.out.println(stockoutList);
@@ -579,14 +582,14 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testGettingStockoutByLocationWithoutStock() throws Exception {
-		//Given
+		// Given
 		LocationService locationService = Context.getLocationService();
-		//When
+		// When
 		MockHttpServletRequest newGetRequest = newGetRequest("store/stockout", new Parameter("location",
 		        "44938888-e444-ggg3-8aee-61d22227c22e"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
-		//Then
+		// Then
 		Map<String, Object> stockoutList = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		
 		System.out.println(stockoutList);
@@ -596,7 +599,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		newGetRequest = newGetRequest("store/stockout", new Parameter("location", "44939999-d333-fff2-9bff-61d11117c22e"),
 		    new Parameter("q", "spirit"));
 		handleGet = handle(newGetRequest);
-		//Then
+		// Then
 		Map<String, Object> stockoutListBySearch = (new ObjectMapper()).readValue(handleGet.getContentAsString(), Map.class);
 		
 		System.out.println(stockoutListBySearch);
@@ -606,15 +609,15 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testStockMetricsEndpoint() throws Exception {
-		//Give
+		// Give
 		
-		//When
+		// When
 		
 		MockHttpServletRequest newGetRequest = newGetRequest("store/metrics", new Parameter("location",
 		        "44939999-d333-fff2-9bff-61d11117c22e"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		
-		//Then
+		// Then
 		
 	}
 	
@@ -645,7 +648,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		issue.put("requisition", requsition);
 		
-		//post an issue
+		// post an issue
 		MockHttpServletRequest newPostRequest = newPostRequest("store/issue", issue);
 		MockHttpServletResponse handleIssue = handle(newPostRequest);
 		
@@ -654,7 +657,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	public List<Map<String, Object>> getIssuesIssuedFromStoreA() throws Exception {
-		//get issues
+		// get issues
 		MockHttpServletRequest newGetRequest = newGetRequest("store/issues", new Parameter("issuedLocationUuid",
 		        "44938888-e444-ggg3-8aee-61d22227c22e"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
@@ -682,7 +685,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		String dto = this.readFile("dto/store/stock-invoice-create.json");
 		List<Map<String, Object>> stockInvoice = (new ObjectMapper()).readValue(dto, List.class);
 		
-		//post stock invoice
+		// post stock invoice
 		MockHttpServletRequest newPostRequest = newPostRequest("store/stockinvoices", stockInvoice);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		
@@ -692,7 +695,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		assertThat("created 1 stock invoice", createdStockInvoices.size(), is(1));
 		
-		//Get stock invoices
+		// Get stock invoices
 		MockHttpServletRequest newGetRequest = newGetRequest("store/stockinvoices", new Parameter("page", "1"),
 		    new Parameter("pageSize", "1"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
@@ -704,14 +707,14 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Total is 2", (Integer) pagerObject.get("total") == 2, is(true));
 		assertThat("List count is 1", ((List) stockInvoices.get("results")).size() == 1, is(true));
 		
-		//getting specific stock invoice
+		// getting specific stock invoice
 		MockHttpServletRequest newGetRequest3 = newGetRequest("store/stockinvoice/8800zx3570-8z37-11ff-2234-01102007811");
 		MockHttpServletResponse handle3 = handle(newGetRequest3);
 		Map<String, Object> stockInvoiceGet = (new ObjectMapper()).readValue(handle3.getContentAsString(), Map.class);
 		assertThat("There is 1 stock invoice present",
 		    stockInvoiceGet.get("uuid").equals("8800zx3570-8z37-11ff-2234-01102007811"));
 		
-		//Getting stock invoice by status
+		// Getting stock invoice by status
 		MockHttpServletRequest newGetRequest4 = newGetRequest("store/stockinvoices", new Parameter("status", "RECEIVED"));
 		MockHttpServletResponse handle4 = handle(newGetRequest4);
 		System.out.println(handle4.getContentAsString());
@@ -721,7 +724,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		    ((Map) ((List) stockInvoiceGet2.get("results")).get(0)).get("uuid").equals(
 		        "8800zx3570-8z37-11ff-2234-01102007811"));
 		
-		//Getting stock invoice by invoiceNumber
+		// Getting stock invoice by invoiceNumber
 		newGetRequest4 = newGetRequest("store/stockinvoices", new Parameter("q", "inv-101"), new Parameter("startDate",
 		        "2023-01-24"), new Parameter("endDate", "2023-01-26"));
 		handle4 = handle(newGetRequest4);
@@ -736,7 +739,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		String dto = this.readFile("dto/store/supplier-create.json");
 		List<Map<String, Object>> suppliers = (new ObjectMapper()).readValue(dto, List.class);
 		
-		//post stock invoice
+		// post stock invoice
 		MockHttpServletRequest newPostRequest = newPostRequest("store/suppliers", suppliers);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		
@@ -744,7 +747,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		assertThat("created 1 supplier", createdSuppliers.size(), is(1));
 		
-		//Getsuppliers
+		// Getsuppliers
 		MockHttpServletRequest newGetRequest = newGetRequest("store/suppliers", new Parameter("startIndex", "1"),
 		    new Parameter("limit", "10"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
@@ -753,7 +756,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		System.out.println(suppliersObjectMap);
 		assertThat("get 1 supplier", suppliersObjectMap.size(), is(1));
 		
-		//update suppliers
+		// update suppliers
 		String dto2 = this.readFile("dto/store/supplier-update.json");
 		Map<String, Object> supplierUpdate = (new ObjectMapper()).readValue(dto2, Map.class);
 		
@@ -770,7 +773,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		String dto = this.readFile("dto/store/stock-invoice-status-create.json");
 		List<Map<String, Object>> stockInvoiceStatusMapList = (new ObjectMapper()).readValue(dto, List.class);
 		
-		//post stock invoices status
+		// post stock invoices status
 		MockHttpServletRequest newPostRequest = newPostRequest("store/stockinvoicesstatus", stockInvoiceStatusMapList);
 		MockHttpServletResponse handle = handle(newPostRequest);
 		List<Map<String, Object>> createdStockInvoicesStatus = (new ObjectMapper()).readValue(handle.getContentAsString(),
@@ -806,7 +809,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void creatingAndGettingStockInvoiceItems() throws Exception {
 		
-		//getting specific stock invoice
+		// getting specific stock invoice
 		MockHttpServletRequest newGetRequest3 = newGetRequest("store/stockinvoiceitem/8800zx3570-8z37-11ff-2234-01102007812");
 		MockHttpServletResponse handle3 = handle(newGetRequest3);
 		Map<String, Object> stockInvoiceItemGet = (new ObjectMapper()).readValue(handle3.getContentAsString(), Map.class);
@@ -829,7 +832,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		
 		Map<String, Object> invoiceItemMap = (Map) (((List) stockInvoiceMap.get("invoiceItems")).get(0));
 		
-		//updating stock invoice status
+		// updating stock invoice status
 		MockHttpServletRequest newGetRequest = newGetRequest("store/stock", new Parameter("locationUuid",
 		        ((Map) invoiceItemMap.get("location")).get("uuid").toString()));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
@@ -848,7 +851,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> updateInvoiceItem = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat(" The stock invoice item has been updated", updateInvoiceItem.get("batchNo").equals("batch-9"));
 		
-		//updating stock invoice item status and saving stock
+		// updating stock invoice item status and saving stock
 		
 		MockHttpServletRequest newGetRequest = newGetRequest("store/stock", new Parameter("locationUuid",
 		        ((Map) stockInvoiceItemMap.get("location")).get("uuid").toString()));
@@ -875,7 +878,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("There is one created requisition item",
 		    ((Map) createdRequisition.get("item")).get("uuid").equals("8o00d43570-8y37-11f3-1234-08002007777"));
 		
-		//Update requisition Item
+		// Update requisition Item
 		String dto2 = this.readFile("dto/store/requisition-item-update.json");
 		Map<String, Object> requisitionMap2 = (new ObjectMapper()).readValue(dto2, Map.class);
 		MockHttpServletRequest newPostRequest2 = newPostRequest("store/requestitem/8800zx3570-8z37-11ff-2234-01102007815",
@@ -897,11 +900,11 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		assertThat("There is 1 requisition updated",
 		    updateRequisition.get("uuid").equals("8800zx3570-8z37-11ff-2234-01102007813"));
 		
-		//updating statuses of requisition items
+		// updating statuses of requisition items
 		MockHttpServletRequest newGetRequest = newGetRequest("store/request/8800zx3570-8z37-11ff-2234-01102007813");
 		MockHttpServletResponse handleGet = handle(newGetRequest);
 		Map<String, Object> handleGetObject = new ObjectMapper().readValue(handleGet.getContentAsString(), Map.class);
-		//System.out.println(((List)handleGetObject.get("requisitionItems")).get("requisitionItemStatuses"));
+		// System.out.println(((List)handleGetObject.get("requisitionItems")).get("requisitionItemStatuses"));
 		assertThat("There is a pending requisition item status",
 		    (((Map) ((List) ((Map) ((List) handleGetObject.get("requisitionItems")).get(0)).get("requisitionItemStatuses"))
 		            .get(0)).get("status")).equals("PENDING"));
@@ -911,7 +914,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void getStockMetricsList() throws Exception {
 		
-		//expired items
+		// expired items
 		MockHttpServletRequest newGetRequest = newGetRequest("store/expireditems", new Parameter("location",
 		        "44939999-d333-fff2-9bff-61d11117c22e"));
 		MockHttpServletResponse handleGet = handle(newGetRequest);
@@ -919,7 +922,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		System.out.println("expired " + handleGet.getContentAsString());
 		assertThat("The list of expired drugs", ((List) handleGetObject.get("results")).size() == 3);
 		
-		//nearly stockout items
+		// nearly stockout items
 		MockHttpServletRequest newGetRequest1 = newGetRequest("store/nearlystockoutitems", new Parameter("location",
 		        "44939999-d333-fff2-9bff-61d11117c22e"));
 		MockHttpServletResponse handleGet1 = handle(newGetRequest1);
@@ -927,7 +930,7 @@ public class StoreControllerAPITest extends BaseResourceControllerTest {
 		System.out.println("nearlystockout " + handleGet1.getContentAsString());
 		assertThat("The list of nearly stockout items", ((List) handleGetObject1.get("results")).size() == 1);
 		
-		//nearly expired items
+		// nearly expired items
 		MockHttpServletRequest newGetRequest2 = newGetRequest("store/nearlyexpireditems", new Parameter("location",
 		        "44939999-d333-fff2-9bff-61d11117c22e"));
 		MockHttpServletResponse handleGet2 = handle(newGetRequest2);

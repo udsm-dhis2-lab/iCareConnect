@@ -12,5 +12,5 @@ import org.openmrs.module.icare.core.dao.BaseDAO;
  * @author Hibernate Tools
  */
 public class DiscountDAO extends BaseDAO<Discount> {
-
+	
 }

@@ -14,12 +14,10 @@ import org.hibernate.type.Type;
 import org.openmrs.api.context.Context;
 
 public class DAOUtils {
-
+	
 	/**
-	 * Finds all the types for associations to audit in as recursive way i.e if a
-	 * Persistent type is
-	 * found, then we also find its collection element types and types for fields
-	 * mapped as one to
+	 * Finds all the types for associations to audit in as recursive way i.e if a Persistent type is
+	 * found, then we also find its collection element types and types for fields mapped as one to
 	 * one.
 	 * 
 	 * @param clazz the Class to match against
@@ -28,15 +26,13 @@ public class DAOUtils {
 	public static Set<Class<?>> getAssociationTypesToAudit(Class<?> clazz) {
 		return getAssociationTypesToAuditInternal(clazz, null);
 	}
-
+	
 	/**
-	 * Finds all the types for associations to audit in as recursive way i.e if a
-	 * Persistent type is
-	 * found, then we also find its collection element types and types for fields
-	 * mapped as one to
+	 * Finds all the types for associations to audit in as recursive way i.e if a Persistent type is
+	 * found, then we also find its collection element types and types for fields mapped as one to
 	 * one.
 	 * 
-	 * @param clazz           the Class to match against
+	 * @param clazz the Class to match against
 	 * @param foundAssocTypes the found association types
 	 * @return a set of found class names
 	 */
@@ -44,7 +40,7 @@ public class DAOUtils {
 		if (foundAssocTypes == null) {
 			foundAssocTypes = new HashSet<Class<?>>();
 		}
-
+		
 		ClassMetadata cmd = getSessionFactory().getClassMetadata(clazz);
 		if (cmd != null) {
 			for (Type type : cmd.getPropertyTypes()) {
@@ -55,19 +51,19 @@ public class DAOUtils {
 					if (collType.isCollectionType()) {
 						collType = (CollectionType) type;
 						isManyToManyColl = ((SessionFactoryImplementor) getSessionFactory()).getCollectionPersister(
-								collType.getRole()).isManyToMany();
+						    collType.getRole()).isManyToMany();
 					}
 					Class<?> assocType = type.getReturnedClass();
 					if (type.isCollectionType()) {
 						assocType = collType.getElementType((SessionFactoryImplementor) getSessionFactory())
-								.getReturnedClass();
+						        .getReturnedClass();
 					}
-
+					
 					// Ignore non persistent types
 					if (getSessionFactory().getClassMetadata(assocType) == null) {
 						continue;
 					}
-
+					
 					if (!foundAssocTypes.contains(assocType)) {
 						// Don't implicitly audit types for many to many collections items
 						if (!type.isCollectionType() || (type.isCollectionType() && !isManyToManyColl)) {
@@ -81,10 +77,9 @@ public class DAOUtils {
 		}
 		return foundAssocTypes;
 	}
-
+	
 	/**
-	 * Gets a set of concrete subclasses for the specified class recursively, note
-	 * that interfaces
+	 * Gets a set of concrete subclasses for the specified class recursively, note that interfaces
 	 * and abstract classes are excluded
 	 * 
 	 * @param clazz the Super Class
@@ -95,29 +90,27 @@ public class DAOUtils {
 	public static Set<Class<?>> getPersistentConcreteSubclasses(Class<?> clazz) {
 		return getPersistentConcreteSubclassesInternal(clazz, null, null);
 	}
-
+	
 	/**
-	 * Gets a set of concrete subclasses for the specified class recursively, note
-	 * that interfaces
+	 * Gets a set of concrete subclasses for the specified class recursively, note that interfaces
 	 * and abstract classes are excluded
 	 * 
-	 * @param clazz           the Super Class
-	 * @param foundSubclasses the list of subclasses found in previous recursive
-	 *                        calls, should be
-	 *                        null for the first call
-	 * @param mappedClasses   the ClassMetadata Collection
+	 * @param clazz the Super Class
+	 * @param foundSubclasses the list of subclasses found in previous recursive calls, should be
+	 *            null for the first call
+	 * @param mappedClasses the ClassMetadata Collection
 	 * @return a set of subclasses
 	 */
 	@SuppressWarnings("unchecked")
 	private static Set<Class<?>> getPersistentConcreteSubclassesInternal(Class<?> clazz, Set<Class<?>> foundSubclasses,
-			Collection<ClassMetadata> mappedClasses) {
+	        Collection<ClassMetadata> mappedClasses) {
 		if (foundSubclasses == null) {
 			foundSubclasses = new HashSet<Class<?>>();
 		}
 		if (mappedClasses == null) {
 			mappedClasses = getSessionFactory().getAllClassMetadata().values();
 		}
-
+		
 		if (clazz != null) {
 			for (ClassMetadata cmd : mappedClasses) {
 				Class<?> possibleSubclass = cmd.getMappedClass();
@@ -126,18 +119,18 @@ public class DAOUtils {
 						foundSubclasses.add(possibleSubclass);
 					}
 					foundSubclasses.addAll(getPersistentConcreteSubclassesInternal(possibleSubclass, foundSubclasses,
-							mappedClasses));
+					    mappedClasses));
 				}
 			}
 		}
-
+		
 		return foundSubclasses;
 	}
-
+	
 	public static ClassMetadata getClassMetadata(Class<?> clazz) {
 		return getSessionFactory().getClassMetadata(clazz);
 	}
-
+	
 	public static SessionFactory getSessionFactory() {
 		return Context.getRegisteredComponents(SessionFactory.class).get(0);
 	}

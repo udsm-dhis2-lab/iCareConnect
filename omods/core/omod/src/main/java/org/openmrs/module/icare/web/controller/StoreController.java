@@ -1,31 +1,55 @@
 package org.openmrs.module.icare.web.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.DrugOrder;
 import org.openmrs.Encounter;
 import org.openmrs.Location;
 import org.openmrs.PatientProgram;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.models.EncounterPatientProgram;
-import org.openmrs.module.icare.laboratory.models.Sample;
-import org.openmrs.module.icare.store.models.*;
+import org.openmrs.module.icare.store.models.Issue;
+import org.openmrs.module.icare.store.models.IssueItem;
+import org.openmrs.module.icare.store.models.IssueItemStatus;
+import org.openmrs.module.icare.store.models.IssueStatus;
+import org.openmrs.module.icare.store.models.Ledger;
+import org.openmrs.module.icare.store.models.LedgerType;
+import org.openmrs.module.icare.store.models.OrderStatus;
+import org.openmrs.module.icare.store.models.Receipt;
+import org.openmrs.module.icare.store.models.ReceiptItem;
+import org.openmrs.module.icare.store.models.ReorderLevel;
+import org.openmrs.module.icare.store.models.Requisition;
+import org.openmrs.module.icare.store.models.RequisitionItem;
+import org.openmrs.module.icare.store.models.RequisitionItemStatus;
+import org.openmrs.module.icare.store.models.RequisitionStatus;
+import org.openmrs.module.icare.store.models.Stock;
+import org.openmrs.module.icare.store.models.StockInvoice;
+import org.openmrs.module.icare.store.models.StockInvoiceItem;
+import org.openmrs.module.icare.store.models.StockInvoiceStatus;
+import org.openmrs.module.icare.store.models.Supplier;
 import org.openmrs.module.icare.store.services.StoreService;
 import org.openmrs.module.icare.store.util.StockOutException;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/store")
@@ -312,11 +336,12 @@ public class StoreController {
 			ListResult<Requisition> requisitions = this.storeService.getRequestsForRequestedLocation(requestedLocationUuid,
 			    pager, status, orderByDirection, q, start, end);
 			
-			//			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
+			// List<Map<String, Object>> requisitionsList = new ArrayList<Map<String,
+			// Object>>();
 			//
-			//			for (Requisition requisition : requisitions.getResults()) {
-			//				requisitionsList.add(requisition.toMap());
-			//			}
+			// for (Requisition requisition : requisitions.getResults()) {
+			// requisitionsList.add(requisition.toMap());
+			// }
 			
 			return requisitions.toMap();
 			
@@ -326,11 +351,12 @@ public class StoreController {
 			ListResult<Requisition> requisitions = this.storeService.getRequestsByRequestingLocation(requestingLocationUuid,
 			    pager, status, orderByDirection, q, start, end);
 			
-			//			List<Map<String, Object>> requisitionsList = new ArrayList<Map<String, Object>>();
+			// List<Map<String, Object>> requisitionsList = new ArrayList<Map<String,
+			// Object>>();
 			//
-			//			for (Requisition requisition : requisitions.getResults()) {
-			//				requisitionsList.add(requisition.toMap());
-			//			}
+			// for (Requisition requisition : requisitions.getResults()) {
+			// requisitionsList.add(requisition.toMap());
+			// }
 			
 			return requisitions.toMap();
 		}
@@ -573,15 +599,16 @@ public class StoreController {
 		if (locationUuid != null) {
 			stocklist = this.storeService.getStockByLocation(locationUuid, pager, q, startIndex, limit, conceptClassName);
 		} else {
-			//			stocksStatus = this.storeService.getAllStockStatusMetrics();
+			// stocksStatus = this.storeService.getAllStockStatusMetrics();
 			stocklist = this.storeService.getAllStock(pager);
 			
 		}
 		
-		//		List<Map<String, Object>> stockStatusResponse = new ArrayList<Map<String, Object>>();
-		//		for (Stock stock : stocksStatus) {
-		//			stockStatusResponse.add(stock.toMap());
-		//		}
+		// List<Map<String, Object>> stockStatusResponse = new ArrayList<Map<String,
+		// Object>>();
+		// for (Stock stock : stocksStatus) {
+		// stockStatusResponse.add(stock.toMap());
+		// }
 		return stocklist.toMap();
 	}
 	
@@ -673,10 +700,11 @@ public class StoreController {
 		} else {
 			stockObjects = storeService.getStockout(pager);
 		}
-		//		List<Map<String, Object>> stockStatusResponse = new ArrayList<Map<String, Object>>();
-		//		for (Item item : stockObjects) {
-		//			stockStatusResponse.add(item.toMap());
-		//		}
+		// List<Map<String, Object>> stockStatusResponse = new ArrayList<Map<String,
+		// Object>>();
+		// for (Item item : stockObjects) {
+		// stockStatusResponse.add(item.toMap());
+		// }
 		return stockObjects.toMap();
 	}
 	
@@ -749,19 +777,20 @@ public class StoreController {
 		
 	}
 	
-	@RequestMapping(value = "stockinvoices",method = RequestMethod.POST)
+	@RequestMapping(value = "stockinvoices", method = RequestMethod.POST)
 	@ResponseBody
-	public List<Map<String,Object>> addStockInvoices(@RequestBody List<Map<String,Object>> stockInvoicesMap) throws Exception {
+	public List<Map<String, Object>> addStockInvoices(@RequestBody List<Map<String, Object>> stockInvoicesMap)
+			throws Exception {
 
 		StockInvoice stockInvoice = new StockInvoice();
-		List<Map<String,Object>> newStockInvoicesObject = new ArrayList<>();
+		List<Map<String, Object>> newStockInvoicesObject = new ArrayList<>();
 
-		for(Map<String,Object> stockInvoiceMap : stockInvoicesMap){
+		for (Map<String, Object> stockInvoiceMap : stockInvoicesMap) {
 
 			stockInvoice = StockInvoice.fromMap(stockInvoiceMap);
 
 			List<StockInvoiceItem> stockInvoiceItems = new ArrayList<>();
-			for (Map<String, Object> invoiceItemMap : (List<Map<String, Object>>) stockInvoiceMap.get("invoiceItems")){
+			for (Map<String, Object> invoiceItemMap : (List<Map<String, Object>>) stockInvoiceMap.get("invoiceItems")) {
 				StockInvoiceItem stockInvoiceItem = StockInvoiceItem.fromMap(invoiceItemMap);
 				stockInvoiceItem.setStockInvoice(stockInvoice);
 				stockInvoiceItems.add(stockInvoiceItem);
@@ -777,13 +806,14 @@ public class StoreController {
 
 	}
 	
-	@RequestMapping(value = "stockinvoice/{stockInvoiceUuid}",method = RequestMethod.POST)
+	@RequestMapping(value = "stockinvoice/{stockInvoiceUuid}", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String,Object> updateStockInvoice(@PathVariable String stockInvoiceUuid, @RequestBody Map<String,Object> stockInvoiceMap) throws Exception {
+	public Map<String, Object> updateStockInvoice(@PathVariable String stockInvoiceUuid,
+			@RequestBody Map<String, Object> stockInvoiceMap) throws Exception {
 
 		StockInvoice stockInvoice = StockInvoice.fromMap(stockInvoiceMap);
 		stockInvoice.setUuid(stockInvoiceUuid);
-		if(stockInvoiceMap.get("invoiceItems") != null) {
+		if (stockInvoiceMap.get("invoiceItems") != null) {
 			List<StockInvoiceItem> stockInvoiceItems = new ArrayList<>();
 			for (Map<String, Object> invoiceItemMap : (List<Map<String, Object>>) stockInvoiceMap.get("invoiceItems")) {
 				StockInvoiceItem stockInvoiceItem = StockInvoiceItem.fromMap(invoiceItemMap);
@@ -844,14 +874,15 @@ public class StoreController {
 		
 	}
 	
-	@RequestMapping(value = "suppliers",method = RequestMethod.POST)
+	@RequestMapping(value = "suppliers", method = RequestMethod.POST)
 	@ResponseBody
-	public List<Map<String,Object>> addSuppliers(@RequestBody List<Map<String,Object>> suppliersMap) throws Exception {
+	public List<Map<String, Object>> addSuppliers(@RequestBody List<Map<String, Object>> suppliersMap)
+			throws Exception {
 
 		Supplier supplier = new Supplier();
-		List<Map<String,Object>> newSuppliersMapList = new ArrayList<>();
+		List<Map<String, Object>> newSuppliersMapList = new ArrayList<>();
 
-		for(Map<String,Object> supplierMap : suppliersMap){
+		for (Map<String, Object> supplierMap : suppliersMap) {
 			supplier = Supplier.fromMap(supplierMap);
 
 			Supplier savedSupplier = storeService.saveSupplier(supplier);
@@ -872,25 +903,28 @@ public class StoreController {
 		return updatedSupplier.toMap();
 	}
 	
-	@RequestMapping(value="suppliers",method = RequestMethod.GET)
+	@RequestMapping(value = "suppliers", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String,Object>> getSuppliers(@RequestParam(value = "startIndex",required = false,defaultValue = "0") Integer startIndex,@RequestParam(value="limit" ,required=false,defaultValue = "100") Integer limit){
+	public List<Map<String, Object>> getSuppliers(
+			@RequestParam(value = "startIndex", required = false, defaultValue = "0") Integer startIndex,
+			@RequestParam(value = "limit", required = false, defaultValue = "100") Integer limit) {
 
-		List<Supplier> suppliers = storeService.getSuppliers(startIndex,limit);
-		List<Map<String,Object>> suppliersMap = new ArrayList<>();
-		for (Supplier supplier : suppliers){
+		List<Supplier> suppliers = storeService.getSuppliers(startIndex, limit);
+		List<Map<String, Object>> suppliersMap = new ArrayList<>();
+		for (Supplier supplier : suppliers) {
 			suppliersMap.add(supplier.toMap());
 		}
 		return suppliersMap;
 
 	}
 	
-	@RequestMapping(value = "stockinvoicesstatus",method = RequestMethod.POST)
+	@RequestMapping(value = "stockinvoicesstatus", method = RequestMethod.POST)
 	@ResponseBody
-	public List<Map<String,Object>> addStockInvoiceStatuses(@RequestBody List<Map<String,Object>> stockInvoicesStatusMap) throws Exception {
+	public List<Map<String, Object>> addStockInvoiceStatuses(
+			@RequestBody List<Map<String, Object>> stockInvoicesStatusMap) throws Exception {
 
-		List<Map<String,Object>> newStockInvoiceStatusMapList = new ArrayList<>();
-		for(Map<String,Object> stockInvoiceStatusMap : stockInvoicesStatusMap){
+		List<Map<String, Object>> newStockInvoiceStatusMapList = new ArrayList<>();
+		for (Map<String, Object> stockInvoiceStatusMap : stockInvoicesStatusMap) {
 			StockInvoiceStatus stockInvoiceStatus = StockInvoiceStatus.fromMap(stockInvoiceStatusMap);
 
 			StockInvoiceStatus savedStockInvoiceStatus = storeService.saveStockInvoiceStatus(stockInvoiceStatus);
@@ -900,13 +934,16 @@ public class StoreController {
 		return newStockInvoiceStatusMapList;
 	}
 	
-	@RequestMapping(value ="stockinvoicesstatus", method = RequestMethod.GET)
+	@RequestMapping(value = "stockinvoicesstatus", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String,Object>> getStockInvoicesStatus(@RequestParam(value = "startIndex",defaultValue = "0", required = false) Integer startIndex,@RequestParam(value="limit",required = false,defaultValue = "100") Integer limit, @RequestParam(required = false) String q){
+	public List<Map<String, Object>> getStockInvoicesStatus(
+			@RequestParam(value = "startIndex", defaultValue = "0", required = false) Integer startIndex,
+			@RequestParam(value = "limit", required = false, defaultValue = "100") Integer limit,
+			@RequestParam(required = false) String q) {
 
-		List<StockInvoiceStatus> stockInvoiceStatusList = storeService.getStockInvoicesStatus(startIndex,limit,q);
-		List<Map<String,Object>> stockInvoiceStatusMapList = new ArrayList<>();
-		for(StockInvoiceStatus stockInvoiceStatus : stockInvoiceStatusList){
+		List<StockInvoiceStatus> stockInvoiceStatusList = storeService.getStockInvoicesStatus(startIndex, limit, q);
+		List<Map<String, Object>> stockInvoiceStatusMapList = new ArrayList<>();
+		for (StockInvoiceStatus stockInvoiceStatus : stockInvoiceStatusList) {
 			stockInvoiceStatusMapList.add(stockInvoiceStatus.toMap());
 		}
 
@@ -934,7 +971,7 @@ public class StoreController {
 	
 	@RequestMapping(value = "reports/summarycost", method = RequestMethod.GET)
 	@ResponseBody
-	public Map<String,Object> getStockItemsSummaryCost(
+	public Map<String, Object> getStockItemsSummaryCost(
 			@RequestParam(value = "stockInvoice", required = false) String stockInvoice,
 			@RequestParam(value = "startDate", required = false) String startDate,
 			@RequestParam(value = "endDate", required = false) String endDate,
@@ -942,8 +979,7 @@ public class StoreController {
 			@RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
 			@RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
 			@RequestParam(value = "provider", required = false) String provider,
-			@RequestParam(value = "paymentScheme", required = false) String paymentScheme
-	) throws Exception {
+			@RequestParam(value = "paymentScheme", required = false) String paymentScheme) throws Exception {
 		try {
 			Date start = null;
 			Date end = null;
@@ -966,57 +1002,63 @@ public class StoreController {
 					paymentScheme);
 			Pager pagerInfo = response.getPager();
 			List<Object[]> results = response.getResults();
-			Map<String,Object> outputData = new HashMap<>();
-			for (Object[] result: results) {
+			Map<String, Object> outputData = new HashMap<>();
+			for (Object[] result : results) {
 				double totalBuyingAmount = Double.parseDouble(result[0].toString());
-				Item item =  (Item) result[1];
+				Item item = (Item) result[1];
 				StockInvoice stockInvoiceData = (StockInvoice) result[2];
 				double totalItemAmount = Double.parseDouble(result[3].toString());
 				double totalItemIncomeExpected = 0.0;
 				if (paymentScheme != null) {
 					totalItemIncomeExpected = Double.parseDouble(result[4].toString());
 				}
-				Map<String,Object> itemBuyAndSellDetails = item.toMap();
+				Map<String, Object> itemBuyAndSellDetails = item.toMap();
 				if (!item.getPrices().isEmpty()) {
-					List<Map<String,Object>> pricesBuyAndSellingAmount = new ArrayList<>();
-					for (ItemPrice itemPrice: item.getPrices()) {
-						Map<String,Object> priceDetails = new HashMap<>();
+					List<Map<String, Object>> pricesBuyAndSellingAmount = new ArrayList<>();
+					for (ItemPrice itemPrice : item.getPrices()) {
+						Map<String, Object> priceDetails = new HashMap<>();
 						priceDetails.put("price", itemPrice.getPrice());
 						priceDetails.put("totalBuyAmount", totalBuyingAmount);
-						priceDetails.put("totalExpectedSellAmount", itemPrice.getPrice().doubleValue() * totalItemAmount);
+						priceDetails.put("totalExpectedSellAmount",
+								itemPrice.getPrice().doubleValue() * totalItemAmount);
 						pricesBuyAndSellingAmount.add(priceDetails);
 					}
 					itemBuyAndSellDetails.put("itemBuyAndSellDetails", pricesBuyAndSellingAmount);
 				}
 				outputData.put("totalBuyingAmount", totalBuyingAmount);
-				outputData.put("totalItemIncomeExpected",totalItemIncomeExpected);
+				outputData.put("totalItemIncomeExpected", totalItemIncomeExpected);
 				outputData.put("itemBuyAndSellDetails", itemBuyAndSellDetails);
 			}
 			outputData.put("pager", pagerInfo);
 			return outputData;
 		} catch (Exception e) {
-			throw  new Exception(e.getMessage());
+			throw new Exception(e.getMessage());
 		}
 	}
 	
 	@RequestMapping(value = "encounterpatientprogram", method = RequestMethod.POST)
 	@ResponseBody
-	public List<Map<String, Object>> createEncounterPatientProgram(@RequestBody Map<String, Object> encounterPatientProgramMap) {
+	public List<Map<String, Object>> createEncounterPatientProgram(
+			@RequestBody Map<String, Object> encounterPatientProgramMap) {
 
 		List<Map<String, Object>> encounterWorkflowStateListMap = new ArrayList<>();
 		if (encounterPatientProgramMap.get("encounters") != null) {
-			for (Map<String, Object> encounterMap : (List<Map<String, Object>>) encounterPatientProgramMap.get("encounters")) {
+			for (Map<String, Object> encounterMap : (List<Map<String, Object>>) encounterPatientProgramMap
+					.get("encounters")) {
 
 				EncounterPatientProgram encounterPatientProgram = new EncounterPatientProgram();
-				Encounter encounter = Context.getEncounterService().getEncounterByUuid(encounterMap.get("uuid").toString());
+				Encounter encounter = Context.getEncounterService()
+						.getEncounterByUuid(encounterMap.get("uuid").toString());
 				encounterPatientProgram.setEncounter(encounter);
 
 				if (encounterPatientProgramMap.get("patientProgram") != null) {
 
-					PatientProgram patientProgram = Context.getProgramWorkflowService().getPatientProgramByUuid(((Map) encounterPatientProgramMap.get("patientProgram")).get("uuid").toString());
+					PatientProgram patientProgram = Context.getProgramWorkflowService().getPatientProgramByUuid(
+							((Map) encounterPatientProgramMap.get("patientProgram")).get("uuid").toString());
 					encounterPatientProgram.setPatientProgram(patientProgram);
 				}
-				EncounterPatientProgram savedEncounterPatientProgram = iCareService.saveEncounterPatientProgram(encounterPatientProgram);
+				EncounterPatientProgram savedEncounterPatientProgram = iCareService
+						.saveEncounterPatientProgram(encounterPatientProgram);
 				encounterWorkflowStateListMap.add(savedEncounterPatientProgram.toMap());
 			}
 		}
