@@ -105,8 +105,6 @@ export class PatientListComponent implements OnInit, OnChanges {
     // if (this.filterCategory === "billing") {
     //   this.includeDeadPatients = true;
     // }
-
-    console.log('Items per page 2:', this.itemsPerPage);
     this.getVisits(this.visits);
   }
 
