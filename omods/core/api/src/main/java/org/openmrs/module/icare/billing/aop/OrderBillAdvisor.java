@@ -36,9 +36,9 @@ import org.springframework.aop.Advisor;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
 
 public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor implements Advisor {
-
+	
 	protected final Log log = LogFactory.getLog(getClass());
-
+	
 	@Override
 	public boolean matches(Method method, Class<?> aClass) {
 		log.info("ICareAdvice Matching:" + method.getName());
@@ -46,14 +46,14 @@ public class OrderBillAdvisor extends StaticMethodMatcherPointcutAdvisor impleme
 			return true;
 		return false;
 	}
-
+	
 	@Override
 	public Advice getAdvice() {
 		return new OrderBillCreationAdvice();
 	}
-
+	
 	private class OrderBillCreationAdvice implements MethodInterceptor {
-
+		
 		public Object invoke(MethodInvocation invocation) throws Throwable {
 			BillingService billingService = Context.getService(BillingService.class);
 			if (invocation.getArguments()[0] instanceof TestOrder) {

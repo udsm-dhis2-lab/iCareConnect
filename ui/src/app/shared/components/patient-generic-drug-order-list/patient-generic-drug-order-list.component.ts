@@ -54,7 +54,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   isThereDiagnosisProvided$: Observable<boolean>;
   drugOrders$: Observable<any>;
   drugOrders: any[];
-  selectedPatientData:string[];
+  selectedPatientData: string[];
   drugOrdersKeyedByEncounter: any = {};
 
   @Output() orderSelectAction = new EventEmitter<TableSelectAction>();
@@ -223,9 +223,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   //   prescriptionArrangementFields: any
   // ) {
   //   console.log("Patient Data kk:", this.visit?.visit?.patient);
-   
 
-    
   //   const dialog = this.dialog.open(DispensingFormComponent, {
   //     width: "100%",
   //     disableClose: true,
@@ -253,14 +251,37 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   //     this.loadPatientVisit.emit();
   //   });
 
-  
   // }
   onVerify(
     order: any,
     specificDrugConceptUuid: any,
     prescriptionArrangementFields: any
   ) {
-    console.log("Patient Data kk:", this.visit?.visit?.patient);
+    const dispensingDialog = this.dialog.open(DispensingFormComponent, {
+      width: "100%",
+      disableClose: true,
+      data: {
+        drugOrder: order,
+        patient: this.visit?.visit?.patient,
+        visit: this.visit,
+        location: this.currentLocation,
+        encounterUuid: this.encounterUuid,
+        drugInstructions: arrangeDrugDetails(
+          order,
+          specificDrugConceptUuid,
+          prescriptionArrangementFields
+        )?.description,
+        fromDispensing: true,
+        showAddButton: false,
+        useGenericPrescription: this.useGenericPrescription,
+      },
+    });
+
+    dispensingDialog.afterClosed().subscribe(() => {
+      // This logic runs after the DispensingFormComponent dialog is closed
+      this.loadPatientVisit.emit();
+    });
+    /* console.log("Patient Data kk:", this.visit?.visit?.patient);
   
     const fingerCaptureDialog = this.dialog.open(FingerCaptureComponent, {
       width: "45%",
@@ -294,9 +315,8 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
         // This logic runs after the DispensingFormComponent dialog is closed
         this.loadPatientVisit.emit();
       });
-    });
+    });*/
   }
-  
 
   onPrintPrescriptions(
     event: Event,

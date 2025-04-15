@@ -2,7 +2,6 @@ package org.openmrs.module.icare.laboratory.services;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.openmrs.*;
-//import org.openmrs.api.ObsService;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.context.Context;
@@ -234,30 +233,32 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		return this.sampleStatusDAO.save(sampleStatus);
 	}
 	
-	// public SampleStatus updateSampleStatus(SampleStatus sampleStatus) throws Exception {
+	// public SampleStatus updateSampleStatus(SampleStatus sampleStatus) throws
+	// Exception {
 	
-	// 	Sample sample = this.getSampleByUuid(sampleStatus.getSample().getUuid());
-	// 	if (sample == null) {
-	// 		throw new Exception("Sample with ID '" + sampleStatus.getSample().getUuid() + "' does not exist.");
-	// 	}
-	// 	User user = new User();
-	// 	if (sampleStatus.getUser() != null) {
-	// 		Context.getUserService().getUserByUuid(sampleStatus.getUser().getUuid());
-	// 	} else {
-	// 		user = Context.getAuthenticatedUser();
-	// 	}
+	// Sample sample = this.getSampleByUuid(sampleStatus.getSample().getUuid());
+	// if (sample == null) {
+	// throw new Exception("Sample with ID '" + sampleStatus.getSample().getUuid() +
+	// "' does not exist.");
+	// }
+	// User user = new User();
+	// if (sampleStatus.getUser() != null) {
+	// Context.getUserService().getUserByUuid(sampleStatus.getUser().getUuid());
+	// } else {
+	// user = Context.getAuthenticatedUser();
+	// }
 	
-	// 	if (user == null) {
-	// 		throw new Exception("The user is not authenticated.");
-	// 	}
-	// 	sampleStatus.setSample(sample);
-	// 	sampleStatus.setUser(user);
-	// 	return this.sampleStatusDAO.save(sampleStatus);
+	// if (user == null) {
+	// throw new Exception("The user is not authenticated.");
+	// }
+	// sampleStatus.setSample(sample);
+	// sampleStatus.setUser(user);
+	// return this.sampleStatusDAO.save(sampleStatus);
 	// }
 	
 	@Override
 	public TestAllocation allocateTestWithSample(TestAllocation testAllocation) throws Exception {
-		//Check preconditions
+		// Check preconditions
 		if (testAllocation.getContainer().getUuid() == null) {
 			throw new Exception("Container UUID does not exist. Container uuid must be specified");
 		}
@@ -268,7 +269,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			throw new Exception("Order UUID does not exist. Order uuid must be specified");
 		}
 		
-		//Setting Values
+		// Setting Values
 		Order order = Context.getOrderService().getOrderByUuid(testAllocation.getSampleOrder().getOrder().getUuid());
 		if (order == null) {
 			throw new Exception("Order with ID '" + testAllocation.getSampleOrder().getOrder().getUuid()
@@ -338,7 +339,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				throw new Exception("Order UUID does not exist. Order uuid must be specified");
 			}
 			
-			//Setting Values
+			// Setting Values
 			Order order = Context.getOrderService().getOrderByUuid(testAllocation.getSampleOrder().getOrder().getUuid());
 			if (order == null) {
 				throw new Exception("Order with ID '" + testAllocation.getSampleOrder().getOrder().getUuid()
@@ -425,17 +426,17 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public List<Sample> getAllocationsBySample(String sampleUuid) {
-		//		Sample sample = this.sampleDAO.findByUuid(sampleUuid);
-		//		List<Map<String, Object>> allocations = new ArrayList<>();
-		//		if (sample.getSampleOrders().size() > 0) {
-		//			for (SampleOrder order: sample.getSampleOrders()) {
-		//				if (order.getTestAllocations().size() > 0) {
-		//					for (TestAllocation allocation: order.getTestAllocations()) {
-		//						allocations.add(allocation.toMap());
-		//					}
-		//				}
-		//			}
-		//		}
+		// Sample sample = this.sampleDAO.findByUuid(sampleUuid);
+		// List<Map<String, Object>> allocations = new ArrayList<>();
+		// if (sample.getSampleOrders().size() > 0) {
+		// for (SampleOrder order: sample.getSampleOrders()) {
+		// if (order.getTestAllocations().size() > 0) {
+		// for (TestAllocation allocation: order.getTestAllocations()) {
+		// allocations.add(allocation.toMap());
+		// }
+		// }
+		// }
+		// }
 		return this.testAllocationDAO.getAllocationsBySample(sampleUuid);
 	}
 	
@@ -519,8 +520,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		Result response = this.resultDAO.save(result);
 		
 		/*
-		Save status via results
-		* */
+		 * Save status via results
+		 */
 		TestAllocationStatus resultStatus = new TestAllocationStatus();
 		resultStatus.setStatus(result.getStatus());
 		resultStatus.setCategory(result.getStatusCategory());
@@ -530,7 +531,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		resultStatus.setTestAllocation(response.getTestAllocation());
 		this.testAllocationStatusDAO.save(resultStatus);
 		
-		//Save associated field via result
+		// Save associated field via result
 		if (result.getAssociatedFieldResults().size() > 0) {
 			AssociatedFieldResult associatedFieldResult = new AssociatedFieldResult();
 			AssociatedField associatedField = this.associatedFieldDAO.findByUuid(result.getAssociatedFieldResults().get(0)
@@ -551,16 +552,16 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	public List<Map<String, Object>> saveMultipleResults(List<Result> results) throws Exception {
 		List<Map<String, Object>> resultResponses = new ArrayList<>();
-		for (Result result: results) {
+		for (Result result : results) {
 
 			Result response = this.recordTestAllocationResults(result);
-            /*
-			End of save status via results
-			* */
-//			TODO: Add support to accommodate new status on the allocation response
+			/*
+			 * End of save status via results
+			 */
+			// TODO: Add support to accommodate new status on the allocation response
 			resultResponses.add(response.toMap());
 		}
-		return  resultResponses;
+		return resultResponses;
 	}
 	
 	@Override
@@ -582,7 +583,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	public List<Map<String, Object>> voidMultipleResults(Map<String, Object> resultsToVoid) throws Exception {
 		List<Map<String, Object>> resultResponses = new ArrayList<>();
-		for (Map<String, Object> result: (List<Map<String, Object>>) resultsToVoid.get("results")) {
+		for (Map<String, Object> result : (List<Map<String, Object>>) resultsToVoid.get("results")) {
 			Result resultData = resultDAO.findByUuid(result.get("uuid").toString());
 			resultData.setVoidReason(resultsToVoid.get("voidReason").toString());
 			resultData.setVoided((Boolean) resultsToVoid.get("voided"));
@@ -590,7 +591,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			// retire corresponding sample status for results
 			String sampleUuid = resultsToVoid.get("sample").toString();
 			Sample sample = sampleDAO.findByUuid(sampleUuid);
-			for (SampleStatus sampleStatus: sample.getSampleStatuses()) {
+			for (SampleStatus sampleStatus : sample.getSampleStatuses()) {
 				if (sampleStatus.getCategory().equals("HAS_RESULTS")) {
 					sampleStatus.setRetired(true);
 					SampleStatus statusUpdateResponse = sampleStatusDAO.update(sampleStatus);
@@ -607,25 +608,28 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 					SampleStatus newStatusResponse = sampleStatusDAO.save(newSampleStatus);
 				}
 			}
-            /*
-			End of save status via results
-			* */
-//			TODO: Add support to accommodate new status on the allocation response
+			/*
+			 * End of save status via results
+			 */
+			// TODO: Add support to accommodate new status on the allocation response
 			resultResponses.add(response.toMap());
 		}
-		return  resultResponses;
+		return resultResponses;
 	}
 	
-	public Map<String, Object> saveResultsInstrument(Map<String, Object> resultsInstrumentObject)throws Exception  {
+	public Map<String, Object> saveResultsInstrument(Map<String, Object> resultsInstrumentObject) throws Exception {
 		Concept instrument = new Concept();
 		List responses = new ArrayList();
-		if (resultsInstrumentObject.get("instrument") == null || ((Map) resultsInstrumentObject.get("instrument")).get("uuid") == null) {
+		if (resultsInstrumentObject.get("instrument") == null
+				|| ((Map) resultsInstrumentObject.get("instrument")).get("uuid") == null) {
 			throw new Exception("Instrument is not set");
 		} else {
-//			instrument.setUuid(((Map) resultsInstrumentObject.get("instrument")).get("uuid").toString());
+			// instrument.setUuid(((Map)
+			// resultsInstrumentObject.get("instrument")).get("uuid").toString());
 		}
 
-		for (Map<String, Object> resultObject: (ArrayList<Map<String, Object>>) resultsInstrumentObject.get("results")) {
+		for (Map<String, Object> resultObject : (ArrayList<Map<String, Object>>) resultsInstrumentObject
+				.get("results")) {
 			Result result = new Result();
 			result = resultDAO.findByUuid(resultObject.get("uuid").toString());
 			String instrumentUuid = ((Map<?, ?>) resultsInstrumentObject.get("instrument")).get("uuid").toString();
@@ -664,12 +668,12 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public TestAllocationStatus updateTestAllocationStatus(TestAllocationStatus testAllocationStatus) throws Exception {
 		TestAllocation testAllocation = this.testAllocationDAO
-		        .findByUuid(testAllocationStatus.getTestAllocation().getUuid());
+				.findByUuid(testAllocationStatus.getTestAllocation().getUuid());
 		if (testAllocation == null) {
 			throw new Exception("Test Allocation with ID '" + testAllocationStatus.getTestAllocation().getUuid()
-			        + "' does not exist.");
+					+ "' does not exist.");
 		}
-		
+
 		TestAllocationStatus createdStatus = new TestAllocationStatus();
 		User user = Context.getUserService().getUserByUuid(testAllocationStatus.getUser().getUuid());
 		if (user == null) {
@@ -684,160 +688,170 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 				testAllocationStatus.setTestResult(testResult);
 			}
 			createdStatus = this.testAllocationStatusDAO.save(testAllocationStatus);
-			
-			//		if (countTestAllocationApprovedStatuses(testAllocation.getUuid()) == 2) {
-			
+
+			// if (countTestAllocationApprovedStatuses(testAllocation.getUuid()) == 2) {
+
 			AdministrationService administrationService = Context.getAdministrationService();
 			String labResultApprovalConfig = administrationService
-			        .getGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION);
+					.getGlobalProperty(ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION);
 			if (labResultApprovalConfig == null) {
 				throw new ConfigurationException("Lab result approval configuration is not set. Please set '"
-				        + ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION + "'");
+						+ ICareConfig.LAB_RESULT_APPROVAL_CONFIGURATION + "'");
 			}
 			if ((testAllocationStatus.getStatus().equals("AUTHORIZED")) && testResult != null) {
 				Sample sample = testResult.getTestAllocation().getSample();
 				List<Result> resList = testAllocation.getTestAllocationResults();
-				
+
 				resList.sort(new Comparator<Result>() {
 
-                    @Override
-                    public int compare(Result r1, Result r2) {
-                        return r2.getDateCreated().compareTo(r1.getDateCreated());
-                    }
-                });
+					@Override
+					public int compare(Result r1, Result r2) {
+						return r2.getDateCreated().compareTo(r1.getDateCreated());
+					}
+				});
 
 				Result allocationResults = testResult;
-				//					resList.get(resList.size() - 1);
-				//			for (Result allocationResults : testAllocation.getTestAllocationResults()) {
+				// resList.get(resList.size() - 1);
+				// for (Result allocationResults : testAllocation.getTestAllocationResults()) {
 
-					ObsService observationService = Context.getObsService();
+				ObsService observationService = Context.getObsService();
 
-					Encounter encounter = testAllocation.getSampleOrder().getOrder().getEncounter();
+				Encounter encounter = testAllocation.getSampleOrder().getOrder().getEncounter();
 
-					//						testAllocation.getSampleOrder().getOrder().getEncounter();
+				// testAllocation.getSampleOrder().getOrder().getEncounter();
 
-					Order order = testAllocation.getSampleOrder().getOrder();
+				Order order = testAllocation.getSampleOrder().getOrder();
 
-					Concept concept = Context.getConceptService().getConceptByUuid(allocationResults.getConcept().getUuid());
+				Concept concept = Context.getConceptService()
+						.getConceptByUuid(allocationResults.getConcept().getUuid());
 
-					Person person = testAllocation.getSampleOrder().getOrder().getPatient().getPerson();
+				Person person = testAllocation.getSampleOrder().getOrder().getPatient().getPerson();
 
-					List<TestAllocationStatus> testAllocationStatuses = testAllocation.getTestAllocationStatuses();
+				List<TestAllocationStatus> testAllocationStatuses = testAllocation.getTestAllocationStatuses();
 
-					List<TestAllocationStatus> resultsRemarks = new ArrayList<TestAllocationStatus>();
-					for (TestAllocationStatus status : testAllocationStatuses) {
-						if (status.getStatus() != null && status.getCategory() != null && status.getTestResult().getUuid().equals(testResult.getUuid())
-						        && (status.getCategory().equals("RESULT_REMARKS"))) {
-							resultsRemarks.add(status);
+				List<TestAllocationStatus> resultsRemarks = new ArrayList<TestAllocationStatus>();
+				for (TestAllocationStatus status : testAllocationStatuses) {
+					if (status.getStatus() != null && status.getCategory() != null
+							&& status.getTestResult().getUuid().equals(testResult.getUuid())
+							&& (status.getCategory().equals("RESULT_REMARKS"))) {
+						resultsRemarks.add(status);
+					}
+				}
+
+				List<TestAllocationStatus> resultStatuses = new ArrayList<TestAllocationStatus>();
+				for (TestAllocationStatus status : testAllocationStatuses) {
+					if (status.getStatus() != null && status.getCategory() != null
+							&& status.getTestResult().getUuid().equals(testResult.getUuid())
+							&& (status.getCategory().equals("RESULT_AMENDMENT"))) {
+						resultStatuses.add(status);
+					}
+				}
+
+				Obs observation = new Obs();
+				observation.setConcept(concept);
+				observation.setEncounter(encounter);
+				observation.setCreator(user);
+				observation.setOrder(order);
+				observation.setPerson(person);
+				observation.setObsDatetime(new Date());
+				observation.setDateCreated(new Date());
+				observation.setVoided(false);
+				if (!resultsRemarks.isEmpty()) {
+					observation.setComment(resultsRemarks.get(0).getRemarks());
+				}
+				if (!resultStatuses.isEmpty()) {
+					if (resultStatuses.get(0) != null && resultStatuses.get(0).getStatus() != null) {
+						if (resultStatuses.get(0).getStatus().equals("AMENDED")) {
+							observation.setStatus(Obs.Status.AMENDED);
 						}
 					}
+				} else {
+					observation.setStatus(Obs.Status.FINAL);
+				}
 
-					List<TestAllocationStatus> resultStatuses = new ArrayList<TestAllocationStatus>();
-					for (TestAllocationStatus status : testAllocationStatuses) {
-						if (status.getStatus() != null && status.getCategory() != null && status.getTestResult().getUuid().equals(testResult.getUuid())
-						        && (status.getCategory().equals("RESULT_AMENDMENT"))) {
-							resultStatuses.add(status);
-						}
+				// quick fix for lab - to capture coded results
+				Concept codedAnswer = Context.getConceptService().getConceptByUuid(allocationResults.getValueText());
+				if (codedAnswer != null) {
+					observation.setValueCoded(codedAnswer);
+				} else {
+					if (allocationResults.getValueText() != null) {
+						observation.setValueText(allocationResults.getValueText());
 					}
 
-					Obs observation = new Obs();
-					observation.setConcept(concept);
-					observation.setEncounter(encounter);
-					observation.setCreator(user);
-					observation.setOrder(order);
-					observation.setPerson(person);
-					observation.setObsDatetime(new Date());
-					observation.setDateCreated(new Date());
-					observation.setVoided(false);
-					if (!resultsRemarks.isEmpty()) {
-						observation.setComment(resultsRemarks.get(0).getRemarks());
-					}
-					if (!resultStatuses.isEmpty()) {
-						if (resultStatuses.get(0) != null && resultStatuses.get(0).getStatus() != null) {
-							if (resultStatuses.get(0).getStatus().equals("AMENDED")) {
-								observation.setStatus(Obs.Status.AMENDED);
-							}
-						}
-					} else {
-						observation.setStatus(Obs.Status.FINAL);
+					if (allocationResults.getValueCoded() != null) {
+						observation.setValueCoded(Context.getConceptService().getConceptByUuid(
+								allocationResults.getValueCoded().getUuid()));
 					}
 
-					//quick fix for lab - to capture coded results
-					Concept codedAnswer = Context.getConceptService().getConceptByUuid(allocationResults.getValueText());
-					if (codedAnswer != null) {
-						observation.setValueCoded(codedAnswer);
-					} else {
-						if (allocationResults.getValueText() != null) {
-							observation.setValueText(allocationResults.getValueText());
-						}
-
-						if (allocationResults.getValueCoded() != null) {
-							observation.setValueCoded(Context.getConceptService().getConceptByUuid(
-							    allocationResults.getValueCoded().getUuid()));
-						}
-
-						if (allocationResults.getValueDrug() != null) {
-							observation.setValueDrug(Context.getConceptService().getDrugByUuid(
-							    allocationResults.getValueDrug().getUuid()));
-						}
-
-						if (allocationResults.getValueBoolean() != null) {
-							observation.setValueBoolean(allocationResults.getValueBoolean());
-						}
-
-						if (allocationResults.getValueNumeric() != null) {
-							observation.setValueNumeric(allocationResults.getValueNumeric());
-						}
+					if (allocationResults.getValueDrug() != null) {
+						observation.setValueDrug(Context.getConceptService().getDrugByUuid(
+								allocationResults.getValueDrug().getUuid()));
 					}
-					//					System.out.println(observation);
-					observationService.saveObs(observation, "");
+
+					if (allocationResults.getValueBoolean() != null) {
+						observation.setValueBoolean(allocationResults.getValueBoolean());
+					}
+
+					if (allocationResults.getValueNumeric() != null) {
+						observation.setValueNumeric(allocationResults.getValueNumeric());
+					}
+				}
+				// System.out.println(observation);
+				observationService.saveObs(observation, "");
 				// Add logic to send email
 				// 1. The subject of the email should be stored on a global property.
 				// 2. The body of the email should also be stored on a global property
 				// 3. Results structure html should be stored on a global property
-				
+
 				String shouldSendEmail = administrationService
-				        .getGlobalProperty(ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS);
-				
-//				if (shouldSendEmail == null) {
-//					throw new Exception("The configuration of "
-//					        + ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS
-//					        + " is missing please configure");
-//				}
-				
+						.getGlobalProperty(ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS);
+
+				// if (shouldSendEmail == null) {
+				// throw new Exception("The configuration of "
+				// + ICareConfig.LAB_RESULTS_SHOULD_SEND_EMAIL_FOR_AUTHORIZED_RESULTS
+				// + " is missing please configure");
+				// }
+
 				if (shouldSendEmail.equals("true")
-				        && administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_SUBJECT_CONFIGURATION_HTML) != null
-				        && administrationService
-				                .getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_ATTACHMENT_CONFIGURATION_HTML) != null
-				        && administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_SUMMARY_CONFIGURATION_HTML) != null
-				        && (administrationService.getGlobalProperty(ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE) != null || administrationService.getGlobalProperty(ICareConfig.ICARE_VISIT_EMAIL_ATTRIBUTE_TYPE) != null)) {
+						&& administrationService
+								.getGlobalProperty(ICareConfig.LAB_RESULTS_SUBJECT_CONFIGURATION_HTML) != null
+						&& administrationService
+								.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_ATTACHMENT_CONFIGURATION_HTML) != null
+						&& administrationService
+								.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_SUMMARY_CONFIGURATION_HTML) != null
+						&& (administrationService
+								.getGlobalProperty(ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE) != null
+								|| administrationService
+										.getGlobalProperty(ICareConfig.ICARE_VISIT_EMAIL_ATTRIBUTE_TYPE) != null)) {
 					String attchmentHtml = "";
 
 					List<String> emailsToSendResults = new ArrayList<>();
 					Properties emailProperties = new Properties();
 					String subject = administrationService.getGlobalProperty(
-					    ICareConfig.LAB_RESULTS_SUBJECT_CONFIGURATION_HTML);
+							ICareConfig.LAB_RESULTS_SUBJECT_CONFIGURATION_HTML);
 					String attachmentHtml = administrationService.getGlobalProperty(
-					    ICareConfig.LAB_RESULTS_BODY_ATTACHMENT_CONFIGURATION_HTML);
+							ICareConfig.LAB_RESULTS_BODY_ATTACHMENT_CONFIGURATION_HTML);
 					String bodySummaryHtml = administrationService.getGlobalProperty(
-					    ICareConfig.LAB_RESULTS_BODY_SUMMARY_CONFIGURATION_HTML);
+							ICareConfig.LAB_RESULTS_BODY_SUMMARY_CONFIGURATION_HTML);
 					String bodyFooterHtml = "";
-					if (administrationService.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_FOOTER_CONFIGURATION_HTML) != null) {
+					if (administrationService
+							.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_FOOTER_CONFIGURATION_HTML) != null) {
 						bodyFooterHtml = administrationService.getGlobalProperty(
-						    ICareConfig.LAB_RESULTS_BODY_FOOTER_CONFIGURATION_HTML);
+								ICareConfig.LAB_RESULTS_BODY_FOOTER_CONFIGURATION_HTML);
 					}
 					String clientEmailAttributeTypeUuid = administrationService.getGlobalProperty(
-					    ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE);
+							ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE);
 					String visitEmailAttributeTypeUuid = administrationService.getGlobalProperty(
 							ICareConfig.ICARE_VISIT_EMAIL_ATTRIBUTE_TYPE);
 					attchmentHtml = attachmentHtml;
 					Date date = new Date();
-					bodySummaryHtml = bodySummaryHtml.replace("{sampleCollectionDate}", sample.getDateTime().toString());
+					bodySummaryHtml = bodySummaryHtml.replace("{sampleCollectionDate}",
+							sample.getDateTime().toString());
 					bodySummaryHtml = bodySummaryHtml + "<br />" + bodyFooterHtml;
-					
+
 					attchmentHtml = attchmentHtml.replace("{date}", date.getDate() + "-" + (date.getMonth() + 1) + "-"
-					        + date.getYear());
-					
+							+ date.getYear());
+
 					String regex = "<tbody>(.*?)</tbody>";
 					Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
 					Matcher matcher = pattern.matcher(attchmentHtml);
@@ -871,32 +885,40 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 						String newTableBodies = "";
 						for (SampleOrder sampleOrder : sample.getSampleOrders()) {
 							newTableBodies = newTableBodies
-							        + tbodyContent.replace("{test}", sampleOrder.getOrder().getConcept().getDisplayString());
+									+ tbodyContent.replace("{test}",
+											sampleOrder.getOrder().getConcept().getDisplayString());
 							String regExpForParameterRow = "<tr parameterrepeatable>.*?</tr>";
 							Pattern parameterPattern = Pattern.compile(regExpForParameterRow, Pattern.DOTALL);
 							Matcher parameterRowMatcher = parameterPattern.matcher(tbodyContent.toString());
 							String parameterRow = "";
 							String newRows = "";
-							
-							if (parameterRowMatcher.find() && !sampleOrder.getOrder().getConcept().getSetMembers().isEmpty()) {
+
+							if (parameterRowMatcher.find()
+									&& !sampleOrder.getOrder().getConcept().getSetMembers().isEmpty()) {
 								parameterRow = parameterRowMatcher.group(0);
 								int count = 1;
 								for (Concept conceptSetMember : sampleOrder.getOrder().getConcept().getSetMembers()) {
 									String resultValue = "Processing ....";
 									String comment = " - ";
 									for (TestAllocation testAllocationRef : sampleOrder.getTestAllocations()) {
-										if (testAllocationRef.getTestConcept().getUuid().equals(conceptSetMember.getUuid())) {
+										if (testAllocationRef.getTestConcept().getUuid()
+												.equals(conceptSetMember.getUuid())) {
 											resultValue = getTestResultsValueFromTestAllocation(testAllocationRef);
 											Result result = new Result();
 											if (!testAllocationRef.getTestAllocationResults().isEmpty()) {
-												result =testAllocationRef.getTestAllocationResults().get(
+												result = testAllocationRef.getTestAllocationResults().get(
 														testAllocationRef.getTestAllocationResults().size() - 1);
 											}
 											for (TestAllocationStatus allocationStatus : testAllocationRef
-											        .getTestAllocationStatuses()) {
-												if (result != null && allocationStatus != null && allocationStatus.getTestResult() != null && allocationStatus.getTestResult().getUuid().equals(result.getUuid())
-												        && allocationStatus.getCategory() != null && allocationStatus.getCategory()
-												                .equalsIgnoreCase("result_remarks") && allocationStatus.getRemarks() != null) {
+													.getTestAllocationStatuses()) {
+												if (result != null && allocationStatus != null
+														&& allocationStatus.getTestResult() != null
+														&& allocationStatus.getTestResult().getUuid()
+																.equals(result.getUuid())
+														&& allocationStatus.getCategory() != null
+														&& allocationStatus.getCategory()
+																.equalsIgnoreCase("result_remarks")
+														&& allocationStatus.getRemarks() != null) {
 													comment = allocationStatus.getRemarks();
 												}
 											}
@@ -904,9 +926,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 										}
 									}
 									newRows = newRows
-									        + parameterRow.replace("{sn}", Integer.toString(count))
-									                .replace("{parameter}", conceptSetMember.getDisplayString())
-									                .replace("{result}", resultValue)
+											+ parameterRow.replace("{sn}", Integer.toString(count))
+													.replace("{parameter}", conceptSetMember.getDisplayString())
+													.replace("{result}", resultValue)
 													.replace("{comment}", comment);
 									newTableBodies = newTableBodies.replace(parameterRow, newRows);
 									count = count + 1;
@@ -919,14 +941,19 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 									if (testAllocationRef.getTestConcept().getUuid().equals(orderConcept.getUuid())) {
 										resultValue = getTestResultsValueFromTestAllocation(testAllocationRef);
 										Result result = new Result();
-										if (testAllocationRef.getTestAllocationResults() != null && !testAllocationRef.getTestAllocationResults().isEmpty()) {
+										if (testAllocationRef.getTestAllocationResults() != null
+												&& !testAllocationRef.getTestAllocationResults().isEmpty()) {
 											result = testAllocationRef.getTestAllocationResults().get(
 													testAllocationRef.getTestAllocationResults().size() - 1);
 										}
 										for (TestAllocationStatus allocationStatus : testAllocationRef
-										        .getTestAllocationStatuses()) {
-											if (result != null && allocationStatus != null && allocationStatus.getTestResult() != null && allocationStatus.getTestResult().getUuid().equals(result.getUuid())
-											        && allocationStatus.getCategory() != null && allocationStatus.getCategory().equalsIgnoreCase("result_remarks")) {
+												.getTestAllocationStatuses()) {
+											if (result != null && allocationStatus != null
+													&& allocationStatus.getTestResult() != null
+													&& allocationStatus.getTestResult().getUuid()
+															.equals(result.getUuid())
+													&& allocationStatus.getCategory() != null && allocationStatus
+															.getCategory().equalsIgnoreCase("result_remarks")) {
 												comment = allocationStatus.getRemarks();
 											}
 										}
@@ -934,20 +961,20 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 									}
 								}
 								newRows = newRows
-								        + parameterRow.replace("{sn}", "1")
-								                .replace("{parameter}", orderConcept.getDisplayString())
-								                .replace("{result}", resultValue).replace("{comment}", comment);
+										+ parameterRow.replace("{sn}", "1")
+												.replace("{parameter}", orderConcept.getDisplayString())
+												.replace("{result}", resultValue).replace("{comment}", comment);
 								newTableBodies = newTableBodies.replace(parameterRow, newRows);
 							}
 							attchmentHtml = attchmentHtml.replace(matcher.group(0), newTableBodies);
-							//						System.out.println(content);
+							// System.out.println(content);
 						}
 					}
 					emailProperties.setProperty("content", bodySummaryHtml);
 					emailProperties.setProperty("attachmentFile", attchmentHtml);
 					emailProperties.setProperty("attachmentFileName", "NPHL_results.pdf");
 					ICareService iCareService = Context.getService(ICareService.class);
-					for(String email: emailsToSendResults) {
+					for (String email : emailsToSendResults) {
 						emailProperties.setProperty("to", email);
 						iCareService.processEmail(emailProperties);
 					}
@@ -993,9 +1020,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		return resultValue;
 	}
 	
-	public List<Map<String, Object>> updateTestAllocationStatuses(List<TestAllocationStatus> testAllocationStatuses) throws Exception {
+	public List<Map<String, Object>> updateTestAllocationStatuses(List<TestAllocationStatus> testAllocationStatuses)
+			throws Exception {
 		List<Map<String, Object>> responses = new ArrayList<>();
-		for(TestAllocationStatus testAllocationStatus: testAllocationStatuses) {
+		for (TestAllocationStatus testAllocationStatus : testAllocationStatuses) {
 			TestAllocationStatus response = this.updateTestAllocationStatus(testAllocationStatus);
 			responses.add(response.toMap());
 		}
@@ -1060,7 +1088,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public List<TestTimeConfig> getTestTimeConfigs(String q) {
-		//return IteratorUtils.toList(this.testTimeConfigDAO.findAll().iterator());
+		// return IteratorUtils.toList(this.testTimeConfigDAO.findAll().iterator());
 		return this.testTimeConfigDAO.getConfig(q);
 	}
 	
@@ -1126,7 +1154,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		
 		Concept concept = Context.getConceptService().getConceptByUuid(testOrderLocation.getConcept().getUuid());
 		Location location = Context.getLocationService().getLocationByUuid(testOrderLocation.getLocation().getUuid());
-		//User user = Context.getUserService().getUserByUuid(testOrderLocation.getUser().getUuid());
+		// User user =
+		// Context.getUserService().getUserByUuid(testOrderLocation.getUser().getUuid());
 		User user = Context.getAuthenticatedUser();
 		
 		Date date = new Date();
@@ -1396,7 +1425,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	@Override
 	public Map<String, Object> getWorksheetDefinitionByUuid(String worksheetDefinitionUuid) {
 		WorksheetDefinition worksheetDefinition = worksheetDefinitionDAO.findByUuid(worksheetDefinitionUuid);
-		List<WorksheetSample> worksheetSamples = worksheetSampleDAO.getWorksheetSamplesByWorksheetDefinition(worksheetDefinition.getUuid().toString());
+		List<WorksheetSample> worksheetSamples = worksheetSampleDAO
+				.getWorksheetSamplesByWorksheetDefinition(worksheetDefinition.getUuid().toString());
 
 		Map<String, Object> worksheetDefinitionModified = new HashMap<>();
 		worksheetDefinitionModified.put("uuid", worksheetDefinition.getUuid());
@@ -1405,7 +1435,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		worksheetDefinitionModified.put("additionFields", worksheetDefinition.getAdditionalFields());
 
 		List<Map<String, Object>> worksheetSamplesList = new ArrayList<>();
-		for (WorksheetSample wSample: worksheetSamples) {
+		for (WorksheetSample wSample : worksheetSamples) {
 			worksheetSamplesList.add(wSample.toMap());
 		}
 		worksheetDefinitionModified.put("worksheetSamples", worksheetSamplesList);

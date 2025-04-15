@@ -7,21 +7,21 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AuthToken {
-
+	
 	private String accessToken;
-
+	
 	private String tokenType;
-
+	
 	private NHIFServer server;
-
+	
 	private Date expiry;
-
+	
 	AuthToken() {
 	}
-
+	
 	public static AuthToken fromJSONString(String json, NHIFServer nHIFServer) throws IOException {
 		AuthToken authToken = new AuthToken();
-
+		
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, Object> resultMap = mapper.readValue(json, Map.class);
 		authToken.setAccessToken((String) resultMap.get("access_token"));
@@ -31,35 +31,35 @@ public class AuthToken {
 		authToken.setExpiry(new Date(System.currentTimeMillis() + expires_in));
 		return authToken;
 	}
-
+	
 	public String getAccessToken() {
 		return accessToken;
 	}
-
+	
 	public void setAccessToken(String accessToken) {
 		this.accessToken = accessToken;
 	}
-
+	
 	public String getTokenType() {
 		return tokenType;
 	}
-
+	
 	public void setTokenType(String tokenType) {
 		this.tokenType = tokenType;
 	}
-
+	
 	public Date getExpiry() {
 		return expiry;
 	}
-
+	
 	public void setExpiry(Date expiry) {
 		this.expiry = expiry;
 	}
-
+	
 	public NHIFServer getServer() {
 		return server;
 	}
-
+	
 	public void setServer(NHIFServer server) {
 		this.server = server;
 	}

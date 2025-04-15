@@ -22,26 +22,26 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 public class AuditLogServiceImpl extends BaseOpenmrsService implements AuditLogService {
-
+	
 	private AuditLogDAO dao;
-
+	
 	@Autowired
 	private AuditLogHelper helper;
-
+	
 	/**
 	 * @param dao the dao to set
 	 */
 	public void setDao(AuditLogDAO dao) {
 		this.dao = dao;
 	}
-
+	
 	/**
 	 * @param helper the helper to set
 	 */
 	public void setHelper(AuditLogHelper helper) {
 		this.helper = helper;
 	}
-
+	
 	/**
 	 * @see AuditLogService#isAudited(Class)
 	 * @param clazz
@@ -50,17 +50,17 @@ public class AuditLogServiceImpl extends BaseOpenmrsService implements AuditLogS
 	public boolean isAudited(Class<?> clazz) {
 		return helper.isAudited(clazz);
 	}
-
+	
 	@SuppressWarnings({ "rawtypes" })
 	@Override
 	@Transactional(readOnly = true)
 	public List<AuditLog> getAuditLogs(List<Class<?>> clazzes, List<String> actions, Date startDate, Date endDate,
-			boolean excludeChildAuditLogs, Integer start, Integer length) {
+	        boolean excludeChildAuditLogs, Integer start, Integer length) {
 		if (OpenmrsUtil.compareWithNullAsEarliest(startDate, new Date()) > 0) {
 			throw new APIException(Context.getMessageSourceService().getMessage(
-					AuditLogConstants.MODULE_ID + ".exception.startDateInFuture"));
+			    AuditLogConstants.MODULE_ID + ".exception.startDateInFuture"));
 		}
-
+		
 		List<Class<?>> classesToMatch = null;
 		if (clazzes != null) {
 			classesToMatch = new ArrayList<Class<?>>();
@@ -70,13 +70,12 @@ public class AuditLogServiceImpl extends BaseOpenmrsService implements AuditLogS
 					classesToMatch.add(subclass);
 				}
 			}
-
+			
 		}
-
-		return dao.getAuditLogs(null, classesToMatch, actions, startDate, endDate, excludeChildAuditLogs, start,
-				length);
+		
+		return dao.getAuditLogs(null, classesToMatch, actions, startDate, endDate, excludeChildAuditLogs, start, length);
 	}
-
+	
 	/**
 	 * @see AuditLogService#getObjectById(Class, java.io.Serializable)
 	 */
@@ -85,33 +84,32 @@ public class AuditLogServiceImpl extends BaseOpenmrsService implements AuditLogS
 	public <T> T getObjectById(Class<T> clazz, Serializable id) {
 		return dao.getObjectById(clazz, id);
 	}
-
+	
 	@Override
 	@Transactional(readOnly = true)
 	public <T> T getObjectByUuid(Class<T> clazz, String uuid) {
 		if (StringUtils.isBlank(uuid)) {
 			return null;
 		}
-
+		
 		return dao.getObjectByUuid(clazz, uuid);
 	}
-
+	
 	@Override
 	@Transactional(readOnly = true)
 	public AuditStrategy getAuditingStrategy() {
 		return helper.getAuditingStrategy();
 	}
-
+	
 	@Override
 	@Transactional(readOnly = true)
-	public List<AuditLog> getAuditLogs(Serializable id, Class<?> clazz, List<String> actions, Date startDate,
-			Date endDate,
-			boolean excludeChildAuditLogs) {
-
+	public List<AuditLog> getAuditLogs(Serializable id, Class<?> clazz, List<String> actions, Date startDate, Date endDate,
+	        boolean excludeChildAuditLogs) {
+		
 		if (id == null || clazz == null) {
 			throw new APIException("class and uuid are required when fetching AuditLogs for an object");
 		}
-
+		
 		List<Class<?>> clazzes = new ArrayList<Class<?>>();
 		clazzes.add(clazz);
 		for (Class subclass : DAOUtils.getPersistentConcreteSubclasses(clazz)) {
@@ -120,16 +118,15 @@ public class AuditLogServiceImpl extends BaseOpenmrsService implements AuditLogS
 		System.out.println("a" + clazzes);
 		return dao.getAuditLogs(id, clazzes, actions, startDate, endDate, excludeChildAuditLogs, null, null);
 	}
-
+	
 	/**
-	 * @see AuditLogService#getAuditLogs(Object, java.util.List, java.util.Date,
-	 *      java.util.Date,
+	 * @see AuditLogService#getAuditLogs(Object, java.util.List, java.util.Date, java.util.Date,
 	 *      boolean)
 	 */
 	@Override
 	@Transactional(readOnly = true)
 	public List<AuditLog> getAuditLogs(Object object, List<String> actions, Date startDate, Date endDate,
-			boolean excludeChildAuditLogs) {
+	        boolean excludeChildAuditLogs) {
 		System.out.println("b");
 		return getAuditLogs(dao.getId(object), object.getClass(), actions, startDate, endDate, excludeChildAuditLogs);
 	}

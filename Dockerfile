@@ -11,7 +11,9 @@ COPY ./docker/setenv.sh bin/
 COPY ./docker/admin.json /glowroot/
 
 # Second stage: Use the original OpenMRS image
-FROM udsmdhis2/icare-openmrs:1.0.0
+# FROM udsmdhis2/icare-openmrs:1.0.0
+
+FROM  openmrs/openmrs-core:2.6.2
 
 # Copy the built files from the first stage
 COPY --from=build /glowroot /glowroot
