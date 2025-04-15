@@ -8,6 +8,9 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.services.BillingService;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class FolioDisease {
@@ -28,17 +31,17 @@ public class FolioDisease {
 	public String createdBy;
 	
 	@JsonProperty("DateCreated")
-	public Date dateCreated;
+	public String dateCreated;
 	
 	@JsonProperty("LastModifiedBy")
 	public String lastModifiedBy;
 	
 	@JsonProperty("LastModified")
-	public Date lastModified;
+	public String lastModified;
 	
 	public static FolioDisease fromDiagnosis(Folio folio, Diagnosis diagnosis) {
 		FolioDisease folioDisease = new FolioDisease();
-		folioDisease.setFolioID(folio.getFolioID());
+		// folioDisease.setFolioID(folio.getFolioID());
 		folioDisease.setFolioDiseaseID(diagnosis.getUuid());
 		//diagnosis.getDiagnosis().
 		String diagnosisString = diagnosis.getDiagnosis().getCoded().getDisplayString();
@@ -47,18 +50,26 @@ public class FolioDisease {
 		folioDisease.setDiseaseCode(diagnosisCode);
 		folioDisease.setRemarks(diagnosis.getDiagnosis().getNonCoded());
 		folioDisease.setCreatedBy(diagnosis.getCreator().getDisplayString());
-		folioDisease.setDateCreated(diagnosis.getDateCreated());
+		folioDisease.setDateCreated(formatDate(diagnosis.getDateCreated()));
 		if (diagnosis.getChangedBy() != null) {
 			folioDisease.setLastModifiedBy(diagnosis.getChangedBy().getDisplayString());
 		} else {
 			folioDisease.setLastModifiedBy(diagnosis.getCreator().getDisplayString());
 		}
 		if (diagnosis.getDateChanged() != null) {
-			folioDisease.setLastModified(diagnosis.getDateChanged());
+			folioDisease.setLastModified(formatDate(diagnosis.getDateChanged()));
 		} else {
-			folioDisease.setLastModified(diagnosis.getDateCreated());
+			folioDisease.setLastModified(formatDate(diagnosis.getDateCreated()));
 		}
 		return folioDisease;
+	}
+	
+	private static String formatDate(Date date) {
+		if (date == null) {
+			return null;
+		}
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
+		return formatter.format(Instant.ofEpochMilli(date.getTime()));
 	}
 	
 	public String getFolioDiseaseID() {
@@ -97,11 +108,11 @@ public class FolioDisease {
 		this.createdBy = createdBy;
 	}
 	
-	public Date getDateCreated() {
+	public String getDateCreated() {
 		return dateCreated;
 	}
 	
-	public void setDateCreated(Date dateCreated) {
+	public void setDateCreated(String dateCreated) {
 		this.dateCreated = dateCreated;
 	}
 	
@@ -113,11 +124,11 @@ public class FolioDisease {
 		this.lastModifiedBy = lastModifiedBy;
 	}
 	
-	public Date getLastModified() {
+	public String getLastModified() {
 		return lastModified;
 	}
 	
-	public void setLastModified(Date lastModified) {
+	public void setLastModified(String lastModified) {
 		this.lastModified = lastModified;
 	}
 	

@@ -1258,10 +1258,14 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		BillSubmissionRequest billRequest = new BillSubmissionRequest();
 		billRequest.setSystemAuth(systemAuth);
 		billRequest.setRequestData(requestData);
+		AdministrationService administrationService = Context.getAdministrationService();
 
 		// Serialize RequestData to JSON for signing
 		String requestDataJson = new ObjectMapper().writeValueAsString(requestData);
-
+		GlobalProperty globalProperty = new GlobalProperty();
+		globalProperty.setProperty("gepg.requestDataJson.icareConnect");
+		globalProperty.setPropertyValue(requestDataJson);
+		administrationService.saveGlobalProperty(globalProperty);
 		// Sign the request data
 		String signature = SignatureUtils.signData(requestDataJson, clientPrivateKey);
 		systemAuth.setSignature(signature);
@@ -1310,20 +1314,23 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		for (InvoiceItem invoiceItem : invoiceItems) {
 			Drug drug = invoiceItem.getItem().getDrug();
 			Concept concept = invoiceItem.getItem().getConcept();
+			String GFSCode = null;
 			if (drug == null && concept == null) {
 				throw new IllegalStateException("Concept can not be null for InvoiceItem" + drug + concept);
 			} else if (concept != null) {
 				for (ConceptMap conceptMap : concept.getConceptMappings()) {
 					if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
 					        .equals(GFSCodeConceptSourceMappingUuid)) {
-						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
+						GFSCode = conceptMap.getConceptReferenceTerm().getCode();
 						billItems.getBillItem().add(
 						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(),
 						            invoiceItem.getPrice().toString(), "0.0", GFSCode));
-					} else {
-						throw new IllegalStateException(
-						        "Please verify GFS CODE concept mapping if configured in a correct way");
 					}
+					if (GFSCode == null) {
+						throw new IllegalStateException(
+						        "Please verify GFS CODE concept mapping if configured in a correct way ,found Null GFS CODE");
+					}
+					
 				}
 			} else if (drug != null) {
 				Concept drugConcept = drug.getConcept();
@@ -1331,13 +1338,14 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 					if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
 					        .equals(GFSCodeConceptSourceMappingUuid)) {
 						
-						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
+						GFSCode = conceptMap.getConceptReferenceTerm().getCode();
 						billItems.getBillItem().add(
 						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(),
 						            invoiceItem.getPrice().toString(), "0.0", GFSCode));
-					} else {
+					}
+					if (GFSCode == null) {
 						throw new IllegalStateException(
-						        "Please verify GFS CODE concept mapping if configured in a correct way");
+						        "Please verify GFS CODE concept mapping if configured in a correct way ,found Null GFS CODE");
 					}
 				}
 			}

@@ -11,28 +11,30 @@
 <div class="row" *ngIf="stockMetrics$ | async as metrics">
   <div class="col mb-2">
     <mat-card 
-      appearance="outlined" 
-      class="border p-3"
-      style="cursor: pointer" 
-      (click)="onChangeRoute(
-              $event,
-              'nearly-stocked-out-items/' + currentStore?.uuid,
-              currentStorePage
-            )
-          "
-      >
-      <mat-card-subtitle class="mb-3 h5 text-center">
-        Nearly Stocked Out
-      </mat-card-subtitle>
-      <mat-card-title class="h2 text-center">{{
-        metrics?.nearlyStockedOut
-        }}</mat-card-title>
-    </mat-card>
+  appearance="outlined" 
+  class="border p-3 custom-card text-center justify-content-center"
+  style="cursor: pointer" 
+  (click)="onChangeRoute(
+          $event,
+          'nearly-stocked-out-items/' + currentStore?.uuid,
+          currentStorePage
+        )"
+>
+<div class="d-flex align-items-center justify-content-center gap-10 w-100">
+  <mat-card-subtitle class="h5 mb-0 mx-3">
+    Nearly Stocked Out
+  </mat-card-subtitle>
+  <mat-card-title class="h2 mb-0 mx-3">
+    {{ metrics?.nearlyStockedOut }}
+  </mat-card-title>
+</div>
+</mat-card>
+
   </div>
   <div class="col mb-2">
     <mat-card 
       appearance="outlined" 
-      class="border p-3 outstock-card" 
+      class="border p-3 outstock-card justify-content-center" 
       style="cursor: pointer" 
       (click)="onChangeRoute(
                 $event,
@@ -40,18 +42,21 @@
                 currentStorePage
               )
             ">
-      <mat-card-subtitle class="mb-3 h5 text-center textstyle">
-        Stocked Out
-      </mat-card-subtitle>
-      <mat-card-title class="h2 text-center">{{
-        metrics?.stockedOut
-        }}</mat-card-title>
+            <div class="d-flex align-items-center justify-content-center gap-10 w-100">
+              <mat-card-subtitle class="h5 mb-0 mx-3 textstyle mx-3">
+                Stocked Out
+              </mat-card-subtitle>
+              <mat-card-title class="h2 text-center mx-3">{{
+                metrics?.stockedOut
+                }}</mat-card-title>
+            </div>
+      
     </mat-card>
   </div>
   <div class="col mb-2">
     <mat-card 
       appearance="outlined" 
-      class="border p-3 expired-card"
+      class="border p-3 expired-card justify-content-center"
       style="cursor: pointer" 
       (click)="onChangeRoute(
               $event,
@@ -60,18 +65,21 @@
             )
           "
       >
-      <mat-card-subtitle class="mb-3 h5 text-center textstyle">
-        Expired
-      </mat-card-subtitle>
-      <mat-card-title class="h2 text-center textstyle">{{
-        metrics?.expired
-        }}</mat-card-title>
+      <div class="d-flex align-items-center justify-content-center gap-10 w-100">
+        <mat-card-subtitle class=" h5 mb-0 mx-3  text-center textstyle ">
+          Expired
+        </mat-card-subtitle>
+        <mat-card-title class="h2 text-center textstyle mx-3">{{
+          metrics?.expired
+          }}</mat-card-title>    
+      </div>
+      
     </mat-card>
   </div>
   <div class="col mb-2">
     <mat-card 
       appearance="outlined" 
-      class="border p-3"
+      class="border p-3 custom-card justify-content-center"
       style="cursor: pointer" 
       (click)="onChangeRoute(
               $event,
@@ -80,12 +88,15 @@
             )
           "
       >
-      <mat-card-subtitle class="mb-3 h5 text-center">
-        Nearly Expired
-      </mat-card-subtitle>
-      <mat-card-title class="h2 text-center">{{
-        metrics?.nearlyExpired
-        }}</mat-card-title>
+      <div class="d-flex align-items-center justify-content-center gap-10 w-100">
+        <mat-card-subtitle class=" h5 mb-0 mx-3  text-center">
+          Nearly Expired
+        </mat-card-subtitle>
+        <mat-card-title class="h2 text-center">{{
+          metrics?.nearlyExpired
+          }}</mat-card-title>
+      </div>
+      
     </mat-card>
   </div>
 </div>

@@ -18,8 +18,7 @@
     "generate-report": "marge cypress/reports/mochareports/report.json -f report -o cypress/reports/mochareports",
     "posttest": "npm run combine-reports && npm run generate-report",
     "test:e2e": "npm run clean:reports && npm run e2e || npm run posttest",
-    "generate-api": "curl 'http://icare.co.tz/openmrs/module/webservices/rest/swagger.json' > ./swagger.json && sed -i 's/parent-uuid/parentUuid/g' swagger.json && swagger-typescript-api -p ./swagger.json -o ./ -n ./src/app/shared/modules/openmrs.ts",
-    "postinstall": "ngcc"
+    "generate-api": "curl 'http://icare.co.tz/openmrs/module/webservices/rest/swagger.json' > ./swagger.json && sed -i 's/parent-uuid/parentUuid/g' swagger.json && swagger-typescript-api -p ./swagger.json -o ./ -n ./src/app/shared/modules/openmrs.ts"
   },
   "private": true,
   "dependencies": {
@@ -59,6 +58,7 @@
     "material-design-icons": "^3.0.1",
     "moment": "^2.29.4",
     "ngrx-store-freeze": "^0.2.4",
+    "ngrx-store-localstorage": "^19.0.0",
     "ngx-barcode": "^0.3.0",
     "ngx-barcode6": "^1.0.24",
     "ngx-mat-select-search": "^7.0.5",

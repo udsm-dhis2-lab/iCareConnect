@@ -1,65 +1,61 @@
 <div class="fingerprint-container">
-      
-    <ng-container *ngIf="!fingerprintCapturedMessage && !showLoader">
-      <div class="thumb-scan-container">
-        <video
-          loading="lazy"
-          muted="muted"
-          src="assets/video/finger-print.mp4"
-          type="video/mp4"
-          autoplay="autoplay"
-          loop="loop"
-          class="thumb-video"
-        ></video>
-      </div>
+  <!-- Checking Device Loader -->
+  <ng-container *ngIf="isCheckingDevice">
+    <div class="loader-container">
+      <mat-spinner style="width: 50px; height: 50px;"></mat-spinner>
+    </div>
+    <p class="modal-label">Checking fingerprint device availability...</p>
+  </ng-container>
 
-      <style>
-        .thumb-video {
-          width: 100px;
-          height: auto;
-        }
-      </style>
+  <!-- Device Not Found Message -->
+  <ng-container *ngIf="deviceNotFound">
+    <div class="error-container">
+      <mat-icon class="error-icon">error</mat-icon>
+      <p>Fingerprint device not found. Please connect the device and try again.</p>
+      <button mat-button color="primary" (click)="closeDialog()">OK</button>
+    </div>
+  </ng-container>
 
-      <p class="modal-label">
-        Scan the {{labels}} index finger on the scanning device to authenticate
-      </p>
-    </ng-container>
+  <!-- Scanning Component -->
+  <ng-container *ngIf="showScanningComponent && !fingerprintCaptured">
+    <div class="thumb-scan-container">
+      <video loading="lazy" muted="muted" src="assets/video/finger-print.mp4" autoplay loop class="thumb-video"></video>
+    </div>
+    <p class="modal-label">Scan the {{ labels }} index finger on the scanning device to authenticate.</p>
+  </ng-container>
 
-    <ng-container *ngIf="fingerprintCapturedMessage">
-      <div class="thumb-scan-container">
-        <video
-          loading="lazy"
-          muted="muted"
-          src="assets/video/finger-success.mp4"
-          type="video/mp4"
-          autoplay="autoplay"
-          loop="loop"
-          class="thumb-video"
-        ></video>
-      </div>
-      <div class="thumb-scan-container">
-        <ng-container *ngIf="showLoader">
-            <mat-spinner style="width: 40px; height: 40px;"></mat-spinner>
-        </ng-container>
-      </div>
-      
-      <style>
-        .thumb-video {
-          width: 100px;
-          height: auto;
-        }
-      </style>
-      <p class="modal-label">
-        Fingerprint captured successfully.
-      </p>
-    </ng-container>
-    <ng-container *ngIf="showLoader">
-      <div class="loader-container">
-        <mat-spinner style="width: 50px; height: 50px;"></mat-spinner> 
-    
-      </div>
-      <p class="modal-label">
-        Processing Authorization...
-      </p>
-    </ng-container>
+  <!-- Fingerprint Captured -->
+  <ng-container *ngIf="showScanningComponent &&fingerprintCaptured">
+    <div class="thumb-scan-container">
+      <video loading="lazy" muted="muted" src="assets/video/finger-success.mp4" autoplay loop class="thumb-video"></video>
+    </div>
+    <p class="modal-label">Fingerprint captured successfully.</p>
+  </ng-container>
+
+<!-- Authorization Processing -->
+<ng-container *ngIf="showLoader">
+  <div class="loader-container">
+    <mat-spinner style="width: 50px; height: 50px;"></mat-spinner>
   </div>
+  <p class="modal-label processing-message"></p> <!-- Fancy processing effect here -->
+</ng-container>
+
+
+  <!-- Success Message -->
+  <ng-container *ngIf="authorizationSuccess">
+    <div class="success-container">
+      <mat-icon >check_circle</mat-icon>
+      <p>{{ successMessage }}</p>
+      <button mat-button color="primary" (click)="closeDialog()">OK</button>
+    </div>
+  </ng-container>
+
+  <!-- Error Message -->
+  <ng-container *ngIf="authorizationFailed">
+    <div class="error-container">
+      <mat-icon >error</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button mat-button color="primary" (click)="closeDialog()">OK</button>
+    </div>
+  </ng-container>
+</div>

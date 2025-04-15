@@ -9,6 +9,9 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.services.BillingService;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class FolioItem {
@@ -101,18 +104,36 @@ public class FolioItem {
 		folioItem.setUnitPrice(invoiceItem.getPrice().intValue());
 		folioItem.setAmountClaimed((int) (invoiceItem.getQuantity() * invoiceItem.getPrice()));
 		folioItem.setCreatedBy(order.getCreator().getDisplayString());
-		folioItem.setDateCreated(order.getDateCreated());
+		Date dateCreated = order.getDateCreated();
+		if (dateCreated != null) {
+			// Format the dateCreated to the required format and set it
+			folioItem.setDateCreated(formatDate(dateCreated));
+		}
+		
 		folioItem.setOtherDetails("");
 		//TODO adding approval refference number
 		folioItem.setApprovalRefNo("");
 		if (order.getChangedBy() != null) {
+			// If changed by user is available, set LastModifiedBy and LastModified
 			folioItem.setLastModifiedBy(order.getChangedBy().getDisplayString());
-			folioItem.setLastModified(order.getDateChanged());
+			folioItem.setLastModified(formatDate(order.getDateChanged()));
 		} else {
+			// If not changed by anyone, set the creator's details
 			folioItem.setLastModifiedBy(order.getCreator().getDisplayString());
-			folioItem.setLastModified(order.getDateCreated());
+			Date dateChanged = order.getDateCreated(); // Reusing dateCreated here
+			if (dateChanged != null) {
+				folioItem.setLastModified(formatDate(dateChanged));
+			}
 		}
 		return folioItem;
+	}
+	
+	private static String formatDate(Date date) {
+		if (date == null) {
+			return null; // Handle null dates properly
+		}
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
+		return formatter.format(Instant.ofEpochMilli(date.getTime()));
 	}
 	
 	public String getFolioItemID() {
@@ -187,11 +208,11 @@ public class FolioItem {
 		this.createdBy = createdBy;
 	}
 	
-	public Date getDateCreated() {
+	public String getDateCreated() {
 		return dateCreated;
 	}
 	
-	public void setDateCreated(Date dateCreated) {
+	public void setDateCreated(String dateCreated) {
 		this.dateCreated = dateCreated;
 	}
 	
@@ -203,11 +224,11 @@ public class FolioItem {
 		this.lastModifiedBy = lastModifiedBy;
 	}
 	
-	public Date getLastModified() {
+	public String getLastModified() {
 		return lastModified;
 	}
 	
-	public void setLastModified(Date lastModified) {
+	public void setLastModified(String lastModified) {
 		this.lastModified = lastModified;
 	}
 	
@@ -236,13 +257,13 @@ public class FolioItem {
 	public String createdBy;
 	
 	@JsonProperty("DateCreated")
-	public Date dateCreated;
+	public String dateCreated;
 	
 	@JsonProperty("LastModifiedBy")
 	public String lastModifiedBy;
 	
 	@JsonProperty("LastModified")
-	public Date lastModified;
+	public String lastModified;
 	
 	public String getItemName() {
 		return itemName;

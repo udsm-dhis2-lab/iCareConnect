@@ -4,7 +4,6 @@ import { InsuranceService } from "src/app/shared/services";
 import { catchError, map, switchMap } from "rxjs/operators";
 import { of } from "rxjs";
 import {
-  Notification,
   NotificationService,
 } from "src/app/shared/services/notification.service";
 import { loadVisitType, loadVisitTypeFailure, loadVisitTypeSuccess } from "../actions/insurance-nhif-visit-types.actions";

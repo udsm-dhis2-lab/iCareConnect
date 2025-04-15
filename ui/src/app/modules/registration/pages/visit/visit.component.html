@@ -730,10 +730,10 @@
                   </div>
                   <!-- Fetched Data Section (Appears Only When Data is Available) -->
 
-                  <div *ngIf="fetchAttempted  && visitDetails['Insurance']?.display === 'NHIF'">
+                  <div *ngIf="fetchAttempted && !isLoading  && visitDetails['Insurance']?.display === 'NHIF'">
                     <div
                       [class]="fetchedData.eligibilityStatus === 'Active'? 'fetched-data-card fetched-data-card-active': 'fetched-data-card fetched-data-card-inactive'"
-                      *ngIf="fetchedData; else notFoundTemplate"
+                      *ngIf=" getNHIFCardInfoSuccess; else notFoundTemplate"
                     >
                       <h2>Patient Information</h2>
 
@@ -797,9 +797,9 @@
 
                     <!-- Not Found Message -->
                     <ng-template #notFoundTemplate>
-                      <div class="not-found"  *ngIf="!isLoading">
+                      <div class="not-found">
                         <p>
-                          {{nhifRemark}}
+                          {{nhifFailedRemark}}
                         </p>
                         <button
                           mat-raised-button

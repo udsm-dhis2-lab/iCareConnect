@@ -287,16 +287,16 @@ export class PatientDashboardComponent implements OnInit {
   handlePatientVisitDetails(event, patientVisitDetails): void {
   }
 
-  // Separate method to open the doctor fingerprint modal
+  // Separate method to open the patient fingerprint modal
   openPatientFingerprintModal(patientAuthorization: string): void {
     const patientPointOfCareData = {
       pointOfCareID:
         this.pointOfCares.find(
           (item) =>
-            (item.PointOfCareCode = NHIFPointOfCareCodeE.CONSULTATION)
+            (item.PointOfCareCode === NHIFPointOfCareCodeE.CONSULTATION)
         ).PointOfCareID || null,
       authorizationNo: patientAuthorization,
-      practitionerNo: this.currentProviderDetails[1]["value"],
+      practitionerNo: this.currentProviderDetails[1]["value"], 
       biometricMethod: NHIFBiometricMethodE.fingerprint,
       fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
     };

@@ -1,6 +1,6 @@
 import { createReducer, on, Action } from "@ngrx/store";
 import { initialNHIFPractitionerDetailsState, NHIFPractitionerDetailsState } from "../states/insurance-nhif-practitioner.states";
-import { setNHIFPractitionerDetails, updateNHIFPractitionerDetails } from "../actions/insurance-nhif-practitioner.actions";
+import { clearNHIFPractitionerDetails, setNHIFPractitionerDetails, updateNHIFPractitionerDetails } from "../actions/insurance-nhif-practitioner.actions";
 
 const reducer = createReducer(
   initialNHIFPractitionerDetailsState,
@@ -18,7 +18,10 @@ const reducer = createReducer(
       ...state.NHIFPractitionerDetails,
       ...updates
     }
-  }))
+  })),
+
+   // ✅ Reset to initial state
+   on(clearNHIFPractitionerDetails, () => initialNHIFPractitionerDetailsState)
 );
 
 export function NHIFPractitionerDetailsReducer(

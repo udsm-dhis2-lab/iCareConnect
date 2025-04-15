@@ -34,6 +34,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class StrategiesInsuranceImpl implements InsuranceService {
@@ -360,10 +363,10 @@ public class StrategiesInsuranceImpl implements InsuranceService {
 		folio.setPatientFileNo(visitWrapper.getPatient().getFileNumber());
 		ProviderWrapper providerWrapper = visitWrapper.getConsultationProvider();
 		if (providerWrapper != null) {
-			folio.setPractitionerNo(providerWrapper.getPhoneNumber());
+			// folio.setPractitionerNo(providerWrapper.getPhoneNumber());
 		}
 		folio.setFacilityCode(facilityCode);
-		folio.setFolioID(visit.getUuid());
+		// folio.setFolioID(visit.getUuid());
 		/*if (visit.getStopDatetime() == null) {
 			throw new Exception("To Claim the visit has to be closed");
 		}*/
@@ -377,10 +380,10 @@ public class StrategiesInsuranceImpl implements InsuranceService {
 		folio.setFolioNo(visit.getId());
 		String serialString = "00000";
 		serialString = serialString.substring(String.valueOf(folio.getFolioNo()).length()) + folio.getFolioNo();
-		folio.setAttendanceDate(visit.getStartDatetime());
+		folio.setAttendanceDate(formatDate(visit.getStartDatetime()));
 		
-		folio.setSerialNo(facilityCode + "\\" + (folio.getClaimMonth() < 10 ? "0" : "") + folio.getClaimMonth() + "\\"
-		        + calendar.get(Calendar.YEAR) + "\\" + serialString);
+		// folio.setSerialNo(facilityCode + "\\" + (folio.getClaimMonth() < 10 ? "0" : "") + folio.getClaimMonth() + "\\"
+		//         + calendar.get(Calendar.YEAR) + "\\" + serialString);
 		folio.setAuthorizationNo(visitWrapper.getInsuranceAuthorizationNumber());
 		folio.setCardNo(visitWrapper.getInsuranceID());
 		folio.setPatientFileNo(visitWrapper.getPatient().getFileNumber());
@@ -391,22 +394,22 @@ public class StrategiesInsuranceImpl implements InsuranceService {
 		} else if (visit.getPatient().getGender().equals("F")) {
 			folio.setGender("Female");
 		}
-		folio.setDateOfBirth(visit.getPatient().getBirthdate());
-		folio.setAge(visit.getPatient().getAge());
+		folio.setDateOfBirth(formatDate(visit.getPatient().getBirthdate()));
+		// folio.setAge(visit.getPatient().getAge());
 		
 		folio.setPatientTypeCode("OUT");
 		
 		folio.setCreatedBy(visit.getCreator().getDisplayString());
-		folio.setDateCreated(visit.getDateCreated());
+		folio.setDateCreated(formatDate(visit.getDateCreated()));
 		if (visit.getChangedBy() != null) {
 			folio.setLastModifiedBy(visit.getChangedBy().getDisplayString());
 		} else {
 			folio.setLastModifiedBy(visit.getCreator().getDisplayString());
 		}
 		if (visit.getDateChanged() != null) {
-			folio.setLastModified(visit.getDateChanged());
+			folio.setLastModified(formatDate(visit.getDateChanged()));
 		} else {
-			folio.setLastModified(visit.getDateCreated());
+			folio.setLastModified(formatDate(visit.getDateCreated()));
 		}
 		
 		String bedOrderType = adminService.getGlobalProperty(ICareConfig.BED_ORDER_TYPE);
@@ -434,11 +437,11 @@ public class StrategiesInsuranceImpl implements InsuranceService {
 					folio.getFolioItems().add(folioItem);
 					if (order.getOrderType().getUuid().equals(bedOrderType)) {
 						folio.setPatientTypeCode("IN");
-						folio.setDateAdmitted(order.getEffectiveStartDate());
+						folio.setDateAdmitted(formatDate(order.getEffectiveStartDate()));
 						if (visit.getStopDatetime() == null) {
-							folio.setDateDischarged(new Date());
+							folio.setDateDischarged(formatDate(new Date()));
 						} else {
-							folio.setDateDischarged(visit.getStopDatetime());
+							folio.setDateDischarged(formatDate(visit.getStopDatetime()));
 						}
 					}
 				}
@@ -450,11 +453,19 @@ public class StrategiesInsuranceImpl implements InsuranceService {
 		patientFile = patientFile.replace("{Observation}", observations);
 		patientFile = patientFile.replace("{Name}", visit.getPatient().getPersonName().getFullName());
 		String content = getForm2B_A(visit, folio);
-		folio.setClaimFile(convertToPDFEncodedString("claim", content));
+		// folio.setClaimFile(convertToPDFEncodedString("claim", content));
 		
-		folio.setPatientFile(convertToPDFEncodedString("file", patientFile));
+		// folio.setPatientFile(convertToPDFEncodedString("file", patientFile));
 		
 		return folio;
+	}
+	
+	private static String formatDate(Date date) {
+		if (date == null) {
+			return null; // Handle null dates properly
+		}
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
+		return formatter.format(Instant.ofEpochMilli(date.getTime())); // Convert Date to Instant and format it
 	}
 	
 	public void getReferral(Visit visit) throws Exception {
@@ -546,7 +557,7 @@ public class StrategiesInsuranceImpl implements InsuranceService {
 		content = content.replace("{ConsultationFees}", consultationFees);
 		content = content.replace("{GrandTotal}", String.valueOf(grandtotal));
 		content = content.replace("{AuthNo}", folio.getAuthorizationNo());
-		content = content.replace("{SerialNumber}", folio.getSerialNo());
+		// content = content.replace("{SerialNumber}", folio.getSerialNo());
 		content = content.replace("{Consultation}", consultation);
 		content = content.replace("{Tests}", tests);
 		content = content.replace("{Medicine}", medicine);
