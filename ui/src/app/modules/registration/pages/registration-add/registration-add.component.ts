@@ -133,7 +133,7 @@ export class RegistrationAddComponent implements OnInit {
     return this.patient.fname &&
       this.patient.lname &&
       this.patient.dob &&
-      this.patient.gender
+      this.patient.gender && this.patient.phone
       ? false
       : true;
   }

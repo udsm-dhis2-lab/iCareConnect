@@ -20,7 +20,7 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @Output() patientVisitDetails: EventEmitter<any> = new EventEmitter<any>();
   @Output() shouldLoadNewList: EventEmitter<boolean> =
-    new EventEmitter<boolean>();
+  new EventEmitter<boolean>();
   currentPage: number = 0;
 
   displayedColumns: string[] = [
@@ -37,6 +37,7 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
   constructor( private visitService: VisitsService,) {}
 
   ngOnInit(): void {
+     //console.log("payment type passed .....",this.paymentTypeSelected)
     this.dataSource = new MatTableDataSource(
       sanitizePatientsVisitsForTabularPatientListing(
         this.visits,
@@ -46,11 +47,14 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
         this.page
       )
     );
+
+
     this.dataSource.paginator = this.paginator;
   }
 
   ngOnChanges() {
     this.dataSource = new MatTableDataSource(
+     
       sanitizePatientsVisitsForTabularPatientListing(
         this.visits,  
         this.shouldShowParentLocation,
@@ -59,15 +63,18 @@ export class PatientsTabularListComponent implements OnInit, OnChanges {
         this.page
       )
     );
-  
+ 
     this.dataSource.paginator = this.paginator;
   }
   
   
 
   getSelectedPatient(event, patientVisitDetails) {
-    event.stopPropagation();
-    this.patientVisitDetails.emit(patientVisitDetails);
+
+  event.stopPropagation();
+  this.patientVisitDetails.emit(patientVisitDetails);
+  console.log("patient visit details",patientVisitDetails)
+  
   }
 
   applyFilter(event: Event) {

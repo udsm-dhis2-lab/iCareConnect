@@ -42,11 +42,13 @@ import {
   keySampleTypesByTestOrder,
 } from "src/app/shared/helpers/sample-types.helper";
 import { calculateAgeUsingBirthDate } from "src/app/core/helpers/calculate_age.helper";
+import { BillingService } from "src/app/modules/billing/services/billing.service";
 
 @Injectable()
 export class SamplesEffects {
   constructor(
     private actions$: Actions,
+    private billingService: BillingService,
     private sampleService: SamplesService,
     private store: Store<AppState>,
     private notificationService: NotificationService
@@ -59,7 +61,7 @@ export class SamplesEffects {
         this.notificationService.show(
           new Notification({
             message: "Creating sample with id " + action?.sample?.id,
-            type: "LOADING",
+            type: "LOADING",   
           })
         );
         return this.sampleService.createSample(action.sample).pipe(
@@ -275,6 +277,8 @@ export class SamplesEffects {
                 } else {
                   let formattedOrders = [];
                   _.map(sample?.orders, (order) => {
+                    // console.log("order uuid",order);
+                    console.log("action",action);
                     formattedOrders = [
                       ...formattedOrders,
                       {
@@ -287,6 +291,9 @@ export class SamplesEffects {
                     ];
                   });
                   sample["orders"] = formattedOrders;
+                  // console.log("formattedOrders",action.paidItems)
+                  
+                  console.log("formattedOrders ...paidItems..",formattedOrders)
                   samplesToCollect = [
                     ...samplesToCollect,
                     {

@@ -55,8 +55,6 @@ export class BillConfirmationComponent implements OnInit {
       totalBill: this.data.totalPayableBill
     };
     
-    
-    // Construct the request payload
   const requestPayload = this.data.billItems.map((item: any) => ({
     uuid: item.bill, 
     currency: "TZS" 
@@ -66,9 +64,12 @@ export class BillConfirmationComponent implements OnInit {
 
   
     console.log("Formatted payload:", requestPayload);
-    //Calling Controll number Generation Function
+    //Calling Controll number Generation Function 
     this.generatingControlNumber = true;
-    this.onConntrollNumbGen(requestPayload);
+    if(this.data?.paymentType?.code === 'GePG'){
+      this.onConntrollNumbGen(requestPayload);
+    }
+    
     this.currentUser = this.store.select(getCurrentUserDetails).subscribe({
       next: (currentUser) => {
         return currentUser;
@@ -163,15 +164,12 @@ export class BillConfirmationComponent implements OnInit {
   onGenerateControlNumber(e): void {
     e.stopPropagation();
     this.generatingControlNumber = true;
-    setTimeout(() => {
-      this.controlNumber = random(99000000000, 99999999999);
-      this.generatingControlNumber = false;
-    }, 1000);
+    // TO DO: GET Control number from Data base 
   }
 
   onGepgConfirmation(e): void {
     e.stopPropagation();
-    this.savingPayment = false;
+    this.savingPayment = true;
     this.billingService
       .payBill(this.data?.bill, {
         confirmedItems: this.data?.billItems,

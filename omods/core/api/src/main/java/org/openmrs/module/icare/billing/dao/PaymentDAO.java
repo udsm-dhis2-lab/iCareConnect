@@ -52,7 +52,7 @@ public class PaymentDAO extends BaseDAO<Payment> {
 		return query.list();
 	}
 	
-	public String getReferenceNumberByRequestId(String requestId) {
+	public String getReferenceNumberByRequestId(Integer requestId) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT p.referenceNumber FROM Payment p WHERE p.id = :requestId";
 		Query query = session.createQuery(queryStr);

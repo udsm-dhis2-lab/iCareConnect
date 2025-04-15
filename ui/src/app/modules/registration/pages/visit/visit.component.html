@@ -659,19 +659,160 @@
                       visitDetails['Insurance'])
                   "
                 >
-                  <mat-form-field
+                  <mat-radio-group [(ngModel)]="selectedId">
+                    <mat-radio-button value="insuranceId" color="primary">
+                      Insurance ID
+                    </mat-radio-button>
+                    <mat-radio-button value="nationalId" color="primary">
+                      National ID
+                    </mat-radio-button>
+                  </mat-radio-group>
+
+                  <div class="input-container">
+                    <!-- <mat-form-field
+                      class="w-100"
+                      appearance="fill"
+                      floatLabel="always"
+                    > -->
+                    <mat-form-field
+                      *ngIf="selectedId === 'insuranceId'"
+                      class="input-field"
+                      appearance="fill"
+                      floatLabel="always"
+                    >
+                      <mat-label>Insurance ID</mat-label>
+                      <input
+                        matInput
+                        pattern="\d{12}"
+                        placeholder="Enter Text"
+                        [(ngModel)]="visitDetails['InsuranceID']"
+                      />
+                    </mat-form-field>
+
+                    <!-- <mat-form-field
                     class="w-100"
                     appearance="fill"
                     floatLabel="always"
-                  >
-                    <mat-label>Insurance ID</mat-label>
-                    <input
-                      matInput
-                      pattern="\d{12}"
-                      placeholder="Enter Text"
-                      [(ngModel)]="visitDetails['InsuranceID']"
-                    />
-                  </mat-form-field>
+                  > -->
+                    <mat-form-field
+                      *ngIf="selectedId === 'nationalId'"
+                      class="input-field"
+                      appearance="fill"
+                      floatLabel="always"
+                    >
+                      <mat-label>National ID</mat-label>
+                      <input
+                        matInput
+                        type="text"
+                        pattern="\d{20}"
+                        maxlength="20"
+                        placeholder="Enter National ID"
+                        (input)="onNationalIdInput($event)"
+                        [(ngModel)]="NationalID"
+                        (ngModelChange)="onNationalIDChange($event)"
+                      />
+                    </mat-form-field>
+
+                    <button
+                    *ngIf="visitDetails['Insurance']?.display === 'NHIF'"
+                      mat-raised-button
+                      color="primary"
+                      (click)="getPatientData(selectedId)"
+                    >
+                      Get patient data
+                    </button>
+                  </div>
+
+                  <!-- Loader (Shows while fetching data) -->
+                  <div class="loader-container" *ngIf="isLoading ">
+                    <mat-spinner></mat-spinner>
+                    <p>Fetching patient data...</p>
+                  </div>
+                  <!-- Fetched Data Section (Appears Only When Data is Available) -->
+
+                  <div *ngIf="fetchAttempted  && visitDetails['Insurance']?.display === 'NHIF'">
+                    <div
+                      [class]="fetchedData.eligibilityStatus === 'Active'? 'fetched-data-card fetched-data-card-active': 'fetched-data-card fetched-data-card-inactive'"
+                      *ngIf="fetchedData; else notFoundTemplate"
+                    >
+                      <h2>Patient Information</h2>
+
+                      <div class="data-grid">
+                        <div class="data-item">
+                          <strong>Name:</strong> {{ fetchedData.name }}
+                        </div>
+                        <div class="data-item">
+                          <strong>Gender:</strong> {{ fetchedData.gender }}
+                        </div>
+                        <div class="data-item">
+                          <strong>Product Name:</strong>
+                          {{ fetchedData.productName }}
+                        </div>
+                        <div class="data-item">
+                          <strong>PF Number:</strong>
+                          {{ fetchedData.pfnumber }}
+                        </div>
+                        <div class="data-item">
+                          <strong>Expiration Date:</strong>
+                          {{ fetchedData.expirationDate }}
+                        </div>
+                        
+                        <div class="data-item">
+                          <strong>Eligibility Status:</strong>
+                          <span
+                            [ngClass]="{
+                              active:
+                                fetchedData.eligibilityStatus === 'Active',
+                              inactive:
+                                fetchedData.eligibilityStatus !== 'Active'
+                            }"
+                          >
+                            {{ fetchedData.eligibilityStatus }}
+                          </span>
+                        </div>
+                        
+                      </div>
+
+                      <!-- if patient data foud, authoruze the patient -->
+                       <br>
+                        <h2>Authorize Patient</h2>
+                        <p>Please choose your method of authorization:</p>
+                        <div class="authorization-options">
+                          <button
+                            mat-raised-button
+                            color="primary"
+                            (click)="authorizeInsurance('Face')"
+                          >
+                            Face 
+                          </button>
+                          <button
+                            mat-raised-button
+                            color="accent"
+                            (click)="authorizeInsurance('Fingerprint')"
+                          >
+                            Fingerprint
+                          </button>
+                        </div>
+                    </div>
+
+                    <!-- Not Found Message -->
+                    <ng-template #notFoundTemplate>
+                      <div class="not-found"  *ngIf="!isLoading">
+                        <p>
+                          {{nhifRemark}}
+                        </p>
+                        <button
+                          mat-raised-button
+                          color="primary"
+                          (click)="retryFetch(selectedId)"
+                        >
+                          Retry
+                        </button>
+                      </div>
+                    </ng-template>
+                  </div>
+
+                  <!-- End of patient Response data -->
 
                   <mat-form-field
                     class="w-100"
@@ -690,17 +831,20 @@
                       [(ngModel)]="visitDetails['voteNumber']"
                     />
                   </mat-form-field>
+                  <!-- if patient is NHIF, do not ask this -->
                   <mat-checkbox
+                    *ngIf="visitDetails['Insurance']?.display !== 'NHIF'"
                     color="primary"
                     (change)="toggleAuthorizationNumberInputActive($event)"
                     >Tick if you can NOT authorize now</mat-checkbox
                   >
 
+                  <!-- end of card authoruzation -->
                   <mat-form-field
                     class="w-100"
                     *ngIf="
-                      visitDetails['InsuranceAuthNo'] !== 'NOT_AUTHORIZED' &&
-                      visitDetails['insuranceScheme']?.uuid
+                     ( visitDetails['InsuranceAuthNo'] !== 'NOT_AUTHORIZED' &&
+                     visitDetails['insuranceScheme']?.uuid) || visitDetails['Insurance']?.display === 'NHIF'
                     "
                     appearance="fill"
                     floatLabel="always"
@@ -711,8 +855,10 @@
                     >
                     <input
                       matInput
-                      placeholder="Enter Text"
+                      placeholder="Automatic captured insurance authorization number"
                       [(ngModel)]="visitDetails['InsuranceAuthNo']"
+                      [readonly]="visitDetails['Insurance']?.display === 'NHIF'" 
+                      
                     />
                   </mat-form-field>
                 </div>

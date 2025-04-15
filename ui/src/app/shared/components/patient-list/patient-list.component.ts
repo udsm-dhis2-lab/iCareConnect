@@ -112,7 +112,6 @@ export class PatientListComponent implements OnInit, OnChanges {
   private getVisits(visits: Visit[]) {
     this.loadingPatients = true;
     // this.service = "LABS";
-
     this.visits$ = visits
       ? of(visits)
       : this.service && this.service === "LABS"
@@ -148,6 +147,9 @@ export class PatientListComponent implements OnInit, OnChanges {
               }
             })
           );
+          this.visits$.subscribe((visit)=>{
+            console.log("visit data .....",visit)
+          });
   }
 
 
@@ -259,7 +261,9 @@ export class PatientListComponent implements OnInit, OnChanges {
     this.store.dispatch(clearBills());
     this.store.dispatch(clearBillItems());
     this.store.dispatch(clearActiveVisit());
-    this.selectPatient.emit({ ...visit?.patient, visitUuid: visit?.uuid });
+    this.selectPatient.emit({ ...visit?.patient, visitUuid: visit?.uuid,paymentTypeDetails:visit?.paymentType });
+
+    console.log("werrrr......",visit)
 
       // this.trackActionForAnalytics(`Active Patient Search: View`)
   

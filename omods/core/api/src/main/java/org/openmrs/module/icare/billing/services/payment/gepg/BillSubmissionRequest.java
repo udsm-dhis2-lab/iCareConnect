@@ -18,6 +18,7 @@ import org.openmrs.*;
 import java.net.URL;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.services.BillingService;
@@ -236,4 +237,31 @@ public class BillSubmissionRequest {
 
 		return result;
 	}
+	
+	public Map<String, Object> generateErrorResponse(String errorMessage) throws Exception {
+        Map<String, Object> errorResponse = new HashMap<>();
+        AdministrationService administrationService = Context.getAdministrationService();
+        String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
+
+            // AckData as per your requested format
+            Map<String, Object> ackData = new HashMap<>();
+            ackData.put("Description", errorMessage);
+            ackData.put("RequestId", null);
+            ackData.put("SystemAckCode", "0");
+
+            // Serialize RequestData to JSON for signing
+            String requestDataJson = new ObjectMapper().writeValueAsString(ackData);
+            String signature = SignatureUtils.signData(requestDataJson, clientPrivateKey);
+
+            // SystemAuth as per your requested format
+            Map<String, Object> systemAuth = new HashMap<>();
+            systemAuth.put("SystemCode", "1001");
+            systemAuth.put("Signature", signature);
+
+            errorResponse.put("AckData", ackData);
+            errorResponse.put("SystemAuth", systemAuth);
+
+            return errorResponse;
+
+    }
 }

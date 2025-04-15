@@ -13,6 +13,9 @@ import { DrugsService } from "../../resources/drugs/services/drugs.service";
 import { ObservationService } from "../../resources/observation/services/observation.service";
 import { OrdersService } from "../../resources/order/services/orders.service";
 import { map } from "rxjs/operators";
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+import { getDrugsPrescribedList, getPrescriptionArrangementFields } from "src/app/store/selectors";
 
 @Component({
   selector: "app-general-dispension-form",
@@ -25,7 +28,7 @@ export class GeneralDispensingFormComponent implements OnInit {
   @Input() currentPatient: any;
   @Input() currentVisit: any;
   @Input() currentLocation: any;
-  @Input() provider: any;
+  @Input() provider: any; 
   @Input() dosingUnits$: Observable<any>;
   @Input() durationUnits$: Observable<any>;
   @Input() drugRoutes$: Observable<any>;
@@ -78,11 +81,15 @@ export class GeneralDispensingFormComponent implements OnInit {
   errors: any[] = [];
   selectedDrug: any;
   keyedPreviousVisitDrugOrders$: Observable<any>;
+  drugsPrescribedList = []
+  prescriptionArrangementFields = []
+  isDrugPrescriptionActive: Boolean = false 
 
   constructor(
     private ordersService: OrdersService,
     private observationService: ObservationService,
-    private drugService: DrugsService
+    private drugService: DrugsService,
+    private store: Store<AppState>
   ) {}
 
   async ngOnInit() {
@@ -134,13 +141,73 @@ export class GeneralDispensingFormComponent implements OnInit {
         options: [],
         label: "Search Drug",
         conceptClass: "Drug",
-        searchControlType: "concept",
+        searchControlType: "concept", 
         value: null,
         searchTerm: "ICARE_GENERIC_DRUG",
         shouldHaveLiveSearchForDropDownFields: true,
       });
     }
+
+    this.store.select(getDrugsPrescribedList).subscribe((drugs) => {
+      this.drugsPrescribedList = drugs
+    });
+    
+
+    this.store.select(getPrescriptionArrangementFields).subscribe((data) => {
+      this.prescriptionArrangementFields = data
+    });
   }
+
+  isPrescriptionActive(dosageID: string, selectedDosageUnit: string): boolean {
+    // Find all prescriptions that match the given dosageID
+    const prescriptions = this.drugsPrescribedList.filter(p => 
+        p.obs[this.specificDrugConceptUuid]?.value === dosageID
+    );
+
+    if (!prescriptions.length) {
+        return false;
+    }
+
+
+    const currentDate = new Date();
+
+    for (const prescription of prescriptions) {
+        const prescriptionDate = new Date(prescription.dateActivated);
+        const duration = parseInt(prescription.obs[this.prescriptionArrangementFields['4']?.uuid]?.value);
+        const durationUnit = prescription.obs[this.prescriptionArrangementFields['5']?.uuid]?.value.display;
+        const dosageUnit = prescription.obs[this.prescriptionArrangementFields['2']?.uuid]?.value?.uuid;
+
+        if (!duration || !durationUnit) {
+            continue; // Skip invalid prescriptions
+        }
+
+        let endDate = new Date(prescriptionDate);
+        
+        switch (durationUnit.toLowerCase()) {
+            case 'days':
+                endDate.setDate(prescriptionDate.getDate() + duration);
+                break;
+            case 'weeks':
+                endDate.setDate(prescriptionDate.getDate() + duration * 7);
+                break;
+            case 'months':
+                endDate.setMonth(prescriptionDate.getMonth() + duration);
+                break;
+            case 'years':
+                endDate.setFullYear(prescriptionDate.getFullYear() + duration);
+                break;
+            default:
+                continue; // Skip invalid duration units
+        }
+
+        if (currentDate < endDate && selectedDosageUnit === dosageUnit) {
+            return true;
+        }
+    }
+
+    return false; // No active prescription found
+}
+
 
   onFormUpdate(
     formValues: FormValue,
@@ -163,11 +230,12 @@ export class GeneralDispensingFormComponent implements OnInit {
         ? true
         : false;
     if (
-      formValues.getValues()?.drug?.value?.length > 0 ||
-      (formValues.getValues()?.drug?.value as any)?.display
+      this.formValues?.dosingUnit?.value?.length > 0
     ) {
-      this.selectedDrug = formValues.getValues()?.drug?.value;
+      this.selectedDrug = this.formValues?.drug?.value
+      this.isDrugPrescriptionActive =  this.isPrescriptionActive(this.selectedDrug.uuid,this.formValues?.dosingUnit?.value )
     }
+    
     if (fieldItem == "drug" && !this.specificDrugConceptUuid) {
       this.drugService
         .getDrugsUsingConceptUuid(this.formValues?.drug?.value)
@@ -291,8 +359,7 @@ export class GeneralDispensingFormComponent implements OnInit {
           value: this.formValues["route"].value,
         },
       ].filter((ob) => ob?.value && ob?.value !== "");
-
-      // console.log(JSON.stringify(obs));
+  
       this.ordersService
         .createOrdersViaCreatingEncounter(encounterObject)
         .subscribe((response) => {

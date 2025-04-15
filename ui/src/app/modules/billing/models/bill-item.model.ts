@@ -67,6 +67,7 @@ export class BillItem {
       payable: this.payable,
       bill: this.bill,
       order: this.order,
+      // paid: this.paid,
       calculatedPayableAmount: this.calculatedPayableAmount,
     };
   }

@@ -213,7 +213,7 @@ export interface ProviderGet {
   display?: string;
   person?: PersonGetRef;
   identifier?: string;
-  attributes?: ProviderAttributeGetRef[];
+  attributes?: ProviderAttributeGet[];
   preferredHandlerClassname?: string;
 }
 

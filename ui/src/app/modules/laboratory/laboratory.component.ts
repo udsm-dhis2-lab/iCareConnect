@@ -8,6 +8,7 @@ import {
   getAllUSerRoles,
   getCurrentUserInfo,
   getCurrentUserPrivileges,
+  getProviderDetails,
   getUserAssignedLocations,
 } from "src/app/store/selectors/current-user.selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
@@ -36,7 +37,12 @@ import { LocationService } from "src/app/core/services";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
 import { LabMenu } from "./resources/models/lab-menu.model";
-
+import { ProviderAttributeGet } from "src/app/shared/resources/openmrs";
+import { selectNHIFPractitionerDetails } from "src/app/store/selectors/insurance-nhif-practitioner.selectors";
+import { NHIFBiometricMethodE, NHIFFingerPrintCodeE, NHIFPractitionerDetailsI } from "src/app/shared/resources/store/models/insurance-nhif.model";
+import { loginNHIFPractitioner, setNHIFPractitionerDetails } from "src/app/store/actions/insurance-nhif-practitioner.actions";
+import { MatDialog } from "@angular/material/dialog";
+import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
 @Component({
   selector: "lab-root",
   templateUrl: "./laboratory.component.html",
@@ -69,6 +75,13 @@ export class LaboratoryComponent implements OnInit {
   userRoles$: Observable<any>;
   currentRoutePath: string = "";
   showMenuItems: boolean = true;
+  currentProviderDetails: ProviderAttributeGet[];
+  isNHIFPractitionerLogedIn: boolean = false;
+ 
+
+
+
+
   /**
    *
    * @param store
@@ -173,7 +186,8 @@ export class LaboratoryComponent implements OnInit {
     private route: ActivatedRoute,
     private titleService: Title,
     private locationService: LocationService,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private dialog: MatDialog,
   ) {
     this.store.dispatch(loadRolesDetails());
     this.store.dispatch(loadOrderTypes());
@@ -262,6 +276,65 @@ export class LaboratoryComponent implements OnInit {
   }
 
   ngOnInit() {
+        // get provider details
+        this.store.select(getProviderDetails).subscribe((data) => {
+          if (data) {
+            this.currentProviderDetails = data.attributes;
+          }
+        });
+    
+      // get practitioner details
+    this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
+      // if the doctor is not logged in to NHIF, prompt the doctor to login
+      if (!data || !data.isNHIFPractitionerLogedIn) {
+        const loginData = {
+          practitionerNo: this.currentProviderDetails[1]["value"],
+          nationalID: this.currentProviderDetails[3]["value"],
+          biometricMethod: NHIFBiometricMethodE.fingerprint,
+          fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
+          imageData: "base 64",
+        };
+
+        // ✅ Dispatch the login action
+        this.store.dispatch(loginNHIFPractitioner({ data: loginData }));
+
+        this.dialog
+          .open(FingerCaptureComponent, {
+            width: "45%",
+            data: {
+              detail: "doctor's",
+            },
+          })
+          .afterClosed()
+          .subscribe((result) => {
+            if (result) {
+              console.log("Fingerprint data received:", result);
+              const practitionerData: NHIFPractitionerDetailsI = {
+                practitionerNo: this.currentProviderDetails[1]["value"], // MCT Registration number index
+                nationalID: this.currentProviderDetails[3]["value"],
+                isNHIFPractitionerLogedIn: true,
+              };
+
+              // Dispatch the action to update state
+              this.store.dispatch(
+                setNHIFPractitionerDetails({ data: practitionerData })
+              );
+
+              const loginData = {
+                practitionerNo: this.currentProviderDetails[1]["value"],
+                nationalID: this.currentProviderDetails[3]["value"],
+                biometricMethod: NHIFBiometricMethodE.fingerprint,
+                fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
+                imageData: result.fingerprintCaptured,
+              };
+
+              // ✅ Dispatch the login action
+              this.store.dispatch(loginNHIFPractitioner({ data: loginData }));
+            }
+          });
+      }
+    });
+
     this.systemSettingsService
       .getSystemSettingsByKey(`icare.general.selectedSystemSettings`)
       .subscribe((response) => {
