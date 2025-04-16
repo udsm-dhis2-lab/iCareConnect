@@ -1,14 +1,29 @@
 package org.openmrs.module.icare.auditlog;
 
-import org.apache.commons.lang.StringUtils;
-import org.openmrs.*;
-import org.openmrs.module.icare.core.JSONConverter;
-
-import javax.persistence.*;
-import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.sql.Blob;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.apache.commons.lang.StringUtils;
+import org.openmrs.User;
+import org.openmrs.module.icare.core.JSONConverter;
 
 @Entity
 @Table(name = "audit_log")
@@ -24,15 +39,15 @@ public class AuditLog implements Serializable, JSONConverter {
 	@Column(name = "audit_log_id")
 	private Integer auditLogId;
 	
-	//the fully qualified java class name of the create/updated/deleted object
+	// the fully qualified java class name of the create/updated/deleted object
 	@Column(name = "type", length = 512, nullable = false)
 	private Class<?> type;
 	
-	//the unique database id of the created/updated/deleted object
-	//	@Column(name = "identifier", length = 255, nullable = false)
-	//	private Serializable identifier;
+	// the unique database id of the created/updated/deleted object
+	// @Column(name = "identifier", length = 255, nullable = false)
+	// private Serializable identifier;
 	
-	//the performed operation that which could be a create, update or delete
+	// the performed operation that which could be a create, update or delete
 	@Column(name = "action", length = 50, nullable = false)
 	private String action;
 	
@@ -71,7 +86,7 @@ public class AuditLog implements Serializable, JSONConverter {
 	public AuditLog(Class<?> type, String action, User user, Date dateCreated) {
 		this();
 		this.type = type;
-		//this.identifier = identifier;
+		// this.identifier = identifier;
 		this.action = action;
 		this.user = user;
 		this.dateCreated = dateCreated;
@@ -108,16 +123,16 @@ public class AuditLog implements Serializable, JSONConverter {
 	/**
 	 * @return the identifier
 	 */
-	//	public Serializable getIdentifier() {
-	//		return identifier;
-	//	}
+	// public Serializable getIdentifier() {
+	// return identifier;
+	// }
 	
 	/**
 	 * @param identifier the identifier to set
 	 */
-	//	public void setIdentifier(Serializable identifier) {
-	//		this.identifier = identifier;
-	//	}
+	// public void setIdentifier(Serializable identifier) {
+	// this.identifier = identifier;
+	// }
 	
 	/**
 	 * @return the action
@@ -276,26 +291,26 @@ public class AuditLog implements Serializable, JSONConverter {
 	
 	public Map<String, Object> toMap() {
 		Map<String, Object> auditLogMap = new HashMap<>();
-		if(this.getUuid() != null) {
+		if (this.getUuid() != null) {
 			auditLogMap.put("uuid", this.uuid);
 		}
-		if(this.getDateCreated() != null) {
+		if (this.getDateCreated() != null) {
 			auditLogMap.put("date_created", this.getDateCreated());
 		}
-		if(this.getAction() != null) {
+		if (this.getAction() != null) {
 			auditLogMap.put("action", this.getAction());
 		}
 
-		if(this.getType() != null){
-			auditLogMap.put("type",this.getType());
+		if (this.getType() != null) {
+			auditLogMap.put("type", this.getType());
 		}
 
-		if(this.getUser() != null){
-			Map<String,Object> userObjectMap = new HashMap<>();
-			userObjectMap.put("id",this.getUser().getId());
+		if (this.getUser() != null) {
+			Map<String, Object> userObjectMap = new HashMap<>();
+			userObjectMap.put("id", this.getUser().getId());
 			userObjectMap.put("name", this.getUser().getPersonName().getFullName());
-			userObjectMap.put("username",this.getUser().getUsername());
-			auditLogMap.put("user",userObjectMap);
+			userObjectMap.put("username", this.getUser().getUsername());
+			auditLogMap.put("user", userObjectMap);
 		}
 
 		return auditLogMap;

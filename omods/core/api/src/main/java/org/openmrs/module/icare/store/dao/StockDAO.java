@@ -1,23 +1,32 @@
 package org.openmrs.module.icare.store.dao;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 // Generated Oct 7, 2020 12:49:21 PM by Hibernate Tools 5.2.10.Final
 
 import org.hibernate.Query;
-import org.openmrs.Concept;
-import org.openmrs.Drug;
-import org.openmrs.Location;
-import org.openmrs.Visit;
-import org.openmrs.api.context.Context;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.Item;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
-import org.openmrs.module.icare.store.models.*;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.*;
+import org.openmrs.module.icare.store.models.OrderStatus;
+import org.openmrs.module.icare.store.models.ReorderLevel;
+import org.openmrs.module.icare.store.models.Requisition;
+import org.openmrs.module.icare.store.models.RequisitionItem;
+import org.openmrs.module.icare.store.models.RequisitionItemStatus;
+import org.openmrs.module.icare.store.models.RequisitionStatus;
+import org.openmrs.module.icare.store.models.Stock;
+import org.openmrs.module.icare.store.models.StockInvoice;
+import org.openmrs.module.icare.store.models.StockInvoiceItem;
+import org.openmrs.module.icare.store.models.StockInvoiceItemStatus;
+import org.openmrs.module.icare.store.models.StockInvoiceStatus;
 
 /**
  * Home object for domain model class StStock.
@@ -67,30 +76,33 @@ public class StockDAO extends BaseDAO<Stock> {
 	}
 	
 	public List<Stock> getStockByItemAndLocations(String itemUuid, List<String> locationUuids) {
-		/*DbSession session = this.getSession();
-		String locations = "";
-		for(String location: locationUuids){
-			if(!locations.equals("")){
-				locations += ",";
-			}
-			locations += "'" +location +"'";
+		/*
+		 * DbSession session = this.getSession();
+		 * String locations = "";
+		 * for(String location: locationUuids){
+		 * if(!locations.equals("")){
+		 * locations += ",";
+		 * }
+		 * locations += "'" +location +"'";
+		 * }
+		 * String queryStr = "SELECT st \n" + "FROM Stock st \n"
+		 * + "WHERE st.item = (SELECT it FROM Item it WHERE it.uuid = :itemUuid) "
+		 * +
+		 * "AND st.location = (SELECT l FROM Location l WHERE l.uuid IN (:locationUuids))\n"
+		 * + "AND st.item.stockable = true";
+		 * 
+		 * Query query = session.createQuery(queryStr);
+		 * query.setParameter("itemUuid", itemUuid);
+		 * query.setParameter("locationUuids", locations);
+		 */
+
+		List<Stock> stockList = new ArrayList<>();
+
+		for (String location : locationUuids) {
+			stockList.addAll(getStockByItemAndLocation(itemUuid, location));
 		}
-		String queryStr = "SELECT st \n" + "FROM Stock st \n"
-				+ "WHERE st.item = (SELECT it FROM Item it WHERE it.uuid = :itemUuid) "
-				+ "AND st.location = (SELECT l FROM Location l WHERE l.uuid IN (:locationUuids))\n"
-				+ "AND st.item.stockable = true";
-
-		Query query = session.createQuery(queryStr);
-		query.setParameter("itemUuid", itemUuid);
-		query.setParameter("locationUuids", locations);*/
-
-        List<Stock> stockList = new ArrayList<>();
-
-        for (String location : locationUuids) {
-            stockList.addAll(getStockByItemAndLocation(itemUuid, location));
-        }
-        return stockList;
-    }
+		return stockList;
+	}
 	
 	public List<Stock> getStockByDrugAndLocation(String drugUuid, String locationUuid) {
 		DbSession session = this.getSession();
@@ -172,12 +184,13 @@ public class StockDAO extends BaseDAO<Stock> {
 		
 	}
 	
-	public ListResult<Stock> getStockByLocation(String locationUuid,Pager pager, String search, Integer startIndex, Integer limit,
-	        String conceptClassName) {
-		
+	public ListResult<Stock> getStockByLocation(String locationUuid, Pager pager, String search, Integer startIndex,
+			Integer limit,
+			String conceptClassName) {
+
 		DbSession session = this.getSession();
 		String queryStr = "SELECT st \n"
-		        + "FROM Stock st \n LEFT JOIN st.item it LEFT JOIN it.concept c LEFT JOIN it.drug d";
+				+ "FROM Stock st \n LEFT JOIN st.item it LEFT JOIN it.concept c LEFT JOIN it.drug d";
 		if (search != null) {
 			queryStr += " LEFT JOIN c.names cn WHERE (lower(d.name) LIKE lower(:search) OR lower(cn.name) like lower(:search) ) ";
 		}
@@ -191,18 +204,18 @@ public class StockDAO extends BaseDAO<Stock> {
 
 			queryStr += "st.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
 		}
-		
+
 		if (conceptClassName != null) {
-			
+
 			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
 			} else {
 				queryStr += " AND ";
 			}
 			queryStr += " c.conceptClass =(SELECT ccl FROM ConceptClass ccl WHERE ccl.name = :conceptClassName)";
-			
+
 		}
-		
+
 		if (!queryStr.contains("WHERE")) {
 			queryStr += " WHERE ";
 		} else {
@@ -210,11 +223,10 @@ public class StockDAO extends BaseDAO<Stock> {
 		}
 		queryStr += " (d.retired = false OR c.retired = false) AND it.voided=false AND st.quantity > 0 order by st.item ASC";
 
-		
 		Query query = session.createQuery(queryStr);
-//		query.setFirstResult(startIndex);
-//		query.setMaxResults(limit);
-		
+		// query.setFirstResult(startIndex);
+		// query.setMaxResults(limit);
+
 		if (search != null) {
 			query.setParameter("search", "%" + search.replace(" ", "%") + "%");
 		}
@@ -235,7 +247,7 @@ public class StockDAO extends BaseDAO<Stock> {
 		listResults.setPager(pager);
 		listResults.setResults(query.list());
 		return listResults;
-		
+
 	}
 	
 	public ListResult<Item> getStockedOut(Pager pager) {
@@ -253,64 +265,33 @@ public class StockDAO extends BaseDAO<Stock> {
 		
 	}
 	
-	public ListResult<Item> getNearlyStockedOut(String locationUuid,Pager pager, String q) {
-
-			DbSession session = this.getSession();
-
-//			String queryStr = "SELECT stc.item,SUM(stc.quantity) FROM Stock stc \n"
-//					+ "WHERE stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) \n" + "GROUP BY stc.item \n"
-//					+ "HAVING SUM(stc.quantity) <=  (SELECT rol.quantity FROM ReorderLevel rol \n"
-//					+ "WHERE rol.id.location = (SELECT loc FROM Location loc WHERE loc.uuid = :locationUuid) AND rol.id.item = stc.item)";
-//
-//			String queryStr = "SELECT s FROM Stock s JOIN (SELECT s.item, SUM(s.quantity) as totalQuantity FROM Stock s WHERE s.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) GROUP BY s.item) AS sq ON s.item = sq.item JOIN ReorderLevel r ON s.item = r.id.item WHERE sq.totalQuantity <= r.quantity";
-
-//			String queryStr = "SELECT s FROM Stock s INNER JOIN ReorderLevel r ON s.item = r.id.item WHERE s.item IN ( SELECT s2.item FROM Stock s2 WHERE s2.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) GROUP BY s2.item HAVING SUM(s2.quantity) < r.quantity)";
-
-			String queryStr = "SELECT item FROM Item item LEFT JOIN item.concept c WITH c.retired = false LEFT JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED' LEFT JOIN item.drug d WITH d.retired = false WHERE item IN( SELECT s.item FROM Stock s WHERE s.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) AND  s.item IN ( SELECT r.id.item FROM ReorderLevel r WHERE ( SELECT SUM(s2.quantity) FROM Stock s2 WHERE s2.item = r.id.item AND s2.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid AND s2.expiryDate > current_date) GROUP BY s2.item) <= r.quantity)) ";
-
-			if( q != null){
-				if(!queryStr.contains("WHERE")){
-					queryStr += " WHERE ";
-				} else{
-					queryStr += " AND ";
-				}
-				queryStr += " lower(d.name) LIKE lower(:q) OR lower(cn.name) like lower(:q) ";
-			}
-
-
-			Query query = session.createQuery(queryStr);
-
-			if (q != null) {
-				query.setParameter("q", "%" + q.replace(" ", "%") + "%");
-			}
-
-			query.setParameter("locationUuid", locationUuid);
-
-			if (pager.isAllowed()) {
-				pager.setTotal(query.list().size());
-				query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
-				query.setMaxResults(pager.getPageSize());
-			}
-
-			ListResult<Item> listResults = new ListResult<>();
-			listResults.setPager(pager);
-			listResults.setResults(query.list());
-			return listResults;
-		}
-	
-	public ListResult<Item> getNearlyExpiredByLocation(String locationUuid, Pager pager, String q) {
-
-		LocalDate endDate = LocalDate.now().plusDays(30);
-		Date endDateUtil = Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+	public ListResult<Item> getNearlyStockedOut(String locationUuid, Pager pager, String q) {
 
 		DbSession session = this.getSession();
 
-		String queryStr = "SELECT stc FROM Stock stc INNER JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED' LEFT JOIN it.drug d WHERE stc.expiryDate <= :endDate AND stc.expiryDate > current_date AND (d.retired = false OR c.retired = false) AND stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) AND stc.quantity > 0 ";
+		// String queryStr = "SELECT stc.item,SUM(stc.quantity) FROM Stock stc \n"
+		// + "WHERE stc.location = (SELECT l FROM Location l WHERE l.uuid =
+		// :locationUuid) \n" + "GROUP BY stc.item \n"
+		// + "HAVING SUM(stc.quantity) <= (SELECT rol.quantity FROM ReorderLevel rol \n"
+		// + "WHERE rol.id.location = (SELECT loc FROM Location loc WHERE loc.uuid =
+		// :locationUuid) AND rol.id.item = stc.item)";
+		//
+		// String queryStr = "SELECT s FROM Stock s JOIN (SELECT s.item, SUM(s.quantity)
+		// as totalQuantity FROM Stock s WHERE s.location = (SELECT l FROM Location l
+		// WHERE l.uuid = :locationUuid) GROUP BY s.item) AS sq ON s.item = sq.item JOIN
+		// ReorderLevel r ON s.item = r.id.item WHERE sq.totalQuantity <= r.quantity";
 
-		if( q != null){
-			if(!queryStr.contains("WHERE")){
+		// String queryStr = "SELECT s FROM Stock s INNER JOIN ReorderLevel r ON s.item
+		// = r.id.item WHERE s.item IN ( SELECT s2.item FROM Stock s2 WHERE s2.location
+		// = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) GROUP BY s2.item
+		// HAVING SUM(s2.quantity) < r.quantity)";
+
+		String queryStr = "SELECT item FROM Item item LEFT JOIN item.concept c WITH c.retired = false LEFT JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED' LEFT JOIN item.drug d WITH d.retired = false WHERE item IN( SELECT s.item FROM Stock s WHERE s.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) AND  s.item IN ( SELECT r.id.item FROM ReorderLevel r WHERE ( SELECT SUM(s2.quantity) FROM Stock s2 WHERE s2.item = r.id.item AND s2.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid AND s2.expiryDate > current_date) GROUP BY s2.item) <= r.quantity)) ";
+
+		if (q != null) {
+			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
-			} else{
+			} else {
 				queryStr += " AND ";
 			}
 			queryStr += " lower(d.name) LIKE lower(:q) OR lower(cn.name) like lower(:q) ";
@@ -323,7 +304,45 @@ public class StockDAO extends BaseDAO<Stock> {
 		}
 
 		query.setParameter("locationUuid", locationUuid);
-		query.setParameter("endDate",endDateUtil);
+
+		if (pager.isAllowed()) {
+			pager.setTotal(query.list().size());
+			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+			query.setMaxResults(pager.getPageSize());
+		}
+
+		ListResult<Item> listResults = new ListResult<>();
+		listResults.setPager(pager);
+		listResults.setResults(query.list());
+		return listResults;
+	}
+	
+	public ListResult<Item> getNearlyExpiredByLocation(String locationUuid, Pager pager, String q) {
+
+		LocalDate endDate = LocalDate.now().plusDays(30);
+		Date endDateUtil = Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+		DbSession session = this.getSession();
+
+		String queryStr = "SELECT stc FROM Stock stc INNER JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED' LEFT JOIN it.drug d WHERE stc.expiryDate <= :endDate AND stc.expiryDate > current_date AND (d.retired = false OR c.retired = false) AND stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) AND stc.quantity > 0 ";
+
+		if (q != null) {
+			if (!queryStr.contains("WHERE")) {
+				queryStr += " WHERE ";
+			} else {
+				queryStr += " AND ";
+			}
+			queryStr += " lower(d.name) LIKE lower(:q) OR lower(cn.name) like lower(:q) ";
+		}
+
+		Query query = session.createQuery(queryStr);
+
+		if (q != null) {
+			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
+		}
+
+		query.setParameter("locationUuid", locationUuid);
+		query.setParameter("endDate", endDateUtil);
 		System.out.println(query);
 
 		if (pager.isAllowed()) {
@@ -345,10 +364,10 @@ public class StockDAO extends BaseDAO<Stock> {
 
 		String queryStr = "SELECT stc FROM Stock stc INNER JOIN stc.item it LEFT JOIN it.concept c LEFT JOIN c.names cn WITH cn.conceptNameType = 'FULLY_SPECIFIED' LEFT JOIN it.drug d WHERE stc.expiryDate <= current_date AND (d.retired = false OR c.retired = false) AND  stc.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid) AND stc.quantity > 0 ";
 
-		if( q != null){
-			if(!queryStr.contains("WHERE")){
+		if (q != null) {
+			if (!queryStr.contains("WHERE")) {
 				queryStr += " WHERE ";
-			} else{
+			} else {
 				queryStr += " AND ";
 			}
 			queryStr += " lower(d.name) LIKE lower(:q) OR lower(cn.name) like lower(:q) ";
@@ -366,7 +385,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
 			query.setMaxResults(pager.getPageSize());
 		}
-		//Stock
+		// Stock
 		ListResult<Item> listResults = new ListResult<>();
 		listResults.setPager(pager);
 		listResults.setResults(query.list());
@@ -374,38 +393,42 @@ public class StockDAO extends BaseDAO<Stock> {
 
 	}
 	
-	//TODO fix getting by location query
-	public ListResult<Item> getStockedOutByLocation(String locationUuid, Pager pager, String q, String conceptClassName) {
+	// TODO fix getting by location query
+	public ListResult<Item> getStockedOutByLocation(String locationUuid, Pager pager, String q,
+			String conceptClassName) {
 		DbSession session = this.getSession();
-		//String queryStr = "SELECT item FROM Item item \n"
-		//        + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
-		//String queryStr = "SELECT item FROM Item item, Stock stock WHERE item.stockable = true AND stock.item=item AND stock.location.uuid =:locationUuid";
+		// String queryStr = "SELECT item FROM Item item \n"
+		// + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid
+		// FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
+		// String queryStr = "SELECT item FROM Item item, Stock stock WHERE
+		// item.stockable = true AND stock.item=item AND stock.location.uuid
+		// =:locationUuid";
 
 		String queryStr = "SELECT item FROM Item item LEFT JOIN item.concept c WITH c.retired = false LEFT JOIN item.drug d WITH d.retired = false \n";
-		
+
 		if (q != null) {
 			queryStr += " LEFT JOIN c.names cn";
 			queryStr += " WHERE lower(d.name) LIKE lower(:q) OR lower(cn.name) like lower(:q) ";
 		}
-		
+
 		if (!queryStr.contains("WHERE")) {
 			queryStr += " WHERE ";
 		} else {
 			queryStr += " AND ";
 		}
 		queryStr += "item.stockable = true AND item.voided=false AND ((item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date AND stock2.location.uuid =:locationUuid) <= 0) ) OR (item IN(SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid AND (SELECT SUM(stock2.quantity) FROM Stock stock2 WHERE stock2.item = stock.item AND stock2.expiryDate > current_date AND stock2.location.uuid =:locationUuid) = NULL)) OR (item NOT IN( SELECT stock.item FROM Stock stock WHERE stock.location.uuid =:locationUuid)))";
-		
+
 		Query query = session.createQuery(queryStr);
-		//		query.setFirstResult(startIndex);
-		//		query.setMaxResults(limit);
-		
+		// query.setFirstResult(startIndex);
+		// query.setMaxResults(limit);
+
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
 		}
-		//		if (conceptClassName != null) {
-		//			query.setParameter("conceptClassName", conceptClassName);
-		//		}
-		
+		// if (conceptClassName != null) {
+		// query.setParameter("conceptClassName", conceptClassName);
+		// }
+
 		query.setParameter("locationUuid", locationUuid);
 
 		if (pager.isAllowed()) {
@@ -437,9 +460,12 @@ public class StockDAO extends BaseDAO<Stock> {
 	
 	public List<OrderStatus> getOrderStatusByVisit(String visitUuid) {
 		DbSession session = this.getSession();
-		//String queryStr = "SELECT item FROM Item item \n"
-		//        + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
-		//String queryStr = "SELECT item FROM Item item, Stock stock WHERE item.stockable = true AND stock.item=item AND stock.location.uuid =:locationUuid";
+		// String queryStr = "SELECT item FROM Item item \n"
+		// + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid
+		// FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
+		// String queryStr = "SELECT item FROM Item item, Stock stock WHERE
+		// item.stockable = true AND stock.item=item AND stock.location.uuid
+		// =:locationUuid";
 		String queryStr = "SELECT os FROM OrderStatus os\n" + "INNER JOIN os.order o\n" + "INNER JOIN o.encounter e\n"
 		        + "INNER JOIN e.visit v\n" + "WHERE v.uuid=:visitUuid";
 		
@@ -450,9 +476,12 @@ public class StockDAO extends BaseDAO<Stock> {
 	
 	public List<OrderStatus> getOrderStatusByOrderUuid(String orderUuid) {
 		DbSession session = this.getSession();
-		//String queryStr = "SELECT item FROM Item item \n"
-		//        + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
-		//String queryStr = "SELECT item FROM Item item, Stock stock WHERE item.stockable = true AND stock.item=item AND stock.location.uuid =:locationUuid";
+		// String queryStr = "SELECT item FROM Item item \n"
+		// + "WHERE item.stockable = true AND item.uuid NOT IN(SELECT stock.item.uuid
+		// FROM Stock stock WHERE stock.location.uuid =:locationUuid)";
+		// String queryStr = "SELECT item FROM Item item, Stock stock WHERE
+		// item.stockable = true AND stock.item=item AND stock.location.uuid
+		// =:locationUuid";
 		String queryStr = "SELECT os FROM OrderStatus os\n" + "INNER JOIN os.order o\n" + "WHERE o.uuid=:orderUuid";
 		
 		Query query = session.createQuery(queryStr);
@@ -573,7 +602,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			// Now 'deletedRequisition' contains the deleted object
 		}
 		
-		//session.getTransaction().commit(); // Commit the transaction
+		// session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedRequisition;
 	}
@@ -586,7 +615,8 @@ public class StockDAO extends BaseDAO<Stock> {
 		Query selectQuery = session.createQuery(selectQueryStr);
 		selectQuery.setParameter("requestItemUuid", requestItemUuid);
 		
-		RequisitionItem deletedRequisitionItem = (RequisitionItem) selectQuery.uniqueResult(); // Fetch the object before deletion
+		RequisitionItem deletedRequisitionItem = (RequisitionItem) selectQuery.uniqueResult(); // Fetch the object
+		                                                                                       // before deletion
 		
 		if (deletedRequisitionItem != null) {
 			String deleteQueryStr = "DELETE FROM RequisitionItem rq WHERE rq.uuid = :requestItemUuid";
@@ -598,7 +628,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			
 		}
 		
-		//session.getTransaction().commit(); // Commit the transaction
+		// session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedRequisitionItem;
 		
@@ -612,7 +642,9 @@ public class StockDAO extends BaseDAO<Stock> {
 		Query selectQuery = session.createQuery(selectQueryStr);
 		selectQuery.setParameter("requestStatusUuid", requestStatusUuid);
 		
-		RequisitionStatus deletedRequisitionStatus = (RequisitionStatus) selectQuery.uniqueResult(); // Fetch the object before deletion
+		RequisitionStatus deletedRequisitionStatus = (RequisitionStatus) selectQuery.uniqueResult(); // Fetch the object
+		                                                                                             // before
+		                                                                                             // deletion
 		
 		if (deletedRequisitionStatus != null) {
 			String deleteQueryStr = "DELETE FROM RequisitionStatus rq WHERE rq.uuid = :requestStatusUuid";
@@ -624,7 +656,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			
 		}
 		
-		//session.getTransaction().commit(); // Commit the transaction
+		// session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedRequisitionStatus;
 	}
@@ -636,7 +668,11 @@ public class StockDAO extends BaseDAO<Stock> {
 		Query selectQuery = session.createQuery(selectQueryStr);
 		selectQuery.setParameter("requestItemStatusUuid", requestItemStatusUuid);
 		
-		RequisitionItemStatus deletedRequisitionItemStatus = (RequisitionItemStatus) selectQuery.uniqueResult(); // Fetch the object before deletion
+		RequisitionItemStatus deletedRequisitionItemStatus = (RequisitionItemStatus) selectQuery.uniqueResult(); // Fetch
+		                                                                                                         // the
+		                                                                                                         // object
+		                                                                                                         // before
+		                                                                                                         // deletion
 		
 		if (deletedRequisitionItemStatus != null) {
 			String deleteQueryStr = "DELETE FROM RequisitionItemStatus rq WHERE rq.uuid = :requestItemStatusUuid";
@@ -648,7 +684,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			
 		}
 		
-		//session.getTransaction().commit(); // Commit the transaction
+		// session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedRequisitionItemStatus;
 		
@@ -673,7 +709,8 @@ public class StockDAO extends BaseDAO<Stock> {
 		Query selectQuery = session.createQuery(selectQueryStr);
 		selectQuery.setParameter("stockInvoiceUuid", stockInvoiceUuid);
 		
-		StockInvoice deletedStockInvoice = (StockInvoice) selectQuery.uniqueResult(); // Fetch the object before deletion
+		StockInvoice deletedStockInvoice = (StockInvoice) selectQuery.uniqueResult(); // Fetch the object before
+		                                                                              // deletion
 		
 		if (deletedStockInvoice != null) {
 			String deleteQueryStr = "DELETE FROM StockInvoice sti WHERE sti.uuid = :stockInvoiceUuid";
@@ -685,7 +722,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			
 		}
 		
-		//session.getTransaction().commit(); // Commit the transaction
+		// session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedStockInvoice;
 		
@@ -698,7 +735,9 @@ public class StockDAO extends BaseDAO<Stock> {
 		Query selectQuery = session.createQuery(selectQueryStr);
 		selectQuery.setParameter("stockInvoiceStatusUuid", stockInvoiceStatusUuid);
 		
-		StockInvoiceStatus deletedStockInvoiceStatus = (StockInvoiceStatus) selectQuery.uniqueResult(); // Fetch the object before deletion
+		StockInvoiceStatus deletedStockInvoiceStatus = (StockInvoiceStatus) selectQuery.uniqueResult(); // Fetch the
+		                                                                                                // object before
+		                                                                                                // deletion
 		
 		if (deletedStockInvoiceStatus != null) {
 			String deleteQueryStr = "DELETE FROM StockInvoiceStatus stis WHERE stis.uuid = :stockInvoiceStatusUuid";
@@ -710,7 +749,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			
 		}
 		
-		////session.getTransaction().commit(); // Commit the transaction
+		//// session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedStockInvoiceStatus;
 	}
@@ -723,7 +762,8 @@ public class StockDAO extends BaseDAO<Stock> {
 		Query selectQuery = session.createQuery(selectQueryStr);
 		selectQuery.setParameter("stockInvoiceItemUuid", stockInvoiceItemUuid);
 		
-		StockInvoiceItem deletedStockInvoiceItem = (StockInvoiceItem) selectQuery.uniqueResult(); // Fetch the object before deletion
+		StockInvoiceItem deletedStockInvoiceItem = (StockInvoiceItem) selectQuery.uniqueResult(); // Fetch the object
+		                                                                                          // before deletion
 		
 		if (deletedStockInvoiceItem != null) {
 			String deleteQueryStr = "DELETE FROM StockInvoiceItem stii WHERE stii.uuid = :stockInvoiceItemUuid";
@@ -735,7 +775,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			
 		}
 		
-		//session.getTransaction().commit(); // Commit the transaction
+		// session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedStockInvoiceItem;
 	}
@@ -748,7 +788,11 @@ public class StockDAO extends BaseDAO<Stock> {
 		Query selectQuery = session.createQuery(selectQueryStr);
 		selectQuery.setParameter("stockInvoiceItemStatusUuid", stockInvoiceItemStatusUuid);
 		
-		StockInvoiceItemStatus deletedStockInvoiceItemStatus = (StockInvoiceItemStatus) selectQuery.uniqueResult(); // Fetch the object before deletion
+		StockInvoiceItemStatus deletedStockInvoiceItemStatus = (StockInvoiceItemStatus) selectQuery.uniqueResult(); // Fetch
+		                                                                                                            // the
+		                                                                                                            // object
+		                                                                                                            // before
+		                                                                                                            // deletion
 		
 		if (deletedStockInvoiceItemStatus != null) {
 			String deleteQueryStr = "DELETE FROM StockInvoiceItemStatus stiis WHERE stiis.uuid = :stockInvoiceItemStatusUuid";
@@ -760,7 +804,7 @@ public class StockDAO extends BaseDAO<Stock> {
 			
 		}
 		
-		//session.getTransaction().commit(); // Commit the transaction
+		// session.getTransaction().commit(); // Commit the transaction
 		
 		return deletedStockInvoiceItemStatus;
 	}

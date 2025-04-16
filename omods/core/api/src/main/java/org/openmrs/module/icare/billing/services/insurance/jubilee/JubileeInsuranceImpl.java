@@ -1,20 +1,67 @@
 package org.openmrs.module.icare.billing.services.insurance.jubilee;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.itextpdf.text.DocumentException;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.openmrs.*;
+import org.openmrs.Concept;
+import org.openmrs.ConceptClass;
+import org.openmrs.ConceptDatatype;
+import org.openmrs.ConceptMap;
+import org.openmrs.ConceptName;
+import org.openmrs.ConceptReferenceTerm;
+import org.openmrs.ConceptSource;
+import org.openmrs.Diagnosis;
+import org.openmrs.Drug;
+import org.openmrs.DrugOrder;
+import org.openmrs.Encounter;
+import org.openmrs.Obs;
+import org.openmrs.Order;
+import org.openmrs.TestOrder;
+import org.openmrs.Visit;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.ConceptNameType;
 import org.openmrs.api.ConceptService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
-import org.openmrs.module.icare.billing.services.insurance.*;
+import org.openmrs.module.icare.billing.services.insurance.AuthorizationStatus;
+import org.openmrs.module.icare.billing.services.insurance.Claim;
+import org.openmrs.module.icare.billing.services.insurance.ClaimResult;
+import org.openmrs.module.icare.billing.services.insurance.ClaimStatus;
+import org.openmrs.module.icare.billing.services.insurance.EligibilityStatus;
+import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
+import org.openmrs.module.icare.billing.services.insurance.SyncResult;
+import org.openmrs.module.icare.billing.services.insurance.VerificationException;
+import org.openmrs.module.icare.billing.services.insurance.VerificationRequest;
+import org.openmrs.module.icare.billing.services.insurance.VerificationResponse;
 import org.openmrs.module.icare.billing.services.insurance.nhif.AuthToken;
 import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFConfig;
 import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFServer;
@@ -31,19 +78,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itextpdf.text.DocumentException;
 
 public class JubileeInsuranceImpl implements InsuranceService {
 	
@@ -395,8 +431,9 @@ public class JubileeInsuranceImpl implements InsuranceService {
 		serialString = serialString.substring(String.valueOf(folio.getFolioNo()).length()) + folio.getFolioNo();
 		folio.setAttendanceDate(formatDate(visit.getStartDatetime()));
 		
-		// folio.setSerialNo(facilityCode + "\\" + (folio.getClaimMonth() < 10 ? "0" : "") + folio.getClaimMonth() + "\\"
-		//         + calendar.get(Calendar.YEAR) + "\\" + serialString);
+		// folio.setSerialNo(facilityCode + "\\" + (folio.getClaimMonth() < 10 ? "0" :
+		// "") + folio.getClaimMonth() + "\\"
+		// + calendar.get(Calendar.YEAR) + "\\" + serialString);
 		folio.setAuthorizationNo(visitWrapper.getInsuranceAuthorizationNumber());
 		folio.setCardNo(visitWrapper.getInsuranceID());
 		folio.setPatientFileNo(visitWrapper.getPatient().getFileNumber());

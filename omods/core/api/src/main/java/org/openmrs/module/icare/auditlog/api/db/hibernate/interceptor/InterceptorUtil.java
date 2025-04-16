@@ -1,8 +1,12 @@
 package org.openmrs.module.icare.auditlog.api.db.hibernate.interceptor;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.EntityMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.metadata.ClassMetadata;
 import org.openmrs.api.context.Context;
@@ -11,10 +15,6 @@ import org.openmrs.module.icare.auditlog.AuditLogHelper;
 import org.openmrs.module.icare.auditlog.api.db.AuditLogDAO;
 import org.openmrs.module.icare.auditlog.api.db.DAOUtils;
 import org.openmrs.module.icare.auditlog.util.AuditLogUtil;
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 final class InterceptorUtil {
 	
@@ -65,7 +65,7 @@ final class InterceptorUtil {
 	 * @return the serialized JSON text
 	 */
 	static String serializePersistentObject(Object object) {
-		//TODO Might be better to use xstream
+		// TODO Might be better to use xstream
 		Map<String, Object> propertyNameValueMap = null;
 		ClassMetadata cmd = DAOUtils.getClassMetadata(AuditLogUtil.getActualType(object));
 		if (cmd != null) {

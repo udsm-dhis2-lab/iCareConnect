@@ -1,5 +1,10 @@
 package org.openmrs.module.icare.auditlog.api.impl;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
@@ -14,11 +19,6 @@ import org.openmrs.module.icare.auditlog.util.AuditLogConstants;
 import org.openmrs.util.OpenmrsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 @Transactional
 public class AuditLogServiceImpl extends BaseOpenmrsService implements AuditLogService {
