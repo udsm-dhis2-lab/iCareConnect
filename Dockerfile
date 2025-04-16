@@ -14,5 +14,5 @@ FROM udsmdhis2/icare-openmrs:1.0.0
 COPY --from=build /glowroot /glowroot
 COPY --from=build /bin/setenv.sh bin/
 
-COPY ./omods/core/omod/target/icare-1.0.0-SNAPSHOT.omod .OpenMRS/modules/icare.omod
+COPY ./omods/core/omod/target/icare-1.0.0-SNAPSHOT.omod .OpenMRS/modules/
 COPY ./ui/dist/icare-ui webapps/ROOT
