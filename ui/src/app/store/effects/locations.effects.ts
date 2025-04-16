@@ -183,7 +183,7 @@ export class LocationsEffects {
                   upsertLocation({
                     location: {
                       ...locationResponse,
-                      ...(formatLocationsPayLoad([locationResponse] || []) ||
+                      ...(formatLocationsPayLoad(locationResponse ? [locationResponse] : []) ||
                         [])[0],
                     },
                   }),
