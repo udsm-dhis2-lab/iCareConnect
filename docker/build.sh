@@ -18,6 +18,4 @@ else
 fi
 safe_branch=$(echo "$branch" | sed 's/[^a-zA-Z0-9._-]/_/g')
 # docker push udsmdhis2/icare-core:$safe_branch-$version
-docker buildx build --platform linux/amd64,linux/arm64 \
-  -t udsmdhis2/icare-core:$safe_branch-$version \
-  --push .
+docker buildx build -t udsmdhis2/icare-core:$safe_branch-$version --push .
