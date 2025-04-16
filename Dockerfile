@@ -19,4 +19,3 @@ COPY --from=build /bin/setenv.sh bin/
 
 COPY ./omods/core/omod/target/icare-1.0.0-SNAPSHOT.omod .OpenMRS/modules/icare.omod
 COPY ./ui/dist/icare-ui webapps/ROOT
-#COPY ./docs/build webapps/docs
