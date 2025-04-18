@@ -704,7 +704,7 @@ export class SharedPatientDashboardComponent implements OnInit {
       telephoneNo: data.telephoneNo,
       clinicalNotes: data.clinicalNotes,
       dateOfBirth: data.dateOfBirth,
-      authorizationNo: data.authorizationNo || "520527857321", //enter valid authorization
+      authorizationNo: data.authorizationNo,
       facilityPatientFileNumber: data.patientFileNo,
       attendanceDate: new Date().toISOString(),
       serviceDate: new Date().toISOString(),
