@@ -62,6 +62,7 @@ import { take } from "rxjs/operators";
 import {
   authorizeNHIFCardSuccess,
   getNHIFCardDetailsByCardNumber,
+  getNHIFCardDetailsByCardNumberFailure,
   getNHIFCardDetailsByCardNumberSuccess,
   getNHIFCardDetailsByNIN,
   getNHIFCardDetailsByNINFailure,
@@ -1101,14 +1102,41 @@ export class VisitComponent implements OnInit {
       };
 
       this.store.dispatch(getNHIFCardDetailsByCardNumber({ data: cardData }));
-      this.actionNHIFGetCardByCardNoSubscription = this.actions$
-        .pipe(ofType(getNHIFCardDetailsByCardNumberSuccess), take(1))
-        .subscribe(({ response }) => {
-          if (response.status === 200) {
-          } else {
-          }
-          console.log("Get detail by Card Response:", response);
-        });
+
+      merge(
+        this.actions$.pipe(
+          ofType(getNHIFCardDetailsByCardNumberSuccess),
+          take(1)
+        ),
+        this.actions$.pipe(
+          ofType(getNHIFCardDetailsByCardNumberFailure),
+          take(1)
+        )
+      ).subscribe((action) => {
+        this.isLoading = false;
+        this.getNHIFCardInfoSuccess = true;
+        if (action.type === getNHIFCardDetailsByCardNumberSuccess.type) {
+          const { response } = action;
+
+          this.fetchedData = {
+            name: response.firstName + " " + response.lastName,
+            gender: response.gender,
+            productName: response.productCode,
+            pfnumber: "",
+            expirationDate: response.expiryDate,
+            eligibilityStatus: response.isActive ? "Active" : "Inactive",
+          };
+
+          // set card number in state
+          this.authorizationData.cardNo = response.cardNo;
+        } else {
+          console.log(action.error);
+          // Error case
+          this.nhifFailedRemark =
+            action.error || "Failed to fetch card details by NIN";
+          this.getNHIFCardInfoSuccess = false;
+        }
+      });
     } else {
       // get patient card details  by NIDA number
       this.store.dispatch(
@@ -1155,14 +1183,14 @@ export class VisitComponent implements OnInit {
   onInsuranceIDChange(newValue: string): void {
     this.authorizationData = {
       ...this.authorizationData,
-      cardNo : newValue
+      cardNo: newValue,
     };
   }
 
   onNationalIDChange(newValue: string): void {
     this.authorizationData = {
       ...this.authorizationData,
-      nationalID : newValue
+      nationalID: newValue,
     };
   }
 
@@ -1197,14 +1225,14 @@ export class VisitComponent implements OnInit {
     if (!this.authorizationData.nationalID) {
       this.authorizationData = {
         ...this.authorizationData,
-        nationalID : "string"
+        nationalID: "string",
       };
     }
 
     if (!this.authorizationData.cardNo) {
       this.authorizationData = {
         ...this.authorizationData,
-        cardNo :"string"
+        cardNo: "string",
       };
     }
 

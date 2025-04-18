@@ -20,6 +20,9 @@ import {
   submitNHIFServiceNotificationSuccess,
   submitNHIFServiceNotification,
   submitNHIFServiceNotificationFailure,
+  RequestNHIFServiceApproval,
+  RequestNHIFServiceApprovalSuccess,
+  RequestNHIFServiceApprovalFailure,
 } from "../actions/insurance-nhif-point-of-care.actions";
 import { catchError, map, switchMap } from "rxjs/operators";
 import { of } from "rxjs";
@@ -134,17 +137,10 @@ export class PointOfCareEffects {
       ofType(getNHIFCardDetailsByCardNumber),
       switchMap(({ data }) => {
         return this.insuranceService.getCardDetailsByCardNumber(data).pipe(
-          map((response: { status: number; body: object }) => {
+          map((response) => {
             return getNHIFCardDetailsByCardNumberSuccess({ response });
           }),
           catchError((error) => {
-            this.notificationService.show(
-              new Notification({
-                message: "Problem getting NHIF card by card number",
-                type: "ERROR",
-              })
-            );
-
             return of(
               getNHIFCardDetailsByCardNumberFailure({
                 error:
@@ -157,7 +153,6 @@ export class PointOfCareEffects {
     )
   );
 
-
   // service notification
 
   submitNHIFServiceNotification$ = createEffect(() =>
@@ -167,8 +162,31 @@ export class PointOfCareEffects {
         this.insuranceService.submitServiceNotification(data).pipe(
           map((response) => submitNHIFServiceNotificationSuccess({ response })),
           catchError((error) => {
-            const serverMessage = error?.error?.message || 'Service Notification failed';
-            return of(submitNHIFServiceNotificationFailure({ error: serverMessage }));
+            const serverMessage =
+              error?.error?.message || "Service Notification failed";
+            return of(
+              submitNHIFServiceNotificationFailure({ error: serverMessage })
+            );
+          })
+        )
+      )
+    )
+  );
+
+  // Request service approval
+
+  RequestNHIFServiceApproval$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(RequestNHIFServiceApproval),
+      switchMap(({ data }) =>
+        this.insuranceService.requestApproval(data).pipe(
+          map((response) => RequestNHIFServiceApprovalSuccess({ response })),
+          catchError((error) => {
+            const serverMessage =
+              error?.error?.message || "Service Notification failed";
+            return of(
+              RequestNHIFServiceApprovalFailure({ error: serverMessage })
+            );
           })
         )
       )

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
-import { Observable } from "rxjs";
+import { merge, Observable } from "rxjs";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { DiagnosisObject } from "src/app/shared/resources/diagnosis/models/diagnosis-object.model";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
@@ -77,7 +77,7 @@ import { UserService } from "src/app/modules/maintenance/services/users.service"
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { VisitConsultationStatusModalComponent } from "../../dialogs/visit-consultation-status-modal/visit-consultation-status-modal.component";
 import { BillingService } from "src/app/modules/billing/services/billing.service";
-import { map, map as rxMap, switchMap } from "rxjs/operators";
+import { map, map as rxMap, switchMap, take } from "rxjs/operators";
 import { keyBy, orderBy } from "lodash";
 import { loadActiveVisit } from "src/app/store/actions/visit.actions";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
@@ -85,7 +85,18 @@ import { SharedRemotePatientHistoryModalComponent } from "../../dialogs/shared-r
 import { MatRadioChange } from "@angular/material/radio";
 import { LocationService } from "src/app/core/services";
 import { GlobalSettingService } from "../../resources/global-setting/services";
-import { submitNHIFServiceNotification } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
+import {
+  RequestNHIFServiceApproval,
+  RequestNHIFServiceApprovalFailure,
+  RequestNHIFServiceApprovalSuccess,
+  submitNHIFServiceNotification,
+  submitNHIFServiceNotificationFailure,
+  submitNHIFServiceNotificationSuccess,
+} from "src/app/store/actions/insurance-nhif-point-of-care.actions";
+import { Actions, ofType } from "@ngrx/effects";
+import { NHIFServiceNotificationI } from "../../resources/store/models/insurance-nhif.model";
+import { environment } from "src/environments/environment";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: "app-shared-patient-dashboard",
@@ -177,6 +188,7 @@ export class SharedPatientDashboardComponent implements OnInit {
   hfrCodeLocationAttribute$: Observable<any>;
   constructor(
     private store: Store<AppState>,
+    private actions$: Actions,
     private dialog: MatDialog,
     private systemSettingsService: SystemSettingsService,
     private ordersService: OrdersService,
@@ -186,7 +198,8 @@ export class SharedPatientDashboardComponent implements OnInit {
     private billingService: BillingService,
     private globalSettingService: GlobalSettingService,
     private googleAnalyticsService: GoogleAnalyticsService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private snackBar: MatSnackBar
   ) {
     this.store.dispatch(loadEncounterTypes());
   }
@@ -641,6 +654,7 @@ export class SharedPatientDashboardComponent implements OnInit {
       "phone"
     );
     const diseases = selectedOrders.reduce((acc, order) => {
+      console.log("the order", order);
       if (Array.isArray(order?.diseases)) {
         const formatted = order.diseases.map((disease) => ({
           diseaseCode: disease.code || disease.diseaseCode,
@@ -682,10 +696,105 @@ export class SharedPatientDashboardComponent implements OnInit {
     };
   }
 
+  mapToNHIFApprovalRequest(data: NHIFServiceNotificationI) {
+    return {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      gender: data.gender,
+      telephoneNo: data.telephoneNo,
+      clinicalNotes: data.clinicalNotes,
+      dateOfBirth: data.dateOfBirth,
+      authorizationNo: data.authorizationNo || "520527857321", //enter valid authorization
+      facilityPatientFileNumber: data.patientFileNo,
+      attendanceDate: new Date().toISOString(),
+      serviceDate: new Date().toISOString(),
+      expiryDate: new Date().toISOString(),
+      sourceFacilityCode: environment.NHIF_CLIENT_ID,
+      practitionerNo: data.practitionerNo,
+      prescribedBy: "Doctor",
+      requestedBy: "Doctor huyo  huyo",
+      createdBy: "Doctor pia",
+      approvalDiseases: [],
+      authorizedItems: [
+        {
+          serviceTypeID: 1,
+          itemCode: data.requestedServices[0].itemCode,
+          description: data.requestedServices[0].remarks,
+          quantityRequested: 1,
+          unitPrice: 1000,
+          percentCovered: 100,
+          createdBy: "Doctor",
+          dateCreated: new Date().toISOString(),
+        },
+      ],
+      approvalSupportingDocuments: [],
+    };
+  }
+
   onUpdateConsultationOrder(selectedOrders: any) {
-    // if is NHIF visit dispatch NHIF service notification (simon add this condition later)
     const nhifPayload = this.mapToNHIFServiceNotification(selectedOrders);
+    const nhifApprovalPayload = this.mapToNHIFApprovalRequest(nhifPayload);
+
+    // Show loading
+    this.snackBar.open("Sending NHIF service notification...", "", {
+      duration: 3000,
+    });
+
     this.store.dispatch(submitNHIFServiceNotification({ data: nhifPayload }));
+
+    merge(
+      this.actions$.pipe(ofType(submitNHIFServiceNotificationSuccess), take(1)),
+      this.actions$.pipe(ofType(submitNHIFServiceNotificationFailure), take(1))
+    ).subscribe((action) => {
+      if (action.type === submitNHIFServiceNotificationSuccess.type) {
+        const { response } = action;
+        if (response.services[0].status === "REJECTED") {
+          this.store.dispatch(
+            RequestNHIFServiceApproval({ data: nhifApprovalPayload })
+          );
+
+          merge(
+            this.actions$.pipe(
+              ofType(RequestNHIFServiceApprovalSuccess),
+              take(1)
+            ),
+            this.actions$.pipe(
+              ofType(RequestNHIFServiceApprovalFailure),
+              take(1)
+            )
+          ).subscribe((approvalAction) => {
+            if (
+              approvalAction.type === RequestNHIFServiceApprovalSuccess.type
+            ) {
+              this.snackBar.open("Approval request sent successfully.", "", {
+                duration: 3000,
+              });
+            } else {
+              this.snackBar.open(
+                `Approval failed: ${approvalAction?.error || "Unknown error"}`,
+                "Dismiss"
+              );
+            }
+          });
+        } else {
+          this.snackBar.open(
+            "Service notification submitted successfully.",
+            "",
+            {
+              duration: 3000,
+            }
+          );
+        }
+      } else {
+        this.snackBar.open(
+          `Service notification failed: ${action.error || "Unknown error"}`,
+          "Dismiss",
+          { duration: 5000 }
+        );
+      }
+    });
+
+    // Optionally update order status if consultation hasn't started
     if (!this.activeVisit.consultationStarted) {
       const orders = [
         {
@@ -696,17 +805,14 @@ export class SharedPatientDashboardComponent implements OnInit {
           encounter: this.activeVisit.consultationStatusOrder?.encounter?.uuid,
         },
       ];
-      console.log("orders ", orders);
+
       this.ordersService.updateOrdersViaEncounter(orders).subscribe((order) => {
         if (!order.error) {
-          // console.log("==> Order results: ", order);
+          console.log("Consultation order updated successfully.");
         }
       });
-
-      // call the method to submit NHIF service notification if ensured
     }
   }
-
   onAssignBed(event: Event): void {
     event.stopPropagation();
     this.assignBed.emit(true);

@@ -121,6 +121,32 @@ export interface GetCardNumberDetailsI {
   verifierID: string;
 }
 
+
+export interface GetCardNumberDetailsResponseI {
+  cardNo: string; 
+  firstName: string; 
+  middleName: string; 
+  lastName: string; 
+  gender: string; 
+  dateOfBirth: string; 
+  schemeID: number;
+  membershipNo: string; 
+  memberCategoryID: number; 
+  productCode: string; 
+  cardExistence: string; 
+  cardStatusID: number;
+  cardStatus: string; 
+  expiryDate: string;
+  statusDescription: string; 
+  isActive: boolean; 
+  isValidCard: boolean; 
+  nationalID: string | null; 
+  zanID: string | null; 
+  picturePath: string | null; 
+}
+
+
+
 export interface NHIFCardAuthorizationI {
   cardNo: string;
   nationalID: string;
@@ -292,6 +318,27 @@ export interface NHIFRequestApprovalI {
   approvalSupportingDocuments: NHIFApprovalSupportingDocument[];
 }
 
+export interface NHIFServiceResponseItemI {
+  requestedServiceID: string;
+  requestID: string;
+  itemCode: string;
+  usage: string;
+  quantityRequested: number;
+  effectiveDate: string;
+  endDate: string;
+  availableAfterDate: string | null;
+  status: 'REJECTED' | 'APPROVED';
+  requiresApproval: boolean;
+  remarks: string;
+  rejectionDetails: string;
+  rejectionReasonCode: string | null;
+  authorizationNo: string | null;
+  createdBy: string;
+  dateCreated: string;
+  lastModifiedBy: string;
+  lastModified: string;
+  itemName: string | null;
+}
 
 export interface NHIFServiceNotificationResponseI {
   requestID: string;
@@ -314,24 +361,4 @@ export interface NHIFServiceNotificationResponseI {
   services:NHIFServiceResponseItemI[];
 }
 
-export interface NHIFServiceResponseItemI {
-  requestedServiceID: string;
-  requestID: string;
-  itemCode: string;
-  usage: string;
-  quantityRequested: number;
-  effectiveDate: string;
-  endDate: string;
-  availableAfterDate: string | null;
-  status: string;
-  requiresApproval: boolean;
-  remarks: string;
-  rejectionDetails: string;
-  rejectionReasonCode: string | null;
-  authorizationNo: string | null;
-  createdBy: string;
-  dateCreated: string;
-  lastModifiedBy: string;
-  lastModified: string;
-  itemName: string | null;
-}
+
