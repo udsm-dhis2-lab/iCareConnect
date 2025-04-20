@@ -12,12 +12,32 @@
         <span class="ml-2">Clients for E-claim</span>
       </mat-toolbar>
       <div>
-        <app-patient-list
-          [itemsPerPage]="10"
-          [isTabularList]="true"
-          [defaultFilter]="'Insurance'"
-          (selectPatient)="onSelectPatient($event)"
-        ></app-patient-list>
+        <mat-tab-group>
+          <mat-tab label="All">
+            <app-patient-list
+              [itemsPerPage]="10"
+              [isTabularList]="true"
+              [defaultFilter]="'Insurance'"
+              (selectPatient)="onSelectPatient($event)"
+            ></app-patient-list>
+          </mat-tab>
+          <mat-tab label="Claims">
+            <app-patient-list
+              [itemsPerPage]="10"
+              [isTabularList]="true"
+              [defaultFilter]="'Insurance'"
+              (selectPatient)="onSelectPatient($event)"
+            ></app-patient-list>
+          </mat-tab>
+          <mat-tab label="Submitted Claims">
+            <app-patient-list
+              [itemsPerPage]="10"
+              [isTabularList]="true"
+              [defaultFilter]="'Insurance'"
+              (selectPatient)="onSelectPatient($event)"
+            ></app-patient-list>
+          </mat-tab>
+        </mat-tab-group>
       </div>
     </div>
   </div>
