@@ -25,6 +25,41 @@ export class SubmitEClaimDashboardComponent implements OnInit {
     this.visitClaim$ = this.visitService.getVisitClaim(this.visitUuid);
   }
 
+  visitClaim = {
+    patientName: "TEST DECEMBER",
+    gender: "Male",
+    age: 22,
+    birthDate: "Feb 10, 2003",
+    mrn: "108106-6-00001/2025",
+    phone: "0799889988",
+    email: "",
+    paymentType: "INSURANCE",
+    authorizationNo: "NOT_AUTHORIZED",
+    insuranceId: "889988998899",
+    paymentScheme: "STANDARD/NAJALI AFYA/TIMIZA/NAWEZA",
+    insuranceName: "NHIF",
+    room: "Room(Dental Clinic) / University of Dar es Salaam",
+    totalCost: 20000,
+    claimItems: [
+      {
+        category: "Registration",
+        serviceDetails: ["Registration"],
+        cost: 2000,
+      },
+      {
+        category: "Triage",
+        serviceDetails: ["Vitals"],
+        cost: 3000,
+      },
+      {
+        category: "Clinic",
+        serviceDetails: ["Consultation", "Diagnosis"],
+        cost: 4000,
+      },
+    ]
+  };
+  
+
   onSubmitEClaim(event: Event, visitUuid): void {
     event.stopPropagation();
     this.claimSent = false;

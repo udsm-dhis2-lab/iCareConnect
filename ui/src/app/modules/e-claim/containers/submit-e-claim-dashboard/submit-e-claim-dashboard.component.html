@@ -20,7 +20,7 @@
     <button
       mat-icon-button
       [routerLink]="'/e-claim'"
-      matTooltip="Go to Clients List" 
+      matTooltip="Go to Clients List"
     >
       <mat-icon>arrow_back</mat-icon>
     </button>
@@ -30,26 +30,57 @@
     mode="indeterminate"
     *ngIf="!params?.visitClaim"
   ></mat-progress-bar>
-  <mat-tab-group>
-    <mat-tab label="Claim Form">
-      <div class="p-1">
-        <div
-          style="height: 600px; overflow: auto"
-          *ngIf="params?.visitClaim"
-          [innerHtml]="params?.visitClaim?.claimFile"
-        ></div>
+  <div class="e-claim-summary-container">
+    <div class="claim-header-container">
+      <h3 class="patient-name-title">
+        {{ visitClaim.patientName }},
+        <span class="demographics">
+          ({{ visitClaim.gender }} | {{ visitClaim.age }} Yrs | {{ visitClaim.birthDate }})
+        </span>
+      </h3>
+      <hr />
+      <div class="row-info">
+        <span><strong>MRN:</strong> {{ visitClaim.mrn }}</span>
+        <span><strong>Phone:</strong> {{ visitClaim.phone }}</span>
+        <span><strong>Email:</strong> {{ visitClaim.email || '-' }}</span>
+        <span><strong>Payment type:</strong> {{ visitClaim.paymentType }}</span>
+        <span><strong>Authorized NO.:</strong> {{ visitClaim.authorizationNo }}</span>
+        <span><strong>Insurance ID:</strong> {{ visitClaim.insuranceId }}</span>
+        <span><strong>PaymentScheme:</strong> {{ visitClaim.paymentScheme }}</span>
+        <span><strong>Insurance:</strong> {{ visitClaim.insuranceName }}</span>
+        <span class="room-info">
+          <mat-icon inline style="font-size: 16px;">location_on</mat-icon>
+          {{ visitClaim.room }}
+        </span>
       </div>
-    </mat-tab>
-    <mat-tab label="Patient Treatment Details">
-      <div class="p-1">
-        <div
-          style="height: 600px; overflow: auto"
-          *ngIf="params?.visitClaim"
-          [innerHtml]="params?.visitClaim?.patientFile"
-        ></div>
-      </div>
-    </mat-tab>
-  </mat-tab-group>
+    </div>
+    
+
+    <!-- Claim Items Table -->
+    <table class="claim-table">
+      <thead>
+        <tr>
+          <th>Service Category</th>
+          <th>Service Details</th>
+          <th>Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of visitClaim.claimItems">
+          <td>{{ item.category }}</td>
+          <td>{{ item.serviceDetails.join(", ") }}</td>
+          <td>{{ item.cost | number }}/=</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="2" class="text-right">Total Cost</th>
+          <th>{{ visitClaim.totalCost | number }}/=</th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
   <div class="alert alert-success" role="alert" *ngIf="claimSent">
     Claim submitted Successfully
   </div>

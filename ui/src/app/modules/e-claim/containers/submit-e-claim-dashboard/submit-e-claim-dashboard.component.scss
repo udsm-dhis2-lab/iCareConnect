@@ -1,0 +1,85 @@
+.e-claim-summary-container {
+    padding: 16px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .back-button {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .back-button mat-icon {
+    vertical-align: middle;
+  }
+  
+  .patient-info,
+  .insurance-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .patient-info div,
+  .insurance-info div {
+    flex: 1 1 200px;
+  }
+  
+  .claim-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+  }
+  
+  .claim-table th,
+  .claim-table td {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    text-align: left;
+  }
+  
+  .claim-table tfoot th {
+    text-align: right;
+    font-weight: bold;
+  }
+  
+  .claim-header-container {
+    background: #f9f9f9;
+    border: 1px solid #cce0ff;
+    padding: 16px;
+    margin-bottom: 24px;
+    border-radius: 4px;
+  }
+  
+  .patient-name-title {
+    margin: 0 0 8px 0;
+    font-weight: 500;
+    color: #1976d2;
+  }
+  
+  .demographics {
+    font-weight: normal;
+    color: #444;
+  }
+  
+  .row-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 14px;
+    color: #555;
+  }
+  
+  .row-info span {
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .room-info {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+  }
+  
