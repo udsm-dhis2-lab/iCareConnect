@@ -193,7 +193,6 @@ export class MenuComponent implements OnInit {
       )
       .subscribe((response) => {
         if (response && !response?.error) {
-          console.warn(response);
         } else if (response && response?.error) {
           this.store.dispatch(go({ path: ["login"] }));
         }

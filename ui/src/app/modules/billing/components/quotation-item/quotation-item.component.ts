@@ -88,7 +88,6 @@ export class QuotationItemComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log("this.billItems :....",this.billItems);
     this.dataSource = new MatTableDataSource(this.billItems);
 
     this.columns = [
@@ -200,7 +199,6 @@ export class QuotationItemComponent implements OnInit {
   onGetInvoice(e: MouseEvent) {}
 
   onChangePaymentType(e) {
-    // console.log(e);
   }
   testCallback(event:any){
     const payload = {
@@ -483,7 +481,6 @@ export class QuotationItemComponent implements OnInit {
 
     //For bills
     if (e.Bill) {
-      // console.log("The bills are:", e.Bill);
       if (e.Bill.length > 0) {
         // let sum = sumBy(
         //   e.Bill.filter((record) => record.billItem.discounted === false),
