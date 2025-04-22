@@ -1,5 +1,9 @@
 package org.openmrs.module.icare.billing.dao;
 
+import java.util.List;
+
+import javax.transaction.Transactional;
+
 // Generated Oct 7, 2020 12:49:21 PM by Hibernate Tools 5.2.10.Final
 
 import org.hibernate.Query;
@@ -8,12 +12,6 @@ import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.icare.billing.models.Payment;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.springframework.stereotype.Repository;
-
-import javax.transaction.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Home object for domain model class BlPayment.
@@ -61,7 +59,7 @@ public class PaymentDAO extends BaseDAO<Payment> {
 		return referenceNumber;
 	}
 	
-	//Get All Payments with its status
+	// Get All Payments with its status
 	public List<Payment> getAllPayments() {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT p FROM Payment p";

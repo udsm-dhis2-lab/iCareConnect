@@ -2,45 +2,20 @@ import { Component, OnInit } from "@angular/core";
 import { Observable, of, zip } from "rxjs";
 import { AppState } from "src/app/store/reducers";
 
-import { loadFormPrivilegesConfigs } from "src/app/store/actions/form-privileges-configs.actions";
-import {
-  getFormPrivilegesConfigs,
-  getFormPrivilegesConfigsLoadingState,
-} from "src/app/store/selectors/form-privileges-configs.selectors";
-import {
-  getCurrentUserDetails,
-  getCurrentUserPrivileges,
-  getProviderDetails,
-  getRolesLoadingState,
-} from "src/app/store/selectors/current-user.selectors";
-import { select, Store } from "@ngrx/store";
+import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from "@angular/router";
-import {
-  go,
-  loadCurrentPatient,
-  loadRolesDetails,
-} from "src/app/store/actions";
-import {
-  getActiveVisit,
-  getVisitLoadingState,
-} from "src/app/store/selectors/visit.selectors";
-import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
+import { select, Store } from "@ngrx/store";
+import { catchError, map } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { BillingService } from "src/app/modules/billing/services/billing.service";
+import { PaymentService } from "src/app/modules/billing/services/payment.service";
+import { addBillStatusOnBedOrders } from "src/app/modules/inpatient/helpers/sanitize-bed-orders.helper";
+import { DischargePatientModalComponent } from "src/app/shared/components/discharge-patient-modal/discharge-patient-modal.component";
+import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
 import {
   LocationGet,
   ProviderAttributeGet,
 } from "src/app/shared/resources/openmrs";
-import { getCurrentLocation } from "src/app/store/selectors";
-import { catchError, map } from "rxjs/operators";
-import { getAllObservations } from "src/app/store/selectors/observation.selectors";
-import { MatDialog } from "@angular/material/dialog";
-import { DischargePatientModalComponent } from "src/app/shared/components/discharge-patient-modal/discharge-patient-modal.component";
-import { addBillStatusOnBedOrders } from "src/app/modules/inpatient/helpers/sanitize-bed-orders.helper";
-import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
-import { BillingService } from "src/app/modules/billing/services/billing.service";
-import { PaymentService } from "src/app/modules/billing/services/payment.service";
-import { VisitsService } from "src/app/shared/resources/visits/services";
-import { InsuranceService } from "src/app/shared/services";
 import {
   FingerPrintPaylodTypeE,
   NHIFBiometricMethodE,
@@ -49,17 +24,31 @@ import {
   NHIFPointOfCareI,
   NHIFPractitionerDetailsI,
 } from "src/app/shared/resources/store/models/insurance-nhif.model";
-import {
-  getListofPointOfCare,
-  getPointOfCareLoading,
-} from "src/app/store/selectors/insurance-nhif-point-of-care.selectors";
-import {
-  loadPointOfCare,
-  verifyPointOfCare,
-} from "src/app/store/actions/insurance-nhif-point-of-care.actions";
-import { selectNHIFPractitionerDetails } from "src/app/store/selectors/insurance-nhif-practitioner.selectors";
 import { PatientI } from "src/app/shared/resources/store/models/patient.model";
-import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
+import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
+import { VisitsService } from "src/app/shared/resources/visits/services";
+import { loadCurrentPatient } from "src/app/store/actions";
+import { loadFormPrivilegesConfigs } from "src/app/store/actions/form-privileges-configs.actions";
+import { loadPointOfCare } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
+import { getCurrentLocation } from "src/app/store/selectors";
+import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
+import {
+  getCurrentUserDetails,
+  getCurrentUserPrivileges,
+  getProviderDetails,
+  getRolesLoadingState,
+} from "src/app/store/selectors/current-user.selectors";
+import {
+  getFormPrivilegesConfigs,
+  getFormPrivilegesConfigsLoadingState,
+} from "src/app/store/selectors/form-privileges-configs.selectors";
+import { getListofPointOfCare } from "src/app/store/selectors/insurance-nhif-point-of-care.selectors";
+import { selectNHIFPractitionerDetails } from "src/app/store/selectors/insurance-nhif-practitioner.selectors";
+import { getAllObservations } from "src/app/store/selectors/observation.selectors";
+import {
+  getActiveVisit,
+  getVisitLoadingState,
+} from "src/app/store/selectors/visit.selectors";
 
 @Component({
   selector: "app-patient-dashboard",
@@ -284,30 +273,29 @@ export class PatientDashboardComponent implements OnInit {
     });
   }
 
-  handlePatientVisitDetails(event, patientVisitDetails): void {
-  }
+  handlePatientVisitDetails(event, patientVisitDetails): void {}
 
   // Separate method to open the patient fingerprint modal
   openPatientFingerprintModal(patientAuthorization: string): void {
     const patientPointOfCareData = {
       pointOfCareID:
         this.pointOfCares.find(
-          (item) =>
-            (item.PointOfCareCode === NHIFPointOfCareCodeE.CONSULTATION)
+          (item) => item.PointOfCareCode === NHIFPointOfCareCodeE.CONSULTATION
         ).PointOfCareID || null,
       authorizationNo: patientAuthorization,
-      practitionerNo: this.currentProviderDetails[1]["value"], 
+      practitionerNo: this.currentProviderDetails[1]["value"],
       biometricMethod: NHIFBiometricMethodE.fingerprint,
       fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
     };
-    this.dialog
-      .open(FingerCaptureComponent, {
-        width: "45%",
-        data: { detail: "patient's", data: {
+    /*this.dialog.open(FingerCaptureComponent, {
+      width: "45%",
+      data: {
+        detail: "patient's",
+        data: {
           type: FingerPrintPaylodTypeE.Patient_POC_Verification,
-          payload: patientPointOfCareData
-        } },
-      })
-      
+          payload: patientPointOfCareData,
+        },
+      },
+    });*/
   }
 }

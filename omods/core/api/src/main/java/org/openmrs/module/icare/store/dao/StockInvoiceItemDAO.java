@@ -1,6 +1,9 @@
 package org.openmrs.module.icare.store.dao;
 
-import org.openmrs.Concept;
+import java.util.Date;
+import java.util.List;
+
+import org.hibernate.Query;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.billing.models.ItemPrice;
 import org.openmrs.module.icare.core.Item;
@@ -10,11 +13,6 @@ import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.laboratory.models.Sample;
 import org.openmrs.module.icare.store.models.StockInvoice;
 import org.openmrs.module.icare.store.models.StockInvoiceItem;
-import org.hibernate.Query;
-import org.openmrs.module.icare.store.models.StockInvoiceItemStatus;
-
-import java.util.Date;
-import java.util.List;
 
 public class StockInvoiceItemDAO extends BaseDAO<StockInvoiceItem> {
 	

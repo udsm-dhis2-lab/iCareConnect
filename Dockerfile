@@ -1,4 +1,3 @@
-# First stage: Build with node and other dependencies
 FROM openjdk:11 AS build
 
 RUN apt-get update && \
@@ -10,10 +9,8 @@ COPY ./docker/glowroot /glowroot
 COPY ./docker/setenv.sh bin/
 COPY ./docker/admin.json /glowroot/
 
-# Second stage: Use the original OpenMRS image
 FROM udsmdhis2/icare-openmrs:1.0.0
 
-# Copy the built files from the first stage
 COPY --from=build /glowroot /glowroot
 COPY --from=build /bin/setenv.sh bin/
 

@@ -25,13 +25,13 @@ export class ModulesSelectorComponent implements OnInit {
 
   showModal = false;
 
-  // openModal() {
-  //   this.showModal = true;
-  // }
+  openModal() {
+    // this.showModal = true;
+  }
 
-  // closeModal() {
-  //   this.showModal = false;
-  // }
+  closeModal() {
+    // this.showModal = false;
+  }
 
   @Input() currentLocation: any;
   userLocationsForTheCurrentModule: Location[];
@@ -210,7 +210,6 @@ export class ModulesSelectorComponent implements OnInit {
         !navigationDetails?.path[0])
         ? false
         : true;
-    // console.log("navigationDetails", navigationDetails);
 
     this.store.dispatch(
       go({
@@ -233,7 +232,7 @@ export class ModulesSelectorComponent implements OnInit {
                 ? navigationDetails?.path[0]
                 : this.currentModule?.id,
             ],
-        query: { queryParams: navigationDetails["queryParams"] },
+        query: { queryParams: (navigationDetails??{})["queryParams"] },
       })
     );
     this.locationStatusControl();
@@ -249,7 +248,6 @@ export class ModulesSelectorComponent implements OnInit {
 
   onSelectModuleLocation(event: Event, module: any): void {
     // module?.app?.name
-    console.log("wzzzzzzzzzz......",module);
     event.stopPropagation();
     this.currentModule = module;
     this.userLocationsForTheCurrentModule =

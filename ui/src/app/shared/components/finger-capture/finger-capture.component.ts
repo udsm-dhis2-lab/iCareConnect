@@ -1,13 +1,9 @@
 import { Component, Inject, OnInit } from "@angular/core";
-import { FingerprintService } from "../../services";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
-import {
-  FingerPrintPaylodTypeE,
-  NHIFCardAuthorizationI,
-  NHIFPractitionerDetailsI,
-  NHIFPractitionerLoginI,
-  PatientPOCVerificationI,
-} from "../../resources/store/models/insurance-nhif.model";
+import { Actions, ofType } from "@ngrx/effects";
+import { Store } from "@ngrx/store";
+import { merge, Subscription } from "rxjs";
+import { take } from "rxjs/operators";
 import {
   authorizeNHIFCard,
   authorizeNHIFCardFailure,
@@ -16,17 +12,18 @@ import {
   verifyPointOfCareFailure,
   verifyPointOfCareSuccess,
 } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
-import { Store } from "@ngrx/store";
-import { AppState } from "src/app/store/reducers";
 import {
   loginNHIFPractitioner,
   loginNHIFPractitionerFailure,
   loginNHIFPractitionerSuccess,
   setNHIFPractitionerDetails,
 } from "src/app/store/actions/insurance-nhif-practitioner.actions";
-import { merge, Subscription } from "rxjs";
-import { Actions, ofType } from "@ngrx/effects";
-import { take } from "rxjs/operators";
+import { AppState } from "src/app/store/reducers";
+import {
+  FingerPrintPaylodTypeE,
+  NHIFPractitionerDetailsI,
+} from "../../resources/store/models/insurance-nhif.model";
+import { FingerprintService } from "../../services";
 
 @Component({
   selector: "app-finger-capture",
@@ -66,7 +63,7 @@ export class FingerCaptureComponent implements OnInit {
         (result) => {
           this.isCheckingDevice = false;
           if (result?.ErrorCode === "0") {
-            this.showScanningComponent = true; // Step 2: Show scanning UI
+            this.showScanningComponent = false; // Step 2: Show scanning UI
             this.captureFingerprint();
           } else {
             this.deviceNotFound = true; // Show "device not found" message
@@ -114,21 +111,21 @@ export class FingerCaptureComponent implements OnInit {
         this.actions$.pipe(ofType(verifyPointOfCareFailure), take(1))
       ).subscribe((action) => {
         this.showLoader = false;
-      
+
         if (action.type === verifyPointOfCareSuccess.type) {
           const response = action.response;
-      
-          if (response?.authorizationStatus === 'REJECTED') {
+
+          if (response?.authorizationStatus === "REJECTED") {
             this.authorizationFailed = true;
-            this.errorMessage = response.message || 'Verification rejected';
+            this.errorMessage = response.message || "Verification rejected";
           } else {
             this.authorizationSuccess = true;
-            this.successMessage = 'Point of Care verified successfully!';
+            this.successMessage = "Point of Care verified successfully!";
           }
         } else {
           // Failure case
           this.authorizationFailed = true;
-          this.errorMessage = action.error || 'Failed to verify point of care';
+          this.errorMessage = action.error || "Failed to verify point of care";
         }
       });
     } else if (
@@ -143,7 +140,6 @@ export class FingerCaptureComponent implements OnInit {
         this.actions$.pipe(ofType(loginNHIFPractitionerFailure), take(1))
       ).subscribe((action) => {
         this.showLoader = false;
-        
 
         if (action.type === loginNHIFPractitionerSuccess.type) {
           const response = action.response;
@@ -154,7 +150,7 @@ export class FingerCaptureComponent implements OnInit {
           } else {
             this.authorizationSuccess = true;
             this.successMessage = "Practitioner logged in successful!";
-            // what is the response if sucessfull? 
+            // what is the response if sucessfull?
             const practitionerData: NHIFPractitionerDetailsI = {
               practitionerNo: this.payload.payload.practitionerNo,
               nationalID: this.payload.payload.nationalID,
@@ -171,16 +167,15 @@ export class FingerCaptureComponent implements OnInit {
           this.errorMessage =
             action.error || "Failed to login NHIF practitioner";
 
-          
-            const practitionerData: NHIFPractitionerDetailsI = {
-              practitionerNo: this.payload.payload.practitionerNo,
-              nationalID: this.payload.payload.nationalID,
-              isNHIFPractitionerLogedIn: false,
-            };
+          const practitionerData: NHIFPractitionerDetailsI = {
+            practitionerNo: this.payload.payload.practitionerNo,
+            nationalID: this.payload.payload.nationalID,
+            isNHIFPractitionerLogedIn: false,
+          };
 
-            this.store.dispatch(
-              setNHIFPractitionerDetails({ data: practitionerData })
-            );
+          this.store.dispatch(
+            setNHIFPractitionerDetails({ data: practitionerData })
+          );
         }
       });
     } else if (

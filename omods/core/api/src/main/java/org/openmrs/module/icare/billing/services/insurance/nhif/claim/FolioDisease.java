@@ -1,17 +1,12 @@
 package org.openmrs.module.icare.billing.services.insurance.nhif.claim;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.openmrs.ConceptMap;
-import org.openmrs.Diagnosis;
-import org.openmrs.Order;
-import org.openmrs.api.context.Context;
-import org.openmrs.module.icare.billing.models.InvoiceItem;
-import org.openmrs.module.icare.billing.services.BillingService;
-
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.openmrs.Diagnosis;
 
 public class FolioDisease {
 	
@@ -43,7 +38,7 @@ public class FolioDisease {
 		FolioDisease folioDisease = new FolioDisease();
 		// folioDisease.setFolioID(folio.getFolioID());
 		folioDisease.setFolioDiseaseID(diagnosis.getUuid());
-		//diagnosis.getDiagnosis().
+		// diagnosis.getDiagnosis().
 		String diagnosisString = diagnosis.getDiagnosis().getCoded().getDisplayString();
 		String diagnosisCode = diagnosisString.split(" ")[0].replace("(", "").replace(")", "").toUpperCase();
 		

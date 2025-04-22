@@ -1,6 +1,10 @@
 package org.openmrs.module.icare.auditlog.api.db;
 
-import org.hibernate.EntityMode;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.metadata.ClassMetadata;
@@ -8,11 +12,6 @@ import org.hibernate.type.CollectionType;
 import org.hibernate.type.OneToOneType;
 import org.hibernate.type.Type;
 import org.openmrs.api.context.Context;
-
-import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 public class DAOUtils {
 	
@@ -45,7 +44,7 @@ public class DAOUtils {
 		ClassMetadata cmd = getSessionFactory().getClassMetadata(clazz);
 		if (cmd != null) {
 			for (Type type : cmd.getPropertyTypes()) {
-				//If this is a OneToOne or a collection type
+				// If this is a OneToOne or a collection type
 				if (type.isCollectionType() || OneToOneType.class.isAssignableFrom(type.getClass())) {
 					CollectionType collType = (CollectionType) type;
 					boolean isManyToManyColl = false;
@@ -60,16 +59,16 @@ public class DAOUtils {
 						        .getReturnedClass();
 					}
 					
-					//Ignore non persistent types
+					// Ignore non persistent types
 					if (getSessionFactory().getClassMetadata(assocType) == null) {
 						continue;
 					}
 					
 					if (!foundAssocTypes.contains(assocType)) {
-						//Don't implicitly audit types for many to many collections items
+						// Don't implicitly audit types for many to many collections items
 						if (!type.isCollectionType() || (type.isCollectionType() && !isManyToManyColl)) {
 							foundAssocTypes.add(assocType);
-							//Recursively inspect each association type
+							// Recursively inspect each association type
 							foundAssocTypes.addAll(getAssociationTypesToAuditInternal(assocType, foundAssocTypes));
 						}
 					}

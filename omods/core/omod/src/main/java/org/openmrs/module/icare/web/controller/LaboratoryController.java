@@ -1,29 +1,73 @@
 package org.openmrs.module.icare.web.controller;
 
-import org.openmrs.*;
-import org.openmrs.api.*;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.openmrs.Concept;
+import org.openmrs.ConceptMap;
+import org.openmrs.ConceptSource;
+import org.openmrs.Location;
+import org.openmrs.User;
+import org.openmrs.Visit;
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.ConceptService;
+import org.openmrs.api.LocationService;
+import org.openmrs.api.OrderService;
+import org.openmrs.api.ProviderService;
+import org.openmrs.api.UserService;
+import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.core.ICareService;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
-import org.openmrs.module.icare.laboratory.models.*;
+import org.openmrs.module.icare.laboratory.models.AssociatedField;
+import org.openmrs.module.icare.laboratory.models.AssociatedFieldResult;
+import org.openmrs.module.icare.laboratory.models.Batch;
+import org.openmrs.module.icare.laboratory.models.BatchSample;
+import org.openmrs.module.icare.laboratory.models.BatchSet;
+import org.openmrs.module.icare.laboratory.models.BatchSetStatus;
+import org.openmrs.module.icare.laboratory.models.BatchStatus;
+import org.openmrs.module.icare.laboratory.models.Result;
+import org.openmrs.module.icare.laboratory.models.Sample;
+import org.openmrs.module.icare.laboratory.models.SampleExt;
+import org.openmrs.module.icare.laboratory.models.SampleLable;
+import org.openmrs.module.icare.laboratory.models.SampleOrder;
+import org.openmrs.module.icare.laboratory.models.SampleStatus;
+import org.openmrs.module.icare.laboratory.models.TestAllocation;
+import org.openmrs.module.icare.laboratory.models.TestAllocationAssociatedField;
+import org.openmrs.module.icare.laboratory.models.TestAllocationStatus;
+import org.openmrs.module.icare.laboratory.models.TestOrderLocation;
+import org.openmrs.module.icare.laboratory.models.TestRangeConfig;
+import org.openmrs.module.icare.laboratory.models.TestTimeConfig;
+import org.openmrs.module.icare.laboratory.models.WorkloadSummary;
+import org.openmrs.module.icare.laboratory.models.Worksheet;
+import org.openmrs.module.icare.laboratory.models.WorksheetControl;
+import org.openmrs.module.icare.laboratory.models.WorksheetDefinition;
+import org.openmrs.module.icare.laboratory.models.WorksheetSample;
+import org.openmrs.module.icare.laboratory.models.WorksheetSampleStatus;
+import org.openmrs.module.icare.laboratory.models.WorksheetStatus;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
-import org.openmrs.module.icare.store.models.Requisition;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.io.StreamCorruptedException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/lab")
@@ -171,42 +215,48 @@ public class LaboratoryController {
 	
 	@RequestMapping(value = "sample", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Map<String, Object>> getSamplesByVisit(@RequestParam(value = "visit", required = false) String visitId,
-	        @RequestParam(value = "patient", required = false) String patient,
-	        @RequestParam(value = "startDate", required = false) String startDate,
-	        @RequestParam(value = "endDate", required = false) String endDate) throws Exception {
-		
+	public List<Map<String, Object>> getSamplesByVisit(
+			@RequestParam(value = "visit", required = false) String visitId,
+			@RequestParam(value = "patient", required = false) String patient,
+			@RequestParam(value = "startDate", required = false) String startDate,
+			@RequestParam(value = "endDate", required = false) String endDate) throws Exception {
+
 		Date sampleCreatedStartDate = null;
 		Date sampleCreatedEndDate = null;
-		
-		if ((startDate != null || endDate != null) && (startDate.length() > 0 || endDate.length() > 0)) {
-			
+
+		if ((startDate != null || endDate != null)
+				&& ((startDate != null && startDate.length() > 0) || (endDate != null && endDate.length() > 0))) {
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			try {
-				sampleCreatedStartDate = formatter.parse(startDate);
-				if (endDate != null) {
-					sampleCreatedEndDate = formatter.parse(endDate);
+				sampleCreatedStartDate = startDate != null && !startDate.isEmpty() ? formatter.parse(startDate) : null;
+				sampleCreatedEndDate = endDate != null && !endDate.isEmpty() ? formatter.parse(endDate) : null;
+			} catch (Exception e) {
+				System.out.println(
+						"Dates provided were not in correct format, please format as yyyy-MM-dd. Example: 1990-01-05");
+			}
+		}
+
+		List<Sample> samples = laboratoryService.getSamplesByVisitOrPatientAndOrDates(
+				visitId, patient, sampleCreatedStartDate, sampleCreatedEndDate);
+
+		List<Map<String, Object>> responseSamplesObject = new ArrayList<>();
+
+		for (Sample sample : samples) {
+			if (sample != null) {
+				try {
+					Map<String, Object> sampleObject = sample.toMap();
+					responseSamplesObject.add(sampleObject);
+				} catch (NullPointerException npe) {
+					System.out.println(
+							"Skipping a sample due to null reference in nested structure: " + npe.getMessage());
+					npe.printStackTrace(); // optional, for detailed trace in logs
+				} catch (Exception e) {
+					System.out.println("Unexpected error converting sample to map: " + e.getMessage());
+					e.printStackTrace(); // optional
 				}
 			}
-			catch (Exception e) {
-				System.out
-				        .println("Dates provided were not in correct format, please format in year-month-date e.g 1990-01-05");
-			}
 		}
-		
-		List<Sample> samples = laboratoryService.getSamplesByVisitOrPatientAndOrDates(visitId, patient,
-		    sampleCreatedStartDate, sampleCreatedEndDate);
-		
-		List<Map<String, Object>> responseSamplesObject = new ArrayList<Map<String, Object>>();
-		for (Sample sample : samples) {
-			
-			Map<String, Object> sampleObject = sample.toMap();
-			
-			// add the sample after creating its object
-			responseSamplesObject.add(sampleObject);
-			
-		}
-		
+
 		return responseSamplesObject;
 	}
 	

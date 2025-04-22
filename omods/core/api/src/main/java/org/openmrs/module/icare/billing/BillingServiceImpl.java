@@ -1,20 +1,68 @@
 package org.openmrs.module.icare.billing;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import javax.naming.ConfigurationException;
+
 import org.aopalliance.intercept.MethodInvocation;
-import org.openmrs.*;
-import org.openmrs.api.*;
+import org.openmrs.Concept;
+import org.openmrs.ConceptMap;
+import org.openmrs.Drug;
+import org.openmrs.DrugOrder;
+import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
+import org.openmrs.GlobalProperty;
+import org.openmrs.Obs;
+import org.openmrs.Order;
+import org.openmrs.OrderType;
+import org.openmrs.Patient;
+import org.openmrs.PersonAttribute;
+import org.openmrs.Provider;
+import org.openmrs.TestOrder;
+import org.openmrs.Visit;
+import org.openmrs.VisitType;
+import org.openmrs.api.APIException;
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.ConceptService;
+import org.openmrs.api.EncounterService;
+import org.openmrs.api.OrderContext;
+import org.openmrs.api.OrderService;
+import org.openmrs.api.PatientService;
+import org.openmrs.api.ProviderService;
+import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.attribute.AttributeType;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.Utils.PaymentStatus;
 import org.openmrs.module.icare.billing.dao.DiscountDAO;
 import org.openmrs.module.icare.billing.dao.InvoiceDAO;
 import org.openmrs.module.icare.billing.dao.PaymentDAO;
-import org.openmrs.module.icare.billing.models.*;
+import org.openmrs.module.icare.billing.models.Discount;
+import org.openmrs.module.icare.billing.models.DiscountInvoiceItem;
+import org.openmrs.module.icare.billing.models.Invoice;
+import org.openmrs.module.icare.billing.models.InvoiceItem;
+import org.openmrs.module.icare.billing.models.ItemPrice;
+import org.openmrs.module.icare.billing.models.Payment;
+import org.openmrs.module.icare.billing.models.PaymentItem;
+import org.openmrs.module.icare.billing.models.Prescription;
 import org.openmrs.module.icare.billing.services.BillingService;
-import org.openmrs.module.icare.billing.services.insurance.*;
-import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFConfig;
+import org.openmrs.module.icare.billing.services.insurance.AuthorizationStatus;
+import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
+import org.openmrs.module.icare.billing.services.insurance.SyncResult;
+import org.openmrs.module.icare.billing.services.insurance.VerificationException;
+import org.openmrs.module.icare.billing.services.insurance.VerificationRequest;
+import org.openmrs.module.icare.billing.services.insurance.VerificationResponse;
 import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFServiceImpl;
 import org.openmrs.module.icare.billing.services.payment.gepg.BillHdr;
 import org.openmrs.module.icare.billing.services.payment.gepg.BillItem;
@@ -30,16 +78,6 @@ import org.openmrs.module.icare.core.dao.ICareDao;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.naming.ConfigurationException;
-
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class BillingServiceImpl extends BaseOpenmrsService implements BillingService {
 	

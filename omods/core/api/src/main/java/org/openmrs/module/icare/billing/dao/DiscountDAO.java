@@ -4,7 +4,6 @@ package org.openmrs.module.icare.billing.dao;
 
 import org.openmrs.module.icare.billing.models.Discount;
 import org.openmrs.module.icare.core.dao.BaseDAO;
-import org.springframework.stereotype.Repository;
 
 /**
  * Home object for domain model class BlDiscount.
