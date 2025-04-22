@@ -7,6 +7,7 @@ import { sharedModals } from "../../modals";
 import { FilterFieldsPipe } from "../../pipes/filter-fields.pipe";
 import { FilterAuthorizationStatusesPipe } from "../../pipes/filter-authorization-statuses.pipe";
 import { FilterAllocationsByNamePipe } from "../../pipes/filter-allocations-by-name.pipe";
+import { SampleAcceptanceAndResultsModule } from "../../modules/sample-acceptance-and-results/sample-acceptance-and-results.module";
 @NgModule({
     imports: [CommonModule, ...materialModules, SharedModule],
     exports: [
