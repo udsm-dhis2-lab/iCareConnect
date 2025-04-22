@@ -8,7 +8,6 @@ docker run --rm -w="/app" -v "$(pwd)/ui":/app $NODE_IMAGE npm run build:prod
 docker run --rm -v $(pwd)/omods/core:/usr/src/omod -w /usr/src/omod udsmdhis2/icare-omod-compiler mvn clean package -DskipTests
 
 version=$(cat version)
-
 if [ -n "$GITHUB_HEAD_REF" ]; then
   branch="$GITHUB_HEAD_REF"
 else

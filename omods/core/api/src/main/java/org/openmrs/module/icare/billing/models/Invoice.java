@@ -1,17 +1,30 @@
 package org.openmrs.module.icare.billing.models;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
 // Generated Oct 7, 2020 12:48:40 PM by Hibernate Tools 5.2.10.Final
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.openmrs.BaseChangeableOpenmrsData;
 import org.openmrs.Concept;
-import org.openmrs.Patient;
 import org.openmrs.Visit;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.*;
-import java.util.*;
 
 //import com.google.gson.annotations.Expose;
 //import com.google.gson.annotations.SerializedName;

@@ -1,37 +1,12 @@
 import { Component, OnInit } from "@angular/core";
-import { Observable, of } from "rxjs";
-import { Patient } from "src/app/shared/resources/patient/models/patient.model";
-import { select, Store } from "@ngrx/store";
-import { AppState } from "src/app/store/reducers";
-import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
-import { LabOrder } from "src/app/shared/resources/visits/models/lab-order.model";
-import {
-  getAllLabOrders,
-  getAllPatientsVisitsReferences,
-  getPatientCollectedLabSamples,
-  getVisitsParameters,
-} from "src/app/store/selectors";
-import {
-  getVisitLoadingState,
-  getVisitLoadedState,
-  getActiveVisit,
-} from "src/app/store/selectors/visit.selectors";
-import { SampleObject } from "../../../../resources/models";
-import { getAllLabSamples } from "../../../../store/selectors/samples.selectors";
-import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
-import { getSpecimenSources } from "../../../../store/selectors/specimen-sources-and-tests-management.selectors";
-import { loadCurrentPatient } from "src/app/store/actions";
-import { getAllPayments } from "src/app/store/selectors/payment.selector";
-import { SampleTypesService } from "src/app/shared/services/sample-types.service";
+import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from "@angular/router";
-import { loadActiveVisit } from "src/app/store/actions/visit.actions";
-import {
-  getLoadingBillStatus,
-  getPatientBills,
-} from "src/app/store/selectors/bill.selectors";
+import { Store } from "@ngrx/store";
+import { Observable, of } from "rxjs";
 import { BillingService } from "src/app/modules/billing/services/billing.service";
+import { ProviderAttributeGet } from "src/app/shared/resources/openmrs";
+import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import {
-  FingerPrintPaylodTypeE,
   NHIFBiometricMethodE,
   NHIFFingerPrintCodeE,
   NHIFPointOfCareCodeE,
@@ -39,13 +14,31 @@ import {
   NHIFPractitionerDetailsI,
 } from "src/app/shared/resources/store/models/insurance-nhif.model";
 import { PatientI } from "src/app/shared/resources/store/models/patient.model";
-import { ProviderAttributeGet } from "src/app/shared/resources/openmrs";
-import { MatDialog } from "@angular/material/dialog";
-import { loadPointOfCare, verifyPointOfCare } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
-import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
+import { LabOrder } from "src/app/shared/resources/visits/models/lab-order.model";
+import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
+import { SampleTypesService } from "src/app/shared/services/sample-types.service";
+import { loadCurrentPatient } from "src/app/store/actions";
+import { loadPointOfCare } from "src/app/store/actions/insurance-nhif-point-of-care.actions";
+import { loadActiveVisit } from "src/app/store/actions/visit.actions";
+import { AppState } from "src/app/store/reducers";
+import {
+  getAllLabOrders,
+  getAllPatientsVisitsReferences,
+  getVisitsParameters,
+} from "src/app/store/selectors";
+import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import { getProviderDetails } from "src/app/store/selectors/current-user.selectors";
-import { selectNHIFPractitionerDetails } from "src/app/store/selectors/insurance-nhif-practitioner.selectors";
 import { getListofPointOfCare } from "src/app/store/selectors/insurance-nhif-point-of-care.selectors";
+import { selectNHIFPractitionerDetails } from "src/app/store/selectors/insurance-nhif-practitioner.selectors";
+import { getAllPayments } from "src/app/store/selectors/payment.selector";
+import {
+  getActiveVisit,
+  getVisitLoadedState,
+  getVisitLoadingState,
+} from "src/app/store/selectors/visit.selectors";
+import { SampleObject } from "../../../../resources/models";
+import { getAllLabSamples } from "../../../../store/selectors/samples.selectors";
+import { getSpecimenSources } from "../../../../store/selectors/specimen-sources-and-tests-management.selectors";
 @Component({
   selector: "app-laboratory-sample-collection",
   templateUrl: "./laboratory-sample-collection.component.html",
@@ -90,16 +83,16 @@ export class LaboratorySampleCollectionComponent implements OnInit {
         this.currentProviderDetails = data.attributes;
       }
     });
-     // get nhif practitioner details
-        this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
-          this.selectedPractitionerDetails = data;
-        });
-        // Fetch point of care
-        this.store.dispatch(loadPointOfCare());
-    
-        this.store.select(getListofPointOfCare).subscribe((data) => {
-          this.pointOfCares = data;
-        });
+    // get nhif practitioner details
+    this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
+      this.selectedPractitionerDetails = data;
+    });
+    // Fetch point of care
+    this.store.dispatch(loadPointOfCare());
+
+    this.store.select(getListofPointOfCare).subscribe((data) => {
+      this.pointOfCares = data;
+    });
     this.patientId = this.route.snapshot.params["patientId"];
     this.visitId = this.route.snapshot.params["visitId"];
     this.store.dispatch(loadCurrentPatient({ uuid: this.patientId }));
@@ -149,7 +142,6 @@ export class LaboratorySampleCollectionComponent implements OnInit {
     /**TODO: Filter samples collection for this patient */
     this.activeVisit$ = this.store.select(getActiveVisit);
     this.payments$ = this.store.select(getAllPayments);
-    
   }
 
   onGetSamplesToCollect(count: number): void {
@@ -168,7 +160,7 @@ export class LaboratorySampleCollectionComponent implements OnInit {
       biometricMethod: NHIFBiometricMethodE.fingerprint,
       fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
     };
-    this.dialog.open(FingerCaptureComponent, {
+    /*this.dialog.open(FingerCaptureComponent, {
       width: "45%",
       data: {
         data: {
@@ -176,6 +168,6 @@ export class LaboratorySampleCollectionComponent implements OnInit {
           payload: patientPointOfCareData,
         },
       },
-    });
+    });*/
   }
 }

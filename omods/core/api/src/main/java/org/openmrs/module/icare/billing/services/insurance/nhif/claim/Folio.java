@@ -1,15 +1,14 @@
 package org.openmrs.module.icare.billing.services.insurance.nhif.claim;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-// import org.openmrs.module.icare.billing.models.Invoice;
-import org.openmrs.module.icare.billing.services.insurance.Claim;
-
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+// import org.openmrs.module.icare.billing.models.Invoice;
+import org.openmrs.module.icare.billing.services.insurance.Claim;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Folio implements Claim {
 

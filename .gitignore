@@ -89,7 +89,6 @@ docs/.env.production.local
 docs/npm-debug.log*
 docs/yarn-debug.log*
 docs/yarn-error.log*
-<<<<<<< HEAD
 node_modules/canvas/build/Release/librsvg-2.so.2
-=======
->>>>>>> develop
+Dockerfile-local
+build-local.sh
