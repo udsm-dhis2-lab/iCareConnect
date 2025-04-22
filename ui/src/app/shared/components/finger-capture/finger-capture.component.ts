@@ -54,7 +54,6 @@ export class FingerCaptureComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("==> Here I am ")
     if (this.data) {
       this.labels = this.data.detail;
       this.payload = this.data.data;
