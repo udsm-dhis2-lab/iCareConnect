@@ -8,7 +8,6 @@ import { EffectsModule } from "@ngrx/effects";
 import { labEffects } from "./store/effects";
 import { labReducers } from "./store/reducers";
 import { LaboratoryComponent } from "./laboratory.component";
-import { SampleAcceptanceAndResultsModule } from "./modules/sample-acceptance-and-results/sample-acceptance-and-results.module";
 
 @NgModule({
   declarations: [...labPages, LaboratoryComponent],
@@ -18,7 +17,6 @@ import { SampleAcceptanceAndResultsModule } from "./modules/sample-acceptance-an
     LaboratoryRoutingModule,
     SharedModule,
     ...labReducers,
-    SampleAcceptanceAndResultsModule,
     EffectsModule.forFeature(labEffects),
   ],
   bootstrap: [LaboratoryComponent],
