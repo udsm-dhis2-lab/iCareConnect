@@ -1,15 +1,14 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
 
-import jsPDF from "jspdf";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import htmlToPdfmake from "html-to-pdfmake";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
+pdfMake.vfs = pdfFonts?.pdfMake?.vfs;
 @Component({
   selector: "app-shared-print-results-dashboard",
   templateUrl: "./shared-print-results-dashboard.component.html",

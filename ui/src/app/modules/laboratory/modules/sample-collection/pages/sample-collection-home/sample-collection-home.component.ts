@@ -30,9 +30,8 @@ export class SampleCollectionHomeComponent implements OnInit {
   ngOnInit(): void {
     // get provider details
     this.store.select(getProviderDetails).subscribe((data) => {
-      console.log("curren provider", data);
       if (data) {
-        this.currentProviderDetails = data.attributes;
+        this.currentProviderDetails = data?.attributes;
       }
     });
     this.loadingVisit$ = this.store.pipe(select(getVisitLoadingState));

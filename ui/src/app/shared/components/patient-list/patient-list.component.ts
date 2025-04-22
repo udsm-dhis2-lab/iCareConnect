@@ -147,9 +147,6 @@ export class PatientListComponent implements OnInit, OnChanges {
               }
             })
           );
-          this.visits$.subscribe((visit)=>{
-            console.log("visit data .....",visit)
-          });
   }
 
 

@@ -41,7 +41,6 @@ export class SampleAcceptanceDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUser$ = this.store.select(getCurrentUserDetails);
-    // console.log("Acceptance", this.datesParameters, this.labSamplesDepartments);
     this.store.dispatch(
       addLabDepartments({ labDepartments: this.labSamplesDepartments })
     );
