@@ -25,13 +25,13 @@ export class ModulesSelectorComponent implements OnInit {
 
   showModal = false;
 
-  // openModal() {
-  //   this.showModal = true;
-  // }
+  openModal() {
+    // this.showModal = true;
+  }
 
-  // closeModal() {
-  //   this.showModal = false;
-  // }
+  closeModal() {
+    // this.showModal = false;
+  }
 
   @Input() currentLocation: any;
   userLocationsForTheCurrentModule: Location[];
@@ -248,7 +248,6 @@ export class ModulesSelectorComponent implements OnInit {
 
   onSelectModuleLocation(event: Event, module: any): void {
     // module?.app?.name
-    console.log("wzzzzzzzzzz......",module);
     event.stopPropagation();
     this.currentModule = module;
     this.userLocationsForTheCurrentModule =

@@ -54,6 +54,7 @@ export class FingerCaptureComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log("==> Here I am ")
     if (this.data) {
       this.labels = this.data.detail;
       this.payload = this.data.data;
@@ -63,7 +64,7 @@ export class FingerCaptureComponent implements OnInit {
         (result) => {
           this.isCheckingDevice = false;
           if (result?.ErrorCode === "0") {
-            this.showScanningComponent = true; // Step 2: Show scanning UI
+            this.showScanningComponent = false; // Step 2: Show scanning UI
             this.captureFingerprint();
           } else {
             this.deviceNotFound = true; // Show "device not found" message
