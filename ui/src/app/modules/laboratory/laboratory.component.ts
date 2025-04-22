@@ -285,8 +285,8 @@ export class LaboratoryComponent implements OnInit {
       // if the doctor is not logged in to NHIF, prompt the doctor to login
       if (!data || !data.isNHIFPractitionerLogedIn) {
         const loginData = {
-          practitionerNo: this.currentProviderDetails[1]["value"] || null,
-          nationalID: this.currentProviderDetails[3]["value"] || null,
+          practitionerNo: this.currentProviderDetails[1]?.value || null,
+          nationalID: this.currentProviderDetails[3]?.value || null,
           biometricMethod: NHIFBiometricMethodE.fingerprint,
           fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
         };
