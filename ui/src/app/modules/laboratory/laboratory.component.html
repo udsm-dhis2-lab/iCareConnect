@@ -46,16 +46,10 @@
     >
       <ng-container *ngIf="!params?.LISConfigurations?.isLIS">
         <div
-          [ngClass]="{
-            'col-2': params?.LISConfigurations?.isLIS && showMenuItems,
-            'col-12': !params?.LISConfigurations?.isLIS
-          }"
           *ngIf="showMenuItems"
           class="laboratory-header mat-elevation-z1"
           [ngStyle]="{
-            height: 'auto',
-            'margin-top': params?.LISConfigurations?.isLIS ? '-15px' : '',
-            'margin-left': params?.LISConfigurations?.isLIS ? '-5px' : ''
+            height: 'auto'
           }"
         >
           <mat-chip-listbox
