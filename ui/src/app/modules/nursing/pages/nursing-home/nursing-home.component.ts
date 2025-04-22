@@ -4,7 +4,6 @@ import { ActivatedRoute } from "@angular/router";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
-import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
 import { PatientListDialogComponent } from "src/app/shared/dialogs";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
 import { addCurrentPatient, go } from "src/app/store/actions";
