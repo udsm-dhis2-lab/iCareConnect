@@ -365,7 +365,7 @@
                 *ngIf="orderCount == 0"
                 [attr.rowspan]="sample?.orders?.length"
               >
-                {{ sample?.dateCreated | date: "medium" }}
+                {{ sample?.dateCreated | date : "medium" }}
               </td>
               <td
                 *ngIf="orderCount == 0"
@@ -634,7 +634,7 @@
                 {{ visit?.patient?.person?.age }}
               </td>
               <td>
-                {{ visit?.startDatetime | date: "medium" }}
+                {{ visit?.startDatetime | date : "medium" }}
               </td>
               <td>
                 {{ visit?.location?.parentLocation?.display }} /
@@ -654,10 +654,10 @@
                   >
                     View samples
                   </button>
-                  <ng-container *ngIf="showModal">
+                  <!-- <ng-container *ngIf="showModal">
                     <app-finger-print detail="Patient's" (modalClosed)="closeModal()"> </app-finger-print>
                   </ng-container>
-              
+               -->
                 </div>
               </td>
             </tr>
@@ -785,7 +785,7 @@
                                 *ngIf="orderCount == 0"
                                 [attr.rowspan]="sample?.orders?.length"
                               >
-                                {{ sample?.dateCreated | date: "medium" }}
+                                {{ sample?.dateCreated | date : "medium" }}
                               </td>
                               <td
                                 *ngIf="orderCount == 0"
@@ -871,9 +871,12 @@
                                     >
                                       Accept
                                     </button>
-                                    
+
                                     <ng-container *ngIf="showModal">
-                                      <app-finger-print detail="Patient's" (modalClosed)="closeModal()"></app-finger-print>
+                                      <app-finger-print
+                                        detail="Patient's"
+                                        (modalClosed)="closeModal()"
+                                      ></app-finger-print>
                                     </ng-container>
 
                                     <button

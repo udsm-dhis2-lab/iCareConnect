@@ -713,14 +713,14 @@
                       />
                     </mat-form-field>
 
-                    <button
+                    <!-- <button
                     *ngIf="visitDetails['Insurance']?.display === 'NHIF'"
                       mat-raised-button
                       color="primary"
                       (click)="getPatientData(selectedId)"
                     >
                       Get patient data
-                    </button>
+                    </button> -->
                   </div>
 
                   <!-- Loader (Shows while fetching data) -->
@@ -832,8 +832,8 @@
                     />
                   </mat-form-field>
                   <!-- if patient is NHIF, do not ask this -->
+                  <!-- *ngIf="visitDetails['Insurance']?.display !== 'NHIF'" -->
                   <mat-checkbox
-                    *ngIf="visitDetails['Insurance']?.display !== 'NHIF'"
                     color="primary"
                     (change)="toggleAuthorizationNumberInputActive($event)"
                     >Tick if you can NOT authorize now</mat-checkbox
@@ -857,10 +857,10 @@
                       matInput
                       placeholder="Automatic captured insurance authorization number"
                       [(ngModel)]="visitDetails['InsuranceAuthNo']"
-                      [readonly]="visitDetails['Insurance']?.display === 'NHIF'" 
                       
-                    />
-                  </mat-form-field>
+                      />
+                      <!-- [readonly]="visitDetails['Insurance']?.display === 'NHIF'"  -->
+                    </mat-form-field>
                 </div>
 
                 <p *ngIf="visitDetails['Payment']['display'] == 'Cash'">
