@@ -41,9 +41,9 @@ public void testSubmitBill_withValidUuid_returnsSuccess() throws Exception {
     
     payload.add(payloadItem);
 
-    Map<String, Object> response = controller.generateControlNumber(payload);
+    // Map<String, Object> response = controller.generateControlNumber(payload);
     
-   System.out.println("response data ---------------------"+response);
+    // System.out.println("response data ---------------------"+response);
 }
 	
 	@Test

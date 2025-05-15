@@ -20,10 +20,6 @@ export class NewPatientProfileComponent implements OnInit {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
-    this.activeVisit$.subscribe((visit) => {
-      console.log("Active Visit:", visit);
-    });
-
     const phoneDetails =
       this.currentPatient?.patient?.person?.attributes &&
       this.currentPatient?.patient?.person?.attributes?.length > 0

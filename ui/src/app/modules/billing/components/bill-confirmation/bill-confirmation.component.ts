@@ -56,7 +56,7 @@ export class BillConfirmationComponent implements OnInit {
     };
     
   const requestPayload = this.data.billItems.map((item: any) => ({
-    uuid: item.bill, 
+    ...item.billItem, 
     currency: "TZS" 
   }));
 
