@@ -60,7 +60,6 @@ export class BillConfirmationComponent implements OnInit {
     currency: "TZS" 
   }));
 
-    //Calling Controll number Generation Function 
     this.generatingControlNumber = true;
     if(this.data?.paymentType?.code === 'GePG'){
       this.onConntrollNumbGen(requestPayload);
