@@ -82,6 +82,8 @@ public interface BillingService extends OpenmrsService {
 	
 	Order createOrderForOngoingDeceasedPatients() throws Exception;
 	
+	Order getOrderByUuid(String uuid) throws Exception;
+	
 	List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) throws Exception;
 	
 	Map<String, Object> processGepgCallbackResponse(Map<String, Object> feedBack) throws Exception;

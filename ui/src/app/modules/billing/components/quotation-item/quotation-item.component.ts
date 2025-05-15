@@ -162,8 +162,8 @@ export class QuotationItemComponent implements OnInit {
     });
 
     dialog.afterClosed().subscribe((paymentResponse) => {
-      this.paymentSuccess.emit();
       if (paymentResponse) {
+        this.paymentSuccess.emit();
         this.dialog.open(PaymentReceiptComponent, {
           width: "500px",
           data: {
@@ -255,8 +255,8 @@ export class QuotationItemComponent implements OnInit {
     });
     
     dialog.afterClosed().subscribe((paymentResponse) => {
-      this.paymentSuccess.emit();
       if (paymentResponse) {
+        this.paymentSuccess.emit();
         this.dialog.open(PaymentReceiptComponent, {
           width: "500px",
           data: {

@@ -3,22 +3,18 @@ package org.openmrs.module.icare.web.controller;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.openmrs.GlobalProperty;
+import org.openmrs.Order;
 import org.openmrs.Visit;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.ContextAuthenticationException;
 import org.openmrs.module.icare.ICareConfig;
-import org.openmrs.module.icare.billing.models.Invoice;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.payment.gepg.BillSubmissionRequest;
@@ -48,39 +44,45 @@ public class GepgBillingController {
     public Map<String, Object> generateControlNumber(@RequestBody List<Map<String, Object>> requestPayload)
             throws Exception {
         Map<String, Object> generatedControlNumberObject = new HashMap<>();
-        System.out.println("Payload received: " + requestPayload);
 
         Visit visit = null;
         Double totalBillAmount = 0.0;
         String currency = null;
         String billId = null;
+
         List<InvoiceItem> invoiceItems = new ArrayList<>();
 
-        for (Map<String, Object> invoiceReference : requestPayload) {
-            String uuid = (String) invoiceReference.get("uuid");
-            if (uuid == null) {
-                throw new IllegalArgumentException("UUID cannot be null");
+        for(Map<String, Object> receivedItem : requestPayload){
+            Order order = null;
+            InvoiceItem invoiceItem;
+
+            Object orderObject = receivedItem.get("order");
+
+            if (orderObject instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> orderMap = (Map<String, Object>) orderObject;
+
+                order = orderMap.get("uuid") != null ? billingService.getOrderByUuid((String) orderMap.get("uuid")) : null;
             }
 
             if (currency == null) {
-                currency = (String) invoiceReference.get("currency");
+                currency = (String) receivedItem.get("currency");
             }
 
-            Invoice invoice = billingService.getInvoiceDetailsByUuid(uuid);
 
-            if (invoice == null) {
-                throw new IllegalStateException("Invoice not found for UUID: " + uuid);
-            }
-
-            billId = invoice.getId().toString();
-
-            visit = invoice.getVisit();
-            if (visit == null) {
-                throw new IllegalStateException("Visit cannot be null for Invoice: " + uuid);
-            }
-
-            for (InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
+            if (order != null) {
+                invoiceItem = billingService.getInvoiceItemByOrder(order);
                 totalBillAmount += invoiceItem.getPrice();
+
+                billId = invoiceItem.getInvoice().getId().toString();
+
+                visit = invoiceItem.getInvoice().getVisit();
+
+                if (visit == null) {
+                    throw new IllegalStateException("Visit cannot be null for Invoice: " + billId);
+                }
+
+
                 invoiceItems.add(invoiceItem);
             }
         }
@@ -114,7 +116,7 @@ public class GepgBillingController {
 
         // Create the GePG payload using BillSubmissionRequest
         BillSubmissionRequest billSubmissionRequest = new BillSubmissionRequest();
-        Map<String, Object> gepgPayloadResponse = billingService.createGePGPayload(
+        Map<String, Object> gepgPayload = billingService.createGePGPayload(
                 visit.getPatient(),
                 invoiceItems,
                 totalBillAmount,
@@ -135,20 +137,11 @@ public class GepgBillingController {
                 enginepublicKey, billId);
 
         try {
-            // billRequest from the gepgPayloadResponse map
-            BillSubmissionRequest billRequest = (BillSubmissionRequest) gepgPayloadResponse.get("billRequest");
+            BillSubmissionRequest billRequest = (BillSubmissionRequest) gepgPayload.get("billRequest");
             String billPayload = billRequest.toJson();
-            System.out.println("Generated BillSubmissionRequest: " + billPayload);
 
-            // Save the payload in a global property
-            GlobalProperty globalProperty = new GlobalProperty();
-            globalProperty.setProperty("gepg.jsonPayload.icareConnect");
-            globalProperty.setPropertyValue(billPayload);
-            administrationService.saveGlobalProperty(globalProperty);
-
-            // Submit the request and get the response
             generatedControlNumberObject = gepgbillService.submitGepgRequest(billPayload,
-                    (String) gepgPayloadResponse.get("signature"), GEPGUccBaseUrl);
+                    (String) gepgPayload.get("signature"), GEPGUccBaseUrl);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

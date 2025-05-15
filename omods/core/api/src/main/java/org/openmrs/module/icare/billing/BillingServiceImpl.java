@@ -790,6 +790,12 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	}
 	
 	@Override
+	public Order getOrderByUuid(String uuid) throws Exception {
+		OrderService orderService = Context.getService(OrderService.class);
+		return orderService.getOrderByUuid(uuid);
+	}
+	
+	@Override
 	public List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) throws Exception {
 		return this.invoiceDAO.getTotalAmountFromPaidInvoices(startDate, endDate, provider);
 	}
@@ -1364,11 +1370,10 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(),
 						            invoiceItem.getPrice().toString(), "0.0", GFSCode));
 					}
-					if (GFSCode == null) {
-						throw new IllegalStateException(
-						        "Please verify GFS CODE concept mapping if configured in a correct way ,found Null GFS CODE");
-					}
-					
+				}
+				if (GFSCode == null) {
+					throw new IllegalStateException("No valid GFS Code mapping found for item with name and id: "
+					        + concept.getDisplayString() + concept.getUuid() + " respectively.");
 				}
 			} else if (drug != null) {
 				Concept drugConcept = drug.getConcept();
@@ -1381,10 +1386,10 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(),
 						            invoiceItem.getPrice().toString(), "0.0", GFSCode));
 					}
-					if (GFSCode == null) {
-						throw new IllegalStateException(
-						        "Please verify GFS CODE concept mapping if configured in a correct way ,found Null GFS CODE");
-					}
+				}
+				if (GFSCode == null) {
+					throw new IllegalStateException("No valid GFS Code mapping found for item with name and id: "
+					        + drug.getDisplayName() + drug.getUuid() + " respectively.");
 				}
 			}
 		}

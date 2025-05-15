@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  */
 
 public class SampleDAO extends BaseDAO<Sample> {
-
+	
 	// TODO: Add also support to get samples by day and month
 	public long getNumberOfRegisteredSamplesThisYear() {
 		DbSession session = this.getSession();
@@ -32,18 +32,18 @@ public class SampleDAO extends BaseDAO<Sample> {
 		query.setParameter("year", calendar.get(Calendar.YEAR));
 		return (long) query.list().get(0);
 	}
-
+	
 	public List<Sample> getSamplesByVisit(String id) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT sp \n" + "FROM Sample sp \n"
-				+ "WHERE sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
-
+		        + "WHERE sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
+		
 		Query query = session.createQuery(queryStr);
 		query.setParameter("visitUuid", id);
-
+		
 		return query.list();
 	}
-
+	
 	public Sample getSamplesById(String id) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT sample FROM Sample sample WHERE sp.label = :label";
@@ -55,34 +55,34 @@ public class SampleDAO extends BaseDAO<Sample> {
 			return new Sample();
 		}
 	}
-
+	
 	public List<Sample> getSamplesByDates(Date startDate, Date endDate) {
-
+		
 		DbSession session = this.getSession();
 		String queryStr = "SELECT sp \n" + "FROM Sample sp \n"
-				+ "WHERE cast(sp.dateTime as date) BETWEEN :startDate AND :endDate \n"
-				+ "OR cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate";
-
+		        + "WHERE cast(sp.dateTime as date) BETWEEN :startDate AND :endDate \n"
+		        + "OR cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate";
+		
 		Query query = session.createQuery(queryStr);
 		query.setParameter("startDate", startDate);
 		query.setParameter("endDate", endDate);
-
+		
 		return query.list();
 	}
-
+	
 	public List<Visit> getPendingSampleCollectionVisits(Integer limit, Integer startIndex) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT distinct v FROM Visit v" + " INNER JOIN v.encounters e" + " INNER JOIN e.orders o"
-				+ " INNER JOIN o.orderType ot" + " WHERE ot.javaClassName='org.openmrs.TestOrder' AND v NOT IN("
-				+ "		SELECT v FROM Sample s" + "		INNER JOIN s.visit v" + ") AND v.stopDatetime IS NULL" + " ";
-
+		        + " INNER JOIN o.orderType ot" + " WHERE ot.javaClassName='org.openmrs.TestOrder' AND v NOT IN("
+		        + "		SELECT v FROM Sample s" + "		INNER JOIN s.visit v" + ") AND v.stopDatetime IS NULL" + " ";
+		
 		Query query = session.createQuery(queryStr);
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
-
+		
 		return query.list();
 	}
-
+	
 	public ListResult<Sample> getSamples(Date startDate, Date endDate, Pager pager, String locationUuid,
 			String sampleCategory, String testCategory, String q, String hasStatus, String acceptedByUuid,
 			String testConceptUuid, String departmentUuid, String specimenSourceUuid, String instrumentUuid,
@@ -352,40 +352,39 @@ public class SampleDAO extends BaseDAO<Sample> {
 		listResults.setResults(query.list());
 		return listResults;
 	}
-
-	public List<Sample> getSamplesByVisitOrPatientAndOrDates(String visitId, String patient, Date startDate,
-			Date endDate) {
-
+	
+	public List<Sample> getSamplesByVisitOrPatientAndOrDates(String visitId, String patient, Date startDate, Date endDate) {
+		
 		DbSession session = this.getSession();
-
+		
 		// General search query
 		String queryStr = "SELECT sp FROM Sample sp";
-
+		
 		// If visit is provided, use visit instead
 		if (visitId != null && visitId.length() > 0) {
 			queryStr = "SELECT sp \n" + "FROM Sample sp \n"
-					+ "WHERE sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
+			        + "WHERE sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
 		}
-
+		
 		// if no visit is provided but patient is provided
 		if ((visitId == null || visitId.equals("")) && patient != null) {
 			queryStr += " LEFT JOIN sp.visit v LEFT JOIN v.patient pnt WHERE pnt.uuid=:patientUuid ";
 		}
-
+		
 		// if visit / patient is provided
 		if (visitId != null || patient != null) {
 			if (startDate != null && endDate == null) {
 				queryStr += " AND sp.dateCreated >= :startDate";
 			}
-
+			
 			// if both dates are provided
 			if (startDate != null && endDate != null) {
 				queryStr += " AND sp.dateCreated >= :startDate AND sp.dateCreated <= :endDate";
 			}
 		}
-
+		
 		// Append with dates if provided but no patient/visit number
-
+		
 		if ((visitId == null || visitId.equals(""))) {
 			if (patient == null || patient.equals("")) {
 				// if start date only is provided
@@ -398,10 +397,10 @@ public class SampleDAO extends BaseDAO<Sample> {
 				}
 			}
 		}
-
+		
 		// Construct a query object
 		Query query = session.createQuery(queryStr);
-
+		
 		// Attach arguments accordingly
 		if (startDate != null) {
 			query.setParameter("startDate", startDate);
@@ -409,74 +408,74 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (endDate != null && startDate != null) {
 			query.setParameter("endDate", endDate);
 		}
-
+		
 		if (visitId != null && visitId.length() > 0) {
 			query.setParameter("visitUuid", visitId);
 		}
-
+		
 		if ((visitId == null || visitId.length() < 1) && patient != null) {
 			query.setParameter("patientUuid", patient);
 		}
-
+		
 		return query.list();
 	}
-
+	
 	public WorkloadSummary getWorkloadSummary(Date startDate, Date endDate) {
-
+		
 		WorkloadSummary workloadSummary = new WorkloadSummary();
-
+		
 		DbSession session = getSession();
-
+		
 		if (startDate != null && endDate != null) {
-
+			
 			String queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.status='REJECTED')) AND (sample.dateCreated BETWEEN :startDate AND :endDate)";
 			Query query = session.createQuery(queryStr);
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
 			workloadSummary.setSamplesWithRejectedResults((long) query.list().get(0));
-
+			
 			queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.status='APPROVED' ) ) AND (sample.dateCreated BETWEEN :startDate AND :endDate) ";
 			query = session.createQuery(queryStr);
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
 			workloadSummary.setSamplesAuthorized((long) query.list().get(0));
-
+			
 			queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testresult.testAllocation FROM Result testresult) ) AND (sample.dateCreated BETWEEN :startDate AND :endDate) ";
 			query = session.createQuery(queryStr);
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
 			workloadSummary.setSamplesWithResults((long) query.list().get(0));
-
+			
 			queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc NOT IN (SELECT testresult.testAllocation FROM Result testresult) ) AND (sample.dateCreated BETWEEN :startDate AND :endDate) ";
 			query = session.createQuery(queryStr);
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
 			workloadSummary.setSamplesWithNoResults((long) query.list().get(0));
-
+			
 		} else {
-
+			
 			String queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.status='REJECTED')) ";
 			Query query = session.createQuery(queryStr);
 			workloadSummary.setSamplesWithRejectedResults((long) query.list().get(0));
-
+			
 			queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.status='APPROVED' )) ";
 			query = session.createQuery(queryStr);
 			workloadSummary.setSamplesAuthorized((long) query.list().get(0));
-
+			
 			queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testresult.testAllocation FROM Result testresult) ) ";
 			query = session.createQuery(queryStr);
 			workloadSummary.setSamplesWithResults((long) query.list().get(0));
-
+			
 			queryStr = "SELECT COUNT(sample) FROM Sample sample WHERE sample IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc NOT IN (SELECT testresult.testAllocation FROM Result testresult) )  ";
 			query = session.createQuery(queryStr);
 			workloadSummary.setSamplesWithNoResults((long) query.list().get(0));
-
+			
 		}
-
+		
 		return workloadSummary;
-
+		
 	}
-
+	
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager,
 			String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
 			String acceptedByUuid, String testConceptUuid, String departmentUuid, String specimenSourceUuid,
@@ -754,7 +753,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		listResults.setResults(query.list());
 		return listResults;
 	}
-
+	
 	public List<Sample> getSamplesByBatchSampleUuid(String batchSampleUuid) {
 		DbSession session = this.getSession();
 		String queryStr = "SELECT s FROM Sample s WHERE s.batchSample IN (select bs FROM BatchSample bs WHERE bs.uuid =:batchUuid)";
