@@ -1,14 +1,12 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
-import { random } from "lodash";
 import { Observable } from "rxjs";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import { BillingService } from "../../services/billing.service";
-import { Payment } from "../../models/payment.model";
 
 @Component({
   selector: "app-bill-confirmation",
