@@ -102,7 +102,6 @@ export class NursingHomeComponent implements OnInit {
     if (e) {
       e.stopPropagation();
     }
-    console.log("testing123", patient);
     this.store.dispatch(addCurrentPatient({ patient }));
 
     if (patient?.paymentTypeDetails === "Cash") {

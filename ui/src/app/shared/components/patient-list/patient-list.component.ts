@@ -260,9 +260,7 @@ export class PatientListComponent implements OnInit, OnChanges {
     this.store.dispatch(clearActiveVisit());
     this.selectPatient.emit({ ...visit?.patient, visitUuid: visit?.uuid,paymentTypeDetails:visit?.paymentType });
 
-    console.log("werrrr......",visit)
-
-      // this.trackActionForAnalytics(`Active Patient Search: View`)
+    // this.trackActionForAnalytics(`Active Patient Search: View`)
   
   }
   trackActionForAnalytics(eventname: any) {

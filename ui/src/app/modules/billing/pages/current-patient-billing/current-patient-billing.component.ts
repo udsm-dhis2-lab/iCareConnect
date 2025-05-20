@@ -38,6 +38,7 @@ import { ExemptionConfirmationComponent } from "../../components/exemption-confi
 import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { animate, state, style, transition, trigger } from "@angular/animations";
+import { GePGRequestControlNumber } from "../../dialogs/gepg-request-control-number/gepg-request-control-number.component";
 
 
 interface Payments {
@@ -283,31 +284,6 @@ export class CurrentPatientBillingComponent implements OnInit {
           }
         })
       );
-      this.patientBillingDetails$
-      .pipe(
-        map((data: any) => data.payments.map((payment: any, index: number) => ({
-          position: index + 1,
-          receivedBy: payment.paymentDetails.receivedBy,
-          creator: payment.paymentDetails.creator.display,
-          paymentType: payment.paymentDetails.paymentType.name,
-          referenceNumber: payment.paymentDetails.referenceNumber,
-          status: payment.status,
-          createdAt: new Date(payment.created).toLocaleDateString(),
-          receiptNumber: payment.paymentDetails.receiptNumber,
-          billAmount: payment.paymentDetails.billAmount,
-          paidAmount: payment.paymentDetails.paidAmount,
-          gepgpaymentDate: new Date(payment.paymentDetails.paymentDate).toLocaleDateString(),
-          payerNumber: payment.paymentDetails.payerNumber,
-          payerName: payment.paymentDetails.payerName,
-          pspName: payment.paymentDetails.pspName,
-          accountNumber: payment.paymentDetails.accountNumber,
-
-        })))
-      )
-      .subscribe((payments: Payments[]) => {
-        this.dataSource = payments;
-      });
-    
   }
 
 
@@ -329,14 +305,33 @@ export class CurrentPatientBillingComponent implements OnInit {
         const visit = res[0];
         const bills = res[1];
         const payments = res[2];
+
+        this.dataSource = payments.map((payment: any, index: number) => ({
+          position: index + 1,
+          receivedBy: payment.paymentDetails.receivedBy,
+          creator: payment.paymentDetails.creator.display,
+          paymentType: payment.paymentDetails.paymentType.name,
+          referenceNumber: payment.paymentDetails.referenceNumber,
+          status: payment.status,
+          createdAt: new Date(payment.created).toLocaleDateString(),
+          receiptNumber: payment.paymentDetails.receiptNumber,
+          billAmount: payment.paymentDetails.billAmount,
+          paidAmount: payment.paymentDetails.paidAmount,
+          gepgpaymentDate: new Date(payment.paymentDetails.paymentDate).toLocaleDateString(),
+          payerNumber: payment.paymentDetails.payerNumber,
+          payerName: payment.paymentDetails.payerName,
+          pspName: payment.paymentDetails.pspName,
+          accountNumber: payment.paymentDetails.accountNumber,
+        })).filter((payment: any) => payment.status === 'REQUESTED');
+
         return {
           visit,
           bills: bills.filter((bill) => {
-            if (!bill.isInsurance && bill.items.length > 0) {
+            if (!bill.isInsurance && bill?.items?.length > 0) {
               return bill;
             }
           }),
-          payments: payments,
+          payments: payments?.filter((payment: any) => payment?.paymentDetails?.status === "PAID"),
           paymentKeys: Object.keys(groupBy(payments, "visit")),
           currentPayments: groupBy(payments, "visit")[visit?.uuid],
           paymentItemCount: payments
@@ -352,16 +347,21 @@ export class CurrentPatientBillingComponent implements OnInit {
       })
     );
   }
-  RequestControlNumber(events, bills) {
+  requestControlNumber(events, bills) {
     events.stopPropagation();
-    console.log("Bill clicked ..",bills.currentPayments)
-    const requestPayloads = bills.currentPayments.map((bill) => {
-        return bill.paymentDetails.items.map((billItem) => ({
-            uuid: billItem.item.uuid, 
-            currency: "TZS"
-        }));
-    }).flat();
-    this.onConntrollNumbGen(JSON.stringify(requestPayloads)); 
+    // const requestPayloads = bills.currentPayments.map((bill) => {
+    //     return bill.paymentDetails.items.map((billItem) => ({
+    //         uuid: billItem.item.uuid, 
+    //         currency: "TZS"
+    //     }));
+    // }).flat();
+
+    this.dialog.open(GePGRequestControlNumber, {
+      data: {
+        bills: bills
+      }
+    })
+    // this.onConntrollNumbGen(JSON.stringify(requestPayloads)); 
 }
 
 

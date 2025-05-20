@@ -15,11 +15,11 @@ export class FingerDialogComponent {
 
    
 
-    this.dialog.open(FingerCaptureComponent,
-      {
-        width:'40%' ,
-      }
-    );
+    // this.dialog.open(FingerCaptureComponent,
+    //   {
+    //     width:'40%' ,
+    //   }
+    // );
 
   }
 }

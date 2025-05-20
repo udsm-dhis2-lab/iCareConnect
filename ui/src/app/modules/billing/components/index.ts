@@ -11,6 +11,7 @@ import { DiscountsComponent } from './discounts/discounts.component';
 import { ExemptionHistoryComponent } from './exemption-history/exemption-history.component';
 import { ExemptionDenialComponent } from './exemption-denial/exemption-denial.component';
 import { ExemptionFullConfirmationComponent } from './exemption-full-confirmation/exemption-full-confirmation.component';
+import { GePGRequestControlNumber } from '../dialogs/gepg-request-control-number/gepg-request-control-number.component';
 
 export const billingComponents: any[] = [
   QuotationsComponent,
@@ -25,7 +26,8 @@ export const billingComponents: any[] = [
   DiscountsComponent,
   ExemptionHistoryComponent,
   ExemptionDenialComponent,
-  ExemptionFullConfirmationComponent
+  ExemptionFullConfirmationComponent,
+  GePGRequestControlNumber
 ];
 
 export const billingEntryComponents: any[] = [
