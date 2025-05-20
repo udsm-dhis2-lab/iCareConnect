@@ -56,16 +56,18 @@ public class GepgBillingController {
             Order order = null;
             InvoiceItem invoiceItem;
 
-            Object orderObject = receivedItem.get("order");
+            if(receivedItem.containsKey("order")){
+                Object orderObject = receivedItem.get("order");
 
-            if (orderObject instanceof Map) {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> orderMap = (Map<String, Object>) orderObject;
+                if (orderObject instanceof Map) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> orderMap = (Map<String, Object>) orderObject;
 
-                order = orderMap.get("uuid") != null ? billingService.getOrderByUuid((String) orderMap.get("uuid")) : null;
+                    order = orderMap.get("uuid") != null ? billingService.getOrderByUuid((String) orderMap.get("uuid")) : null;
+                }
             }
 
-            if (currency == null) {
+            if (receivedItem.containsKey("currency") && currency == null) {
                 currency = (String) receivedItem.get("currency");
             }
 
@@ -114,8 +116,10 @@ public class GepgBillingController {
             throw new IllegalStateException("One or more global properties are missing");
         }
 
-        // Create the GePG payload using BillSubmissionRequest
-        BillSubmissionRequest billSubmissionRequest = new BillSubmissionRequest();
+        if(visit == null){
+            throw new IllegalArgumentException("Visit cannot be null!");
+        }
+
         Map<String, Object> gepgPayload = billingService.createGePGPayload(
                 visit.getPatient(),
                 invoiceItems,
