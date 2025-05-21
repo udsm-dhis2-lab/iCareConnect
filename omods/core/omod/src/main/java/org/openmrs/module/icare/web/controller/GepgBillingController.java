@@ -78,12 +78,9 @@ public class GepgBillingController {
 
                 billId = invoiceItem.getInvoice().getId().toString();
 
-                visit = invoiceItem.getInvoice().getVisit();
-
-                if (visit == null) {
-                    throw new IllegalStateException("Visit cannot be null for Invoice: " + billId);
+                if (visit == null && invoiceItem.getInvoice().getVisit() != null) {
+                    visit = invoiceItem.getInvoice().getVisit();
                 }
-
 
                 invoiceItems.add(invoiceItem);
             }

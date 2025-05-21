@@ -308,20 +308,21 @@ export class CurrentPatientBillingComponent implements OnInit {
 
         this.dataSource = payments.map((payment: any, index: number) => ({
           position: index + 1,
-          receivedBy: payment.paymentDetails.receivedBy,
-          creator: payment.paymentDetails.creator.display,
-          paymentType: payment.paymentDetails.paymentType.name,
-          referenceNumber: payment.paymentDetails.referenceNumber,
-          status: payment.status,
-          createdAt: new Date(payment.created).toLocaleDateString(),
-          receiptNumber: payment.paymentDetails.receiptNumber,
-          billAmount: payment.paymentDetails.billAmount,
-          paidAmount: payment.paymentDetails.paidAmount,
-          gepgpaymentDate: new Date(payment.paymentDetails.paymentDate).toLocaleDateString(),
-          payerNumber: payment.paymentDetails.payerNumber,
-          payerName: payment.paymentDetails.payerName,
-          pspName: payment.paymentDetails.pspName,
-          accountNumber: payment.paymentDetails.accountNumber,
+          receivedBy: payment?.paymentDetails?.receivedBy,
+          creator: payment?.paymentDetails?.creator?.display,
+          paymentType: payment?.paymentDetails?.paymentType.name,
+          referenceNumber: payment?.paymentDetails?.referenceNumber,
+          status: payment?.paymentDetails?.status,
+          createdAt: new Date(payment?.created).toLocaleDateString(),
+          receiptNumber: payment?.paymentDetails?.receiptNumber,
+          billAmount: payment?.paymentDetails?.billAmount,
+          paidAmount: payment?.paymentDetails?.paidAmount,
+          gepgpaymentDate: new Date(payment?.paymentDetails?.paymentDate).toLocaleDateString(),
+          payerNumber: payment?.paymentDetails?.payerNumber,
+          payerName: payment?.paymentDetails?.payerName,
+          pspName: payment?.paymentDetails?.pspName,
+          accountNumber: payment?.paymentDetails?.accountNumber,
+          items: payment?.paymentDetails?.items
         })).filter((payment: any) => payment.status === 'REQUESTED');
 
         return {
@@ -347,21 +348,13 @@ export class CurrentPatientBillingComponent implements OnInit {
       })
     );
   }
-  requestControlNumber(events, bills) {
+  requestControlNumber(events, items) {
     events.stopPropagation();
-    // const requestPayloads = bills.currentPayments.map((bill) => {
-    //     return bill.paymentDetails.items.map((billItem) => ({
-    //         uuid: billItem.item.uuid, 
-    //         currency: "TZS"
-    //     }));
-    // }).flat();
-
-    this.dialog.open(GePGRequestControlNumber, {
-      data: {
-        bills: bills
-      }
-    })
-    // this.onConntrollNumbGen(JSON.stringify(requestPayloads)); 
+    const requestPayloads = items.map((item) => ({
+            ...item,
+            currency: "TZS"
+        }))
+    this.onConntrollNumbGen(JSON.stringify(requestPayloads)); 
 }
 
 

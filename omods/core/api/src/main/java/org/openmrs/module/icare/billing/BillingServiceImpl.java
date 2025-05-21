@@ -1293,7 +1293,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 				currency, billId, billExpirlyDate, billItems, subSpCode, SpSysId, patientId);
 
 		// Create and populate RequestData
-		RequestData requestData = createRequestData(billHdr, billTrxInf, billId);
+		RequestData requestData = createRequestData(billHdr, billTrxInf, billId, invoiceItems);
 
 		// Create and populate SystemAuth
 		SystemAuth systemAuth = createSystemAuth(sytemCode, serviceCode);
@@ -1446,7 +1446,8 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	}
 	
 	// Create RequestData
-	private RequestData createRequestData(BillHdr billHdr, BillTrxInf billTrxInf, String billId) throws Exception {
+	private RequestData createRequestData(BillHdr billHdr, BillTrxInf billTrxInf, String billId,
+	        List<InvoiceItem> invoiceItems) throws Exception {
 		AdministrationService administrationService = Context.getAdministrationService();
 		// Save PaymentData before Reference Number (Control Number)
 		RequestData requestData = new RequestData();
@@ -1477,7 +1478,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			payment.setStatus(PaymentStatus.REQUESTED);
 			payment.setCreator(Context.getAuthenticatedUser());
 			payment.setDateCreated(new Date());
-			for (InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
+			for (InvoiceItem invoiceItem : invoiceItems) {
 				PaymentItem paymentItem = new PaymentItem();
 				paymentItem.setPayment(payment);
 				paymentItem.setItem(invoiceItem.getItem());
