@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { GeneralDispensingFormComponent } from './general-dispension-form.component';
+import { GeneralDispensingFormComponent } from './gepg-request-control-number.component';
 
 describe('GeneralDispensingFormComponent', () => {
   let component: GeneralDispensingFormComponent;
