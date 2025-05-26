@@ -1,5 +1,5 @@
 import { Payment } from "src/app/modules/billing/models/payment.model";
-import { keys, sumBy, sum, groupBy } from "lodash";
+import { sumBy, sum, groupBy } from "lodash";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 
@@ -19,18 +19,14 @@ import { PaymentService } from "../../services/payment.service";
 import { select, Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation, getParentLocation } from "src/app/store/selectors";
-import { DomSanitizer } from "@angular/platform-browser";
 import {
   getCurrentUserDetails,
   getProviderDetails,
 } from "src/app/store/selectors/current-user.selectors";
 import { EncountersService } from "src/app/shared/services/encounters.service";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
-import { any } from "cypress/types/bluebird";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
-import { getEncounterTypeByName } from "src/app/store/selectors/encounter-type.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { MatTableDataSource } from "@angular/material/table";
 import { getIsPatientSentForExemption } from "src/app/store/selectors/visit.selectors";
 import { go, loadCurrentPatient } from "src/app/store/actions";
 import { MatDialog } from "@angular/material/dialog";
@@ -38,7 +34,6 @@ import { ExemptionConfirmationComponent } from "../../components/exemption-confi
 import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { animate, state, style, transition, trigger } from "@angular/animations";
-import { GePGRequestControlNumber } from "../../dialogs/gepg-request-control-number/gepg-request-control-number.component";
 
 
 interface Payments {
