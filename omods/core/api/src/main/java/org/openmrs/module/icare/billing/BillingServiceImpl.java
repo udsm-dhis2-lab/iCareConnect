@@ -1302,14 +1302,10 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		BillSubmissionRequest billRequest = new BillSubmissionRequest();
 		billRequest.setSystemAuth(systemAuth);
 		billRequest.setRequestData(requestData);
-		AdministrationService administrationService = Context.getAdministrationService();
 
 		// Serialize RequestData to JSON for signing
 		String requestDataJson = new ObjectMapper().writeValueAsString(requestData);
-		GlobalProperty globalProperty = new GlobalProperty();
-		globalProperty.setProperty("gepg.requestDataJson.icareConnect");
-		globalProperty.setPropertyValue(requestDataJson);
-		administrationService.saveGlobalProperty(globalProperty);
+
 		// Sign the request data
 		String signature = SignatureUtils.signData(requestDataJson, clientPrivateKey);
 		systemAuth.setSignature(signature);
@@ -1372,8 +1368,8 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 					}
 				}
 				if (GFSCode == null) {
-					throw new IllegalStateException("No valid GFS Code mapping found for item with name and id: "
-					        + concept.getDisplayString() + concept.getUuid() + " respectively.");
+					throw new IllegalStateException("No valid GFS Code mapping found for item with name: "
+					        + concept.getDisplayString() + " and id " + concept.getUuid() + ".");
 				}
 			} else if (drug != null) {
 				Concept drugConcept = drug.getConcept();
@@ -1388,8 +1384,8 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 					}
 				}
 				if (GFSCode == null) {
-					throw new IllegalStateException("No valid GFS Code mapping found for item with name and id: "
-					        + drug.getDisplayName() + drug.getUuid() + " respectively.");
+					throw new IllegalStateException("No valid GFS Code mapping found for item with name: "
+					        + drug.getDisplayName() + "and id " + drug.getUuid() + ".");
 				}
 			}
 		}
@@ -1512,10 +1508,6 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		AdministrationService administrationService = Context.getAdministrationService();
 		String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
 		try {
-			GlobalProperty globalProperty = new GlobalProperty();
-			globalProperty.setProperty("gepg.signaturerowData.icareConnect");
-			globalProperty.setPropertyValue(rowData);
-			administrationService.saveGlobalProperty(globalProperty);
 			String signature = SignatureUtils.signData(rowData, clientPrivateKey);
 			return signature;
 		}
