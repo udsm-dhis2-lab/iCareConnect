@@ -1,5 +1,5 @@
 import { Payment } from "src/app/modules/billing/models/payment.model";
-import { keys, sumBy, sum, groupBy } from "lodash";
+import { sumBy, sum, groupBy } from "lodash";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 
@@ -19,18 +19,14 @@ import { PaymentService } from "../../services/payment.service";
 import { select, Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation, getParentLocation } from "src/app/store/selectors";
-import { DomSanitizer } from "@angular/platform-browser";
 import {
   getCurrentUserDetails,
   getProviderDetails,
 } from "src/app/store/selectors/current-user.selectors";
 import { EncountersService } from "src/app/shared/services/encounters.service";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
-import { any } from "cypress/types/bluebird";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
-import { getEncounterTypeByName } from "src/app/store/selectors/encounter-type.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { MatTableDataSource } from "@angular/material/table";
 import { getIsPatientSentForExemption } from "src/app/store/selectors/visit.selectors";
 import { go, loadCurrentPatient } from "src/app/store/actions";
 import { MatDialog } from "@angular/material/dialog";
@@ -283,31 +279,6 @@ export class CurrentPatientBillingComponent implements OnInit {
           }
         })
       );
-      this.patientBillingDetails$
-      .pipe(
-        map((data: any) => data.payments.map((payment: any, index: number) => ({
-          position: index + 1,
-          receivedBy: payment.paymentDetails.receivedBy,
-          creator: payment.paymentDetails.creator.display,
-          paymentType: payment.paymentDetails.paymentType.name,
-          referenceNumber: payment.paymentDetails.referenceNumber,
-          status: payment.status,
-          createdAt: new Date(payment.created).toLocaleDateString(),
-          receiptNumber: payment.paymentDetails.receiptNumber,
-          billAmount: payment.paymentDetails.billAmount,
-          paidAmount: payment.paymentDetails.paidAmount,
-          gepgpaymentDate: new Date(payment.paymentDetails.paymentDate).toLocaleDateString(),
-          payerNumber: payment.paymentDetails.payerNumber,
-          payerName: payment.paymentDetails.payerName,
-          pspName: payment.paymentDetails.pspName,
-          accountNumber: payment.paymentDetails.accountNumber,
-
-        })))
-      )
-      .subscribe((payments: Payments[]) => {
-        this.dataSource = payments;
-      });
-    
   }
 
 
@@ -329,14 +300,34 @@ export class CurrentPatientBillingComponent implements OnInit {
         const visit = res[0];
         const bills = res[1];
         const payments = res[2];
+
+        this.dataSource = payments.map((payment: any, index: number) => ({
+          position: index + 1,
+          receivedBy: payment?.paymentDetails?.receivedBy,
+          creator: payment?.paymentDetails?.creator?.display,
+          paymentType: payment?.paymentDetails?.paymentType.name,
+          referenceNumber: payment?.paymentDetails?.referenceNumber,
+          status: payment?.paymentDetails?.status,
+          createdAt: new Date(payment?.created).toLocaleDateString(),
+          receiptNumber: payment?.paymentDetails?.receiptNumber,
+          billAmount: payment?.paymentDetails?.billAmount,
+          paidAmount: payment?.paymentDetails?.paidAmount,
+          gepgpaymentDate: new Date(payment?.paymentDetails?.paymentDate).toLocaleDateString(),
+          payerNumber: payment?.paymentDetails?.payerNumber,
+          payerName: payment?.paymentDetails?.payerName,
+          pspName: payment?.paymentDetails?.pspName,
+          accountNumber: payment?.paymentDetails?.accountNumber,
+          items: payment?.paymentDetails?.items
+        })).filter((payment: any) => payment.status === 'REQUESTED');
+
         return {
           visit,
           bills: bills.filter((bill) => {
-            if (!bill.isInsurance && bill.items.length > 0) {
+            if (!bill.isInsurance && bill?.items?.length > 0) {
               return bill;
             }
           }),
-          payments: payments,
+          payments: payments?.filter((payment: any) => payment?.paymentDetails?.status === "PAID"),
           paymentKeys: Object.keys(groupBy(payments, "visit")),
           currentPayments: groupBy(payments, "visit")[visit?.uuid],
           paymentItemCount: payments
@@ -352,15 +343,12 @@ export class CurrentPatientBillingComponent implements OnInit {
       })
     );
   }
-  RequestControlNumber(events, bills) {
+  requestControlNumber(events, items) {
     events.stopPropagation();
-    console.log("Bill clicked ..",bills.currentPayments)
-    const requestPayloads = bills.currentPayments.map((bill) => {
-        return bill.paymentDetails.items.map((billItem) => ({
-            uuid: billItem.item.uuid, 
+    const requestPayloads = items.map((item) => ({
+            ...item,
             currency: "TZS"
-        }));
-    }).flat();
+        }))
     this.onConntrollNumbGen(JSON.stringify(requestPayloads)); 
 }
 

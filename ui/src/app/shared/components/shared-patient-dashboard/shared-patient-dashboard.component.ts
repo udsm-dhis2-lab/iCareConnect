@@ -698,7 +698,6 @@ export class SharedPatientDashboardComponent implements OnInit {
 
   handlePatientVisitDetails(patientVisitDetails: any): void {
     this.patientVisitDetails = patientVisitDetails;
-    console.log("Received patient visit details in parent:", patientVisitDetails);
   }
   
 }
