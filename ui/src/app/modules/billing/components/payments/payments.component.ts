@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { PaymentItem } from "../../models/payment-item.model";
-import { PaymentObject } from "../../models/payment-object.model";
 import { Payment } from "../../models/payment.model";
 import { flatten, each } from "lodash";
 import { MatTableDataSource } from "@angular/material/table";
