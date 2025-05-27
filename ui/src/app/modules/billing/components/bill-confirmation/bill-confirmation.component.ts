@@ -25,6 +25,7 @@ export class BillConfirmationComponent implements OnInit {
   gepgConceptField$: Observable<any>;
   isFormValid: boolean;
   formValues: any;
+  reloadPatientDetails = false;
 
   constructor(
     private matDialogRef: MatDialogRef<BillConfirmationComponent>,
@@ -77,7 +78,7 @@ export class BillConfirmationComponent implements OnInit {
  
 
   onConntrollNumbGen(payload: any) {
-    this.generatingControlNumber = true;  
+    this.generatingControlNumber = true;
     this.billingService.gepgpayBill(payload).subscribe(
       (response: any) => {
         if (response && response.controlNumber) {
@@ -85,18 +86,17 @@ export class BillConfirmationComponent implements OnInit {
           console.log("Successfully generated control number:", this.controlNumber);
         } else if (response.error) {
           this.savingPaymentError = response.error;
+          this.reloadPatientDetails = true
+          this.onCancel();
           console.log("Error in response:", response.error);
         } else {
           this.savingPaymentError = 'Server Error Please Contact an Admin !';
-          console.log("Unexpected response:", response);
         }
         this.generatingControlNumber = false; 
         // this.matDialogRef.close(response);
       },
       (error) => {
-        this.savingPaymentError = error;
-        this.generatingControlNumber = false; 
-        console.log("Failed to generate control number:", error);
+        this.generatingControlNumber = false;
       }
     );
   }
@@ -127,9 +127,11 @@ export class BillConfirmationComponent implements OnInit {
     }
   }
 
-  onCancel(e): void {
-    e.stopPropagation();
-    this.matDialogRef.close();
+  onCancel(e?: any): void {
+    if(e){
+      e?.stopPropagation();
+    }
+    this.matDialogRef.close(this.reloadPatientDetails ? {reloadPatientDetails: this.reloadPatientDetails} : undefined);
   }
 
   onConfirm(e): void {

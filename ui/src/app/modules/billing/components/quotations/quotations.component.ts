@@ -58,6 +58,7 @@ export class QuotationsComponent implements OnInit {
   }>();
   @Output() billPaymentSuccess = new EventEmitter<any>();
   @Output() checkOpenExemptionRequest = new EventEmitter<any>();
+  @Output() reloadPatientDetails = new EventEmitter<any>();
   constructor() {}
 
   get isAllSelected() {
@@ -92,6 +93,10 @@ export class QuotationsComponent implements OnInit {
 
   onConfirmBillPayment(paymentInput: PaymentInput, bill: BillObject): void {
     this.confirmPayment.emit({ bill, paymentInput });
+  }
+
+  onReloadPatientDetails(){
+    this.reloadPatientDetails.emit();
   }
 
   onSelectRow(e: MouseEvent, row) {
