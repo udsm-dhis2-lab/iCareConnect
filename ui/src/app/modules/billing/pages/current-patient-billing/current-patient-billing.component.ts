@@ -34,6 +34,7 @@ import { ExemptionConfirmationComponent } from "../../components/exemption-confi
 import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { animate, state, style, transition, trigger } from "@angular/animations";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 
 interface Payments {
@@ -105,6 +106,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   itemuuid: any;
   controlNumber: any;
   savingPaymentError: any;
+  requestingControlNumber: boolean  =  false;
   onRowClick(row: any): void {
     // Only expand if paymentType is 'Gepg'
     if (row.paymentType === 'Gepg') {
@@ -125,7 +127,8 @@ export class CurrentPatientBillingComponent implements OnInit {
     private systemSettingsService: SystemSettingsService,
     private store: Store<AppState>,
     private dialog: MatDialog,
-    private googleAnalyticsService: GoogleAnalyticsService
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
@@ -286,6 +289,10 @@ export class CurrentPatientBillingComponent implements OnInit {
     console.log('Printing:', element);
   }
 
+  onReloadPatientDetails(){
+    this._getPatientDetails();
+  }
+
   
   private _getPatientDetails() {
     this.loading = true;
@@ -354,19 +361,39 @@ export class CurrentPatientBillingComponent implements OnInit {
 
 
 onConntrollNumbGen(payload: any) {
-
+  this.requestingControlNumber = true;
   this.billingService.gepgpayBill(payload).subscribe(
     (response: any) => {
+      this.requestingControlNumber = false;
       if (response && response.ackCode === "CONS9005") {
-console.log("Authentication Failed")
+        console.log("Authentication Failed")
+        this.savingPaymentError = 'Authentication Failed! Kindly, try again or contact your IT Administrator';
       }else {
         this.savingPaymentError = 'Server Error Please Contact an Admin !';
         console.log("Unexpected response:", response);
       }
+
+      if(this.savingPaymentError){
+        this.snackBar.open(this.savingPaymentError, "OK", {
+          horizontalPosition: "center",
+          verticalPosition: "bottom",
+          duration: 3500,
+          panelClass: ["snack-color"],
+        });
+      }
     },
     (error) => {
+      this.requestingControlNumber = false;
       this.savingPaymentError = error;
       console.log("Failed to generate control number:", error);
+      if(this.savingPaymentError){
+        this.snackBar.open(`Failed to generate control number: ${this.savingPaymentError}`, "OK", {
+          horizontalPosition: "center",
+          verticalPosition: "bottom",
+          duration: 3500,
+          panelClass: ["snack-color"],
+        });
+      }
     }
   );
 }

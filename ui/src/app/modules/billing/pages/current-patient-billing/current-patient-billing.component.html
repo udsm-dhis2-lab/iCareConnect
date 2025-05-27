@@ -55,6 +55,7 @@
                     [exemptionOrderType]="params?.exemptionOrderType" [currentPatient]="params?.currentPatient"
                     [facilityDetails]="params?.facilityDetails" [logo]="params?.logo"
                     (confirmPayment)="onConfirmBillPayment($event)" (billPaymentSuccess)="onPaymentSuccess()"
+                    (reloadPatientDetails)="onReloadPatientDetails()"
                     (checkOpenExemptionRequest)="
                       onCheckOpenExemptionRequest($event)
                     " id="quotation"></app-quotations>
@@ -116,6 +117,9 @@
                 </ng-template>
               
                 <div class="py-4" style="text-align: center">
+                  <ng-container *ngIf="requestingControlNumber">
+                    <mat-progress-bar *ngIf="requestingControlNumber" mode="indeterminate"></mat-progress-bar>
+                  </ng-container>
                   <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" multiTemplateDataRows>
               
                     <!-- Position Column -->
