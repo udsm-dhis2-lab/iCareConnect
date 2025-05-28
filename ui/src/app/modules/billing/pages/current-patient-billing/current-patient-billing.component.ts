@@ -35,26 +35,7 @@ import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { animate, state, style, transition, trigger } from "@angular/animations";
 import { MatSnackBar } from "@angular/material/snack-bar";
-
-
-interface Payments {
-  position: number;
-  receivedBy: string;
-  creator: string;
-  paymentType: string;
-  referenceNumber: string;
-  status: string;
-  createdAt: string;
-  receiptNumber: string;
-  billAmount: number;
-  paidAmount: number;
-  gepgpaymentDate: string;
-  payerNumber: string;
-  payerName: string;
-  pspName: string;
-  accountNumber: string;
-}
-
+import { Payments } from "../../interfaces/payments.interfaces";
 
 
 @Component({
@@ -308,7 +289,7 @@ export class CurrentPatientBillingComponent implements OnInit {
         const bills = res[1];
         const payments = res[2];
 
-        this.dataSource = payments.map((payment: any, index: number) => ({
+        const formartedPayments = payments.map((payment: any, index: number) => ({
           position: index + 1,
           receivedBy: payment?.paymentDetails?.receivedBy,
           creator: payment?.paymentDetails?.creator?.display,
@@ -319,13 +300,15 @@ export class CurrentPatientBillingComponent implements OnInit {
           receiptNumber: payment?.paymentDetails?.receiptNumber,
           billAmount: payment?.paymentDetails?.billAmount,
           paidAmount: payment?.paymentDetails?.paidAmount,
-          gepgpaymentDate: new Date(payment?.paymentDetails?.paymentDate).toLocaleDateString(),
+          gepgpaymentDate: payment?.paymentDetails?.paymentDate ? new Date(payment?.paymentDetails?.paymentDate).toLocaleDateString(): '',
           payerNumber: payment?.paymentDetails?.payerNumber,
           payerName: payment?.paymentDetails?.payerName,
           pspName: payment?.paymentDetails?.pspName,
           accountNumber: payment?.paymentDetails?.accountNumber,
           items: payment?.paymentDetails?.items
-        })).filter((payment: any) => payment.status === 'REQUESTED');
+        }));
+
+        this.dataSource = formartedPayments.filter((payment: any) => payment.status === 'REQUESTED');
 
         return {
           visit,
