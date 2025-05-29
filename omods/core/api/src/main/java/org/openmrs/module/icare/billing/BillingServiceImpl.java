@@ -1454,18 +1454,18 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	
 	// Create RequestData
 	private RequestData createRequestData(BillHdr billHdr, BillTrxInf billTrxInf, String billId,
-	        List<InvoiceItem> invoiceItems, String payment_uuid) throws Exception {
+	        List<InvoiceItem> invoiceItems, String paymentUuid) throws Exception {
 		AdministrationService administrationService = Context.getAdministrationService();
 		// Save PaymentData before Reference Number (Control Number)
 		RequestData requestData = new RequestData();
 		try {
 			Payment payment = new Payment();
 			
-			if (payment_uuid != null) {
-				payment = this.paymentDAO.getPaymentByUuid(payment_uuid);
+			if (paymentUuid != null) {
+				payment = this.paymentDAO.getPaymentByUuid(paymentUuid);
 			}
 			
-			if (payment == null) {
+			if (paymentUuid == null) {
 				Integer billUuid = Integer.parseInt(billId);
 				Invoice invoice = invoiceDAO.findById(billUuid);
 				if (invoice == null) {
@@ -1508,7 +1508,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		}
 		catch (Exception e) {
 			String message = "Failed to Save Payments Data: ";
-			if (payment_uuid != null) {
+			if (paymentUuid != null) {
 				message = "Failed to get payments data: ";
 			}
 			throw new Exception(message + e.getMessage());
