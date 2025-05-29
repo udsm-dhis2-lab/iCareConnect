@@ -88,13 +88,6 @@ export class CurrentPatientBillingComponent implements OnInit {
   controlNumber: any;
   savingPaymentError: any;
   requestingControlNumber: boolean  =  false;
-  onRowClick(row: any): void {
-    // Only expand if paymentType is 'Gepg'
-    if (row.paymentType === 'Gepg') {
-      this.expandedElement = this.expandedElement === row ? null : row;
-    }
-  }
-
 
   constructor(
     private route: ActivatedRoute,
@@ -341,46 +334,60 @@ export class CurrentPatientBillingComponent implements OnInit {
             currency: "TZS"
         }))
     this.onConntrollNumbGen(JSON.stringify(requestPayloads), payment?.uuid); 
-}
+  }
 
 
-onConntrollNumbGen(payload: any, payment?: String) {
-  this.requestingControlNumber = true;
-  this.billingService.gepgpayBill(payload, payment).subscribe(
-    (response: any) => {
-      this.requestingControlNumber = false;
-      if (response && response.ackCode === "CONS9005") {
-        console.log("Authentication Failed")
-        this.savingPaymentError = 'Authentication Failed! Kindly, try again or contact your IT Administrator';
-      }else {
-        this.savingPaymentError = 'Server Error Please Contact an Admin !';
-        console.log("Unexpected response:", response);
-      }
+  onConntrollNumbGen(payload: any, payment?: String) {
+    this.requestingControlNumber = true;
+    this.billingService.gepgpayBill(payload, payment).subscribe(
+      (response: any) => {
+        this.requestingControlNumber = false;
+        if (response && response.ackCode === "CONS9005") {
+          console.log("Authentication Failed")
+          this.savingPaymentError = 'Authentication Failed! Kindly, try again or contact your IT Administrator';
+        }else {
+          this.savingPaymentError = 'Server Error Please Contact an Admin !';
+          console.log("Unexpected response:", response);
+        }
 
-      if(this.savingPaymentError){
-        this.snackBar.open(this.savingPaymentError, "OK", {
-          horizontalPosition: "center",
-          verticalPosition: "bottom",
-          duration: 3500,
-          panelClass: ["snack-color"],
-        });
+        if(this.savingPaymentError){
+          this.snackBar.open(this.savingPaymentError, "OK", {
+            horizontalPosition: "center",
+            verticalPosition: "bottom",
+            duration: 3500,
+            panelClass: ["snack-color"],
+          });
+        }
+      },
+      (error) => {
+        this.requestingControlNumber = false;
+        this.savingPaymentError = error;
+        console.log("Failed to generate control number:", error);
+        if(this.savingPaymentError){
+          this.snackBar.open(`Failed to generate control number: ${this.savingPaymentError}`, "OK", {
+            horizontalPosition: "center",
+            verticalPosition: "bottom",
+            duration: 3500,
+            panelClass: ["snack-color"],
+          });
+        }
       }
-    },
-    (error) => {
-      this.requestingControlNumber = false;
-      this.savingPaymentError = error;
-      console.log("Failed to generate control number:", error);
-      if(this.savingPaymentError){
-        this.snackBar.open(`Failed to generate control number: ${this.savingPaymentError}`, "OK", {
-          horizontalPosition: "center",
-          verticalPosition: "bottom",
-          duration: 3500,
-          panelClass: ["snack-color"],
-        });
+    );
+  }
+
+  reversePaymentRequest(paymentUuid: String){
+    this.billingService.reversePaymentRequest(paymentUuid).subscribe(
+      {
+        next: (response) => {
+          console.log("Succeeded to reverse payment request:", response);
+          this._getPatientDetails();
+        },
+        error: (error) => {
+          console.log("Failsed to reverse payment request:", error);
+        }
       }
-    }
-  );
-}
+    )
+  }
   
   onConfirmBillPayment(results: {
     bill: BillObject;

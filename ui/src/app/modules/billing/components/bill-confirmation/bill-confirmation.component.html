@@ -29,6 +29,7 @@
           <b>{{ data?.totalPayableBill | currency: 'TZS':'':'.0' }}</b>
           from the client for items below:
         </p>
+        <!-- TODO: Use GEPG Concept UUid instead of name anywhere with this type of check -->
         <p *ngIf="data?.paymentType?.code === 'GePG'">
           This is to confirm that client will be paying
           <b>{{ data?.totalPayableBill | currency: 'TZS':'':'.0' }}</b>

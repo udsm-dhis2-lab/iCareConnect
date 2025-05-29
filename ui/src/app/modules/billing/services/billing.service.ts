@@ -126,6 +126,12 @@ export class BillingService {
       })
     );
   }
+
+  reversePaymentRequest(paymentUuid: String): Observable<any> {
+    const url = `gepg/payment ?payment=${paymentUuid}`;
+
+    return this.httpClient.delete(url);
+  }
   
 
   gepgpayCallBack(payload: any): Observable<Payment> {

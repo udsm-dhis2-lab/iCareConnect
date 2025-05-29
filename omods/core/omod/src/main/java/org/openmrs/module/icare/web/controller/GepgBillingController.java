@@ -149,6 +149,17 @@ public class GepgBillingController {
         return generatedControlNumberObject;
     }
 	
+	@RequestMapping(value = "/payment", method = RequestMethod.DELETE)
+	public ResponseEntity<?> removePayment(@RequestParam(value = "payment", required = true) String payment) {
+		try {
+			billingService.removeFailedGepgPaymentRequests(payment);
+			return ResponseEntity.noContent().build();
+		}
+		catch (Exception e) {
+			return ResponseEntity.badRequest().build();
+		}
+	}
+	
 	@RequestMapping(value = "/callback", method = RequestMethod.POST)
 	public ResponseEntity<?> handleCallback(HttpServletRequest request) {
 		try {

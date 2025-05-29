@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 // Generated Oct 7, 2020 12:49:21 PM by Hibernate Tools 5.2.10.Final
 
 import org.hibernate.Query;
+import org.hibernate.Transaction;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.icare.billing.models.Payment;
@@ -100,6 +101,25 @@ public class PaymentDAO extends BaseDAO<Payment> {
 		Query query = session.createQuery(queryStr);
 		query.setParameter("paymentTypeId", paymentTypeId);
 		return query.list();
+	}
+	
+	public void deletePaymentAndPaymentItemsByPaymentUuid(String paymentUuid) {
+		
+		DbSession session = this.getSession();
+		
+		String deleteItemsHql = "DELETE FROM PaymentItem pi WHERE pi.id.payment.id IN (SELECT p.id FROM Payment p WHERE p.uuid = :paymentUuid)";
+		Query deleteItemsQuery = session.createQuery(deleteItemsHql);
+		deleteItemsQuery.setParameter("paymentUuid", paymentUuid);
+		int itemsDeletedCount = deleteItemsQuery.executeUpdate();
+		System.out.println("Deleted " + itemsDeletedCount + " payment items for payment UUID: " + paymentUuid);
+		
+		String deletePaymentHql = "DELETE FROM Payment p WHERE p.uuid = :paymentUuid";
+		Query deletePaymentQuery = session.createQuery(deletePaymentHql);
+		deletePaymentQuery.setParameter("paymentUuid", paymentUuid);
+		int paymentDeleteCount = deletePaymentQuery.executeUpdate();
+		System.out.println("Deleted " + paymentDeleteCount + " payments for payment UUID: " + paymentUuid);
+		
+		session.flush();
 	}
 	
 	public void updatePayment(Payment payment) {

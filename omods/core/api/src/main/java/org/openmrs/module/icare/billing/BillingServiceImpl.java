@@ -1318,6 +1318,17 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		return result;
 	}
 	
+	@Override
+	public void removeFailedGepgPaymentRequests(String paymentUuid) throws Exception {
+		try {
+			this.paymentDAO.deletePaymentAndPaymentItemsByPaymentUuid(paymentUuid);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Failed to delete payment with UUID: " + paymentUuid, e);
+		}
+	}
+	
 	// Validate the inputs
 	private void validateInputs(Patient patient, List<InvoiceItem> invoiceItems, String currency, String gepgAuthSignature,
 	        String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode, String serviceCode, String SpSysId,

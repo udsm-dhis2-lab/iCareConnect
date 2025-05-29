@@ -168,10 +168,10 @@
                     <ng-container matColumnDef="print">
                       <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> </th>
                       <td mat-cell *matCellDef="let element">
-                        <!-- <button mat-icon-button *ngIf="element.referenceNumber" (click)="printElement(element)">
-                          <mat-icon>{{ element === expandedElement ? 'visibility_off' : 'visibility' }}</mat-icon>
-                        </button> -->
-                        <button mat-button *ngIf="element.status === 'REQUESTED'" (click)="requestControlNumber($event, element)" style="color: white;">
+                        <button class="mr-3 btn btn-outline-danger" role="button" (click)="reversePaymentRequest(element?.uuid)" matTooltip="Reverse tbis payment back to bills">
+                          Reverse
+                        </button>
+                        <button class="btn btn-outline-info" *ngIf="element.status === 'REQUESTED'" (click)="requestControlNumber($event, element)" matTooltip="Request control number again!">
                           Request
                         </button>
                         
