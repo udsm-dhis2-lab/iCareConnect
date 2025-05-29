@@ -81,21 +81,38 @@ export class BillConfirmationComponent implements OnInit {
     this.generatingControlNumber = true;
     this.billingService.gepgpayBill(payload).subscribe(
       (response: any) => {
-        if (response && response.controlNumber) {
-          this.controlNumber = response.controlNumber;
+        if (response && response?.controlNumber) {
+          this.controlNumber = response?.controlNumber;
           console.log("Successfully generated control number:", this.controlNumber);
-        } else if (response.error) {
-          this.savingPaymentError = response.error;
-          this.reloadPatientDetails = true
-          this.onCancel();
-          console.log("Error in response:", response.error);
+
+          if(this.controlNumber === 'Not found within timeout'){
+            this.reloadPatientDetails = true
+            this.onCancel();
+          }
+          return;
+        }
+        
+        if (response?.error) {
+          this.savingPaymentError = response?.error;
+          console.log("Error in response:", response?.error);
         } else {
           this.savingPaymentError = 'Server Error Please Contact an Admin !';
         }
         this.generatingControlNumber = false; 
-        // this.matDialogRef.close(response);
+        this.reloadPatientDetails = true
+        this.onCancel();
       },
       (error) => {
+        if (error?.error) {
+          this.savingPaymentError = error?.error;
+          console.log("Error in response:", error?.error);
+        } else {
+          this.savingPaymentError = 'Server Error Please Contact an Admin !';
+        }
+        
+        this.generatingControlNumber = false; 
+        this.reloadPatientDetails = true
+        this.onCancel();
         this.generatingControlNumber = false;
       }
     );

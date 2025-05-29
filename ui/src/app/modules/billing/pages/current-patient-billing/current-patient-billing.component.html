@@ -110,8 +110,8 @@
               <!-- Payments Requests) -->
               <mat-tab>
                 <ng-template mat-tab-label>
-                  <span class="mr-2" [matBadge]="patientBillingDetails.pendingPayments?.length" matBadgePosition="after"
-                    matBadgeOverlap="false" [matBadgeHidden]="patientBillingDetails.pendingPayments?.length === 0">
+                  <span class="mr-2" [matBadge]="dataSource?.length" matBadgePosition="after"
+                    matBadgeOverlap="false" [matBadgeHidden]="dataSource?.length === 0">
                     Payments Requests
                   </span>
                 </ng-template>
@@ -131,7 +131,7 @@
                     <!-- Created Column -->
                     <ng-container matColumnDef="createdAt">
                       <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Created At </th>
-                      <td mat-cell *matCellDef="let element"> {{element.createdAt}} </td>
+                      <td mat-cell *matCellDef="let element"> {{element.createdAt | date }} </td>
                     </ng-container>
               
                     <!-- Received By Column -->
@@ -142,7 +142,7 @@
               
                     <!-- Creator Column -->
                     <ng-container matColumnDef="creator">
-                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Creator </th>
+                      <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> Initiated By </th>
                       <td mat-cell *matCellDef="let element"> {{element.creator}} </td>
                     </ng-container>
               
@@ -168,10 +168,10 @@
                     <ng-container matColumnDef="print">
                       <th mat-header-cell *matHeaderCellDef [style.background-color]="color"> </th>
                       <td mat-cell *matCellDef="let element">
-                        <button mat-icon-button *ngIf="element.referenceNumber" (click)="printElement(element)">
-                          <mat-icon>print</mat-icon>
+                        <button class="mr-3 btn btn-outline-danger" role="button" (click)="reversePaymentRequest(element?.uuid)" matTooltip="Reverse tbis payment back to bills">
+                          Reverse
                         </button>
-                        <button mat-button *ngIf="element.status === 'REQUESTED'" (click)="requestControlNumber($event, element?.items)" style="color: white;">
+                        <button class="btn btn-outline-info" *ngIf="element.status === 'REQUESTED'" (click)="requestControlNumber($event, element)" matTooltip="Request control number again!">
                           Request
                         </button>
                         
@@ -285,7 +285,7 @@
               <!-- Payments made -->
               <mat-tab>
                 <ng-template mat-tab-label>
-                  <span [matBadge]="patientBillingDetails.paymentItemCount" matBadgePosition="after"
+                  <span [matBadge]="patientBillingDetails.payments?.length" matBadgePosition="after"
                     matBadgeOverlap="false" [matBadgeHidden]="
                       patientBillingDetails.payments?.length === 0
                     ">Payments

@@ -1270,7 +1270,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			String personEmailAttributeTypeUuid, String currency, String gepgAuthSignature,
 			String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode, String serviceCode,
 			String SpSysId, String subSpCode, String clientPrivateKey, String pkcs12Path,
-			String pkcs12Password, String enginepublicKey, String billId) throws Exception {
+			String pkcs12Password, String enginepublicKey, String billId, String payment) throws Exception {
 
 		// Validate inputs
 		validateInputs(patient, invoiceItems, currency, gepgAuthSignature, GFSCodeConceptSourceMappingUuid,
@@ -1293,7 +1293,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 				currency, billId, billExpirlyDate, billItems, subSpCode, SpSysId, patientId);
 
 		// Create and populate RequestData
-		RequestData requestData = createRequestData(billHdr, billTrxInf, billId, invoiceItems);
+		RequestData requestData = createRequestData(billHdr, billTrxInf, billId, invoiceItems, payment);
 
 		// Create and populate SystemAuth
 		SystemAuth systemAuth = createSystemAuth(sytemCode, serviceCode);
@@ -1316,6 +1316,17 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		result.put("signature", signature);
 
 		return result;
+	}
+	
+	@Override
+	public void removeFailedGepgPaymentRequests(String paymentUuid) throws Exception {
+		try {
+			this.paymentDAO.deletePaymentAndPaymentItemsByPaymentUuid(paymentUuid);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Failed to delete payment with UUID: " + paymentUuid, e);
+		}
 	}
 	
 	// Validate the inputs
@@ -1443,52 +1454,64 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	
 	// Create RequestData
 	private RequestData createRequestData(BillHdr billHdr, BillTrxInf billTrxInf, String billId,
-	        List<InvoiceItem> invoiceItems) throws Exception {
+	        List<InvoiceItem> invoiceItems, String payment_uuid) throws Exception {
 		AdministrationService administrationService = Context.getAdministrationService();
 		// Save PaymentData before Reference Number (Control Number)
 		RequestData requestData = new RequestData();
 		try {
-			Integer billUuid = Integer.parseInt(billId);
-			Invoice invoice = invoiceDAO.findById(billUuid);
-			if (invoice == null) {
-				throw new Exception("Invoice of this Bill id " + billId + " is not valid");
-				
-			}
-			
-			String paymentTypeConceptUuid = administrationService
-			        .getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
-			if (paymentTypeConceptUuid == null) {
-				throw new Exception("No default payment type based on control number");
-			}
-			
-			Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
-			if (paymentType == null) {
-				throw new Exception("Payment type concept not found for UUID: " + paymentTypeConceptUuid);
-			}
-			
 			Payment payment = new Payment();
-			payment.setPaymentType(paymentType);
-			payment.setReferenceNumber(null);
-			payment.setInvoice(invoice);
-			payment.setReceivedBy("SYSTEM");
-			payment.setStatus(PaymentStatus.REQUESTED);
-			payment.setCreator(Context.getAuthenticatedUser());
-			payment.setDateCreated(new Date());
-			for (InvoiceItem invoiceItem : invoiceItems) {
-				PaymentItem paymentItem = new PaymentItem();
-				paymentItem.setPayment(payment);
-				paymentItem.setItem(invoiceItem.getItem());
-				paymentItem.setOrder(invoiceItem.getOrder());
-				paymentItem.setAmount(invoiceItem.getPrice());
-				paymentItem.setStatus(null);
-				payment.getItems().add(paymentItem);
+			
+			if (payment_uuid != null) {
+				payment = this.paymentDAO.getPaymentByUuid(payment_uuid);
 			}
-			this.paymentDAO.save(payment);
+			
+			if (payment == null) {
+				Integer billUuid = Integer.parseInt(billId);
+				Invoice invoice = invoiceDAO.findById(billUuid);
+				if (invoice == null) {
+					throw new Exception("Invoice of this Bill id " + billId + " is not valid");
+					
+				}
+				
+				String paymentTypeConceptUuid = administrationService
+				        .getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
+				if (paymentTypeConceptUuid == null) {
+					throw new Exception("No default payment type based on control number");
+				}
+				
+				Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
+				if (paymentType == null) {
+					throw new Exception("Payment type concept not found for UUID: " + paymentTypeConceptUuid);
+				}
+				
+				payment.setPaymentType(paymentType);
+				payment.setReferenceNumber(null);
+				payment.setInvoice(invoice);
+				payment.setReceivedBy("SYSTEM");
+				payment.setStatus(PaymentStatus.REQUESTED);
+				payment.setCreator(Context.getAuthenticatedUser());
+				payment.setDateCreated(new Date());
+				for (InvoiceItem invoiceItem : invoiceItems) {
+					PaymentItem paymentItem = new PaymentItem();
+					paymentItem.setPayment(payment);
+					paymentItem.setItem(invoiceItem.getItem());
+					paymentItem.setOrder(invoiceItem.getOrder());
+					paymentItem.setAmount(invoiceItem.getPrice());
+					paymentItem.setStatus(null);
+					payment.getItems().add(paymentItem);
+				}
+				this.paymentDAO.save(payment);
+			}
+			
 			Integer paymentId = payment.getId();
 			requestData.setRequestId(paymentId.toString());
 		}
 		catch (Exception e) {
-			throw new Exception("Failed to Save Payments Data: " + e.getMessage());
+			String message = "Failed to Save Payments Data: ";
+			if (payment_uuid != null) {
+				message = "Failed to get payments data: ";
+			}
+			throw new Exception(message + e.getMessage());
 		}
 		requestData.setBillHdr(billHdr);
 		requestData.setBillTrxInf(billTrxInf);
