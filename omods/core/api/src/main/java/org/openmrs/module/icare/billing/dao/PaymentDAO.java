@@ -75,6 +75,14 @@ public class PaymentDAO extends BaseDAO<Payment> {
 		return (Payment) query.uniqueResult();
 	}
 	
+	public Payment getPaymentByUuid(String uuid) {
+		DbSession session = this.getSession();
+		String queryStr = "SELECT p FROM Payment p WHERE p.uuid = :uuid";
+		Query query = session.createQuery(queryStr);
+		query.setParameter("uuid", uuid);
+		return (Payment) query.uniqueResult();
+	}
+	
 	public int setReferenceNumberByPaymentId(Integer paymentId, String pyReference) {
 		DbSession session = this.getSession();
 		String queryStr = "UPDATE Payment p SET p.referenceNumber = :pyReference WHERE p.id = :paymentId";

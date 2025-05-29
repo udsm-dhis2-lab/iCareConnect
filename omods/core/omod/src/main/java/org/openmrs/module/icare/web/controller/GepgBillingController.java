@@ -22,10 +22,7 @@ import org.openmrs.module.icare.billing.services.payment.gepg.GEPGService;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,7 +38,9 @@ public class GepgBillingController {
 	private BillingService billingService;
 	
 	@RequestMapping(value = "/generatecontrolno", method = RequestMethod.POST)
-    public Map<String, Object> generateControlNumber(@RequestBody List<Map<String, Object>> requestPayload)
+    public Map<String, Object> generateControlNumber(
+            @RequestParam(value="payment", required = false) String payment,
+            @RequestBody List<Map<String, Object>> requestPayload)
             throws Exception {
         Map<String, Object> generatedControlNumberObject = new HashMap<>();
 
@@ -135,7 +134,7 @@ public class GepgBillingController {
                 clientPrivateKey,
                 pkcs12Path,
                 pkcs12Password,
-                enginepublicKey, billId);
+                enginepublicKey, billId, payment);
 
         try {
             BillSubmissionRequest billRequest = (BillSubmissionRequest) gepgPayload.get("billRequest");

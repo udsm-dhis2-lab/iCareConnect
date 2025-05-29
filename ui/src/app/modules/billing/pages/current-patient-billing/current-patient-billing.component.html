@@ -171,7 +171,7 @@
                         <!-- <button mat-icon-button *ngIf="element.referenceNumber" (click)="printElement(element)">
                           <mat-icon>{{ element === expandedElement ? 'visibility_off' : 'visibility' }}</mat-icon>
                         </button> -->
-                        <button mat-button *ngIf="element.status === 'REQUESTED'" (click)="requestControlNumber($event, element?.items)" style="color: white;">
+                        <button mat-button *ngIf="element.status === 'REQUESTED'" (click)="requestControlNumber($event, element)" style="color: white;">
                           Request
                         </button>
                         

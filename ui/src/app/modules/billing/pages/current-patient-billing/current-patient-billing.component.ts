@@ -305,7 +305,8 @@ export class CurrentPatientBillingComponent implements OnInit {
           payerName: payment?.paymentDetails?.payerName,
           pspName: payment?.paymentDetails?.pspName,
           accountNumber: payment?.paymentDetails?.accountNumber,
-          items: payment?.paymentDetails?.items
+          items: payment?.paymentDetails?.items,
+          uuid: payment?.paymentDetails?.uuid
         }));
 
         this.dataSource = formartedPayments.filter((payment: any) => payment.status === 'REQUESTED');
@@ -333,19 +334,19 @@ export class CurrentPatientBillingComponent implements OnInit {
       })
     );
   }
-  requestControlNumber(events, items) {
+  requestControlNumber(events, payment?: any) {
     events.stopPropagation();
-    const requestPayloads = items.map((item) => ({
+    const requestPayloads = payment?.items.map((item) => ({
             ...item,
             currency: "TZS"
         }))
-    this.onConntrollNumbGen(JSON.stringify(requestPayloads)); 
+    this.onConntrollNumbGen(JSON.stringify(requestPayloads), payment?.uuid); 
 }
 
 
-onConntrollNumbGen(payload: any) {
+onConntrollNumbGen(payload: any, payment?: String) {
   this.requestingControlNumber = true;
-  this.billingService.gepgpayBill(payload).subscribe(
+  this.billingService.gepgpayBill(payload, payment).subscribe(
     (response: any) => {
       this.requestingControlNumber = false;
       if (response && response.ackCode === "CONS9005") {

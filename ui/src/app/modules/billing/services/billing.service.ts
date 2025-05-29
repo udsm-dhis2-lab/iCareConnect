@@ -105,8 +105,9 @@ export class BillingService {
       .pipe(map(() => new Payment(billPayment)));
   }
 
-  gepgpayBill(payload: any): Observable<Payment> {
-    const url = `gepg/generatecontrolno`;
+  gepgpayBill(payload: any, payment?: String): Observable<Payment> {
+
+    const url = `gepg/generatecontrolno ${payment ? `?payment=${payment}` : ''}`;
     return this.httpClient.post(url, payload).pipe(
       map((response: any) => {
         if (response.error) {
