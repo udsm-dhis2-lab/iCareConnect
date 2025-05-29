@@ -96,7 +96,7 @@ public interface BillingService extends OpenmrsService {
 	        Date billExpirlyDate, String personPhoneAttributeTypeUuid, String personEmailAttributeTypeUuid, String currency,
 	        String gepgAuthSignature, String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode,
 	        String serviceCode, String SpSysId, String subSpCode, String clientPrivateKey, String pkcs12Path,
-	        String pkcs12Password, String enginepublicKey, String billId, String regenerate) throws Exception;
+	        String pkcs12Password, String enginepublicKey, String billId, String payment) throws Exception;
 	
 	void removeFailedGepgPaymentRequests(String paymentUuid) throws Exception;
 	
