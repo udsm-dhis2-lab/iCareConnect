@@ -149,7 +149,7 @@ public class BillSubmissionRequest {
 				}
 				if (GFSCode == null) {
 					throw new IllegalStateException("No valid GFS Code mapping found for item with name and id: "
-							+ concept.getDisplayString() + concept.getUuid() + " respectively.");
+							+ concept.getDisplayString() + " " + concept.getUuid() + " respectively.");
 				}
 			} else if (drug != null) {
 				Concept drugConcept = drug.getConcept();
@@ -169,7 +169,7 @@ public class BillSubmissionRequest {
 				}
 				if (GFSCode == null) {
 					throw new IllegalStateException("No valid GFS Code mapping found for drug with name and id: "
-							+ drug.getDisplayName() + drug.getUuid() + " respectively.");
+							+ drug.getDisplayName() + " " + drug.getUuid() + " respectively.");
 				}
 			}
 
