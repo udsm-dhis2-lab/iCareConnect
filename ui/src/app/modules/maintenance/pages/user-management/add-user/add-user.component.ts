@@ -102,12 +102,21 @@ export class AddUserComponent implements OnInit {
     if (this.user && this.user?.uuid) {
       this.selectedModules = this.user?.userProperties?.preferredModules
         ? this.systemModules?.filter(
-            (module) =>
-              (
-                JSON.parse(this.user?.userProperties?.preferredModules)?.filter(
+            (module) => {
+              let preferredModules = [] 
+              
+              try {
+                preferredModules = JSON.parse(this.user?.userProperties?.preferredModules)
+              } catch (error: any) {
+                console.error("Failed to get user preferred modules :", error);
+              }
+
+              return (
+               preferredModules?.filter(
                   (moduleId) => moduleId === module?.id
                 ) || []
               )?.length > 0
+            }
           ) || []
         : [];
       this.usersService
