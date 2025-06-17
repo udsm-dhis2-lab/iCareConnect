@@ -530,9 +530,10 @@ public class ICareDao extends BaseDAO<Item> {
 
 			if (includeInactive != null && includeInactive) {
 				queryStr += " WHERE 1=1 ";
-			} else {
-				queryStr += " WHERE v.stopDatetime IS NULL ";
 			}
+//			else {
+//				queryStr += " WHERE v.stopDatetime IS NULL ";
+//			}
 		}
 
 		if (includeInactive != null && includeInactive) {
@@ -552,6 +553,14 @@ public class ICareDao extends BaseDAO<Item> {
 			}
 			queryStr += " v.stopDatetime IS NULL";
 		}
+
+		if (!queryStr.contains("WHERE")) {
+			queryStr += " WHERE ";
+		} else {
+			queryStr += " AND ";
+		}
+
+		queryStr += " p.dead = :includeDeadPatients";
 
 		if (search != null) {
 			queryStr += " AND (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:search) OR lower(pname.givenName) LIKE lower(:search) OR lower(pname.middleName) LIKE lower(:search) OR lower(pname.familyName) LIKE lower(:search) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:search) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:search) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:search)  OR pi.identifier LIKE :search)";
@@ -618,14 +627,6 @@ public class ICareDao extends BaseDAO<Item> {
 
 		}
 
-		if (!queryStr.contains("WHERE")) {
-			queryStr += " WHERE ";
-		} else {
-			queryStr += " AND ";
-		}
-
-		queryStr += " p.dead = :includeDeadPatients";
-
 		if (orderBy == VisitWrapper.OrderBy.VISIT) {
 			queryStr += " ORDER BY v.startDatetime ";
 		} else if (orderBy == VisitWrapper.OrderBy.ENCOUNTER) {
@@ -641,6 +642,7 @@ public class ICareDao extends BaseDAO<Item> {
 		} else if (orderByDirection == VisitWrapper.OrderByDirection.DESC) {
 			queryStr += " DESC ";
 		}
+
 		query = session.createQuery(queryStr);
 		if (orderTypeUuid != null) {
 			query.setParameter("orderTypeUuid", orderTypeUuid);
@@ -680,6 +682,7 @@ public class ICareDao extends BaseDAO<Item> {
 
 		query.setParameter("includeDeadPatients", includeDeadPatients);
 
+
 		if (exclude != null) {
 			Pattern pattern = Pattern.compile("List:\\[(.*?)\\]");
 			Matcher matcher = pattern.matcher(exclude);
@@ -696,6 +699,7 @@ public class ICareDao extends BaseDAO<Item> {
 		}
 		query.setFirstResult(startIndex);
 		query.setMaxResults(limit);
+
 		return query.list();
 
 	}
