@@ -11,10 +11,7 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.icare.billing.OrderMetaData;
 import org.openmrs.module.icare.billing.VisitMetaData;
-import org.openmrs.module.icare.billing.models.Discount;
-import org.openmrs.module.icare.billing.models.Invoice;
-import org.openmrs.module.icare.billing.models.InvoiceItem;
-import org.openmrs.module.icare.billing.models.Payment;
+import org.openmrs.module.icare.billing.models.*;
 import org.openmrs.module.icare.billing.services.insurance.SyncResult;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,4 +98,10 @@ public interface BillingService extends OpenmrsService {
 	void removeFailedGepgPaymentRequests(String paymentUuid) throws Exception;
 	
 	String signatureData(String rowData) throws Exception;
+	
+	GePGLogs getGepgLogsDataById(Integer id) throws Exception;
+	
+	GePGLogs createGepgLogs(GePGLogs logs) throws Exception;
+	
+	GePGLogs updateGepgLogs(GePGLogs logs) throws Exception;
 }

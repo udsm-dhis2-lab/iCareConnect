@@ -7,7 +7,9 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.Utils.JSONExtractor;
 import org.openmrs.module.icare.billing.dao.PaymentDAO;
+import org.openmrs.module.icare.billing.models.GePGLogs;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,8 +17,13 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.openmrs.module.icare.Utils.JSONExtractor.getValueByPath;
 
 @Service
 public class GEPGService {
@@ -27,11 +34,13 @@ public class GEPGService {
     @Autowired
     private BillingService billingService;
 
+
     private final Map<String, Map<String, Object>> callbackResponses = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public Map<String, Object> submitGepgRequest(String jsonPayload, String signature, String uccUrl) {
+    public Map<String, Object> submitGepgRequest(String jsonPayload, String signature, String uccUrl) throws Exception {
         Map<String, Object> responseMap = new ConcurrentHashMap<>();
+        GePGLogs log = new GePGLogs();
         HttpURLConnection con = null;
 
         try {
@@ -44,6 +53,23 @@ public class GEPGService {
             con.setDoInput(true);
             con.setDoOutput(true);
 
+            Map<String, Object> logMap = new HashMap<>();
+
+            logMap.put("signature", signature);
+            logMap.put("payload", jsonPayload);
+
+            String logMapString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(logMap);
+            log.setRequest(logMapString);
+
+            Optional<String> requestIdOptional = getValueByPath(jsonPayload, String.class, "RequestData", "RequestId");
+            requestIdOptional.ifPresent(log::setRequestId);
+
+            Date now = new Date();
+            log.setDateCreated(now);
+            log.setDateUpdated(now);
+
+            billingService.createGepgLogs(log);
+
             // Write JSON payload
             try (OutputStream os = con.getOutputStream();
                     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"))) {
@@ -54,6 +80,10 @@ public class GEPGService {
             // Process the response
             int responseCode = con.getResponseCode();
             responseMap.put("Code", responseCode);
+
+            log.setHttpStatusCode(responseCode);
+            log.setDateUpdated(new Date());
+            billingService.updateGepgLogs(log);
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 StringBuilder content = new StringBuilder();
@@ -66,6 +96,8 @@ public class GEPGService {
 
                 String responseString = content.toString();
                 responseMap.put("response", responseString);
+
+                log.setResponse(responseString);
 
                 // Extract relevant data from the response
                 Map<String, Object> parsedResponse = parseJsonResponse(responseString);
@@ -106,14 +138,26 @@ public class GEPGService {
                 }
             } else {
                 handleErrorResponse(con, responseMap);
+
+                String responseMapjson = objectMapper.writeValueAsString(responseMap);
+                Optional<String> errorOptional = getValueByPath(responseMapjson, String.class, "error");
+                errorOptional.ifPresent(log::setResponse);
             }
         } catch (Exception e) {
             responseMap.put("Code", 500);
             responseMap.put("error", "Unexpected error: " + (e.getMessage() != null ? e.getMessage() : "null"));
+
+            String responseMapjson = objectMapper.writeValueAsString(responseMap);
+            Optional<String> errorOptional = getValueByPath(responseMapjson, String.class, "error");
+            errorOptional.ifPresent(log::setResponse);
         } finally {
             if (con != null) {
                 con.disconnect();
             }
+
+            Date now = new Date();
+            log.setDateUpdated(now);
+            billingService.updateGepgLogs(log);
         }
         return responseMap;
     }
