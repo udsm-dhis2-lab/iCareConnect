@@ -40,7 +40,7 @@ public class GEPGService {
 
     public Map<String, Object> submitGepgRequest(String jsonPayload, String signature, String uccUrl) throws Exception {
         Map<String, Object> responseMap = new ConcurrentHashMap<>();
-        GePGLogs log = new GePGLogs();
+        GePGLogs gepgLog = new GePGLogs();
         HttpURLConnection con = null;
 
         try {
@@ -53,22 +53,23 @@ public class GEPGService {
             con.setDoInput(true);
             con.setDoOutput(true);
 
-            Map<String, Object> logMap = new HashMap<>();
+            Map<String, Object> gepgLogMap = new HashMap<>();
 
-            logMap.put("signature", signature);
-            logMap.put("payload", jsonPayload);
+            gepgLogMap.put("signature", signature);
+            gepgLogMap.put("payload", jsonPayload);
 
-            String logMapString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(logMap);
-            log.setRequest(logMapString);
+            String logMapString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(gepgLogMap);
+            gepgLog.setRequest(logMapString);
 
             Optional<String> requestIdOptional = getValueByPath(jsonPayload, String.class, "RequestData", "RequestId");
-            requestIdOptional.ifPresent(log::setRequestId);
+            requestIdOptional.ifPresent(gepgLog::setRequestId);
 
             Date now = new Date();
-            log.setDateCreated(now);
-            log.setDateUpdated(now);
+            gepgLog.setDateCreated(now);
+            gepgLog.setDateUpdated(now);
+            gepgLog.setStatus("REQUEST");
 
-            billingService.createGepgLogs(log);
+            billingService.createGepgLogs(gepgLog);
 
             // Write JSON payload
             try (OutputStream os = con.getOutputStream();
@@ -81,9 +82,9 @@ public class GEPGService {
             int responseCode = con.getResponseCode();
             responseMap.put("Code", responseCode);
 
-            log.setHttpStatusCode(responseCode);
-            log.setDateUpdated(new Date());
-            billingService.updateGepgLogs(log);
+            gepgLog.setHttpStatusCode(responseCode);
+            gepgLog.setDateUpdated(new Date());
+            billingService.updateGepgLogs(gepgLog);
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 StringBuilder content = new StringBuilder();
@@ -97,7 +98,7 @@ public class GEPGService {
                 String responseString = content.toString();
                 responseMap.put("response", responseString);
 
-                log.setResponse(responseString);
+                gepgLog.setResponse(responseString);
 
                 // Extract relevant data from the response
                 Map<String, Object> parsedResponse = parseJsonResponse(responseString);
@@ -141,7 +142,7 @@ public class GEPGService {
 
                 String responseMapjson = objectMapper.writeValueAsString(responseMap);
                 Optional<String> errorOptional = getValueByPath(responseMapjson, String.class, "error");
-                errorOptional.ifPresent(log::setResponse);
+                errorOptional.ifPresent(gepgLog::setResponse);
             }
         } catch (Exception e) {
             responseMap.put("Code", 500);
@@ -149,15 +150,15 @@ public class GEPGService {
 
             String responseMapjson = objectMapper.writeValueAsString(responseMap);
             Optional<String> errorOptional = getValueByPath(responseMapjson, String.class, "error");
-            errorOptional.ifPresent(log::setResponse);
+            errorOptional.ifPresent(gepgLog::setResponse);
         } finally {
             if (con != null) {
                 con.disconnect();
             }
 
             Date now = new Date();
-            log.setDateUpdated(now);
-            billingService.updateGepgLogs(log);
+            gepgLog.setDateUpdated(now);
+            billingService.updateGepgLogs(gepgLog);
         }
         return responseMap;
     }
