@@ -46,16 +46,10 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.Utils.PaymentStatus;
 import org.openmrs.module.icare.billing.dao.DiscountDAO;
+import org.openmrs.module.icare.billing.dao.GePGLogsDAO;
 import org.openmrs.module.icare.billing.dao.InvoiceDAO;
 import org.openmrs.module.icare.billing.dao.PaymentDAO;
-import org.openmrs.module.icare.billing.models.Discount;
-import org.openmrs.module.icare.billing.models.DiscountInvoiceItem;
-import org.openmrs.module.icare.billing.models.Invoice;
-import org.openmrs.module.icare.billing.models.InvoiceItem;
-import org.openmrs.module.icare.billing.models.ItemPrice;
-import org.openmrs.module.icare.billing.models.Payment;
-import org.openmrs.module.icare.billing.models.PaymentItem;
-import org.openmrs.module.icare.billing.models.Prescription;
+import org.openmrs.module.icare.billing.models.*;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.insurance.AuthorizationStatus;
 import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
@@ -89,6 +83,8 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	
 	DiscountDAO discountDAO;
 	
+	GePGLogsDAO gePGLogsDAO;
+	
 	public void setDao(ICareDao dao) {
 		this.dao = dao;
 	}
@@ -103,6 +99,10 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	
 	public void setDiscountDAO(DiscountDAO discountDAO) {
 		this.discountDAO = discountDAO;
+	}
+	
+	public void setGePGLogsDAO(GePGLogsDAO gePGLogsDAO) {
+		this.gePGLogsDAO = gePGLogsDAO;
 	}
 	
 	@Override
@@ -1538,5 +1538,20 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			throw new Exception("Error signing data due to I/O: " + e.getMessage(), e);
 		}
 		
+	}
+	
+	@Override
+	public GePGLogs getGepgLogsDataById(Integer id) throws Exception {
+		return this.gePGLogsDAO.findById(id);
+	}
+	
+	@Override
+	public GePGLogs createGepgLogs(GePGLogs logs) throws Exception {
+		return this.gePGLogsDAO.save(logs);
+	}
+	
+	@Override
+	public GePGLogs updateGepgLogs(GePGLogs logs) throws Exception {
+		return this.gePGLogsDAO.update(logs);
 	}
 }

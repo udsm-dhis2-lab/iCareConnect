@@ -98,6 +98,11 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
+                <property name="gePGLogsDAO">
+                    <bean class="org.openmrs.module.icare.billing.dao.GePGLogsDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
             </bean>
         </property>
         <property name="preInterceptors">

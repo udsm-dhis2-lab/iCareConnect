@@ -15,6 +15,7 @@ import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.ContextAuthenticationException;
 import org.openmrs.module.icare.ICareConfig;
+import org.openmrs.module.icare.billing.models.GePGLogs;
 import org.openmrs.module.icare.billing.models.InvoiceItem;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.openmrs.module.icare.billing.services.payment.gepg.BillSubmissionRequest;
@@ -36,6 +37,8 @@ public class GepgBillingController {
 	
 	@Autowired
 	private BillingService billingService;
+	
+	private final ObjectMapper objectMapper = new ObjectMapper();
 	
 	@RequestMapping(value = "/generatecontrolno", method = RequestMethod.POST)
     public Map<String, Object> generateControlNumber(
@@ -144,6 +147,8 @@ public class GepgBillingController {
                     (String) gepgPayload.get("signature"), GEPGUccBaseUrl);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println(e);;
         }
 
         return generatedControlNumberObject;
@@ -163,6 +168,8 @@ public class GepgBillingController {
 	@RequestMapping(value = "/callback", method = RequestMethod.POST)
 	public ResponseEntity<?> handleCallback(HttpServletRequest request) {
 		try {
+			
+			GePGLogs gepgLog = new GePGLogs();
 			
 			AdministrationService administrationService = Context.getAdministrationService();
 			// Retrieve GePG user credentials
@@ -194,6 +201,11 @@ public class GepgBillingController {
 				return generateErrorResponse("Status is missing in callback data.", "");
 			}
 			String requestId = (String) status.get("RequestId");
+			gepgLog.setStatus("CALLBACK");
+			gepgLog.setRequestId(requestId);
+			String requestDtoJsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestDto);
+			gepgLog.setResponse(requestDtoJsonString);
+			this.billingService.createGepgLogs(gepgLog);
 			
 			Map<String, Object> systemAuth = (Map<String, Object>) callbackData.get("SystemAuth");
 			if (systemAuth == null || !systemAuth.containsKey("Signature")) {
