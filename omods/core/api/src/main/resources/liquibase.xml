@@ -5140,4 +5140,25 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet id="create_gepg_logs_sql" author="jonas-mwambimbi" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="gepg_logs"/>
+            </not>
+        </preConditions>
+        <comment>Creating GePG logs table using raw SQL</comment>
+        <sql>
+            CREATE TABLE gepg_logs (
+                gepg_logs_id INT AUTO_INCREMENT NOT NULL,
+                request_id CHAR(50) NULL,
+                request TEXT NULL,
+                response TEXT NULL,
+                http_status_code INTEGER NULL,
+                status TEXT NULL,
+                date_created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                date_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                CONSTRAINT gepg_logs_id_pk PRIMARY KEY (gepg_logs_id)
+            );
+        </sql>
+    </changeSet>
 </databaseChangeLog>
