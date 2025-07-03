@@ -230,11 +230,6 @@ export class PatientDashboardComponent implements OnInit {
         );
       }
     });
-
-    // Subscribe to visit$ observable and log the value
-    this.patientBillingDetails$.subscribe((visit) => {
-      console.log("Testermmm....>>>.", visit);
-    });
   }
 
   dischargePatient(

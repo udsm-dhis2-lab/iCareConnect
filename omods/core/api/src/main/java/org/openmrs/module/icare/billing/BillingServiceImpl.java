@@ -819,77 +819,72 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 
 				Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
 				Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
-				GlobalProperty globalProperty = new GlobalProperty();
-				globalProperty.setProperty("gepg.callbackResponseData.icareConnect");
-				globalProperty.setPropertyValue(callbackData.toString());
-				administrationService.saveGlobalProperty(globalProperty);
 				if (feedbackData.containsKey("gepgPmtSpInfo")) {
-					Map<String, Object> gepgPmtSpInfo = (Map<String, Object>) feedbackData.get("gepgPmtSpInfo");
-					Map<String, Object> pymtTrxInf = (Map<String, Object>) gepgPmtSpInfo.get("PymtTrxInf");
+					@SuppressWarnings("unchecked") Map<String, Object> gepgPmtSpInfo = (Map<String, Object>) feedbackData.get("gepgPmtSpInfo");
+					@SuppressWarnings("unchecked") Map<String, Object> pymtTrxInf = (Map<String, Object>) gepgPmtSpInfo.get("PymtTrxInf");
 					String requestId = status.containsKey("RequestId") ? (String) status.get("RequestId") : null;
 					Payment payment = this.paymentDAO.getPaymentByRequestId(Integer.parseInt(requestId));
-					Invoice invoice = invoiceDAO.findById(payment.getInvoice().getId());
-					if (payment != null) {
-						payment.setReferenceNumber((String) pymtTrxInf.get("PayCtrNum"));
-						payment.setBillAmount(Double.parseDouble((String) pymtTrxInf.get("BillAmt")));
-						payment.setPaidAmount(Double.parseDouble((String) pymtTrxInf.get("PaidAmt")));
-						LocalDateTime localDateTime = LocalDateTime.parse((String) pymtTrxInf.get("TrxDtTm"));
-						Date paymentDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-						payment.setReceiptNumber((String) pymtTrxInf.get("PspReceiptNumber"));
-						payment.setPaymentDate(paymentDate);
-						payment.setPayerNumber((String) pymtTrxInf.get("PyrCellNum"));
-						payment.setPayerName((String) pymtTrxInf.get("PyrName"));
-						payment.setPspName((String) pymtTrxInf.get("PspName"));
-						payment.setAccountNumber((String) pymtTrxInf.get("CtrAccNum"));
-						payment.setStatus(PaymentStatus.PAID);
-						for (PaymentItem item : payment.getItems()) {
-							item.setPayment(payment);
-							InvoiceItem invoiceItem = null;
-							for (InvoiceItem iI : invoice.getInvoiceItems()) {
-								if (iI.getItem().getUuid().equals(item.getItem().getUuid())
-										&& iI.getOrder().getUuid().equals(item.getOrder().getUuid())) {
-									invoiceItem = iI;
+					if(payment != null){
+						Invoice invoice = invoiceDAO.findById(payment.getInvoice().getId());
+						if (pymtTrxInf.get("PayCtrNum") != null && !pymtTrxInf.get("PayCtrNum").equals("0")) {
+							payment.setReferenceNumber((String) pymtTrxInf.get("PayCtrNum"));
+							payment.setBillAmount(Double.parseDouble((String) pymtTrxInf.get("BillAmt")));
+							payment.setPaidAmount(Double.parseDouble((String) pymtTrxInf.get("PaidAmt")));
+							LocalDateTime localDateTime = LocalDateTime.parse((String) pymtTrxInf.get("TrxDtTm"));
+							Date paymentDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+							payment.setReceiptNumber((String) pymtTrxInf.get("PspReceiptNumber"));
+							payment.setPaymentDate(paymentDate);
+							payment.setPayerNumber((String) pymtTrxInf.get("PyrCellNum"));
+							payment.setPayerName((String) pymtTrxInf.get("PyrName"));
+							payment.setPspName((String) pymtTrxInf.get("PspName"));
+							payment.setAccountNumber((String) pymtTrxInf.get("CtrAccNum"));
+							payment.setStatus(PaymentStatus.PAID);
+							for (PaymentItem item : payment.getItems()) {
+								item.setPayment(payment);
+								InvoiceItem invoiceItem = null;
+								for (InvoiceItem iI : invoice.getInvoiceItems()) {
+									if (iI.getItem().getUuid().equals(item.getItem().getUuid())
+											&& iI.getOrder().getUuid().equals(item.getOrder().getUuid())) {
+										invoiceItem = iI;
+									}
 								}
+								if (invoiceItem == null) {
+									throw new APIException("Invalid payment item for the invoice.");
+								}
+								item.setItem(invoiceItem.getItem());
+								item.setOrder(invoiceItem.getOrder());
+								item.setStatus(PaymentStatus.PAID);
 							}
-							if (invoiceItem == null) {
-								throw new APIException("Invalid payment item for the invoice.");
-							}
-							item.setItem(invoiceItem.getItem());
-							item.setOrder(invoiceItem.getOrder());
-							item.setStatus(PaymentStatus.PAID);
-						}
-						payment.setReceivedBy(Context.getAuthenticatedUser().getName());
-						payment.setStatus(PaymentStatus.PAID);
-						// Save the updated payment
-						paymentDAO.updatePayment(payment);
-						// paymentDAO.save(payment);
-						ackData.put("SystemAckCode", "0");
-						ackData.put("Description", "Payment Successfully Updated");
-						ackData.put("RequestId", requestId);
+							payment.setReceivedBy(Context.getAuthenticatedUser().getName());
+							payment.setStatus(PaymentStatus.PAID);
+							// Save the updated payment
+							paymentDAO.updatePayment(payment);
+							// paymentDAO.save(payment);
+							ackData.put("SystemAckCode", "0");
+							ackData.put("Description", "Payment Successfully Updated");
+							ackData.put("RequestId", requestId);
 
-						// Sign the ackData
-						String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
-						String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
-						systemAuth.put("Signature", signature);
-						systemAuth.put("SystemCode", systemCode);
-						response.put("SystemAuth", systemAuth);
-						response.put("AckData", ackData);
+							// Sign the ackData
+							String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
+							String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
+							systemAuth.put("Signature", signature);
 
-					} else {
-						ackData.put("SystemAckCode", "0");
-						ackData.put("Description", "Fail, No Data with this RequestId");
-						ackData.put("RequestId", requestId);
-						// Sign the ackData
-						String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
-						String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
-						systemAuth.put("Signature", signature);
-						systemAuth.put("SystemCode", systemCode);
-						response.put("SystemAuth", systemAuth);
-						response.put("AckData", ackData);
-					}
+                        } else {
+							ackData.put("SystemAckCode", "0");
+							ackData.put("Description", "Fail, No Data with this RequestId");
+							ackData.put("RequestId", requestId);
+							// Sign the ackData
+							String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
+							String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
+							systemAuth.put("Signature", signature);
+                        }
+                        systemAuth.put("SystemCode", systemCode);
+                        response.put("SystemAuth", systemAuth);
+                        response.put("AckData", ackData);
+                    }
 				} else if (feedbackData.containsKey("gepgBillSubResp")) {
-					Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
-					Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
+					@SuppressWarnings("unchecked") Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
+					@SuppressWarnings("unchecked") Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
 
 					String billIdString = (String) billTrxInf.get("BillId");
 
@@ -897,7 +892,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 					String requestId = status.containsKey("RequestId") ? (String) status.get("RequestId") : null;
 
 					systemAuth.put("SystemCode", systemCode);
-					if (billIdString == null || payCntrNum == null || requestId == null) {
+					if (billIdString == null || payCntrNum == null || payCntrNum.equals("0") || requestId == null) {
 						return buildErrorResponse(response, systemAuth, ackData, requestId,
 								"Invalid data in callbackData: missing BillId, PayCntrNum, or RequestId");
 					}
@@ -1040,6 +1035,11 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			}
 		}
 		return controlNumber;
+	}
+	
+	@Override
+	public Integer setPaymentReferenceNumberByPaymentId(Integer paymentId, String referenceNumber) throws Exception {
+		return this.paymentDAO.setReferenceNumberByPaymentId(paymentId, referenceNumber);
 	}
 	
 	// create payload for GePG Control Number Generation
@@ -1327,6 +1327,22 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			e.printStackTrace();
 			throw new RuntimeException("Failed to delete payment with UUID: " + paymentUuid, e);
 		}
+	}
+	
+	@Override
+	public Payment getPaymentById(Integer id) throws Exception {
+		return this.paymentDAO.getPaymentByRequestId(id);
+	}
+	
+	@Override
+	public Payment getPaymentByPaymentUuid(String Uuid) throws Exception {
+		return this.paymentDAO.getPaymentByUuid(Uuid);
+	}
+	
+	@Override
+	public List<GePGLogs> getGepgLogsByRequestId(String requestId, String patientName, String status,
+	        Boolean startWithLastLogs) throws Exception {
+		return this.gePGLogsDAO.getGepgLogsByRequestId(requestId, patientName, status, startWithLastLogs);
 	}
 	
 	// Validate the inputs
