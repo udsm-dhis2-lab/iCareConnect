@@ -168,7 +168,7 @@ public class GepgBillingController {
 	@RequestMapping(value = "/callback", method = RequestMethod.POST)
 	public ResponseEntity<?> handleCallback(HttpServletRequest request) {
 		try {
-            GePGLogs gepgLog = new GePGLogs();
+			GePGLogs gepgLog = new GePGLogs();
 			AdministrationService administrationService = Context.getAdministrationService();
 			// Retrieve GePG user credentials
 			String gepgUsername = administrationService.getGlobalProperty(ICareConfig.GEPG_USERNAME);
@@ -228,7 +228,7 @@ public class GepgBillingController {
 				
 			}
 			catch (ContextAuthenticationException e) {
-                System.out.println("GEPG ERROR: " + e);
+				System.out.println("GEPG ERROR: " + e);
 				return generateErrorResponse("Authentication failed please contact an Admin", requestId);
 			}
 			finally {
@@ -237,7 +237,7 @@ public class GepgBillingController {
 			
 		}
 		catch (IOException e) {
-            System.out.println("GEPG ERROR: " + e);
+			System.out.println("GEPG ERROR: " + e);
 			return generateErrorResponse("Error reading request body for this request", "");
 		}
 		catch (Exception ex) {

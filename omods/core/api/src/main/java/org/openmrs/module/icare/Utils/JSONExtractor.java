@@ -28,8 +28,6 @@ public class JSONExtractor {
 		try {
 			JsonNode currentNode = mapper.readTree(jsonString);
 			for (String key : keys) {
-				// The path() method is safe and never returns null.
-				// If a key doesn't exist, it returns a MissingNode.
 				currentNode = currentNode.path(key);
 				if (currentNode.isMissingNode()) {
 					return Optional.empty();
@@ -59,11 +57,9 @@ public class JSONExtractor {
 	public static <T> Optional<T> getValueByPath(String jsonString, Class<T> valueType, String... keys) {
         return getNodeByPath(jsonString, keys).flatMap(node -> {
             try {
-                // treeToValue can convert a JsonNode to any compatible Java type.
                 T value = mapper.treeToValue(node, valueType);
                 return Optional.ofNullable(value);
             } catch (JsonProcessingException e) {
-                // This can happen if you try to convert an object to a String, for example.
                 System.err.printf("Failed to convert node at path '%s' to type %s%n",
                         String.join(".", keys), valueType.getSimpleName());
                 return Optional.empty();

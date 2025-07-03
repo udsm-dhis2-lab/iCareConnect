@@ -87,6 +87,8 @@ public interface BillingService extends OpenmrsService {
 	
 	String fetchControlNumber(Integer requestId) throws Exception;
 	
+	Integer setPaymentReferenceNumberByPaymentId(Integer paymentId, String referenceNumber) throws Exception;
+	
 	List<Payment> getAllPaymentsWithStatus() throws Exception;
 	
 	Map<String, Object> createGePGPayload(Patient patient, List<InvoiceItem> invoiceItems, Number totalBillAmount,
@@ -96,6 +98,13 @@ public interface BillingService extends OpenmrsService {
 	        String pkcs12Password, String enginepublicKey, String billId, String payment) throws Exception;
 	
 	void removeFailedGepgPaymentRequests(String paymentUuid) throws Exception;
+	
+	Payment getPaymentById(Integer id) throws Exception;
+	
+	Payment getPaymentByPaymentUuid(String Uuid) throws Exception;
+	
+	List<GePGLogs> getGepgLogsByRequestId(String requestId, String patientName, String status, Boolean startWithLastLogs)
+	        throws Exception;
 	
 	String signatureData(String rowData) throws Exception;
 	
