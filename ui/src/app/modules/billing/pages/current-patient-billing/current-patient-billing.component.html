@@ -171,7 +171,7 @@
                         <button class="mr-3 btn btn-outline-danger" role="button" (click)="reversePaymentRequest(element?.uuid)" matTooltip="Reverse tbis payment back to bills">
                           Reverse
                         </button>
-                        <button class="btn btn-outline-info" *ngIf="element.status === 'REQUESTED'" (click)="requestControlNumber($event, element)" matTooltip="Request control number again!">
+                        <button class="btn btn-outline-info" *ngIf="element.status === 'REQUESTED' && !element.referenceNumber" (click)="requestControlNumber($event, element)" matTooltip="Request control number again!">
                           Request
                         </button>
                         

@@ -333,21 +333,26 @@ export class CurrentPatientBillingComponent implements OnInit {
             ...item,
             currency: "TZS"
         }))
-    this.onConntrollNumbGen(JSON.stringify(requestPayloads), payment?.uuid); 
+    this.onControllNumbGen(JSON.stringify(requestPayloads), payment?.uuid); 
   }
 
 
-  onConntrollNumbGen(payload: any, payment?: String) {
+  onControllNumbGen(payload: any, payment?: String) {
     this.requestingControlNumber = true;
     this.billingService.gepgpayBill(payload, payment).subscribe(
       (response: any) => {
         this.requestingControlNumber = false;
-        if (response && response.ackCode === "CONS9005") {
-          console.log("Authentication Failed")
+        if (response && response?.ackCode === "CONS9005") {
           this.savingPaymentError = 'Authentication Failed! Kindly, try again or contact your IT Administrator';
-        }else {
-          this.savingPaymentError = 'Server Error Please Contact an Admin !';
-          console.log("Unexpected response:", response);
+        } else if (response?.paymentDetails?.status === 'success'){
+            this.snackBar.open(response?.paymentDetails?.message, "OK", {
+              horizontalPosition: "right",
+              verticalPosition: "top",
+              duration: 3500,
+              panelClass: ["snack-color"],
+            });
+          } else {
+            this.savingPaymentError = 'Server Error Please Contact an Admin !';
         }
 
         if(this.savingPaymentError){
