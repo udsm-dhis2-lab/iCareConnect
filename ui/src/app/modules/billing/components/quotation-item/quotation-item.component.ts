@@ -15,6 +15,7 @@ import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
 import { forEach } from "cypress/types/lodash";
 import { event } from "cypress/types/jquery";
 import { BillingService } from "../../services/billing.service";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: "app-quotation-item",
@@ -39,15 +40,20 @@ export class QuotationItemComponent implements OnInit {
   displayedColumns: string[];
   selectedPaymentType: any;
 
+  errors: any[] = [];
+
   @Output() confirmPayment = new EventEmitter<PaymentInput>();
   @Output() paymentSuccess = new EventEmitter<any>();
+  @Output() reloadPatientDetails = new EventEmitter<any>();
+  
   gepgConceptUuid$: Observable<any>;
 
   constructor(
     private dialog: MatDialog,
     private billableItemsService: BillableItemsService,
     private billingService: BillingService,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
+    private snackBar: MatSnackBar
   ) {}
 
   get canDisableItemSelection(): boolean {
@@ -88,7 +94,6 @@ export class QuotationItemComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log("this.billItems :....",this.billItems);
     this.dataSource = new MatTableDataSource(this.billItems);
 
     this.columns = [
@@ -163,8 +168,8 @@ export class QuotationItemComponent implements OnInit {
     });
 
     dialog.afterClosed().subscribe((paymentResponse) => {
-      this.paymentSuccess.emit();
       if (paymentResponse) {
+        this.paymentSuccess.emit();
         this.dialog.open(PaymentReceiptComponent, {
           width: "500px",
           data: {
@@ -200,7 +205,6 @@ export class QuotationItemComponent implements OnInit {
   onGetInvoice(e: MouseEvent) {}
 
   onChangePaymentType(e) {
-    // console.log(e);
   }
   testCallback(event:any){
     const payload = {
@@ -257,8 +261,8 @@ export class QuotationItemComponent implements OnInit {
     });
     
     dialog.afterClosed().subscribe((paymentResponse) => {
-      this.paymentSuccess.emit();
-      if (paymentResponse) {
+      if (paymentResponse && !paymentResponse?.reloadPatientDetails) {
+        this.paymentSuccess.emit();
         this.dialog.open(PaymentReceiptComponent, {
           width: "500px",
           data: {
@@ -274,6 +278,16 @@ export class QuotationItemComponent implements OnInit {
             facilityDetails: this.facilityDetails,
           },
         });
+      }
+
+      if(paymentResponse?.reloadPatientDetails){
+        this.snackBar.open("The control number request is taking longer than expected, kindly go to payment request to complete this payment!", "OK", {
+          horizontalPosition: "center",
+          verticalPosition: "bottom",
+          duration: 5000,
+          panelClass: ["snack-color"],
+        });
+        this.reloadPatientDetails.emit()
       }
     });
   }
@@ -483,7 +497,6 @@ export class QuotationItemComponent implements OnInit {
 
     //For bills
     if (e.Bill) {
-      // console.log("The bills are:", e.Bill);
       if (e.Bill.length > 0) {
         // let sum = sumBy(
         //   e.Bill.filter((record) => record.billItem.discounted === false),

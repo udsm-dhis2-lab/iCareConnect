@@ -1,11 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { select, Store } from "@ngrx/store";
-import { Observable, of } from "rxjs";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
 import { DispensingFormComponent } from "src/app/shared/dialogs/dispension-form/dispension-form.component";
 import { AppState } from "src/app/store/reducers";
 import {
-  getCurrentLocation,
   getIfThereIsAnyDiagnosisInTheCurrentActiveVisit,
   getParentLocation,
 } from "src/app/store/selectors";
@@ -14,20 +13,15 @@ import { TableActionOption } from "../../models/table-action-options.model";
 import { TableColumn } from "../../models/table-column.model";
 import { TableConfig } from "../../models/table-config.model";
 import { TableSelectAction } from "../../models/table-select-action.model";
-import { DrugOrdersService } from "../../resources/order/services";
-import { OrdersService } from "../../resources/order/services/orders.service";
 import { Visit } from "../../resources/visits/models/visit.model";
 
 import { flatten, keyBy } from "lodash";
-import { loadActiveVisit } from "src/app/store/actions/visit.actions";
-import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { map, tap } from "rxjs/operators";
-import { Api } from "../../resources/openmrs";
-import { arrangeDrugDetails } from "../../helpers/drugs.helper";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
+import { arrangeDrugDetails } from "../../helpers/drugs.helper";
 import { formatDateToString } from "../../helpers/format-date.helper";
 import { ConfigsService } from "../../services/configs.service";
-import { FingerCaptureComponent } from "../finger-capture/finger-capture.component";
 
 @Component({
   selector: "app-patient-generic-drug-order-list",
@@ -54,7 +48,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   isThereDiagnosisProvided$: Observable<boolean>;
   drugOrders$: Observable<any>;
   drugOrders: any[];
-  selectedPatientData:string[];
+  selectedPatientData: string[];
   drugOrdersKeyedByEncounter: any = {};
 
   @Output() orderSelectAction = new EventEmitter<TableSelectAction>();
@@ -223,9 +217,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   //   prescriptionArrangementFields: any
   // ) {
   //   console.log("Patient Data kk:", this.visit?.visit?.patient);
-   
 
-    
   //   const dialog = this.dialog.open(DispensingFormComponent, {
   //     width: "100%",
   //     disableClose: true,
@@ -253,14 +245,37 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
   //     this.loadPatientVisit.emit();
   //   });
 
-  
   // }
   onVerify(
     order: any,
     specificDrugConceptUuid: any,
     prescriptionArrangementFields: any
   ) {
-    console.log("Patient Data kk:", this.visit?.visit?.patient);
+    const dispensingDialog = this.dialog.open(DispensingFormComponent, {
+      width: "100%",
+      disableClose: true,
+      data: {
+        drugOrder: order,
+        patient: this.visit?.visit?.patient,
+        visit: this.visit,
+        location: this.currentLocation,
+        encounterUuid: this.encounterUuid,
+        drugInstructions: arrangeDrugDetails(
+          order,
+          specificDrugConceptUuid,
+          prescriptionArrangementFields
+        )?.description,
+        fromDispensing: true,
+        showAddButton: false,
+        useGenericPrescription: this.useGenericPrescription,
+      },
+    });
+
+    dispensingDialog.afterClosed().subscribe(() => {
+      // This logic runs after the DispensingFormComponent dialog is closed
+      this.loadPatientVisit.emit();
+    });
+    /* console.log("Patient Data kk:", this.visit?.visit?.patient);
   
     const fingerCaptureDialog = this.dialog.open(FingerCaptureComponent, {
       width: "45%",
@@ -294,9 +309,8 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
         // This logic runs after the DispensingFormComponent dialog is closed
         this.loadPatientVisit.emit();
       });
-    });
+    });*/
   }
-  
 
   onPrintPrescriptions(
     event: Event,

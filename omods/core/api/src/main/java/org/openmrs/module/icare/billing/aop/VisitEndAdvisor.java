@@ -1,5 +1,10 @@
 package org.openmrs.module.icare.billing.aop;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
+import javax.naming.ConfigurationException;
+
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -17,15 +22,8 @@ import org.openmrs.attribute.AttributeType;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.VisitInvalidException;
 import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
-import org.openmrs.module.icare.billing.services.insurance.jubilee.JubileeInsuranceImpl;
-import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFServiceImpl;
-import org.openmrs.module.icare.billing.services.insurance.startegies.StrategiesInsuranceImpl;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
-
-import javax.naming.ConfigurationException;
-import java.lang.reflect.Method;
-import java.util.List;
 
 public class VisitEndAdvisor extends StaticMethodMatcherPointcutAdvisor implements Advisor {
 	
@@ -73,9 +71,9 @@ public class VisitEndAdvisor extends StaticMethodMatcherPointcutAdvisor implemen
 				AttributeType attributeType = attribute.getAttributeType();
 				for (VisitAttributeType visitAttributeType : visitAttributeTypes) {
 					if (visitAttributeType.getUuid().equals(attributeType.getUuid())) {
-						if (visitAttributeType.getUuid().equals(insuranceAttributeUuid)) { //CASH OR Insurance
+						if (visitAttributeType.getUuid().equals(insuranceAttributeUuid)) { // CASH OR Insurance
 							insurance = (String) attribute.getValue();
-						} else if (visitAttributeType.getUuid().equals(paymentTypeAttribute)) { //CASH OR Insurance
+						} else if (visitAttributeType.getUuid().equals(paymentTypeAttribute)) { // CASH OR Insurance
 							paymentType = (String) attribute.getValue();
 						}
 					}
@@ -92,18 +90,23 @@ public class VisitEndAdvisor extends StaticMethodMatcherPointcutAdvisor implemen
 						throw new VisitInvalidException("Insurance Concept '" + insurance.toString() + "' does not exist.");
 					}
 					insuranceService = InsuranceService.getInsuranceInstance(insuranceConcept.getName().toString());
-					/*if (insuranceConcept.getName().toString().toLowerCase().equals("nhif")) {
-						insuranceService = new NHIFServiceImpl();
-						
-					} else if (insuranceConcept.getName().toString().toLowerCase().equals("jubilee")) {
-						insuranceService = new JubileeInsuranceImpl();
-						
-					} else if (insuranceConcept.getName().toString().toLowerCase().equals("stratergies")) {
-						insuranceService = new StrategiesInsuranceImpl();
-					} else {
-						
-						throw new VisitInvalidException("Insurance '" + insurance.toString() + "' has not been implemented.");
-					}*/
+					/*
+					 * if (insuranceConcept.getName().toString().toLowerCase().equals("nhif")) {
+					 * insuranceService = new NHIFServiceImpl();
+					 * 
+					 * } else if
+					 * (insuranceConcept.getName().toString().toLowerCase().equals("jubilee")) {
+					 * insuranceService = new JubileeInsuranceImpl();
+					 * 
+					 * } else if
+					 * (insuranceConcept.getName().toString().toLowerCase().equals("stratergies")) {
+					 * insuranceService = new StrategiesInsuranceImpl();
+					 * } else {
+					 * 
+					 * throw new VisitInvalidException("Insurance '" + insurance.toString() +
+					 * "' has not been implemented.");
+					 * }
+					 */
 					
 					paymentTypeConcept = conceptService.getConceptByName(insuranceConcept.getName().toString());
 					if (paymentTypeConcept == null) {

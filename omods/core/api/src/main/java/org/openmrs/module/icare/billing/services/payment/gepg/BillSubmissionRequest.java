@@ -132,6 +132,7 @@ public class BillSubmissionRequest {
 		for (InvoiceItem invoiceItem : invoiceItems) {
 			Drug drug = invoiceItem.getItem().getDrug();
 			Concept concept = invoiceItem.getItem().getConcept();
+			String GFSCode = null;
 
 			if (drug == null && concept == null) {
 				throw new IllegalStateException("Concept can not be null for InvoiceItem" + drug + concept);
@@ -139,14 +140,16 @@ public class BillSubmissionRequest {
 				for (ConceptMap conceptMap : concept.getConceptMappings()) {
 					if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
 							.equals(GFSCodeConceptSourceMappingUuid)) {
-						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
+						GFSCode = conceptMap.getConceptReferenceTerm().getCode();
 						billItems.getBillItem().add(
 								new BillItem(invoiceItem.getItem().getId().toString(), "N",
 										invoiceItem.getPrice().toString(),
 										invoiceItem.getPrice().toString(), "0.0", GFSCode));
-					}else {
-						throw new IllegalStateException("Please verify GFS CODE concept mapping if configured in a correct way");
 					}
+				}
+				if (GFSCode == null) {
+					throw new IllegalStateException("No valid GFS Code mapping found for item with name and id: "
+							+ concept.getDisplayString() + " " + concept.getUuid() + " respectively.");
 				}
 			} else if (drug != null) {
 				Concept drugConcept = drug.getConcept();
@@ -157,14 +160,16 @@ public class BillSubmissionRequest {
 						globalProperty.setProperty("iCare.gepg.DrugConcept.icareConnect");
 						globalProperty.setPropertyValue("if condition meet");
 						administrationService.saveGlobalProperty(globalProperty);
-						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
+						GFSCode = conceptMap.getConceptReferenceTerm().getCode();
 						billItems.getBillItem().add(
 								new BillItem(invoiceItem.getItem().getId().toString(), "N",
 										invoiceItem.getPrice().toString(),
 										invoiceItem.getPrice().toString(), "0.0", GFSCode));
-					} else {
-						throw new IllegalStateException("Please verify GFS CODE concept mapping if configured in a correct way");
 					}
+				}
+				if (GFSCode == null) {
+					throw new IllegalStateException("No valid GFS Code mapping found for drug with name and id: "
+							+ drug.getDisplayName() + " " + drug.getUuid() + " respectively.");
 				}
 			}
 

@@ -155,7 +155,7 @@
         (currentUser?.userPrivileges['ALL'] ||
           currentUser?.userPrivileges[
             'SAMPLE TESTING AND RESULTS_ADD_WORKSHEET'
-          ])
+          ]) && LISConfigurations?.isLIS
       "
     >
       <ng-template matTabContent>

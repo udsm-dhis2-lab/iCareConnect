@@ -1,14 +1,12 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import { Store } from "@ngrx/store";
-import { random } from "lodash";
 import { Observable } from "rxjs";
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import { BillingService } from "../../services/billing.service";
-import { Payment } from "../../models/payment.model";
 
 @Component({
   selector: "app-bill-confirmation",
@@ -27,6 +25,7 @@ export class BillConfirmationComponent implements OnInit {
   gepgConceptField$: Observable<any>;
   isFormValid: boolean;
   formValues: any;
+  reloadPatientDetails = false;
 
   constructor(
     private matDialogRef: MatDialogRef<BillConfirmationComponent>,
@@ -56,15 +55,10 @@ export class BillConfirmationComponent implements OnInit {
     };
     
   const requestPayload = this.data.billItems.map((item: any) => ({
-    uuid: item.bill, 
+    ...item.billItem, 
     currency: "TZS" 
   }));
 
-  console.log("Request Payload:", JSON.stringify(requestPayload, null, 2));
-
-  
-    console.log("Formatted payload:", requestPayload);
-    //Calling Controll number Generation Function 
     this.generatingControlNumber = true;
     if(this.data?.paymentType?.code === 'GePG'){
       this.onConntrollNumbGen(requestPayload);
@@ -84,26 +78,42 @@ export class BillConfirmationComponent implements OnInit {
  
 
   onConntrollNumbGen(payload: any) {
-    this.generatingControlNumber = true;  
+    this.generatingControlNumber = true;
     this.billingService.gepgpayBill(payload).subscribe(
       (response: any) => {
-        if (response && response.controlNumber) {
-          this.controlNumber = response.controlNumber;
+        if (response && response?.controlNumber) {
+          this.controlNumber = response?.controlNumber;
           console.log("Successfully generated control number:", this.controlNumber);
-        } else if (response.error) {
-          this.savingPaymentError = response.error;
-          console.log("Error in response:", response.error);
+
+          if(this.controlNumber === 'Not found within timeout'){
+            this.reloadPatientDetails = true
+            this.onCancel();
+          }
+          return;
+        }
+        
+        if (response?.error) {
+          this.savingPaymentError = response?.error;
+          console.log("Error in response:", response?.error);
         } else {
           this.savingPaymentError = 'Server Error Please Contact an Admin !';
-          console.log("Unexpected response:", response);
         }
         this.generatingControlNumber = false; 
-        // this.matDialogRef.close(response);
+        this.reloadPatientDetails = true
+        this.onCancel();
       },
       (error) => {
-        this.savingPaymentError = error;
+        if (error?.error) {
+          this.savingPaymentError = error?.error;
+          console.log("Error in response:", error?.error);
+        } else {
+          this.savingPaymentError = 'Server Error Please Contact an Admin !';
+        }
+        
         this.generatingControlNumber = false; 
-        console.log("Failed to generate control number:", error);
+        this.reloadPatientDetails = true
+        this.onCancel();
+        this.generatingControlNumber = false;
       }
     );
   }
@@ -134,9 +144,11 @@ export class BillConfirmationComponent implements OnInit {
     }
   }
 
-  onCancel(e): void {
-    e.stopPropagation();
-    this.matDialogRef.close();
+  onCancel(e?: any): void {
+    if(e){
+      e?.stopPropagation();
+    }
+    this.matDialogRef.close(this.reloadPatientDetails ? {reloadPatientDetails: this.reloadPatientDetails} : undefined);
   }
 
   onConfirm(e): void {

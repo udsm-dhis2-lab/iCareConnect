@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Observable, of } from "rxjs";
+import { Observable, of, throwError } from "rxjs";
 import { Api } from "../../../shared/resources/openmrs";
 import { BillObject } from "../models/bill-object.model";
 import { Bill } from "../models/bill.model";
@@ -105,8 +105,9 @@ export class BillingService {
       .pipe(map(() => new Payment(billPayment)));
   }
 
-  gepgpayBill(payload: any): Observable<Payment> {
-    const url = `gepg/generatecontrolno`;
+  gepgpayBill(payload: any, payment?: String): Observable<Payment> {
+
+    const url = `gepg/generatecontrolno ${payment ? `?payment=${payment}` : ''}`;
     return this.httpClient.post(url, payload).pipe(
       map((response: any) => {
         if (response.error) {
@@ -120,9 +121,16 @@ export class BillingService {
       }),
       catchError((error) => {
         console.error("Error in gepgpayBill:", error);
-        return of({ error: error.message || 'An unknown error occurred' } as any);
+        return throwError( error?.message ? error : 'An unknown error occurred');
+        // return of({ error: error.message || 'An unknown error occurred' } as any);
       })
     );
+  }
+
+  reversePaymentRequest(paymentUuid: String): Observable<any> {
+    const url = `gepg/payment ?payment=${paymentUuid}`;
+
+    return this.httpClient.delete(url);
   }
   
 

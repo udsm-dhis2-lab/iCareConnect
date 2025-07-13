@@ -46,6 +46,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -132,8 +135,8 @@ public class NHIFServiceImpl implements InsuranceService {
 		urlString = serverUrl + "/" + authToken.getServer().getEndPoint() + urlString;
 		URL url = new URL(urlString);
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		//con.setReadTimeout(15000);
-		//con.setConnectTimeout(15000);
+		// con.setReadTimeout(15000);
+		// con.setConnectTimeout(15000);
 		con.setRequestMethod("POST");
 		String bearer = String.format("Bearer %1s", authToken.getAccessToken());
 		con.addRequestProperty("Authorization", bearer);
@@ -253,14 +256,14 @@ public class NHIFServiceImpl implements InsuranceService {
 			verificationResponse.setId(verificationRequest.getId());
 			verificationResponse.setAuthorizationNumber(verificationRequest.getAuthorizationNumber());
 			verificationResponse.setRemarks("Verified OK");
-			//TODO Should be provided by the user
+			// TODO Should be provided by the user
 			verificationResponse.setPaymentScheme(conceptService.getConceptByUuid(verificationRequest.getPaymentScheme()));
 			return verificationResponse;
 		}
 	}
 	
 	public Concept getPaymentSchemePackages(Map<String, Object> pricePackage) {
-		//Get Scheme for this product
+		// Get Scheme for this product
 		ConceptService conceptService = Context.getService(ConceptService.class);
 		ConceptSource NHIFConceptSource = conceptService.getConceptSourceByName("NHIF");
 		ConceptReferenceTerm conceptReferenceTerm = conceptService.getConceptReferenceTermByCode(
@@ -318,23 +321,23 @@ public class NHIFServiceImpl implements InsuranceService {
 	public SyncResult syncPriceList() throws Exception {
 		log.info("Started Syncing Process");
 		Map<Integer, ItemType> itemTypeMap = new HashMap<>();
-		itemTypeMap.put(1,new ItemType("Service","N/A"));
-		itemTypeMap.put(2, new ItemType("Bed","N/A"));
-		itemTypeMap.put(3,new ItemType("Drug","N/A"));
-		itemTypeMap.put(4,new ItemType("Procedure","Boolean"));
-		itemTypeMap.put(5,new ItemType("Test","Text"));
-		itemTypeMap.put(6, new ItemType("Prosthesis","Boolean"));
-		itemTypeMap.put(7,new ItemType("Service Device","N/A"));
-		itemTypeMap.put(8,new ItemType("Procedure","Boolean"));
-		itemTypeMap.put(10,new ItemType("Procedure","Boolean"));
-		itemTypeMap.put(11,new ItemType("Procedure","Boolean"));
+		itemTypeMap.put(1, new ItemType("Service", "N/A"));
+		itemTypeMap.put(2, new ItemType("Bed", "N/A"));
+		itemTypeMap.put(3, new ItemType("Drug", "N/A"));
+		itemTypeMap.put(4, new ItemType("Procedure", "Boolean"));
+		itemTypeMap.put(5, new ItemType("Test", "Text"));
+		itemTypeMap.put(6, new ItemType("Prosthesis", "Boolean"));
+		itemTypeMap.put(7, new ItemType("Service Device", "N/A"));
+		itemTypeMap.put(8, new ItemType("Procedure", "Boolean"));
+		itemTypeMap.put(10, new ItemType("Procedure", "Boolean"));
+		itemTypeMap.put(11, new ItemType("Procedure", "Boolean"));
 		SyncResult result = new SyncResult();
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		String facilityCode = adminService.getGlobalProperty(NHIFConfig.FACILITY_CODE);
 		if (facilityCode == null) {
 			result.setStatus("ERROR");
 			result.setMessage("Facility code not configured. Please Configure " + NHIFConfig.FACILITY_CODE
-			        + ".");
+					+ ".");
 			log.error("Facility code not configured. Please Configure " + NHIFConfig.FACILITY_CODE + ".");
 			return result;
 		}
@@ -349,26 +352,29 @@ public class NHIFServiceImpl implements InsuranceService {
 
 		List<Map<String, Object>> excludedServices = (List<Map<String, Object>>) resultMap.get("ExcludedServices");
 
-		/*int NUM_THREADS = 3;
-		ExecutorService exec = Executors.newFixedThreadPool(NUM_THREADS);
-
-		List<PriceListSyncHelper> callables =
-				new ArrayList<> ();
-		for(List<Map<String, Object>> list: chunkArray(pricePackages,NUM_THREADS)){
-			callables.add(new PriceListSyncHelper(Context.getUserContext(), list, excludedServices));
-		}
-		try {
-			List<Future<SyncResult>> callableResults = exec.invokeAll(callables);
-			for (Future<SyncResult> callableResult: callableResults) {
-				System.out.println("Got result of thread #" + callableResult.get());
-			}
-		} catch (InterruptedException ex) {
-			ex.printStackTrace();
-		} catch (ExecutionException ex) {
-			ex.printStackTrace();
-		} finally {
-			exec.shutdownNow();
-		}*/
+		/*
+		 * int NUM_THREADS = 3;
+		 * ExecutorService exec = Executors.newFixedThreadPool(NUM_THREADS);
+		 * 
+		 * List<PriceListSyncHelper> callables =
+		 * new ArrayList<> ();
+		 * for(List<Map<String, Object>> list: chunkArray(pricePackages,NUM_THREADS)){
+		 * callables.add(new PriceListSyncHelper(Context.getUserContext(), list,
+		 * excludedServices));
+		 * }
+		 * try {
+		 * List<Future<SyncResult>> callableResults = exec.invokeAll(callables);
+		 * for (Future<SyncResult> callableResult: callableResults) {
+		 * System.out.println("Got result of thread #" + callableResult.get());
+		 * }
+		 * } catch (InterruptedException ex) {
+		 * ex.printStackTrace();
+		 * } catch (ExecutionException ex) {
+		 * ex.printStackTrace();
+		 * } finally {
+		 * exec.shutdownNow();
+		 * }
+		 */
 
 		Concept nhifConcept = conceptService.getConceptByName("NHIF");
 		if (nhifConcept == null) {
@@ -379,14 +385,15 @@ public class NHIFServiceImpl implements InsuranceService {
 		}
 		log.info("Started Saving Packages");
 		for (Map<String, Object> pricePackage : pricePackages) {
-			if(((String) pricePackage.get("ItemName")).trim().equals("")){
+			if (((String) pricePackage.get("ItemName")).trim().equals("")) {
 				continue;
 			}
-			//Get Item Mapping for this item
-			
-			//Get Scheme for this product
-			
-			Concept concept = getPaymentSchemePackages(pricePackage);//conceptService.getConceptByName("NHIF:" + pricePackage.get("SchemeID"));
+			// Get Item Mapping for this item
+
+			// Get Scheme for this product
+
+			Concept concept = getPaymentSchemePackages(pricePackage);// conceptService.getConceptByName("NHIF:" +
+																		// pricePackage.get("SchemeID"));
 			if (concept == null) {
 				result.setStatus("ERROR");
 				result.setMessage("Some Items have errors.");
@@ -399,13 +406,13 @@ public class NHIFServiceImpl implements InsuranceService {
 				continue;
 			}
 			ICareService iCareService = Context.getService(ICareService.class);
-			//Creeate Item Price if not exists
-			//for(conceptService.getConceptByMapping())
+			// Creeate Item Price if not exists
+			// for(conceptService.getConceptByMapping())
 			Concept itemConcept = conceptService.getConceptByMapping((String) pricePackage.get("ItemCode"), "NHIF");
 			Item item = null;
 			ItemPrice itemPrice = null;
 			if (itemConcept == null) {
-				if(pricePackage.get("ItemTypeID") != null && ((int)pricePackage.get("ItemTypeID")) == 3){
+				if (pricePackage.get("ItemTypeID") != null && ((int) pricePackage.get("ItemTypeID")) == 3) {
 					itemConcept = conceptService.getConceptByName((String) pricePackage.get("ItemName"));
 					Drug drug = getDrugItemConcept(itemConcept, pricePackage);
 					item = iCareService.getItemByDrugUuid(drug.getUuid());
@@ -417,21 +424,22 @@ public class NHIFServiceImpl implements InsuranceService {
 					}
 					itemPrice = iCareService.getItemPriceByDrugId(item.getDrug().getId(), concept.getId(),
 							nhifConcept.getId());
-				}else if(pricePackage.get("ItemTypeID") != null){
+				} else if (pricePackage.get("ItemTypeID") != null) {
 					itemConcept = conceptService.getConceptByName((String) pricePackage.get("ItemName"));
 
-
-					if(itemConcept == null){
+					if (itemConcept == null) {
 						itemConcept = new Concept();
 						itemConcept.setSet(false);
-						ConceptClass conceptClass = conceptService.getConceptClassByName(itemTypeMap.get(pricePackage.get("ItemTypeID")).getName());
-						if(conceptClass == null){
+						ConceptClass conceptClass = conceptService
+								.getConceptClassByName(itemTypeMap.get(pricePackage.get("ItemTypeID")).getName());
+						if (conceptClass == null) {
 							conceptClass = new ConceptClass();
 							conceptClass.setName(itemTypeMap.get(pricePackage.get("ItemTypeID")).getName());
 							conceptService.saveConceptClass(conceptClass);
 						}
 						itemConcept.setConceptClass(conceptClass);
-						itemConcept.setDatatype(conceptService.getConceptDatatypeByName(itemTypeMap.get(pricePackage.get("ItemTypeID")).getDataType()));
+						itemConcept.setDatatype(conceptService.getConceptDatatypeByName(
+								itemTypeMap.get(pricePackage.get("ItemTypeID")).getDataType()));
 
 						ConceptName conceptName = new ConceptName();
 						conceptName.setName((String) pricePackage.get("ItemName"));
@@ -457,7 +465,6 @@ public class NHIFServiceImpl implements InsuranceService {
 						conceptService.saveConcept(itemConcept);
 					}
 
-
 					item = iCareService.getItemByConceptUuid(itemConcept.getUuid());
 					if (item == null) {
 						item = new Item();
@@ -478,7 +485,7 @@ public class NHIFServiceImpl implements InsuranceService {
 					continue;
 				}
 
-			} else{
+			} else {
 				item = iCareService.getItemByConceptUuid(itemConcept.getUuid());
 				if (item == null) {
 					item = new Item();
@@ -488,15 +495,16 @@ public class NHIFServiceImpl implements InsuranceService {
 				itemPrice = iCareService.getItemPriceByConceptId(item.getConcept().getId(), concept.getId(),
 						nhifConcept.getId());
 			}
-			//Item item = null;
+			// Item item = null;
 
-			//ItemPrice itemPrice = new ItemPrice();
+			// ItemPrice itemPrice = new ItemPrice();
 			if (itemPrice == null) {
 				itemPrice = new ItemPrice();
 				itemPrice.setPaymentScheme(concept);
 				itemPrice.setPaymentType(nhifConcept);
 				itemPrice.setItem(item);
-				if ((pricePackage.get("IsRestricted") != null && (Boolean) pricePackage.get("IsRestricted")) || isServiceExcluded(excludedServices, pricePackage)) {
+				if ((pricePackage.get("IsRestricted") != null && (Boolean) pricePackage.get("IsRestricted"))
+						|| isServiceExcluded(excludedServices, pricePackage)) {
 					itemPrice.setPrice(0.0);
 					itemPrice.setPayable((Double) pricePackage.get("UnitPrice"));
 				} else {
@@ -509,25 +517,26 @@ public class NHIFServiceImpl implements InsuranceService {
 			insuranceItem.setName((String) pricePackage.get("ItemName"));
 			insuranceItem.setMessage("Successfully created.");
 			result.getCreated().add(insuranceItem);
-			log.info("Successfully created for " + pricePackage.get("ItemName") + "(" + pricePackage.get("ItemCode") + ")");
+			log.info("Successfully created for " + pricePackage.get("ItemName") + "(" + pricePackage.get("ItemCode")
+					+ ")");
 		}
 		log.info("Finished syncing price packages.");
 		log.info("NumberCreated:" + result.getCreated().size());
 		log.info("NumberUpdated:" + result.getUpdated().size());
 		log.info("NumberIgnored:" + result.getIgnored().size());
 		log.info("NumberDeleted:" + result.getDeleted().size());
-		for(InsuranceItem insuranceItem:result.getIgnored()){
-			log.info("IgnoredSingle:" + insuranceItem.getName() +" - " + insuranceItem.getMessage());
+		for (InsuranceItem insuranceItem : result.getIgnored()) {
+			log.info("IgnoredSingle:" + insuranceItem.getName() + " - " + insuranceItem.getMessage());
 
 		}
 		return result;
 	}
 	
-	private <T> List<List<T>> chunkArray(List<T> list, Integer chunk){
-		//int chunk = 2; // chunk size to divide
+	private <T> List<List<T>> chunkArray(List<T> list, Integer chunk) {
+		// int chunk = 2; // chunk size to divide
 		List<List<T>> chunks = new ArrayList<>();
-		for(int i=0;i<list.size();i+=chunk){
-			T[] listChunk = (T[]) Arrays.copyOfRange(list.toArray(), i, Math.min(list.size(),i+chunk));
+		for (int i = 0; i < list.size(); i += chunk) {
+			T[] listChunk = (T[]) Arrays.copyOfRange(list.toArray(), i, Math.min(list.size(), i + chunk));
 			chunks.add(Arrays.asList(listChunk));
 		}
 		return chunks;
@@ -557,22 +566,26 @@ public class NHIFServiceImpl implements InsuranceService {
 			drug.setName(pricePackage.get("ItemName") + " " + pricePackage.get("Strength"));
 			drug.setStrength((String) pricePackage.get("Strength"));
 			
-			/*ConceptReferenceTerm conceptReferenceTerm = conceptService.getConceptReferenceTermByCode(
-			
-			(String) pricePackage.get("ItemCode"), NHIFConceptSource);
-			if (conceptReferenceTerm == null) {
-				conceptReferenceTerm = new ConceptReferenceTerm();
-				conceptReferenceTerm.setCode((String) pricePackage.get("ItemCode"));
-				conceptReferenceTerm.setConceptSource(NHIFConceptSource);
-				conceptReferenceTerm.setName((String) pricePackage.get("ItemName"));
-				conceptService.saveConceptReferenceTerm(conceptReferenceTerm);
-			}
-			
-			DrugReferenceMap drugReferenceMap = new DrugReferenceMap();
-			drugReferenceMap.setConceptReferenceTerm(conceptReferenceTerm);
-			drugReferenceMap.setDrug(drug);
-			drugReferenceMap.setConceptMapType(conceptService.getDefaultConceptMapType());
-			drug.getDrugReferenceMaps().add(drugReferenceMap);*/
+			/*
+			 * ConceptReferenceTerm conceptReferenceTerm =
+			 * conceptService.getConceptReferenceTermByCode(
+			 * 
+			 * (String) pricePackage.get("ItemCode"), NHIFConceptSource);
+			 * if (conceptReferenceTerm == null) {
+			 * conceptReferenceTerm = new ConceptReferenceTerm();
+			 * conceptReferenceTerm.setCode((String) pricePackage.get("ItemCode"));
+			 * conceptReferenceTerm.setConceptSource(NHIFConceptSource);
+			 * conceptReferenceTerm.setName((String) pricePackage.get("ItemName"));
+			 * conceptService.saveConceptReferenceTerm(conceptReferenceTerm);
+			 * }
+			 * 
+			 * DrugReferenceMap drugReferenceMap = new DrugReferenceMap();
+			 * drugReferenceMap.setConceptReferenceTerm(conceptReferenceTerm);
+			 * drugReferenceMap.setDrug(drug);
+			 * drugReferenceMap.setConceptMapType(conceptService.getDefaultConceptMapType())
+			 * ;
+			 * drug.getDrugReferenceMaps().add(drugReferenceMap);
+			 */
 		}
 		NHIFDrug nhifDrug = new NHIFDrug(drug);
 		if (!nhifDrug.hasItemCode()) {
@@ -580,51 +593,57 @@ public class NHIFServiceImpl implements InsuranceService {
 		}
 		nhifDrug.setDosageForm((String) pricePackage.get("Dosage"));
 		conceptService.saveDrug(nhifDrug.getDrug());
-		/*if (itemConcept == null) {
-			itemConcept = new Concept();
-			itemConcept.setSet(false);
-			itemConcept.setConceptClass(conceptService.getConceptClassByName("Drug"));
-			itemConcept.setDatatype(conceptService.getConceptDatatypeByName("N/A"));
-
-			ConceptName conceptName = new ConceptName();
-			conceptName.setName((String) pricePackage.get("ItemName"));
-			conceptName.setConceptNameType(ConceptNameType.FULLY_SPECIFIED);
-			conceptName.setLocale(Locale.ENGLISH);
-			itemConcept.setPreferredName(conceptName);
-			conceptService.saveConcept(itemConcept);
-		} else {
-			ConceptSource NHIFConceptSource = conceptService.getConceptSourceByName("NHIF");
-			ConceptReferenceTerm conceptReferenceTerm = conceptService.getConceptReferenceTermByCode(
-
-					(String) pricePackage.get("ItemCode"), NHIFConceptSource);
-			if (conceptReferenceTerm == null) {
-				conceptReferenceTerm = new ConceptReferenceTerm();
-				conceptReferenceTerm.setCode((String) pricePackage.get("ItemCode"));
-				conceptReferenceTerm.setConceptSource(NHIFConceptSource);
-				conceptReferenceTerm.setName((String) pricePackage.get("ItemName"));
-				conceptService.saveConceptReferenceTerm(conceptReferenceTerm);
-			}
-
-			ConceptMap conceptMap = new ConceptMap();
-			conceptMap.setConceptReferenceTerm(conceptReferenceTerm);
-			itemConcept.addConceptMapping(conceptMap);
-			conceptService.saveConcept(itemConcept);
-		}
-
-		List<Drug> drugs = conceptService.getDrugsByConcept(itemConcept);
-		Drug drug = null;
-		for (Drug d : drugs) {
-			if (d.getName().equals(pricePackage.get("ItemName") + " " + pricePackage.get("Strength"))) {
-				drug = d;
-			}
-		}
-		if (drug == null) {
-			drug = new Drug();
-			drug.setConcept(itemConcept);
-			drug.setName(pricePackage.get("ItemName") + " " + pricePackage.get("Strength"));
-			drug.setStrength((String) pricePackage.get("Strength"));
-			conceptService.saveDrug(drug);
-		}*/
+		/*
+		 * if (itemConcept == null) {
+		 * itemConcept = new Concept();
+		 * itemConcept.setSet(false);
+		 * itemConcept.setConceptClass(conceptService.getConceptClassByName("Drug"));
+		 * itemConcept.setDatatype(conceptService.getConceptDatatypeByName("N/A"));
+		 * 
+		 * ConceptName conceptName = new ConceptName();
+		 * conceptName.setName((String) pricePackage.get("ItemName"));
+		 * conceptName.setConceptNameType(ConceptNameType.FULLY_SPECIFIED);
+		 * conceptName.setLocale(Locale.ENGLISH);
+		 * itemConcept.setPreferredName(conceptName);
+		 * conceptService.saveConcept(itemConcept);
+		 * } else {
+		 * ConceptSource NHIFConceptSource =
+		 * conceptService.getConceptSourceByName("NHIF");
+		 * ConceptReferenceTerm conceptReferenceTerm =
+		 * conceptService.getConceptReferenceTermByCode(
+		 * 
+		 * (String) pricePackage.get("ItemCode"), NHIFConceptSource);
+		 * if (conceptReferenceTerm == null) {
+		 * conceptReferenceTerm = new ConceptReferenceTerm();
+		 * conceptReferenceTerm.setCode((String) pricePackage.get("ItemCode"));
+		 * conceptReferenceTerm.setConceptSource(NHIFConceptSource);
+		 * conceptReferenceTerm.setName((String) pricePackage.get("ItemName"));
+		 * conceptService.saveConceptReferenceTerm(conceptReferenceTerm);
+		 * }
+		 * 
+		 * ConceptMap conceptMap = new ConceptMap();
+		 * conceptMap.setConceptReferenceTerm(conceptReferenceTerm);
+		 * itemConcept.addConceptMapping(conceptMap);
+		 * conceptService.saveConcept(itemConcept);
+		 * }
+		 * 
+		 * List<Drug> drugs = conceptService.getDrugsByConcept(itemConcept);
+		 * Drug drug = null;
+		 * for (Drug d : drugs) {
+		 * if (d.getName().equals(pricePackage.get("ItemName") + " " +
+		 * pricePackage.get("Strength"))) {
+		 * drug = d;
+		 * }
+		 * }
+		 * if (drug == null) {
+		 * drug = new Drug();
+		 * drug.setConcept(itemConcept);
+		 * drug.setName(pricePackage.get("ItemName") + " " +
+		 * pricePackage.get("Strength"));
+		 * drug.setStrength((String) pricePackage.get("Strength"));
+		 * conceptService.saveDrug(drug);
+		 * }
+		 */
 		return drug;
 	}
 	
@@ -688,14 +707,71 @@ public class NHIFServiceImpl implements InsuranceService {
 		return false;
 	}
 	
+	// @Override
+	// public ClaimResult claim(Visit visit) throws Exception {
+	// ClaimResult result = new ClaimResult();
+	// AdministrationService adminService =
+	// Context.getService(AdministrationService.class);
+	// String facilityCode =
+	// adminService.getGlobalProperty(NHIFConfig.FACILITY_CODE);
+	// if (facilityCode == null) {
+	// result.setStatus("ERROR");
+	// result.setMessage("Facility code not configured. Please Configure " +
+	// NHIFConfig.FACILITY_CODE + ".");
+	// return result;
+	// }
+	
+	// String allowOnlineVerification =
+	// adminService.getGlobalProperty(NHIFConfig.ALLOW_ONLINE_CLAIM);
+	// if (allowOnlineVerification == null ||
+	// allowOnlineVerification.trim().equals("")) {
+	// throw new VerificationException("Allowing Online Claim is not set. Please set
+	// " + NHIFConfig.ALLOW_ONLINE_CLAIM
+	// + ".");
+	// }
+	// if (allowOnlineVerification.equals("true")) {
+	// Folio folio = getFolioFromVisit(visit);
+	// FolioEntities folioEntities = new FolioEntities();
+	// folioEntities.getEntities().add(folio);
+	// ObjectMapper oMapper = new ObjectMapper();
+	// final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	// //final DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+	// oMapper.setDateFormat(df);
+	// //oMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+	// AuthToken authToken = getAuthToken(NHIFServer.CLAIM);
+	// System.out.println("Potfolio data payload:" + folioEntities);
+	// String results = "";
+	// // String results = this.postRequest(urlString,
+	// oMapper.convertValue(folioEntities, Map.class), authToken);
+	// ObjectMapper mapper = new ObjectMapper();
+	// //TODO add status to invoice on whether is claimed
+	// VisitWrapper visitWrapper = new VisitWrapper(visit);
+	// visitWrapper.setInsuranceClaimStatus(ClaimStatus.CLAIMED);
+	// } else {
+	// visit.setStopDatetime(new Date());
+	// Context.getVisitService().saveVisit(visit);
+	// }
+	// /*VisitService visitService = Context.getVisitService();
+	// VisitAttribute serviceVisitAttribute = new VisitAttribute();
+	// serviceVisitAttribute.setAttributeType(visitService.getVisitAttributeTypeByUuid(adminService
+	// .getGlobalProperty(ICareConfig.INSURANCE_CLAIM_STATUS)));
+	// serviceVisitAttribute.setValue("CLAIMED");
+	// serviceVisitAttribute.setValueReferenceInternal(visit.getUuid());
+	// serviceVisitAttribute.setVisit(visit);
+	// visit.addAttribute(serviceVisitAttribute);*/
+	// //visitService..saveVisit(visit);
+	// return result;
+	// }
+	
 	@Override
 	public ClaimResult claim(Visit visit) throws Exception {
 		ClaimResult result = new ClaimResult();
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		String facilityCode = adminService.getGlobalProperty(NHIFConfig.FACILITY_CODE);
+		
 		if (facilityCode == null) {
 			result.setStatus("ERROR");
-			result.setMessage("Facility code not configured. Please Configure " + NHIFConfig.FACILITY_CODE + ".");
+			result.setMessage("Facility code is not configured. Please Configure " + NHIFConfig.FACILITY_CODE + ".");
 			return result;
 		}
 		
@@ -704,36 +780,20 @@ public class NHIFServiceImpl implements InsuranceService {
 			throw new VerificationException("Allowing Online Claim is not set. Please set " + NHIFConfig.ALLOW_ONLINE_CLAIM
 			        + ".");
 		}
+		
 		if (allowOnlineVerification.equals("true")) {
-			String urlString = "/api/v1/Claims/SubmitFolios";
+			// Get the folio and set it in the result
 			Folio folio = getFolioFromVisit(visit);
-			FolioEntities folioEntities = new FolioEntities();
-			folioEntities.getEntities().add(folio);
-			ObjectMapper oMapper = new ObjectMapper();
-			final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-			//final DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-			oMapper.setDateFormat(df);
-			//oMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-			AuthToken authToken = getAuthToken(NHIFServer.CLAIM);
-			String results = this.postRequest(urlString, oMapper.convertValue(folioEntities, Map.class), authToken);
-			ObjectMapper mapper = new ObjectMapper();
-			Map<String, Object> resultMap = mapper.readValue(String.valueOf(results), Map.class);
-			//TODO add status to invoice on whether is claimed
-			VisitWrapper visitWrapper = new VisitWrapper(visit);
-			visitWrapper.setInsuranceClaimStatus(ClaimStatus.CLAIMED);
+			result.setFolio(folio);
+			result.setStatus("SUCCESS");
+			result.setMessage("Claim processed successfully.");
 		} else {
 			visit.setStopDatetime(new Date());
 			Context.getVisitService().saveVisit(visit);
+			result.setStatus("ERROR");
+			result.setMessage("Claim submission is not allowed.");
 		}
-		/*VisitService visitService = Context.getVisitService();
-		VisitAttribute serviceVisitAttribute = new VisitAttribute();
-		serviceVisitAttribute.setAttributeType(visitService.getVisitAttributeTypeByUuid(adminService
-		        .getGlobalProperty(ICareConfig.INSURANCE_CLAIM_STATUS)));
-		serviceVisitAttribute.setValue("CLAIMED");
-		serviceVisitAttribute.setValueReferenceInternal(visit.getUuid());
-		serviceVisitAttribute.setVisit(visit);
-		visit.addAttribute(serviceVisitAttribute);*/
-		//visitService..saveVisit(visit);
+		
 		return result;
 	}
 	
@@ -745,119 +805,165 @@ public class NHIFServiceImpl implements InsuranceService {
 			throw new Exception("Facility code is not configured. Please check " + NHIFConfig.FACILITY_CODE + ".");
 		}
 		
-		Folio folio = new Folio();
-		//TODO set the actual phone number
-		folio.setTelephoneNo(visitWrapper.getPatient().getPhoneNumber());
-		folio.setPatientFileNo(visitWrapper.getPatient().getFileNumber());
-		ProviderWrapper providerWrapper = visitWrapper.getConsultationProvider();
-		if (providerWrapper != null) {
-			folio.setPractitionerNo(providerWrapper.getPhoneNumber());
-		}
-		folio.setFacilityCode(facilityCode);
-		folio.setFolioID(visit.getUuid());
-		/*if (visit.getStopDatetime() == null) {
-			throw new Exception("To Claim the visit has to be closed");
-		}*/
+		Folio folioDetails = new Folio();
+		
+		// Basic patient and facility details
+		folioDetails.setTelephoneNo(visitWrapper.getPatient().getPhoneNumber());
+		folioDetails.setPatientFileNo(visitWrapper.getPatient().getFileNumber());
+		folioDetails.setFacilityCode(facilityCode);
+		
+		// Set claim year, month, folioDetails number, and attendance date based on
+		// visit start datetime
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(visit.getStartDatetime());
-		folio.setClaimYear(calendar.get(Calendar.YEAR));
-		folio.setClaimMonth(calendar.get(Calendar.MONTH) + 1);
+		folioDetails.setClaimYear(calendar.get(Calendar.YEAR));
+		folioDetails.setClaimMonth(calendar.get(Calendar.MONTH) + 1);
+		folioDetails.setFolioNo(visit.getId());
+		folioDetails.setAttendanceDate(formatDate(visit.getStartDatetime()));
 		
-		ICareService iCareService = Context.getService(ICareService.class);
-		//folio.setFolioNo(iCareService.getVisitSerialNumber(visit));
-		folio.setFolioNo(visit.getId());
-		String serialString = "00000";
-		serialString = serialString.substring(String.valueOf(folio.getFolioNo()).length()) + folio.getFolioNo();
-		folio.setAttendanceDate(visit.getStartDatetime());
+		// Set insurance and personal details
+		folioDetails.setAuthorizationNo(visitWrapper.getInsuranceAuthorizationNumber());
+		folioDetails.setCardNo(visitWrapper.getInsuranceID());
+		folioDetails.setFirstName(visit.getPatient().getGivenName());
+		folioDetails.setLastName(visit.getPatient().getFamilyName());
 		
-		folio.setSerialNo(facilityCode + "\\" + (folio.getClaimMonth() < 10 ? "0" : "") + folio.getClaimMonth() + "\\"
-		        + calendar.get(Calendar.YEAR) + "\\" + serialString);
-		folio.setAuthorizationNo(visitWrapper.getInsuranceAuthorizationNumber());
-		folio.setCardNo(visitWrapper.getInsuranceID());
-		folio.setPatientFileNo(visitWrapper.getPatient().getFileNumber());
-		folio.setFirstName(visit.getPatient().getGivenName());
-		folio.setLastName(visit.getPatient().getFamilyName());
-		if (visit.getPatient().getGender().equals("M")) {
-			folio.setGender("Male");
-		} else if (visit.getPatient().getGender().equals("F")) {
-			folio.setGender("Female");
+		// Set gender based on patient information
+		String gender = visit.getPatient().getGender();
+		if ("M".equalsIgnoreCase(gender)) {
+			folioDetails.setGender("Male");
+		} else if ("F".equalsIgnoreCase(gender)) {
+			folioDetails.setGender("Female");
+		} else {
+			folioDetails.setGender(gender);
 		}
-		folio.setDateOfBirth(visit.getPatient().getBirthdate());
-		folio.setAge(visit.getPatient().getAge());
+		// Date of Birth
+		Date birthdate = visit.getPatient().getBirthdate();
+		if (birthdate != null) {
+			folioDetails.setDateOfBirth(formatDate(birthdate));
+		}
 		
-		folio.setPatientTypeCode("OUT");
+		// Default patient type is outpatient ("OUT")
+		folioDetails.setPatientTypeCode("OUT");
 		
-		folio.setCreatedBy(visit.getCreator().getDisplayString());
-		folio.setDateCreated(visit.getDateCreated());
+		// Audit fields
+		folioDetails.setCreatedBy(visit.getCreator().getDisplayString());
+		Date datecreated = visit.getDateCreated();
+		// Date Created
+		Date dateCreated = visit.getDateCreated();
+		if (dateCreated != null) {
+			folioDetails.setDateCreated(formatDate(dateCreated));
+		}
 		if (visit.getChangedBy() != null) {
-			folio.setLastModifiedBy(visit.getChangedBy().getDisplayString());
+			folioDetails.setLastModifiedBy(visit.getChangedBy().getDisplayString());
 		} else {
-			folio.setLastModifiedBy(visit.getCreator().getDisplayString());
-		}
-		if (visit.getDateChanged() != null) {
-			folio.setLastModified(visit.getDateChanged());
-		} else {
-			folio.setLastModified(visit.getDateCreated());
+			folioDetails.setLastModifiedBy(visit.getCreator().getDisplayString());
 		}
 		
-		String bedOrderType = adminService.getGlobalProperty(ICareConfig.BED_ORDER_TYPE);
-		String patientFile = new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
-		        .getResource("nhif/patientFile.html").toURI())));
-		String observations = "";
-		SimpleDateFormat dt = new SimpleDateFormat("dd-MM-yyyy HH:MM");
+		// Last Modified Date
+		Date dateChanged = visit.getDateChanged();
+		if (dateChanged != null) {
+			folioDetails.setLastModified(formatDate(dateChanged));
+		} else {
+			folioDetails.setLastModified(formatDate(dateChanged));
+		}
+		
+		// Process encounters to add diseases, items, and capture observations
+		StringBuilder observationsBuilder = new StringBuilder();
+		SimpleDateFormat dt = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 		for (Encounter encounter : visit.getEncounters()) {
+			// Build an HTML table row for each observation
 			for (Obs obs : encounter.getObs()) {
-				observations += "<tr><td>" + dt.format(obs.getObsDatetime()) + "</td><td>" + dt.format(obs.getObsDatetime())
-				        + "</td><td>" + obs.getConcept().getName().getName() + "</td><td>"
-				        + obs.getValueAsString(Locale.ENGLISH) + "</td></tr>";
-				
+				observationsBuilder.append("<tr><td>").append(dt.format(obs.getObsDatetime())).append("</td><td>")
+				        .append(dt.format(obs.getObsDatetime())).append("</td><td>")
+				        .append(obs.getConcept().getName().getName()).append("</td><td>")
+				        .append(obs.getValueAsString(Locale.ENGLISH)).append("</td></tr>");
 			}
 			
+			// Add diagnoses to folio diseases
 			if (encounter.getDiagnoses() != null) {
 				for (Diagnosis diagnosis : encounter.getDiagnoses()) {
-					FolioDisease folioDisease = FolioDisease.fromDiagnosis(folio, diagnosis);
-					folio.getFolioDiseases().add(folioDisease);
+					FolioDisease folioDisease = FolioDisease.fromDiagnosis(folioDetails, diagnosis);
+					folioDetails.getFolioDiseases().add(folioDisease);
 				}
 			}
+			
+			// Process orders to add folio items and check for bed orders (which indicate an
+			// inpatient)
 			for (Order order : encounter.getOrders()) {
 				FolioItem folioItem = FolioItem.fromOrder(order);
 				if (folioItem != null) {
-					folio.getFolioItems().add(folioItem);
+					folioDetails.getFolioItems().add(folioItem);
+					String bedOrderType = adminService.getGlobalProperty(ICareConfig.BED_ORDER_TYPE);
 					if (order.getOrderType().getUuid().equals(bedOrderType)) {
-						folio.setPatientTypeCode("IN");
-						folio.setDateAdmitted(order.getEffectiveStartDate());
+						folioDetails.setPatientTypeCode("IN");
+						// Date Admitted
+						Date dateAdmitted = order.getEffectiveStartDate();
+						if (dateAdmitted != null) {
+							folioDetails.setDateAdmitted(formatDate(dateAdmitted));
+						}
 						if (visit.getStopDatetime() == null) {
-							folio.setDateDischarged(new Date());
+							folioDetails.setDateDischarged(formatDate(new Date()));
 						} else {
-							folio.setDateDischarged(visit.getStopDatetime());
+							Date dateDischarged = visit.getStopDatetime();
+							if (dateDischarged != null) {
+								folioDetails.setDateDischarged(formatDate(dateDischarged));
+							}
 						}
 					}
 				}
 			}
 		}
-		if (observations.equals("")) {
+		String observations = observationsBuilder.toString();
+		if (observations.isEmpty()) {
 			observations = "<tr><td colspan='5' align='center'>There are no observations</td></tr>";
 		}
+		
+		// Generate clinical notes using a patient file template
+		String patientFileTemplate = new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
+		        .getResource("nhif/patientFile.html").toURI())));
 		PatientWrapper patientWrapper = new PatientWrapper(visit.getPatient());
-		patientFile = patientFile.replace("{Observation}", observations);
-		patientFile = patientFile.replace("{Name}", patientWrapper.getPatient().getPersonName().getFullName());
-		patientFile = patientFile.replace("{Gender}", patientWrapper.getPatient().getGender());
-		patientFile = patientFile.replace("{Years}", patientWrapper.getPatient().getAge().toString());
-		
+		patientFileTemplate = patientFileTemplate.replace("{Observation}", observations)
+		        .replace("{Name}", patientWrapper.getPatient().getPersonName().getFullName())
+		        .replace("{Gender}", patientWrapper.getPatient().getGender())
+		        .replace("{Years}", patientWrapper.getPatient().getAge().toString());
 		if (visit.getPatient().getBirthDateTime() != null) {
-			patientFile = patientFile.replace("{BirthDate}", visit.getPatient().getBirthDateTime().toString());
+			patientFileTemplate = patientFileTemplate.replace("{BirthDate}", visit.getPatient().getBirthDateTime()
+			        .toString());
 		} else {
-			patientFile = patientFile.replace("{BirthDate}", "");
+			patientFileTemplate = patientFileTemplate.replace("{BirthDate}", "");
 		}
-		patientFile = patientFile.replace("{PhoneNumber}", patientWrapper.getPhoneNumber());
-		patientFile = patientFile.replace("{Email}", patientWrapper.getEmail());
-		patientFile = patientFile.replace("{Identifier}", patientWrapper.getFileNumber());
-		String content = getForm2B_A(visit, folio);
-		folio.setClaimFile(convertToPDFEncodedString("claim", content));
+		patientFileTemplate = patientFileTemplate.replace("{PhoneNumber}", patientWrapper.getPhoneNumber())
+		        .replace("{Email}", patientWrapper.getEmail()).replace("{Identifier}", patientWrapper.getFileNumber());
 		
-		folio.setPatientFile(convertToPDFEncodedString("file", patientFile));
+		// In the updated Folio, we use the ClinicalNotes field to hold the patient file
+		// content.
+		folioDetails.setClinicalNotes(visit.getVoidReason());
 		
-		return folio;
+		// Set BillNo
+		folioDetails.setBillNo("");
+		
+		folioDetails.setVisitTypeID(0);
+		folioDetails.setLateSubmissionReason("");
+		folioDetails.setAmountClaimed(0);
+		folioDetails.setConfirmationCode("");
+		
+		// Consultation provider as an attending practitioner if available
+		ProviderWrapper providerWrapper = visitWrapper.getConsultationProvider();
+		// ProviderWrapper consultationProvider =
+		// visitWrapper.getConsultationProvider();
+		if (providerWrapper != null) {
+			folioDetails.getAttendingPractitioners().add(providerWrapper.getProvider().getIdentifier().toString());
+		}
+		
+		return folioDetails;
+	}
+	
+	private static String formatDate(Date date) {
+		if (date == null) {
+			return null; // Handle null dates properly
+		}
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
+		return formatter.format(Instant.ofEpochMilli(date.getTime()));
 	}
 	
 	public void getReferral(Visit visit) throws Exception {
@@ -978,13 +1084,14 @@ public class NHIFServiceImpl implements InsuranceService {
 		}
 		grandtotal += consultationsubtotal + medicinesubtotal + testssubtotal + proceduresubtotal + radiologysubtotal;
 		
-		//consultation += "<tr><td colspan='4'>GRAND TOTAL</td><td class='blue' align='right' style='font-weight:bold'>" + grandtotal + "</td></tr>";
+		// consultation += "<tr><td colspan='4'>GRAND TOTAL</td><td class='blue'
+		// align='right' style='font-weight:bold'>" + grandtotal + "</td></tr>";
 		String content = new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
 		        .getResource("nhif/form2B-A.html").toURI())));
 		content = content.replace("{ConsultationFees}", consultationFees);
 		content = content.replace("{GrandTotal}", String.valueOf(grandtotal));
 		content = content.replace("{AuthNo}", folio.getAuthorizationNo());
-		content = content.replace("{SerialNumber}", folio.getSerialNo());
+		// content = content.replace("{SerialNumber}", folio.getSerialNo());
 		content = content.replace("{Consultation}", consultation);
 		content = content.replace("{Tests}", tests);
 		content = content.replace("{Medicine}", medicine);
@@ -992,7 +1099,7 @@ public class NHIFServiceImpl implements InsuranceService {
 		content = content.replace("{Radiology}", radiology);
 		content = content.replace("{FacilityName}", adminService.getGlobalProperty(ICareConfig.FACILITY_NAME));
 		content = content.replace("{Address}", "");
-		//TODO Add consulation fee {ConsultationFees}
+		// TODO Add consulation fee {ConsultationFees}
 		
 		content = content.replace("{DateOfAttendance}", dt.format(visit.getStartDatetime()));
 		content = content.replace("{Department}", visit.getVisitType().getName());
@@ -1019,7 +1126,7 @@ public class NHIFServiceImpl implements InsuranceService {
 		
 		content = content.replace("{PatientSignature}", visitWrapper.getSignature());
 		
-		//Signature
+		// Signature
 		String claimantName = adminService.getGlobalProperty(NHIFConfig.CLAIMANT_NAME);
 		if (claimantName != null) {
 			content = content.replace("{ClaimantName}", claimantName);
@@ -1027,7 +1134,7 @@ public class NHIFServiceImpl implements InsuranceService {
 			content = content.replace("{ClaimantName}", "[Not Set]");
 		}
 		
-		//Claimant Name
+		// Claimant Name
 		String claimantSignature = adminService.getGlobalProperty(NHIFConfig.CLAIMANT_SIGNATURE);
 		if (claimantSignature != null) {
 			content = content.replace("{ClaimantSignature}", claimantSignature);
@@ -1074,7 +1181,7 @@ public class NHIFServiceImpl implements InsuranceService {
 		
 		File output = new File(tempPDFFile);
 		ITextRenderer renderer = new ITextRenderer();
-		//renderer.setDocument(input);
+		// renderer.setDocument(input);
 		renderer.setDocumentFromString(template);
 		
 		renderer.layout();
@@ -1083,12 +1190,16 @@ public class NHIFServiceImpl implements InsuranceService {
 		renderer.createPDF(outputStream);
 		outputStream.close();
 		/*
-		Document document = new Document(new Rectangle(Utilities.millimetersToPoints(470),
-		        Utilities.millimetersToPoints(288)), 0, 0, 0, 0);
-		PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(tempFile));
-		document.open();
-		XMLWorkerHelper.getInstance().parseXHtml(writer, document, new ByteArrayInputStream(template.getBytes()));
-		document.close();*/
+		 * Document document = new Document(new
+		 * Rectangle(Utilities.millimetersToPoints(470),
+		 * Utilities.millimetersToPoints(288)), 0, 0, 0, 0);
+		 * PdfWriter writer = PdfWriter.getInstance(document, new
+		 * FileOutputStream(tempFile));
+		 * document.open();
+		 * XMLWorkerHelper.getInstance().parseXHtml(writer, document, new
+		 * ByteArrayInputStream(template.getBytes()));
+		 * document.close();
+		 */
 		byte[] inFileBytes = Files.readAllBytes(Paths.get(tempPDFFile));
 		return new String(org.apache.commons.codec.binary.Base64.encodeBase64(inFileBytes));
 	}

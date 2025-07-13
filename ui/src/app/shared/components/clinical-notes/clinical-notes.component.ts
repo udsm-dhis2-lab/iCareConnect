@@ -123,8 +123,7 @@ export class ClinicalNotesComponent implements OnInit {
       // TODO: Add support to use configured time for the 2 hrs constant
       console.log("clearingFormTime .....",this.clearingFormTime);
       
-      this.useFilledObsData = duration.asHours() > this.clearingFormTime ? false : true;
-      console.log("useFilledObsData .....",this.useFilledObsData);
+      this.useFilledObsData = duration.asHours() >= this.clearingFormTime ? false : true;
     }
 
     this.dependedFormHasData = this.evaluateFormDependency(

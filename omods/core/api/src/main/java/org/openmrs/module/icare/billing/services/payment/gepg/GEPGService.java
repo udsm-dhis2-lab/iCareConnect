@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openmrs.GlobalProperty;
 import org.openmrs.api.AdministrationService;
-import org.openmrs.GlobalProperty;
-import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.icare.billing.dao.GePGLogsDAO;
 import org.openmrs.module.icare.billing.dao.PaymentDAO;
+import org.openmrs.module.icare.billing.models.GePGLogs;
+import org.openmrs.module.icare.billing.models.Payment;
 import org.openmrs.module.icare.billing.services.BillingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,26 +16,88 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static java.lang.Integer.parseInt;
+import static org.openmrs.module.icare.Utils.JSONExtractor.getValueByPath;
 
 @Service
 public class GEPGService {
 
     @Autowired
-    private PaymentDAO paymentDAO;
-
-    @Autowired
     private BillingService billingService;
+
 
     private final Map<String, Map<String, Object>> callbackResponses = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public Map<String, Object> submitGepgRequest(String jsonPayload, String signature, String uccUrl) {
+    public Map<String, Object> submitGepgRequest(String jsonPayload, String signature, String uccUrl) throws Exception {
         Map<String, Object> responseMap = new ConcurrentHashMap<>();
+        GePGLogs gepgLog = new GePGLogs();
         HttpURLConnection con = null;
 
         try {
+            // Check if the existing payment request has a control number or is waiting for control number.
+            Optional<String> requestIdOptional = getValueByPath(jsonPayload, String.class, "RequestData", "RequestId");
+            AtomicReference<String> requestIdRef = new AtomicReference<>();
+
+            requestIdOptional.ifPresent(requestIdRef::set);
+
+            if(requestIdRef.get() != null){
+
+                Payment existingPayment =  billingService.getPaymentById(Integer.parseInt(requestIdRef.get()));
+                if(existingPayment.getReferenceNumber() != null && !existingPayment.getReferenceNumber().equals("0")){
+                    responseMap.put("status", "success");
+                    responseMap.put("controlNumber", existingPayment.getReferenceNumber());
+                    responseMap.put("message", "Request processed successfully.");
+                    return responseMap;
+
+                }
+
+                try {
+                    List<GePGLogs> logs = this.billingService.getGepgLogsByRequestId(requestIdRef.get(), null, null, true);
+                } catch(Exception e) {
+                    System.out.println("Error occured: " + e);
+                }
+
+                List<GePGLogs> logs = this.billingService.getGepgLogsByRequestId(requestIdRef.get(), null, null, true);
+
+                if(!logs.isEmpty()){
+                    for(GePGLogs log: logs){
+                        Optional<String> systemAcknowledgementCodeOptional = Optional.empty();
+
+                        AtomicReference<String> codeOrControlNumberRef = new AtomicReference<>();
+
+                        if(log.getStatus().equals("REQUEST")){
+                            systemAcknowledgementCodeOptional = getValueByPath(log.getResponse(), String.class, "AckData", "SystemAckCode");
+
+                        }
+
+                        if(log.getStatus().equals("CALLBACK")){
+                            systemAcknowledgementCodeOptional = getValueByPath(log.getResponse(), String.class, "FeedbackData", "gepgBillSubResp", "BillTrxInf", "PayCntrNum");
+                        }
+                        systemAcknowledgementCodeOptional.ifPresent(codeOrControlNumberRef::set);
+
+                        if(codeOrControlNumberRef.get().equals("R3001")){
+                            responseMap.put("status", "success");
+                            responseMap.put("message", "Request processed successfully. Waiting for control number to be sent!");
+                            return responseMap;
+                        }
+
+                        if(codeOrControlNumberRef.get() != null && !codeOrControlNumberRef.get().equals("0")){
+                            responseMap.put("status", "success");
+                            responseMap.put("controlNumber", codeOrControlNumberRef.get());
+                            responseMap.put("message", "Request processed successfully.");
+
+                            this.billingService.setPaymentReferenceNumberByPaymentId(existingPayment.getId(), codeOrControlNumberRef.get());
+                            return responseMap;
+                        }
+                    }
+                }
+            }
+
             URL url = new URL(uccUrl);
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
@@ -43,6 +106,23 @@ public class GEPGService {
             con.addRequestProperty("Signature", signature);
             con.setDoInput(true);
             con.setDoOutput(true);
+
+            Map<String, Object> gepgLogMap = new HashMap<>();
+
+            gepgLogMap.put("signature", signature);
+            gepgLogMap.put("payload", jsonPayload);
+
+            String logMapString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(gepgLogMap);
+            gepgLog.setRequest(logMapString);
+
+            requestIdOptional.ifPresent(gepgLog::setRequestId);
+
+            Date now = new Date();
+            gepgLog.setDateCreated(now);
+            gepgLog.setDateUpdated(now);
+            gepgLog.setStatus("REQUEST");
+
+            billingService.createGepgLogs(gepgLog);
 
             // Write JSON payload
             try (OutputStream os = con.getOutputStream();
@@ -55,6 +135,10 @@ public class GEPGService {
             int responseCode = con.getResponseCode();
             responseMap.put("Code", responseCode);
 
+            gepgLog.setHttpStatusCode(responseCode);
+            gepgLog.setDateUpdated(new Date());
+            billingService.updateGepgLogs(gepgLog);
+
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 StringBuilder content = new StringBuilder();
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
@@ -66,6 +150,8 @@ public class GEPGService {
 
                 String responseString = content.toString();
                 responseMap.put("response", responseString);
+
+                gepgLog.setResponse(responseString);
 
                 // Extract relevant data from the response
                 Map<String, Object> parsedResponse = parseJsonResponse(responseString);
@@ -82,14 +168,9 @@ public class GEPGService {
                 // Handle different ackCodes
                 if ("R3001".equals(ackCode)) {
                     Integer requestpaymentId = null;
-                    requestpaymentId = Integer.parseInt(requestId);
+                    requestpaymentId = parseInt(requestId);
                     String controlNumber = billingService.fetchControlNumber(requestpaymentId);
-                    // Save the payload in a global property
-                    AdministrationService administrationService = Context.getAdministrationService();
-                    GlobalProperty globalProperty = new GlobalProperty();
-                    globalProperty.setProperty("gepg.controlNumberGen.icareConnect");
-                    globalProperty.setPropertyValue(controlNumber);
-                    administrationService.saveGlobalProperty(globalProperty);
+
                     responseMap.put("status", "success");
                     responseMap.put("controlNumber",
                             controlNumber != null ? controlNumber : "Not found within timeout");
@@ -106,10 +187,23 @@ public class GEPGService {
                 }
             } else {
                 handleErrorResponse(con, responseMap);
+
+                String responseMapjson = objectMapper.writeValueAsString(responseMap);
+                Optional<String> errorOptional = getValueByPath(responseMapjson, String.class, "error");
+                errorOptional.ifPresent(gepgLog::setResponse);
+                gepgLog.setDateUpdated(new Date());
+                billingService.updateGepgLogs(gepgLog);
             }
         } catch (Exception e) {
             responseMap.put("Code", 500);
             responseMap.put("error", "Unexpected error: " + (e.getMessage() != null ? e.getMessage() : "null"));
+
+            String responseMapjson = objectMapper.writeValueAsString(responseMap);
+            Optional<String> errorOptional = getValueByPath(responseMapjson, String.class, "error");
+            errorOptional.ifPresent(gepgLog::setResponse);
+            Date now = new Date();
+            gepgLog.setDateUpdated(now);
+            billingService.updateGepgLogs(gepgLog);
         } finally {
             if (con != null) {
                 con.disconnect();
@@ -142,7 +236,7 @@ public class GEPGService {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e);
         }
         return resultMap;
     }

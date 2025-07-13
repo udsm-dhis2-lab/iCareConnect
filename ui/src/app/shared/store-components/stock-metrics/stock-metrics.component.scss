@@ -1,6 +1,9 @@
 .expired-card {
     background-color: rgb(236, 74, 74);
     color: aliceblue;
+    border-left: 0.25rem solid #2a8fd1 !important;
+    border-radius: 20px;
+    height: 150px;
   }
   .textstyle{
     color: aliceblue;
@@ -8,4 +11,13 @@
   .outstock-card {
     background-color: rgb(236, 160, 74);
     color: aliceblue;
+    border-radius: 20px;
+    border-left: 0.25rem solid #2a8fd1 !important;
+    height: 150px;
+  }
+  .custom-card {
+    border-radius: 20px;
+    border-left: 0.25rem solid #2a8fd1 !important;
+    border-radius: 20px;
+    height: 150px;
   }

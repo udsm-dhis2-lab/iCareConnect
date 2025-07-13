@@ -1,10 +1,10 @@
 package org.openmrs.module.icare.billing.services.insurance.nhif;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AuthToken {
 	

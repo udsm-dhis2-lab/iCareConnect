@@ -60,4 +60,8 @@ public class ProviderWrapper {
 	public String getPhoneNumber() throws ConfigurationException {
 		return this.getAttribute(ICareConfig.PROVIDER_PHONENUMBER_ATTRIBUTE);
 	}
+	
+	public String getPractionerNumber() throws ConfigurationException {
+		return this.getAttribute(ICareConfig.PRACTIONER_NUMBER);
+	}
 }

@@ -303,6 +303,13 @@
 		<description>
 		</description>
 	</globalProperty>
+    <globalProperty>
+		<property>icare.attribute.provider.number</property>
+		<defaultValue></defaultValue>
+		<description>
+		</description>
+	</globalProperty>
+	
 	<globalProperty>
 		<property>iCare.interoperability.settings.exchangeLocationsTag</property>
 		<defaultValue>HDU API Exchange</defaultValue>

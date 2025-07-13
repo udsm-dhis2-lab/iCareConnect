@@ -10,15 +10,14 @@ import { TextArea } from "src/app/shared/modules/form/models/text-area.model";
 import { DateField } from "src/app/shared/modules/form/models/date-field.model";
 import { GenerateMetadataLabelsService } from "src/app/core/services";
 import { MatCheckboxChange } from "@angular/material/checkbox";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import htmlToPdfmake from "html-to-pdfmake";
 import { AdditionalFieldsModalComponent } from "src/app/modules/laboratory/modals/additional-fields-modal/additional-fields-modal.component";
 import { MatDialog } from "@angular/material/dialog";
 import { ExportDataService } from "src/app/core/services/export-data.service";
+
+pdfMake.vfs = pdfFonts?.pdfMake?.vfs;
 
 @Component({
   selector: "app-worksheet-definition",

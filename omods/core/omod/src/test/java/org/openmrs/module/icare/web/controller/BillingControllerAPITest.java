@@ -70,41 +70,41 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 	
 	@Test
 	public void testAShouldNotHavePendingInvoices() throws Exception {
-		//executeDataSet("billing-data.xml");
-		//Given
+		// executeDataSet("billing-data.xml");
+		// Given
 		PatientService patientService = Context.getService(PatientService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
 		
-		//When
+		// When
 		MockHttpServletRequest newGetRequest = newGetRequest("billing/invoice", new Parameter("patient", patient.getUuid()));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		
-		//Then
+		// Then
 		Invoice[] invoices = (new ObjectMapper()).readValue(handle.getContentAsString(), Invoice[].class);
-		//SimpleObject[] objectCreated = deserialize(handle);
+		// SimpleObject[] objectCreated = deserialize(handle);
 		assertThat("List empty invoices", invoices.length == 0);
 	}
 	
 	@Test
 	public void testAShouldNoPayments() throws Exception {
-		//executeDataSet("billing-data.xml");
-		//Given
+		// executeDataSet("billing-data.xml");
+		// Given
 		PatientService patientService = Context.getService(PatientService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
 		
-		//When
+		// When
 		MockHttpServletRequest newGetRequest = newGetRequest("billing/payment", new Parameter("patient", patient.getUuid()));
 		MockHttpServletResponse handle = handle(newGetRequest);
 		
-		//Then
+		// Then
 		Invoice[] invoices = (new ObjectMapper()).readValue(handle.getContentAsString(), Invoice[].class);
-		//SimpleObject[] objectCreated = deserialize(handle);
+		// SimpleObject[] objectCreated = deserialize(handle);
 		assertThat("List empty payments", invoices.length == 0);
 	}
 	
 	@Test
 	public void testBFetchingPendingInvoices() throws Exception {
-		//Given
+		// Given
 		PatientService patientService = Context.getService(PatientService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
 		Visit visit = createVisit(patient);
@@ -169,7 +169,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	@Ignore("To be done with NHIF Servers")
 	public void testBFetchingPendingInvoicesNHIF() throws Exception {
-		//Given
+		// Given
 		PatientService patientService = Context.getService(PatientService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
 		createVisitInsurance(patient);
@@ -199,7 +199,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testCMakingDiscounts() throws Exception {
 		
-		//Given
+		// Given
 		PatientService patientService = Context.getService(PatientService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
 		
@@ -212,12 +212,12 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		String dto = this.readFile("dto/discount-create.json");
 		Map<String, Object> discount = (new ObjectMapper()).readValue(dto, Map.class);
 		
-		//When
+		// When
 		((Map) ((Map) ((List) discount.get("items")).get(0)).get("invoice")).put("uuid", invoice.getUuid());
 		MockHttpServletRequest newGetRequest = newPostRequest("billing/discount", discount);
 		MockHttpServletResponse handle = handle(newGetRequest);
 		
-		//Then
+		// Then
 		Map<String, Object> newDiscount = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("Should contain discount", newDiscount != null);
 		assertThat("Should contain Remarks", discount.get("remarks"), is(newDiscount.get("remarks")));
@@ -230,7 +230,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Should have item with amount", (Double.valueOf(amount)),
 		    is(((Map) ((List) newDiscount.get("items")).get(0)).get("amount")));
 		
-		//Test fetching discounts on the invoice
+		// Test fetching discounts on the invoice
 		newGetRequest = newGetRequest("billing/invoice", new Parameter("patient", patient.getUuid()));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		List invoiceMaps = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
@@ -241,7 +241,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testDMakingDiscountsDoubleAmount() throws Exception {
 		
-		//Given
+		// Given
 		PatientService patientService = Context.getService(PatientService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
 		createVisit(patient);
@@ -251,12 +251,12 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		String dto = this.readFile("dto/discount-create-double.json");
 		Map<String, Object> discount = (new ObjectMapper()).readValue(dto, Map.class);
 		
-		//When
+		// When
 		((Map) ((Map) ((List) discount.get("items")).get(0)).get("invoice")).put("uuid", invoice.getUuid());
 		MockHttpServletRequest newGetRequest = newPostRequest("billing/discount", discount);
 		MockHttpServletResponse handle = handle(newGetRequest);
 		
-		//Then
+		// Then
 		Map<String, Object> newDiscount = (new ObjectMapper()).readValue(handle.getContentAsString(), Map.class);
 		assertThat("Should contain discount", newDiscount != null);
 		assertThat("Should contain Remarks", discount.get("remarks"), is(newDiscount.get("remarks")));
@@ -269,7 +269,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		assertThat("Should have item with amount", (Double.valueOf(amount)),
 		    is(((Map) ((List) newDiscount.get("items")).get(0)).get("amount")));
 		
-		//Test fetching discounts on the invoice
+		// Test fetching discounts on the invoice
 		newGetRequest = newGetRequest("billing/invoice", new Parameter("patient", patient.getUuid()));
 		MockHttpServletResponse handle2 = handle(newGetRequest);
 		List invoiceMaps = (new ObjectMapper()).readValue(handle2.getContentAsString(), List.class);
@@ -278,10 +278,10 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 	}
 	
 	@Test
-	//@Ignore
+	// @Ignore
 	public void testDViewingPayments() throws Exception {
 		
-		//Given
+		// Given
 		PatientService patientService = Context.getService(PatientService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
 		
@@ -296,7 +296,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testEMakingPartialPayments() throws Exception {
 		
-		//Given
+		// Given
 		PatientService patientService = Context.getService(PatientService.class);
 		ICareService iCareService = Context.getService(ICareService.class);
 		
@@ -316,16 +316,17 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		InvoiceItem invoiceItem = invoice.getInvoiceItems().get(0);
 		paymentItem.add("order", (new SimpleObject()).add("uuid", invoiceItem.getOrder().getUuid()));
 		paymentItem.add("item", (new SimpleObject()).add("uuid", invoiceItem.getItem().getUuid()));
-		//paymentItem.add("invoice", (new SimpleObject()).add("uuid", invoice.getUuid()));
+		// paymentItem.add("invoice", (new SimpleObject()).add("uuid",
+		// invoice.getUuid()));
 		paymentItem.add("amount", 2000);
 		discountItems.add(paymentItem);
 		payment.add("items", discountItems);
 		
-		//When
+		// When
 		MockHttpServletRequest newPostRequest = newPostRequest("billing/payment", payment);
 		MockHttpServletResponse handler = handle(newPostRequest);
 		
-		//Then
+		// Then
 		MockHttpServletRequest newGetRequest = newGetRequest("billing/payment", new Parameter("patient", patient.getUuid()));
 		handler = handle(newGetRequest);
 		List newPayments = (new ObjectMapper()).readValue(handler.getContentAsString(), List.class);
@@ -346,7 +347,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testEMakingFullPayments() throws Exception {
 		
-		//Given
+		// Given
 		PatientService patientService = Context.getService(PatientService.class);
 		ICareService iCareService = Context.getService(ICareService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
@@ -366,16 +367,17 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 			SimpleObject paymentItem = new SimpleObject();
 			paymentItem.add("order", (new SimpleObject()).add("uuid", invoiceItem.getOrder().getUuid()));
 			paymentItem.add("item", (new SimpleObject()).add("uuid", invoiceItem.getItem().getUuid()));
-			//paymentItem.add("invoice", (new SimpleObject()).add("uuid", invoice.getUuid()));
+			// paymentItem.add("invoice", (new SimpleObject()).add("uuid",
+			// invoice.getUuid()));
 			paymentItem.add("amount", invoiceItem.getPrice() * invoiceItem.getQuantity());
 			discountItems.add(paymentItem);
 		}
 		payment.add("items", discountItems);
 		
-		//When
+		// When
 		MockHttpServletRequest newPostRequest = newPostRequest("billing/payment", payment);
 		MockHttpServletResponse handler = handle(newPostRequest);
-		//Then
+		// Then
 		MockHttpServletRequest newGetRequest = newGetRequest("billing/payment", new Parameter("patient", patient.getUuid()));
 		handler = handle(newGetRequest);
 		List newPayments = (new ObjectMapper()).readValue(handler.getContentAsString(), List.class);
@@ -385,8 +387,8 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		    is(Optional.ofNullable(payment.get("referenceNumber"))));
 		
 		List<Map> itemPayments = (List<Map>) newPayment.get("items");
-		//TODO find out how to run a reliable test with the below line
-		//assertThat("List should contain payment", itemPayments.size(), is(2));
+		// TODO find out how to run a reliable test with the below line
+		// assertThat("List should contain payment", itemPayments.size(), is(2));
 		
 		newGetRequest = newGetRequest("billing/invoice", new Parameter("patient", patient.getUuid()));
 		handler = handle(newGetRequest);
@@ -397,7 +399,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 	@Test
 	public void testExceptions() throws Exception {
 		
-		//Given
+		// Given
 		PatientService patientService = Context.getService(PatientService.class);
 		ICareService iCareService = Context.getService(ICareService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
@@ -416,37 +418,47 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		SimpleObject paymentItem = new SimpleObject();
 		InvoiceItem invoiceItem = invoice.getInvoiceItems().get(0);
 		paymentItem.add("item", (new SimpleObject()).add("uuid", invoiceItem.getItem().getUuid()));
-		//paymentItem.add("invoice", (new SimpleObject()).add("uuid", invoice.getUuid()));
+		// paymentItem.add("invoice", (new SimpleObject()).add("uuid",
+		// invoice.getUuid()));
 		paymentItem.add("amount", 2000);
 		discountItems.add(paymentItem);
 		payment.add("items", discountItems);
 		
-		//When
-		/*MockHttpServletRequest newPostRequest = newPostRequest("billing/payment", payment);
-		MockHttpServletResponse handler = handle(newPostRequest);
-		
-		//Then
-		MockHttpServletRequest newGetRequest = newGetRequest("billing/payment", new Parameter("patient", patient.getUuid()));
-		handler = handle(newGetRequest);
-		List newPayments = (new ObjectMapper()).readValue(handler.getContentAsString(), List.class);
-		
-		Map newPayment = (Map) newPayments.get(0);
-		assertThat("List should contain payment", newPayment.get("referenceNumber"), is(payment.get("referenceNumber")));
-		
-		List<Map> itemPayments = (List<Map>) newPayment.get("items");
-		assertThat("List should contain payment", itemPayments.get(0).get("amount"), CoreMatchers.<Object> is(2000.0));
-		
-		newGetRequest = newGetRequest("billing/invoice", new Parameter("patient", patient.getUuid()));
-		handler = handle(newGetRequest);
-		List invoicePayment = (new ObjectMapper()).readValue(handler.getContentAsString(), List.class);
-		assertThat("Should still contain a invoice", invoicePayment.size(), is(1));*/
+		// When
+		/*
+		 * MockHttpServletRequest newPostRequest = newPostRequest("billing/payment",
+		 * payment);
+		 * MockHttpServletResponse handler = handle(newPostRequest);
+		 * 
+		 * //Then
+		 * MockHttpServletRequest newGetRequest = newGetRequest("billing/payment", new
+		 * Parameter("patient", patient.getUuid()));
+		 * handler = handle(newGetRequest);
+		 * List newPayments = (new
+		 * ObjectMapper()).readValue(handler.getContentAsString(), List.class);
+		 * 
+		 * Map newPayment = (Map) newPayments.get(0);
+		 * assertThat("List should contain payment", newPayment.get("referenceNumber"),
+		 * is(payment.get("referenceNumber")));
+		 * 
+		 * List<Map> itemPayments = (List<Map>) newPayment.get("items");
+		 * assertThat("List should contain payment", itemPayments.get(0).get("amount"),
+		 * CoreMatchers.<Object> is(2000.0));
+		 * 
+		 * newGetRequest = newGetRequest("billing/invoice", new Parameter("patient",
+		 * patient.getUuid()));
+		 * handler = handle(newGetRequest);
+		 * List invoicePayment = (new
+		 * ObjectMapper()).readValue(handler.getContentAsString(), List.class);
+		 * assertThat("Should still contain a invoice", invoicePayment.size(), is(1));
+		 */
 	}
 	
 	@Test
 	@Ignore("Need to finish the test to accomodate the new discount creation")
 	public void testAutomaticFullDiscountCreation() throws Exception {
 		
-		//Discount Creation
+		// Discount Creation
 		PatientService patientService = Context.getService(PatientService.class);
 		Patient patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
 		createVisit(patient);
@@ -459,15 +471,15 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		Map<String, Object> discount = (new ObjectMapper()).readValue(dto, Map.class);
 		discount.put("exempted", true);
 		
-		//When
+		// When
 		((Map) ((Map) ((List) discount.get("items")).get(0)).get("invoice")).put("uuid", invoice.getUuid());
 		MockHttpServletRequest newGetRequest = newPostRequest("billing/discount", discount);
 		MockHttpServletResponse handle = handle(newGetRequest);
 		
 		System.out.println(invoice.getInvoiceItems().size());
 		
-		///Create a new bill
-		//Given
+		/// Create a new bill
+		// Given
 		OrderType orderType = new OrderType();
 		orderType.setJavaClassName("org.openmrs.module.icare.billing.models.Prescription");
 		orderType.setName("Prescription");
@@ -475,7 +487,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		
 		Map<String, Object> result = getResourceDTOMap("core/ledger-add");
 		MockHttpServletRequest newPostRequest = null;
-		//		MockHttpServletResponse
+		// MockHttpServletResponse
 		handle = null;
 		newPostRequest = newPostRequest("store/ledger", result);
 		handle = handle(newPostRequest);
@@ -483,17 +495,17 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		result = getResourceDTOMap("drug-create-dto");
 		patientService = Context.getService(PatientService.class);
 		patient = patientService.getPatientByUuid("1f6959e5-d15a-4025-bb48-340ee9e2c58d");
-		//Visit visit = this.getVisit(patient);
+		// Visit visit = this.getVisit(patient);
 		
 		EncounterService encounterService = Context.getService(EncounterService.class);
 		Encounter encounter = encounterService.getEncountersByVisit(visit, false).get(0);
 		result.put("encounter", encounter.getUuid());
 		
-		//When
+		// When
 		newGetRequest = newPostRequest("icare/prescription", result);
 		handle = handle(newGetRequest);
 		
-		//logics to check if full discount is created automatically
+		// logics to check if full discount is created automatically
 		Double discountPrice = invoice.getDiscountItems().get(1).getAmount();
 		Double totalPrice = invoice.getInvoiceItems().get(1).getPrice() * invoice.getInvoiceItems().get(1).getQuantity();
 		
@@ -510,7 +522,7 @@ public class BillingControllerAPITest extends BaseResourceControllerTest {
 		AdministrationService adminService = Context.getService(AdministrationService.class);
 		ConceptService conceptService = Context.getService(ConceptService.class);
 		adminService.setGlobalProperty(ICareConfig.BED_ORDER_TYPE, "2msir5eb-5345-11e8-9922-40b034c3cfef");
-		//adminService.setGlobalProperty(ICareConfig.SERVICE_ATTRIBUTE,"SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE");
+		// adminService.setGlobalProperty(ICareConfig.SERVICE_ATTRIBUTE,"SERVICE0IIIIIIIIIIIIIIIIIIIIIIIATYPE");
 		System.out.println("Yuhu:" + Context.getProviderService().getProvider(1));
 		adminService.setGlobalProperty(ICareConfig.BED_ORDER_CONCEPT, "e721ec30-mfy4-11e8-ie7c-40b69mdy79ee");
 		

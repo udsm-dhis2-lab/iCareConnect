@@ -1,14 +1,43 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { Router } from "@angular/router";
+import { Actions, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import * as _ from "lodash";
-import { merge, Observable, of } from "rxjs";
+import { merge, Observable, of, Subscription } from "rxjs";
+import { map, take } from "rxjs/operators";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { GoogleAnalyticsService } from "src/app/google-analytics.service";
+import { ProgramEnrollment } from "src/app/modules/vertical-programs/models/programEnrollment.model";
+import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
+import { toISOStringFormat } from "src/app/shared/helpers/format-date.helper";
 import { patientObj } from "src/app/shared/models/patient";
+import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
+import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
+import { ProgramGetFull } from "src/app/shared/resources/openmrs";
 import { Patient } from "src/app/shared/resources/patient/models/patient.model";
+import { ProgramsService } from "src/app/shared/resources/programs/services/programs.service";
+import {
+  FingerPrintPaylodTypeE,
+  NHIFBiometricMethodE,
+  NHIFCardAuthorizationI,
+  NHIFFingerPrintCodeE,
+  NHIFVisitTypeI,
+  VisitTypeAliasE,
+} from "src/app/shared/resources/store/models/insurance-nhif.model";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
-import { go, loadConceptByUuid } from "src/app/store/actions";
+import { VisitsService } from "src/app/shared/resources/visits/services";
+import { loadConceptByUuid } from "src/app/store/actions";
+import {
+  authorizeNHIFCardSuccess,
+  getNHIFCardDetailsByCardNumber,
+  getNHIFCardDetailsByCardNumberFailure,
+  getNHIFCardDetailsByCardNumberSuccess,
+  getNHIFCardDetailsByNIN,
+  getNHIFCardDetailsByNINFailure,
+  getNHIFCardDetailsByNINSuccess,
+} from "src/app/store/actions/insurance-nhif-point-of-care.actions";
+import { loadVisitType } from "src/app/store/actions/insurance-nhif-visit-types.actions";
 import {
   clearActiveVisit,
   startVisit,
@@ -21,6 +50,8 @@ import {
   getLocationsByTagName,
 } from "src/app/store/selectors";
 import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
+import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.selectors";
+import { getListOfVisitTypes } from "src/app/store/selectors/insurance-nhif-visit-types.selectors";
 import {
   getActiveVisit,
   getActiveVisitUuid,
@@ -29,45 +60,8 @@ import {
   getVisitLoadingState,
 } from "src/app/store/selectors/visit.selectors";
 import { SelectRoomComponent } from "../../components/select-room/select-room.component";
-import { VisitClaimComponent } from "../../components/visit-claim/visit-claim.component";
 import { RegistrationService } from "../../services/registration.services";
-import { VisitsService } from "src/app/shared/resources/visits/services";
-import { map } from "rxjs/operators";
-import { getCurrentUserPrivileges } from "src/app/store/selectors/current-user.selectors";
-import { toISOStringFormat } from "src/app/shared/helpers/format-date.helper";
-import { SharedConfirmationComponent } from "src/app/shared/components/shared-confirmation/shared-confirmation.component";
-import { ProgramsService } from "src/app/shared/resources/programs/services/programs.service";
-import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { ProgramEnrollment } from "src/app/modules/vertical-programs/models/programEnrollment.model";
-import { ProgramGet, ProgramGetFull } from "src/app/shared/resources/openmrs";
-import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
-import { GoogleAnalyticsService } from "src/app/google-analytics.service";
-import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
-import { FingerprintService, InsuranceService } from "src/app/shared/services";
-import { InsuranceResponse } from "src/app/modules/billing/models/insurance-response.model";
-import {
-  FingerPrintPaylodTypeE,
-  NHIFBiometricMethodE,
-  NHIFCardAuthorizationI,
-  NHIFFingerPrintCodeE,
-  NHIFVisitTypeI,
-  VisitTypeAliasE,
-} from "src/app/shared/resources/store/models/insurance-nhif.model";
 import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
-import { loadVisitType } from "src/app/store/actions/insurance-nhif-visit-types.actions";
-import { getListOfVisitTypes } from "src/app/store/selectors/insurance-nhif-visit-types.selectors";
-import { Subscription } from "rxjs";
-import { Actions, ofType } from "@ngrx/effects";
-import { take } from "rxjs/operators";
-import {
-  authorizeNHIFCardSuccess,
-  getNHIFCardDetailsByCardNumber,
-  getNHIFCardDetailsByCardNumberFailure,
-  getNHIFCardDetailsByCardNumberSuccess,
-  getNHIFCardDetailsByNIN,
-  getNHIFCardDetailsByNINFailure,
-  getNHIFCardDetailsByNINSuccess,
-} from "src/app/store/actions/insurance-nhif-point-of-care.actions";
 @Component({
   selector: "app-visit",
   templateUrl: "./visit.component.html",

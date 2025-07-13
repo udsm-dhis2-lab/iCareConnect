@@ -20,7 +20,7 @@ export class SharedErrorComponent implements OnInit {
   toggleIndex?: string;
   /**
    * This is the component specific for displaying erros.
-   * Customize it accordingly by never delete what's already written as it may disrupt some other parts of the software
+   * Customize it accordingly but never delete what's already written as it may disrupt some other parts of the software
    * 
    * ***************** Declare errors array from which you would add the like of the below object ********************
       [

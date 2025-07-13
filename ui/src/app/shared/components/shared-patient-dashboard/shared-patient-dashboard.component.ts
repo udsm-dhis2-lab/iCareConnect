@@ -395,6 +395,17 @@ export class SharedPatientDashboardComponent implements OnInit {
 
     // // Define visit$ observable
     // this.activeVisit$ = this.store.pipe(select(getActiveVisit));
+    this.loadGlobalProperty();
+
+  // // Define visit$ observable
+  // this.activeVisit$ = this.store.pipe(select(getActiveVisit));
+
+  // // Subscribe to visit$ observable and log the value
+  // this.activeVisit$.subscribe((visit) => {
+  //   console.log("Active Visit:....>>>.", visit);
+  // });
+
+
 
     // // Subscribe to visit$ observable and log the value
     // this.activeVisit$.subscribe((visit) => {
@@ -407,10 +418,13 @@ export class SharedPatientDashboardComponent implements OnInit {
   }
   async loadGlobalProperty() {
     try {
-      const globalProperty = await this.globalSettingService
-        .getSpecificGlobalProperties("ed9dac4a-5b2a-4a5f-8ee2-ca0d88b08506")
-        .toPromise();
-      const minutes = parseInt(globalProperty?.value ?? "0", 10);
+      // const globalProperty = await this.globalSettingService.getSpecificGlobalProperties("ed9dac4a-5b2a-4a5f-8ee2-ca0d88b08506").toPromise();
+      // const minutes = parseInt(globalProperty?.value ?? "0", 10);
+      
+      // GET global property by key to ensure  clearing time is set for clinic module
+      const globalProperty = await this.systemSettingsService.getSystemSettingsByKey("iCare.clinic.forms.observations.prefilStopTime").toPromise();
+      const minutes = parseInt(globalProperty ?? "0", 10);
+      
       this.clearingFormTime = isNaN(minutes / 60) ? 0.5 : minutes / 60;
       console.log("time received :", this.clearingFormTime);
     } catch (error) {

@@ -11,7 +11,7 @@
   <mat-toolbar color="primary">
     <span>Bill confirmation</span>
     <span class="toolbar-spacer"></span>
-    <button mat-icon-button mat-dialog-close matTooltip="close">
+    <button mat-icon-button (click)="onCancel($event)" matTooltip="close">
       <mat-icon>close</mat-icon>
     </button>
   </mat-toolbar>
@@ -29,6 +29,7 @@
           <b>{{ data?.totalPayableBill | currency: 'TZS':'':'.0' }}</b>
           from the client for items below:
         </p>
+        <!-- TODO: Use GEPG Concept UUid instead of name anywhere with this type of check -->
         <p *ngIf="data?.paymentType?.code === 'GePG'">
           This is to confirm that client will be paying
           <b>{{ data?.totalPayableBill | currency: 'TZS':'':'.0' }}</b>
@@ -89,7 +90,7 @@
 
   <!-- Actions -->
   <mat-dialog-actions align="end" class="m-0 p-3">
-    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-button (click)="onCancel($event)">Cancel</button>
 
     <button *ngIf="data?.paymentType?.code === 'CASH'" mat-flat-button color="primary" (click)="onConfirm($event)" cdkFocusInitial>
       Confirm Payment

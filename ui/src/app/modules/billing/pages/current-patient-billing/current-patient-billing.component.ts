@@ -1,5 +1,5 @@
 import { Payment } from "src/app/modules/billing/models/payment.model";
-import { keys, sumBy, sum, groupBy } from "lodash";
+import { sumBy, sum, groupBy } from "lodash";
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 
@@ -19,18 +19,14 @@ import { PaymentService } from "../../services/payment.service";
 import { select, Store } from "@ngrx/store";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentLocation, getParentLocation } from "src/app/store/selectors";
-import { DomSanitizer } from "@angular/platform-browser";
 import {
   getCurrentUserDetails,
   getProviderDetails,
 } from "src/app/store/selectors/current-user.selectors";
 import { EncountersService } from "src/app/shared/services/encounters.service";
 import { OrdersService } from "src/app/shared/resources/order/services/orders.service";
-import { any } from "cypress/types/bluebird";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
-import { getEncounterTypeByName } from "src/app/store/selectors/encounter-type.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { MatTableDataSource } from "@angular/material/table";
 import { getIsPatientSentForExemption } from "src/app/store/selectors/visit.selectors";
 import { go, loadCurrentPatient } from "src/app/store/actions";
 import { MatDialog } from "@angular/material/dialog";
@@ -38,26 +34,8 @@ import { ExemptionConfirmationComponent } from "../../components/exemption-confi
 import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
 import { GoogleAnalyticsService } from "src/app/google-analytics.service";
 import { animate, state, style, transition, trigger } from "@angular/animations";
-
-
-interface Payments {
-  position: number;
-  receivedBy: string;
-  creator: string;
-  paymentType: string;
-  referenceNumber: string;
-  status: string;
-  createdAt: string;
-  receiptNumber: string;
-  billAmount: number;
-  paidAmount: number;
-  gepgpaymentDate: string;
-  payerNumber: string;
-  payerName: string;
-  pspName: string;
-  accountNumber: string;
-}
-
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { Payments } from "../../interfaces/payments.interfaces";
 
 
 @Component({
@@ -109,13 +87,7 @@ export class CurrentPatientBillingComponent implements OnInit {
   itemuuid: any;
   controlNumber: any;
   savingPaymentError: any;
-  onRowClick(row: any): void {
-    // Only expand if paymentType is 'Gepg'
-    if (row.paymentType === 'Gepg') {
-      this.expandedElement = this.expandedElement === row ? null : row;
-    }
-  }
-
+  requestingControlNumber: boolean  =  false;
 
   constructor(
     private route: ActivatedRoute,
@@ -129,7 +101,8 @@ export class CurrentPatientBillingComponent implements OnInit {
     private systemSettingsService: SystemSettingsService,
     private store: Store<AppState>,
     private dialog: MatDialog,
-    private googleAnalyticsService: GoogleAnalyticsService
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
@@ -283,36 +256,15 @@ export class CurrentPatientBillingComponent implements OnInit {
           }
         })
       );
-      this.patientBillingDetails$
-      .pipe(
-        map((data: any) => data.payments.map((payment: any, index: number) => ({
-          position: index + 1,
-          receivedBy: payment.paymentDetails.receivedBy,
-          creator: payment.paymentDetails.creator.display,
-          paymentType: payment.paymentDetails.paymentType.name,
-          referenceNumber: payment.paymentDetails.referenceNumber,
-          status: payment.status,
-          createdAt: new Date(payment.created).toLocaleDateString(),
-          receiptNumber: payment.paymentDetails.receiptNumber,
-          billAmount: payment.paymentDetails.billAmount,
-          paidAmount: payment.paymentDetails.paidAmount,
-          gepgpaymentDate: new Date(payment.paymentDetails.paymentDate).toLocaleDateString(),
-          payerNumber: payment.paymentDetails.payerNumber,
-          payerName: payment.paymentDetails.payerName,
-          pspName: payment.paymentDetails.pspName,
-          accountNumber: payment.paymentDetails.accountNumber,
-
-        })))
-      )
-      .subscribe((payments: Payments[]) => {
-        this.dataSource = payments;
-      });
-    
   }
 
 
   printElement(element: any) {
     console.log('Printing:', element);
+  }
+
+  onReloadPatientDetails(){
+    this._getPatientDetails();
   }
 
   
@@ -329,14 +281,37 @@ export class CurrentPatientBillingComponent implements OnInit {
         const visit = res[0];
         const bills = res[1];
         const payments = res[2];
+
+        const formartedPayments = payments.map((payment: any, index: number) => ({
+          position: index + 1,
+          receivedBy: payment?.paymentDetails?.receivedBy,
+          creator: payment?.paymentDetails?.creator?.display,
+          paymentType: payment?.paymentDetails?.paymentType.name,
+          referenceNumber: payment?.paymentDetails?.referenceNumber,
+          status: payment?.paymentDetails?.status,
+          createdAt: new Date(payment?.created).toLocaleDateString(),
+          receiptNumber: payment?.paymentDetails?.receiptNumber,
+          billAmount: payment?.paymentDetails?.billAmount,
+          paidAmount: payment?.paymentDetails?.paidAmount,
+          gepgpaymentDate: payment?.paymentDetails?.paymentDate ? new Date(payment?.paymentDetails?.paymentDate).toLocaleDateString(): '',
+          payerNumber: payment?.paymentDetails?.payerNumber,
+          payerName: payment?.paymentDetails?.payerName,
+          pspName: payment?.paymentDetails?.pspName,
+          accountNumber: payment?.paymentDetails?.accountNumber,
+          items: payment?.paymentDetails?.items,
+          uuid: payment?.paymentDetails?.uuid
+        }));
+
+        this.dataSource = formartedPayments.filter((payment: any) => payment.status === 'REQUESTED');
+
         return {
           visit,
           bills: bills.filter((bill) => {
-            if (!bill.isInsurance && bill.items.length > 0) {
+            if (!bill.isInsurance && bill?.items?.length > 0) {
               return bill;
             }
           }),
-          payments: payments,
+          payments: payments?.filter((payment: any) => payment?.paymentDetails?.status === "PAID"),
           paymentKeys: Object.keys(groupBy(payments, "visit")),
           currentPayments: groupBy(payments, "visit")[visit?.uuid],
           paymentItemCount: payments
@@ -352,36 +327,72 @@ export class CurrentPatientBillingComponent implements OnInit {
       })
     );
   }
-  RequestControlNumber(events, bills) {
+  requestControlNumber(events, payment?: any) {
     events.stopPropagation();
-    console.log("Bill clicked ..",bills.currentPayments)
-    const requestPayloads = bills.currentPayments.map((bill) => {
-        return bill.paymentDetails.items.map((billItem) => ({
-            uuid: billItem.item.uuid, 
+    const requestPayloads = payment?.items.map((item) => ({
+            ...item,
             currency: "TZS"
-        }));
-    }).flat();
-    this.onConntrollNumbGen(JSON.stringify(requestPayloads)); 
-}
+        }))
+    this.onControllNumbGen(JSON.stringify(requestPayloads), payment?.uuid); 
+  }
 
 
-onConntrollNumbGen(payload: any) {
+  onControllNumbGen(payload: any, payment?: String) {
+    this.requestingControlNumber = true;
+    this.billingService.gepgpayBill(payload, payment).subscribe(
+      (response: any) => {
+        this.requestingControlNumber = false;
+        if (response && response?.ackCode === "CONS9005") {
+          this.savingPaymentError = 'Authentication Failed! Kindly, try again or contact your IT Administrator';
+        } else if (response?.paymentDetails?.status === 'success'){
+            this.snackBar.open(response?.paymentDetails?.message, "OK", {
+              horizontalPosition: "right",
+              verticalPosition: "top",
+              duration: 3500,
+              panelClass: ["snack-color"],
+            });
+          } else {
+            this.savingPaymentError = 'Server Error Please Contact an Admin !';
+        }
 
-  this.billingService.gepgpayBill(payload).subscribe(
-    (response: any) => {
-      if (response && response.ackCode === "CONS9005") {
-console.log("Authentication Failed")
-      }else {
-        this.savingPaymentError = 'Server Error Please Contact an Admin !';
-        console.log("Unexpected response:", response);
+        if(this.savingPaymentError){
+          this.snackBar.open(this.savingPaymentError, "OK", {
+            horizontalPosition: "center",
+            verticalPosition: "bottom",
+            duration: 3500,
+            panelClass: ["snack-color"],
+          });
+        }
+      },
+      (error) => {
+        this.requestingControlNumber = false;
+        this.savingPaymentError = error;
+        console.log("Failed to generate control number:", error);
+        if(this.savingPaymentError){
+          this.snackBar.open(`Failed to generate control number: ${this.savingPaymentError}`, "OK", {
+            horizontalPosition: "center",
+            verticalPosition: "bottom",
+            duration: 3500,
+            panelClass: ["snack-color"],
+          });
+        }
       }
-    },
-    (error) => {
-      this.savingPaymentError = error;
-      console.log("Failed to generate control number:", error);
-    }
-  );
-}
+    );
+  }
+
+  reversePaymentRequest(paymentUuid: String){
+    this.billingService.reversePaymentRequest(paymentUuid).subscribe(
+      {
+        next: (response) => {
+          console.log("Succeeded to reverse payment request:", response);
+          this._getPatientDetails();
+        },
+        error: (error) => {
+          console.log("Failsed to reverse payment request:", error);
+        }
+      }
+    )
+  }
   
   onConfirmBillPayment(results: {
     bill: BillObject;

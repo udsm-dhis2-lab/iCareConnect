@@ -71,6 +71,8 @@ public class ICareConfig {
 	
 	public static final String PROVIDER_PHONENUMBER_ATTRIBUTE = "icare.attribute.provider.phoneNumber";
 	
+	public static final String PRACTIONER_NUMBER = "icare.attribute.provider.number";
+	
 	public static final String PATIENT_OCCUPATION_ATTRIBUTE = "icare.attribute.patient.occupation";
 	
 	public static final String PATIENT_ID_FORMAT = "icare.patient.id.format";

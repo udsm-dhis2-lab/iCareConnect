@@ -1,20 +1,62 @@
 package org.openmrs.module.icare.billing;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import javax.naming.ConfigurationException;
+
 import org.aopalliance.intercept.MethodInvocation;
-import org.openmrs.*;
-import org.openmrs.api.*;
+import org.openmrs.Concept;
+import org.openmrs.ConceptMap;
+import org.openmrs.Drug;
+import org.openmrs.DrugOrder;
+import org.openmrs.Encounter;
+import org.openmrs.EncounterType;
+import org.openmrs.GlobalProperty;
+import org.openmrs.Obs;
+import org.openmrs.Order;
+import org.openmrs.OrderType;
+import org.openmrs.Patient;
+import org.openmrs.PersonAttribute;
+import org.openmrs.Provider;
+import org.openmrs.TestOrder;
+import org.openmrs.Visit;
+import org.openmrs.VisitType;
+import org.openmrs.api.APIException;
+import org.openmrs.api.AdministrationService;
+import org.openmrs.api.ConceptService;
+import org.openmrs.api.EncounterService;
+import org.openmrs.api.OrderContext;
+import org.openmrs.api.OrderService;
+import org.openmrs.api.PatientService;
+import org.openmrs.api.ProviderService;
+import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.attribute.AttributeType;
 import org.openmrs.module.icare.ICareConfig;
 import org.openmrs.module.icare.billing.Utils.PaymentStatus;
 import org.openmrs.module.icare.billing.dao.DiscountDAO;
+import org.openmrs.module.icare.billing.dao.GePGLogsDAO;
 import org.openmrs.module.icare.billing.dao.InvoiceDAO;
 import org.openmrs.module.icare.billing.dao.PaymentDAO;
 import org.openmrs.module.icare.billing.models.*;
 import org.openmrs.module.icare.billing.services.BillingService;
-import org.openmrs.module.icare.billing.services.insurance.*;
-import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFConfig;
+import org.openmrs.module.icare.billing.services.insurance.AuthorizationStatus;
+import org.openmrs.module.icare.billing.services.insurance.InsuranceService;
+import org.openmrs.module.icare.billing.services.insurance.SyncResult;
+import org.openmrs.module.icare.billing.services.insurance.VerificationException;
+import org.openmrs.module.icare.billing.services.insurance.VerificationRequest;
+import org.openmrs.module.icare.billing.services.insurance.VerificationResponse;
 import org.openmrs.module.icare.billing.services.insurance.nhif.NHIFServiceImpl;
 import org.openmrs.module.icare.billing.services.payment.gepg.BillHdr;
 import org.openmrs.module.icare.billing.services.payment.gepg.BillItem;
@@ -31,16 +73,6 @@ import org.openmrs.module.icare.core.utils.VisitWrapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.naming.ConfigurationException;
-
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
 public class BillingServiceImpl extends BaseOpenmrsService implements BillingService {
 	
 	ICareDao dao;
@@ -50,6 +82,8 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	PaymentDAO paymentDAO;
 	
 	DiscountDAO discountDAO;
+	
+	GePGLogsDAO gePGLogsDAO;
 	
 	public void setDao(ICareDao dao) {
 		this.dao = dao;
@@ -65,6 +99,10 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	
 	public void setDiscountDAO(DiscountDAO discountDAO) {
 		this.discountDAO = discountDAO;
+	}
+	
+	public void setGePGLogsDAO(GePGLogsDAO gePGLogsDAO) {
+		this.gePGLogsDAO = gePGLogsDAO;
 	}
 	
 	@Override
@@ -752,6 +790,12 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	}
 	
 	@Override
+	public Order getOrderByUuid(String uuid) throws Exception {
+		OrderService orderService = Context.getService(OrderService.class);
+		return orderService.getOrderByUuid(uuid);
+	}
+	
+	@Override
 	public List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) throws Exception {
 		return this.invoiceDAO.getTotalAmountFromPaidInvoices(startDate, endDate, provider);
 	}
@@ -775,77 +819,72 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 
 				Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
 				Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
-				GlobalProperty globalProperty = new GlobalProperty();
-				globalProperty.setProperty("gepg.callbackResponseData.icareConnect");
-				globalProperty.setPropertyValue(callbackData.toString());
-				administrationService.saveGlobalProperty(globalProperty);
 				if (feedbackData.containsKey("gepgPmtSpInfo")) {
-					Map<String, Object> gepgPmtSpInfo = (Map<String, Object>) feedbackData.get("gepgPmtSpInfo");
-					Map<String, Object> pymtTrxInf = (Map<String, Object>) gepgPmtSpInfo.get("PymtTrxInf");
+					@SuppressWarnings("unchecked") Map<String, Object> gepgPmtSpInfo = (Map<String, Object>) feedbackData.get("gepgPmtSpInfo");
+					@SuppressWarnings("unchecked") Map<String, Object> pymtTrxInf = (Map<String, Object>) gepgPmtSpInfo.get("PymtTrxInf");
 					String requestId = status.containsKey("RequestId") ? (String) status.get("RequestId") : null;
 					Payment payment = this.paymentDAO.getPaymentByRequestId(Integer.parseInt(requestId));
-					Invoice invoice = invoiceDAO.findById(payment.getInvoice().getId());
-					if (payment != null) {
-						payment.setReferenceNumber((String) pymtTrxInf.get("PayCtrNum"));
-						payment.setBillAmount(Double.parseDouble((String) pymtTrxInf.get("BillAmt")));
-						payment.setPaidAmount(Double.parseDouble((String) pymtTrxInf.get("PaidAmt")));
-						LocalDateTime localDateTime = LocalDateTime.parse((String) pymtTrxInf.get("TrxDtTm"));
-						Date paymentDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-						payment.setReceiptNumber((String) pymtTrxInf.get("PspReceiptNumber"));
-						payment.setPaymentDate(paymentDate);
-						payment.setPayerNumber((String) pymtTrxInf.get("PyrCellNum"));
-						payment.setPayerName((String) pymtTrxInf.get("PyrName"));
-						payment.setPspName((String) pymtTrxInf.get("PspName"));
-						payment.setAccountNumber((String) pymtTrxInf.get("CtrAccNum"));
-						payment.setStatus(PaymentStatus.PAID);
-						for (PaymentItem item : payment.getItems()) {
-							item.setPayment(payment);
-							InvoiceItem invoiceItem = null;
-							for (InvoiceItem iI : invoice.getInvoiceItems()) {
-								if (iI.getItem().getUuid().equals(item.getItem().getUuid())
-										&& iI.getOrder().getUuid().equals(item.getOrder().getUuid())) {
-									invoiceItem = iI;
+					if(payment != null){
+						Invoice invoice = invoiceDAO.findById(payment.getInvoice().getId());
+						if (pymtTrxInf.get("PayCtrNum") != null && !pymtTrxInf.get("PayCtrNum").equals("0")) {
+							payment.setReferenceNumber((String) pymtTrxInf.get("PayCtrNum"));
+							payment.setBillAmount(Double.parseDouble((String) pymtTrxInf.get("BillAmt")));
+							payment.setPaidAmount(Double.parseDouble((String) pymtTrxInf.get("PaidAmt")));
+							LocalDateTime localDateTime = LocalDateTime.parse((String) pymtTrxInf.get("TrxDtTm"));
+							Date paymentDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+							payment.setReceiptNumber((String) pymtTrxInf.get("PspReceiptNumber"));
+							payment.setPaymentDate(paymentDate);
+							payment.setPayerNumber((String) pymtTrxInf.get("PyrCellNum"));
+							payment.setPayerName((String) pymtTrxInf.get("PyrName"));
+							payment.setPspName((String) pymtTrxInf.get("PspName"));
+							payment.setAccountNumber((String) pymtTrxInf.get("CtrAccNum"));
+							payment.setStatus(PaymentStatus.PAID);
+							for (PaymentItem item : payment.getItems()) {
+								item.setPayment(payment);
+								InvoiceItem invoiceItem = null;
+								for (InvoiceItem iI : invoice.getInvoiceItems()) {
+									if (iI.getItem().getUuid().equals(item.getItem().getUuid())
+											&& iI.getOrder().getUuid().equals(item.getOrder().getUuid())) {
+										invoiceItem = iI;
+									}
 								}
+								if (invoiceItem == null) {
+									throw new APIException("Invalid payment item for the invoice.");
+								}
+								item.setItem(invoiceItem.getItem());
+								item.setOrder(invoiceItem.getOrder());
+								item.setStatus(PaymentStatus.PAID);
 							}
-							if (invoiceItem == null) {
-								throw new APIException("Invalid payment item for the invoice.");
-							}
-							item.setItem(invoiceItem.getItem());
-							item.setOrder(invoiceItem.getOrder());
-							item.setStatus(PaymentStatus.PAID);
-						}
-						payment.setReceivedBy(Context.getAuthenticatedUser().getName());
-						payment.setStatus(PaymentStatus.PAID);
-						// Save the updated payment
-						paymentDAO.updatePayment(payment);
-						// paymentDAO.save(payment);
-						ackData.put("SystemAckCode", "0");
-						ackData.put("Description", "Payment Successfully Updated");
-						ackData.put("RequestId", requestId);
+							payment.setReceivedBy(Context.getAuthenticatedUser().getName());
+							payment.setStatus(PaymentStatus.PAID);
+							// Save the updated payment
+							paymentDAO.updatePayment(payment);
+							// paymentDAO.save(payment);
+							ackData.put("SystemAckCode", "0");
+							ackData.put("Description", "Payment Successfully Updated");
+							ackData.put("RequestId", requestId);
 
-						// Sign the ackData
-						String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
-						String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
-						systemAuth.put("Signature", signature);
-						systemAuth.put("SystemCode", systemCode);
-						response.put("SystemAuth", systemAuth);
-						response.put("AckData", ackData);
+							// Sign the ackData
+							String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
+							String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
+							systemAuth.put("Signature", signature);
 
-					} else {
-						ackData.put("SystemAckCode", "0");
-						ackData.put("Description", "Fail, No Data with this RequestId");
-						ackData.put("RequestId", requestId);
-						// Sign the ackData
-						String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
-						String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
-						systemAuth.put("Signature", signature);
-						systemAuth.put("SystemCode", systemCode);
-						response.put("SystemAuth", systemAuth);
-						response.put("AckData", ackData);
-					}
+                        } else {
+							ackData.put("SystemAckCode", "0");
+							ackData.put("Description", "Fail, No Data with this RequestId");
+							ackData.put("RequestId", requestId);
+							// Sign the ackData
+							String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
+							String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
+							systemAuth.put("Signature", signature);
+                        }
+                        systemAuth.put("SystemCode", systemCode);
+                        response.put("SystemAuth", systemAuth);
+                        response.put("AckData", ackData);
+                    }
 				} else if (feedbackData.containsKey("gepgBillSubResp")) {
-					Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
-					Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
+					@SuppressWarnings("unchecked") Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
+					@SuppressWarnings("unchecked") Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
 
 					String billIdString = (String) billTrxInf.get("BillId");
 
@@ -853,7 +892,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 					String requestId = status.containsKey("RequestId") ? (String) status.get("RequestId") : null;
 
 					systemAuth.put("SystemCode", systemCode);
-					if (billIdString == null || payCntrNum == null || requestId == null) {
+					if (billIdString == null || payCntrNum == null || payCntrNum.equals("0") || requestId == null) {
 						return buildErrorResponse(response, systemAuth, ackData, requestId,
 								"Invalid data in callbackData: missing BillId, PayCntrNum, or RequestId");
 					}
@@ -996,6 +1035,11 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			}
 		}
 		return controlNumber;
+	}
+	
+	@Override
+	public Integer setPaymentReferenceNumberByPaymentId(Integer paymentId, String referenceNumber) throws Exception {
+		return this.paymentDAO.setReferenceNumberByPaymentId(paymentId, referenceNumber);
 	}
 	
 	// create payload for GePG Control Number Generation
@@ -1226,7 +1270,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			String personEmailAttributeTypeUuid, String currency, String gepgAuthSignature,
 			String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode, String serviceCode,
 			String SpSysId, String subSpCode, String clientPrivateKey, String pkcs12Path,
-			String pkcs12Password, String enginepublicKey, String billId) throws Exception {
+			String pkcs12Password, String enginepublicKey, String billId, String payment) throws Exception {
 
 		// Validate inputs
 		validateInputs(patient, invoiceItems, currency, gepgAuthSignature, GFSCodeConceptSourceMappingUuid,
@@ -1249,7 +1293,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 				currency, billId, billExpirlyDate, billItems, subSpCode, SpSysId, patientId);
 
 		// Create and populate RequestData
-		RequestData requestData = createRequestData(billHdr, billTrxInf, billId);
+		RequestData requestData = createRequestData(billHdr, billTrxInf, billId, invoiceItems, payment);
 
 		// Create and populate SystemAuth
 		SystemAuth systemAuth = createSystemAuth(sytemCode, serviceCode);
@@ -1272,6 +1316,33 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		result.put("signature", signature);
 
 		return result;
+	}
+	
+	@Override
+	public void removeFailedGepgPaymentRequests(String paymentUuid) throws Exception {
+		try {
+			this.paymentDAO.deletePaymentAndPaymentItemsByPaymentUuid(paymentUuid);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Failed to delete payment with UUID: " + paymentUuid, e);
+		}
+	}
+	
+	@Override
+	public Payment getPaymentById(Integer id) throws Exception {
+		return this.paymentDAO.getPaymentByRequestId(id);
+	}
+	
+	@Override
+	public Payment getPaymentByPaymentUuid(String Uuid) throws Exception {
+		return this.paymentDAO.getPaymentByUuid(Uuid);
+	}
+	
+	@Override
+	public List<GePGLogs> getGepgLogsByRequestId(String requestId, String patientName, String status,
+	        Boolean startWithLastLogs) throws Exception {
+		return this.gePGLogsDAO.getGepgLogsByRequestId(requestId, patientName, status, startWithLastLogs);
 	}
 	
 	// Validate the inputs
@@ -1310,20 +1381,22 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		for (InvoiceItem invoiceItem : invoiceItems) {
 			Drug drug = invoiceItem.getItem().getDrug();
 			Concept concept = invoiceItem.getItem().getConcept();
+			String GFSCode = null;
 			if (drug == null && concept == null) {
 				throw new IllegalStateException("Concept can not be null for InvoiceItem" + drug + concept);
 			} else if (concept != null) {
 				for (ConceptMap conceptMap : concept.getConceptMappings()) {
 					if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
 					        .equals(GFSCodeConceptSourceMappingUuid)) {
-						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
+						GFSCode = conceptMap.getConceptReferenceTerm().getCode();
 						billItems.getBillItem().add(
 						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(),
 						            invoiceItem.getPrice().toString(), "0.0", GFSCode));
-					} else {
-						throw new IllegalStateException(
-						        "Please verify GFS CODE concept mapping if configured in a correct way");
 					}
+				}
+				if (GFSCode == null) {
+					throw new IllegalStateException("No valid GFS Code mapping found for item with name: "
+					        + concept.getDisplayString() + " and id " + concept.getUuid() + ".");
 				}
 			} else if (drug != null) {
 				Concept drugConcept = drug.getConcept();
@@ -1331,14 +1404,15 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 					if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
 					        .equals(GFSCodeConceptSourceMappingUuid)) {
 						
-						String GFSCode = conceptMap.getConceptReferenceTerm().getCode();
+						GFSCode = conceptMap.getConceptReferenceTerm().getCode();
 						billItems.getBillItem().add(
 						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(),
 						            invoiceItem.getPrice().toString(), "0.0", GFSCode));
-					} else {
-						throw new IllegalStateException(
-						        "Please verify GFS CODE concept mapping if configured in a correct way");
 					}
+				}
+				if (GFSCode == null) {
+					throw new IllegalStateException("No valid GFS Code mapping found for item with name: "
+					        + drug.getDisplayName() + "and id " + drug.getUuid() + ".");
 				}
 			}
 		}
@@ -1395,52 +1469,65 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	}
 	
 	// Create RequestData
-	private RequestData createRequestData(BillHdr billHdr, BillTrxInf billTrxInf, String billId) throws Exception {
+	private RequestData createRequestData(BillHdr billHdr, BillTrxInf billTrxInf, String billId,
+	        List<InvoiceItem> invoiceItems, String paymentUuid) throws Exception {
 		AdministrationService administrationService = Context.getAdministrationService();
 		// Save PaymentData before Reference Number (Control Number)
 		RequestData requestData = new RequestData();
 		try {
-			Integer billUuid = Integer.parseInt(billId);
-			Invoice invoice = invoiceDAO.findById(billUuid);
-			if (invoice == null) {
-				throw new Exception("Invoice of this Bill id " + billId + " is not valid");
-				
-			}
-			
-			String paymentTypeConceptUuid = administrationService
-			        .getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
-			if (paymentTypeConceptUuid == null) {
-				throw new Exception("No default payment type based on control number");
-			}
-			
-			Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
-			if (paymentType == null) {
-				throw new Exception("Payment type concept not found for UUID: " + paymentTypeConceptUuid);
-			}
-			
 			Payment payment = new Payment();
-			payment.setPaymentType(paymentType);
-			payment.setReferenceNumber(null);
-			payment.setInvoice(invoice);
-			payment.setReceivedBy("SYSTEM");
-			payment.setStatus(PaymentStatus.REQUESTED);
-			payment.setCreator(Context.getAuthenticatedUser());
-			payment.setDateCreated(new Date());
-			for (InvoiceItem invoiceItem : invoice.getInvoiceItems()) {
-				PaymentItem paymentItem = new PaymentItem();
-				paymentItem.setPayment(payment);
-				paymentItem.setItem(invoiceItem.getItem());
-				paymentItem.setOrder(invoiceItem.getOrder());
-				paymentItem.setAmount(invoiceItem.getPrice());
-				paymentItem.setStatus(null);
-				payment.getItems().add(paymentItem);
+			
+			if (paymentUuid != null) {
+				payment = this.paymentDAO.getPaymentByUuid(paymentUuid);
 			}
-			this.paymentDAO.save(payment);
+			
+			if (paymentUuid == null) {
+				Integer billUuid = Integer.parseInt(billId);
+				Invoice invoice = invoiceDAO.findById(billUuid);
+				if (invoice == null) {
+					throw new Exception("Invoice of this Bill id " + billId + " is not valid");
+					
+				}
+				
+				String paymentTypeConceptUuid = administrationService
+				        .getGlobalProperty(ICareConfig.DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER);
+				if (paymentTypeConceptUuid == null) {
+					throw new Exception("No default payment type based on control number");
+				}
+				
+				Concept paymentType = Context.getConceptService().getConceptByUuid(paymentTypeConceptUuid);
+				if (paymentType == null) {
+					throw new Exception("Payment type concept not found for UUID: " + paymentTypeConceptUuid);
+				}
+				
+				payment.setPaymentType(paymentType);
+				payment.setReferenceNumber(null);
+				payment.setInvoice(invoice);
+				payment.setReceivedBy("SYSTEM");
+				payment.setStatus(PaymentStatus.REQUESTED);
+				payment.setCreator(Context.getAuthenticatedUser());
+				payment.setDateCreated(new Date());
+				for (InvoiceItem invoiceItem : invoiceItems) {
+					PaymentItem paymentItem = new PaymentItem();
+					paymentItem.setPayment(payment);
+					paymentItem.setItem(invoiceItem.getItem());
+					paymentItem.setOrder(invoiceItem.getOrder());
+					paymentItem.setAmount(invoiceItem.getPrice());
+					paymentItem.setStatus(null);
+					payment.getItems().add(paymentItem);
+				}
+				this.paymentDAO.save(payment);
+			}
+			
 			Integer paymentId = payment.getId();
 			requestData.setRequestId(paymentId.toString());
 		}
 		catch (Exception e) {
-			throw new Exception("Failed to Save Payments Data: " + e.getMessage());
+			String message = "Failed to Save Payments Data: ";
+			if (paymentUuid != null) {
+				message = "Failed to get payments data: ";
+			}
+			throw new Exception(message + e.getMessage());
 		}
 		requestData.setBillHdr(billHdr);
 		requestData.setBillTrxInf(billTrxInf);
@@ -1460,10 +1547,6 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		AdministrationService administrationService = Context.getAdministrationService();
 		String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
 		try {
-			GlobalProperty globalProperty = new GlobalProperty();
-			globalProperty.setProperty("gepg.signaturerowData.icareConnect");
-			globalProperty.setPropertyValue(rowData);
-			administrationService.saveGlobalProperty(globalProperty);
 			String signature = SignatureUtils.signData(rowData, clientPrivateKey);
 			return signature;
 		}
@@ -1471,5 +1554,20 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			throw new Exception("Error signing data due to I/O: " + e.getMessage(), e);
 		}
 		
+	}
+	
+	@Override
+	public GePGLogs getGepgLogsDataById(Integer id) throws Exception {
+		return this.gePGLogsDAO.findById(id);
+	}
+	
+	@Override
+	public GePGLogs createGepgLogs(GePGLogs logs) throws Exception {
+		return this.gePGLogsDAO.save(logs);
+	}
+	
+	@Override
+	public GePGLogs updateGepgLogs(GePGLogs logs) throws Exception {
+		return this.gePGLogsDAO.update(logs);
 	}
 }

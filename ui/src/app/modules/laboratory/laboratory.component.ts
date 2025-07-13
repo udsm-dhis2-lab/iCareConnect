@@ -1,9 +1,38 @@
 import { Component, OnInit, ViewEncapsulation } from "@angular/core";
-import { Observable, of } from "rxjs";
-import { Store } from "@ngrx/store";
+import { MatDialog } from "@angular/material/dialog";
+import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
+import { Store } from "@ngrx/store";
+import { Observable, of } from "rxjs";
 import { map, take } from "rxjs/operators";
+import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
+import { LocationService } from "src/app/core/services";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { ProviderAttributeGet } from "src/app/shared/resources/openmrs";
+import {
+  NHIFBiometricMethodE,
+  NHIFFingerPrintCodeE,
+} from "src/app/shared/resources/store/models/insurance-nhif.model";
+import {
+  clearLoadedLabOrders,
+  clearLoadedLabSamples,
+  clearVisitsDatesParameters,
+  go,
+  loadLabConfigurations,
+  loadOrderTypes,
+  loadRolesDetails,
+  loadSampleTypes,
+  loadSystemSettings,
+  setCurrentUserCurrentLocation,
+  setVisitsParameters,
+} from "src/app/store/actions";
 import { AppState } from "src/app/store/reducers";
+import {
+  getAllSampleTypes,
+  getCurrentLocation,
+  getLoadedSystemSettingsState,
+} from "src/app/store/selectors";
 import {
   getAllUSerRoles,
   getCurrentUserInfo,
@@ -11,46 +40,10 @@ import {
   getProviderDetails,
   getUserAssignedLocations,
 } from "src/app/store/selectors/current-user.selectors";
-import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
-import {
-  loadLabConfigurations,
-  setVisitsParameters,
-  clearLoadedLabSamples,
-  loadSampleTypes,
-  clearLoadedLabOrders,
-  loadRolesDetails,
-  loadOrderTypes,
-  go,
-  clearVisitsDatesParameters,
-  setCurrentUserCurrentLocation,
-  loadSystemSettings,
-} from "src/app/store/actions";
-import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
-import {
-  getAllSampleTypes,
-  getCurrentLocation,
-  getLoadedSystemSettingsState,
-} from "src/app/store/selectors";
-import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
-import { Title } from "@angular/platform-browser";
-import { LocationService } from "src/app/core/services";
-import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
-import { LabMenu } from "./resources/models/lab-menu.model";
-import { ProviderAttributeGet } from "src/app/shared/resources/openmrs";
 import { selectNHIFPractitionerDetails } from "src/app/store/selectors/insurance-nhif-practitioner.selectors";
-import {
-  FingerPrintPaylodTypeE,
-  NHIFBiometricMethodE,
-  NHIFFingerPrintCodeE,
-  NHIFPractitionerDetailsI,
-} from "src/app/shared/resources/store/models/insurance-nhif.model";
-import {
-  loginNHIFPractitioner,
-  setNHIFPractitionerDetails,
-} from "src/app/store/actions/insurance-nhif-practitioner.actions";
-import { MatDialog } from "@angular/material/dialog";
-import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
+import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
+import { LabMenu } from "./resources/models/lab-menu.model";
+import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
 @Component({
   selector: "lab-root",
   templateUrl: "./laboratory.component.html",
@@ -292,13 +285,13 @@ export class LaboratoryComponent implements OnInit {
       // if the doctor is not logged in to NHIF, prompt the doctor to login
       if (!data || !data.isNHIFPractitionerLogedIn) {
         const loginData = {
-          practitionerNo: this.currentProviderDetails[1]["value"] || null,
-          nationalID: this.currentProviderDetails[3]["value"] || null,
+          practitionerNo: this.currentProviderDetails[1]?.value || null,
+          nationalID: this.currentProviderDetails[3]?.value || null,
           biometricMethod: NHIFBiometricMethodE.fingerprint,
           fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
         };
 
-        this.dialog.open(FingerCaptureComponent, {
+        /*this.dialog.open(FingerCaptureComponent, {
           width: "45%",
           data: {
             detail: "doctor's",
@@ -307,7 +300,7 @@ export class LaboratoryComponent implements OnInit {
               payload: loginData,
             },
           },
-        });
+        });*/
       }
     });
 

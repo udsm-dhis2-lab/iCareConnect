@@ -11,10 +11,7 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.icare.billing.OrderMetaData;
 import org.openmrs.module.icare.billing.VisitMetaData;
-import org.openmrs.module.icare.billing.models.Discount;
-import org.openmrs.module.icare.billing.models.Invoice;
-import org.openmrs.module.icare.billing.models.InvoiceItem;
-import org.openmrs.module.icare.billing.models.Payment;
+import org.openmrs.module.icare.billing.models.*;
 import org.openmrs.module.icare.billing.services.insurance.SyncResult;
 import org.openmrs.module.icare.core.utils.VisitWrapper;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,11 +79,15 @@ public interface BillingService extends OpenmrsService {
 	
 	Order createOrderForOngoingDeceasedPatients() throws Exception;
 	
+	Order getOrderByUuid(String uuid) throws Exception;
+	
 	List<Object[]> getTotalAmountFromPaidInvoices(Date startDate, Date endDate, String provider) throws Exception;
 	
 	Map<String, Object> processGepgCallbackResponse(Map<String, Object> feedBack) throws Exception;
 	
 	String fetchControlNumber(Integer requestId) throws Exception;
+	
+	Integer setPaymentReferenceNumberByPaymentId(Integer paymentId, String referenceNumber) throws Exception;
 	
 	List<Payment> getAllPaymentsWithStatus() throws Exception;
 	
@@ -94,7 +95,22 @@ public interface BillingService extends OpenmrsService {
 	        Date billExpirlyDate, String personPhoneAttributeTypeUuid, String personEmailAttributeTypeUuid, String currency,
 	        String gepgAuthSignature, String GFSCodeConceptSourceMappingUuid, String spCode, String sytemCode,
 	        String serviceCode, String SpSysId, String subSpCode, String clientPrivateKey, String pkcs12Path,
-	        String pkcs12Password, String enginepublicKey, String billId) throws Exception;
+	        String pkcs12Password, String enginepublicKey, String billId, String payment) throws Exception;
+	
+	void removeFailedGepgPaymentRequests(String paymentUuid) throws Exception;
+	
+	Payment getPaymentById(Integer id) throws Exception;
+	
+	Payment getPaymentByPaymentUuid(String Uuid) throws Exception;
+	
+	List<GePGLogs> getGepgLogsByRequestId(String requestId, String patientName, String status, Boolean startWithLastLogs)
+	        throws Exception;
 	
 	String signatureData(String rowData) throws Exception;
+	
+	GePGLogs getGepgLogsDataById(Integer id) throws Exception;
+	
+	GePGLogs createGepgLogs(GePGLogs logs) throws Exception;
+	
+	GePGLogs updateGepgLogs(GePGLogs logs) throws Exception;
 }
