@@ -312,8 +312,18 @@ export class VisitComponent implements OnInit {
 
   startVisit(event) {
     event.stopPropagation();
+
+    // check if insurance scheme is set
+    if (
+      this.visitDetails["Payment"]?.display === "Insurance" &&
+      !this.visitDetails["insuranceScheme"]?.uuid
+    ) {
+      this.openSnackBar("Please select an insurance scheme", null);
+      return;
+    }
     if (this.visitPayloadViable) {
       let visitAttributes = [];
+      console.log("the insurance scheme", this.visitDetails?.insuranceScheme);
       visitAttributes.push({
         attributeType: "PSCHEME0IIIIIIIIIIIIIIIIIIIIIIIATYPE",
         value:
@@ -624,7 +634,23 @@ export class VisitComponent implements OnInit {
     }
   }
 
+  // setInsuranceTypeOption(value) {
+  //   this.store.dispatch(
+  //     loadConceptByUuid({
+  //       uuid: value?.uuid,
+  //       fields:
+  //         "custom:(uuid,name,display,setMembers:(uuid,name,names,display))",
+  //     })
+  //   );
+  //   this.visitDetails["Insurance"] = value;
+  //   this.insuranceSchemes$ = this.store.select(getConceptById, {
+  //     id: value?.uuid,
+  //   });
+  // }
   setInsuranceTypeOption(value) {
+    this.visitDetails["Insurance"] = value;
+
+    // Dispatch to load schemes under this insurance
     this.store.dispatch(
       loadConceptByUuid({
         uuid: value?.uuid,
@@ -632,9 +658,18 @@ export class VisitComponent implements OnInit {
           "custom:(uuid,name,display,setMembers:(uuid,name,names,display))",
       })
     );
-    this.visitDetails["Insurance"] = value;
+
+    // Fetch and subscribe to insurance schemes
     this.insuranceSchemes$ = this.store.select(getConceptById, {
       id: value?.uuid,
+    });
+
+    // Auto-select the scheme if there’s only one
+    this.insuranceSchemes$.pipe(take(1)).subscribe((concept) => {
+      const schemes = concept?.setMembers || [];
+      if (schemes.length === 1) {
+        this.setInsuranceScheme(schemes[0]);
+      }
     });
   }
 

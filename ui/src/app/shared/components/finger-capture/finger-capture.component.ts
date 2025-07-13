@@ -83,13 +83,13 @@ export class FingerCaptureComponent implements OnInit {
   captureFingerprint(): void {
     this.fingerprintService.captureFingerprint().subscribe(
       (result) => {
-        if (result.RawData) {
+        console.log("Fingerprint capture result:", result);
+        if (result.WsqImage) {
           this.fingerprintCaptured = true;
           this.showScanningComponent = false; // hide the scanning components
 
           if (this.payload.payload) {
-            this.payload["payload"]["imageData"] = result.RawData;
-            this.payload["payload"]["practitionerNo"] = "198910311413323";
+            this.payload["payload"]["imageData"] = result.WsqImage;
           }
 
           setTimeout(() => {
@@ -135,6 +135,8 @@ export class FingerCaptureComponent implements OnInit {
       this.payload.type === FingerPrintPaylodTypeE.Practitioner_login
     ) {
       // Dispatch action to login practitioner and wait for response
+      // this.payload["payload"]["imageData"] = "NONE";
+      this.payload["payload"]["practitionerNo"] ='3326'
       this.store.dispatch(
         loginNHIFPractitioner({ data: this.payload.payload })
       );

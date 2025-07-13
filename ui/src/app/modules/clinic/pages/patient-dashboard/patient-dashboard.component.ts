@@ -306,7 +306,7 @@ export class PatientDashboardComponent implements OnInit {
   // Separate method to open the patient fingerprint modal
   retryNHIFPractitionerLogin(): void {
     const loginData = {
-      practitionerNo: this.currentProviderDetails[1]?.["value"] || null,
+      practitionerNo: this.currentProviderDetails[4]?.["value"] || null,
       nationalID: this.currentProviderDetails[3]?.["value"] || null,
       biometricMethod: NHIFBiometricMethodE.fingerprint,
       fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
@@ -331,7 +331,7 @@ export class PatientDashboardComponent implements OnInit {
           (item) => item.PointOfCareCode === NHIFPointOfCareCodeE.CONSULTATION
         )?.PointOfCareID || null,
       authorizationNo: authNo,
-      practitionerNo: this.currentProviderDetails[1]?.["value"],
+      practitionerNo: this.currentProviderDetails[4]?.["value"],
       biometricMethod: NHIFBiometricMethodE.fingerprint,
       fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
     };
