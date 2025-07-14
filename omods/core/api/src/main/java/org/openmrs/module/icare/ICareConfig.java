@@ -177,6 +177,8 @@ public class ICareConfig {
 	
 	public static final String GEPG_PASSWORD = "iCare.GePG.settings.GepgPassword";
 	
+	public static final String GEPG_PAYMENT_OPTION = "iCare.GePG.settings.PaymentOption";
+	
 	public static final String DEFAULT_PAYMENT_TYPE_VIA_CONTROL_NUMBER = "icare.billing.controlNumberBasedPaymentType.concept.uuid";
 	
 	public static final String ALLOW_REMOTE_HISTORY = "iCare.interoperability.settings.allowRemoteHistory";

@@ -73,6 +73,8 @@ import org.openmrs.module.icare.core.utils.VisitWrapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import static org.openmrs.module.icare.ICareConfig.GEPG_PAYMENT_OPTION;
+
 public class BillingServiceImpl extends BaseOpenmrsService implements BillingService {
 	
 	ICareDao dao;
@@ -1272,6 +1274,14 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			String SpSysId, String subSpCode, String clientPrivateKey, String pkcs12Path,
 			String pkcs12Password, String enginepublicKey, String billId, String payment) throws Exception {
 
+		AdministrationService administrationService = Context.getAdministrationService();
+
+		String gepgPaymentOption = administrationService.getGlobalProperty(GEPG_PAYMENT_OPTION);
+
+		if(gepgPaymentOption == null || gepgPaymentOption.isEmpty()){
+			throw new Exception("GePG Payment Option (" + GEPG_PAYMENT_OPTION + ") was not set.");
+		}
+
 		// Validate inputs
 		validateInputs(patient, invoiceItems, currency, gepgAuthSignature, GFSCodeConceptSourceMappingUuid,
 				spCode, sytemCode, serviceCode, SpSysId, subSpCode);
@@ -1290,7 +1300,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 
 		// Create and populate BillTrxInf
 		BillTrxInf billTrxInf = createBillTrxInf(totalBillAmount, patientNames, patientPhoneNumber, email,
-				currency, billId, billExpirlyDate, billItems, subSpCode, SpSysId, patientId);
+				currency, billId, billExpirlyDate, billItems, subSpCode, SpSysId, patientId, gepgPaymentOption);
 
 		// Create and populate RequestData
 		RequestData requestData = createRequestData(billHdr, billTrxInf, billId, invoiceItems, payment);
@@ -1436,7 +1446,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	// Create BillTrxInf
 	private BillTrxInf createBillTrxInf(Number totalBillAmount, String patientNames, String patientPhoneNumber,
 	        String email, String currency, String billId, Date billExpirlyDate, BillItems billItems, String subSpCode,
-	        String SpSysId, String patientId) {
+	        String SpSysId, String patientId, String gepgPaymentOption) {
 		
 		Date now = new Date();
 		
@@ -1463,7 +1473,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		billTrxInf.setCcy(currency);
 		billTrxInf.setBillEqvAmt(totalBillAmount.toString());
 		billTrxInf.setRemFlag("false");
-		billTrxInf.setBillPayOpt("2");
+		billTrxInf.setBillPayOpt(gepgPaymentOption);
 		billTrxInf.setBillItems(billItems);
 		return billTrxInf;
 	}

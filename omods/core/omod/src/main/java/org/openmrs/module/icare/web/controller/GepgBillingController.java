@@ -41,117 +41,122 @@ public class GepgBillingController {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
 	@RequestMapping(value = "/generatecontrolno", method = RequestMethod.POST)
-    public Map<String, Object> generateControlNumber(
+    public ResponseEntity<?> generateControlNumber(
             @RequestParam(value="payment", required = false) String payment,
-            @RequestBody List<Map<String, Object>> requestPayload)
-            throws Exception {
-        Map<String, Object> generatedControlNumberObject = new HashMap<>();
-
-        Visit visit = null;
-        Double totalBillAmount = 0.0;
-        String currency = null;
-        String billId = null;
-
-        List<InvoiceItem> invoiceItems = new ArrayList<>();
-
-        for(Map<String, Object> receivedItem : requestPayload){
-            Order order = null;
-            InvoiceItem invoiceItem;
-
-            if(receivedItem.containsKey("order")){
-                Object orderObject = receivedItem.get("order");
-
-                if (orderObject instanceof Map) {
-                    @SuppressWarnings("unchecked")
-                    Map<String, Object> orderMap = (Map<String, Object>) orderObject;
-
-                    order = orderMap.get("uuid") != null ? billingService.getOrderByUuid((String) orderMap.get("uuid")) : null;
-                }
-            }
-
-            if (receivedItem.containsKey("currency") && currency == null) {
-                currency = (String) receivedItem.get("currency");
-            }
-
-
-            if (order != null) {
-                invoiceItem = billingService.getInvoiceItemByOrder(order);
-                totalBillAmount += invoiceItem.getPrice();
-
-                billId = invoiceItem.getInvoice().getId().toString();
-
-                if (visit == null && invoiceItem.getInvoice().getVisit() != null) {
-                    visit = invoiceItem.getInvoice().getVisit();
-                }
-
-                invoiceItems.add(invoiceItem);
-            }
-        }
-
-        AdministrationService administrationService = Context.getAdministrationService();
-        Date billExpDate = new Date();
-        String personPhoneNumberAttributeTypeUuid = administrationService
-                .getGlobalProperty(ICareConfig.PHONE_NUMBER_ATTRIBUTE);
-        String spCode = administrationService.getGlobalProperty(ICareConfig.SP_CODE);
-        String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
-        String serviceCode = administrationService.getGlobalProperty(ICareConfig.SERVICE_CODE);
-        String spsyId = administrationService.getGlobalProperty(ICareConfig.SERVICE_PROVIDER_ID);
-        String subSpCode = administrationService.getGlobalProperty(ICareConfig.SUB_SERVICE_PROVIDER_CODE);
-        String personEmailAttributeTypeUuid = administrationService
-                .getGlobalProperty(ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE);
-        String gepgAuthSignature = administrationService.getGlobalProperty(ICareConfig.GEPG_AUTH_SIGNATURE);
-        String GFSCodeConceptSourceMappingUuid = administrationService
-                .getGlobalProperty(ICareConfig.GFSCODE_CONCEPT_SOURCE_REFERENCE);
-        String GEPGUccBaseUrl = administrationService.getGlobalProperty(ICareConfig.GEPG_UCC_BASE_URL_API);
-        String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
-        String enginepublicKey = administrationService.getGlobalProperty(ICareConfig.ENGINE_PUBLIC_KEY);
-        String pkcs12Path = administrationService.getGlobalProperty(ICareConfig.PKCS12_PATH);
-        String pkcs12Password = administrationService.getGlobalProperty(ICareConfig.PKCS12_PASSWORD);
-
-        if (currency == null) {
-            throw new IllegalArgumentException("Currency cannot be null");
-        }
-        if (personPhoneNumberAttributeTypeUuid == null || gepgAuthSignature == null) {
-            throw new IllegalStateException("One or more global properties are missing");
-        }
-
-        if(visit == null){
-            throw new IllegalArgumentException("Visit cannot be null!");
-        }
-
-        Map<String, Object> gepgPayload = billingService.createGePGPayload(
-                visit.getPatient(),
-                invoiceItems,
-                totalBillAmount,
-                billExpDate,
-                personPhoneNumberAttributeTypeUuid,
-                personEmailAttributeTypeUuid,
-                currency,
-                gepgAuthSignature,
-                GFSCodeConceptSourceMappingUuid,
-                spCode,
-                systemCode,
-                serviceCode,
-                spsyId,
-                subSpCode,
-                clientPrivateKey,
-                pkcs12Path,
-                pkcs12Password,
-                enginepublicKey, billId, payment);
+            @RequestBody List<Map<String, Object>> requestPayload) {
 
         try {
-            BillSubmissionRequest billRequest = (BillSubmissionRequest) gepgPayload.get("billRequest");
-            String billPayload = billRequest.toJson();
+            Map<String, Object> generatedControlNumberObject = new HashMap<>();
 
-            generatedControlNumberObject = gepgbillService.submitGepgRequest(billPayload,
-                    (String) gepgPayload.get("signature"), GEPGUccBaseUrl);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            System.out.println(e);;
+            Visit visit = null;
+            Double totalBillAmount = 0.0;
+            String currency = null;
+            String billId = null;
+
+            List<InvoiceItem> invoiceItems = new ArrayList<>();
+
+            for(Map<String, Object> receivedItem : requestPayload){
+                Order order = null;
+                InvoiceItem invoiceItem;
+
+                if(receivedItem.containsKey("order")){
+                    Object orderObject = receivedItem.get("order");
+
+                    if (orderObject instanceof Map) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> orderMap = (Map<String, Object>) orderObject;
+
+                        order = orderMap.get("uuid") != null ? billingService.getOrderByUuid((String) orderMap.get("uuid")) : null;
+                    }
+                }
+
+                if (receivedItem.containsKey("currency") && currency == null) {
+                    currency = (String) receivedItem.get("currency");
+                }
+
+
+                if (order != null) {
+                    invoiceItem = billingService.getInvoiceItemByOrder(order);
+                    totalBillAmount += invoiceItem.getPrice();
+
+                    billId = invoiceItem.getInvoice().getId().toString();
+
+                    if (visit == null && invoiceItem.getInvoice().getVisit() != null) {
+                        visit = invoiceItem.getInvoice().getVisit();
+                    }
+
+                    invoiceItems.add(invoiceItem);
+                }
+            }
+
+            AdministrationService administrationService = Context.getAdministrationService();
+            Date billExpDate = new Date();
+            String personPhoneNumberAttributeTypeUuid = administrationService
+                    .getGlobalProperty(ICareConfig.PHONE_NUMBER_ATTRIBUTE);
+            String spCode = administrationService.getGlobalProperty(ICareConfig.SP_CODE);
+            String systemCode = administrationService.getGlobalProperty(ICareConfig.GEPG_SYSTEM_CODE);
+            String serviceCode = administrationService.getGlobalProperty(ICareConfig.SERVICE_CODE);
+            String spsyId = administrationService.getGlobalProperty(ICareConfig.SERVICE_PROVIDER_ID);
+            String subSpCode = administrationService.getGlobalProperty(ICareConfig.SUB_SERVICE_PROVIDER_CODE);
+            String personEmailAttributeTypeUuid = administrationService
+                    .getGlobalProperty(ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE);
+            String gepgAuthSignature = administrationService.getGlobalProperty(ICareConfig.GEPG_AUTH_SIGNATURE);
+            String GFSCodeConceptSourceMappingUuid = administrationService
+                    .getGlobalProperty(ICareConfig.GFSCODE_CONCEPT_SOURCE_REFERENCE);
+            String GEPGUccBaseUrl = administrationService.getGlobalProperty(ICareConfig.GEPG_UCC_BASE_URL_API);
+            String clientPrivateKey = administrationService.getGlobalProperty(ICareConfig.CLIENT_PRIVATE_KEY);
+            String enginepublicKey = administrationService.getGlobalProperty(ICareConfig.ENGINE_PUBLIC_KEY);
+            String pkcs12Path = administrationService.getGlobalProperty(ICareConfig.PKCS12_PATH);
+            String pkcs12Password = administrationService.getGlobalProperty(ICareConfig.PKCS12_PASSWORD);
+
+            if (currency == null) {
+                throw new IllegalArgumentException("Currency cannot be null");
+            }
+            if (personPhoneNumberAttributeTypeUuid == null || gepgAuthSignature == null) {
+                throw new IllegalStateException("One or more global properties are missing");
+            }
+
+            if(visit == null){
+                throw new IllegalArgumentException("Visit cannot be null!");
+            }
+
+            Map<String, Object> gepgPayload = billingService.createGePGPayload(
+                    visit.getPatient(),
+                    invoiceItems,
+                    totalBillAmount,
+                    billExpDate,
+                    personPhoneNumberAttributeTypeUuid,
+                    personEmailAttributeTypeUuid,
+                    currency,
+                    gepgAuthSignature,
+                    GFSCodeConceptSourceMappingUuid,
+                    spCode,
+                    systemCode,
+                    serviceCode,
+                    spsyId,
+                    subSpCode,
+                    clientPrivateKey,
+                    pkcs12Path,
+                    pkcs12Password,
+                    enginepublicKey, billId, payment);
+
+            try {
+                BillSubmissionRequest billRequest = (BillSubmissionRequest) gepgPayload.get("billRequest");
+                String billPayload = billRequest.toJson();
+
+                generatedControlNumberObject = gepgbillService.submitGepgRequest(billPayload,
+                        (String) gepgPayload.get("signature"), GEPGUccBaseUrl);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+            return ResponseEntity.ok().body(generatedControlNumberObject);
         }
-
-        return generatedControlNumberObject;
+        catch (Exception e){
+            return ResponseEntity.status(500).body(e);
+        }
     }
 	
 	@RequestMapping(value = "/payment", method = RequestMethod.DELETE)

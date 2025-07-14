@@ -26,6 +26,7 @@ export class BillConfirmationComponent implements OnInit {
   isFormValid: boolean;
   formValues: any;
   reloadPatientDetails = false;
+  requestPayload: any;
 
   constructor(
     private matDialogRef: MatDialogRef<BillConfirmationComponent>,
@@ -54,15 +55,15 @@ export class BillConfirmationComponent implements OnInit {
       totalBill: this.data.totalPayableBill
     };
     
-  const requestPayload = this.data.billItems.map((item: any) => ({
-    ...item.billItem, 
-    currency: "TZS" 
-  }));
+    this.requestPayload = this.data.billItems.map((item: any) => ({
+      ...item.billItem, 
+      currency: "TZS" 
+    }));
 
-    this.generatingControlNumber = true;
-    if(this.data?.paymentType?.code === 'GePG'){
-      this.onConntrollNumbGen(requestPayload);
-    }
+    // this.generatingControlNumber = true;
+    // if(this.data?.paymentType?.code === 'GePG'){
+    //   this.onConntrollNumbGen(requestPayload);
+    // }
     
     this.currentUser = this.store.select(getCurrentUserDetails).subscribe({
       next: (currentUser) => {
@@ -77,14 +78,13 @@ export class BillConfirmationComponent implements OnInit {
    
  
 
-  onConntrollNumbGen(payload: any) {
+  onConntrollNumbGen(event: any) {
+    event?.stopPropagation();
     this.generatingControlNumber = true;
-    this.billingService.gepgpayBill(payload).subscribe(
+    this.billingService.gepgpayBill(this.requestPayload).subscribe(
       (response: any) => {
         if (response && response?.controlNumber) {
           this.controlNumber = response?.controlNumber;
-          console.log("Successfully generated control number:", this.controlNumber);
-
           if(this.controlNumber === 'Not found within timeout'){
             this.reloadPatientDetails = true
             this.onCancel();
@@ -93,8 +93,7 @@ export class BillConfirmationComponent implements OnInit {
         }
         
         if (response?.error) {
-          this.savingPaymentError = response?.error;
-          console.log("Error in response:", response?.error);
+          this.savingPaymentError = response?.error?.message ?? response?.message ?? response;
         } else {
           this.savingPaymentError = 'Server Error Please Contact an Admin !';
         }
@@ -104,15 +103,11 @@ export class BillConfirmationComponent implements OnInit {
       },
       (error) => {
         if (error?.error) {
-          this.savingPaymentError = error?.error;
-          console.log("Error in response:", error?.error);
+          this.savingPaymentError = error?.error?.message ?? error?.message ?? error;
         } else {
           this.savingPaymentError = 'Server Error Please Contact an Admin !';
         }
         
-        this.generatingControlNumber = false; 
-        this.reloadPatientDetails = true
-        this.onCancel();
         this.generatingControlNumber = false;
       }
     );
