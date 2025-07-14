@@ -2,20 +2,20 @@ import { Component, OnInit } from "@angular/core";
 import { Observable, of, zip } from "rxjs";
 import { AppState } from "src/app/store/reducers";
 
+import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from "@angular/router";
 import { select, Store } from "@ngrx/store";
+import { catchError, map, take } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { BillingService } from "src/app/modules/billing/services/billing.service";
+import { PaymentService } from "src/app/modules/billing/services/payment.service";
+import { addBillStatusOnBedOrders } from "src/app/modules/inpatient/helpers/sanitize-bed-orders.helper";
+import { DischargePatientModalComponent } from "src/app/shared/components/discharge-patient-modal/discharge-patient-modal.component";
+import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
 import {
   LocationGet,
   ProviderAttributeGet,
 } from "src/app/shared/resources/openmrs";
-import { catchError, map, take } from "rxjs/operators";
-import { MatDialog } from "@angular/material/dialog";
-import { DischargePatientModalComponent } from "src/app/shared/components/discharge-patient-modal/discharge-patient-modal.component";
-import { addBillStatusOnBedOrders } from "src/app/modules/inpatient/helpers/sanitize-bed-orders.helper";
-import { BillingService } from "src/app/modules/billing/services/billing.service";
-import { PaymentService } from "src/app/modules/billing/services/payment.service";
-import { InsuranceService } from "src/app/shared/services";
 import {
   FingerPrintPaylodTypeE,
   NHIFBiometricMethodE,
@@ -25,9 +25,6 @@ import {
   NHIFPractitionerDetailsI,
 } from "src/app/shared/resources/store/models/insurance-nhif.model";
 import { PatientI } from "src/app/shared/resources/store/models/patient.model";
-import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
-import { loginNHIFPractitionerSuccess } from "src/app/store/actions/insurance-nhif-practitioner.actions";
-import { Actions, ofType } from "@ngrx/effects";
 import { VisitObject } from "src/app/shared/resources/visits/models/visit-object.model";
 import { VisitsService } from "src/app/shared/resources/visits/services";
 import { loadCurrentPatient } from "src/app/store/actions";
@@ -52,6 +49,8 @@ import {
   getActiveVisit,
   getVisitLoadingState,
 } from "src/app/store/selectors/visit.selectors";
+import { Actions, ofType } from "@ngrx/effects";
+import { loginNHIFPractitionerSuccess } from "src/app/store/actions/insurance-nhif-practitioner.actions";
 
 @Component({
   selector: "app-patient-dashboard",
@@ -212,8 +211,10 @@ export class PatientDashboardComponent implements OnInit {
     this.activeVisit$.subscribe((response: any) => {
       // if is insurance patient, show verify point of care
       if (response && response?.isEnsured) {
+        // check if attribute exists
+        console.log('active visiti',response.attributes)
         this.activePatientAuthorization =
-          response.attributes?.[4]?.visitAttributeDetails?.value; //authorization number
+          response.attributes?.[5]?.visitAttributeDetails?.value; //authorization number
 
         this.openPatientFingerprintModal(this.activePatientAuthorization);
       }else{
@@ -291,8 +292,8 @@ export class PatientDashboardComponent implements OnInit {
   // Separate method to open the patient fingerprint modal
   retryNHIFPractitionerLogin(): void {
     const loginData = {
-      practitionerNo: this.currentProviderDetails[4]?.["value"] || null,
-      nationalID: this.currentProviderDetails[3]?.["value"] || null,
+      practitionerNo: this.currentProviderDetails[3]?.["value"] || null,
+      nationalID: this.currentProviderDetails[2]?.["value"] || null,
       biometricMethod: NHIFBiometricMethodE.fingerprint,
       fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
     };
@@ -316,7 +317,7 @@ export class PatientDashboardComponent implements OnInit {
           (item) => item.PointOfCareCode === NHIFPointOfCareCodeE.CONSULTATION
         )?.PointOfCareID || null,
       authorizationNo: authNo,
-      practitionerNo: this.currentProviderDetails[4]?.["value"],
+      practitionerNo: this.currentProviderDetails[3]?.["value"],
       biometricMethod: NHIFBiometricMethodE.fingerprint,
       fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
     };

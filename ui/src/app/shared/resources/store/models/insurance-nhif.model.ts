@@ -32,6 +32,7 @@ export interface PatientPOCVerificationI {
   biometricMethod: string;
   fpCode: string;
   imageData: string;
+  nationalID?: string;
 }
 
 export interface NHIFPractitionerDetailsI {

@@ -116,11 +116,18 @@ export class SystemUsersService {
   }
 
   getProviderByUserUuid(userUuid: string): Observable<any> {
-    return this.httpClient
-      .get(`provider?user=${userUuid}&v=custom:(uuid,display,attributes)`)
-      .pipe(
-        map((response) => response?.results),
-        catchError((error) => of(error))
-      );
-  }
+  return this.httpClient
+    .get(`provider?user=${userUuid}&v=custom:(uuid,display,attributes:(uuid,value,voided,attributeType))`)
+    .pipe(
+      map((response: any) => {
+        const providers = response?.results || [];
+        return providers.map((provider: any) => ({
+          ...provider,
+          attributes: provider.attributes.filter((attr: any) => !attr.voided)
+        }));
+      }),
+      catchError((error) => of(error))
+    );
+}
+
 }

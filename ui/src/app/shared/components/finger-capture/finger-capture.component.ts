@@ -104,6 +104,8 @@ export class FingerCaptureComponent implements OnInit {
     this.showLoader = true;
 
     if (this.payload.type === FingerPrintPaylodTypeE.Patient_POC_Verification) {
+      // add national 
+      this.payload.payload.nationalID = '19960227332060000220'
       // Dispatch action to verify point of care and listen to the success action
       this.store.dispatch(verifyPointOfCare({ data: this.payload.payload }));
       merge(
@@ -154,7 +156,8 @@ export class FingerCaptureComponent implements OnInit {
             this.successMessage = "Practitioner logged in successful!";
             // what is the response if sucessfull?
             const practitionerData: NHIFPractitionerDetailsI = {
-              practitionerNo: this.payload.payload.practitionerNo,
+              practitionerNo: 3326,
+              // practitionerNo: this.payload.payload.practitionerNo,
               nationalID: this.payload.payload.nationalID,
               isNHIFPractitionerLogedIn: true,
             };
@@ -171,7 +174,8 @@ export class FingerCaptureComponent implements OnInit {
 
           
             const practitionerData: NHIFPractitionerDetailsI = {
-              practitionerNo: this.payload.payload.practitionerNo,
+              // practitionerNo: this.payload.payload.practitionerNo,
+              practitionerNo: 3326, // (Put this for testing purposes)
               nationalID: this.payload.payload.nationalID,
               isNHIFPractitionerLogedIn: false,   // (Put this true for testing purposes)
             };
