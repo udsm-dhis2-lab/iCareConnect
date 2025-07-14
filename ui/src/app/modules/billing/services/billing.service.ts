@@ -120,9 +120,7 @@ export class BillingService {
         });
       }),
       catchError((error) => {
-        console.error("Error in gepgpayBill:", error);
         return throwError( error?.message ? error : 'An unknown error occurred');
-        // return of({ error: error.message || 'An unknown error occurred' } as any);
       })
     );
   }

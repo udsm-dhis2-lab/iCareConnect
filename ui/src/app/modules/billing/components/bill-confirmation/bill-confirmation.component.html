@@ -77,7 +77,7 @@
 
       <!-- Control Number Generation -->
       <div class="controlNumber-field m-3" *ngIf="params?.gepgConceptField && data?.paymentType?.code === 'GePG'">
-        <div *ngIf="!savingPaymentError && !controlNumber">
+        <div *ngIf="!savingPaymentError && !controlNumber && generatingControlNumber">
           <mat-progress-bar mode="indeterminate"></mat-progress-bar>
           <div class="text-center"><div>Processing...</div></div>
         </div>
@@ -103,7 +103,7 @@
     <!-- <app-print-button *ngIf="controlNumber && data?.paymentType?.code === 'GePG'" [iconName]="'print'" [toolTipText]="'Click to print control number'" [showText]="'Print Control Number'" [classesList]="['float-right', 'button', 'mr-5']"
       [ElementToBePrinted]="{ControlNumber: controlNumber, CurrentPatient: data?.currentPatient, FacilityDetails: facilityDetailsJson}" (print)="onPrint($event)">
     </app-print-button> -->
-    <button *ngIf="controlNumber && data?.paymentType?.code === 'GePG'" mat-flat-button color="primary" (click)="onGepgConfirmation($event)">
+    <button *ngIf="data?.paymentType?.code === 'GePG'" mat-flat-button color="primary" (click)="onConntrollNumbGen($event)">
       Confirm Payment
     </button>
   </mat-dialog-actions>
