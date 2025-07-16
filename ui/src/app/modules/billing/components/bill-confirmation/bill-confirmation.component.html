@@ -51,28 +51,14 @@
       </div>
 
      <!-- Control Number Display -->
-<div *ngIf="controlNumber === 'Not found within timeout'; else displayControlNumber">
-  <div class="text-center">
-    <div class="text-danger small font-weight-bold">
-      Sorry, your request is taking longer than expected!
-    </div>
-      <div class="text-danger small font-weight-bold">
-      Please refresh the page after 5 minutes.
-     </div>
-    
-  </div>
-</div>
-
-<ng-template #displayControlNumber>
-  <div *ngIf="controlNumber">
-    <div class="d-flex justify-content-center align-items-center control-number-container">
-      <div class="text-center">
-        <div class="h3 mb-4">Bill Control Number</div>
-        <div class="control-number">{{ controlNumber }}</div>
+      <div *ngIf="controlNumber && controlNumber !== 'Not found within timeout'">
+        <div class="d-flex justify-content-center align-items-center control-number-container">
+          <div class="text-center">
+            <div class="h3 mb-4">Bill Control Number</div>
+            <div class="control-number">{{ controlNumber }}</div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</ng-template>
 
 
       <!-- Control Number Generation -->
@@ -103,7 +89,7 @@
     <!-- <app-print-button *ngIf="controlNumber && data?.paymentType?.code === 'GePG'" [iconName]="'print'" [toolTipText]="'Click to print control number'" [showText]="'Print Control Number'" [classesList]="['float-right', 'button', 'mr-5']"
       [ElementToBePrinted]="{ControlNumber: controlNumber, CurrentPatient: data?.currentPatient, FacilityDetails: facilityDetailsJson}" (print)="onPrint($event)">
     </app-print-button> -->
-    <button *ngIf="data?.paymentType?.code === 'GePG'" mat-flat-button color="primary" (click)="onConntrollNumbGen($event)">
+    <button *ngIf="data?.paymentType?.code === 'GePG' && !alreadyRequested" mat-flat-button color="primary" (click)="onConntrollNumbGen($event)">
       Confirm Payment
     </button>
   </mat-dialog-actions>

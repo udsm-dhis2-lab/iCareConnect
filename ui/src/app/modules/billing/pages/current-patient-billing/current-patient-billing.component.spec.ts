@@ -1,9 +1,11 @@
 /* tslint:disable:no-unused-variable */
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { DebugElement } from '@angular/core';
 
 import { CurrentPatientBillingComponent } from './current-patient-billing.component';
+import { beforeEach } from 'mocha';
+import { describe } from 'mocha';
+import { expect } from 'chai';
+import { it } from 'mocha';
 
 describe('CurrentPatientBillingComponent', () => {
   let component: CurrentPatientBillingComponent;

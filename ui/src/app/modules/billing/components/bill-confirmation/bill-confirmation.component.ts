@@ -27,6 +27,7 @@ export class BillConfirmationComponent implements OnInit {
   formValues: any;
   reloadPatientDetails = false;
   requestPayload: any;
+  alreadyRequested: boolean = false;
 
   constructor(
     private matDialogRef: MatDialogRef<BillConfirmationComponent>,
@@ -86,20 +87,18 @@ export class BillConfirmationComponent implements OnInit {
         if (response && response?.controlNumber) {
           this.controlNumber = response?.controlNumber;
           if(this.controlNumber === 'Not found within timeout'){
+            this.savingPaymentError = "Request was submitted successfully! Please, take a minute then refresh the page to see if control number has been generated.";
             this.reloadPatientDetails = true
-            this.onCancel();
           }
           return;
         }
         
-        if (response?.error) {
+        if (response?.status === 'error') {
           this.savingPaymentError = response?.error?.message ?? response?.message ?? response;
         } else {
           this.savingPaymentError = 'Server Error Please Contact an Admin !';
         }
-        this.generatingControlNumber = false; 
-        this.reloadPatientDetails = true
-        this.onCancel();
+        
       },
       (error) => {
         if (error?.error) {
@@ -108,7 +107,10 @@ export class BillConfirmationComponent implements OnInit {
           this.savingPaymentError = 'Server Error Please Contact an Admin !';
         }
         
+      },
+      () => {
         this.generatingControlNumber = false;
+        this.alreadyRequested = false;
       }
     );
   }

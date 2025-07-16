@@ -109,15 +109,10 @@ export class BillingService {
 
     const url = `gepg/generatecontrolno ${payment ? `?payment=${payment}` : ''}`;
     return this.httpClient.post(url, payload).pipe(
-      map((response: any) => {
-        if (response.error) {
-          throw new Error(response.error);
+      tap((response: any) => {
+        if (response?.error) {
+          throw new Error(response?.message ?? response?.error);
         }
-
-        return new Payment({
-          controlNumber: response.controlNumber, 
-          ...response, 
-        });
       }),
       catchError((error) => {
         return throwError( error?.message ? error : 'An unknown error occurred');
