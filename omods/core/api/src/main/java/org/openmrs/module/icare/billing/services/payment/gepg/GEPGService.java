@@ -56,12 +56,6 @@ public class GEPGService {
 
                 }
 
-                try {
-                    List<GePGLogs> logs = this.billingService.getGepgLogsByRequestId(requestIdRef.get(), null, null, true);
-                } catch(Exception e) {
-                    System.out.println("Error occured: " + e);
-                }
-
                 List<GePGLogs> logs = this.billingService.getGepgLogsByRequestId(requestIdRef.get(), null, null, true);
 
                 if(!logs.isEmpty()){

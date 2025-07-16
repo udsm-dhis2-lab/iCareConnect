@@ -12,8 +12,6 @@ import { BillConfirmationComponent } from "../bill-confirmation/bill-confirmatio
 import { PaymentReceiptComponent } from "../payment-reciept/payment-reciept.component";
 import { sum, sumBy } from "lodash";
 import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
-import { forEach } from "cypress/types/lodash";
-import { event } from "cypress/types/jquery";
 import { BillingService } from "../../services/billing.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
 
@@ -50,7 +48,6 @@ export class QuotationItemComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog,
-    private billableItemsService: BillableItemsService,
     private billingService: BillingService,
     private systemSettingsService: SystemSettingsService,
     private snackBar: MatSnackBar

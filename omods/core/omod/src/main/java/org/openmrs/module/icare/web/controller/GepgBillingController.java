@@ -140,17 +140,11 @@ public class GepgBillingController {
                     pkcs12Password,
                     enginepublicKey, billId, payment);
 
-            try {
-                BillSubmissionRequest billRequest = (BillSubmissionRequest) gepgPayload.get("billRequest");
-                String billPayload = billRequest.toJson();
+            BillSubmissionRequest billRequest = (BillSubmissionRequest) gepgPayload.get("billRequest");
+            String billPayload = billRequest.toJson();
 
-                generatedControlNumberObject = gepgbillService.submitGepgRequest(billPayload,
-                        (String) gepgPayload.get("signature"), GEPGUccBaseUrl);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                System.out.println(e);
-            }
+            generatedControlNumberObject = gepgbillService.submitGepgRequest(billPayload,
+                    (String) gepgPayload.get("signature"), GEPGUccBaseUrl);
 
             return ResponseEntity.ok().body(generatedControlNumberObject);
         }

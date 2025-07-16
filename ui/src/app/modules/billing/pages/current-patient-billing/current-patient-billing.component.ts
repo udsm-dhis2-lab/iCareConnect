@@ -344,16 +344,46 @@ export class CurrentPatientBillingComponent implements OnInit {
         this.requestingControlNumber = false;
         if (response && response?.ackCode === "CONS9005") {
           this.savingPaymentError = 'Authentication Failed! Kindly, try again or contact your IT Administrator';
-        } else if (response?.paymentDetails?.status === 'success'){
-            this.snackBar.open(response?.paymentDetails?.message, "OK", {
-              horizontalPosition: "right",
-              verticalPosition: "top",
-              duration: 3500,
-              panelClass: ["snack-color"],
-            });
+        } else if (response?.status === 'success'){
+            if (response && response?.controlNumber) {
+              if(response?.controlNumber === 'Not found within timeout'){
+                  response = {
+                    ...response,
+                    message: "Request was submitted successfully! Please, take a minute then refresh the page to see if control number has been generated."
+                }
+              } else {
+                this.controlNumber = response?.controlNumber;
+                response = {
+                  ...response,
+                  message: "Request was submitted successfully! Please copy this control number or reload the page. " + this.controlNumber
+                }
+              }
+              this.snackBar.open(response?.message, "OK", {
+                horizontalPosition: "right",
+                verticalPosition: "top",
+                duration: 5000,
+                panelClass: ["snack-color"],
+              });
+            }
           } else {
             this.savingPaymentError = 'Server Error Please Contact an Admin !';
         }
+
+        // if (response && response?.controlNumber) {
+        //   this.controlNumber = response?.controlNumber;
+        //   if(this.controlNumber === 'Not found within timeout'){
+        //     this.savingPaymentError = "Request was submitted successfully! Please, take a minute then refresh the page to see if control number has been generated.";
+        //     this.reloadPatientDetails = true
+        //   }
+        //   return;
+        // }
+        
+        // if (response?.status === 'error') {
+        //   this.savingPaymentError = response?.error?.message ?? response?.message ?? response;
+        // } else {
+        //   this.savingPaymentError = 'Server Error Please Contact an Admin !';
+        // }
+        
 
         if(this.savingPaymentError){
           this.snackBar.open(this.savingPaymentError, "OK", {
