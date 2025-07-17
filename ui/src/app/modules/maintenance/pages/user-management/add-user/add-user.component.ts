@@ -384,47 +384,88 @@ export class AddUserComponent implements OnInit {
       : this.service.createUser({ user })
     ).subscribe(
       (user) => {
+        console.log("user for provider: ", user)
         if (user) {
           // create provider
           // TODO: Add support to capture attributes dynamically
-          const provider = {
-            identifier: data?.username,
-            person: user?.person?.uuid,
-            attributes: [
-              {
-                uuid: userToUpdate?.providerAttributes
-                  ? (userToUpdate?.providerAttributes?.filter(
+          let providerAttributes = []
+
+          if (userToUpdate?.providerAttributes){
+            providerAttributes = [
+              ...providerAttributes,
+              ...[
+                {
+                  uuid: userToUpdate?.providerAttributes
+                    ? (userToUpdate?.providerAttributes?.filter(
                       (attribute) =>
                         attribute?.attributeType?.uuid ===
                         "79fa49fc-d584-4b74-9dcd-eb265372ade1"
                     ) || [])[0]?.uuid
-                  : null,
-                attributeType: "79fa49fc-d584-4b74-9dcd-eb265372ade1",
-                value: data?.MCTNumber,
-              },
-              {
-                uuid: userToUpdate?.providerAttributes
-                  ? (userToUpdate?.providerAttributes?.filter(
+                    : null,
+                  attributeType: "79fa49fc-d584-4b74-9dcd-eb265372ade1",
+                  value: data?.MCTNumber,
+                },
+                {
+                  uuid: userToUpdate?.providerAttributes
+                    ? (userToUpdate?.providerAttributes?.filter(
                       (attribute) =>
                         attribute?.attributeType?.uuid ===
                         "685a0d80-25e5-4ed4-8a03-974a1d161bf3"
                     ) || [])[0]?.uuid
-                  : null,
-                attributeType: "685a0d80-25e5-4ed4-8a03-974a1d161bf3",
-                value: data?.phoneNumber,
-              },
-              {
-                uuid: userToUpdate?.providerAttributes
-                  ? (userToUpdate?.providerAttributes?.filter(
+                    : null,
+                  attributeType: "685a0d80-25e5-4ed4-8a03-974a1d161bf3",
+                  value: data?.phoneNumber,
+                },
+                {
+                  uuid: userToUpdate?.providerAttributes
+                    ? (userToUpdate?.providerAttributes?.filter(
                       (attribute) =>
                         attribute?.attributeType?.uuid ===
                         "9c4420fa-5a22-4249-978c-da6e0f24880b"
                     ) || [])[0]?.uuid
-                  : null,
-                attributeType: "9c4420fa-5a22-4249-978c-da6e0f24880b",
-                value: data?.qualification,
-              },
-            ],
+                    : null,
+                  attributeType: "9c4420fa-5a22-4249-978c-da6e0f24880b",
+                  value: data?.qualification,
+                },
+              ]
+            ]
+          } else {
+            if (data.MCTNumber) {
+              providerAttributes = [
+                ...providerAttributes,
+                {
+                  attributeType: "79fa49fc-d584-4b74-9dcd-eb265372ade1",
+                  value: data?.MCTNumber
+                }
+              ]
+            }
+
+            if(data.phoneNumber) {
+              providerAttributes = [
+                ...providerAttributes,
+                {
+                  attributeType: "685a0d80-25e5-4ed4-8a03-974a1d161bf3",
+                  value: data?.phoneNumber
+                }
+              ]
+            }
+
+            if(data.qualification){
+              providerAttributes = [
+                ...providerAttributes,
+                {
+                  attributeType: "9c4420fa-5a22-4249-978c-da6e0f24880b",
+                  value: data?.qualification
+                }
+              ]
+            }
+          }
+
+          const provider = {
+            identifier: data?.username,
+            person: user?.person?.uuid,
+            attributes: providerAttributes,
+            retired: false
           };
           this.shouldCreateProvider
             ? this.service
