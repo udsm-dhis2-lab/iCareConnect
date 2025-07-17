@@ -1415,9 +1415,10 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 					        .equals(GFSCodeConceptSourceMappingUuid)) {
 						
 						GFSCode = conceptMap.getConceptReferenceTerm().getCode();
+						Double billAmount = invoiceItem.getPrice() * invoiceItem.getQuantity();
 						billItems.getBillItem().add(
-						    new BillItem(invoiceItem.getItem().getId().toString(), "N", invoiceItem.getPrice().toString(),
-						            invoiceItem.getPrice().toString(), "0.0", GFSCode));
+						    new BillItem(invoiceItem.getItem().getId().toString(), "N", billAmount.toString(), billAmount
+						            .toString(), "0.0", GFSCode));
 					}
 				}
 				if (GFSCode == null) {
@@ -1522,7 +1523,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 					paymentItem.setPayment(payment);
 					paymentItem.setItem(invoiceItem.getItem());
 					paymentItem.setOrder(invoiceItem.getOrder());
-					paymentItem.setAmount(invoiceItem.getPrice());
+					paymentItem.setAmount(invoiceItem.getPrice() * invoiceItem.getQuantity());
 					paymentItem.setStatus(null);
 					payment.getItems().add(paymentItem);
 				}
