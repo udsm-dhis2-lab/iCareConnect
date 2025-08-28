@@ -1,0 +1,28 @@
+name: TASK
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  TASK:
+    if: |
+      github.event_name == 'push'
+    name: TASK
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔄
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.push.head.sha }}
+
+      - uses: BaharaJr/clickup@0.0.9
+        with:
+          CLICKUP_TOKEN: ${{secrets.CLICKTOKEN}}
+          LIST_ID: ${{secrets.LIST_ID}}
+          TASK_STATUS: ${{secrets.STATUS}}
+          ASSIGNEES: ${{secrets.ASSIGNEES}}
+          FIELDS: ${{secrets.FIELDS}}
+          MESSAGE: ${{github.event.head_commit.message}}
+          AUTHOR: ${{ github.event.commits[0].author.username ||
+            github.event.commits[0].author.login }}

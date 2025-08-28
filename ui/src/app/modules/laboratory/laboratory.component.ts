@@ -44,6 +44,7 @@ import { selectNHIFPractitionerDetails } from "src/app/store/selectors/insurance
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 import { LabMenu } from "./resources/models/lab-menu.model";
 import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
+import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
 @Component({
   selector: "lab-root",
   templateUrl: "./laboratory.component.html",
@@ -281,7 +282,7 @@ export class LaboratoryComponent implements OnInit {
     });
 
     // get practitioner details
-    this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
+    /*this.store.select(selectNHIFPractitionerDetails).subscribe((data) => {
       // if the doctor is not logged in to NHIF, prompt the doctor to login
       if (!data || !data.isNHIFPractitionerLogedIn) {
         const loginData = {
@@ -291,7 +292,7 @@ export class LaboratoryComponent implements OnInit {
           fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
         };
 
-        /*this.dialog.open(FingerCaptureComponent, {
+        this.dialog.open(FingerCaptureComponent, {
           width: "45%",
           data: {
             detail: "doctor's",
@@ -300,9 +301,9 @@ export class LaboratoryComponent implements OnInit {
               payload: loginData,
             },
           },
-        });*/
+        });
       }
-    });
+    }); */
 
     this.systemSettingsService
       .getSystemSettingsByKey(`icare.general.selectedSystemSettings`)

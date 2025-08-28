@@ -92,7 +92,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   receivedByField: any;
 
   testOrders: any[] = [];
-  groupedTestOrdersByDepartments: any[] = [];
+   groupedTestOrdersByDepartments: any[] = [];
   errorMessage: string = "";
 
   sampleLabelsUsedDetails: any[] = [];

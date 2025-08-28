@@ -1,7 +1,6 @@
 <div
   class="app-container"
   *ngIf="{
-    LISConfigurations: LISConfigurations$ | async,
     userLocations: locationsForCurrentUser$ | async
   } as params"
 >
@@ -9,11 +8,11 @@
   <div
     [ngClass]="{
       contents:
-        !params?.LISConfigurations?.isLIS &&
-        !params?.LISConfigurations?.isPharmacy,
+        !LISConfigurations?.isLIS &&
+        !LISConfigurations?.isPharmacy,
       'lis-contents':
-        params?.LISConfigurations?.isLIS ||
-        params?.LISConfigurations?.isPharmacy
+        LISConfigurations?.isLIS ||
+        LISConfigurations?.isPharmacy
     }"
   >
     <router-outlet></router-outlet>
