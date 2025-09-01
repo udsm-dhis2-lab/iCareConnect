@@ -33,7 +33,7 @@ import { initiateEncounterType } from "src/app/store/actions/encounter-type.acti
 import { getLISConfigurations } from "src/app/store/selectors/lis-configurations.selectors";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { OpenmrsHttpClientService } from "../../../shared/modules/openmrs-http-client/services/openmrs-http-client.service";
-import { catchError, map } from "rxjs/operators";
+import { catchError, map, tap } from "rxjs/operators";
 import { ManageUserProfileModalComponent } from "../../../shared/dialogs/manage-user-profile-modal/manage-user-profile-modal.component";
 import { SystemUsersService } from "src/app/core/services/system-users.service";
 import { LabEditUserModalComponent } from "src/app/modules/laboratory/modules/settings/components/lab-edit-user-modal/lab-edit-user-modal.component";
@@ -75,7 +75,7 @@ export class MenuComponent implements OnInit {
     this.googleFormLink$ = this.systemSettingsService.getSystemSettingsByKey(
       "iCare.general.systemSettings.support.googleFormLink"
     );
-    this.lisConfigurations$ = this.store.select(getLISConfigurations);
+    this.lisConfigurations$ = this.store.select(getLISConfigurations)
 
     this.authService.getSession().subscribe((sessionResponse) => {
       this.store.dispatch(

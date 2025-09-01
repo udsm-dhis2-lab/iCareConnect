@@ -92,7 +92,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   receivedByField: any;
 
   testOrders: any[] = [];
-  groupedTestOrdersByDepartments: any[] = [];
+   groupedTestOrdersByDepartments: any[] = [];
   errorMessage: string = "";
 
   sampleLabelsUsedDetails: any[] = [];
@@ -727,7 +727,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
         } else if (testOrdersWithNoDepartments.length > 0) {
           this.errorMessage = `Test${
             testOrdersWithNoDepartments.length > 1 ? "s" : ""
-          }s
+          }
             ${(
               testOrdersWithNoDepartments?.map(
                 (testOrderWithNoDept: any) => testOrderWithNoDept?.display
@@ -831,39 +831,44 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                               "non-clinical"
                                 ? (patientIdentifierTypes || [])
                                     .map((personIdentifierType) => {
-                                      if (
-                                        personIdentifierType.id ===
-                                        this.preferredPersonIdentifier
-                                      ) {
-                                        return {
-                                          identifier: this.personDetailsData[
-                                            "mrn"
-                                          ]
-                                            ? this.personDetailsData["mrn"]
-                                            : this.personDetailsData[
+                                      if(personIdentifierType?.id && this.personDetailsData?.identifiers?.filter((identifier) => {
+                                        return identifier?.identifierType?.uuid === personIdentifierType.id;
+                                      })?.filter(identifier => identifier)?.length == 0){
+                                        if (
+                                          personIdentifierType.id ===
+                                          this.preferredPersonIdentifier 
+                                        ) {
+                                          return {
+                                            identifier: this.personDetailsData[
+                                              "mrn"
+                                            ]
+                                              ? this.personDetailsData["mrn"]
+                                              : this.personDetailsData[
+                                                  personIdentifierType.id
+                                                ],
+                                            identifierType:
+                                              personIdentifierType.id,
+                                            location:
+                                              this.currentLocation?.uuid ||
+                                              "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this,
+                                            preferred: true,
+                                          }
+                                        } else {
+                                          return {
+                                            identifier:
+                                              this.personDetailsData[
                                                 personIdentifierType.id
                                               ],
-                                          identifierType:
-                                            personIdentifierType.id,
-                                          location:
-                                            this.currentLocation?.uuid ||
-                                            "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this,
-                                          preferred: true,
-                                        };
-                                      } else {
-                                        return {
-                                          identifier:
-                                            this.personDetailsData[
-                                              personIdentifierType.id
-                                            ],
-                                          identifierType:
-                                            personIdentifierType.id,
-                                          location:
-                                            this.currentLocation?.uuid ||
-                                            "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this,
-                                          preferred: false,
-                                        };
+                                            identifierType:
+                                              personIdentifierType.id,
+                                            location:
+                                              this.currentLocation?.uuid ||
+                                              "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this,
+                                            preferred: false,
+                                          };
+                                        }
                                       }
+                                      return undefined;
                                     })
                                     .filter(
                                       (patientIdentifier) =>
@@ -881,6 +886,10 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                     },
                                   ],
                           };
+
+                          if(this.patientPayload?.identifiers?.filter(identifier => identifier)?.length == 0){
+                            this.patientPayload = omit(this.patientPayload, 'identifiers');
+                          }
                           this.savingData = true;
                           this.registrationService
                             .createPatient(

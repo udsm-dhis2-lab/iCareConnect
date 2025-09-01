@@ -15,10 +15,18 @@ import java.util.*;
  */
 @Entity
 @Table(name = "lb_sample_order")
+@IdClass(SampleOrderID.class)
 public class SampleOrder implements Serializable {
 	
-	@EmbeddedId
-	private SampleOrderID id;
+	@Id
+	@ManyToOne
+	@JoinColumn(name = "sample_id")
+	private Sample sample;
+	
+	@Id
+	@ManyToOne
+	@JoinColumn(name = "order_id")
+	private Order order;
 	
 	@ManyToOne
 	@JoinColumn(name = "technician")
@@ -35,34 +43,21 @@ public class SampleOrder implements Serializable {
 		this.technician = technician;
 	}
 	
-	public SampleOrderID getId() {
-		return id;
-	}
-	
-	public void setId(SampleOrderID id) {
-		this.id = id;
-	}
-	
 	public void setOrder(Order order) {
-		if (id == null) {
-			this.id = new SampleOrderID();
-		}
-		this.id.setOrder(order);
+		this.order = order;
 	}
 	
 	public void setSample(Sample sample) {
-		if (id == null) {
-			this.id = new SampleOrderID();
-		}
-		this.id.setSample(sample);
+		
+		this.sample = sample;
 	}
 	
 	public Order getOrder() {
-		return id.getOrder();
+		return this.order;
 	}
 	
 	public Sample getSample() {
-		return id.getSample();
+		return this.sample;
 	}
 	
 	public static SampleOrder fromMap(Map<String, Object> map) {

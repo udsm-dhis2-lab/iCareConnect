@@ -5161,4 +5161,16 @@
             );
         </sql>
     </changeSet>
+    <changeSet id="add-sample-type-discriminator-column" author="jonas-mwambimbi">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="lb_sample" columnName="sample_extended"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="lb_sample">
+            <column name="sample_extended" type="varchar(50)" defaultValue="SAMPLE">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

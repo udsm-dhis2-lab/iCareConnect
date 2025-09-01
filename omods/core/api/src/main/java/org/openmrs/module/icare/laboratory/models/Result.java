@@ -1,5 +1,7 @@
 package org.openmrs.module.icare.laboratory.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.openmrs.*;
 
 import javax.naming.Context;
@@ -45,7 +47,8 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "value_group_id", nullable = true)
-	private Result valueGroup;
+    @JsonIgnore
+    private Result valueGroup;
 
 	@Column(name = "value_date_time")
 	private Date valueDatetime;
@@ -66,7 +69,8 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	private Integer addReqTimeLimit;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "test_allocation_id")
+	@JoinColumn(name = "test_allocation_id", nullable = false)
+    @JsonBackReference
 	private TestAllocation testAllocation;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -374,7 +378,7 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 
 		TestAllocation testAllocation = new TestAllocation();
 		testAllocation.setUuid(((Map) map.get("testAllocation")).get("uuid").toString());
-		result.setTestAllocation(testAllocation);
+//		result.setTestAllocation(testAllocation);
 
 		return result;
 	}
@@ -459,15 +463,15 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		resultsObject.put("concept", resultsConceptObject);
 
 		Map<String, Object> testObject = new HashMap<String, Object>();
-		testObject.put("uuid", this.getTestAllocation().getUuid());
+//		testObject.put("uuid", this.getTestAllocation().getUuid());
 		resultsObject.put("testAllocation", testObject);
 
 		Map<String, Object> sampleDetails = new HashMap<>();
-		if (this.getTestAllocation().getSample() != null) {
-			sampleDetails.put("uuid", this.getTestAllocation().getSample().getUuid());
-			sampleDetails.put("label", this.getTestAllocation().getSample().getLabel());
-			sampleDetails.put("display", this.getTestAllocation().getSample().getLabel());
-		}
+//		if (this.getTestAllocation().getSample() != null) {
+//			sampleDetails.put("uuid", this.getTestAllocation().getSample().getUuid());
+//			sampleDetails.put("label", this.getTestAllocation().getSample().getLabel());
+//			sampleDetails.put("display", this.getTestAllocation().getSample().getLabel());
+//		}
 		resultsObject.put("sample", sampleDetails);
 
 		Map<String, Object> creatorObject = new HashMap<String, Object>();
