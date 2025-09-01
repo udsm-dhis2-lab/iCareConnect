@@ -49,6 +49,7 @@ export class PersonDetailsComponent implements OnInit {
   age: number = 0;
   month: number = 0;
   searchByIdentifier: boolean = false;
+  existingClicked = false;
 
   selectedClientData: any;
 
@@ -201,6 +202,12 @@ export class PersonDetailsComponent implements OnInit {
       identifier = values[key]?.value;
       this.lastIdentifier = key;
     });
+
+    if(this.existingClicked){
+      this.existingClicked = false;
+    } else {
+      this.personDetailsCategory = 'new';
+    }
     this.personDetails.emit({
       ...this.personDetailsData,
       isNewPatient: this.personDetailsCategory === "new",
@@ -281,6 +288,8 @@ export class PersonDetailsComponent implements OnInit {
               identifiers: personDetails?.identifiers,
               phoneNumber: phoneNumber,
             };
+            this.existingClicked = true;
+            this.personDetailsCategory = 'selected';
             this.setPersonDetails(person);
             this.showSearchedDetails = false;
           }
@@ -335,11 +344,13 @@ export class PersonDetailsComponent implements OnInit {
         value: personDetails ? personDetails[key] : null,
       };
     });
-    if (personDetails) {
+    if (personDetails) {;
       this.setIdentifierFields(this.identifierTypes, personDetails);
+      this.personDetailsData = {...this.personDetailsData, identifiers: personDetails?.identifiers,};
       this.personDetails.emit({
         ...this.personDetailsData,
         isNewPatient: this.personDetailsCategory === "new",
+        identifiers: personDetails?.identifiers,
         patientUuid: this.patientUuid,
         pimaCOVIDLinkDetails: !this.selectedClientData?.hasResults
           ? this.selectedClientData
