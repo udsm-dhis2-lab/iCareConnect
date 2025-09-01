@@ -404,7 +404,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		
 		Sample sample = this.sampleDAO.findByUuid(sampleOrder.getSample().getUuid());
 		sampleOrder.setSample(sample);
-		SampleOrder savedSampleOrder = this.sampleOrderDAO.get(sampleOrder.getId());
+		SampleOrderID idToFind = new SampleOrderID(sample.getId(), order.getId());
+		SampleOrder savedSampleOrder = this.sampleOrderDAO.get(idToFind);
 		
 		User user = Context.getUserService().getUserByUuid(sampleOrder.getTechnician().getUuid());
 		if (user == null) {

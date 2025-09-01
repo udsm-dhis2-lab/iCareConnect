@@ -14,7 +14,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "lb_sample")
-@DiscriminatorValue("00")
+@DiscriminatorValue("SAMPLE_EXTENSION")
 public class SampleExt extends Sample {
 	
 	@Override

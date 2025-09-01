@@ -26,8 +26,9 @@ import static javax.persistence.GenerationType.IDENTITY;
  */
 @Entity
 @Table(name = "lb_sample")
-@DiscriminatorFormula("0")
-@DiscriminatorValue("0")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "sample_extended")
+@DiscriminatorValue("SAMPLE")
 public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSONConverter {
 	
 	@Id
@@ -60,7 +61,7 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	private Concept specimenSource;
 	
 	@JsonIgnore
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "id.sample", cascade = { CascadeType.PERSIST })
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "sample", cascade = { CascadeType.PERSIST })
 	private List<SampleOrder> sampleOrders = new ArrayList<SampleOrder>(0);
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "sample")

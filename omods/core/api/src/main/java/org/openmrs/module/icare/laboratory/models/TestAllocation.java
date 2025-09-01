@@ -2,6 +2,7 @@ package org.openmrs.module.icare.laboratory.models;
 
 // Generated Oct 7, 2020 12:48:40 PM by Hibernate Tools 5.2.10.Final
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.GenericGenerator;
 import org.openmrs.*;
 import org.openmrs.api.ConceptService;
@@ -55,7 +56,8 @@ public class TestAllocation extends BaseOpenmrsData implements java.io.Serializa
 	private List<TestAllocationStatus> testAllocationStatuses = new ArrayList<TestAllocationStatus>(0);
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "testAllocation")
-	private List<Result> testAllocationResults = new ArrayList<Result>(0);
+    @JsonManagedReference
+    private List<Result> testAllocationResults = new ArrayList<Result>(0);
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "testAllocation")
 	private List<TestAllocationAssociatedField> testAllocationAssociatedFields = new ArrayList<>(0);
