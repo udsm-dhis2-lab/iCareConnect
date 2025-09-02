@@ -2,6 +2,7 @@ package org.openmrs.module.icare.laboratory.dao;
 
 // Generated Oct 7, 2020 12:49:21 PM by Hibernate Tools 5.2.10.Final
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSession;

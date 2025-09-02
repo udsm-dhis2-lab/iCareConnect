@@ -676,7 +676,6 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
         // Identify if tests ordered are well configured
 
         // Identify referring doctor fields entered values
-        console.log("Personal Data from the form: ", this.personDetailsData)
         let attributeMissingOnDoctorsAttributes;
         this.sampleLabelsUsedDetails = [];
         const doctorsAttributesWithValues =
@@ -887,8 +886,6 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                     },
                                   ],
                           };
-                          
-                          console.log("Personal for submission: ", this.patientPayload)
         
                           if(!this.patientPayload?.identifiers?.filter(identifier => identifier)?.length){
                             this.patientPayload = omit(this.patientPayload, 'identifiers');

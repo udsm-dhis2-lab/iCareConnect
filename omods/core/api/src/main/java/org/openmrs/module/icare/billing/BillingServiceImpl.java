@@ -602,8 +602,6 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	public void processVisit(VisitWrapper visitWrapper, VisitMetaData visitMetaData) throws VisitInvalidException,
 	        ConfigurationException {
 		
-		System.out.println("Care Service: " + visitMetaData.getServiceConcept().getDisplayString());
-		
 		// Start Creating Invoice
 		Patient patient = visitWrapper.getVisit().getPatient();
 		Invoice invoice = new Invoice();
