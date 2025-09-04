@@ -12,6 +12,7 @@ import {
   DateAdapter,
   MAT_DATE_FORMATS,
   MAT_DATE_LOCALE,
+  ThemePalette,
 } from "@angular/material/core";
 import { Observable, of } from "rxjs";
 import { DATE_FORMATS_DD_MM_YYYY } from "src/app/core/constants/date-formats.constants";
@@ -41,6 +42,8 @@ export class FieldComponent implements AfterViewInit {
   @Input() fieldClass: string;
   @Input() shouldDisable: boolean;
   members$: Observable<any[]> = of([]);
+
+  public color: ThemePalette = 'primary';
 
   constructor(private formService: FormService) {}
 
