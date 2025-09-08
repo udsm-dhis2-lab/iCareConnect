@@ -214,7 +214,7 @@ export class PatientDashboardComponent implements OnInit {
         // check if attribute exists
         console.log('active visiti',response.attributes)
         this.activePatientAuthorization =
-          response.attributes?.[5]?.visitAttributeDetails?.value; //authorization number
+          response.attributes?.[6]?.visitAttributeDetails?.value; //authorization number
 
         this.openPatientFingerprintModal(this.activePatientAuthorization);
       }else{
@@ -298,7 +298,7 @@ export class PatientDashboardComponent implements OnInit {
       fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
     };
 
-    this.dialog.open(FingerCaptureComponent, {
+    const dialogRef = this.dialog.open(FingerCaptureComponent, {
       width: "45%",
       data: {
         detail: "doctor's",
@@ -307,6 +307,13 @@ export class PatientDashboardComponent implements OnInit {
           payload: loginData,
         },
       },
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      // Only open patient dialog after practitioner dialog is closed
+      if (this.activePatientAuthorization) {
+        this.launchPatientFingerprintModal(this.activePatientAuthorization);
+      }
     });
   }
 

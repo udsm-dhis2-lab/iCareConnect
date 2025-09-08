@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { getActiveVisit } from "src/app/store/selectors/visit.selectors";
 import { merge, Observable } from "rxjs";
 import { ICARE_CONFIG } from "src/app/shared/resources/config";
 import { DiagnosisObject } from "src/app/shared/resources/diagnosis/models/diagnosis-object.model";
@@ -20,7 +19,6 @@ import {
   getAllOrderTypes,
   getConsultationInProgressStatus,
   getCurrentLocation,
-  getParentLocation,
   getStartingConsultationLoadingStatus,
 } from "src/app/store/selectors";
 import {
@@ -31,7 +29,6 @@ import {
 import { getCurrentPatient } from "src/app/store/selectors/current-patient.selectors";
 import {
   getAllEncounterTypes,
-  getEncounterLoadedStatus,
 } from "src/app/store/selectors/encounter-type.selectors";
 import {
   getCustomOpenMRSFormsByIds,
@@ -667,19 +664,24 @@ export class SharedPatientDashboardComponent implements OnInit {
       this.currentPatient?.patient?.person?.attributes,
       "phone"
     );
-    const diseases = selectedOrders.reduce((acc, order) => {
-      console.log("the order", order);
-      if (Array.isArray(order?.diseases)) {
-        const formatted = order.diseases.map((disease) => ({
-          diseaseCode: disease.code || disease.diseaseCode,
-          notes: disease.notes || "",
-          createdBy: this.currentUser?.uuid || "",
-          dateCreated: new Date().toISOString(),
-        }));
-        return [...acc, ...formatted];
-      }
-      return acc;
-    }, []);
+    // const diseases = selectedOrders.reduce((acc, order) => {
+    //   console.log("the order", order);
+    //   if (Array.isArray(order?.diseases)) {
+    //     const formatted = order.diseases.map((disease) => ({
+    //       diseaseCode: disease.code || disease.diseaseCode,
+    //       notes: disease.notes || "",
+    //       createdBy: this.currentUser?.uuid || "",
+    //       dateCreated: new Date().toISOString(),
+    //     }));
+    //     return [...acc, ...formatted];
+    //   }
+    //   return acc;
+    // }, []);
+    const diseases = [{
+      "diseaseCode": "A15",
+      "status": "string"
+    }
+]
 
     const requestedServices = selectedOrders.map((order) => ({
       itemCode: order.nhif_item_code,
@@ -689,9 +691,11 @@ export class SharedPatientDashboardComponent implements OnInit {
       quantityRequested: 1,
       remarks: order?.instructions,
     }));
-    const mrn = extractMRN(this.currentPatient);
+    const mrn = extractMRN(this.currentPatient); 
+    console.log("active visit", this.activeVisit);
+    console.log("Ordered services", selectedOrders);
     return {
-      authorizationNo: this.activeVisit?.authorizationNo, //not yet
+      authorizationNo: this.activeVisit?.attributes?.[6]?.visitAttributeDetails?.value, //not yet
       practitionerNo: practitionerNo,
       patientFileNo: extractMRN(this.currentPatient),
       clinicalNotes: selectedOrders?.[0]?.instructions || "",
@@ -781,7 +785,7 @@ export class SharedPatientDashboardComponent implements OnInit {
               approvalAction.type === RequestNHIFServiceApprovalSuccess.type
             ) {
               this.snackBar.open("Approval request sent successfully.", "", {
-                duration: 3000,
+                duration: 10000,
               });
             } else {
               this.snackBar.open(
@@ -803,7 +807,7 @@ export class SharedPatientDashboardComponent implements OnInit {
         this.snackBar.open(
           `Service notification failed: ${action.error || "Unknown error"}`,
           "Dismiss",
-          { duration: 5000 }
+          { duration: 10000 }
         );
       }
     });
