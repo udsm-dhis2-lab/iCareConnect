@@ -100,3 +100,10 @@ ng-deep .disabled-form-selection-option,
   height: 60px; /* Adjust the height as needed */
   align-items: center; /* Optional: centers input content */
 }
+
+::ng-deep .mat-datepicker-content-container {
+  background-color: #fff !important;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.08);
+}

@@ -352,7 +352,7 @@
           >
             <div
               class="w-100 no-print d-flex justify-content-end"
-              *ngIf="showDate"
+              *ngIf="params?.LISConfigurations?.isLIS || showDate"
             >
               <mat-form-field appearance="fill" floatLabel="always">
                 <mat-label>Select a date range</mat-label>

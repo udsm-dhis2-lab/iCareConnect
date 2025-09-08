@@ -831,9 +831,9 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                               "non-clinical"
                                 ? (patientIdentifierTypes || [])
                                     .map((personIdentifierType) => {
-                                      if(personIdentifierType?.id && this.personDetailsData?.identifiers?.filter((identifier) => {
+                                      if(!this.personDetailsData?.identifiers?.filter((identifier) => {
                                         return identifier?.identifierType?.uuid === personIdentifierType.id;
-                                      })?.filter(identifier => identifier)?.length == 0){
+                                      })?.filter(identifier => identifier)?.length){
                                         if (
                                           personIdentifierType.id ===
                                           this.preferredPersonIdentifier 
@@ -853,7 +853,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                               "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this,
                                             preferred: true,
                                           }
-                                        } else {
+                                        }
+                                        else {
                                           return {
                                             identifier:
                                               this.personDetailsData[
@@ -868,7 +869,6 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                           };
                                         }
                                       }
-                                      return undefined;
                                     })
                                     .filter(
                                       (patientIdentifier) =>
@@ -886,8 +886,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                     },
                                   ],
                           };
-
-                          if(this.patientPayload?.identifiers?.filter(identifier => identifier)?.length == 0){
+        
+                          if(!this.patientPayload?.identifiers?.filter(identifier => identifier)?.length){
                             this.patientPayload = omit(this.patientPayload, 'identifiers');
                           }
                           this.savingData = true;
