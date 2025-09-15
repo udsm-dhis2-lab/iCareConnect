@@ -398,7 +398,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 				}
 			}
 		}
-
+		
 		// Construct a query object
 		Query query = session.createQuery(queryStr);
 		

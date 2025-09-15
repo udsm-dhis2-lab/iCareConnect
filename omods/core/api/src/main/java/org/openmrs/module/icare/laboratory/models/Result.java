@@ -74,7 +74,7 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	private TestAllocation testAllocation;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "concept_id", unique = true, nullable = false)
+	@JoinColumn(name = "concept_id", nullable = false)
 	private Concept concept;
 
 	// @ManyToOne(fetch = FetchType.LAZY)
