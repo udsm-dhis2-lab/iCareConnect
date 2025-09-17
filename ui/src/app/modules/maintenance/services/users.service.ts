@@ -36,7 +36,7 @@ export class UserService {
     return this.httpClient.get(url);
   }
   getRoles() {
-    const url = "role?startIndex=0&limit=100";
+    const url = "role?startIndex=0&limit";
     return this.httpClient.get(url);
   }
   updateUser({ data, uuid }): Observable<any> {
