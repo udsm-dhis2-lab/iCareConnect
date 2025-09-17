@@ -195,6 +195,9 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	public <T extends Order> Order processOrder(OrderMetaData<T> orderMetaData, Double quantity) {
 		
 		List<Invoice> invoices = this.getInvoicesByVisitUuid(orderMetaData.getOrder().getEncounter().getVisit().getUuid());
+		for (Invoice invoice : invoices) {
+			System.out.println("Invoice uuid: " + invoice.getUuid() + " has " + invoice.getPayments().size() + " payments");
+		}
 		if (invoices.size() == 0) {
 			Concept paymentModeConcept;
 			if (!orderMetaData.getItemPrice().getPaymentType().getName().getName().toLowerCase().equals("cash")) {

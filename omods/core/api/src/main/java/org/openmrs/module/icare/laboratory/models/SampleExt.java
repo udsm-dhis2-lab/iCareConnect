@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Entity
-@Table(name = "lb_sample")
 @DiscriminatorValue("SAMPLE_EXTENSION")
 public class SampleExt extends Sample {
 	
