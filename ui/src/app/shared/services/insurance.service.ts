@@ -19,7 +19,7 @@ import { switchMap } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class InsuranceService {
-  private readonly baseUrl = '/nhif-api';
+  private readonly baseUrl = '/insurance';
   private readonly tokenUrl = '/nhif-token'
   private readonly portifolioUrl = '/nhif-portifolio'
 
@@ -70,15 +70,19 @@ export class InsuranceService {
     );
   }
 
+  // getCardDetailsByNIN(data: NationalIdI): Observable<any> {
+  //   return this.getToken().pipe(
+  //     switchMap(token =>
+  //       this.http.get(`${this.baseUrl}/Verification/GetCardDetailsByNIN?nationalID=${data.nationalID}`, {
+  //         headers: this.getAuthorizedHeaders(token)
+  //       })
+  //     )
+  //   );
+  // }
+
   getCardDetailsByNIN(data: NationalIdI): Observable<any> {
-    return this.getToken().pipe(
-      switchMap(token =>
-        this.http.get(`${this.baseUrl}/Verification/GetCardDetailsByNIN?nationalID=${data.nationalID}`, {
-          headers: this.getAuthorizedHeaders(token)
-        })
-      )
-    );
-  }
+      return this.http.post(this.baseUrl + '/GetCardDetailsByNIN', data);
+    }
 
   getCardDetailsByCardNumber(data: GetCardNumberDetailsI): Observable<any> {
     return this.getToken().pipe(
@@ -90,24 +94,33 @@ export class InsuranceService {
     );
   }
 
+  // getListOfPointOfcare(): Observable<NHIFPointOfCareI[]> {
+  //   return this.getToken().pipe(
+  //     switchMap(token =>
+  //       this.http.get<NHIFPointOfCareI[]>(`${this.baseUrl}/Verification/GetPointsOfCare`, {
+  //         headers: this.getAuthorizedHeaders(token)
+  //       })
+  //     )
+  //   );
+  // }
+
   getListOfPointOfcare(): Observable<NHIFPointOfCareI[]> {
-    return this.getToken().pipe(
-      switchMap(token =>
-        this.http.get<NHIFPointOfCareI[]>(`${this.baseUrl}/Verification/GetPointsOfCare`, {
-          headers: this.getAuthorizedHeaders(token)
-        })
-      )
-    );
+    return this.http.get<NHIFPointOfCareI[]>(this.baseUrl + 'getpoc');
   }
+ 
+
+  // getListOfVisitTypes(): Observable<NHIFVisitTypeI[]> {
+  //   return this.getToken().pipe(
+  //     switchMap(token =>
+  //       this.http.get<NHIFVisitTypeI[]>(`${this.baseUrl}/Verification/GetVisitTypes`, {
+  //         headers: this.getAuthorizedHeaders(token)
+  //       })
+  //     )
+  //   );
+  // }
 
   getListOfVisitTypes(): Observable<NHIFVisitTypeI[]> {
-    return this.getToken().pipe(
-      switchMap(token =>
-        this.http.get<NHIFVisitTypeI[]>(`${this.baseUrl}/Verification/GetVisitTypes`, {
-          headers: this.getAuthorizedHeaders(token)
-        })
-      )
-    );
+    return this.http.get<NHIFVisitTypeI[]>(this.baseUrl + 'getvisittype');
   }
 
   verifyPointOfCare(data: PatientPOCVerificationI): Observable<any> {
