@@ -63,7 +63,7 @@ export class FingerCaptureComponent implements OnInit {
         (result) => {
           this.isCheckingDevice = false;
           if (result?.ErrorCode === "0") {
-            this.showScanningComponent = true; // Step 2: Show scanning UI
+            this.showScanningComponent = false; // Step 2: Show scanning UI
             this.captureFingerprint();
           } else {
             this.deviceNotFound = true; // Show "device not found" message
@@ -156,7 +156,7 @@ export class FingerCaptureComponent implements OnInit {
             this.successMessage = "Practitioner logged in successful!";
             // what is the response if sucessfull?
             const practitionerData: NHIFPractitionerDetailsI = {
-              practitionerNo: '3326',
+              practitionerNo: 3326,
               // practitionerNo: this.payload.payload.practitionerNo,
               nationalID: this.payload.payload.nationalID,
               isNHIFPractitionerLogedIn: true,
