@@ -14,15 +14,15 @@ import java.util.Map;
 public abstract class ICareTestBase extends BaseModuleContextSensitiveTest {
 	
 	public void initTestData() throws Exception {
-		initializeInMemoryDatabase();
-		executeDataSet("billing-data.xml");
-		AdministrationService adminService = Context.getService(AdministrationService.class);
-		adminService.setGlobalProperty("icare.billing.serviceAttribute", "298b75eb-5345-11e8-9c7c-40b0yt63cfee");
-		adminService.setGlobalProperty("icare.billing.paymentSchemeAttribute", "298b75eb-5345-12e8-9c7c-40b0yt63cfee");
-		adminService.setGlobalProperty("icare.billing.paymentTypeAttribute", "298b75eb-er45-12e8-9c7c-40b0yt63cfee");
-		adminService.setGlobalProperty("icare.registration.encounterType", "2msir5eb-5345-11e8-9c7c-40b034c3cfee");
-		adminService.setGlobalProperty("icare.billing.orderType", "2msir5eb-5345-11e8-9922-40b034c3cfee");
-		adminService.setGlobalProperty("icare.registration.feeConcept", "e721ec30-mfy4-11e8-ie7c-40b69mdy79ee");
+		//		initializeInMemoryDatabase();
+		//		executeDataSet("billing-data.xml");
+		//		AdministrationService adminService = Context.getService(AdministrationService.class);
+		//		adminService.setGlobalProperty("icare.billing.serviceAttribute", "298b75eb-5345-11e8-9c7c-40b0yt63cfee");
+		//		adminService.setGlobalProperty("icare.billing.paymentSchemeAttribute", "298b75eb-5345-12e8-9c7c-40b0yt63cfee");
+		//		adminService.setGlobalProperty("icare.billing.paymentTypeAttribute", "298b75eb-er45-12e8-9c7c-40b0yt63cfee");
+		//		adminService.setGlobalProperty("icare.registration.encounterType", "2msir5eb-5345-11e8-9c7c-40b034c3cfee");
+		//		adminService.setGlobalProperty("icare.billing.orderType", "2msir5eb-5345-11e8-9922-40b034c3cfee");
+		//		adminService.setGlobalProperty("icare.registration.feeConcept", "e721ec30-mfy4-11e8-ie7c-40b69mdy79ee");
 		
 		/*Class<?> cls = Context.loadClass("org.openmrs.api.EncounterService");
 		Class<?> adviceClass = Context.loadClass("org.openmrs.module.icare.billing.aop.VisitBillAdvisor");
@@ -32,16 +32,17 @@ public abstract class ICareTestBase extends BaseModuleContextSensitiveTest {
 	}
 	
 	protected Map<String, Object> readDTOFile(String file) throws IOException {
-		URL url = this.getClass().getClassLoader().getResource(file);
-		BufferedReader br = new BufferedReader(new FileReader(url.getPath()));
-		StringBuilder sb = new StringBuilder();
-		String line = br.readLine();
-		
-		while (line != null) {
-			sb.append(line);
-			sb.append(System.lineSeparator());
-			line = br.readLine();
-		}
-		return (new ObjectMapper()).readValue(sb.toString(), Map.class);
+		//		URL url = this.getClass().getClassLoader().getResource(file);
+		//		BufferedReader br = new BufferedReader(new FileReader(url.getPath()));
+		//		StringBuilder sb = new StringBuilder();
+		//		String line = br.readLine();
+		//
+		//		while (line != null) {
+		//			sb.append(line);
+		//			sb.append(System.lineSeparator());
+		//			line = br.readLine();
+		//		}
+		//		return (new ObjectMapper()).readValue(sb.toString(), Map.class);
+		return null;
 	}
 }

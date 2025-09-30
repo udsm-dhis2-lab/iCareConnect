@@ -299,8 +299,11 @@ public class InsurancesServices {
         String token = getAuthToken();
 
         if (token == null) {
-            return Collections.singletonList(
-                    Map.of("status", 401, "error", "Failed to obtain authentication token"));
+            Map<String, Object> errorMap = new HashMap<>();
+            errorMap.put("status", 401);
+            errorMap.put("error", "Failed to obtain authentication token");
+
+            return Collections.singletonList(errorMap);
         }
 
         try {
@@ -326,12 +329,18 @@ public class InsurancesServices {
                         });
 
             } else {
-                return Collections.singletonList(
-                        Map.of("status", responseCode, "error", "Failed to fetch data. HTTP Code: " + responseCode));
+                Map<String, Object> errorMap = new HashMap<>();
+                errorMap.put("status", responseCode);
+                errorMap.put("error", "Failed to fetch data. HTTP Code: " + responseCode);
+
+                return Collections.singletonList(errorMap);
             }
         } catch (Exception e) {
-            return Collections.singletonList(
-                    Map.of("status", 500, "error", "Internal Server Error", "exception", e.getMessage()));
+            Map<String, Object> errorMap = new HashMap<>();
+            errorMap.put("status", 500);
+            errorMap.put("error", "Internal Server Error");
+            errorMap.put("exception", e.getMessage());
+            return Collections.singletonList(errorMap);
         }
 
         return visitTypes;

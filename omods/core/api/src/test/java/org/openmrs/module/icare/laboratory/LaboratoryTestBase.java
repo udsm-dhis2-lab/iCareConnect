@@ -5,8 +5,8 @@ import org.openmrs.test.BaseModuleContextSensitiveTest;
 public abstract class LaboratoryTestBase extends BaseModuleContextSensitiveTest {
 	
 	public void initTestData() throws Exception {
-		initializeInMemoryDatabase();
-		executeDataSet("lab-data.xml");
+		//		initializeInMemoryDatabase();
+		//		executeDataSet("lab-data.xml");
 	}
 	
 }

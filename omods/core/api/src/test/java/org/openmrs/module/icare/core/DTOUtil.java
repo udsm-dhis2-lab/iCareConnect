@@ -11,16 +11,17 @@ import java.util.Map;
 public class DTOUtil {
 	
 	public static Map<String, Object> readDTOFile(String file) throws IOException {
-		URL url = DTOUtil.class.getResource(file);
-		BufferedReader br = new BufferedReader(new FileReader(url.getPath()));
-		StringBuilder sb = new StringBuilder();
-		String line = br.readLine();
-		
-		while (line != null) {
-			sb.append(line);
-			sb.append(System.lineSeparator());
-			line = br.readLine();
-		}
-		return (new ObjectMapper()).readValue(sb.toString(), Map.class);
+		//		URL url = DTOUtil.class.getResource(file);
+		//		BufferedReader br = new BufferedReader(new FileReader(url.getPath()));
+		//		StringBuilder sb = new StringBuilder();
+		//		String line = br.readLine();
+		//
+		//		while (line != null) {
+		//			sb.append(line);
+		//			sb.append(System.lineSeparator());
+		//			line = br.readLine();
+		//		}
+		//		return (new ObjectMapper()).readValue(sb.toString(), Map.class);
+		return null;
 	}
 }

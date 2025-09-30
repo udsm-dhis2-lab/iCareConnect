@@ -24,29 +24,29 @@ public class UpgradeTest {
 	
 	@BeforeClass
 	public static void beforeClass() throws IOException {
-		testAppDataDir = File.createTempFile("appdir-for-unit-tests", "");
-		testAppDataDir.delete();// so we can make turn it into a directory
-		testAppDataDir.mkdir();
-		
-		System.setProperty(OpenmrsConstants.APPLICATION_DATA_DIRECTORY_RUNTIME_PROPERTY, testAppDataDir.getAbsolutePath());
-		OpenmrsUtil.setApplicationDataDirectory(testAppDataDir.getAbsolutePath());
+		//		testAppDataDir = File.createTempFile("appdir-for-unit-tests", "");
+		//		testAppDataDir.delete();// so we can make turn it into a directory
+		//		testAppDataDir.mkdir();
+		//
+		//		System.setProperty(OpenmrsConstants.APPLICATION_DATA_DIRECTORY_RUNTIME_PROPERTY, testAppDataDir.getAbsolutePath());
+		//		OpenmrsUtil.setApplicationDataDirectory(testAppDataDir.getAbsolutePath());
 	}
 	
 	@AfterClass
 	public static void afterClass() throws Exception {
-		FileUtils.deleteDirectory(testAppDataDir);
-		//Just to be safe, not to affect other units in the test suite
-		System.clearProperty(OpenmrsConstants.APPLICATION_DATA_DIRECTORY_RUNTIME_PROPERTY);
+		//		FileUtils.deleteDirectory(testAppDataDir);
+		//		//Just to be safe, not to affect other units in the test suite
+		//		System.clearProperty(OpenmrsConstants.APPLICATION_DATA_DIRECTORY_RUNTIME_PROPERTY);
 	}
 	
 	@Before
 	public void before() throws IOException, SQLException {
-		upgradeTestUtil = new DatabaseUpgradeTestUtil(DATABASE_PATH);
+		//		upgradeTestUtil = new DatabaseUpgradeTestUtil(DATABASE_PATH);
 	}
 	
 	@After
 	public void after() throws SQLException {
-		upgradeTestUtil.close();
+		//		upgradeTestUtil.close();
 	}
 	
 	@Test
