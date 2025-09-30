@@ -236,7 +236,7 @@ public abstract class BaseResourceControllerTest extends MainResourceControllerT
 	
 	@Override
 	@Ignore
-	public void shouldGetAll() {
+	public void shouldGetAll() throws Exception {
 		
 	}
 	
