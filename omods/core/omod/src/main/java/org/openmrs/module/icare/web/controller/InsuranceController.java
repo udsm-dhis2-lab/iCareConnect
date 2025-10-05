@@ -104,16 +104,19 @@ public class InsuranceController {
 		if (payload.get("practitionerNo") == null || payload.get("practitionerNo").toString().trim().isEmpty())
 			return false;
 		
-		if (payload.get("diseases") != null) {
+		// Validate diseases only if present and not null
+		// Note: Empty diseases array is now allowed (field can be omitted from payload)
+		if (payload.containsKey("diseases") && payload.get("diseases") != null) {
 			@SuppressWarnings("unchecked")
 			List<Map<String, Object>> diseases = (List<Map<String, Object>>) payload.get("diseases");
-			if (diseases.isEmpty())
-				return false;
-			for (Map<String, Object> disease : diseases) {
-				if (disease.get("diseaseCode") == null || disease.get("diseaseCode").toString().trim().isEmpty())
-					return false;
-				if (disease.get("status") == null || disease.get("status").toString().trim().isEmpty())
-					return false;
+			// Only validate structure if diseases array is not empty
+			if (!diseases.isEmpty()) {
+				for (Map<String, Object> disease : diseases) {
+					if (disease.get("diseaseCode") == null || disease.get("diseaseCode").toString().trim().isEmpty())
+						return false;
+					if (disease.get("status") == null || disease.get("status").toString().trim().isEmpty())
+						return false;
+				}
 			}
 		}
 		
