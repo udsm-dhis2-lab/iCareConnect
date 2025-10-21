@@ -1,3 +1,29 @@
+::ng-deep .custom-dialog-container {
+    width: 70%;
+}
+
+.context {
+    overflow: auto;
+    max-height: 90vh;
+}
+
+mat-toolbar {
+    white-space: normal;
+    word-break: break-word;
+}
+
 mat-form-field {
     width: 100%;
+}
+
+@media (max-width: 600px) {
+    ::ng-deep .custom-dialog-container {
+        width: 95%;
+        height: 100vh;
+        margin: 0 auto;
+    }
+
+    .context {
+        max-height: calc(100vh - 64px);
+    }
 }
