@@ -1,4 +1,4 @@
-FROM openjdk:11 AS build
+FROM eclipse-temurin:11 AS build
 
 RUN apt-get update && \
     apt-get install -y curl gnupg apt-transport-https ca-certificates && \
