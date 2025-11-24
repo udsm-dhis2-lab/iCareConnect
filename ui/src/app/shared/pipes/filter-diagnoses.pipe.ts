@@ -9,9 +9,10 @@ export class FilterDiagnosesPipe implements PipeTransform {
       return [];
     }
 
-    if (!filteringCondition) {
+    if (filteringCondition === undefined || filteringCondition === null) {
       return diagnoses || [];
     }
+    
     return (
       diagnoses.filter(
         (diagnosis) => diagnosis?.isConfirmedDiagnosis === filteringCondition
