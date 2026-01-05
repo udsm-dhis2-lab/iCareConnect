@@ -679,9 +679,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 		// if (sampleCategory != null) {
 		// queryStr += ",ss.timestamp DESC";
 		// }
-		// System.out.println(queryStr);
-		Query query = session.createQuery(queryStr);
 		System.out.println(queryStr);
+		Query query = session.createQuery(queryStr);
 		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
@@ -749,7 +748,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setMaxResults(pager.getPageSize());
 		}
 
-		ListResult<SampleExt> listResults = new ListResult();
+		ListResult<SampleExt> listResults = new ListResult<>();
 		listResults.setPager(pager);
 		listResults.setResults(query.list());
 		return listResults;
