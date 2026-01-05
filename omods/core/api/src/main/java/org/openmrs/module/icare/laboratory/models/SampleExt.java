@@ -125,12 +125,12 @@ public class SampleExt extends Sample {
         sampleObject.put("specimenSource", specimenSource);
 
         List<Map<String, Object>> orders = new ArrayList<Map<String, Object>>();
-
+      
         for (SampleOrder sampleOrder : this.getSampleOrders()) {
                 boolean excludeAllocations = true;
-            if (!sampleOrder.getOrder().getVoided()) {
-                orders.add(sampleOrder.toMap(excludeAllocations));
-            }
+        	if (sampleOrder.getOrder() != null && !sampleOrder.getOrder().getVoided()) {
+        		orders.add(sampleOrder.toMap(excludeAllocations));
+        	}
         }
 
         sampleObject.put("orders", orders);

@@ -42,6 +42,9 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	@JsonDeserialize(using = ChildIdOnlyDeserializer.class)
 	private Visit visit;
 	
+	@Transient
+	private Integer visitId;
+	
 	@Column(name = "label", length = 65535)
 	private String label;
 	
@@ -165,21 +168,23 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 		
 		sampleObject.put("voided", this.getVoided());
 		HashMap<String, Object> visitObject = new HashMap<String, Object>();
-		visitObject.put("uuid", this.getVisit().getUuid());
-		visitObject.put("startDateTime", this.getVisit().getStartDatetime());
-		visitObject.put("stopDateTime", this.getVisit().getStopDatetime());
-		List<Map<String, Object>> visitAttributes = new ArrayList<>();
-		if ( this.getVisit().getAttributes().size() > 0) {
-			for(VisitAttribute visitAttribute: this.getVisit().getAttributes()) {
-				Map<String, Object> attribute = new HashMap<>();
-				attribute.put("value", visitAttribute.getValue());
-				Map<String, Object> attributeType =  new HashMap<>();
-				attributeType.put("uuid", visitAttribute.getAttributeType().getUuid());
-				attribute.put("attributeType", attributeType);
-				visitAttributes.add(attribute);
+		if (this.getVisit() != null) {
+			visitObject.put("uuid", this.getVisit().getUuid());
+			visitObject.put("startDateTime", this.getVisit().getStartDatetime());
+			visitObject.put("stopDateTime", this.getVisit().getStopDatetime());
+			List<Map<String, Object>> visitAttributes = new ArrayList<>();
+			if ( this.getVisit().getAttributes().size() > 0) {
+				for(VisitAttribute visitAttribute: this.getVisit().getAttributes()) {
+					Map<String, Object> attribute = new HashMap<>();
+					attribute.put("value", visitAttribute.getValue());
+					Map<String, Object> attributeType =  new HashMap<>();
+					attributeType.put("uuid", visitAttribute.getAttributeType().getUuid());
+					attribute.put("attributeType", attributeType);
+					visitAttributes.add(attribute);
+				}
 			}
+			visitObject.put("attributes", visitAttributes);
 		}
-		visitObject.put("attributes", visitAttributes);
 		
 		sampleObject.put("visit", visitObject);
 		
@@ -228,29 +233,32 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 		
 		//add sample patietient details
 		HashMap<String, Object> patientObject = new HashMap<String, Object>();
-		patientObject.put("uuid", this.getVisit().getPatient().getUuid());
-		patientObject.put("allergy", this.getVisit().getPatient().getAllergyStatus());
-		//		patientObject.put("dob", this.getVisit().getPatient().getPerson().getBirthDateTime());
-		patientObject.put("dob", this.getVisit().getPatient().getPerson().getBirthdate());
-		
-		//		if (this.getVisit().getPatient().getBirthDateTime() == null) {
-		//			if (this.getVisit().getPatient().getPerson().getBirthDateTime() == null) {
-		//
-		//			} else {
-		//				patientObject.put("dob", this.getVisit().getPatient().getPerson().getBirthDateTime());
-		//			}
-		//
-		//		} else {
-		//			patientObject.put("dob", this.getVisit().getPatient().getBirthDateTime());
-		//		}
-		
-		List<HashMap<String, Object>> patientIdentifiers = new ArrayList<HashMap<String, Object>>();
-		for (PatientIdentifier patientIdentifier : this.getVisit().getPatient().getIdentifiers()) {
-			HashMap<String, Object> patientIdentifierObject = new HashMap<String, Object>();
-			patientIdentifierObject.put("id", patientIdentifier.getIdentifier());
-			patientIdentifierObject.put("name", patientIdentifier.getIdentifierType().getName());
-			patientIdentifiers.add(patientIdentifierObject);
-		}
+		if (this.getVisit() != null && this.getVisit().getPatient() != null) {
+			patientObject.put("uuid", this.getVisit().getPatient().getUuid());
+			patientObject.put("allergy", this.getVisit().getPatient().getAllergyStatus());
+			//		patientObject.put("dob", this.getVisit().getPatient().getPerson().getBirthDateTime());
+			patientObject.put("dob", this.getVisit().getPatient().getPerson().getBirthdate());
+
+			//		if (this.getVisit().getPatient().getBirthDateTime() == null) {
+			//			if (this.getVisit().getPatient().getPerson().getBirthDateTime() == null) {
+			//
+			//			} else {
+			//				patientObject.put("dob", this.getVisit().getPatient().getPerson().getBirthDateTime());
+			//			}
+			//
+			//		} else {
+			//			patientObject.put("dob", this.getVisit().getPatient().getBirthDateTime());
+			//		}
+
+			List<HashMap<String, Object>> patientIdentifiers = new ArrayList<HashMap<String, Object>>();
+			if (this.getVisit() != null && this.getVisit().getPatient() != null) {
+				for (PatientIdentifier patientIdentifier : this.getVisit().getPatient().getIdentifiers()) {
+					HashMap<String, Object> patientIdentifierObject = new HashMap<String, Object>();
+					patientIdentifierObject.put("id", patientIdentifier.getIdentifier());
+					patientIdentifierObject.put("name", patientIdentifier.getIdentifierType().getName());
+					patientIdentifiers.add(patientIdentifierObject);
+				}
+			}
 
 //		String phoneNumber = null;
 //		String phoneAttributeTypeUuid = Context.getService(AdministrationService.class).getGlobalProperty(ICareConfig.PHONE_NUMBER_ATTRIBUTE);
@@ -259,92 +267,99 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 //		}
 //		patientObject.put("phone", phoneNumber);
 
-		patientObject.put("identifiers", patientIdentifiers);
-		patientObject.put("age", this.getVisit().getPatient().getAge());
-		patientObject.put("familyName", this.getVisit().getPatient().getPersonName().getFamilyName());
-		patientObject.put("middleName", this.getVisit().getPatient().getPersonName().getMiddleName());
-		patientObject.put("givenName", this.getVisit().getPatient().getPersonName().getGivenName());
-		patientObject.put("familyName2", this.getVisit().getPatient().getPersonName().getFamilyName2());
-		patientObject.put("gender", this.getVisit().getPatient().getGender());
-		patientObject.put("uuid", this.getVisit().getPatient().getUuid());
+			patientObject.put("identifiers", patientIdentifiers);
+			if (this.getVisit() != null && this.getVisit().getPatient() != null) {
+				patientObject.put("age", this.getVisit().getPatient().getAge());
+				patientObject.put("familyName", this.getVisit().getPatient().getPersonName().getFamilyName());
+				patientObject.put("middleName", this.getVisit().getPatient().getPersonName().getMiddleName());
+				patientObject.put("givenName", this.getVisit().getPatient().getPersonName().getGivenName());
+				patientObject.put("familyName2", this.getVisit().getPatient().getPersonName().getFamilyName2());
+				patientObject.put("gender", this.getVisit().getPatient().getGender());
+				patientObject.put("uuid", this.getVisit().getPatient().getUuid());
 
-		List<Map<String, Object>> personAttributes = new ArrayList<>();
-		if (this.getVisit().getPatient().getPerson().getAttributes().size() > 0) {
-			for (PersonAttribute personAttribute: this.getVisit().getPatient().getPerson().getAttributes()) {
-				Map<String, Object> attribute = new HashMap<>();
-				Map<String, Object> attributeType = new HashMap<>();
-				attributeType.put("uuid", personAttribute.getAttributeType().getUuid());
-				attributeType.put("name", personAttribute.getAttributeType().getName());
-				attribute.put("attributeType", attributeType);
-				attribute.put("value", personAttribute.getValue());
-				personAttributes.add(attribute);
+				List<Map<String, Object>> personAttributes = new ArrayList<>();
+				if (this.getVisit() != null && this.getVisit().getPatient() != null && this.getVisit().getPatient().getPerson() != null) {
+					if (this.getVisit().getPatient().getPerson().getAttributes().size() > 0) {
+						for (PersonAttribute personAttribute : this.getVisit().getPatient().getPerson().getAttributes()) {
+							Map<String, Object> attribute = new HashMap<>();
+							Map<String, Object> attributeType = new HashMap<>();
+							attributeType.put("uuid", personAttribute.getAttributeType().getUuid());
+							attributeType.put("name", personAttribute.getAttributeType().getName());
+							attribute.put("attributeType", attributeType);
+							attribute.put("value", personAttribute.getValue());
+							personAttributes.add(attribute);
+						}
+					}
+				}
+				patientObject.put("attributes", personAttributes);
+
+				List<Map<String, Object>> addresses = new ArrayList<>();
+				if (this.getVisit() != null && this.getVisit().getPatient() != null && this.getVisit().getPatient().getPerson() != null) {
+					if (this.getVisit().getPatient().getPerson().getAddresses().size() > 0) {
+						for (PersonAddress personAddress : this.getVisit().getPatient().getPerson().getAddresses()) {
+							Map<String, Object> address = new HashMap<>();
+							String address1 = null;
+							String address2 = null;
+							String address3 = null;
+							String address4 = null;
+							String cityVillage = null;
+							String country = null;
+							if (personAddress.getAddress1() != null) {
+								address1 = personAddress.getAddress1().toString();
+							}
+							address.put("address1", address1);
+							if (personAddress.getAddress2() != null) {
+								address2 = personAddress.getAddress2().toString();
+							}
+							address.put("address2", address2);
+
+							if (personAddress.getAddress3() != null) {
+								address3 = personAddress.getAddress3().toString();
+							}
+							address.put("address3", address3);
+
+							if (personAddress.getAddress4() != null) {
+								address4 = personAddress.getAddress4().toString();
+							}
+							address.put("address4", address4);
+
+							if (personAddress.getCityVillage() != null) {
+								cityVillage = personAddress.getCityVillage().toString();
+							}
+							address.put("cityVillage", cityVillage);
+
+							if (personAddress.getCountry() != null) {
+								country = personAddress.getCountry().toString();
+							}
+							address.put("country", country);
+							addresses.add(address);
+						}
+					}
+				}
+				patientObject.put("addresses", addresses);
+
+				sampleObject.put("patient", patientObject);
+
+				if (this.getBatchSample() != null) {
+					Map<String, Object> batchObject = new HashMap<>();
+					batchObject.put("uuid", this.getBatchSample().getUuid());
+					batchObject.put("display", this.getBatchSample().getCode());
+					sampleObject.put("batchSample", batchObject);
+				}
+
+				if (this.worksheetSample != null) {
+					Map<String, Object> worksheetSampleObject = new HashMap<>();
+					worksheetSampleObject.put("uuid", this.getWorksheetSample().getUuid());
+					worksheetSampleObject.put("display", this.getWorksheetSample().getCode());
+					Map<String, Object> worksheetDefinitionObject = new HashMap<>();
+					worksheetDefinitionObject.put("uuid", this.getWorksheetSample().getWorksheetDefinition().getUuid());
+					worksheetDefinitionObject.put("code", this.getWorksheetSample().getWorksheetDefinition().getCode());
+					worksheetSampleObject.put("worksheetDefinition", worksheetDefinitionObject);
+					sampleObject.put("worksheetSample", worksheetSampleObject);
+				}
+
 			}
 		}
-		patientObject.put("attributes", personAttributes);
-
-		List<Map<String, Object>> addresses = new ArrayList<>();
-		if (this.getVisit().getPatient().getPerson().getAddresses().size() > 0) {
-			for(PersonAddress personAddress: this.getVisit().getPatient().getPerson().getAddresses()) {
-				Map<String, Object> address = new HashMap<>();
-				String address1 = null;
-				String address2 = null;
-				String address3 = null;
-				String address4 = null;
-				String cityVillage = null;
-				String country = null;
-				if (personAddress.getAddress1() != null) {
-					address1 = personAddress.getAddress1().toString();
-				}
-				address.put("address1", address1);
-				if (personAddress.getAddress2() != null) {
-					address2 = personAddress.getAddress2().toString();
-				}
-				address.put("address2", address2);
-
-				if (personAddress.getAddress3() != null) {
-					address3 = personAddress.getAddress3().toString();
-				}
-				address.put("address3", address3);
-
-				if (personAddress.getAddress4() != null) {
-					address4= personAddress.getAddress4().toString();
-				}
-				address.put("address4", address4);
-
-				if (personAddress.getCityVillage() != null) {
-					cityVillage = personAddress.getCityVillage().toString();
-				}
-				address.put("cityVillage", cityVillage);
-
-				if (personAddress.getCountry() != null) {
-					country = personAddress.getCountry().toString();
-				}
-				address.put("country", country);
-				addresses.add(address);
-			}
-		}
-		patientObject.put("addresses", addresses);
-		
-		sampleObject.put("patient", patientObject);
-
-		if(this.getBatchSample() != null){
-			Map<String,Object> batchObject = new HashMap<>();
-			batchObject.put("uuid",this.getBatchSample().getUuid());
-			batchObject.put("display",this.getBatchSample().getCode());
-			sampleObject.put("batchSample",batchObject);
-		}
-
-		if(this.worksheetSample != null){
-			Map<String,Object> worksheetSampleObject = new HashMap<>();
-			worksheetSampleObject.put("uuid", this.getWorksheetSample().getUuid());
-			worksheetSampleObject.put("display", this.getWorksheetSample().getCode());
-			Map<String,Object> worksheetDefinitionObject = new HashMap<>();
-			worksheetDefinitionObject.put("uuid", this.getWorksheetSample().getWorksheetDefinition().getUuid());
-			worksheetDefinitionObject.put("code",this.getWorksheetSample().getWorksheetDefinition().getCode());
-			worksheetSampleObject.put("worksheetDefinition", worksheetDefinitionObject);
-			sampleObject.put("worksheetSample",worksheetSampleObject);
-		}
-		
 		return sampleObject;
 	}
 	
@@ -362,6 +377,17 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 	
 	public void setVisit(Visit visit) {
 		this.visit = visit;
+	}
+	
+	public Integer getVisitId() {
+		if (this.visit != null) {
+			return this.visit.getId();
+		}
+		return this.visitId;
+	}
+	
+	public void setVisitId(Integer visitId) {
+		this.visitId = visitId;
 	}
 	
 	public String getLabel() {
