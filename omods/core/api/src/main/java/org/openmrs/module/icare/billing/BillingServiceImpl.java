@@ -681,17 +681,19 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 	
 	@Override
 	public Visit createVisit(MethodInvocation invocation) throws Throwable {
-		// Visit visit = (Visit) invocation.getArguments()[0];
-		// VisitWrapper visit = new VisitWrapper((Visit) invocation.getArguments()[0]);
+		// VisitWrapper is created from the visit argument
 		VisitWrapper visitWrapper = new VisitWrapper((Visit) invocation.getArguments()[0]);
-		VisitService visitService = Context.getVisitService();
-		Visit existingVisit = visitService.getVisitByUuid(visitWrapper.getVisit().getUuid());
-		if (existingVisit != null) {
-			return (Visit) invocation.proceed();
-		}
+		
+		// Validate the visit metadata (payment scheme, etc.)
 		VisitMetaData visitMetaData = this.validateVisitMetaData(visitWrapper);
+		
+		// Proceed with the actual saveVisit call
+		// Note: invocation.proceed() will save the visit via VisitService
 		visitWrapper = new VisitWrapper((Visit) invocation.proceed());
+		
+		// Process the visit (create invoices, encounters, orders)
 		this.processVisit(visitWrapper, visitMetaData);
+		
 		return visitWrapper.getVisit();
 	}
 	
