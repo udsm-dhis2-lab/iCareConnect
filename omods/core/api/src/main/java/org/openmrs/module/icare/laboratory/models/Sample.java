@@ -29,6 +29,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "sample_extended")
 @DiscriminatorValue("SAMPLE")
+@DiscriminatorFormula("'SAMPLE_EXTENSION'")
 public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSONConverter {
 	
 	@Id

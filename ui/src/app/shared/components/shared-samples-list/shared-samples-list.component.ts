@@ -94,9 +94,9 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.connection = webSocket(this.barcodeSettings?.socketUrl);
     this.connection.subscribe({
-      next: (msg) => console.log("message received: ", msg), // Called whenever there is a message from the server.
-      error: (err) => console.log(err), // Called if at any point WebSocket API signals some kind of error.
-      complete: () => console.log("complete"), // Called when connection is closed (for whatever reason).
+      next: (msg) => console.log("message received: ", msg),
+      error: (err) => console.log(err),
+      complete: () => console.log("complete"),
     });
     // [tabType]="'completed-samples'"
     if (this.listType === "samples") {
