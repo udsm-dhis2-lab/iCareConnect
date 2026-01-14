@@ -10,7 +10,9 @@ import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
 import org.openmrs.module.icare.laboratory.models.*;
+import org.springframework.beans.BeanUtils;
 
+import javax.persistence.TemporalType;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -484,7 +486,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 
 		DbSession session = this.getSession();
 
-		String queryStr = "SELECT DISTINCT sp \n" + "FROM SampleExt sp ";
+		String queryStr = "SELECT DISTINCT sp \n" + "FROM Sample sp ";
 		// if (sampleCategory != null) {
 		// queryStr += " JOIN sp.sampleStatuses ss ";
 		// }
@@ -679,9 +681,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 		// if (sampleCategory != null) {
 		// queryStr += ",ss.timestamp DESC";
 		// }
-		// System.out.println(queryStr);
-		Query query = session.createQuery(queryStr);
 		System.out.println(queryStr);
+		Query query = session.createQuery(queryStr);
 		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
@@ -749,9 +750,20 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setMaxResults(pager.getPageSize());
 		}
 
-		ListResult<SampleExt> listResults = new ListResult();
+		List<Sample> rawSamples = query.list();
+
+		List<SampleExt> finalResults = new ArrayList<>();
+
+		for (Sample parent : rawSamples) {
+			SampleExt child = new SampleExt();
+			BeanUtils.copyProperties(parent, child);
+
+			finalResults.add(child);
+		}
+
+		ListResult<SampleExt> listResults = new ListResult<>();
 		listResults.setPager(pager);
-		listResults.setResults(query.list());
+		listResults.setResults(finalResults);
 		return listResults;
 	}
 	

@@ -70,8 +70,11 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "test_allocation_id", nullable = false)
-    @JsonBackReference
+	   @JsonBackReference
 	private TestAllocation testAllocation;
+
+	@Transient
+	private Integer testAllocationId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "concept_id", nullable = false)
@@ -102,6 +105,17 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public Integer getTestAllocationId() {
+		if (this.testAllocation != null) {
+			return this.testAllocation.getId();
+		}
+		return this.testAllocationId;
+	}
+
+	public void setTestAllocationId(Integer testAllocationId) {
+		this.testAllocationId = testAllocationId;
 	}
 
 	public Boolean getAbnormal() {
@@ -463,15 +477,17 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 		resultsObject.put("concept", resultsConceptObject);
 
 		Map<String, Object> testObject = new HashMap<String, Object>();
-//		testObject.put("uuid", this.getTestAllocation().getUuid());
+		if (this.getTestAllocation() != null) {
+			testObject.put("uuid", this.getTestAllocation().getUuid());
+		}
 		resultsObject.put("testAllocation", testObject);
 
 		Map<String, Object> sampleDetails = new HashMap<>();
-//		if (this.getTestAllocation().getSample() != null) {
-//			sampleDetails.put("uuid", this.getTestAllocation().getSample().getUuid());
-//			sampleDetails.put("label", this.getTestAllocation().getSample().getLabel());
-//			sampleDetails.put("display", this.getTestAllocation().getSample().getLabel());
-//		}
+		if (this.getTestAllocation() != null && this.getTestAllocation().getSample() != null) {
+			sampleDetails.put("uuid", this.getTestAllocation().getSample().getUuid());
+			sampleDetails.put("label", this.getTestAllocation().getSample().getLabel());
+			sampleDetails.put("display", this.getTestAllocation().getSample().getLabel());
+		}
 		resultsObject.put("sample", sampleDetails);
 
 		Map<String, Object> creatorObject = new HashMap<String, Object>();

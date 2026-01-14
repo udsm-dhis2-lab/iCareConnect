@@ -1259,12 +1259,6 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                             .sampleLabelsUsedDetails,
                                                                           sample,
                                                                         ];
-                                                                      this.sampleLabelsUsedDetails =
-                                                                        [
-                                                                          ...this
-                                                                            .sampleLabelsUsedDetails,
-                                                                          sample,
-                                                                        ];
 
                                                                       // Create sample allocations
 
