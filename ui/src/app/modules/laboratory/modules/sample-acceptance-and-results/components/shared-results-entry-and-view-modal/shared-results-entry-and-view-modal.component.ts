@@ -185,7 +185,6 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   onClose(event: Event): void {
     event.stopPropagation();
     this.dialogRef.close(true);
-    window.location.reload();
   }
 
   onSave(event: Event, order: any, alreadyApproved?: boolean): void {

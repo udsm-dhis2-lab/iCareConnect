@@ -461,7 +461,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		if (result.getConcept().getUuid() == null) {
 			throw new Exception("Concept is null. Concept for the result must be provided");
 		}
-		if (result.getTestAllocation().getUuid() == null) {
+		if (result.getTestAllocation() == null || result.getTestAllocation().getUuid() == null) {
 			throw new Exception("Test Allocation is null. Test allocation uuid must be provided");
 		}
 		
