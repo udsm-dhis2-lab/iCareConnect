@@ -392,8 +392,8 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 
 		TestAllocation testAllocation = new TestAllocation();
 		testAllocation.setUuid(((Map) map.get("testAllocation")).get("uuid").toString());
-//		result.setTestAllocation(testAllocation);
 
+		result.setTestAllocation(testAllocation);
 		return result;
 	}
 
