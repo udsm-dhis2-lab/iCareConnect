@@ -76,7 +76,7 @@ export class UserManagementDashboardComponent implements OnInit, AfterViewInit {
       if (userResponse) {
         this.data = userResponse;
         this.dialog.open(LabEditUserModalComponent, {
-          maxWidth: "70%",
+          maxWidth: "95%",
           data: this.data,
         });
       }

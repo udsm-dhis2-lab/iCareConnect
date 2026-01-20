@@ -453,7 +453,7 @@ export class SharedManageUserComponent implements OnInit {
                   }
                 })
             : this._snackBar.open(
-                `User ${person.display} created successfully`,
+                `User ${person.display} ${userToUpdate?.uuid ? "updated" : "created"} successfully`,
                 "OK",
                 {
                   horizontalPosition: "center",
@@ -466,6 +466,7 @@ export class SharedManageUserComponent implements OnInit {
             window.location.href = "#/maintenance/users-management/";
           }
           this.saving = false;
+          this.cancel.emit(true);
         }
       },
       (error: { error: any }) => {
@@ -797,7 +798,7 @@ export class SharedManageUserComponent implements OnInit {
       } else {
         this.passwordStrong = false;
         this.passwordStrengthMessage =
-          "Password should meet the following conditions" +
+          "Password should meet the following conditions:\n" +
           (regExpressSetting && regExpressSetting?.value
             ? "Pattern: " + regExpressSetting?.value
             : passwordMinLengthSetting?.value
