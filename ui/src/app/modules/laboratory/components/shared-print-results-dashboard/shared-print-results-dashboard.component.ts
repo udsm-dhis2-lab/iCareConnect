@@ -158,6 +158,11 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
 
     // const doc = new jsPDF();
 
+    if (!this.pdfTable) {
+        console.error("Table element not found");
+        return;
+    }
+
     const pdfTable = this.pdfTable.nativeElement;
 
     var html = htmlToPdfmake(pdfTable.innerHTML);

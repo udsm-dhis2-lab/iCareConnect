@@ -80,7 +80,7 @@ public class SampleOrder implements Serializable {
 		
 	}
 	
-	public Map<String, Object> toMap(Boolean excludeAllocations) throws Exception {
+	public Map<String, Object> toMap(Boolean includeAllocations) throws Exception {
 		Map<String, Object> sampleOrderObject = new HashMap<String, Object>();
 		
 		Map<String, Object> technicianObject = new HashMap<String, Object>();
@@ -196,12 +196,14 @@ public class SampleOrder implements Serializable {
 		}
 		
 		sampleOrderObject.put("order", orderObject);
-		if (!excludeAllocations) {
-			List<Map<String, Object>> testAllocationObject = new ArrayList<Map<String, Object>>();
+		System.out.println("Waiting to see if they'll be excluded. " + (includeAllocations));
+		if (includeAllocations) {
+			System.out.println("There are being included");
+			List<Map<String, Object>> testAllocations = new ArrayList<Map<String, Object>>();
 			for (TestAllocation testAllocation : this.getTestAllocations()) {
-				testAllocationObject.add(testAllocation.toMap());
+				testAllocations.add(testAllocation.toMap());
 			}
-			sampleOrderObject.put("testAllocations", testAllocationObject);
+			sampleOrderObject.put("testAllocations", testAllocations);
 		}
 		return sampleOrderObject;
 	}

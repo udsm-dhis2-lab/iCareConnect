@@ -36,7 +36,6 @@ export class SharedSampleOrderResultsComponent implements OnInit {
         testAllocations: allAllocations,
       };
     });
-    //console.log("orderWithResults", this.ordersWithResults);
     this.testOrdersDetails$ = zip(
       ...this.ordersWithResults?.map((orderWithResults: any) => {
         return this.conceptService

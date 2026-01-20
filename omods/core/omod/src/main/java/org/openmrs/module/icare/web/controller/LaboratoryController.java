@@ -264,9 +264,8 @@ public class LaboratoryController {
 	@ResponseBody
 	public Map<String, Object> getSamplesByIdentification(@PathVariable String sampleIdentification) throws Exception {
 		Sample sample = new Sample();
-		if (laboratoryService.getSampleByUuid(sampleIdentification) != null) {
-			sample = laboratoryService.getSampleByUuid(sampleIdentification);
-		} else {
+		sample = laboratoryService.getSampleByUuid(sampleIdentification);
+		if (sample == null) {
 			sample = laboratoryService.getSampleById(sampleIdentification);
 		}
 		return sample.toMap();
@@ -383,7 +382,7 @@ public class LaboratoryController {
 		SampleOrder sampleOrder = SampleOrder.fromMap(sampleOrderObject);
 		SampleOrder newSampleOrder = laboratoryService.saveSampleOrder(sampleOrder);
 		// save the sampleorder
-		return newSampleOrder.toMap(false);
+		return newSampleOrder.toMap(true);
 	}
 	
 	@RequestMapping(value = "sample/{sampleUuid}/orders", method = RequestMethod.GET)
@@ -393,7 +392,7 @@ public class LaboratoryController {
 		List<Sample> samples = laboratoryService.getSampleOrdersBySampleUuid(sampleUuid);
 		for (Sample sample : samples) {
 			for (SampleOrder order : sample.getSampleOrders()) {
-				orders.add(order.toMap(false));
+				orders.add(order.toMap(true));
 			}
 		}
 		return orders;
@@ -419,7 +418,7 @@ public class LaboratoryController {
 		SampleOrder sampleOrder = SampleOrder.fromMap(sampleOrderObject);
 		SampleOrder newSampleOrder = laboratoryService.updateSampleOrder(sampleOrder);
 		// save the sampleorder
-		return newSampleOrder.toMap(false);
+		return newSampleOrder.toMap(true);
 	}
 	
 	@RequestMapping(value = "allocation", method = RequestMethod.POST)

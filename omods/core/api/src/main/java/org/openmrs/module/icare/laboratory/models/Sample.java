@@ -217,7 +217,7 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 		for (SampleOrder sampleOrder : this.getSampleOrders()) {
 			
 			if (!sampleOrder.getOrder().getVoided()) {
-				orders.add(sampleOrder.toMap(false));
+				orders.add(sampleOrder.toMap(true));
 			}
 		}
 
