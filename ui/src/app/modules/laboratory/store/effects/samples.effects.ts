@@ -277,8 +277,6 @@ export class SamplesEffects {
                 } else {
                   let formattedOrders = [];
                   _.map(sample?.orders, (order) => {
-                    // console.log("order uuid",order);
-                    console.log("action",action);
                     formattedOrders = [
                       ...formattedOrders,
                       {
@@ -293,7 +291,6 @@ export class SamplesEffects {
                   sample["orders"] = formattedOrders;
                   // console.log("formattedOrders",action.paidItems)
                   
-                  console.log("formattedOrders ...paidItems..",formattedOrders)
                   samplesToCollect = [
                     ...samplesToCollect,
                     {

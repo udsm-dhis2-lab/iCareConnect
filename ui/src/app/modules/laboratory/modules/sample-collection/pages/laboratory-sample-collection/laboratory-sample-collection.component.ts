@@ -150,16 +150,16 @@ export class LaboratorySampleCollectionComponent implements OnInit {
 
   // Separate method to open the patient fingerprint modal
   openPatientFingerprintModal(patientAuthorization: string): void {
-    const patientPointOfCareData = {
-      pointOfCareID:
-        this.pointOfCares.find(
-          (item) => item.PointOfCareCode === NHIFPointOfCareCodeE.CONSULTATION
-        ).PointOfCareID || null,
-      authorizationNo: patientAuthorization,
-      practitionerNo: this.currentProviderDetails[1]["value"],
-      biometricMethod: NHIFBiometricMethodE.fingerprint,
-      fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
-    };
+    // const patientPointOfCareData = {
+    //   pointOfCareID:
+    //     this.pointOfCares.find(
+    //       (item) => item.PointOfCareCode === NHIFPointOfCareCodeE.CONSULTATION
+    //     ).PointOfCareID || null,
+    //   authorizationNo: patientAuthorization,
+    //   practitionerNo: this.currentProviderDetails[1]["value"],
+    //   biometricMethod: NHIFBiometricMethodE.fingerprint,
+    //   fpCode: NHIFFingerPrintCodeE.Right_hand_thumb,
+    // };
     /*this.dialog.open(FingerCaptureComponent, {
       width: "45%",
       data: {
