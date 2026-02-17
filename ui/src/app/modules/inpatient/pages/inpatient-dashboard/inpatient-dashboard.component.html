@@ -48,6 +48,7 @@
           [provider]="params?.provider"
           [currentUser]="params?.currentUser"
           [userPrivileges]="params?.userPrivileges"
+          (reloadPage)="reloadPage()"
         ></app-inpatient>
 
         <mat-progress-bar

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Provider } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output, Provider } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { select, Store } from "@ngrx/store";
@@ -47,6 +47,8 @@ export class InpatientComponent implements OnInit {
   @Input() formPrivilegesConfigs: any[];
   @Input() currentUser: any;
   @Input() userPrivileges: any;
+
+  @Output() reloadPage: EventEmitter<any> = new EventEmitter<any>();
   savingObservations$: Observable<boolean>;
   bedOrdersWithBillStatus: any[];
   countOfUnPaidBedOrders: number;
@@ -225,6 +227,9 @@ export class InpatientComponent implements OnInit {
         invoice: event?.invoice,
       },
     });
+  }
+  reload(){
+    this.reloadPage.emit();
   }
 
   createNewOrder(event: Event, visit, currentPatient, provider, lastBedOrder) {

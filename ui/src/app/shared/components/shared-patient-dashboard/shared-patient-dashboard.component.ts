@@ -151,6 +151,8 @@ export class SharedPatientDashboardComponent implements OnInit {
 
   @Output() assignBed: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Output() dichargePatient: EventEmitter<any> = new EventEmitter<boolean>();
+  @Output() reloadPage: EventEmitter<any> = new EventEmitter<any>();
+  
   observationChartForm$: Observable<any>;
   observationChartEncounterType$: Observable<any>;
 
@@ -677,7 +679,8 @@ export class SharedPatientDashboardComponent implements OnInit {
     this.trackActionForAnalytics(`End Consultation: Open`);
   }
   reload(currentPatient: Patient) {
-    this.store.dispatch(loadActiveVisit({ patientId: currentPatient?.id }));
+    this.reloadPage.emit();
+    // this.store.dispatch(loadActiveVisit({ patientId: currentPatient?.id }));
   }
 
   onOpenClientHistoryFromRemote(

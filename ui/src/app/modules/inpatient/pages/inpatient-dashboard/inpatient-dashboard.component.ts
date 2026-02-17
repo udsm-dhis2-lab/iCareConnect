@@ -134,4 +134,8 @@ export class InpatientDashboardComponent implements OnInit {
       );
     });
   }
+
+  reloadPage(){
+    this.ngOnInit();
+  }
 }
