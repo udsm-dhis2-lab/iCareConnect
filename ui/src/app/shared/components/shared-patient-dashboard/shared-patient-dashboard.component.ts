@@ -679,8 +679,11 @@ export class SharedPatientDashboardComponent implements OnInit {
     this.trackActionForAnalytics(`End Consultation: Open`);
   }
   reload(currentPatient: Patient) {
-    this.reloadPage.emit();
-    // this.store.dispatch(loadActiveVisit({ patientId: currentPatient?.id }));
+    if(currentPatient){
+      this.store.dispatch(loadActiveVisit({ patientId: currentPatient?.id }));
+    } else {
+      this.reloadPage.emit();
+    }
   }
 
   onOpenClientHistoryFromRemote(
