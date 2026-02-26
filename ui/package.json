@@ -54,7 +54,7 @@
     "highcharts": "^9.1.2",
     "html-to-pdfmake": "^2.4.15",
     "jsbarcode": "^3.11.6",
-    "jspdf": "^2.5.1",
+    "jspdf": "^4.1.0",
     "material-design-icons": "^3.0.1",
     "moment": "^2.29.4",
     "ngrx-store-freeze": "^0.2.4",
