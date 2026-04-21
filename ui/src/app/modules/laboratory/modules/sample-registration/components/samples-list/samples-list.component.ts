@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
+import { Component, effect, ElementRef, inject, Injector, Input, OnInit, ViewChild } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { MatSelectChange } from "@angular/material/select";
 import { from, fromEvent, Observable, of, Subject, Subscription } from "rxjs";
@@ -9,8 +9,9 @@ import {
   take,
   tap,
 } from "rxjs/operators";
-import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { formatDateToYYMMDD, formatDateToString } from "src/app/shared/helpers/format-date.helper";
 import { SamplesService } from "src/app/shared/services/samples.service";
+import { LabDateService } from "src/app/modules/laboratory/services/lab-date.service";
 
 @Component({
   selector: "app-samples-list",
@@ -22,6 +23,10 @@ export class SamplesListComponent implements OnInit {
   @Input() specimenSources: any[];
   @Input() codedSampleRejectionReasons: any[];
   @ViewChild("search") elementRef: ElementRef;
+
+  labDateService: LabDateService = inject(LabDateService);
+  private injector = inject(Injector);
+
   samples$: Observable<any>;
   page: number;
   pageSize: number;
@@ -30,9 +35,10 @@ export class SamplesListComponent implements OnInit {
   searchText: string;
   subject = new Subject<string>();
   selectedSampleUuid: string = "";
-  startDate: Date;
-  endDate: Date;
+  startDate?: Date;
+  endDate?: Date;
   parameters: any = {};
+
   constructor(private samplesService: SamplesService) {
     this.subject
       .pipe(debounceTime(2000), distinctUntilChanged())
@@ -42,47 +48,45 @@ export class SamplesListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    let endDate = formatDateToYYMMDD(new Date());
-    this.parameters = {
-      ...this.parameters,
-      startDate: formatDateToYYMMDD(
-        new Date(
-          Number(endDate?.split("-")[0]),
-          Number(endDate?.split("-")[1]) - 1,
-          Number(endDate?.split("-")[2]) - 2
-        )
-      ),
-      endDate: formatDateToYYMMDD(
-        new Date(
-          Number(endDate?.split("-")[0]),
-          Number(endDate?.split("-")[1]) - 1,
-          Number(endDate?.split("-")[2])
-        )
-      ),
-    };
     this.page = 1;
     this.pageSize = 10;
-    this.getList();
+
+    effect(() => {
+      this.startDate = this.labDateService.startDate();
+      this.endDate = this.labDateService.endDate();
+
+      if (this.startDate && this.endDate && this.startDate <= this.endDate) {
+        
+        this.parameters = {
+          ...this.parameters,
+          startDate: formatDateToString(this.startDate || new Date(), "yyyy-MM-dd"),
+          endDate: formatDateToString(this.endDate || new Date(), "yyyy-MM-dd"),
+        }
+
+        this.getList();
+      }
+    }, { injector: this.injector });
+    
   }
 
   searchSamples(): void {
     // this.subject.next()
   }
 
-  onDateChange(reload?: boolean): void {
-    this.parameters = {
-      ...this.parameters,
-      startDate: `${this.startDate.getFullYear()}-${
-        this.startDate.getMonth() + 1
-      }-${this.startDate.getDate()}`,
-      endDate: `${this.endDate.getFullYear()}-${
-        this.endDate.getMonth() + 1
-      }-${this.endDate.getDate()}`,
-    };
-    if (reload) {
-      this.getList();
-    }
-  }
+  // onDateChange(reload?: boolean): void {
+  //   this.parameters = {
+  //     ...this.parameters,
+  //     startDate: `${this.startDate.getFullYear()}-${
+  //       this.startDate.getMonth() + 1
+  //     }-${this.startDate.getDate()}`,
+  //     endDate: `${this.endDate?.getFullYear()}-${
+  //       this.endDate?.getMonth() + 1
+  //     }-${this.endDate?.getDate()}`,
+  //   };
+  //   if (reload) {
+  //     this.getList();
+  //   }
+  // }
 
   onViewSampleDetails(sample: any): void {
     this.selectedSampleUuid = sample?.uuid;

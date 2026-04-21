@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from "@angular/core";
+import { Component, OnInit, signal, ViewEncapsulation } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
@@ -45,6 +45,7 @@ import { getLISConfigurations } from "src/app/store/selectors/lis-configurations
 import { LabMenu } from "./resources/models/lab-menu.model";
 import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
 import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
+import { LabDateService } from "./services/lab-date.service";
 @Component({
   selector: "lab-root",
   templateUrl: "./laboratory.component.html",
@@ -185,7 +186,8 @@ export class LaboratoryComponent implements OnInit {
     private titleService: Title,
     private locationService: LocationService,
     private systemSettingsService: SystemSettingsService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private labDateService: LabDateService
   ) {
     this.store.dispatch(loadRolesDetails());
     this.store.dispatch(loadOrderTypes());
@@ -373,8 +375,12 @@ export class LaboratoryComponent implements OnInit {
       ),
     };
 
-    this.startDate = this.parameters?.startDate;
-    this.endDate = this.parameters?.endDate;
+    this.startDate = new Date(this.parameters?.startDate);
+    this.endDate = new Date(this.parameters?.endDate);
+
+    this.labDateService.startDate.set(this.startDate);
+    this.labDateService.endDate.set(this.endDate);
+    
 
     this.store.dispatch(
       loadLabConfigurations({ periodParameters: this.parameters })
@@ -524,6 +530,9 @@ export class LaboratoryComponent implements OnInit {
   }
 
   onDateChange(reload?: boolean) {
+    this.labDateService.startDate.set(this.startDate);
+    this.labDateService.endDate.set(this.endDate);
+
     if (reload && this.endDate) {
       this.store.dispatch(clearLoadedLabOrders());
 
