@@ -15,7 +15,9 @@ import {
   ThemePalette,
 } from "@angular/material/core";
 import { Observable, of } from "rxjs";
-import { DATE_FORMATS_DD_MM_YYYY } from "src/app/core/constants/date-formats.constants";
+import { DATE_FORMATS_DD_MM_YYYY, DATETIME_FORMATS_DD_MM_YYYY } from "src/app/core/constants/date-formats.constants";
+import { NGX_MAT_DATE_FORMATS, NgxMatDateAdapter } from "@angular-material-components/datetime-picker";
+import { NgxMatMomentDateAdapter } from "../../adapters/ngx-mat-moment-date.adapter";
 import { Field } from "../../models/field.model";
 import { FormService } from "../../services";
 
@@ -31,6 +33,8 @@ import { FormService } from "../../services";
     },
 
     { provide: MAT_DATE_FORMATS, useValue: DATE_FORMATS_DD_MM_YYYY },
+    { provide: NgxMatDateAdapter, useClass: NgxMatMomentDateAdapter },
+    { provide: NGX_MAT_DATE_FORMATS, useValue: DATETIME_FORMATS_DD_MM_YYYY },
   ],
 })
 export class FieldComponent implements AfterViewInit {
