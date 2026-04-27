@@ -15,8 +15,14 @@ import {
   ThemePalette,
 } from "@angular/material/core";
 import { Observable, of } from "rxjs";
-import { DATE_FORMATS_DD_MM_YYYY, DATETIME_FORMATS_DD_MM_YYYY } from "src/app/core/constants/date-formats.constants";
-import { NGX_MAT_DATE_FORMATS, NgxMatDateAdapter } from "@angular-material-components/datetime-picker";
+import {
+  DATE_FORMATS_DD_MM_YYYY,
+  DATETIME_FORMATS_DD_MM_YYYY,
+} from "src/app/core/constants/date-formats.constants";
+import {
+  NGX_MAT_DATE_FORMATS,
+  NgxMatDateAdapter,
+} from "@angular-material-components/datetime-picker";
 import { NgxMatMomentDateAdapter } from "../../adapters/ngx-mat-moment-date.adapter";
 import { Field } from "../../models/field.model";
 import { FormService } from "../../services";
@@ -47,7 +53,7 @@ export class FieldComponent implements AfterViewInit {
   @Input() shouldDisable: boolean;
   members$: Observable<any[]> = of([]);
 
-  public color: ThemePalette = 'primary';
+  public color: ThemePalette = "primary";
 
   constructor(private formService: FormService) {}
 
@@ -96,7 +102,7 @@ export class FieldComponent implements AfterViewInit {
         },
         this.field?.searchControlType,
         this.field?.filteringItems,
-        this.field
+        this.field,
       );
     } else if (this.field?.options?.length > 0) {
       this.members$ = of(this.field?.options);
@@ -183,7 +189,6 @@ export class FieldComponent implements AfterViewInit {
 
   onListenKeyEvent(event: KeyboardEvent, fieldtype: any): void {
     if (fieldtype === "number") {
-
       if (
         event.key === "Backspace" ||
         event.key === "ArrowLeft" ||
@@ -224,14 +229,14 @@ export class FieldComponent implements AfterViewInit {
 
   get getOptionValue(): any {
     const matchedOption = (this.field.options.filter(
-      (option) => option?.key === this.value
+      (option) => option?.key === this.value,
     ) || [])[0];
     return matchedOption ? matchedOption?.value : "";
   }
 
   get getOptionValueLabel(): any {
     const matchedOption = (this.field.options.filter(
-      (option) => option?.key === this.value
+      (option) => option?.key === this.value,
     ) || [])[0];
     return matchedOption ? matchedOption?.label : "";
   }
@@ -265,7 +270,7 @@ export class FieldComponent implements AfterViewInit {
       parameters,
       this.field?.searchControlType,
       this.field?.filteringItems,
-      this.field
+      this.field,
     );
   }
 
@@ -283,8 +288,8 @@ export class FieldComponent implements AfterViewInit {
       field?.options?.filter(
         (option) =>
           option?.label?.toLowerCase()?.indexOf(searchingText?.toLowerCase()) >
-          -1
-      ) || []
+          -1,
+      ) || [],
     );
     let objectToUpdate: any = {};
     if (!searchingText || searchingText?.length === 0) {
@@ -326,7 +331,7 @@ export class FieldComponent implements AfterViewInit {
   displayLabelFunc(value?: any): string {
     return value
       ? this.field?.options?.find(
-          (option) => option?.value === (value?.value ? value?.value : value)
+          (option) => option?.value === (value?.value ? value?.value : value),
         )?.label
       : undefined;
   }
