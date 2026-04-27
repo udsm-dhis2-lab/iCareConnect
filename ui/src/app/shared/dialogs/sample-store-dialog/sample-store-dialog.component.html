@@ -1,0 +1,90 @@
+<h2 mat-dialog-title>Store sample</h2>
+
+<mat-dialog-content class="sample-lifecycle-dialog-content">
+  <div class="sample-lifecycle-summary">
+    <div class="summary-item">
+      <span class="summary-label">Laboratory No.</span>
+      <span class="summary-value">{{ sample?.label || "-" }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">Specimen</span>
+      <span class="summary-value">{{ sample?.specimenSource?.name || sample?.specimenSource?.display || "-" }}</span>
+    </div>
+    <div class="summary-item">
+      <span class="summary-label">Patient</span>
+      <span class="summary-value">
+        {{ sample?.patient?.givenName || "" }}
+        {{ sample?.patient?.middleName || "" }}
+        {{ sample?.patient?.familyName || "" }}
+      </span>
+    </div>
+  </div>
+
+  <mat-progress-bar *ngIf="loadingMetadata" mode="indeterminate"></mat-progress-bar>
+
+  <form [formGroup]="form" class="sample-lifecycle-form">
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Storage type</mat-label>
+        <mat-select formControlName="storageTypeUuid">
+          <mat-option *ngFor="let storageType of storageTypes" [value]="storageType?.uuid">
+            {{ storageType?.name || storageType?.display }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('storageTypeUuid')?.hasError('required')">
+          Storage type is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Storage unit</mat-label>
+        <mat-select formControlName="storageUuid">
+          <mat-option *ngFor="let storage of filteredStorages" [value]="storage?.uuid">
+            {{ storage?.name || storage?.display }}
+            <ng-container *ngIf="storage?.capacity !== null && storage?.capacity !== undefined">
+              • Capacity {{ storage?.capacity }}
+            </ng-container>
+          </mat-option>
+        </mat-select>
+        <mat-hint *ngIf="form.get('storageTypeUuid')?.value && filteredStorages?.length === 0">
+          No storage units found for the selected storage type.
+        </mat-hint>
+        <mat-error *ngIf="form.get('storageUuid')?.hasError('required')">
+          Storage unit is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Stored on</mat-label>
+        <input matInput type="datetime-local" formControlName="timestamp" />
+        <mat-error *ngIf="form.get('timestamp')?.hasError('required')">
+          Date and time are required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Storage note</mat-label>
+        <textarea
+          matInput
+          rows="3"
+          formControlName="comments"
+          placeholder="Optional notes about where or how the sample is being stored"
+        ></textarea>
+      </mat-form-field>
+    </div>
+
+    <div *ngIf="errorMessage" class="dialog-error-state">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button type="button" (click)="close()" [disabled]="saving">
+    Cancel
+  </button>
+  <button mat-flat-button color="primary" type="button" (click)="save()" [disabled]="saving || loadingMetadata">
+    {{ saving ? "Saving..." : "Store sample" }}
+  </button>
+</mat-dialog-actions>

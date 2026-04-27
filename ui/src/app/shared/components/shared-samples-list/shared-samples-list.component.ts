@@ -24,6 +24,7 @@ import { map } from "rxjs/operators";
 import { webSocket } from "rxjs/webSocket";
 import { BarCodeModalComponent } from "src/app/shared/dialogs/bar-code-modal/bar-code-modal.component";
 import { formatDateToYYMMDD } from "../../helpers/format-date.helper";
+import { SampleDisposeDialogComponent, SampleStoreDialogComponent } from "../../dialogs";
 
 @Component({
   selector: "app-shared-samples-list",
@@ -348,6 +349,74 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     }
   }
 
+
+  onStore(event: Event, sample: any): void {
+    event.stopPropagation();
+    this.dialog
+      .open(SampleStoreDialogComponent, {
+        width: "720px",
+        maxWidth: "95vw",
+        disableClose: true,
+        panelClass: "custom-dialog-container",
+        data: {
+          sample,
+          LISConfigurations: this.LISConfigurations,
+        },
+      })
+      .afterClosed()
+      .subscribe((result) => {
+        if (result?.saved) {
+          this.refreshVisibleSamples();
+        }
+      });
+  }
+
+  onOpenDisposeDialog(event: Event, sample: any): void {
+    event.stopPropagation();
+    if (sample?.disposedStatus) {
+      return;
+    }
+
+    this.dialog
+      .open(SampleDisposeDialogComponent, {
+        width: "720px",
+        maxWidth: "95vw",
+        disableClose: true,
+        panelClass: "custom-dialog-container",
+        data: {
+          sample,
+          LISConfigurations: this.LISConfigurations,
+        },
+      })
+      .afterClosed()
+      .subscribe((result) => {
+        if (result?.saved) {
+          this.refreshVisibleSamples();
+        }
+      });
+  }
+
+  private refreshVisibleSamples(): void {
+    if (this.listType === "samples") {
+      this.getSamples({
+        category: this.category,
+        hasStatus: this.hasStatus,
+        pageSize: this.pageSize,
+        page: this.page,
+        q: this.searchingText,
+        testUuid: this.testUuid,
+        specimenUuid: this.specimenUuid,
+        instrument: this.instrumentUuid,
+        dapartment: this.dapartment,
+      });
+    } else if (this.currentVisit?.uuid) {
+      this.currentSamplesByVisits$ = this.visitsService.getSamplesByVisitUuid(
+        this.currentVisit?.uuid,
+        this.sampleVisitParameters
+      );
+    }
+  }
+
   onSelectDepartment(event: MatSelectChange): void {
     this.dapartment = event?.value?.uuid;
     this.getSamples({
@@ -464,8 +533,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
   }
 
   onDispose(event: Event, sample: any): void {
-    event.stopPropagation();
-    this.selectedSampleDetails.emit(sample);
+    this.onOpenDisposeDialog(event, sample);
   }
 
   onPrintBarcode(event: Event, sample: any): void {

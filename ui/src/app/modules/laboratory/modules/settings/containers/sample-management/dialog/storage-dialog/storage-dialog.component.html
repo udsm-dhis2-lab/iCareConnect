@@ -1,0 +1,66 @@
+<div class="dialog-shell">
+  <div class="dialog-header">
+    <div>
+      <p class="dialog-kicker">Metadata setup</p>
+      <h2>{{ title }}</h2>
+      <p class="dialog-description">
+        Register the physical unit staff will use. When you need room, fridge,
+        rack, or shelf precision without changing the schema, encode that path
+        in the storage unit name.
+      </p>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <form class="dialog-form" [formGroup]="form" (ngSubmit)="save()">
+    <div class="dialog-grid">
+      <mat-form-field appearance="outline" class="dialog-grid-span-2">
+        <mat-label>Storage unit name</mat-label>
+        <input
+          matInput
+          type="text"
+          formControlName="name"
+          maxlength="32"
+          placeholder="For example: Virology / Room 2 / Fridge 01 / Shelf B"
+        />
+        <mat-hint align="end">{{ storageNameControl?.value?.length || 0 }}/32</mat-hint>
+        <mat-error *ngIf="storageNameControl?.hasError('required')">Storage unit name is required.</mat-error>
+        <mat-error *ngIf="storageNameControl?.hasError('maxlength')">Use 32 characters or fewer.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Storage type</mat-label>
+        <mat-select formControlName="storageTypeUuid">
+          <mat-option *ngFor="let type of data.storageTypes" [value]="type.uuid || type.id">
+            {{ type.name }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="storageTypeControl?.hasError('required')">Storage type is required.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Capacity</mat-label>
+        <input
+          matInput
+          type="number"
+          min="1"
+          formControlName="capacity"
+          placeholder="For example: 120"
+        />
+        <mat-hint>Total supported positions or slots</mat-hint>
+        <mat-error *ngIf="capacityControl?.hasError('required')">Capacity is required.</mat-error>
+        <mat-error *ngIf="capacityControl?.hasError('min')">Capacity must be greater than zero.</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="dialog-actions">
+      <button mat-stroked-button type="button" (click)="close()">Close</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="saving">
+        <mat-icon *ngIf="!saving">save</mat-icon>
+        <mat-spinner *ngIf="saving" diameter="20"></mat-spinner>
+        {{ submitLabel }}
+      </button>
+    </div>
+  </form>
+</div>

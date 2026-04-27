@@ -439,6 +439,7 @@
                     >
                       Print
                     </button>
+                     
                   </div>
                   <div
                     *ngIf="tabType === 'completed-samples'"
@@ -509,6 +510,33 @@
                     Send
                   </button>
                 </div>
+                <div class="w-100 d-flex justify-content-end">
+                  <button
+                    *ngIf="LISConfigurations?.isLIS"
+                    mat-flat-button
+                    class="mt-2"
+                    color="primary"
+                    (click)="onStore($event, sample)"
+                  >
+                    <mat-icon>inventory_2</mat-icon>
+                    Store
+                  </button>
+                </div>
+
+                <div class="w-100 d-flex justify-content-end">
+                  <button
+                    *ngIf="LISConfigurations?.isLIS"
+                    mat-flat-button
+                    class="mt-2"
+                    color="primary"
+                    (click)="onOpenDisposeDialog($event, sample)"
+                    [disabled]="sample?.disposedStatus"
+                  >
+                    <mat-icon>delete_outline</mat-icon>
+                    Dispose
+                  </button>
+                </div>
+
                 <div class="w-100 d-flex justify-content-end">
                   <button
                     *ngIf="LISConfigurations?.isLIS"

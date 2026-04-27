@@ -1,0 +1,80 @@
+:host {
+  display: block;
+}
+
+.dialog-shell {
+  padding: 1.25rem 1.25rem 1rem;
+}
+
+.dialog-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #5f6b7a;
+}
+
+.dialog-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.dialog-description {
+  margin: 0.5rem 0 0;
+  color: #526071;
+  line-height: 1.6;
+}
+
+.dialog-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.dialog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.dialog-grid-span-2 {
+  grid-column: span 2;
+}
+
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.dialog-actions .mat-mdc-progress-spinner,
+.dialog-actions .mat-progress-spinner {
+  display: inline-block;
+  margin-right: 0.25rem;
+}
+
+@media (max-width: 767px) {
+  .dialog-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dialog-grid-span-2 {
+    grid-column: span 1;
+  }
+
+  .dialog-actions {
+    justify-content: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .dialog-actions button {
+    width: 100%;
+  }
+}

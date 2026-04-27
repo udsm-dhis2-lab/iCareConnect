@@ -35,7 +35,7 @@ export const getAllUniqueDrugOrders = createSelector(
 
     const billItems: BillItem[] = flatten(bills.map((bill) => bill?.items));
 
-    return uniqOrders.map((order) => {
+    return uniqOrders.map((order: any) => {
       const unpaidOrder = find(billItems, ['order.uuid', order.id]);
 
       //if no drug = not calc
@@ -72,7 +72,7 @@ export const getTotalDrugOrderAmount = createSelector(
   getAllUniqueDrugOrders,
   (drugOrders) => {
     return (drugOrders || []).reduce(
-      (sum, drugOrder) => sum + parseInt(drugOrder?.amount || 0, 10),
+      (sum, drugOrder: any) => sum + parseInt(drugOrder?.amount || 0, 10),
       0
     );
   }

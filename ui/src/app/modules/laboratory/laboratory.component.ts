@@ -171,6 +171,12 @@ export class LaboratoryComponent implements OnInit {
           id: "price-list",
           icon: "money",
         },
+        {
+          name: "Sample Management",
+          route: "settings/sample-management",
+          id: "sample-management",
+          icon: "money",
+        },
       ],
     },
   ];

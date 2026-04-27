@@ -52,8 +52,7 @@ import {
   removeCollectedSampleFromSamplesToCollect,
 } from "src/app/modules/laboratory/store/actions";
 import { getLISConfigurations } from "../selectors/lis-configurations.selectors";
-
-import * as moment from "moment";
+import * as moment from 'moment';
 import {
   getAllSampleTypes,
   getCodedSampleRejectionReassons,
@@ -1990,7 +1989,7 @@ function getAuthorizationDetails(sample) {
   );
   const allocationStatuses = _.uniqBy(
     _.flatten(
-      approvedAllocations?.map((allocation) => {
+      approvedAllocations?.map((allocation: any) => {
         return allocation?.statuses?.map((status) => {
           return {
             ...status,
