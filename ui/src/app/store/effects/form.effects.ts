@@ -151,7 +151,8 @@ export class FormEffects {
                           formField?.field?.concept,
                           formField,
                           action.causesOfDeathConcepts,
-                          formResponse?.conceptSourceUuid
+                          formResponse?.conceptSourceUuid,
+                          formResponse?.formFields
                         ),
                       ],
                       ["fieldNumber", "fieldPart"],
