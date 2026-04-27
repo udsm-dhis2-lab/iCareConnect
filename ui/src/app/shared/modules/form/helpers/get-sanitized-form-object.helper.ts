@@ -16,7 +16,8 @@ export function getSanitizedFormObject(
   concept: ConceptGet,
   fieldsInfo?,
   conceptsForDiagnosis?: string[],
-  conceptSourceUuid?: string
+  conceptSourceUuid?: string,
+  formFields?: any[]
 ): ICAREForm {
   if (!concept) {
     return null;
@@ -41,11 +42,11 @@ export function getSanitizedFormObject(
     mappings,
     units,
   } = concept;
-  // console.log(conceptSourceUuid);
+
   const formObject = {
     id: uuid,
     uuid,
-    name: name?.name ? name?.name : display,
+    name: fieldsInfo?.field?.display ? fieldsInfo?.field?.display : name?.name ? name?.name : display,
     dataType:
       answers?.length > 0 || isDiagnosis
         ? "Coded"
@@ -100,13 +101,17 @@ export function getSanitizedFormObject(
     conceptClass: conceptClass?.display,
     captureData: setMembers?.length == 0 ? true : false,
     options: getFormFieldOptions(answers),
-    setMembers: (setMembers || []).map((setMember) =>
-      getSanitizedFormObject(
+    setMembers: (setMembers || []).map((setMember: any) => {
+      
+      fieldsInfo = formFields?.filter((formField) => formField?.field?.concept?.uuid === setMember?.uuid)?.[0];
+      
+      return getSanitizedFormObject(
         setMember,
         fieldsInfo,
         conceptsForDiagnosis,
         conceptSourceUuid
       )
+    }
     ),
     mappings: mappings,
     units: units,
@@ -114,15 +119,15 @@ export function getSanitizedFormObject(
 
   // console.log("formObject", formObject);
 
-  const formField = getFormField(formObject, isDiagnosis, conceptSourceUuid);
-  const formFields = getFormFields(formObject, isDiagnosis, conceptSourceUuid);
+  const returnFormField = getFormField(formObject, isDiagnosis, conceptSourceUuid);
+  const returnFormFields = getFormFields(formObject, isDiagnosis, conceptSourceUuid);
   return {
     ...formObject,
-    formField,
-    formFields,
+    formField: returnFormField,
+    formFields: returnFormFields,
     groupedFields:
-      formFields && formFields?.length > 0
-        ? groupBy(formFields, "fieldPart")
+      returnFormFields && returnFormFields?.length > 0
+        ? groupBy(returnFormFields, "fieldPart")
         : null,
   };
 }
