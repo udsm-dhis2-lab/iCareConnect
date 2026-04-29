@@ -372,13 +372,9 @@
                 [attr.rowspan]="sample?.orders?.length"
               >
                 {{
-                  !LISConfigurations?.isLIS
-                    ? sample?.priorityHigh
-                      ? "Urgent"
-                      : "Routine"
-                    : sample?.priorityStatus?.status
-                    ? sample?.priorityStatus?.status
-                    : "Routine"
+                  sample?.priorityHigh
+                  ? "Urgent"
+                  : "Routine"
                 }}
               </td>
 
@@ -792,13 +788,9 @@
                                 [attr.rowspan]="sample?.orders?.length"
                               >
                                 {{
-                                  !LISConfigurations?.isLIS
-                                    ? sample?.priorityHigh
+                                  sample?.priorityHigh
                                       ? "Urgent"
                                       : "Routine"
-                                    : sample?.priorityStatus?.status
-                                    ? sample?.priorityStatus?.status
-                                    : "Routine"
                                 }}
                               </td>
                               <td

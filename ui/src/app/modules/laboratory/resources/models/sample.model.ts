@@ -512,8 +512,7 @@ export class LabSample {
         (status) => status?.status === "HIGH" || status?.status === "Urgent"
       ) || []
     )?.length > 0
-      ? true
-      : false;
+      ? true : this.sample?.orders?.[0]?.order?.urgency === "STAT"
   }
 
   get priorityOrderNumber(): any {
