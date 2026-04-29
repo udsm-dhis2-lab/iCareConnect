@@ -36,6 +36,8 @@ import { getLocationsByIds } from "src/app/store/selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { webSocket } from "rxjs/webSocket";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { GlobalSettingService } from "src/app/shared/resources/global-setting/services/globalsetting.service";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "app-single-registration",
@@ -144,6 +146,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   generalObservationsData: any;
   isGeneralObsFormValid: boolean = true;
   formId: string;
+  priorityFieldSettings: any;
 
   constructor(
     private samplesService: SamplesService,
@@ -158,6 +161,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     private orderService: OrdersService,
     private conceptService: ConceptsService,
     private otherSystemsService: OtherClientLevelSystemsService,
+    private systemSettings: SystemSettingsService,
     private store: Store<AppState>
   ) {
     this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
@@ -172,11 +176,12 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     // console.log(
     //   "sampleRegistrationCategories refKey",
     //   this.sampleRegistrationCategories
     // );
+    this.priorityFieldSettings = await this.systemSettings.getSystemSettingsByKey("iCare.laboratory.settings.single.sample.registration.priorityField").toPromise();
     this.registrationCategory = this.sampleRegistrationCategories[0];
     const userLocationsIds = JSON.parse(
       this.currentUser?.userProperties?.locations
@@ -229,7 +234,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     this.renderGenericForms = true;
   }
 
-  onCustomFormUpdate(data: FormValue): void {
+  async onCustomFormUpdate(data: FormValue): Promise<void> {
     this.isGeneralObsFormValid = data.isValid;
     this.generalObsFormData = {
       ...this.generalObsFormData,
@@ -254,6 +259,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
       }) || [],
       "form"
     );
+
   }
 
   onGetFormId(id: string): void {
@@ -651,7 +657,41 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     this.formData = { ...this.formData, ...clinicalData };
   }
 
-  onSave(event: Event, forRejection?: boolean, labLocations?: any[]): void {
+  async getUrgencyValue() {
+    
+    if(!this.priorityFieldSettings){
+      console.log("", "Error loading global variable for urgency field (iCare.laboratory.settings.single.sample.registration.priorityField) , check if it's set correctly");
+      return null;
+    }
+
+    let allFieldsValues: any = []
+
+    Object.keys(this.generalObservationsData).forEach((key) => {
+      allFieldsValues = [
+        ...allFieldsValues,
+        ...this.generalObservationsData[key].map((field: any) => {
+          return {
+            concept: field?.concept,
+            value: field?.value,
+          }
+        })
+      ]
+    })
+
+    const urgencyField = allFieldsValues.find((field: any) => field?.concept === this.priorityFieldSettings?.urgencyFieldConcept && field?.value);
+
+    if(!urgencyField){
+      return null;
+    }
+
+    const urgencyValueMappings: any = await this.conceptService.getConceptMappingByConceptUuid(urgencyField?.value).toPromise() || of([]).toPromise();
+       
+
+    return urgencyValueMappings?.results?.find(
+      (mapping: any) => mapping?.conceptReferenceTerm?.conceptSource?.uuid === this.priorityFieldSettings?.urgencyMappingSource)?.conceptReferenceTerm?.code || null;
+  }
+
+  async onSave(event: Event, forRejection?: boolean, labLocations?: any[]): Promise<void> {
     event.stopPropagation();
     if (labLocations?.length === 1) {
       this.currentLabLocation = labLocations[0];
@@ -671,7 +711,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
       },
     });
 
-    confirmationDialogue.afterClosed().subscribe((closingObject) => {
+    confirmationDialogue.afterClosed().subscribe(async (closingObject) => {
       if (closingObject?.confirmed) {
         // Identify if tests ordered are well configured
 
@@ -696,6 +736,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
             }
           });
         }
+
+        const priority = await this.getUrgencyValue();
 
         const testOrdersWithNoDepartments: any[] = flatten(
           this.groupedTestOrdersByDepartments
@@ -1034,7 +1076,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                 orderer: this.provider?.uuid,
                                                 patient: patientResponse?.uuid,
                                                 careSetting: "OUTPATIENT",
-                                                urgency: "ROUTINE", // TODO: Change to reflect users input
+                                                urgency: priority ?? "ROUTINE",
                                                 instructions: "",
                                                 type: "testorder",
                                               };

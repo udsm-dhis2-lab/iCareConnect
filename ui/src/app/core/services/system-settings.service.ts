@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { from, Observable, of, zip } from "rxjs";
+import { from, Observable, of, throwError, zip } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { SystemSettingsWithKeyDetails } from "../models/system-settings.model";
@@ -27,14 +27,17 @@ export class SystemSettingsService {
   getSystemSettingsByKey(key: string): Observable<any> {
     return this.httpClient.get(`systemsetting?q=${key}&v=full`).pipe(
       map((response) => {
-        return response?.results && response?.results[0]
+          return response?.results && response?.results[0]
           ? response?.results[0]?.value.indexOf("{") === 0 ||
             response?.results[0]?.value.indexOf("[") === 0
             ? JSON.parse(response?.results[0]?.value)
             : response?.results[0]?.value
           : "none";
       }),
-      catchError((error) => of(error))
+      catchError((error) => {
+        return throwError(() => error)
+      }
+      )
     );
   }
   getSystemSettingsByUuid(uuid: string): Observable<any> {
