@@ -521,8 +521,7 @@ export class LabSample {
         (status) => status?.status === "HIGH" || status?.status === "Urgent"
       ) || []
     )?.length > 0
-      ? 0
-      : 1;
+      ? 0 : this.sample?.orders?.[0]?.order?.urgency === "STAT" ? 1 : 0;
   }
 
   get hasResults(): boolean {
