@@ -134,6 +134,13 @@ export class LaboratoryComponent implements OnInit {
       subMenus: [],
     },
     {
+      name: "Sample Referral",
+      route: "sample-referral",
+      id: "referral",
+      icon: "send",
+      subMenus: [],
+    },
+    {
       name: "Sample Tracking",
       route: "sample-tracking",
       id: "tracking",

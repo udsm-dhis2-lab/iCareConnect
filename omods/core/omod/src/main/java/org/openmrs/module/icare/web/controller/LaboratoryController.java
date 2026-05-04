@@ -290,7 +290,9 @@ public class LaboratoryController {
 	        @RequestParam(value = "specimen", required = false) String specimenSourceUuid,
 	        @RequestParam(value = "instrument", required = false) String instrumentUuid,
 	        @RequestParam(value = "visit", required = false) String visitUuid,
-	        @RequestParam(value = "excludeStatus", required = false) String excludeStatus) throws Exception {
+	        @RequestParam(value = "excludeStatus", required = false) String excludeStatus,
+	        @RequestParam(value = "orderType", required = false) String orderType,
+	        @RequestParam(value = "referredOnly", required = false) Boolean referredOnly) throws Exception {
 		
 		Date start = null;
 		Date end = null;
@@ -306,6 +308,13 @@ public class LaboratoryController {
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
+		if (orderType != null) {
+			referredOnly = referredOnly ? referredOnly : false;
+			ListResult<Sample> sampleResults = laboratoryService.getSamplesByOrderType(start, end, pager, orderType,
+			    referredOnly, q);
+			
+			return sampleResults.toMap();
+		}
 		if (!excludeAllocations) {
 			ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
 			    testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid,

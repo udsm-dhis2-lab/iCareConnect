@@ -357,6 +357,68 @@ public class SampleDAO extends BaseDAO<Sample> {
 		return listResults;
 	}
 	
+	public ListResult<Sample> getSamplesByOrderType(Date startDate, Date endDate, Pager pager, String orderTypeUuid,
+	        Boolean referredOnly, String q) {
+		DbSession session = this.getSession();
+		
+		String queryStr = "SELECT DISTINCT s FROM Sample s JOIN s.sampleOrders so JOIN so.order o JOIN o.orderType ot";
+		
+		boolean hasWhere = false;
+		
+		if (orderTypeUuid != null) {
+			if (referredOnly != null && referredOnly) {
+				queryStr += " WHERE ot.uuid = :orderTypeUuid";
+				hasWhere = true;
+			} else {
+				queryStr += " WHERE s.id NOT IN (SELECT s2.id FROM Sample s2 JOIN s2.sampleOrders so2 JOIN so2.order o2 JOIN o2.orderType ot2 WHERE ot2.uuid = :orderTypeUuid)";
+				hasWhere = true;
+			}
+		}
+		
+		if (q != null && !q.isEmpty()) {
+			queryStr += (hasWhere ? " AND " : " WHERE ");
+			queryStr += " lower(s.label) LIKE :q ";
+			hasWhere = true;
+		}
+		
+		if (startDate != null && endDate != null) {
+			queryStr += (hasWhere ? " AND " : " WHERE ");
+			queryStr += " (cast(s.dateCreated as date) BETWEEN :startDate AND :endDate) ";
+			hasWhere = true;
+		}
+		
+		queryStr += " ORDER BY s.dateCreated DESC";
+		
+		Query query = session.createQuery(queryStr);
+		
+		if (orderTypeUuid != null) {
+			query.setParameter("orderTypeUuid", orderTypeUuid);
+		}
+		
+		if (q != null && !q.isEmpty()) {
+			query.setParameter("q", "%" + q.toLowerCase() + "%");
+		}
+		
+		if (startDate != null && endDate != null) {
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
+		}
+		
+		ListResult<Sample> listResults = new ListResult<Sample>();
+		if (pager != null && pager.isAllowed()) {
+			int totalCount = query.list().size();
+			pager.setTotal(totalCount);
+			
+			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+			query.setMaxResults(pager.getPageSize());
+			
+			listResults.setPager(pager);
+		}
+		
+		listResults.setResults(query.list());
+		return listResults;
+	}
+	
 	public List<Sample> getSamplesByVisitOrPatientAndOrDates(String visitId, String patient, Date startDate, Date endDate) {
 		
 		DbSession session = this.getSession();
