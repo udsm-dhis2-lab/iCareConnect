@@ -1,0 +1,53 @@
+<mat-horizontal-stepper #stepper linear>
+  <mat-step label="Step 1" #referralSamplesInformationStep>
+    <ng-template matStepLabel>Referral Samples Information</ng-template>
+    <div>
+        @if(referralForms?.sample_information){
+            <app-referral-sample-information></app-referral-sample-information>
+        }
+        @else {
+            <p class="alert alert-warning">No Referral Samples Information Form configured for referrals. Please contact system administrator.</p>
+        }
+      <button mat-raised-button color="primary" (click)="referralSamplesInformationStep.completed = true; stepper.next()">Complete Step 1</button>
+    </div>
+  </mat-step>
+
+  <mat-step label="Step 2" #referralDestinationStep>
+    <ng-template matStepLabel>Referral Destination Information</ng-template>
+    <div>
+        @if(referralForms?.destination_information){
+            <app-referral-destination-information></app-referral-destination-information>
+        }
+        @else {
+            <p class="alert alert-warning">No Referral Destination Information Form configured for referrals. Please contact system administrator.</p>
+        }
+      <button mat-raised-button color="primary" (click)="referralDestinationStep.completed = true; stepper.next()">Complete Step 2</button>
+    </div>
+  </mat-step>
+
+  <mat-step label="Step 3" #referralPackagingStep>
+    <ng-template matStepLabel>Referral Packaging Information</ng-template>
+    <div>
+         @if(referralForms?.packaging_information){
+                <app-referral-packaging-information></app-referral-packaging-information>
+          }
+          @else {
+                <p class="alert alert-warning">No Referral Packaging Information Form configured for referrals. Please contact system administrator.</p>
+          }
+      <button mat-raised-button color="primary" (click)="referralPackagingStep.completed = true; stepper.next()">Complete Step 3</button>
+    </div>
+  </mat-step>
+
+  <mat-step label="Step 4" #referralTransportStep>
+    <ng-template matStepLabel>Referral Transport Information</ng-template>
+    <div>
+        @if(referralForms?.transport_information){
+            <app-referral-transport-information></app-referral-transport-information>
+        }
+        @else {
+            <p class="alert alert-warning">No Referral Transport Information Form configured for referrals. Please contact system administrator.</p>
+        }
+      <button mat-raised-button color="primary" (click)="referralTransportStep.completed = true;">Complete Step 4</button>
+    </div>
+  </mat-step>
+</mat-horizontal-stepper>

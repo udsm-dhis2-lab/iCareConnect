@@ -1,9 +1,12 @@
 import { Component, effect, inject, Injector, Input, OnInit } from "@angular/core";
 import { SampleReferralService } from "../../services/referral-samples.service";
 import { ReferralSystemSettingsService } from "../../services/referral-system-settings.service";
-import { Observable } from "rxjs";
+import { Observable, Subject } from "rxjs";
 import { LabDateService } from "src/app/modules/laboratory/services/lab-date.service";
 import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
+import { debounceTime, distinctUntilChanged } from "rxjs/operators";
+import { MatDialog } from "@angular/material/dialog";
+import { AddSampleReferralsComponent } from "../../dialogs/add-sample-referrals/add-sample-referrals.component";
 
 @Component({
   selector: "app-referred-samples",
@@ -15,15 +18,29 @@ export class ReferredSamplesComponent implements OnInit {
   private sampleReferralService = inject(SampleReferralService);
   private referralSystemSettingsService = inject(ReferralSystemSettingsService);
   private labDateService = inject(LabDateService);
+  private dialog = inject(MatDialog);
 
   
   referredSamples$?: Observable<any>;
+  searchText: string;
+  subject = new Subject<string>();
 
   referralOrderTypeUuid?: string;
   startDate?: Date;
   endDate?: Date;
   page = 1;
   pageSize = 10;
+  pageCounts: number[] = [10, 20, 25, 50];
+
+  constructor() {
+    this.subject
+          .pipe(debounceTime(2000), distinctUntilChanged())
+          .subscribe(() => {
+            if(this.referralOrderTypeUuid) {
+              this.getSamplesByReferralOrderType(this.referralOrderTypeUuid);
+            }
+          });
+  }
 
   ngOnInit(): void {
     this.reloadSampleListOnDateChange();
@@ -40,14 +57,13 @@ export class ReferredSamplesComponent implements OnInit {
 
   reloadSampleListOnDateChange() {
     effect(() => {
-        console.log("Date parameters changed. Reloading referred samples list...", this.labDateService.startDate());
-          this.startDate = this.labDateService.startDate();
-          this.endDate = this.labDateService.endDate();
+      this.startDate = this.labDateService.startDate();
+      this.endDate = this.labDateService.endDate();
     
-          if (this.startDate && this.endDate && this.startDate <= this.endDate) {
-            this.getSamplesByReferralOrderType(this.referralOrderTypeUuid!);
-          }
-        }, { injector: this.injector });
+      if (this.startDate && this.endDate && this.startDate <= this.endDate) {
+        this.getSamplesByReferralOrderType(this.referralOrderTypeUuid!);
+      }
+    }, { injector: this.injector });
   }
 
   getSamplesByReferralOrderType(orderTypeUuid: string) {
@@ -58,6 +74,22 @@ export class ReferredSamplesComponent implements OnInit {
       startDate: formatDateToString(this.startDate, "yyyy-MM-dd"),
       endDate: formatDateToString(this.endDate, "yyyy-MM-dd"),
       haveThisOrderType: true,
+    });
+  }
+
+  onPageChange(event) {
+    this.page = event.pageIndex + 1;
+    this.pageSize = Number(event?.pageSize);
+    this.getSamplesByReferralOrderType(this.referralOrderTypeUuid!);
+  }
+
+  openReferralForm(){
+    this.dialog.open(AddSampleReferralsComponent, {
+      maxWidth: "80vw",
+      maxHeight: "80vh",
+      data: {
+        referralSettings: this.referralSystemSettingsService.referralSettings(),
+      }
     });
   }
 

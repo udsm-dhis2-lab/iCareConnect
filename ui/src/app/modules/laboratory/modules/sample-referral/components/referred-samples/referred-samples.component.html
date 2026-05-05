@@ -1,16 +1,24 @@
-@if({
-  referredSamples: referredSamples$ | async 
-}; as params) {
-  <div>
-    <div class="row">
-      <div class="col-4">
-        <mat-form-field class="w-100">
-          <input class="ml-2 w-100" matInput autocomplete="off" id="search" placeholder="Search" [(ngModel)]="searchText"
-            (ngModelChange)="this.subject.next($event)" />
-        </mat-form-field>
-      </div>
+
+<div>
+  <div class="row">
+    <div class="col-4">
+      <mat-form-field class="w-100">
+        <input class="ml-2 w-100" matInput autocomplete="off" id="search" placeholder="Search" [(ngModel)]="searchText"
+          (ngModelChange)="this.subject.next($event)" />
+      </mat-form-field>
     </div>
-    
+    <div class="col-6"></div>
+    <div class="col-2">
+      <button mat-raised-button color="primary" class="w-100" (click)="openReferralForm()">
+        <mat-icon>add</mat-icon>
+        Refer Samples
+      </button>
+    </div>
+  </div>
+  
+  @if ({
+    referredSamples: referredSamples$ | async
+  }; as params) {
     <div>
       <table class="table mt-2">
         <thead>
@@ -105,6 +113,6 @@
         [pageSizeOptions]="pageCounts" (page)="onPageChange($event)">
       </mat-paginator>
     </div>
+  }
 
-  </div>
-}
+</div>
