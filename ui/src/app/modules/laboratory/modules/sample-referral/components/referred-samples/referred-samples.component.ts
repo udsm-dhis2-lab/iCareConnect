@@ -87,9 +87,6 @@ export class ReferredSamplesComponent implements OnInit {
     this.dialog.open(AddSampleReferralsComponent, {
       maxWidth: "80vw",
       maxHeight: "80vh",
-      data: {
-        referralSettings: this.referralSystemSettingsService.referralSettings(),
-      }
     });
   }
 

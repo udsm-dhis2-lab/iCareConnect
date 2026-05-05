@@ -5,6 +5,7 @@ import { SystemSettingsService } from "src/app/core/services/system-settings.ser
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import { AppState } from "src/app/store/reducers";
 import { getCustomOpenMRSFormById } from "src/app/store/selectors/form.selectors";
+import { FormService } from "../../modules/form/services";
 
 @Component({
   selector: "app-render-openmrs-form",
@@ -13,6 +14,7 @@ import { getCustomOpenMRSFormById } from "src/app/store/selectors/form.selectors
 })
 export class RenderOpenmrsFormComponent implements OnInit {
   @Input() formId: string;
+
   customForm$: Observable<any>;
   @Output() formDataUpdate: EventEmitter<FormValue> =
     new EventEmitter<FormValue>();
@@ -20,6 +22,7 @@ export class RenderOpenmrsFormComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private systemSettingsService: SystemSettingsService,
+    private formsService: FormService
   ) {}
 
   ngOnInit(): void {
