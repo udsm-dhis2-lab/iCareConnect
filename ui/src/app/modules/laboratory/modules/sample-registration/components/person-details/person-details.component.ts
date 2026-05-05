@@ -15,6 +15,7 @@ import { FormComponent } from "src/app/shared/modules/form/components/form/form.
 import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
 import * as moment from "moment";
 import { PersonService } from "src/app/core/services/person.service";
+import { LocationService } from "src/app/core/services/location.service";
 import { Observable } from "rxjs";
 import { tap } from "rxjs/operators";
 import { PatientService } from "src/app/shared/services/patient.service";
@@ -75,6 +76,7 @@ export class PersonDetailsComponent implements OnInit {
     private registrationService: RegistrationService,
     private personService: PersonService,
     private patientService: PatientService,
+    private locationService: LocationService,
   ) {}
 
   ngOnInit(): void {
@@ -209,7 +211,6 @@ export class PersonDetailsComponent implements OnInit {
       this.personFieldsGroupThree = updatedFields;
     }
 
-    console.log("Form Values: ========= **********", this.personDetailsData);
     this.handleLocationCascading(values);
 
     this.personDetails.emit({
@@ -443,6 +444,54 @@ export class PersonDetailsComponent implements OnInit {
         value: personDetails ? personDetails[key] : null,
       };
     });
+
+    if (personDetails?.addresses && personDetails?.addresses?.length > 0) {
+      const address = personDetails?.addresses[0];
+      const locationUuids = [
+        address?.address1,
+        address?.address2,
+        address?.address3,
+      ].filter((uuid) => uuid && uuid !== "");
+
+      if (locationUuids.length > 0) {
+        this.locationService
+          .getLocationByIds(locationUuids, {
+            v: "custom:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display)))",
+          })
+          .subscribe((locations) => {
+            if (locations && locations.length > 0) {
+              const locationMap: any = {};
+              locations.forEach((location) => {
+                locationMap[location?.uuid] = location;
+              });
+
+              this.personFieldsGroupThree = this.personFieldsGroupThree.map(
+                (field) => {
+                  if (field.id === "ward" && address?.address1) {
+                    return { ...field, value: locationMap[address?.address1] };
+                  }
+                  if (field.id === "council" && address?.address2) {
+                    return { ...field, value: locationMap[address?.address2] };
+                  }
+                  if (field.id === "region" && address?.address3) {
+                    return { ...field, value: locationMap[address?.address3] };
+                  }
+                  return field;
+                },
+              );
+
+              const textAddress = address?.address1 || "";
+              this.personDetailsData = {
+                ...this.personDetailsData,
+                ward: locationMap[address?.address1],
+                council: locationMap[address?.address2],
+                region: locationMap[address?.address3],
+              };
+            }
+          });
+      }
+    }
+
     if (personDetails) {
       this.setIdentifierFields(this.identifierTypes, personDetails);
       this.personDetailsData = {
