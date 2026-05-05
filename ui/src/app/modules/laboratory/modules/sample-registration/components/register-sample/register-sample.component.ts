@@ -115,7 +115,7 @@ export class RegisterSampleComponent implements OnInit {
     private systemSettingsService: SystemSettingsService,
     private store: Store<AppState>,
     private registrationService: RegistrationService,
-    private conceptService: ConceptsService
+    private conceptService: ConceptsService,
   ) {}
 
   ngOnInit(): void {
@@ -123,7 +123,7 @@ export class RegisterSampleComponent implements OnInit {
     this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
     try {
       this.selectedTabGroup = localStorage.getItem(
-        "labSampleRegistrationModuleTab"
+        "labSampleRegistrationModuleTab",
       )
         ? localStorage.getItem("labSampleRegistrationModuleTab")
         : this.selectedTabGroup;
@@ -132,43 +132,43 @@ export class RegisterSampleComponent implements OnInit {
     }
 
     this.store.dispatch(
-      loadLocationsByTagNames({ tagNames: ["Lab+Location"] })
+      loadLocationsByTagNames({ tagNames: ["Lab+Location"] }),
     );
 
     this.mrnGeneratorSourceUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.generateMRN.source"
+        "iCare.generateMRN.source",
       );
     this.preferredPersonIdentifier$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.preferredPersonIdentifier"
+        "iCare.preferredPersonIdentifier",
       );
     this.referFromFacilityVisitAttribute$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        "lis.attribute.referFromFacility"
+        "lis.attribute.referFromFacility",
       );
     this.unifiedCodingReferenceConceptSourceUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        `icare.laboratory.concept.unifiedCodingReference.conceptSourceUuid`
+        `icare.laboratory.concept.unifiedCodingReference.conceptSourceUuid`,
       );
 
     this.relatedMetadataAttributeUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        `icare.laboratory.concept.relatedMetadata.attributeUuid`
+        `icare.laboratory.concept.relatedMetadata.attributeUuid`,
       );
 
     this.hfrCodeAttributeUuid$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        `icare.location.attributes.hfrCode.attributeUuid`
+        `icare.location.attributes.hfrCode.attributeUuid`,
       );
     this.labTestRequestProgramStageId$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        "iCare.externalSystems.integrated.pimaCovid.programStages.testRequestStage"
+        "iCare.externalSystems.integrated.pimaCovid.programStages.testRequestStage",
       );
 
     this.specimenSourceConceptUuid$ = this.systemSettingsService
       .getSystemSettingsByKey(
-        `lis.sampleRegistration.specimenSource.concept.uuid`
+        `lis.sampleRegistration.specimenSource.concept.uuid`,
       )
       .pipe(
         map((response) => {
@@ -184,7 +184,7 @@ export class RegisterSampleComponent implements OnInit {
             ];
           }
           return response;
-        })
+        }),
       );
     this.agencyConceptConfigs$ = this.store.select(getConceptById, {
       id: this.LISConfigurations?.agencyConceptUuid,
@@ -195,19 +195,19 @@ export class RegisterSampleComponent implements OnInit {
         if (!response?.error) {
           return response;
         }
-      })
+      }),
     );
     this.batches$ = this.samplesService.getBatches().pipe(
       map((response) => {
         if (!response?.error) {
           return response;
         }
-      })
+      }),
     );
 
     this.referringDoctorAttributes$ =
       this.systemSettingsService.getSystemSettingsMatchingAKey(
-        "lis.attributes.referringDoctor"
+        "lis.attributes.referringDoctor",
       );
 
     this.barcodeSettings$ = this.systemSettingsService
@@ -229,7 +229,7 @@ export class RegisterSampleComponent implements OnInit {
           if (response?.error) {
             this.errors = [...this.errors, response?.error];
           }
-        })
+        }),
       );
 
     this.identifierTypes$ =
@@ -237,23 +237,23 @@ export class RegisterSampleComponent implements OnInit {
 
     this.testsFromExternalSystemsConfigs$ =
       this.systemSettingsService.getSystemSettingsMatchingAKey(
-        `iCare.externalSystems.integrated.tests`
+        `iCare.externalSystems.integrated.tests`,
       );
     this.store.dispatch(
       loadConceptByUuid({
         uuid: this.LISConfigurations?.agencyConceptUuid,
         fields: "custom:(uuid,display,setMembers:(uuid,display))",
-      })
+      }),
     );
 
     this.labNumberCharactersCount$ =
       this.systemSettingsService.getSystemSettingsByKey(
-        "lis.settings.labNumber.charactersCount"
+        "lis.settings.labNumber.charactersCount",
       );
     this.sampleRegistrationCategories$ = this.conceptService
       .getConceptDetailsByUuid(
         this.sampleRegistrationCategoriesConceptUuid,
-        "custom:(uuid,display,setMembers:(uuid,display))"
+        "custom:(uuid,display,setMembers:(uuid,display))",
       )
       .pipe(
         map((response) =>
@@ -262,9 +262,9 @@ export class RegisterSampleComponent implements OnInit {
               ...setMember,
               refKey: setMember?.display?.toLowerCase().split(" ").join(""),
             };
-          })
+          }),
         ),
-        catchError((error) => of(error))
+        catchError((error) => of(error)),
       );
     this.initializeRegistrationFields();
   }
@@ -278,7 +278,7 @@ export class RegisterSampleComponent implements OnInit {
     this.selectedTabGroup = group;
     localStorage.setItem(
       "labSampleRegistrationModuleTab",
-      this.selectedTabGroup
+      this.selectedTabGroup,
     );
     // this.store.dispatch(
     //   go({
@@ -614,6 +614,30 @@ export class RegisterSampleComponent implements OnInit {
         label: "Address",
         required: false,
         type: "text",
+      }),
+      ward: new Dropdown({
+        id: "ward",
+        key: "ward",
+        label: "Ward",
+        shouldHaveLiveSearchForDropDownFields: true,
+        searchControlType: "location",
+        searchTerm: "Ward Location",
+      }),
+      council: new Dropdown({
+        id: "council",
+        key: "council",
+        label: "Council",
+        shouldHaveLiveSearchForDropDownFields: true,
+        searchControlType: "location",
+        searchTerm: "Council Location",
+      }),
+      region: new Dropdown({
+        id: "region",
+        key: "region",
+        label: "Region",
+        shouldHaveLiveSearchForDropDownFields: true,
+        searchControlType: "location",
+        searchTerm: "Region Location",
       }),
     };
 

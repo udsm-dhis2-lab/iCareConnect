@@ -59,6 +59,9 @@ export class PersonDetailsComponent implements OnInit {
   @ViewChildren("fieldItem")
   fieldItems: QueryList<FieldComponent>;
 
+  @ViewChild("personFieldsGroupThreeForm", { static: false })
+  personFieldsGroupThreeForm: FormComponent;
+
   pinnedCategory: string;
   @Output() selectedSystem: EventEmitter<any> = new EventEmitter<any>();
 
@@ -71,7 +74,7 @@ export class PersonDetailsComponent implements OnInit {
   constructor(
     private registrationService: RegistrationService,
     private personService: PersonService,
-    private patientService: PatientService
+    private patientService: PatientService,
   ) {}
 
   ngOnInit(): void {
@@ -106,10 +109,10 @@ export class PersonDetailsComponent implements OnInit {
   setIdentifierFields(
     identifierTypes: any[],
     personDetails?: any,
-    patientIdentifier?: string
+    patientIdentifier?: string,
   ): void {
     this.primaryIdentifierFields = Object.keys(
-      this.allRegistrationFields?.primaryIdentifierFields
+      this.allRegistrationFields?.primaryIdentifierFields,
     ).map((key) => {
       return {
         ...this.allRegistrationFields?.primaryIdentifierFields[key],
@@ -119,14 +122,14 @@ export class PersonDetailsComponent implements OnInit {
           ? (personDetails?.identifiers?.filter(
               (identifier) =>
                 identifier?.identifierType?.uuid ===
-                this.allRegistrationFields?.primaryIdentifierFields[key]?.id
+                this.allRegistrationFields?.primaryIdentifierFields[key]?.id,
             ) || [])[0]?.identifier
           : null,
       };
     });
 
     this.identifiersFields = Object.keys(
-      this.allRegistrationFields?.otherIdentifiersFields
+      this.allRegistrationFields?.otherIdentifiersFields,
     ).map((key) => {
       return {
         ...this.allRegistrationFields?.otherIdentifiersFields[key],
@@ -136,7 +139,7 @@ export class PersonDetailsComponent implements OnInit {
           ? (personDetails?.identifiers?.filter(
               (identifier) =>
                 identifier?.identifierType?.uuid ===
-                this.allRegistrationFields?.otherIdentifiersFields[key]?.id
+                this.allRegistrationFields?.otherIdentifiersFields[key]?.id,
             ) || [])[0]?.identifier
           : null,
       };
@@ -155,7 +158,7 @@ export class PersonDetailsComponent implements OnInit {
       this.personDetailsData["dob"] = new Date(
         new Date().getFullYear() - Number(this.personDetailsData["age"]),
         monthDate,
-        new Date().getDate()
+        new Date().getDate(),
       );
       this.personDOBField[0].value = this.personDetailsData
         ? this.personDetailsData?.dob
@@ -167,6 +170,8 @@ export class PersonDetailsComponent implements OnInit {
 
   onFormUpdate(formValues: FormValue): void {
     const values = formValues.getValues();
+    const previousData = { ...this.personDetailsData };
+
     Object.keys(values).forEach((key) => {
       this.personDetailsData[key] = values[key]?.value;
     });
@@ -184,6 +189,29 @@ export class PersonDetailsComponent implements OnInit {
       ];
     }
 
+    let hasChanges = false;
+    const updatedFields = this.personFieldsGroupThree.map((field) => {
+      const fieldValue = values[field.id]?.value;
+      if (
+        fieldValue !== undefined &&
+        fieldValue !== null &&
+        fieldValue !== ""
+      ) {
+        if (field.value !== fieldValue) {
+          hasChanges = true;
+          return { ...field, value: fieldValue };
+        }
+      }
+      return field;
+    });
+
+    if (hasChanges) {
+      this.personFieldsGroupThree = updatedFields;
+    }
+
+    console.log("Form Values: ========= **********", this.personDetailsData);
+    this.handleLocationCascading(values);
+
     this.personDetails.emit({
       ...this.personDetailsData,
       isNewPatient: this.personDetailsCategory === "new",
@@ -192,6 +220,77 @@ export class PersonDetailsComponent implements OnInit {
         ? this.selectedClientData
         : null,
     });
+  }
+
+  private handleLocationCascading(values: any): void {
+    const wardValue = values?.ward?.value;
+    const councilValue = values?.council?.value;
+
+    if (!this.personFieldsGroupThreeForm) return;
+
+    const updateObject: any = {};
+
+    if (wardValue?.uuid && wardValue?.parentLocation?.uuid) {
+      const targetCouncil = wardValue.parentLocation;
+      const currentCouncil =
+        this.personFieldsGroupThreeForm.form.get("council")?.value;
+
+      if (currentCouncil?.uuid !== targetCouncil.uuid) {
+        updateObject["council"] = targetCouncil;
+      }
+
+      if (targetCouncil.parentLocation?.uuid) {
+        const targetRegion = targetCouncil.parentLocation;
+        const currentRegion =
+          this.personFieldsGroupThreeForm.form.get("region")?.value;
+        if (currentRegion?.uuid !== targetRegion.uuid) {
+          updateObject["region"] = targetRegion;
+        }
+      }
+    } else if (councilValue?.uuid && councilValue?.parentLocation?.uuid) {
+      const targetRegion = councilValue.parentLocation;
+      const currentRegion =
+        this.personFieldsGroupThreeForm.form.get("region")?.value;
+      if (currentRegion?.uuid !== targetRegion.uuid) {
+        updateObject["region"] = targetRegion;
+      }
+    }
+
+    if (Object.keys(updateObject).length > 0) {
+      Promise.resolve().then(() => {
+        this.personFieldsGroupThree = this.personFieldsGroupThree.map(
+          (field) => {
+            if (updateObject[field.id]) {
+              return { ...field, value: updateObject[field.id] };
+            }
+            return field;
+          },
+        );
+
+        this.personFieldsGroupThreeForm.form.patchValue(updateObject, {
+          emitEvent: false,
+        });
+
+        Object.keys(updateObject).forEach((key) => {
+          this.personDetailsData[key] = updateObject[key];
+        });
+
+        // Emit complete form values after update
+        const allFormValues = this.personFieldsGroupThreeForm.form.value;
+        Object.keys(allFormValues).forEach((key) => {
+          this.personDetailsData[key] = allFormValues[key];
+        });
+
+        this.personDetails.emit({
+          ...this.personDetailsData,
+          isNewPatient: this.personDetailsCategory === "new",
+          patientUuid: this.patientUuid,
+          pimaCOVIDLinkDetails: !this.selectedClientData?.hasResults
+            ? this.selectedClientData
+            : null,
+        });
+      });
+    }
   }
 
   onUpdatePrimaryIdentifierForm(formValues: FormValue): void {
@@ -203,10 +302,10 @@ export class PersonDetailsComponent implements OnInit {
       this.lastIdentifier = key;
     });
 
-    if(this.existingClicked){
+    if (this.existingClicked) {
       this.existingClicked = false;
     } else {
-      this.personDetailsCategory = 'new';
+      this.personDetailsCategory = "new";
     }
     this.personDetails.emit({
       ...this.personDetailsData,
@@ -235,7 +334,7 @@ export class PersonDetailsComponent implements OnInit {
               }
             });
           }
-        })
+        }),
       );
   }
 
@@ -281,7 +380,7 @@ export class PersonDetailsComponent implements OnInit {
                   //TODO: Find a way to softcode this
                   return attribute;
                 }
-              }
+              },
             )[0]?.value;
             const person = {
               ...personDetails?.person,
@@ -289,14 +388,14 @@ export class PersonDetailsComponent implements OnInit {
               phoneNumber: phoneNumber,
             };
             this.existingClicked = true;
-            this.personDetailsCategory = 'selected';
+            this.personDetailsCategory = "selected";
             this.setPersonDetails(person);
             this.showSearchedDetails = false;
           }
           if (personDetails?.error) {
             // console.log("==> Error when trying to get details: ");
           }
-        })
+        }),
       )
       .subscribe();
   }
@@ -305,7 +404,7 @@ export class PersonDetailsComponent implements OnInit {
     this.patientUuid = personDetails?.uuid;
 
     this.personFields = Object.keys(
-      this.allRegistrationFields?.personFields
+      this.allRegistrationFields?.personFields,
     ).map((key) => {
       if (personDetails) {
         personDetails = {
@@ -337,16 +436,19 @@ export class PersonDetailsComponent implements OnInit {
       },
     ];
     this.personFieldsGroupThree = Object.keys(
-      this.allRegistrationFields?.personFieldsGroupThree
+      this.allRegistrationFields?.personFieldsGroupThree,
     ).map((key) => {
       return {
         ...this.allRegistrationFields?.personFieldsGroupThree[key],
         value: personDetails ? personDetails[key] : null,
       };
     });
-    if (personDetails) {;
+    if (personDetails) {
       this.setIdentifierFields(this.identifierTypes, personDetails);
-      this.personDetailsData = {...this.personDetailsData, identifiers: personDetails?.identifiers,};
+      this.personDetailsData = {
+        ...this.personDetailsData,
+        identifiers: personDetails?.identifiers,
+      };
       this.personDetails.emit({
         ...this.personDetailsData,
         isNewPatient: this.personDetailsCategory === "new",
@@ -366,7 +468,7 @@ export class PersonDetailsComponent implements OnInit {
   getSelection(event: MatRadioChange): void {
     this.personDetailsCategory = event?.value;
     this.fromExternalSystem.emit(
-      this.personDetailsCategory === "other" ? true : false
+      this.personDetailsCategory === "other" ? true : false,
     );
 
     this.personDetails.emit({
@@ -422,7 +524,7 @@ export class PersonDetailsComponent implements OnInit {
             this.setIdentifierFields(
               this.identifierTypes,
               personDetailsData,
-              clientRequest?.passportNumber
+              clientRequest?.passportNumber,
             );
           }
         }

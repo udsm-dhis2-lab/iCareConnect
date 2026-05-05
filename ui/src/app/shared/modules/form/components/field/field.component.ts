@@ -88,7 +88,7 @@ export class FieldComponent implements AfterViewInit {
             this.field?.searchControlType !== "location"
               ? this.field?.searchTerm
               : "",
-          limit: 50,
+          limit: 50, // TODO: (LOCATION) What should be the default limit for search results?
           tag: this.field?.searchTerm,
           class: this.field?.conceptClass,
           source: this.field?.source,
@@ -96,7 +96,8 @@ export class FieldComponent implements AfterViewInit {
           v:
             this.field?.searchControlType === "concept"
               ? "custom:(uuid,display,datatype,conceptClass,mappings)"
-              : this.field?.searchControlType === "residenceLocation"
+              : this.field?.searchControlType === "residenceLocation" ||
+                this.field?.searchControlType === "location"
               ? "custom:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display)))))"
               : "custom:(uuid,display)",
         },
@@ -241,6 +242,14 @@ export class FieldComponent implements AfterViewInit {
     return matchedOption ? matchedOption?.label : "";
   }
 
+  get getSelectedLocationDisplay(): string {
+    const currentValue = this.form?.controls[this.field.id]?.value;
+    if (currentValue && typeof currentValue === "object") {
+      return currentValue?.display || currentValue?.name || "";
+    }
+    return "";
+  }
+
   searchItem(event: any, field?: any): void {
     // event.stopPropagation();
     const searchingText = (event.target as HTMLInputElement).value;
@@ -259,7 +268,8 @@ export class FieldComponent implements AfterViewInit {
       source: this.field?.source,
       v:
         field?.searchControlType === "residenceLocation" ||
-        field?.searchControlType === "healthFacility"
+        field?.searchControlType === "healthFacility" ||
+        field?.searchControlType === "location"
           ? "custom:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display)))))"
           : field?.searchControlType === "concept" ||
             field?.conceptClass === "Diagnosis"
@@ -314,6 +324,8 @@ export class FieldComponent implements AfterViewInit {
     let objectToUpdate = {};
     objectToUpdate[field?.key] =
       field?.searchControlType === "drugStock"
+        ? item
+        : field?.searchControlType === "location"
         ? item
         : !field?.searchControlType ||
           field?.searchControlType !== "residenceLocation"
