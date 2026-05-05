@@ -358,7 +358,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<Sample> getSamplesByOrderType(Date startDate, Date endDate, Pager pager, String orderTypeUuid,
-	        Boolean referredOnly, String q) {
+	        Boolean haveThisOrderType, String q) {
 		DbSession session = this.getSession();
 		
 		String queryStr = "SELECT DISTINCT s FROM Sample s JOIN s.sampleOrders so JOIN so.order o JOIN o.orderType ot";
@@ -366,7 +366,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		boolean hasWhere = false;
 		
 		if (orderTypeUuid != null) {
-			if (referredOnly != null && referredOnly) {
+			if (haveThisOrderType != null && haveThisOrderType) {
 				queryStr += " WHERE ot.uuid = :orderTypeUuid";
 				hasWhere = true;
 			} else {

@@ -290,9 +290,7 @@ public class LaboratoryController {
 	        @RequestParam(value = "specimen", required = false) String specimenSourceUuid,
 	        @RequestParam(value = "instrument", required = false) String instrumentUuid,
 	        @RequestParam(value = "visit", required = false) String visitUuid,
-	        @RequestParam(value = "excludeStatus", required = false) String excludeStatus,
-	        @RequestParam(value = "orderType", required = false) String orderType,
-	        @RequestParam(value = "referredOnly", required = false) Boolean referredOnly) throws Exception {
+	        @RequestParam(value = "excludeStatus", required = false) String excludeStatus) throws Exception {
 		
 		Date start = null;
 		Date end = null;
@@ -308,13 +306,6 @@ public class LaboratoryController {
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
-		if (orderType != null) {
-			referredOnly = referredOnly ? referredOnly : false;
-			ListResult<Sample> sampleResults = laboratoryService.getSamplesByOrderType(start, end, pager, orderType,
-			    referredOnly, q);
-			
-			return sampleResults.toMap();
-		}
 		if (!excludeAllocations) {
 			ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
 			    testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid,
@@ -328,6 +319,38 @@ public class LaboratoryController {
 			return sampleResults.toMap();
 		}
 		return null;
+	}
+	
+	@RequestMapping(value = "order-type/{orderType}/samples", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getSamplesByOrderType(@PathVariable String orderType,
+	        @RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(value = "q", required = false) String q,
+	        @RequestParam(value = "haveThisOrderType", required = false) Boolean haveThisOrderType) throws Exception {
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+		
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+		
+		haveThisOrderType = haveThisOrderType ? haveThisOrderType : false;
+		ListResult<Sample> sampleResults = laboratoryService.getSamplesByOrderType(start, end, pager, orderType,
+		    haveThisOrderType, q);
+		
+		return sampleResults.toMap();
 	}
 	
 	@RequestMapping(value = "sampleaccept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)

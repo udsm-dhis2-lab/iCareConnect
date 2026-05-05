@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { ConceptsService } from "src/app/shared/resources/concepts/services/concepts.service";
 import { AppState } from "src/app/store/reducers";
 import {
@@ -18,6 +19,8 @@ import {
   getVisitsLoadedState,
   getVisitsParameters,
 } from "src/app/store/selectors/visits.selectors";
+import { ReferralSystemSettingsService } from "../../services/referral-system-settings.service";
+import { tap } from "rxjs/operators";
 
 @Component({
   selector: "app-home",
@@ -25,42 +28,30 @@ import {
   styleUrls: ["./home.component.scss"],
 })
 export class HomeComponent implements OnInit {
-  datesParameters$: Observable<any>;
-  visitReferences$: Observable<any>;
-  visitsLoadedState$: Observable<boolean>;
-  labSamplesDepartments$: Observable<any>;
-  labSamplesContainers$: Observable<any>;
-  sampleTypesLoadedState$: Observable<any>;
-  sampleTypes$: Observable<any>;
-  configs$: Observable<any>;
-  codedSampleRejectionReasons$: Observable<any>;
 
-  LISConfigurations$: Observable<iCareConnectConfigurationsModel>;
+  LISConfigurations$?: Observable<iCareConnectConfigurationsModel>;
+  sampleReferralSettings$?: Observable<any>;
+  datesParameters$?: Observable<any>;
+
   constructor(
     private store: Store<AppState>,
-    private conceptService: ConceptsService
+    private systemSettingsService: SystemSettingsService,
+    private referralSystemSettingsService: ReferralSystemSettingsService
   ) {}
 
   ngOnInit(): void {
-    this.datesParameters$ = this.store.select(getVisitsParameters);
-    this.visitsLoadedState$ = this.store.select(getVisitsLoadedState);
-    this.visitReferences$ = this.store.select(getAllPatientsVisitsReferences);
-    this.sampleTypesLoadedState$ = this.store.select(getSampleTypesLoadedState);
-    this.sampleTypes$ = this.store.select(getAllSampleTypes);
-    this.labSamplesContainers$ = this.store.select(getLabTestsContainers);
-    this.configs$ = this.store.select(getLabConfigurations);
-    this.codedSampleRejectionReasons$ = this.store.select(
-      getCodedSampleRejectionReassons
-    );
-
+    
     this.LISConfigurations$ = this.store.select(getLISConfigurations);
-    // Load departments depending either is LIS or not
-    this.LISConfigurations$.subscribe((LISConfigs) => {
-      if (LISConfigs) {
-        this.labSamplesDepartments$ = !LISConfigs?.isLIS
-          ? this.store.select(getLabDepartments)
-          : this.conceptService.getConceptsBySearchTerm("LAB_DEPARTMENT");
-      }
-    });
+    this.datesParameters$ = this.store.select(getVisitsParameters);
+
+    this.sampleReferralSettings$ = this.systemSettingsService.getSystemSettingsByKey("iCare.laboratory.sampleReferral.settings.referralForm").pipe(
+      tap((settings: any) => {
+        if (!settings) {
+          console.warn("No referral form settings found for sample referral module");
+        }
+        this.referralSystemSettingsService.referralSettings.set(settings);
+
+      })
+    );
   }
 }

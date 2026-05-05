@@ -26,7 +26,7 @@ public interface LaboratoryService extends OpenmrsService {
 	        String departmentUuid, String specimenSourceUuid, String instrumentUuid, String visitUuid, String excludeStatus);
 	
 	ListResult<Sample> getSamplesByOrderType(Date startDate, Date endDate, Pager pager, String orderTypeUuid,
-	        Boolean referredOnly, String q);
+	        Boolean haveThisOrderType, String q);
 	
 	List<Sample> getSampleByDates(Date startDate, Date endDate);
 	

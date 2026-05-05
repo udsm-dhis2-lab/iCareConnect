@@ -1,20 +1,13 @@
 <div
   *ngIf="{
     datesParameters: datesParameters$ | async,
-    visitReferences: visitReferences$ | async,
-    visitsLoadedState: visitsLoadedState$ | async,
-    sampleTypesLoadedState: sampleTypesLoadedState$ | async,
-    sampleTypes: sampleTypes$ | async,
-    labSamplesDepartments: labSamplesDepartments$ | async,
-    labSamplesContainers: labSamplesContainers$ | async,
-    configs: configs$ | async,
-    codedSampleRejectionReasons: codedSampleRejectionReasons$ | async,
-    LISConfigurations: LISConfigurations$ | async
+    LISConfigurations: LISConfigurations$ | async,
+    sampleReferralSettings: sampleReferralSettings$ | async
   } as params"
 >
 
 
-@if(params?.LISConfigurations?.isLIS){
+@if(params?.LISConfigurations?.isLIS && params?.sampleReferralSettings){
   <div style="margin-top: -20px">
 
   <div class="mb-2">
@@ -25,16 +18,12 @@
       }
     </div>
 
-    <p class="mb-2">Sample Referrals</p>
-    
+    <h5 class="mb-2 mt-4">Sample Referrals</h5>
+    <router-outlet></router-outlet>
 
   </div>
 }
   <mat-progress-bar *ngIf="
-        !params?.datesParameters ||
-        !params?.sampleTypesLoadedState ||
-        !params?.labSamplesDepartments ||
-        !params?.configs ||
-        !params?.LISConfigurations
+        !params?.LISConfigurations || !params?.sampleReferralSettings || !params?.datesParameters
       " mode="indeterminate"></mat-progress-bar>
 </div>
