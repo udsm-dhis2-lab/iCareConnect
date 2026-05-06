@@ -1,4 +1,4 @@
-import { Component, effect, inject, Injector, Input, OnInit } from "@angular/core";
+import { Component, effect, inject, Injector, Input, OnDestroy, OnInit } from "@angular/core";
 import { SampleReferralService } from "../../services/referral-samples.service";
 import { ReferralSystemSettingsService } from "../../services/referral-system-settings.service";
 import { Observable, Subject } from "rxjs";
@@ -13,7 +13,7 @@ import { AddSampleReferralsComponent } from "../../dialogs/add-sample-referrals/
   templateUrl: "./referred-samples.component.html",
   styleUrls: ["./referred-samples.component.scss"],
 })
-export class ReferredSamplesComponent implements OnInit {
+export class ReferredSamplesComponent implements OnInit, OnDestroy {
   private injector = inject(Injector);
   private sampleReferralService = inject(SampleReferralService);
   private referralSystemSettingsService = inject(ReferralSystemSettingsService);
@@ -87,7 +87,13 @@ export class ReferredSamplesComponent implements OnInit {
     this.dialog.open(AddSampleReferralsComponent, {
       maxWidth: "80vw",
       maxHeight: "80vh",
+      closeOnNavigation: false,
+      disableClose: true
     });
+  }
+
+  ngOnDestroy() {
+    this.dialog.closeAll();
   }
 
 }

@@ -13,8 +13,8 @@ export class SampleReferralService {
 
     getSamplesByRefferalOrderType(orderTypeUuid: string, params: {
         paging: boolean;
-        page: number;
-        pageSize: number;
+        page?: number;
+        pageSize?: number;
         startDate?: string;
         endDate?: string;
         haveThisOrderType?: boolean;

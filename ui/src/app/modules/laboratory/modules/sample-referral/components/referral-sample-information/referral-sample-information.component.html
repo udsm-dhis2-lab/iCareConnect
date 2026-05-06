@@ -1,5 +1,26 @@
-@if(formId){
-    <app-render-openmrs-form 
-        [formId]="formId"
-        (formDataUpdate)="onFormUpdate($event, formId)"></app-render-openmrs-form>
+@if({
+    formId: formId,
+    unreferredSamples: unreferredSamples$ | async
+}; as params){
+
+    @if(!params?.unreferredSamples || !params?.formId){
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    } @else {
+        <div class="row">
+            <div class="col-12">
+                <app-multiple-results-entry 
+                [options]="options"
+                [label]="'Select Samples'"
+                [loading]="loadingOptions"
+                (loadMore)="onLoadMore()"
+                (selectedList)="onSelection($event)"
+                ></app-multiple-results-entry>
+            </div>
+            <div class="col-6">
+                <app-render-openmrs-form 
+                    [formId]="formId"
+                    (formDataUpdate)="onFormUpdate($event, formId)"></app-render-openmrs-form>
+            </div>
+        </div>
+    }
 }

@@ -5,6 +5,8 @@ import {
   Input,
   Output,
   EventEmitter,
+  input,
+  ElementRef,
 } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
 import { MatSelect, MatSelectChange } from "@angular/material/select";
@@ -26,7 +28,11 @@ export class MultipleResultsEntryComponent implements OnInit {
   version = null;
   @Input() options: any[];
   @Input() value: any;
+  @Input() label: string = "";
+  @Input() loading: boolean = false;
+
   @Output() selectedList: EventEmitter<any[]> = new EventEmitter<any[]>();
+  @Output() loadMore: EventEmitter<void> = new EventEmitter<void>();
 
   multipleSelectionFormControl: UntypedFormControl = new UntypedFormControl();
   list: any[];
@@ -50,9 +56,12 @@ export class MultipleResultsEntryComponent implements OnInit {
   public filteredMultiList: ReplaySubject<any> = new ReplaySubject<any>(1);
 
   @ViewChild("singleSelect") singleSelect: MatSelect;
+  @ViewChild("multiSelect", { static: false }) multiSelect: MatSelect;
+  @ViewChild("panel", { static: false }) panel: ElementRef;
 
   /** Subject that emits when the component has been destroyed. */
   private _onDestroy = new Subject<void>();
+  private scrollListener: (() => void) | null = null;
 
   ngOnInit() {
     // this.selectedList.emit(this.value);
@@ -90,6 +99,47 @@ export class MultipleResultsEntryComponent implements OnInit {
 
   ngAfterViewInit() {
     // this.setInitialValue();
+    if (this.multiSelect) {
+      this.multiSelect.openedChange.pipe(takeUntil(this._onDestroy)).subscribe(
+        (opened) => {
+          if (opened) {
+            setTimeout(() => this.attachScrollListener(), 100);
+          } else {
+            this.detachScrollListener();
+          }
+        }
+      );
+    }
+  }
+
+  private attachScrollListener() {
+    if (this.scrollListener) return;
+
+    const panel = document.querySelector('.mat-select-panel');
+    if (!panel) return;
+
+    this.scrollListener = () => {
+      const element = panel as HTMLElement;
+      const scrollThreshold = 100;
+      
+      if (
+        element.scrollTop + element.clientHeight >= 
+        element.scrollHeight - scrollThreshold &&
+        !this.loading
+      ) {
+        this.loadMore.emit();
+      }
+    };
+
+    panel.addEventListener('scroll', this.scrollListener);
+  }
+
+  private detachScrollListener() {
+    const panel = document.querySelector('.mat-select-panel');
+    if (panel && this.scrollListener) {
+      panel.removeEventListener('scroll', this.scrollListener);
+      this.scrollListener = null;
+    }
   }
 
   getSelectedValues(event: MatSelectChange): void {

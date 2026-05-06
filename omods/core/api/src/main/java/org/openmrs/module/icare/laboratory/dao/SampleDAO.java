@@ -359,64 +359,73 @@ public class SampleDAO extends BaseDAO<Sample> {
 	
 	public ListResult<Sample> getSamplesByOrderType(Date startDate, Date endDate, Pager pager, String orderTypeUuid,
 	        Boolean haveThisOrderType, String q) {
+		
 		DbSession session = this.getSession();
 		
-		String queryStr = "SELECT DISTINCT s FROM Sample s JOIN s.sampleOrders so JOIN so.order o JOIN o.orderType ot";
+		String hqlBase = " FROM Sample s ";
 		
+		if (haveThisOrderType != null && haveThisOrderType && orderTypeUuid != null) {
+			hqlBase += " JOIN s.sampleOrders so JOIN so.order o JOIN o.orderType ot ";
+		}
+		
+		String whereClause = "";
 		boolean hasWhere = false;
 		
 		if (orderTypeUuid != null) {
 			if (haveThisOrderType != null && haveThisOrderType) {
-				queryStr += " WHERE ot.uuid = :orderTypeUuid";
+				whereClause += " WHERE ot.uuid = :orderTypeUuid ";
 				hasWhere = true;
 			} else {
-				queryStr += " WHERE s.id NOT IN (SELECT s2.id FROM Sample s2 JOIN s2.sampleOrders so2 JOIN so2.order o2 JOIN o2.orderType ot2 WHERE ot2.uuid = :orderTypeUuid)";
+				whereClause += " WHERE s.id NOT IN (SELECT s2.id FROM Sample s2 JOIN s2.sampleOrders so2 JOIN so2.order o2 JOIN o2.orderType ot2 WHERE ot2.uuid = :orderTypeUuid) ";
 				hasWhere = true;
 			}
 		}
 		
 		if (q != null && !q.isEmpty()) {
-			queryStr += (hasWhere ? " AND " : " WHERE ");
-			queryStr += " lower(s.label) LIKE :q ";
+			whereClause += (hasWhere ? " AND " : " WHERE ");
+			whereClause += " s.label LIKE :q ";
 			hasWhere = true;
 		}
 		
 		if (startDate != null && endDate != null) {
-			queryStr += (hasWhere ? " AND " : " WHERE ");
-			queryStr += " (cast(s.dateCreated as date) BETWEEN :startDate AND :endDate) ";
+			whereClause += (hasWhere ? " AND " : " WHERE ");
+			whereClause += " s.dateCreated >= :startDate AND s.dateCreated <= :endDate ";
 			hasWhere = true;
 		}
 		
-		queryStr += " ORDER BY s.dateCreated DESC";
+		String countHql = "SELECT count(DISTINCT s.id) " + hqlBase + whereClause;
+		Query countQuery = session.createQuery(countHql);
+		setParameters(countQuery, orderTypeUuid, q, startDate, endDate);
 		
-		Query query = session.createQuery(queryStr);
+		Long totalCount = (Long) countQuery.uniqueResult();
 		
-		if (orderTypeUuid != null) {
-			query.setParameter("orderTypeUuid", orderTypeUuid);
-		}
-		
-		if (q != null && !q.isEmpty()) {
-			query.setParameter("q", "%" + q.toLowerCase() + "%");
-		}
-		
-		if (startDate != null && endDate != null) {
-			query.setParameter("startDate", startDate);
-			query.setParameter("endDate", endDate);
-		}
+		String dataHql = "SELECT s " + hqlBase + whereClause + " GROUP BY s.id ORDER BY s.dateCreated DESC";
+		Query query = session.createQuery(dataHql);
+		setParameters(query, orderTypeUuid, q, startDate, endDate);
 		
 		ListResult<Sample> listResults = new ListResult<Sample>();
 		if (pager != null && pager.isAllowed()) {
-			int totalCount = query.list().size();
-			pager.setTotal(totalCount);
-			
+			pager.setTotal(totalCount.intValue());
 			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
 			query.setMaxResults(pager.getPageSize());
-			
 			listResults.setPager(pager);
 		}
 		
 		listResults.setResults(query.list());
 		return listResults;
+	}
+	
+	private void setParameters(Query query, String orderTypeUuid, String q, Date startDate, Date endDate) {
+		if (orderTypeUuid != null) {
+			query.setParameter("orderTypeUuid", orderTypeUuid);
+		}
+		if (q != null && !q.isEmpty()) {
+			query.setParameter("q", "%" + q + "%");
+		}
+		if (startDate != null && endDate != null) {
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
+		}
 	}
 	
 	public List<Sample> getSamplesByVisitOrPatientAndOrDates(String visitId, String patient, Date startDate, Date endDate) {
