@@ -14,6 +14,7 @@ import { FormService } from "../../modules/form/services";
 })
 export class RenderOpenmrsFormComponent implements OnInit {
   @Input() formId: string;
+  @Input() colClass?: string;
 
   customForm$: Observable<any>;
   @Output() formDataUpdate: EventEmitter<FormValue> =

@@ -21,6 +21,7 @@ export class ReferralSampleInformationComponent {
   page = 1;
   pageSize = 10;
   totalCount = 0;
+  searchText = "";
 
   loadingOptions = false;
 
@@ -38,16 +39,16 @@ export class ReferralSampleInformationComponent {
 
   getUnreferredSamples(){
     this.loadingOptions = true;
-    this.unreferredSamples$ = this.sampleReferralService.getSamplesByRefferalOrderType(this.orderType, {
+    this.sampleReferralService.getSamplesByRefferalOrderType(this.orderType, {
           paging: true,
           page: this.page,
           pageSize: this.pageSize,
           haveThisOrderType: false,
-        }).pipe(
-          tap((response: any) => {
+          q: this.searchText
+        }).subscribe({
+          next: (response: any) => {
             this.totalCount = response?.pagination?.totalCount || 0;
-            this.loadingOptions = false;
-
+            
             if(this.appendOptions){
               const existingValues = new Set(this.options.map(opt => opt.value));
               const newOptions = response?.results
@@ -57,17 +58,23 @@ export class ReferralSampleInformationComponent {
                   }))
                 ?.filter((newItem: { name: string; value: string }) => !existingValues.has(newItem.value)) || [];
 
-              this.options = [...this.options, ...newOptions];
-            } else {
-              this.options = response?.results?.map((sample: any) => { 
-                return { 
-                  name: sample?.label, 
-                  value: sample?.uuid 
-                }
-              }) || [];
-            }
-          })
-        );
+                this.options = [...this.options, ...newOptions];
+              } else {
+                this.options = response?.results?.map((sample: any) => { 
+                  return { 
+                    name: sample?.label, 
+                    value: sample?.uuid 
+                  }
+                }) || [];
+              }
+              
+              this.loadingOptions = false;
+          },
+          error: (err) => {
+            console.error("Error fetching unreferred samples: ", err);
+            this.loadingOptions = false;
+          }
+        });
   }
 
   onSelection(e: any) {
@@ -80,8 +87,16 @@ export class ReferralSampleInformationComponent {
   }
 
   onLoadMore() {
+    console.log("Load more options");
     this.page++;
     this.appendOptions = true;
+    this.getUnreferredSamples();
+  }
+
+  onSearchChange(searchTerm: string) {
+    this.searchText = searchTerm;
+    this.page = 1;
+    this.appendOptions = false;
     this.getUnreferredSamples();
   }
 }

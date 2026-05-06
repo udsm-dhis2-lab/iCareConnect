@@ -5,7 +5,7 @@
   <mat-select [formControl]="listMultiCtrl" placeholder="" [multiple]="true"
     (selectionChange)="getSelectedValues($event)" #multiSelect>
     <mat-option>
-      <ngx-mat-select-search placeholderLabel="Search" [formControl]="listMultiFilterCtrl"></ngx-mat-select-search>
+      <ngx-mat-select-search [noEntriesFoundLabel]="noEntriesFoundLabel" placeholderLabel="Search" [formControl]="listMultiFilterCtrl" ></ngx-mat-select-search>
     </mat-option>
     <mat-option *ngFor="let item of filteredMultiList | async" [value]="item">
       {{ item?.name }}

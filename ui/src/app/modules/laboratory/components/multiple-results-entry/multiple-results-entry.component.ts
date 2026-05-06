@@ -7,12 +7,13 @@ import {
   EventEmitter,
   input,
   ElementRef,
+  SimpleChanges,
 } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
 import { MatSelect, MatSelectChange } from "@angular/material/select";
 
 import { ReplaySubject, Subject } from "rxjs";
-import { take, takeUntil } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, take, takeUntil } from "rxjs/operators";
 
 interface Bank {
   id: string;
@@ -30,9 +31,11 @@ export class MultipleResultsEntryComponent implements OnInit {
   @Input() value: any;
   @Input() label: string = "";
   @Input() loading: boolean = false;
+  @Input() noEntriesFoundLabel: string = "";
 
   @Output() selectedList: EventEmitter<any[]> = new EventEmitter<any[]>();
   @Output() loadMore: EventEmitter<void> = new EventEmitter<void>();
+  @Output() searchChange: EventEmitter<string> = new EventEmitter<string>();
 
   multipleSelectionFormControl: UntypedFormControl = new UntypedFormControl();
   list: any[];
@@ -65,8 +68,29 @@ export class MultipleResultsEntryComponent implements OnInit {
 
   ngOnInit() {
     // this.selectedList.emit(this.value);
-    this.setList(this.options);
+    this.setupSearchSubscription();
+    this.setList(this.options || []);
   }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['options'] && !changes['options'].firstChange) {
+      this.setList(this.options || []);
+    }
+  }
+
+  private setupSearchSubscription() {
+    this.listMultiFilterCtrl.valueChanges
+      .pipe(
+        takeUntil(this._onDestroy),
+        debounceTime(500),
+        distinctUntilChanged()
+      )
+      .subscribe((searchTerm: string) => {
+        
+        this.searchChange.emit(searchTerm);
+      });
+  }
+
 
   setList(list: any[]) {
     this.list = list;
@@ -76,15 +100,12 @@ export class MultipleResultsEntryComponent implements OnInit {
           (this.value?.filter((val) => val === (item?.value || item?.id)) || [])
             ?.length > 0
       ) || [];
-    // set default selection
     this.listMultiCtrl.setValue(defaultValues);
     this.selectedList.emit(this.listMultiCtrl.value);
 
-    // load the initial list
     this.filteredList.next(this.list.slice());
     this.filteredMultiList.next(this.list.slice());
 
-    // listen for search field value changes
     this.listFilterCtrl.valueChanges
       .pipe(takeUntil(this._onDestroy))
       .subscribe(() => {
@@ -98,7 +119,6 @@ export class MultipleResultsEntryComponent implements OnInit {
   }
 
   ngAfterViewInit() {
-    // this.setInitialValue();
     if (this.multiSelect) {
       this.multiSelect.openedChange.pipe(takeUntil(this._onDestroy)).subscribe(
         (opened) => {
@@ -146,27 +166,10 @@ export class MultipleResultsEntryComponent implements OnInit {
     this.selectedList.emit(this.listMultiCtrl.value);
   }
 
-  ngOnDestroy() {
-    this._onDestroy.next();
-    this._onDestroy.complete();
-  }
-
-  /**
-   * Sets the initial value after the filteredList are loaded initially
-   */
-  private setInitialValue() {
-    this.filteredList
-      .pipe(take(1), takeUntil(this._onDestroy))
-      .subscribe(() => {
-        this.singleSelect.compareWith = (a: any, b: any) => a?.key === b?.key;
-      });
-  }
-
   private filterList() {
     if (!this.list) {
       return;
     }
-    // get the search keyword
     let search = this.listFilterCtrl.value;
     if (!search) {
       this.filteredList.next(this.list.slice());
@@ -174,7 +177,6 @@ export class MultipleResultsEntryComponent implements OnInit {
     } else {
       search = search.toLowerCase();
     }
-    // filter the list
     this.filteredList.next(
       this.list.filter((item) => item?.name.toLowerCase().indexOf(search) > -1)
     );
@@ -184,7 +186,6 @@ export class MultipleResultsEntryComponent implements OnInit {
     if (!this.list) {
       return;
     }
-    // get the search keyword
     let search = this.listMultiFilterCtrl.value;
     if (!search) {
       this.filteredMultiList.next(this.list.slice());
@@ -195,5 +196,18 @@ export class MultipleResultsEntryComponent implements OnInit {
     this.filteredMultiList.next(
       this.list.filter((item) => item?.name.toLowerCase().indexOf(search) > -1)
     );
+  }
+
+  ngOnDestroy() {
+    this._onDestroy.next();
+    this._onDestroy.complete();
+  }
+
+  private setInitialValue() {
+    this.filteredList
+      .pipe(take(1), takeUntil(this._onDestroy))
+      .subscribe(() => {
+        this.singleSelect.compareWith = (a: any, b: any) => a?.key === b?.key;
+      });
   }
 }

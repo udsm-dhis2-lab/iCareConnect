@@ -13,6 +13,7 @@
     *ngIf="params?.customForm"
     [form]="params?.customForm"
     [isLIS]="true"
+    [colClass]="colClass"
     [formValidationRules]="params?.formValidationRules"
     (formDataUpdate)="onFormUpdate($event)"
   ></app-capture-form-data>
