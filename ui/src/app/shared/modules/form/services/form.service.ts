@@ -65,7 +65,6 @@ export class FormService {
     filteringItems?,
     field?,
   ): Observable<any[]> {
-    // console.log("searchControlType", searchControlType);
     if (field?.conceptUuid) {
       return from(
         this.api.concept.getConcept(field?.conceptUuid, {
