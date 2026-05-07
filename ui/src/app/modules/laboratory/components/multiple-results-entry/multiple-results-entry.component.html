@@ -3,6 +3,7 @@
   <mat-label>{{ label }}</mat-label>
   }
   <mat-select [formControl]="listMultiCtrl" placeholder="" [multiple]="true"
+    panelClass="infinite-scroll-panel"
     (selectionChange)="getSelectedValues($event)" #multiSelect>
     <mat-option>
       <ngx-mat-select-search [noEntriesFoundLabel]="noEntriesFoundLabel" placeholderLabel="Search" [formControl]="listMultiFilterCtrl" ></ngx-mat-select-search>
