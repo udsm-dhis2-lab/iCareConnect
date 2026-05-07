@@ -166,8 +166,24 @@ export class SamplesForResultsReviewComponent implements OnInit, OnDestroy {
   performBulkAuthorization(): void {
     this.allocationStatuses = [];
     let sampleAuthorizationStatuses = [];
+    let skippedCount = 0;
 
     this.selectedSamples.forEach((sample: any) => {
+      // LIS rule: a user cannot authorize results they entered.
+      if (this.LISConfigurations?.isLIS) {
+        const enteredByMe = sample?.orders?.some((order: any) =>
+          order?.testAllocations?.some((alloc: any) =>
+            alloc?.results?.some(
+              (r: any) => r?.resultsFedBy?.uuid === this.userUuid,
+            ),
+          ),
+        );
+        if (enteredByMe) {
+          skippedCount++;
+          return;
+        }
+      }
+
       if (
         (
           sample?.statuses?.filter(
@@ -241,6 +257,23 @@ export class SamplesForResultsReviewComponent implements OnInit, OnDestroy {
       ];
     });
 
+    if (
+      sampleAuthorizationStatuses.length === 0 &&
+      this.allocationStatuses.length === 0
+    ) {
+      const msg =
+        skippedCount > 0
+          ? "You cannot authorise results processed by you"
+          : "Selected sample(s) are already authorized";
+      this.snackBar.open(msg, "OK", {
+        horizontalPosition: "center",
+        verticalPosition: "bottom",
+        duration: 4000,
+        panelClass: ["snack-color"],
+      });
+      return;
+    }
+
     this.savingAuthorization = true;
     this.sampleAllocationService
       .saveAllocationStatuses(this.allocationStatuses)
@@ -250,9 +283,9 @@ export class SamplesForResultsReviewComponent implements OnInit, OnDestroy {
             if (sampleAuthorizationStatuses?.length > 0) {
               this.sampleService
                 .saveSampleStatuses(sampleAuthorizationStatuses)
-                .subscribe(() => this.onAuthorizationComplete());
+                .subscribe(() => this.onAuthorizationComplete(skippedCount));
             } else {
-              this.onAuthorizationComplete();
+              this.onAuthorizationComplete(skippedCount);
             }
           } else {
             this.savingAuthorization = false;
@@ -280,20 +313,20 @@ export class SamplesForResultsReviewComponent implements OnInit, OnDestroy {
       );
   }
 
-  onAuthorizationComplete(): void {
-    const authorizedCount = this.selectedSamples.length;
+  onAuthorizationComplete(skippedCount: number = 0): void {
+    const authorizedCount = this.selectedSamples.length - skippedCount;
     this.savingAuthorization = false;
     this.selectedSamples = [];
-    this.snackBar.open(
-      `Successfully authorized ${authorizedCount} sample(s)`,
-      "OK",
-      {
-        horizontalPosition: "center",
-        verticalPosition: "bottom",
-        duration: 3500,
-        panelClass: ["snack-color"],
-      },
-    );
+    const message =
+      skippedCount > 0
+        ? `Authorized ${authorizedCount} sample(s). ${skippedCount} skipped — you cannot authorise results processed by you.`
+        : `Successfully authorized ${authorizedCount} sample(s)`;
+    this.snackBar.open(message, "OK", {
+      horizontalPosition: "center",
+      verticalPosition: "bottom",
+      duration: skippedCount > 0 ? 6000 : 3500,
+      panelClass: ["snack-color"],
+    });
     setTimeout(() => this.triggerRefresh(), 100);
   }
 }

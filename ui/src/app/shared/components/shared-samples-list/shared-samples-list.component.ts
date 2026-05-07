@@ -71,6 +71,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
   itemsToShow: any = {};
   currentUser$: Observable<any>;
+  currentUserUuid: string = "";
   listType: string = "patients";
 
   currentSamplesByVisits$: Observable<any[]>;
@@ -155,6 +156,20 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     });
 
     this.currentUser$ = this.store.select(getCurrentUserDetails);
+    this.currentUser$.subscribe((user) => {
+      this.currentUserUuid = user?.uuid || "";
+    });
+  }
+
+  canUserAuthorize(sample: any): boolean {
+    if (!this.LISConfigurations?.isLIS) return true;
+    return !sample?.orders?.some((order: any) =>
+      order?.testAllocations?.some((alloc: any) =>
+        alloc?.results?.some(
+          (r: any) => r?.resultsFedBy?.uuid === this.currentUserUuid
+        )
+      )
+    );
   }
 
   toggleCurrentPatientSamples(event: MatCheckboxChange, samples: any[]): void {
@@ -399,9 +414,13 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
   onSelectAll(event: MatCheckboxChange, samples: any[]): void {
     this.selectedSamples = [];
-    this.selectedSamples = event?.checked
-      ? [...this.selectedSamples, ...samples]
-      : [];
+    if (event?.checked) {
+      const eligible =
+        this.tabType === "authorization"
+          ? (samples || []).filter((s) => this.canUserAuthorize(s))
+          : samples || [];
+      this.selectedSamples = [...eligible];
+    }
     this.keyedSelectedSamples =
       this.selectedSamples?.length > 0 ? keyBy(this.selectedSamples, "id") : {};
     this.samplesForAction.emit(this.selectedSamples);

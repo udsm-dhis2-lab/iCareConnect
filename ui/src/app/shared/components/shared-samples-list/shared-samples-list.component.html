@@ -438,11 +438,16 @@
                     <section
                       *ngIf="tabType === 'authorization'"
                       class="ml-4"
-                      title="Tick to select"
                     >
                       <mat-checkbox
                         color="primary"
                         [checked]="keyedSelectedSamples[sample?.id]"
+                        [disabled]="!canUserAuthorize(sample)"
+                        [matTooltip]="
+                          !canUserAuthorize(sample)
+                            ? 'You cannot authorise results processed by you'
+                            : ''
+                        "
                         (change)="onSelectItem($event, sample)"
                       ></mat-checkbox>
                     </section>
