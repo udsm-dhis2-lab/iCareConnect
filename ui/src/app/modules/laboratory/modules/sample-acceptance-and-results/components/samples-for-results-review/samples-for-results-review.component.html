@@ -1,12 +1,7 @@
-<div
-  class="w-100"
-  *ngIf="{
-    providerDetails: providerDetails$ | async
-  } as params"
->
+<div class="w-100">
   <mat-progress-bar
     mode="indeterminate"
-    *ngIf="!params?.providerDetails"
+    *ngIf="!providerDetailsData"
   ></mat-progress-bar>
   <div class="loading-overlay" *ngIf="saving">
     <div class="text-center">
@@ -16,7 +11,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="params?.providerDetails">
+  <div *ngIf="providerDetailsData">
     <mat-radio-group class="mb-3 mt-2">
       <mat-radio-button
         [value]="'Normal'"
@@ -56,29 +51,53 @@
         [viewType]="viewType"
       ></app-result-entry-by-batch-home>
     </div>
-    <app-shared-samples-list
-      *ngIf="selectedResultEntryCategory === 'Normal'"
-      [tabType]="tabType"
-      [LISConfigurations]="LISConfigurations"
-      [labSamplesDepartments]="labSamplesDepartments"
-      (resultEntrySample)="
-        onResultsEntryAndReview(
-          $event,
-          params?.providerDetails,
-          'authorization'
-        )
-      "
-      (selectedSampleDetails)="
-        onGetSelectedSampleDetails($event, params?.providerDetails)
-      "
-      [category]="category"
-      [hasStatus]="hasStatus"
-      [showLegend]="true"
-      [excludedSampleCategories]="['RESULT_AUTHORIZATION']"
-      [datesParameters]="datesParameters"
-      [excludeAllocations]="true"
-      [sampleTypes]="sampleTypes"
-      [codedSampleRejectionReasons]="codedSampleRejectionReasons"
-    ></app-shared-samples-list>
+    <div *ngIf="selectedResultEntryCategory === 'Normal'" class="p-2">
+      <!-- Loading overlay for authorization -->
+      <div class="loading-overlay" *ngIf="savingAuthorization">
+        <div class="text-center">
+          <div>Authorizing samples ....</div>
+          <div class="mt-3 d-flex justify-content-center w-100">
+            <mat-spinner diameter="50" strokeWidth="2"></mat-spinner>
+          </div>
+        </div>
+      </div>
+
+      <!-- Authorize toolbar — shown once samples are selected -->
+      <div
+        *ngIf="selectedSamples.length > 0"
+        class="d-flex align-items-center justify-content-between mb-3 p-2 bg-light border rounded"
+      >
+        <span>
+          <strong>{{ selectedSamples.length }}</strong> sample(s) selected
+        </span>
+        <button
+          mat-raised-button
+          color="primary"
+          [disabled]="savingAuthorization"
+          (click)="onAuthorizeSelected($event)"
+        >
+          <mat-icon>check_circle</mat-icon>
+          Authorize Selected ({{ selectedSamples.length }})
+        </button>
+      </div>
+
+      <app-shared-samples-list
+        *ngIf="!isRefreshing"
+        tabType="authorization"
+        [LISConfigurations]="LISConfigurations"
+        [labSamplesDepartments]="labSamplesDepartments"
+        [datesParameters]="datesParameters"
+        [category]="category"
+        [hasStatus]="hasStatus"
+        [showLegend]="true"
+        [excludedSampleCategories]="excludedSampleCategories"
+        [excludeAllocations]="true"
+        [sampleTypes]="sampleTypes"
+        [codedSampleRejectionReasons]="codedSampleRejectionReasons"
+        (resultEntrySample)="onResultsEntryAndReview($event, providerDetailsData, 'authorization')"
+        (selectedSampleDetails)="onGetSelectedSampleDetails($event, providerDetailsData)"
+        (samplesForAction)="onSamplesForAction($event)"
+      ></app-shared-samples-list>
+    </div>
   </div>
 </div>
