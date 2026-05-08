@@ -842,129 +842,123 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                 2. Create visit (Orders should be added in)
                 3. Create sample
                 */
-                          console.log(
-                            "this.personDetailsData ======================= ************** ",
-                            this.personDetailsData,
-                          ),
-                            (this.patientPayload = {
-                              person: {
-                                names: [
-                                  {
-                                    givenName:
-                                      this.personDetailsData?.firstName,
-                                    familyName:
-                                      this.personDetailsData?.lastName,
-                                    familyName2:
-                                      this.personDetailsData?.middleName,
-                                  },
-                                ],
-                                gender:
-                                  this.personDetailsData?.gender.length > 0
-                                    ? this.personDetailsData?.gender
-                                    : "U",
-                                age: this.personDetailsData?.age,
-                                birthdate: this.personDetailsData?.dob
-                                  ? this.personDetailsData?.dob
-                                  : null,
-                                birthdateEstimated: this.personDetailsData?.dob
-                                  ? false
-                                  : true,
-                                addresses: [
-                                  {
-                                    address1:
-                                      this.personDetailsData?.ward?.uuid,
-                                    address2:
-                                      this.personDetailsData?.council?.uuid,
-                                    address3:
-                                      this.personDetailsData?.region?.uuid,
-                                    cityVillage: "",
-                                    country: "",
-                                    postalCode: "",
-                                  },
-                                ],
-                                attributes: [
-                                  {
-                                    attributeType:
-                                      this.personPhoneAttributeTypeUuid,
-                                    value: this.personDetailsData?.mobileNumber,
-                                  },
-                                  {
-                                    attributeType:
-                                      this.personEmailAttributeTypeUuid,
-                                    value: this.personDetailsData?.email,
-                                  },
-                                ]?.filter(
-                                  (personAttribute: any) =>
-                                    personAttribute?.value,
-                                ),
-                              },
-                              identifiers:
-                                this.registrationCategory?.refKey !==
-                                "non-clinical"
-                                  ? (patientIdentifierTypes || [])
-                                      .map((personIdentifierType) => {
+                          this.patientPayload = {
+                            person: {
+                              names: [
+                                {
+                                  givenName: this.personDetailsData?.firstName,
+                                  familyName: this.personDetailsData?.lastName,
+                                  familyName2:
+                                    this.personDetailsData?.middleName,
+                                },
+                              ],
+                              gender:
+                                this.personDetailsData?.gender.length > 0
+                                  ? this.personDetailsData?.gender
+                                  : "U",
+                              age: this.personDetailsData?.age,
+                              birthdate: this.personDetailsData?.dob
+                                ? this.personDetailsData?.dob
+                                : null,
+                              birthdateEstimated: this.personDetailsData?.dob
+                                ? false
+                                : true,
+                              addresses: [
+                                {
+                                  address1: this.personDetailsData?.ward?.uuid,
+                                  address2:
+                                    this.personDetailsData?.council?.uuid,
+                                  address3:
+                                    this.personDetailsData?.region?.uuid,
+                                  cityVillage: "",
+                                  country: "",
+                                  postalCode: "",
+                                },
+                              ],
+                              attributes: [
+                                {
+                                  attributeType:
+                                    this.personPhoneAttributeTypeUuid,
+                                  value: this.personDetailsData?.mobileNumber,
+                                },
+                                {
+                                  attributeType:
+                                    this.personEmailAttributeTypeUuid,
+                                  value: this.personDetailsData?.email,
+                                },
+                              ]?.filter(
+                                (personAttribute: any) =>
+                                  personAttribute?.value,
+                              ),
+                            },
+                            identifiers:
+                              this.registrationCategory?.refKey !==
+                              "non-clinical"
+                                ? (patientIdentifierTypes || [])
+                                    .map((personIdentifierType) => {
+                                      if (
+                                        !this.personDetailsData?.identifiers
+                                          ?.filter((identifier) => {
+                                            return (
+                                              identifier?.identifierType
+                                                ?.uuid ===
+                                              personIdentifierType.id
+                                            );
+                                          })
+                                          ?.filter((identifier) => identifier)
+                                          ?.length
+                                      ) {
                                         if (
-                                          !this.personDetailsData?.identifiers
-                                            ?.filter((identifier) => {
-                                              return (
-                                                identifier?.identifierType
-                                                  ?.uuid ===
-                                                personIdentifierType.id
-                                              );
-                                            })
-                                            ?.filter((identifier) => identifier)
-                                            ?.length
+                                          personIdentifierType.id ===
+                                          this.preferredPersonIdentifier
                                         ) {
-                                          if (
-                                            personIdentifierType.id ===
-                                            this.preferredPersonIdentifier
-                                          ) {
-                                            return {
-                                              identifier: this
-                                                .personDetailsData["mrn"]
-                                                ? this.personDetailsData["mrn"]
-                                                : this.personDetailsData[
-                                                    personIdentifierType.id
-                                                  ],
-                                              identifierType:
-                                                personIdentifierType.id,
-                                              location:
-                                                this.currentLocation?.uuid ||
-                                                "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this,
-                                              preferred: true,
-                                            };
-                                          } else {
-                                            return {
-                                              identifier:
-                                                this.personDetailsData[
+                                          return {
+                                            identifier: this.personDetailsData[
+                                              "mrn"
+                                            ]
+                                              ? this.personDetailsData["mrn"]
+                                              : this.personDetailsData[
                                                   personIdentifierType.id
                                                 ],
-                                              identifierType:
-                                                personIdentifierType.id,
-                                              location:
-                                                this.currentLocation?.uuid ||
-                                                "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this,
-                                              preferred: false,
-                                            };
-                                          }
+                                            identifierType:
+                                              personIdentifierType.id,
+                                            location:
+                                              this.currentLocation?.uuid ||
+                                              "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this,
+                                            preferred: true,
+                                          };
+                                        } else {
+                                          return {
+                                            identifier:
+                                              this.personDetailsData[
+                                                personIdentifierType.id
+                                              ],
+                                            identifierType:
+                                              personIdentifierType.id,
+                                            location:
+                                              this.currentLocation?.uuid ||
+                                              "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this,
+                                            preferred: false,
+                                          };
                                         }
-                                      })
-                                      .filter(
-                                        (patientIdentifier) =>
-                                          patientIdentifier?.identifier,
-                                      )
-                                  : [
-                                      {
-                                        identifier: identifierResponse[0],
-                                        identifierType:
-                                          this.preferredPersonIdentifier,
-                                        location:
-                                          this.currentLocation?.uuid ||
-                                          "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this
-                                        preferred: true,
-                                      },
-                                    ],
-                            });
+                                      }
+                                    })
+                                    .filter(
+                                      (patientIdentifier) =>
+                                        patientIdentifier?.identifier,
+                                    )
+                                : [
+                                    {
+                                      identifier: identifierResponse[0],
+                                      identifierType:
+                                        this.preferredPersonIdentifier,
+                                      location:
+                                        this.currentLocation?.uuid ||
+                                        "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this
+                                      preferred: true,
+                                    },
+                                  ],
+                          };
 
                           if (
                             !this.patientPayload?.identifiers?.filter(

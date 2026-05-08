@@ -174,7 +174,7 @@ export class SamplesForResultsReviewComponent implements OnInit, OnDestroy {
         const enteredByMe = sample?.orders?.some((order: any) =>
           order?.testAllocations?.some((alloc: any) =>
             alloc?.results?.some(
-              (r: any) => r?.resultsFedBy?.uuid === this.userUuid,
+              (r: any) => r?.creator?.uuid === this.userUuid,
             ),
           ),
         );
