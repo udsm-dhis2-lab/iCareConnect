@@ -171,6 +171,7 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 		HashMap<String, Object> visitObject = new HashMap<String, Object>();
 		if (this.getVisit() != null) {
 			visitObject.put("uuid", this.getVisit().getUuid());
+			visitObject.put("visitType", this.getVisit().getVisitType().getUuid());
 			visitObject.put("startDateTime", this.getVisit().getStartDatetime());
 			visitObject.put("stopDateTime", this.getVisit().getStopDatetime());
 			List<Map<String, Object>> visitAttributes = new ArrayList<>();

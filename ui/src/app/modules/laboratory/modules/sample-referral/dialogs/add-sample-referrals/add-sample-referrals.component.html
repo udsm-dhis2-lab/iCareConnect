@@ -9,14 +9,12 @@
     <ng-template matStepLabel>Referral Samples Information</ng-template>
     <div>
       @if(referralForms?.sample_information){
-      <app-referral-sample-information></app-referral-sample-information>
+      <app-referral-sample-information (stepComplete)="referralDestinationStep.completed = true; stepper.next()"></app-referral-sample-information>
       }
       @else {
       <p class="alert alert-warning">No Referral Samples Information Form configured for referrals. Please contact
         system administrator.</p>
       }
-      <button mat-raised-button color="primary"
-        (click)="referralSamplesInformationStep.completed = true; stepper.next()">Complete Step 1</button>
     </div>
   </mat-step>
 
@@ -30,8 +28,6 @@
       <p class="alert alert-warning">No Referral Destination Information Form configured for referrals. Please contact
         system administrator.</p>
       }
-      <button mat-raised-button color="primary"
-        (click)="referralDestinationStep.completed = true; stepper.next()">Complete Step 2</button>
     </div>
   </mat-step>
 
@@ -45,8 +41,6 @@
       <p class="alert alert-warning">No Referral Packaging Information Form configured for referrals. Please contact
         system administrator.</p>
       }
-      <button mat-raised-button color="primary"
-        (click)="referralPackagingStep.completed = true; stepper.next()">Complete Step 3</button>
     </div>
   </mat-step>
 
@@ -60,8 +54,6 @@
       <p class="alert alert-warning">No Referral Transport Information Form configured for referrals. Please contact
         system administrator.</p>
       }
-      <button mat-raised-button color="primary" (click)="referralTransportStep.completed = true;">Complete Step
-        4</button>
     </div>
   </mat-step>
 </mat-horizontal-stepper>

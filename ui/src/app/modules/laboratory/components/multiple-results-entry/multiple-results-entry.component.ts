@@ -6,6 +6,7 @@ import {
   Output,
   EventEmitter,
   OnDestroy,
+  OnChanges,
 } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
 import { MatSelect, MatSelectChange } from "@angular/material/select";
@@ -13,19 +14,14 @@ import { MatSelect, MatSelectChange } from "@angular/material/select";
 import { ReplaySubject, Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged, takeUntil } from "rxjs/operators";
 
-interface Bank {
-  id: string;
-  name: string;
-}
-
 @Component({
   selector: "app-multiple-results-entry",
   templateUrl: "./multiple-results-entry.component.html",
   styleUrls: ["./multiple-results-entry.component.scss"],
 })
-export class MultipleResultsEntryComponent implements OnInit, OnDestroy {
+export class MultipleResultsEntryComponent implements OnInit, OnDestroy, OnChanges {
   @Input() options: any[];
-  @Input() value: any;
+  @Input() value: any[];
   @Input() label: string = "";
   @Input() loading: boolean = false;
   @Input() noEntriesFoundLabel: string = "";
@@ -35,13 +31,14 @@ export class MultipleResultsEntryComponent implements OnInit, OnDestroy {
   @Output() searchChange: EventEmitter<string> = new EventEmitter<string>();
 
   list: any[];
+  private previousSelectedValues: any[] = [];
 
   public listCtrl: UntypedFormControl = new UntypedFormControl();
   public listFilterCtrl: UntypedFormControl = new UntypedFormControl();
   public listMultiCtrl: UntypedFormControl = new UntypedFormControl();
   public listMultiFilterCtrl: UntypedFormControl = new UntypedFormControl();
 
-  public filteredList: ReplaySubject<Bank[]> = new ReplaySubject<Bank[]>(1);
+  public filteredList: ReplaySubject<any> = new ReplaySubject<any>(1);
   public filteredMultiList: ReplaySubject<any> = new ReplaySubject<any>(1);
 
   panelElement?: HTMLElement;
@@ -61,6 +58,20 @@ export class MultipleResultsEntryComponent implements OnInit, OnDestroy {
     if (changes['options'] && !changes['options'].firstChange) {
       this.setList(this.options || []);
     }
+    if (changes['value'] && !changes['value'].firstChange) {
+      this.updateSelectionFromValue();
+    }
+  }
+
+  private updateSelectionFromValue() {
+    if (this.value && this.value.length > 0 && this.list) {
+      const valueSet = new Set(this.value);
+      const defaultValues = this.list.filter((item) => valueSet.has(item.value));
+      if (defaultValues.length !== this.listMultiCtrl.value?.length) {
+        this.listMultiCtrl.setValue(defaultValues);
+        this.selectedList.emit(this.listMultiCtrl.value);
+      }
+    }
   }
 
   private setupSearchSubscription() {
@@ -73,13 +84,25 @@ export class MultipleResultsEntryComponent implements OnInit, OnDestroy {
 
   setList(list: any[]) {
     this.list = list;
-    const defaultValues =
-      this.list?.filter(
-        (item) =>
-          (this.value?.filter((val) => val === (item?.value || item?.id)) || [])
-            ?.length > 0
-      ) || [];
-    this.listMultiCtrl.setValue(defaultValues);
+    
+    if (this.previousSelectedValues && this.previousSelectedValues.length > 0) {
+      const existingValues = new Set(this.previousSelectedValues);
+      const stillValid = this.list.filter(
+        (item) => existingValues.has(item.value || item)
+      );
+      if (stillValid.length > 0) {
+        this.listMultiCtrl.setValue(stillValid);
+      } else if (this.value && this.value.length > 0) {
+        const valueSet = new Set(this.value);
+        const defaultValues = this.list.filter((item) => valueSet.has(item.value));
+        this.listMultiCtrl.setValue(defaultValues);
+      }
+    } else if (this.value && this.value.length > 0) {
+      const valueSet = new Set(this.value);
+      const defaultValues = this.list.filter((item) => valueSet.has(item.value));
+      this.listMultiCtrl.setValue(defaultValues);
+    }
+    
     this.selectedList.emit(this.listMultiCtrl.value);
     this.filteredList.next(this.list.slice());
     this.filteredMultiList.next(this.list.slice());
@@ -132,6 +155,7 @@ export class MultipleResultsEntryComponent implements OnInit, OnDestroy {
   }
 
   getSelectedValues(event: MatSelectChange): void {
+    this.previousSelectedValues = this.listMultiCtrl.value?.map(v => v.value || v) || [];
     this.selectedList.emit(this.listMultiCtrl.value);
   }
 

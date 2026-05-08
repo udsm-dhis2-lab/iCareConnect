@@ -330,7 +330,9 @@ public class LaboratoryController {
 	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
 	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
 	        @RequestParam(value = "q", required = false) String q,
-	        @RequestParam(value = "haveThisOrderType", required = false) Boolean haveThisOrderType) throws Exception {
+	        @RequestParam(value = "haveThisOrderType", required = false) Boolean haveThisOrderType,
+	        @RequestParam(value = "fulfillerStatus", required = false) String fulfillerStatus,
+	        @RequestParam(value = "formUuid", required = false) String formUuid) throws Exception {
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
@@ -346,9 +348,10 @@ public class LaboratoryController {
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 		
-		haveThisOrderType = haveThisOrderType ? haveThisOrderType : false;
+		haveThisOrderType = (haveThisOrderType != null) ? haveThisOrderType : false;
+		
 		ListResult<Sample> sampleResults = laboratoryService.getSamplesByOrderType(start, end, pager, orderType,
-		    haveThisOrderType, q);
+		    haveThisOrderType, q, fulfillerStatus, formUuid);
 		
 		return sampleResults.toMap();
 	}

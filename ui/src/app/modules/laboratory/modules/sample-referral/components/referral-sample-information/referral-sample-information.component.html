@@ -1,8 +1,10 @@
 @if({
     formId: formId,
+    provider: provider$ | async,
+    currentUser: currentUser$ | async
 }; as params){
 
-    @if(!params?.formId){
+    @if(!params?.formId || this.loading){
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     } @else {
         <div class="row">
@@ -21,7 +23,13 @@
                 <app-render-openmrs-form 
                     [formId]="formId"
                     [colClass]="'col-md-12 col-sm-12 col-lg-12'"
-                    (formDataUpdate)="onFormUpdate($event, formId)"></app-render-openmrs-form>
+                    (formDataUpdate)="onFormUpdate($event)"></app-render-openmrs-form>
+            </div>
+        </div>
+        <div class="row align-items-end">
+            <div class="col-12 d-flex justify-content-end">
+                <button mat-raised-button color="primary" [disabled]="!isValid"
+                    (click)="onSaveSampleInformation()">Complete Sample Information</button>
             </div>
         </div>
     }
