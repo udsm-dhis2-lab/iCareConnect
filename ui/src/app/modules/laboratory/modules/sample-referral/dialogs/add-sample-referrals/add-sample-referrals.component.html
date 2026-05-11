@@ -7,7 +7,7 @@
 <mat-horizontal-stepper #stepper linear>
   <mat-step label="Step 1" #referralSamplesInformationStep>
     <ng-template matStepLabel>Referral Samples Information</ng-template>
-    <div>
+    <ng-template matStepContent>
       @if(referralForms?.sample_information){
       <app-referral-sample-information (stepComplete)="referralDestinationStep.completed = true; stepper.next()"></app-referral-sample-information>
       }
@@ -15,12 +15,12 @@
       <p class="alert alert-warning">No Referral Samples Information Form configured for referrals. Please contact
         system administrator.</p>
       }
-    </div>
+    </ng-template>
   </mat-step>
 
   <mat-step label="Step 2" #referralDestinationStep>
     <ng-template matStepLabel>Referral Destination Information</ng-template>
-    <div>
+    <ng-template matStepContent>
       @if(referralForms?.destination_information){
       <app-referral-destination-information></app-referral-destination-information>
       }
@@ -28,12 +28,12 @@
       <p class="alert alert-warning">No Referral Destination Information Form configured for referrals. Please contact
         system administrator.</p>
       }
-    </div>
+    </ng-template>
   </mat-step>
 
   <mat-step label="Step 3" #referralPackagingStep>
     <ng-template matStepLabel>Referral Packaging Information</ng-template>
-    <div>
+    <ng-template matStepContent>
       @if(referralForms?.packaging_information){
       <app-referral-packaging-information></app-referral-packaging-information>
       }
@@ -41,12 +41,12 @@
       <p class="alert alert-warning">No Referral Packaging Information Form configured for referrals. Please contact
         system administrator.</p>
       }
-    </div>
+    </ng-template>
   </mat-step>
 
   <mat-step label="Step 4" #referralTransportStep>
     <ng-template matStepLabel>Referral Transport Information</ng-template>
-    <div>
+    <ng-template matStepContent>
       @if(referralForms?.transport_information){
       <app-referral-transport-information></app-referral-transport-information>
       }
@@ -54,6 +54,6 @@
       <p class="alert alert-warning">No Referral Transport Information Form configured for referrals. Please contact
         system administrator.</p>
       }
-    </div>
+    </ng-template>
   </mat-step>
 </mat-horizontal-stepper>

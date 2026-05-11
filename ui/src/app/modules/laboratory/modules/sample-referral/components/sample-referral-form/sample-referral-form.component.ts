@@ -72,17 +72,18 @@ export class SampleReferralFormComponent {
   }
 
 
-  getUnreferredSamples(){
-    this.loadingOptions = true;
-    this.sampleReferralService.getSamplesByRefferalOrderType(this.orderType, {
-          paging: true,
-          page: this.page,
-          pageSize: this.pageSize,
-          haveThisOrderType: false,
-          formUuid: this.formId,
-          haveThisForm: false,
-          q: this.searchText
-        }).subscribe({
+   getUnreferredSamples(){
+     this.loadingOptions = true;
+     this.sampleReferralService.getSamplesByRefferalOrderType(this.orderType, {
+           paging: true,
+           page: this.page,
+           pageSize: this.pageSize,
+           haveThisOrderType: false,
+           formUuid: this.formId,
+           haveThisForm: false,
+           combineWithOr: true,
+           q: this.searchText
+         }).subscribe({
           next: (response: any) => {
             this.totalCount = response?.pagination?.totalCount || 0;
             this.samples = response?.results;

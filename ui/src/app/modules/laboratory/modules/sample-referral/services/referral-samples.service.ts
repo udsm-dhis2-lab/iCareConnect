@@ -11,21 +11,22 @@ export class SampleReferralService {
     ) {}
 
 
-    getSamplesByRefferalOrderType(orderTypeUuid: string, params: {
-        paging: boolean;
-        page?: number;
-        pageSize?: number;
-        startDate?: string;
-        endDate?: string;
-        haveThisOrderType?: boolean;
-        formUuid?: string,
-        haveThisForm?: boolean,
-        q?: string;
-    } = {
-        paging: true,
-        page: 1,
-        pageSize: 10,
-    }) {
+     getSamplesByRefferalOrderType(orderTypeUuid: string, params: {
+         paging: boolean;
+         page?: number;
+         pageSize?: number;
+         startDate?: string;
+         endDate?: string;
+         haveThisOrderType?: boolean;
+         formUuid?: string,
+         haveThisForm?: boolean,
+         combineWithOr?: boolean,
+         q?: string;
+     } = {
+         paging: true,
+         page: 1,
+         pageSize: 10,
+     }) {
         let parameters = new HttpParams();
         (Object.keys(params) as Array<keyof typeof params>).forEach((key) => {
         const value = params[key];

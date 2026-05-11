@@ -429,7 +429,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 	//	}
 	
 	public ListResult<Sample> getSamplesByOrderType(Date startDate, Date endDate, Pager pager, String orderTypeUuid,
-	        Boolean haveThisOrderType, String q, String fulfillerStatus, String formUuid, Boolean haveThisForm) {
+	        Boolean haveThisOrderType, String q, String fulfillerStatus, String formUuid, Boolean haveThisForm,
+	        Boolean combineWithOr) {
 		
 		DbSession session = this.getSession();
 		
@@ -446,7 +447,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 			endDate = cal.getTime();
 		}
 		
-		String hqlJoins = " FROM Sample s " + " LEFT JOIN s.sampleOrders so " + " LEFT JOIN so.order o ";
+		String hqlJoins = " FROM Sample s " + " JOIN s.sampleOrders so " + " JOIN so.order o ";
 		
 		if (orderTypeUuid != null && !orderTypeUuid.isEmpty()) {
 			hqlJoins += " LEFT JOIN o.orderType ot ";
@@ -457,20 +458,28 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		String whereClause = " WHERE o.voided = false ";
 		
+		String orderTypeCondition = "";
+		String formCondition = "";
+		
 		if (orderTypeUuid != null && !orderTypeUuid.isEmpty()) {
-			if (haveThisOrderType != null && haveThisOrderType) {
-				whereClause += " AND ot.uuid = :orderTypeUuid ";
-			} else {
-				whereClause += " AND s.id NOT IN (SELECT s2.id FROM Sample s2 JOIN s2.sampleOrders so2 JOIN so2.order o2 JOIN o2.orderType ot2 WHERE ot2.uuid = :orderTypeUuid) ";
-			}
+			orderTypeCondition = haveThisOrderType != null && haveThisOrderType ? "ot.uuid = :orderTypeUuid"
+			        : "s.id NOT IN (SELECT so2.sample.id FROM SampleOrder so2 WHERE so2.order.orderType.uuid = :orderTypeUuid AND so2.order.voided = false)";
 		}
 		
 		if (formUuid != null && !formUuid.isEmpty()) {
-			if (haveThisForm != null && haveThisForm) {
-				whereClause += " AND f.uuid = :formUuid ";
-			} else {
-				whereClause += " AND s.id NOT IN (SELECT s3.id FROM Sample s3 JOIN s3.sampleOrders so3 JOIN so3.order o3 JOIN o3.encounter e3 JOIN e3.form f3 WHERE f3.uuid = :formUuid) ";
-			}
+			formCondition = haveThisForm != null && haveThisForm ? "f.uuid = :formUuid"
+			        : "s.id NOT IN (SELECT so3.sample.id FROM SampleOrder so3 WHERE so3.order.encounter.form.uuid = :formUuid AND so3.order.voided = false)";
+		}
+		
+		boolean useOr = combineWithOr != null && combineWithOr;
+		
+		if (!orderTypeCondition.isEmpty() && !formCondition.isEmpty()) {
+			whereClause += useOr ? " AND (" + orderTypeCondition + " OR " + formCondition + ")" : " AND "
+			        + orderTypeCondition + " AND " + formCondition;
+		} else if (!orderTypeCondition.isEmpty()) {
+			whereClause += " AND " + orderTypeCondition;
+		} else if (!formCondition.isEmpty()) {
+			whereClause += " AND " + formCondition;
 		}
 		
 		if (fulfillerStatus != null && !fulfillerStatus.isEmpty()) {
@@ -496,8 +505,8 @@ public class SampleDAO extends BaseDAO<Sample> {
 			return listResults;
 		}
 		
-		String idHql = "SELECT s.id " + hqlJoins + whereClause + " GROUP BY s.id, s.dateCreated "
-		        + " ORDER BY MIN(CASE WHEN o.urgency = :statUrgency THEN 0 ELSE 1 END) ASC, s.dateCreated DESC";
+		String idHql = "SELECT s.id " + hqlJoins + whereClause + " GROUP BY s.id "
+		        + " ORDER BY MIN(CASE WHEN o.urgency = :statUrgency THEN 0 ELSE 1 END) ASC, MAX(o.dateCreated) DESC";
 		
 		Query idQuery = session.createQuery(idHql);
 		this.setExtendedParameters(idQuery, orderTypeUuid, q, startDate, endDate, fulfillerStatus, formUuid);
@@ -510,19 +519,13 @@ public class SampleDAO extends BaseDAO<Sample> {
 		}
 		
 		List<Integer> ids = idQuery.list();
-		if (ids == null || ids.isEmpty()) {
+		if (ids == null || ids.isEmpty())
 			return listResults;
-		}
 		
-		String dataHql = "SELECT DISTINCT s FROM Sample s LEFT JOIN FETCH s.sampleOrders so LEFT JOIN FETCH so.order o ";
-		if (orderTypeUuid != null && !orderTypeUuid.isEmpty()) {
-			dataHql += " LEFT JOIN FETCH o.orderType ot ";
-		}
-		if (formUuid != null && !formUuid.isEmpty()) {
-			dataHql += " LEFT JOIN FETCH o.encounter e LEFT JOIN FETCH e.form f ";
-		}
-		dataHql += " WHERE s.id IN (:ids) "
-		        + " ORDER BY CASE WHEN o.urgency = :statUrgency THEN 0 ELSE 1 END ASC, s.dateCreated DESC";
+		String dataHql = "SELECT DISTINCT s FROM Sample s " + " JOIN FETCH s.sampleOrders so " + " JOIN FETCH so.order o "
+		        + " JOIN FETCH o.orderType ot " + " LEFT JOIN FETCH o.encounter e " + " LEFT JOIN FETCH e.form f "
+		        + " WHERE s.id IN (:ids) "
+		        + " ORDER BY CASE WHEN o.urgency = :statUrgency THEN 0 ELSE 1 END ASC, o.dateCreated DESC";
 		
 		Query dataQuery = session.createQuery(dataHql);
 		dataQuery.setParameterList("ids", ids);

@@ -333,7 +333,8 @@ public class LaboratoryController {
 	        @RequestParam(value = "haveThisOrderType", required = false) Boolean haveThisOrderType,
 	        @RequestParam(value = "fulfillerStatus", required = false) String fulfillerStatus,
 	        @RequestParam(value = "formUuid", required = false) String formUuid,
-	        @RequestParam(value = "haveThisForm", required = false) Boolean haveThisForm) throws Exception {
+	        @RequestParam(value = "haveThisForm", required = false) Boolean haveThisForm,
+	        @RequestParam(value = "combineWithOr", required = false) Boolean combineWithOr) throws Exception {
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
@@ -353,7 +354,7 @@ public class LaboratoryController {
 		haveThisForm = (haveThisForm != null) ? haveThisForm : false;
 		
 		ListResult<Sample> sampleResults = laboratoryService.getSamplesByOrderType(start, end, pager, orderType,
-		    haveThisOrderType, q, fulfillerStatus, formUuid, haveThisForm);
+		    haveThisOrderType, q, fulfillerStatus, formUuid, haveThisForm, combineWithOr);
 		
 		return sampleResults.toMap();
 	}
