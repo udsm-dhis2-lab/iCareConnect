@@ -20,7 +20,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class ReferralSampleInformationComponent {
   private referralSystemSettingsService = inject(ReferralSystemSettingsService);
-  private sampleReferralService = inject(SampleReferralService);
   private store = inject(Store<AppState>);
   private encounterService = inject(EncountersService);
   private orderService = inject(OrdersService);
@@ -30,16 +29,15 @@ export class ReferralSampleInformationComponent {
 
 
   @Output() stepComplete = new EventEmitter<any>();
-
-  unreferredSamples$?: Observable<any>;
-  provider$?: Observable<any>;
-  currentUser$?: Observable<any>;
   
   formId = this.referralSystemSettingsService.referralSettings()?.forms?.sample_information || null;
+  referralOrderConcept = this.referralSystemSettingsService.referralSettings()?.referralOrderConcept || null;
   orderType = this.referralSystemSettingsService.referralSettings()?.referralOrderType || null;
   encounterType = this.referralSystemSettingsService.referralSettings()?.referralEncounterType || null;
   encounterRole = this.referralSystemSettingsService.referralSettings()?.encounterRole || null;
-  referralOrderConcept = this.referralSystemSettingsService.referralSettings()?.referralOrderConcept || null;
+
+  provider$?: Observable<any>;
+  currentUser$?: Observable<any>;
   
   page = 1;
   pageSize = 10;
@@ -57,7 +55,7 @@ export class ReferralSampleInformationComponent {
   appendOptions = false;
 
   selectedSamples: any[] = [];
-  formValues: any;
+  formValues?: FormValue;
   validStatus?: boolean;
   
   constructor() {}
@@ -73,81 +71,11 @@ export class ReferralSampleInformationComponent {
         this.provider = response;
       })
     );
-    if(this.orderType){
-      this.getUnreferredSamples();
-    }
   }
 
-
-  getUnreferredSamples(){
-    this.loadingOptions = true;
-    this.sampleReferralService.getSamplesByRefferalOrderType(this.orderType, {
-          paging: true,
-          page: this.page,
-          pageSize: this.pageSize,
-          haveThisOrderType: false,
-          q: this.searchText
-        }).subscribe({
-          next: (response: any) => {
-            this.totalCount = response?.pagination?.totalCount || 0;
-            this.samples = response?.results;
-            
-            if(this.appendOptions){
-              const existingValues = new Set(this.options.map(opt => opt.value));
-              const newOptions = this.samples
-                ?.map((sample: any) => ({ 
-                    name: sample?.label, 
-                    value: sample?.uuid 
-                  }))
-                ?.filter((newItem: { name: string; value: string }) => !existingValues.has(newItem.value)) || [];
-
-                this.options = [...this.options, ...newOptions];
-              } else {
-                this.options = this.samples?.map((sample: any) => { 
-                  return { 
-                    name: sample?.label, 
-                    value: sample?.uuid 
-                  }
-                }) || [];
-              }
-              
-              this.loadingOptions = false;
-          },
-          error: (err) => {
-            console.error("Error fetching unreferred samples: ", err);
-            this.loadingOptions = false;
-          }
-        });
-  }
-
-  onSelection(e: any) {
-    this.selectedSamples = e;
-  }
-  
-  onFormUpdate(formValue: FormValue) {
-      this.validStatus = formValue.isValid;
-      this.formValues = formValue?.getValues();
-  }
-
-  get isValid(){
-    return this.selectedSamples?.length  >= 1 && this.validStatus
-  }
-
-  onLoadMore() {
-    console.log("Load more options");
-    this.page++;
-    this.appendOptions = true;
-    this.getUnreferredSamples();
-  }
-
-  onSearchChange(searchTerm: string) {
-    this.searchText = searchTerm;
-    this.page = 1;
-    this.appendOptions = false;
-    this.getUnreferredSamples();
-  }
-
-  async onSaveSampleInformation(){
+  async onSaveSampleInformation(formData: any){
+    this.selectedSamples = formData?.samples;
+    this.formValues = formData?.formValues;
     this.loading = true
     const sampleEncounterMap = await this.saveEncounters();
     const sampleOrdersMap = await this.saveOrders(sampleEncounterMap);
@@ -168,13 +96,8 @@ export class ReferralSampleInformationComponent {
     })
   }
 
-  getSelectedSamples(){
-    const selectedSamples = new Set(this.selectedSamples.map(sample => sample?.value));
-    return this.samples.filter(sample => selectedSamples.has(sample?.uuid));;
-  }
-
   async saveEncounters(){
-    const selectedSamples = this.getSelectedSamples();
+    const selectedSamples = this.selectedSamples;
     const sampleToEncounterMap = new Map<string, string>();
 
     const encounters = selectedSamples?.map((sample: any) => {
@@ -207,7 +130,7 @@ export class ReferralSampleInformationComponent {
   }
 
   async saveOrders(sampleToEncounterMap: Map<string, string>){
-    const selectedSamples = this.getSelectedSamples();
+    const selectedSamples = this.selectedSamples;
     const sampleOrderMap = new Map<string, string>();
 
     const orders = selectedSamples?.map?.((sample) => {
@@ -239,7 +162,7 @@ export class ReferralSampleInformationComponent {
   
 
   async saveObservations(sampleToEncounterMap: Map<string, string>){
-    const selectedSamples = this.getSelectedSamples();
+    const selectedSamples = this.selectedSamples;
 
     const observations = selectedSamples?.map((sample: any) => {
       const encounter = sampleToEncounterMap.get(sample?.uuid);
@@ -259,7 +182,7 @@ export class ReferralSampleInformationComponent {
   }
 
   async saveSampleOrders(sampleOrdersMap: Map<string, string>){
-    const sampleOrders = this.getSelectedSamples()?.map((sample) => {
+    const sampleOrders = this.selectedSamples?.map((sample) => {
       return {
         sample: {
           uuid: sample?.uuid

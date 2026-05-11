@@ -18,6 +18,8 @@ export class SampleReferralService {
         startDate?: string;
         endDate?: string;
         haveThisOrderType?: boolean;
+        formUuid?: string,
+        haveThisForm?: boolean,
         q?: string;
     } = {
         paging: true,

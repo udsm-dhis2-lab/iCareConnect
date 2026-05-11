@@ -10,6 +10,7 @@ import { ReferralSampleInformationComponent } from './components/referral-sample
 import { ReferralDestinationInformationComponent } from './components/referral-destination-information/referral-destination-information.component';
 import { ReferralPackagingInformationComponent } from './components/referral-packaging-information/referral-packaging-information.component';
 import { ReferralTransportInformationComponent } from './components/referral-transport-information/referral-transport-information.component';
+import { SampleReferralFormComponent } from "./components/sample-referral-form/sample-referral-form.component";
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { ReferralTransportInformationComponent } from './components/referral-tra
     ReferralSampleInformationComponent,
     ReferralDestinationInformationComponent,
     ReferralPackagingInformationComponent,
-    ReferralTransportInformationComponent
+    ReferralTransportInformationComponent,
+    SampleReferralFormComponent
   ],
   imports: [
     CommonModule,

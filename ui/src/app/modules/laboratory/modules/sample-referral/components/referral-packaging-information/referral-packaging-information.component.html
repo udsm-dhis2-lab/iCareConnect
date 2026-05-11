@@ -1,1 +1,9 @@
-<p>referral-packaging-information works!</p>
+@if({
+    formId: formId,
+    provider: provider$ | async,
+    currentUser: currentUser$ | async
+}; as params){
+
+<app-sample-referral-form [formId]="formId" [saveButtonText]="'Save Packaging Information'"
+    (saveForm)="onSavePackagingInformation($event)"></app-sample-referral-form>
+}

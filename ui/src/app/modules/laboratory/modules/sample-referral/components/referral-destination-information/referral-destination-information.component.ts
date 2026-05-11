@@ -9,6 +9,8 @@ import { AppState } from 'src/app/store/reducers';
 import { Store } from '@ngrx/store';
 import { SampleReferralService } from '../../services/referral-samples.service';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { getCurrentUserDetails, getProviderDetails } from 'src/app/store/selectors/current-user.selectors';
 
 @Component({
   selector: 'app-referral-destination-information',
@@ -31,30 +33,38 @@ export class ReferralDestinationInformationComponent {
   provider$?: Observable<any>;
   currentUser$?: Observable<any>;
   
-  formId = this.referralSystemSettingsService.referralSettings()?.forms?.sample_information || null;
+  formId = this.referralSystemSettingsService.referralSettings()?.forms?.destination_information || null;
   orderType = this.referralSystemSettingsService.referralSettings()?.referralOrderType || null;
   encounterType = this.referralSystemSettingsService.referralSettings()?.referralEncounterType || null;
   encounterRole = this.referralSystemSettingsService.referralSettings()?.encounterRole || null;
   referralOrderConcept = this.referralSystemSettingsService.referralSettings()?.referralOrderConcept || null;
   
-  page = 1;
-  pageSize = 10;
-  totalCount = 0;
-  searchText = "";
-
-  loadingOptions = false;
   loading = false;
   
   currentUser?: any;
   provider?: any;
   samples: any[] = [];
 
-  options: any[] = [];
-  appendOptions = false;
-
   selectedSamples: any[] = [];
   formValues: any;
-  validStatus?: boolean;
 
-  
+  constructor(){}
+
+  ngOnInit(){
+    this.currentUser$ = this.store.select(getCurrentUserDetails).pipe(
+      tap((response: any) => {
+        this.currentUser = response;
+      })
+    );
+    this.provider$ = this.store.select(getProviderDetails).pipe(
+      tap((response: any) => {
+        this.provider = response;
+      })
+    ); 
+  }
+
+  async onSaveDestinationInformation(formData: any){
+    this.selectedSamples = formData?.samples;
+    this.formValues = formData?.formValues;
+  }
 }

@@ -4,33 +4,9 @@
     currentUser: currentUser$ | async
 }; as params){
 
-    @if(!params?.formId || this.loading){
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    } @else {
-        <div class="row">
-            <div class="col-12">
-                <app-multiple-results-entry 
-                [options]="options"
-                [label]="'Select Samples'"
-                [noEntriesFoundLabel]="'No samples found!'"
-                [loading]="loadingOptions"
-                (loadMore)="onLoadMore()"
-                (searchChange)="onSearchChange($event)"
-                (selectedList)="onSelection($event)"
-                ></app-multiple-results-entry>
-            </div>
-            <div class="col-12">
-                <app-render-openmrs-form 
-                    [formId]="formId"
-                    [colClass]="'col-md-12 col-sm-12 col-lg-12'"
-                    (formDataUpdate)="onFormUpdate($event)"></app-render-openmrs-form>
-            </div>
-        </div>
-        <div class="row align-items-end">
-            <div class="col-12 d-flex justify-content-end">
-                <button mat-raised-button color="primary" [disabled]="!isValid"
-                    (click)="onSaveSampleInformation()">Complete Sample Information</button>
-            </div>
-        </div>
-    }
+    <app-sample-referral-form
+        [formId]="formId"
+        [saveButtonText]="'Save Sample Information'"
+        (saveForm)="onSaveSampleInformation($event)"
+    ></app-sample-referral-form>
 }

@@ -1,1 +1,9 @@
-<p>referral-destination-information works!</p>
+@if({
+    formId: formId,
+    provider: provider$ | async,
+    currentUser: currentUser$ | async
+}; as params){
+
+<app-sample-referral-form [formId]="formId" [saveButtonText]="'Save Destination Information'"
+    (saveForm)="onSaveDestinationInformation($event)"></app-sample-referral-form>
+}

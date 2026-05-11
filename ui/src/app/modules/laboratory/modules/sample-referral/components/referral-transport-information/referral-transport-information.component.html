@@ -1,1 +1,9 @@
-<p>referral-transport-information works!</p>
+@if({
+formId: formId,
+provider: provider$ | async,
+currentUser: currentUser$ | async
+}; as params){
+
+<app-sample-referral-form [formId]="formId" [saveButtonText]="'Save Transport Information'"
+    (saveForm)="onSaveTransportInformation($event)"></app-sample-referral-form>
+}

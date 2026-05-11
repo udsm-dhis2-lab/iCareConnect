@@ -429,7 +429,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 	//	}
 	
 	public ListResult<Sample> getSamplesByOrderType(Date startDate, Date endDate, Pager pager, String orderTypeUuid,
-	        Boolean haveThisOrderType, String q, String fulfillerStatus, String formUuid) {
+	        Boolean haveThisOrderType, String q, String fulfillerStatus, String formUuid, Boolean haveThisForm) {
 		
 		DbSession session = this.getSession();
 		
@@ -457,7 +457,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		String whereClause = " WHERE o.voided = false ";
 		
-		if (orderTypeUuid != null) {
+		if (orderTypeUuid != null && !orderTypeUuid.isEmpty()) {
 			if (haveThisOrderType != null && haveThisOrderType) {
 				whereClause += " AND ot.uuid = :orderTypeUuid ";
 			} else {
@@ -465,12 +465,16 @@ public class SampleDAO extends BaseDAO<Sample> {
 			}
 		}
 		
-		if (fulfillerStatus != null && !fulfillerStatus.isEmpty()) {
-			whereClause += " AND o.fulfillerStatus = :fulfillerStatus ";
+		if (formUuid != null && !formUuid.isEmpty()) {
+			if (haveThisForm != null && haveThisForm) {
+				whereClause += " AND f.uuid = :formUuid ";
+			} else {
+				whereClause += " AND s.id NOT IN (SELECT s3.id FROM Sample s3 JOIN s3.sampleOrders so3 JOIN so3.order o3 JOIN o3.encounter e3 JOIN e3.form f3 WHERE f3.uuid = :formUuid) ";
+			}
 		}
 		
-		if (formUuid != null && !formUuid.isEmpty()) {
-			whereClause += " AND (f.uuid IS NULL OR f.uuid != :formUuid) ";
+		if (fulfillerStatus != null && !fulfillerStatus.isEmpty()) {
+			whereClause += " AND o.fulfillerStatus = :fulfillerStatus ";
 		}
 		
 		if (q != null && !q.isEmpty()) {
@@ -486,8 +490,6 @@ public class SampleDAO extends BaseDAO<Sample> {
 		this.setExtendedParameters(countQuery, orderTypeUuid, q, startDate, endDate, fulfillerStatus, formUuid);
 		Long totalCount = (Long) countQuery.uniqueResult();
 		
-		System.out.println(countHql);
-		
 		if (totalCount == null || totalCount == 0) {
 			if (pager != null)
 				pager.setTotal(0);
@@ -498,7 +500,6 @@ public class SampleDAO extends BaseDAO<Sample> {
 		        + " ORDER BY MIN(CASE WHEN o.urgency = :statUrgency THEN 0 ELSE 1 END) ASC, s.dateCreated DESC";
 		
 		Query idQuery = session.createQuery(idHql);
-		
 		this.setExtendedParameters(idQuery, orderTypeUuid, q, startDate, endDate, fulfillerStatus, formUuid);
 		idQuery.setParameter("statUrgency", org.openmrs.Order.Urgency.STAT);
 		
@@ -525,7 +526,7 @@ public class SampleDAO extends BaseDAO<Sample> {
 		
 		Query dataQuery = session.createQuery(dataHql);
 		dataQuery.setParameterList("ids", ids);
-		dataQuery.setParameter("statUrgency", Order.Urgency.STAT);
+		dataQuery.setParameter("statUrgency", org.openmrs.Order.Urgency.STAT);
 		
 		listResults.setResults(dataQuery.list());
 		return listResults;

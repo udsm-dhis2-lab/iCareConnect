@@ -193,9 +193,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	@Override
 	public ListResult<Sample> getSamplesByOrderType(Date startDate, Date endDate, Pager pager, String orderTypeUuid,
-	        Boolean haveThisOrderType, String q, String fulfillerStatus, String formUuid) {
+	        Boolean haveThisOrderType, String q, String fulfillerStatus, String formUuid, Boolean haveThisForm) {
 		return this.sampleDAO.getSamplesByOrderType(startDate, endDate, pager, orderTypeUuid, haveThisOrderType, q,
-		    fulfillerStatus, formUuid);
+		    fulfillerStatus, formUuid, haveThisForm);
 	}
 	
 	@Override
