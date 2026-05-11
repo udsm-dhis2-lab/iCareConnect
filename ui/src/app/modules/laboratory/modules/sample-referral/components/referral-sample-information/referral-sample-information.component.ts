@@ -76,6 +76,7 @@ export class ReferralSampleInformationComponent {
   async onSaveSampleInformation(formData: any){
     this.selectedSamples = formData?.samples;
     this.formValues = formData?.formValues;
+    
     this.loading = true
     const sampleEncounterMap = await this.saveEncounters();
     const sampleOrdersMap = await this.saveOrders(sampleEncounterMap);
