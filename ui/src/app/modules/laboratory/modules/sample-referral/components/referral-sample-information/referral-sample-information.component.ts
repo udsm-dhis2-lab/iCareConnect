@@ -83,9 +83,6 @@ export class ReferralSampleInformationComponent {
     const obsSaved = await this.saveObservations(sampleEncounterMap);
     const sampleOrders = await this.saveSampleOrders(sampleOrdersMap);
 
-    console.log("Sample Orders: ", sampleOrders)
-    console.log("Observations: ", obsSaved )
-
     if(obsSaved && sampleOrders) {
       this.loading = false;
       this.stepComplete.emit()

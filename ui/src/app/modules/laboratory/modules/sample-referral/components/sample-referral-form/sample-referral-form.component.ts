@@ -22,6 +22,9 @@ export class SampleReferralFormComponent {
   
   @Input() formId?: string;
   @Input() saveButtonText?: string;
+  @Input() haveThisForm: boolean = false;
+  @Input() withOrderType: boolean = false;
+  @Input() combineWithOr: boolean = false;
 
   @Output() saveForm = new EventEmitter<any>();
 
@@ -78,10 +81,10 @@ export class SampleReferralFormComponent {
            paging: true,
            page: this.page,
            pageSize: this.pageSize,
-           haveThisOrderType: false,
+           haveThisOrderType: this.withOrderType,
            formUuid: this.formId,
-           haveThisForm: false,
-           combineWithOr: true,
+           haveThisForm: this.haveThisForm,
+           combineWithOr: this.combineWithOr,
            q: this.searchText
          }).subscribe({
           next: (response: any) => {

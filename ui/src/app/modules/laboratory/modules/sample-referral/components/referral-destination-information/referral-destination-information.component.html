@@ -4,6 +4,11 @@
     currentUser: currentUser$ | async
 }; as params){
 
-<app-sample-referral-form [formId]="formId" [saveButtonText]="'Save Destination Information'"
+<app-sample-referral-form 
+    [formId]="formId"
+    [haveThisForm]="false"
+    [withOrderType]="true"
+    [combineWithOr]="false"
+    [saveButtonText]="'Save Destination Information'"
     (saveForm)="onSaveDestinationInformation($event)"></app-sample-referral-form>
 }

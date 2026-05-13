@@ -70,6 +70,15 @@ export class OrdersService {
       catchError((error) => of(error))
     );
   }
+  
+  updateOrderFulfillerStatus(orderUuid, statusInfo: any): Observable<any> {
+    return this.openMRSHttpClient.put(`order/${orderUuid}/fulfillerstatus`, statusInfo).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
+  }
 
   getOrdersByVisitAndOrderType({ visit, orderType }): Observable<any> {
     return this.openMRSHttpClient
