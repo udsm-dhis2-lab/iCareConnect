@@ -1,0 +1,118 @@
+<div class="dialog-shell dialog-shell--wide">
+  <div class="dialog-header">
+    <div>
+      <p class="dialog-kicker">Storage preview</p>
+      <h2>{{ title }}</h2>
+      <p class="dialog-description">
+        Review how child locations and final sample positions are arranged before the storage area is used operationally.
+      </p>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="dialog-content">
+    <div class="preview-summary-card">
+      <div>
+        <p class="summary-label">Location path</p>
+        <strong>{{ data.location.pathLabel || data.location.name }}</strong>
+      </div>
+      <div>
+        <p class="summary-label">Grid definition</p>
+        <strong>{{ rowsCount }} × {{ columnsCount }}<ng-container *ngIf="layerOptions.length > 1"> × {{ layerOptions.length }}</ng-container></strong>
+      </div>
+      <div>
+        <p class="summary-label">Prepared positions</p>
+        <strong>{{ positionCount }}</strong>
+      </div>
+      <div>
+        <p class="summary-label">Pattern</p>
+        <strong>{{ data.location.slotPattern || '${row}${column}' }}</strong>
+      </div>
+    </div>
+
+    <div class="dialog-inline-note" *ngIf="loadError">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ loadError }}</span>
+    </div>
+
+    <mat-tab-group animationDuration="0ms">
+      <mat-tab label="Layout preview">
+        <div class="tab-panel">
+          <div class="preview-toolbar" *ngIf="layerOptions.length > 1">
+            <span class="preview-toolbar__label">Layer</span>
+            <div class="layer-chips">
+              <button
+                *ngFor="let layer of layerOptions"
+                mat-stroked-button
+                type="button"
+                [color]="selectedLayer === layer ? 'primary' : undefined"
+                (click)="selectedLayerControl.setValue(layer)"
+              >
+                Layer {{ layer }}
+              </button>
+            </div>
+          </div>
+
+          <div class="state-block" *ngIf="loading">
+            <mat-spinner diameter="32"></mat-spinner>
+            <p>Loading prepared positions...</p>
+          </div>
+
+          <div class="layout-grid-shell" *ngIf="!loading && hasGridDefinition">
+            <div class="layout-grid" [style.gridTemplateColumns]="'72px repeat(' + columnsCount + ', minmax(96px, 1fr))'">
+              <div class="grid-header-corner"></div>
+              <div class="grid-column-header" *ngFor="let cell of columnHeaderCells">{{ cell.column }}</div>
+
+              <ng-container *ngFor="let row of rowIndexes">
+                <div class="grid-row-header">{{ previewCells[row * columnsCount]?.rowLabel }}</div>
+                <div class="grid-cell" *ngFor="let cell of previewCells | slice:(row * columnsCount):((row + 1) * columnsCount)">
+                  <div class="grid-cell__label">{{ cell.expectedLabel }}</div>
+                  <div class="grid-cell__meta" [class.grid-cell__meta--ready]="!!cell.slot">
+                    {{ cell.slot ? 'Prepared' : 'Draft position' }}
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <div class="empty-state" *ngIf="!loading && !hasGridDefinition">
+            <mat-icon>grid_view</mat-icon>
+            <h3>No grid definition found</h3>
+            <p>Rows, columns, or layers have not been set on this location yet.</p>
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Child locations">
+        <div class="tab-panel">
+          <div class="state-block" *ngIf="loading">
+            <mat-spinner diameter="32"></mat-spinner>
+            <p>Loading child locations...</p>
+          </div>
+
+          <div class="children-list" *ngIf="!loading && directChildren.length > 0">
+            <div class="children-list__item" *ngFor="let child of directChildren">
+              <div>
+                <div class="cell-primary">{{ child.name }}</div>
+                <div class="cell-secondary">{{ child.code }} · {{ child.locationType?.name || 'Location' }}</div>
+                <div class="cell-secondary" *ngIf="child.pathLabel">{{ child.pathLabel }}</div>
+              </div>
+              <span class="child-badge" [class.child-badge--slot]="child.slot">{{ child.slot ? 'Final position' : 'Child location' }}</span>
+            </div>
+          </div>
+
+          <div class="empty-state" *ngIf="!loading && directChildren.length === 0">
+            <mat-icon>account_tree</mat-icon>
+            <h3>No child locations yet</h3>
+            <p>Create child locations or prepare positions to see them here.</p>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <div class="dialog-actions dialog-actions--sticky">
+    <button mat-stroked-button type="button" (click)="close()">Close</button>
+  </div>
+</div>

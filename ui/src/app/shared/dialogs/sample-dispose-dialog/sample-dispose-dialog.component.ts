@@ -1,7 +1,6 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
-import { forkJoin } from "rxjs";
 import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
 
 @Component({
@@ -10,14 +9,18 @@ import { SamplesService } from "src/app/modules/laboratory/resources/services/sa
   styleUrls: ["./sample-dispose-dialog.component.scss"],
 })
 export class SampleDisposeDialogComponent implements OnInit {
-  form: FormGroup;
-  storageTypes: any[] = [];
-  storages: any[] = [];
-  filteredStorages: any[] = [];
-  loadingMetadata = false;
+  readonly form: FormGroup = this.formBuilder.group({
+    disposalMethod: ["Autoclaved", Validators.required],
+    disposalReason: ["", Validators.required],
+    remarks: [""],
+  });
+
   saving = false;
+  loadingSummary = false;
   errorMessage: string | null = null;
-  disposalMethods: string[] = [
+  storageSummary: any = null;
+
+  readonly disposalMethods: string[] = [
     "Autoclaved",
     "Incinerated",
     "Discarded",
@@ -27,54 +30,26 @@ export class SampleDisposeDialogComponent implements OnInit {
   ];
 
   constructor(
-    private formBuilder: FormBuilder,
-    private samplesService: SamplesService,
-    private dialogRef: MatDialogRef<SampleDisposeDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { sample: any; LISConfigurations?: any },
-  ) {
-    this.form = this.formBuilder.group({
-      storageTypeUuid: [null],
-      storageUuid: [null],
-      timestamp: [this.getDefaultDateTimeValue(), Validators.required],
-      method: ["Autoclaved", Validators.required],
-      reason: ["", Validators.required],
-      comments: [""],
-    });
-  }
+    private readonly formBuilder: FormBuilder,
+    private readonly samplesService: SamplesService,
+    private readonly dialogRef: MatDialogRef<SampleDisposeDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public readonly data: { sample: any; LISConfigurations?: any },
+  ) {}
 
   ngOnInit(): void {
-    this.loadStorageMetadata();
-
-    this.form.get("storageTypeUuid")?.valueChanges.subscribe((storageTypeUuid) => {
-      this.filteredStorages = (this.storages || []).filter(
-        (storage) => storage?.storageType?.uuid === storageTypeUuid
-      );
-
-      const currentStorageUuid = this.form.get("storageUuid")?.value;
-      const hasCurrentSelection = this.filteredStorages.some(
-        (storage) => storage?.uuid === currentStorageUuid
-      );
-
-      if (!hasCurrentSelection) {
-        this.form.get("storageUuid")?.setValue(null);
-      }
-    });
+    this.loadStorageSummary();
   }
 
   get sample(): any {
     return this.data?.sample;
   }
 
-  get selectedStorageType(): any {
-    return (this.storageTypes || []).find(
-      (storageType) => storageType?.uuid === this.form.get("storageTypeUuid")?.value
-    );
+  get currentOccupancy(): any {
+    return this.storageSummary?.currentOccupancy || null;
   }
 
-  get selectedStorage(): any {
-    return (this.filteredStorages || []).find(
-      (storage) => storage?.uuid === this.form.get("storageUuid")?.value
-    );
+  get summaryPath(): string {
+    return this.currentOccupancy?.fullAddress || this.currentOccupancy?.slotLocation?.pathLabel || "Not currently stored";
   }
 
   close(): void {
@@ -84,7 +59,7 @@ export class SampleDisposeDialogComponent implements OnInit {
   }
 
   save(): void {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.saving) {
       this.form.markAllAsTouched();
       return;
     }
@@ -93,22 +68,16 @@ export class SampleDisposeDialogComponent implements OnInit {
     this.saving = true;
 
     this.samplesService
-      .saveSampleDisposalStatus({
+      .disposeSample({
         sampleUuid: this.sample?.uuid,
-        storageType: this.selectedStorageType,
-        storage: this.selectedStorage,
-        method: this.form.get("method")?.value,
-        reason: this.form.get("reason")?.value,
-        comments: this.form.get("comments")?.value,
-        timestamp: this.form.get("timestamp")?.value,
+        disposalMethod: this.form.get("disposalMethod")?.value,
+        disposalReason: this.form.get("disposalReason")?.value,
+        remarks: this.form.get("remarks")?.value || null,
       })
       .subscribe({
         next: (response) => {
           this.saving = false;
-          this.dialogRef.close({
-            saved: true,
-            response,
-          });
+          this.dialogRef.close({ saved: true, response, action: "disposed" });
         },
         error: (error) => {
           this.saving = false;
@@ -117,31 +86,18 @@ export class SampleDisposeDialogComponent implements OnInit {
       });
   }
 
-  private loadStorageMetadata(): void {
-    this.loadingMetadata = true;
+  private loadStorageSummary(): void {
+    this.loadingSummary = true;
+    this.errorMessage = null;
 
-    forkJoin({
-      storageTypesResponse: this.samplesService.getStorageTypes({
-        page: 1,
-        pageSize: 200,
-      }),
-      storagesResponse: this.samplesService.getStorages({
-        page: 1,
-        pageSize: 500,
-      }),
-    }).subscribe({
-      next: ({ storageTypesResponse, storagesResponse }) => {
-        this.storageTypes = storageTypesResponse?.storageTypes || [];
-        this.storages = storagesResponse?.storages || [];
-        this.filteredStorages = [];
-        this.loadingMetadata = false;
+    this.samplesService.getSampleStorageSummary(this.sample?.uuid).subscribe({
+      next: (response) => {
+        this.storageSummary = response;
+        this.loadingSummary = false;
       },
       error: (error) => {
-        this.loadingMetadata = false;
-        this.errorMessage = this.getErrorMessage(
-          error,
-          "Unable to load storage metadata for disposing the sample."
-        );
+        this.loadingSummary = false;
+        this.errorMessage = this.getErrorMessage(error, "Unable to load the current storage summary.");
       },
     });
   }
@@ -153,13 +109,5 @@ export class SampleDisposeDialogComponent implements OnInit {
       error?.message ||
       fallbackMessage
     );
-  }
-
-  private getDefaultDateTimeValue(): string {
-    const currentDate = new Date();
-    const timezoneOffset = currentDate.getTimezoneOffset() * 60000;
-    return new Date(currentDate.getTime() - timezoneOffset)
-      .toISOString()
-      .slice(0, 16);
   }
 }

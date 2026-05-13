@@ -5,18 +5,17 @@ import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.ListResult;
 import org.openmrs.module.icare.core.Pager;
 import org.openmrs.module.icare.core.dao.BaseDAO;
-import org.openmrs.module.icare.laboratory.models.StorageType;
+import org.openmrs.module.icare.laboratory.models.StorageLocationType;
 
-public class StorageTypeDAO extends BaseDAO<StorageType> {
+public class StorageLocationTypeDAO extends BaseDAO<StorageLocationType> {
 	
-	public ListResult<StorageType> getStorageTypes(Pager pager, String q) {
+	public ListResult<StorageLocationType> getStorageLocationTypes(Pager pager, String q) {
 		DbSession session = this.getSession();
-		String queryStr = "SELECT st FROM StorageType st WHERE (st.voided = false OR st.voided is null)";
+		String queryStr = "SELECT t FROM StorageLocationType t WHERE (t.voided = false OR t.voided is null)";
 		if (q != null && !q.trim().equals("")) {
-			queryStr += " AND lower(st.name) like lower(:q)";
+			queryStr += " AND (lower(t.name) like lower(:q) OR lower(t.code) like lower(:q))";
 		}
-		queryStr += " ORDER BY st.name ASC";
-		
+		queryStr += " ORDER BY coalesce(t.levelOrder, 9999) ASC, t.name ASC";
 		Query query = session.createQuery(queryStr);
 		if (q != null && !q.trim().equals("")) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
@@ -26,10 +25,9 @@ public class StorageTypeDAO extends BaseDAO<StorageType> {
 			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
 			query.setMaxResults(pager.getPageSize());
 		}
-		
-		ListResult<StorageType> listResults = new ListResult<StorageType>();
-		listResults.setPager(pager);
-		listResults.setResults(query.list());
-		return listResults;
+		ListResult<StorageLocationType> results = new ListResult<StorageLocationType>();
+		results.setPager(pager);
+		results.setResults(query.list());
+		return results;
 	}
 }

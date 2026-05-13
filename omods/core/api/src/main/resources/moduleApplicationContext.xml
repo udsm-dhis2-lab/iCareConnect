@@ -137,13 +137,38 @@
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
-                <property name="storageDAO" >
+                <property name="storageDAO">
                     <bean class="org.openmrs.module.icare.laboratory.dao.StorageDAO">
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>
-                <property name="storageTypeDAO" >
+
+                <property name="storageTypeDAO">
                     <bean class="org.openmrs.module.icare.laboratory.dao.StorageTypeDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="storageLocationTypeDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.StorageLocationTypeDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="storageLocationDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.StorageLocationDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="sampleStorageOccupancyDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.SampleStorageOccupancyDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="sampleDisposalRecordDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.SampleDisposalRecordDAO">
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>

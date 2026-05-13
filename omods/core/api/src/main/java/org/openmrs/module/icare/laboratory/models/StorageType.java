@@ -17,9 +17,9 @@ public class StorageType extends BaseOpenmrsData implements Serializable, JSONCo
 	@Id
 	@GeneratedValue()
 	@Column(name = "storage_type_id", unique = true, nullable = false)
-	private int id;
+	private Integer id;
 	
-	@Column(name = "name", length = 32)
+	@Column(name = "name", length = 64)
 	private String name;
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "storageType")
@@ -33,8 +33,7 @@ public class StorageType extends BaseOpenmrsData implements Serializable, JSONCo
 		if (storageTypeMap.get("uuid") != null && !storageTypeMap.get("uuid").toString().trim().equals("")) {
 			storageType.setUuid(storageTypeMap.get("uuid").toString());
 		}
-		if (storageTypeMap.get("id") != null && !storageTypeMap.get("id").toString().trim().equals("")
-		        && !"null".equalsIgnoreCase(storageTypeMap.get("id").toString().trim())) {
+		if (storageTypeMap.get("id") != null && !storageTypeMap.get("id").toString().trim().equals("")) {
 			storageType.setId(Integer.parseInt(storageTypeMap.get("id").toString()));
 		}
 		if (storageTypeMap.get("name") != null) {
@@ -46,9 +45,12 @@ public class StorageType extends BaseOpenmrsData implements Serializable, JSONCo
 	public Map<String, Object> toMap() {
 		Map<String, Object> storageTypeObject = new HashMap<String, Object>();
 		storageTypeObject.put("uuid", this.getUuid());
+		storageTypeObject.put("id", this.getId());
 		storageTypeObject.put("display", this.getName());
 		storageTypeObject.put("name", this.getName());
-		storageTypeObject.put("voided", this.getVoided());
+		if (this.getVoided() != null) {
+			storageTypeObject.put("voided", this.getVoided());
+		}
 		return storageTypeObject;
 	}
 	

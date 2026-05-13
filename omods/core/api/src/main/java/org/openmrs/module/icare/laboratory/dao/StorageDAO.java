@@ -11,8 +11,7 @@ public class StorageDAO extends BaseDAO<Storage> {
 	
 	public ListResult<Storage> getStorages(Pager pager, String q, String storageTypeUuid) {
 		DbSession session = this.getSession();
-		String queryStr = "SELECT s FROM Storage s LEFT JOIN s.storageType st WHERE (s.voided = false OR s.voided IS NULL)"
-		        + " AND (st.voided = false OR st.voided IS NULL)";
+		String queryStr = "SELECT s FROM Storage s LEFT JOIN s.storageType st WHERE (s.voided = false OR s.voided is null)";
 		if (storageTypeUuid != null && !storageTypeUuid.trim().equals("")) {
 			queryStr += " AND st.uuid = :storageTypeUuid";
 		}
@@ -20,6 +19,7 @@ public class StorageDAO extends BaseDAO<Storage> {
 			queryStr += " AND (lower(s.name) like lower(:q) OR lower(st.name) like lower(:q))";
 		}
 		queryStr += " ORDER BY s.name ASC";
+		
 		Query query = session.createQuery(queryStr);
 		if (storageTypeUuid != null && !storageTypeUuid.trim().equals("")) {
 			query.setParameter("storageTypeUuid", storageTypeUuid);
@@ -32,6 +32,7 @@ public class StorageDAO extends BaseDAO<Storage> {
 			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
 			query.setMaxResults(pager.getPageSize());
 		}
+		
 		ListResult<Storage> listResults = new ListResult<Storage>();
 		listResults.setPager(pager);
 		listResults.setResults(query.list());

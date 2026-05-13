@@ -1043,6 +1043,7 @@
 //   }
 // }
 
+
 import { Injectable } from "@angular/core";
 import { Observable, of, zip } from "rxjs";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
@@ -1064,7 +1065,7 @@ export class SamplesService {
   constructor(
     private httpClientService: OpenmrsHttpClientService,
     private api: Api,
-  ) { }
+  ) {}
 
   createSample(sample: any): Observable<SampleObject> {
     let ordersUuid: any = [];
@@ -1259,8 +1260,8 @@ export class SamplesService {
               comments:
                 matchedSample?.statuses && matchedSample?.statuses?.length > 0
                   ? getCommentsForAcceptanceOrRejectioon(
-                    matchedSample?.statuses,
-                  )
+                      matchedSample?.statuses,
+                    )
                   : null,
               user:
                 matchedSample?.statuses && matchedSample?.statuses?.length > 0
@@ -1308,86 +1309,86 @@ export class SamplesService {
         let collectedSamples: any[] = [];
         samples && samples?.length > 0
           ? _.each(samples, (sample: any) => {
-            this.api.concept
-              .getConcept(sample?.concept?.uuid)
-              .then((response: any) => {
-                if (response) {
-                  collectedSamples = [
-                    ...collectedSamples,
-                    {
-                      id: sample?.label,
-                      uuid: sample?.uuid,
-                      specimenSourceName: response?.name?.display,
-                      specimenSourceUuid: sample?.concept?.uuid,
-                      departmentName:
-                        keyedDepartmentsByTestOrder[
-                          sample?.orders[0]?.order?.concept?.uuid
-                        ]?.department?.name,
-                      departmentUuid:
-                        keyedDepartmentsByTestOrder[
-                          sample?.orders[0]?.order?.concept?.uuid
-                        ]?.department?.id,
-                      departmentSpecimentSource:
-                        keyedDepartmentsByTestOrder[
-                          sample?.orders[0]?.order?.concept?.uuid
-                        ]?.department?.id +
-                        "_" +
-                        sample?.concept?.uuid,
-                      mrNo: getmRN(sample?.patient),
-                      patient: sample?.patient,
-                      orders: _.map(sample?.orders, (order: any) => ({
-                        ...order?.order,
-                        paid: paidItems[order?.concept?.display]
-                          ? true
-                          : false,
-                        collected: true,
+              this.api.concept
+                .getConcept(sample?.concept?.uuid)
+                .then((response: any) => {
+                  if (response) {
+                    collectedSamples = [
+                      ...collectedSamples,
+                      {
+                        id: sample?.label,
+                        uuid: sample?.uuid,
+                        specimenSourceName: response?.name?.display,
+                        specimenSourceUuid: sample?.concept?.uuid,
+                        departmentName:
+                          keyedDepartmentsByTestOrder[
+                            sample?.orders[0]?.order?.concept?.uuid
+                          ]?.department?.name,
+                        departmentUuid:
+                          keyedDepartmentsByTestOrder[
+                            sample?.orders[0]?.order?.concept?.uuid
+                          ]?.department?.id,
+                        departmentSpecimentSource:
+                          keyedDepartmentsByTestOrder[
+                            sample?.orders[0]?.order?.concept?.uuid
+                          ]?.department?.id +
+                          "_" +
+                          sample?.concept?.uuid,
+                        mrNo: getmRN(sample?.patient),
+                        patient: sample?.patient,
+                        orders: _.map(sample?.orders, (order: any) => ({
+                          ...order?.order,
+                          paid: paidItems[order?.concept?.display]
+                            ? true
+                            : false,
+                          collected: true,
+                          isAdmitted,
+                          technician: order?.technician,
+                          sample: order?.sample,
+                          testAllocations: order?.testAllocations,
+                        })),
                         isAdmitted,
-                        technician: order?.technician,
-                        sample: order?.sample,
-                        testAllocations: order?.testAllocations,
-                      })),
-                      isAdmitted,
-                      collected: true,
-                      priority: sample.priority ? "HIGH" : "None",
-                      allocation: sample?.testsAllocation,
-                      status:
-                        sample?.statuses && sample?.statuses?.length > 0
-                          ? getRejectOrAcceptStatus(sample?.statuses)
-                          : null,
-                      comments:
-                        sample?.statuses && sample?.statuses?.length > 0
-                          ? getCommentsForAcceptanceOrRejectioon(
-                            sample?.statuses,
-                          )
-                          : null,
-                      user:
-                        sample?.statuses && sample?.statuses?.length > 0
-                          ? getUserRejectedOrAccepted(sample?.statuses)
-                          : null,
-                    },
-                  ];
-                  observer.next([
-                    ...(allSamples?.filter(
-                      (sampleInfo: any) =>
-                        (
-                          sampleInfo?.orders?.filter(
-                            (order: any) => !collectedOrders[order?.uuid],
-                          ) || []
-                        ).length > 0,
-                    ) || []),
-                    ...collectedSamples,
-                  ]);
-                }
-              });
-          })
+                        collected: true,
+                        priority: sample.priority ? "HIGH" : "None",
+                        allocation: sample?.testsAllocation,
+                        status:
+                          sample?.statuses && sample?.statuses?.length > 0
+                            ? getRejectOrAcceptStatus(sample?.statuses)
+                            : null,
+                        comments:
+                          sample?.statuses && sample?.statuses?.length > 0
+                            ? getCommentsForAcceptanceOrRejectioon(
+                                sample?.statuses,
+                              )
+                            : null,
+                        user:
+                          sample?.statuses && sample?.statuses?.length > 0
+                            ? getUserRejectedOrAccepted(sample?.statuses)
+                            : null,
+                      },
+                    ];
+                    observer.next([
+                      ...(allSamples?.filter(
+                        (sampleInfo: any) =>
+                          (
+                            sampleInfo?.orders?.filter(
+                              (order: any) => !collectedOrders[order?.uuid],
+                            ) || []
+                          ).length > 0,
+                      ) || []),
+                      ...collectedSamples,
+                    ]);
+                  }
+                });
+            })
           : observer.next(
-            groupTestsBySpecimenSource(
-              orderedLabOrders,
-              specimenSources,
-              labDepartments,
-              patient,
-            ),
-          );
+              groupTestsBySpecimenSource(
+                orderedLabOrders,
+                specimenSources,
+                labDepartments,
+                patient,
+              ),
+            );
 
         function getRejectOrAcceptStatus(statusesInfo: any[]) {
           let status = "";
@@ -1487,8 +1488,8 @@ export class SamplesService {
           startDate && endDate && category.length > 0
             ? `&startDate=${startDate}&endDate=${endDate}`
             : startDate && endDate && category.length === 0
-              ? `?startDate=${startDate}&endDate=${endDate}`
-              : "";
+            ? `?startDate=${startDate}&endDate=${endDate}`
+            : "";
         return this.httpClientService
           .get(`lab/samples${category}${dates}`)
           .pipe(
@@ -1607,8 +1608,8 @@ export class SamplesService {
       storageType: payload?.storageType?.uuid
         ? { uuid: payload.storageType.uuid }
         : payload?.storageType?.id
-          ? { id: payload.storageType.id }
-          : null,
+        ? { id: payload.storageType.id }
+        : null,
     };
 
     if (payload?.uuid) {
@@ -1617,7 +1618,9 @@ export class SamplesService {
       requestBody.id = payload.id;
     }
 
-    const endpoint = payload?.uuid ? `lab/storage/${payload.uuid}` : "lab/storage";
+    const endpoint = payload?.uuid
+      ? `lab/storage/${payload.uuid}`
+      : "lab/storage";
 
     return this.httpClientService
       .post(endpoint, requestBody)
@@ -1631,15 +1634,155 @@ export class SamplesService {
       .pipe(map((response: any) => response));
   }
 
+  saveStorageLocationType(payload: {
+    uuid?: string | null;
+    id?: number | null;
+    code: string;
+    name: string;
+    description?: string | null;
+    levelOrder?: number | null;
+    structural?: boolean | null;
+    slotBearing?: boolean | null;
+    metadataJson?: string | null;
+  }): Observable<any> {
+    const requestBody: any = {
+      code: (payload?.code || "").trim(),
+      name: (payload?.name || "").trim(),
+      description: payload?.description || null,
+      levelOrder: payload?.levelOrder ?? null,
+      structural: payload?.structural ?? false,
+      slotBearing: payload?.slotBearing ?? false,
+      metadataJson: payload?.metadataJson || null,
+    };
+
+    if (payload?.uuid) {
+      requestBody.uuid = payload.uuid;
+    } else if (payload?.id) {
+      requestBody.id = payload.id;
+    }
+
+    const endpoint = payload?.uuid
+      ? `lab/storage-location-type/${payload.uuid}`
+      : "lab/storage-location-type";
+
+    return this.httpClientService
+      .post(endpoint, requestBody)
+      .pipe(map((response: any) => response));
+  }
+
+  deleteStorageLocationType(uuid: string, reason?: string): Observable<any> {
+    const query = this.buildQueryString({ reason });
+    return (this.httpClientService as any)
+      .delete(`lab/storage-location-type/${uuid}${query}`)
+      .pipe(map((response: any) => response));
+  }
+
+  saveStorageLocation(payload: {
+    uuid?: string | null;
+    id?: number | null;
+    code: string;
+    name: string;
+    locationType: { uuid?: string | null; id?: number | null };
+    parentLocation?: { uuid?: string | null; id?: number | null } | null;
+    barcode?: string | null;
+    rowsCount?: number | null;
+    columnsCount?: number | null;
+    layersCount?: number | null;
+    slotPattern?: string | null;
+    slotSeparator?: string | null;
+    slot?: boolean | null;
+    storageConditionType?: string | null;
+    minTemperature?: number | null;
+    maxTemperature?: number | null;
+    capacity?: number | null;
+    metadataJson?: string | null;
+  }): Observable<any> {
+    const requestBody: any = {
+      code: (payload?.code || "").trim(),
+      name: (payload?.name || "").trim(),
+      locationType: payload?.locationType?.uuid
+        ? { uuid: payload.locationType.uuid }
+        : payload?.locationType?.id
+        ? { id: payload.locationType.id }
+        : null,
+      barcode: payload?.barcode || null,
+      rowsCount: payload?.rowsCount ?? null,
+      columnsCount: payload?.columnsCount ?? null,
+      layersCount: payload?.layersCount ?? null,
+      slotPattern: payload?.slotPattern || null,
+      slotSeparator: payload?.slotSeparator || null,
+      slot: payload?.slot ?? null,
+      storageConditionType: payload?.storageConditionType || null,
+      minTemperature: payload?.minTemperature ?? null,
+      maxTemperature: payload?.maxTemperature ?? null,
+      capacity: payload?.capacity ?? null,
+      metadataJson: payload?.metadataJson || null,
+    };
+
+    if (payload?.parentLocation?.uuid) {
+      requestBody.parentLocation = { uuid: payload.parentLocation.uuid };
+    } else if (payload?.parentLocation?.id) {
+      requestBody.parentLocation = { id: payload.parentLocation.id };
+    }
+
+    if (payload?.uuid) {
+      requestBody.uuid = payload.uuid;
+    } else if (payload?.id) {
+      requestBody.id = payload.id;
+    }
+
+    const endpoint = payload?.uuid
+      ? `lab/storage-location/${payload.uuid}`
+      : "lab/storage-location";
+
+    return this.httpClientService
+      .post(endpoint, requestBody)
+      .pipe(map((response: any) => response));
+  }
+
+  deleteStorageLocation(uuid: string, reason?: string): Observable<any> {
+    const query = this.buildQueryString({ reason });
+    return (this.httpClientService as any)
+      .delete(`lab/storage-location/${uuid}${query}`)
+      .pipe(map((response: any) => response));
+  }
+
+  generateStorageLocationSlots(
+    uuid: string,
+    payload?: {
+      rowsCount?: number | null;
+      columnsCount?: number | null;
+      layersCount?: number | null;
+      slotPattern?: string | null;
+    },
+  ): Observable<any> {
+    return this.httpClientService
+      .post(`lab/storage-location/${uuid}/generate-slots`, {
+        rowsCount: payload?.rowsCount ?? null,
+        columnsCount: payload?.columnsCount ?? null,
+        layersCount: payload?.layersCount ?? null,
+        slotPattern: payload?.slotPattern || null,
+      })
+      .pipe(map((response: any) => response));
+  }
+
   saveSampleStorageStatus(payload: {
     sampleUuid: string;
-    storageType?: { uuid?: string | null; name?: string | null; display?: string | null } | null;
+    storageType?: {
+      uuid?: string | null;
+      name?: string | null;
+      display?: string | null;
+    } | null;
     storage?: {
       uuid?: string | null;
       name?: string | null;
       display?: string | null;
       capacity?: number | null;
-      storageType?: { uuid?: string | null; name?: string | null; display?: string | null } | null;
+      storageType?: {
+        uuid?: string | null;
+        name?: string | null;
+        display?: string | null;
+      } | null;
     } | null;
     comments?: string | null;
     timestamp?: string | Date | null;
@@ -1664,13 +1807,21 @@ export class SamplesService {
 
   saveSampleDisposalStatus(payload: {
     sampleUuid: string;
-    storageType?: { uuid?: string | null; name?: string | null; display?: string | null } | null;
+    storageType?: {
+      uuid?: string | null;
+      name?: string | null;
+      display?: string | null;
+    } | null;
     storage?: {
       uuid?: string | null;
       name?: string | null;
       display?: string | null;
       capacity?: number | null;
-      storageType?: { uuid?: string | null; name?: string | null; display?: string | null } | null;
+      storageType?: {
+        uuid?: string | null;
+        name?: string | null;
+        display?: string | null;
+      } | null;
     } | null;
     method?: string | null;
     reason?: string | null;
@@ -1695,7 +1846,10 @@ export class SamplesService {
       .pipe(map((response: any) => response));
   }
 
-  private buildSampleLifecycleRemarks(action: "storage" | "dispose", payload: any): string {
+  private buildSampleLifecycleRemarks(
+    action: "storage" | "dispose",
+    payload: any,
+  ): string {
     const storageTypeName =
       payload?.storageType?.name ||
       payload?.storageType?.display ||
@@ -1703,15 +1857,19 @@ export class SamplesService {
       payload?.storage?.storageType?.display ||
       "";
 
-    const storageName = payload?.storage?.name || payload?.storage?.display || "";
+    const storageName =
+      payload?.storage?.name || payload?.storage?.display || "";
 
     const tokens = [
       `action=${action}`,
-      payload?.storageType?.uuid ? `storageTypeUuid=${payload.storageType.uuid}` : "",
+      payload?.storageType?.uuid
+        ? `storageTypeUuid=${payload.storageType.uuid}`
+        : "",
       storageTypeName ? `storageTypeName=${storageTypeName}` : "",
       payload?.storage?.uuid ? `storageUuid=${payload.storage.uuid}` : "",
       storageName ? `storageName=${storageName}` : "",
-      payload?.storage?.capacity !== undefined && payload?.storage?.capacity !== null
+      payload?.storage?.capacity !== undefined &&
+      payload?.storage?.capacity !== null
         ? `storageCapacity=${payload.storage.capacity}`
         : "",
       payload?.method ? `method=${payload.method}` : "",
@@ -1719,10 +1877,16 @@ export class SamplesService {
       payload?.comments ? `comments=${payload.comments}` : "",
     ].filter((token: string) => token && token.trim() !== "");
 
-    return tokens.length > 0 ? tokens.join("; ") : action === "storage" ? "Sample stored" : "Sample disposed";
+    return tokens.length > 0
+      ? tokens.join("; ")
+      : action === "storage"
+      ? "Sample stored"
+      : "Sample disposed";
   }
 
-  private formatSampleStatusTimestamp(value?: string | Date | null): string | null {
+  private formatSampleStatusTimestamp(
+    value?: string | Date | null,
+  ): string | null {
     if (!value) {
       return null;
     }
@@ -1758,5 +1922,128 @@ export class SamplesService {
       .join("&");
 
     return query ? `?${query}` : "";
+  }
+
+  getStorageLocationTypes(params?: {
+    page?: number;
+    pageSize?: number;
+    q?: string;
+  }): Observable<any> {
+    const query = this.buildQueryString({
+      paging: true,
+      page: params?.page ?? 1,
+      pageSize: params?.pageSize ?? 50,
+      q: params?.q,
+    });
+
+    return this.httpClientService
+      .get(`lab/storage-location-types${query}`)
+      .pipe(
+        map((response: any) => ({
+          pager: response?.pager || null,
+          storageLocationTypes:
+            response?.storageLocationTypes || response || [],
+        })),
+      );
+  }
+
+  getStorageLocations(params?: {
+    page?: number;
+    pageSize?: number;
+    q?: string;
+    parentLocationUuid?: string | null;
+    locationTypeUuid?: string | null;
+    slotOnly?: boolean | null;
+  }): Observable<any> {
+    const query = this.buildQueryString({
+      paging: true,
+      page: params?.page ?? 1,
+      pageSize: params?.pageSize ?? 50,
+      q: params?.q,
+      parentLocationUuid: params?.parentLocationUuid,
+      locationTypeUuid: params?.locationTypeUuid,
+      slotOnly: params?.slotOnly,
+    });
+
+    return this.httpClientService.get(`lab/storage-locations${query}`).pipe(
+      map((response: any) => ({
+        pager: response?.pager || null,
+        storageLocations: response?.storageLocations || response || [],
+      })),
+    );
+  }
+
+  storeSample(payload: {
+    sampleUuid: string;
+    slotLocationUuid: string;
+    occupancyType?: string | null;
+    quantityStored?: number | null;
+    quantityUnit?: string | null;
+    remarks?: string | null;
+  }): Observable<any> {
+    return this.httpClientService
+      .post("lab/sample-storage/store", {
+        sampleUuid: payload?.sampleUuid,
+        slotLocationUuid: payload?.slotLocationUuid,
+        occupancyType: payload?.occupancyType || null,
+        quantityStored: payload?.quantityStored ?? null,
+        quantityUnit: payload?.quantityUnit || null,
+        remarks: payload?.remarks || null,
+      })
+      .pipe(map((response: any) => response));
+  }
+
+  moveStoredSample(payload: {
+    sampleUuid: string;
+    slotLocationUuid: string;
+    remarks?: string | null;
+  }): Observable<any> {
+    return this.httpClientService
+      .post("lab/sample-storage/move", {
+        sampleUuid: payload?.sampleUuid,
+        slotLocationUuid: payload?.slotLocationUuid,
+        remarks: payload?.remarks || null,
+      })
+      .pipe(map((response: any) => response));
+  }
+
+  releaseStoredSample(payload: {
+    sampleUuid: string;
+    releaseReason?: string | null;
+  }): Observable<any> {
+    return this.httpClientService
+      .post("lab/sample-storage/release", {
+        sampleUuid: payload?.sampleUuid,
+        releaseReason: payload?.releaseReason || null,
+      })
+      .pipe(map((response: any) => response));
+  }
+
+  disposeSample(payload: {
+    sampleUuid: string;
+    disposalMethod: string;
+    disposalReason: string;
+    remarks?: string | null;
+  }): Observable<any> {
+    return this.httpClientService
+      .post("lab/sample-disposal/dispose", {
+        sampleUuid: payload?.sampleUuid,
+        disposalMethod: payload?.disposalMethod,
+        disposalReason: payload?.disposalReason,
+        remarks: payload?.remarks || null,
+      })
+      .pipe(map((response: any) => response));
+  }
+
+  getSampleStorageSummary(sampleUuid: string): Observable<any> {
+    return this.httpClientService
+      .get(`lab/sample-storage/sample/${sampleUuid}`)
+      .pipe(map((response: any) => response));
+  }
+
+  getSlotOccupancySummary(slotLocationUuid: string): Observable<any> {
+    return this.httpClientService
+      .get(`lab/sample-storage/slot/${slotLocationUuid}`)
+      .pipe(map((response: any) => response));
   }
 }
