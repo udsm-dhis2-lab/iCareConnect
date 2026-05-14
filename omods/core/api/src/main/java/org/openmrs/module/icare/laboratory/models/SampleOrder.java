@@ -6,6 +6,8 @@ import org.openmrs.*;
 import org.openmrs.api.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.icare.ICareConfig;
+import org.openmrs.module.icare.Utils.SafeTypeCast;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
@@ -80,25 +82,29 @@ public class SampleOrder implements Serializable {
 		
 	}
 	
-	public Map<String, Object> toMap(Boolean includeAllocations) throws Exception {
+	public Map<String, Object> toMap(Object... params ) throws Exception {
 		Map<String, Object> sampleOrderObject = new HashMap<String, Object>();
-		
+
 		Map<String, Object> technicianObject = new HashMap<String, Object>();
-		
+
+		boolean includeAllocations = (params.length > 0 && params[0] != null) ? SafeTypeCast.orDefault(params[0], Boolean.class, false) : false;
+
+		boolean includeOrderEncounter = (params.length > 1 && params[1] != null) ? SafeTypeCast.orDefault(params[1], Boolean.class, false) : false;
+
 		if (this.getTechnician() != null) {
-			
+
 			technicianObject.put("uuid", this.getTechnician().getUuid());
 			technicianObject.put("display", this.getTechnician().getDisplayString());
-			
+
 			sampleOrderObject.put("technician", technicianObject);
 		}
-		
+
 		Map<String, Object> sampleObject = new HashMap<String, Object>();
 		sampleObject.put("uuid", this.getSample().getUuid());
 		sampleObject.put("label", this.getSample().getLabel());
-		
+
 		sampleOrderObject.put("sample", sampleObject);
-		
+
 		Map<String, Object> orderObject = new HashMap<String, Object>();
 		orderObject.put("uuid", this.getOrder().getUuid());
 		orderObject.put("orderNumber", this.getOrder().getOrderNumber());
@@ -106,7 +112,7 @@ public class SampleOrder implements Serializable {
 		orderObject.put("voidReason", this.getOrder().getVoidReason());
 
 		orderObject.put("urgency", this.getOrder().getUrgency().toString());
-		
+
 		Map<String, Object> concept = new HashMap<String, Object>();
 		concept.put("uuid", this.getOrder().getConcept().getUuid());
 		concept.put("display", this.getOrder().getConcept().getDisplayString());
@@ -177,30 +183,51 @@ public class SampleOrder implements Serializable {
 			}
 
 		}
+
+		if(includeOrderEncounter){
+			Map<String, Object> encounter = new HashMap<>();
+			encounter.put("uuid", this.getOrder().getEncounter().getUuid());
+
+
+
+			if(this.getOrder().getEncounter().getForm() != null){
+				Map<String, Object> encounterForm = new HashMap<>();
+				encounterForm.put("uuid", this.getOrder().getEncounter().getForm().getUuid());
+				encounterForm.put("name", this.getOrder().getEncounter().getForm().getName());
+
+				encounter.put("form", encounterForm);
+			}
+
+			Map<String, Object> encounterType = new HashMap<>();
+			encounterType.put("uuid", this.getOrder().getEncounter().getEncounterType().getUuid());
+			encounterType.put("name", this.getOrder().getEncounter().getEncounterType().getName());
+			encounter.put("encounterType", encounterType);
+
+			orderObject.put("encounter", encounter);
+		}
+
 		orderObject.put("concept", concept);
-		
+
 		Map<String, Object> ordererObject = new HashMap<String, Object>();
 		ordererObject.put("uuid", this.getOrder().getOrderer().getUuid());
 		ordererObject.put("name", this.getOrder().getOrderer().getName());
 		orderObject.put("voided", this.getOrder().getVoided());
 		orderObject.put("voidReason", this.getOrder().getVoidReason());
 		orderObject.put("orderer", ordererObject);
-		
+
 //		Map<String, Object> conceptObject = new HashMap<String, Object>();
 //		conceptObject.put("uuid", this.getOrder().getConcept().getUuid());
 //		conceptObject.put("display", getOrder().getConcept().getDisplayString());
 //		orderObject.put("concept", conceptObject);
-		
+
 		if (this.getOrder() != null) {
 			if (this.getOrder().getConcept().getShortNameInLocale(new Locale("en")) != null) {
 				orderObject.put("shortName", this.getOrder().getConcept().getShortNameInLocale(new Locale("en")).getName());
 			}
 		}
-		
+
 		sampleOrderObject.put("order", orderObject);
-		System.out.println("Waiting to see if they'll be excluded. " + (includeAllocations));
 		if (includeAllocations) {
-			System.out.println("There are being included");
 			List<Map<String, Object>> testAllocations = new ArrayList<Map<String, Object>>();
 			for (TestAllocation testAllocation : this.getTestAllocations()) {
 				testAllocations.add(testAllocation.toMap());

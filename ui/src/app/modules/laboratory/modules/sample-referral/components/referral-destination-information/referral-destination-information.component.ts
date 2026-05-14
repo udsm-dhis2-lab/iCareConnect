@@ -11,6 +11,7 @@ import { SampleReferralService } from '../../services/referral-samples.service';
 import { Observable, zip } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { getCurrentUserDetails, getProviderDetails } from 'src/app/store/selectors/current-user.selectors';
+import { formatDateToString } from 'src/app/shared/helpers/format-date.helper';
 
 @Component({
   selector: 'app-referral-destination-information',
@@ -157,12 +158,16 @@ export class ReferralDestinationInformationComponent {
       const encounter = sampleToEncounterMap.get(sample?.uuid);
       
       return Object.values(this.formValues)?.map((formValue: any) => {
+        let value = formValue?.value;
+        if(value instanceof Date ){
+          value = formatDateToString(value, "YYYY-MM-DD hh:mm:ss")
+        }
         return {
           encounter: encounter,
           person: sample?.patient?.uuid,
           concept: formValue?.id,
           obsDatetime: new Date().toISOString(),
-          value: formValue?.value
+          value: value
         }
       })
     })

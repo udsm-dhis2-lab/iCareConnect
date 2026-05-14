@@ -277,6 +277,11 @@ public class StockInvoiceItem extends BaseOpenmrsData implements java.io.Seriali
 		return stockInvoiceItemObject;
 	}
 
+	@Override
+	public Map<String, Object> toMap(Object... params){
+		return toMap();
+	}
+
 	public static StockInvoiceItem fromMap(Map<String, Object> stockInvoiceItemMap) throws ParseException {
 
 		StockInvoiceItem stockInvoiceItem = new StockInvoiceItem();

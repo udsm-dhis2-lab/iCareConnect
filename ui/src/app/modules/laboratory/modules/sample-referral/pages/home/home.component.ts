@@ -21,6 +21,7 @@ import {
 } from "src/app/store/selectors/visits.selectors";
 import { ReferralSystemSettingsService } from "../../services/referral-system-settings.service";
 import { tap } from "rxjs/operators";
+import { SampleReferralService } from "../../services/referral-samples.service";
 
 @Component({
   selector: "app-home",
@@ -36,7 +37,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private systemSettingsService: SystemSettingsService,
-    private referralSystemSettingsService: ReferralSystemSettingsService
+    private referralSystemSettingsService: ReferralSystemSettingsService,
+    private sampleRefferalService: SampleReferralService
   ) {}
 
   ngOnInit(): void {
@@ -44,14 +46,13 @@ export class HomeComponent implements OnInit {
     this.LISConfigurations$ = this.store.select(getLISConfigurations);
     this.datesParameters$ = this.store.select(getVisitsParameters);
 
-    this.sampleReferralSettings$ = this.systemSettingsService.getSystemSettingsByKey("iCare.laboratory.sampleReferral.settings.referralForm").pipe(
-      tap((settings: any) => {
-        if (!settings) {
-          console.warn("No referral form settings found for sample referral module");
-        }
-        this.referralSystemSettingsService.referralSettings.set(settings);
-
-      })
-    );
+    this.sampleReferralSettings$ = this.sampleRefferalService.getReferralSettings().pipe(
+            tap((settings: any) => {
+                if (!settings) {
+                console.warn("No referral form settings found for sample referral module");
+                }
+                this.referralSystemSettingsService.referralSettings.set(settings);
+            })
+    )
   }
 }

@@ -12,6 +12,7 @@ import { EncountersService } from 'src/app/shared/services/encounters.service';
 import { ObservationService } from 'src/app/shared/resources/observation/services';
 import { SamplesService } from 'src/app/shared/services/samples.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { formatDateToString } from 'src/app/shared/helpers/format-date.helper';
 @Component({
   selector: 'app-referral-transport-information',
   templateUrl: './referral-transport-information.component.html',
@@ -72,8 +73,9 @@ export class ReferralTransportInformationComponent {
         const sampleOrdersMap = await this.saveOrders(sampleEncounterMap);
         const obsSaved = await this.saveObservations(sampleEncounterMap);
         const sampleOrders = await this.saveSampleOrders(sampleOrdersMap);
+        const ordersUpdated = await this.updateOrdersFulfillerStatus();
 
-        if(obsSaved && sampleOrders) {
+        if(ordersUpdated && obsSaved && sampleOrders) {
           this.loading = false;
           this.stepComplete.emit()
           return;
@@ -156,12 +158,16 @@ export class ReferralTransportInformationComponent {
           const encounter = sampleToEncounterMap.get(sample?.uuid);
           
           return Object.values(this.formValues)?.map((formValue: any) => {
+            let value = formValue?.value;
+            if(value instanceof Date ){
+              value = formatDateToString(value, "YYYY-MM-DD hh:mm:ss")
+            }
             return {
               encounter: encounter,
               person: sample?.patient?.uuid,
               concept: formValue?.id,
               obsDatetime: new Date().toISOString(),
-              value: formValue?.value
+              value: value
             }
           })
         })
@@ -187,12 +193,12 @@ export class ReferralTransportInformationComponent {
         return await zip(...sampleOrders?.map((sampleOrder) => this.sampleService.createSampleOrder(sampleOrder))).toPromise();
       }
 
-      async updateOrders(){
+      async updateOrdersFulfillerStatus(){
         const orderUpdateRequests = zip(
-          this.selectedSamples?.map((sample: any) => {
+          ...this.selectedSamples?.map((sample: any) => {
             const referralOrder = sample?.orders?.filter((order: any) => order?.order?.concept?.uuid === this.referralOrderConcept)?.[0]
 
-            return this.orderService.updateOrderFulfillerStatus(referralOrder?.uuid,
+            return this.orderService.updateOrderFulfillerStatus(referralOrder?.order?.uuid,
               {
                 fulfillerStatus: "COMPLETE",
                 fulfillerComment: "Referral has been sent."
@@ -200,5 +206,7 @@ export class ReferralTransportInformationComponent {
             )
           })
         )
+
+        return orderUpdateRequests.toPromise()
       }
 }

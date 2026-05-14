@@ -356,7 +356,7 @@ public class LaboratoryController {
 		ListResult<Sample> sampleResults = laboratoryService.getSamplesByOrderType(start, end, pager, orderType,
 		    haveThisOrderType, q, fulfillerStatus, formUuid, haveThisForm, combineWithOr);
 		
-		return sampleResults.toMap();
+		return sampleResults.toMap(true);
 	}
 	
 	@RequestMapping(value = "sampleaccept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)

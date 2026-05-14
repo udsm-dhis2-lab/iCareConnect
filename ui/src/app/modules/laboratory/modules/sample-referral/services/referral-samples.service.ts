@@ -1,5 +1,6 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { BASE_URL } from "src/app/shared/constants/constants.constants";
 
 @Injectable({
@@ -7,11 +8,12 @@ import { BASE_URL } from "src/app/shared/constants/constants.constants";
 })
 export class SampleReferralService {
     constructor(
-        private httpClient: HttpClient
+        private httpClient: HttpClient,
+        private systemSettingsService: SystemSettingsService
     ) {}
 
 
-     getSamplesByRefferalOrderType(orderTypeUuid: string, params: {
+    getSamplesByRefferalOrderType(orderTypeUuid: string, params: {
          paging: boolean;
          page?: number;
          pageSize?: number;
@@ -35,5 +37,9 @@ export class SampleReferralService {
             }
         });
         return this.httpClient.get(BASE_URL + `lab/order-type/${orderTypeUuid}/samples`, { params: parameters });
+    }
+
+    getReferralSettings(){
+        return this.systemSettingsService.getSystemSettingsByKey("iCare.laboratory.sampleReferral.settings.referralForm")
     }
 }

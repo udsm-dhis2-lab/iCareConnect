@@ -21,10 +21,12 @@ import { SamplesService } from "src/app/shared/services/samples.service";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import { VisitsService } from "../../resources/visits/services";
-import { map } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { webSocket } from "rxjs/webSocket";
 import { BarCodeModalComponent } from "src/app/shared/dialogs/bar-code-modal/bar-code-modal.component";
 import { formatDateToYYMMDD } from "../../helpers/format-date.helper";
+import { SampleReferralService } from "src/app/modules/laboratory/modules/sample-referral/services/referral-samples.service";
+import { ReferralSystemSettingsService } from "src/app/modules/laboratory/modules/sample-referral/services/referral-system-settings.service";
 
 @Component({
   selector: "app-shared-samples-list",
@@ -57,6 +59,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
   samples$: Observable<{ pager: any; results: any[] }>;
   labEquipments$: Observable<any[]>;
+  sampleReferralSettings$: Observable<any>;
 
   pageCounts: any[] = [1, 5, 10, 20, 25, 50, 100, 200];
 
@@ -90,6 +93,8 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     private visitsService: VisitsService,
     private cdr: ChangeDetectorRef,
     private snackBar: MatSnackBar,
+    private sampleReferralService: SampleReferralService,
+    private referralSystemSettingsService: ReferralSystemSettingsService,
   ) {}
 
   ngAfterViewInit(): void {
@@ -113,7 +118,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     this.cdr.detectChanges();
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.listType = !this.LISConfigurations?.isLIS ? "patients" : "samples";
     this.pageSize = this.tabType == "completed-samples" ? 200 : 100;
     this.sampleVisitParameters = {
@@ -123,6 +128,15 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
           ? "NOT ACCEPTED"
           : this.category,
     };
+
+    await this.sampleReferralService.getReferralSettings().pipe(
+      tap((settings: any) => {
+          if (!settings) {
+          console.warn("No referral form settings found for sample referral module");
+          }
+          this.referralSystemSettingsService.referralSettings.set(settings);
+      })
+    ).toPromise()
 
     this.searchingTestField = new Dropdown({
       id: "test",
@@ -329,6 +343,20 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
           ? JSON.parse(localStorage?.getItem("currentLocation"))?.uuid
           : null
         : null,
+    ).pipe(
+      map((response: any) => {
+        const referralOrderConcept = this.referralSystemSettingsService.referralSettings()?.referralOrderConcept;
+
+        return {
+          ...response,
+          results: response?.results?.map((sample: any) => {
+            return {
+              ...sample,
+              orders: sample?.orders?.filter((order: any) => order?.order?.concept?.uuid !== referralOrderConcept)
+            }
+          })
+        }
+      })
     );
   }
 
