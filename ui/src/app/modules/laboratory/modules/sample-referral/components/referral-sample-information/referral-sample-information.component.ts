@@ -58,6 +58,8 @@ export class ReferralSampleInformationComponent {
   selectedSamples: any[] = [];
   formValues?: FormValue;
   validStatus?: boolean;
+  markingEncounters: Map<String, Object> = new Map<String, Object>();
+  markingOrders: Map<String, Object> = new Map<String, Object>();
   
   constructor() {}
 
@@ -98,8 +100,34 @@ export class ReferralSampleInformationComponent {
   async saveEncounters(){
     const selectedSamples = this.selectedSamples;
     const sampleToEncounterMap = new Map<string, string>();
+    let encountersWithoutFormId: any = []
 
     const encounters = selectedSamples?.map((sample: any) => {
+      if(sample?.orders?.length){
+          const encounterWithoutForm: any = sample?.orders?.filter((order: any) => order?.order?.encounter?.encounterType?.uuid === this.encounterType && !order?.order?.encounter?.form)?.length || 0;
+          if(!encounterWithoutForm){
+            encountersWithoutFormId = [
+              ...encountersWithoutFormId,
+              {
+              sample: sample?.uuid,
+              encounter: {
+                  encounterDatetime: new Date().toISOString(),
+                  patient: sample?.patient?.uuid,
+                  encounterType: this.encounterType,
+                  location: sample?.location?.uuid,
+                  encounterProviders: [
+                      {
+                          provider: this.provider?.uuid,
+                          encounterRole: this.encounterRole
+                      }
+                  ],
+                  visit: sample?.visit?.uuid
+                }
+              }
+            ]
+          }
+      }
+
       return {
         encounterDatetime: new Date().toISOString(),
         patient: sample?.patient?.uuid,
@@ -120,9 +148,19 @@ export class ReferralSampleInformationComponent {
       ...encounters.map((encounter: any) => this.encounterService.createEncounter(encounter))
     ).toPromise()
 
+
+    await zip(
+      ...encountersWithoutFormId.map((encounter: any) => this.encounterService.createEncounter(encounter?.encounter).pipe(
+        tap((createdEncounter: any) => {
+          this.markingEncounters.set(encounter?.sample, createdEncounter);
+        })
+      ))
+    ).toPromise()
+
+    // createdEncounters?.filter((encounter: any) => !!encounter?.form)?.forEach((encounter: any, index: number) => {
     createdEncounters?.forEach((encounter: any, index: number) => {
       const sample = selectedSamples[index];
-      sampleToEncounterMap.set(sample?.uuid, encounter?.uuid);
+      sampleToEncounterMap.set(sample?.uuid, encounter);
     });
 
     return sampleToEncounterMap;
@@ -134,18 +172,46 @@ export class ReferralSampleInformationComponent {
 
     const orders = selectedSamples?.map?.((sample) => {
       const encounter = sampleToEncounterMap.get(sample?.uuid);
-      return { 
-        encounter: encounter,
-        type: "order",
-        orderType: this.orderType,
-        action: "NEW",
-        urgency: sample?.orders?.[0]?.order?.urgency || "ROUTINE",
-        careSetting: "OUTPATIENT" ,
-        patient: sample?.patient?.uuid,
-        concept: this.referralOrderConcept,
-        orderer: this.provider?.uuid
+        return { 
+          encounter: encounter,
+          type: "order",
+          orderType: this.orderType,
+          action: "NEW",
+          urgency: sample?.orders?.[0]?.order?.urgency || "ROUTINE",
+          careSetting: "OUTPATIENT" ,
+          patient: sample?.patient?.uuid,
+          concept: this.referralOrderConcept,
+          orderer: this.provider?.uuid
+        }
       }
-    })
+    )
+
+    const markingOrders = this.selectedSamples?.filter((sample) => this.markingEncounters.has(sample?.uuid))?.map((sample) => {
+        const encounter: any = this.markingEncounters.get(sample?.uuid);
+          return {
+            sample: sample?.uuid,
+            order: { 
+              encounter: encounter?.uuid,
+              type: "order",
+              orderType: this.orderType,
+              action: "NEW",
+              urgency: sample?.orders?.[0]?.order?.urgency || "ROUTINE",
+              careSetting: "OUTPATIENT" ,
+              patient: sample?.patient?.uuid,
+              concept: this.referralOrderConcept,
+              orderer: this.provider?.uuid
+            }
+          }
+        }
+      )
+
+    await zip(
+      ...markingOrders.map((markingOrder: any) => this.orderService.createOrder(markingOrder.order).pipe(
+          tap((createdOrder: any) => {
+            this.markingOrders.set(markingOrder?.sample, createdOrder);
+          })
+      ))
+    ).toPromise()
 
     const savedOrders = await zip(
       ...orders.map((order: any) => this.orderService.createOrder(order))
@@ -166,7 +232,7 @@ export class ReferralSampleInformationComponent {
     const observations = selectedSamples?.map((sample: any) => {
       const encounter = sampleToEncounterMap.get(sample?.uuid);
       
-      return Object.values(this.formValues)?.map((formValue: any) => {
+      return Object.values(this.formValues)?.filter((formValue: any) => !!formValue?.value)?.map((formValue: any) => {
         let value = formValue?.value;
         if(value instanceof Date ){
           value = formatDateToString(value, "YYYY-MM-DD hh:mm:ss")
@@ -185,19 +251,38 @@ export class ReferralSampleInformationComponent {
   }
 
   async saveSampleOrders(sampleOrdersMap: Map<string, string>){
-    const sampleOrders = this.selectedSamples?.map((sample) => {
-      return {
-        sample: {
-          uuid: sample?.uuid
-        },
-        order: {
-          uuid: sampleOrdersMap.get(sample?.uuid)
-        },
-        technician: {
-          uuid: this.currentUser?.uuid
+    const sampleOrders: any[] = [];
+    
+    (this.selectedSamples || []).forEach((sample) => {
+        if(this.markingOrders.has(sample?.uuid)){
+          const markingOrder: any = this.markingOrders.get(sample?.uuid);
+          sampleOrders.push(
+            {
+              sample: {
+                uuid: sample?.uuid
+              },
+              order: {
+                uuid: markingOrder?.uuid
+              },
+              technician: {
+                uuid: this.currentUser?.uuid
+              }
+            }
+          )
         }
-      }
-    });
+
+        sampleOrders.push({
+          sample: {
+            uuid: sample?.uuid
+          },
+          order: {
+            uuid: sampleOrdersMap.get(sample?.uuid)
+          },
+          technician: {
+            uuid: this.currentUser?.uuid
+          }
+        })
+      })
     
     return await zip(...sampleOrders?.map((sampleOrder) => this.sampleService.createSampleOrder(sampleOrder))).toPromise();
   }

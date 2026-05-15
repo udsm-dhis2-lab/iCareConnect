@@ -4,11 +4,18 @@ provider: provider$ | async,
 currentUser: currentUser$ | async
 }; as params){
 
-<app-sample-referral-form 
-    [formId]="formId"
-    [haveThisForm]="false"
-    [withOrderType]="true"
-    [combineWithOr]="false"
-    [saveButtonText]="'Save Transport Information'"
-    (saveForm)="onSaveTransportInformation($event)"></app-sample-referral-form>
+    @if(loading){
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    } @else {
+        <app-sample-referral-form 
+            [formId]="formId"
+            [haveThisForm]="false"
+            [withOrderType]="true"
+            [combineWithOr]="false"
+            [saveButtonText]="'Save Transport Information'"
+            (saveForm)="onSaveTransportInformation($event)"></app-sample-referral-form>
+    }
+
+
+
 }

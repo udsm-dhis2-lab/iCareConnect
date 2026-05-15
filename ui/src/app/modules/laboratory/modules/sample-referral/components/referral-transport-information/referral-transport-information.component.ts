@@ -157,7 +157,7 @@ export class ReferralTransportInformationComponent {
         const observations = selectedSamples?.map((sample: any) => {
           const encounter = sampleToEncounterMap.get(sample?.uuid);
           
-          return Object.values(this.formValues)?.map((formValue: any) => {
+          return Object.values(this.formValues)?.filter((formValue: any) => !!formValue?.value)?.map((formValue: any) => {
             let value = formValue?.value;
             if(value instanceof Date ){
               value = formatDateToString(value, "YYYY-MM-DD hh:mm:ss")
@@ -194,19 +194,18 @@ export class ReferralTransportInformationComponent {
       }
 
       async updateOrdersFulfillerStatus(){
-        const orderUpdateRequests = zip(
-          ...this.selectedSamples?.map((sample: any) => {
-            const referralOrder = sample?.orders?.filter((order: any) => order?.order?.concept?.uuid === this.referralOrderConcept)?.[0]
 
-            return this.orderService.updateOrderFulfillerStatus(referralOrder?.order?.uuid,
-              {
-                fulfillerStatus: "COMPLETE",
-                fulfillerComment: "Referral has been sent."
-              }
-            )
-          })
-        )
+        const ordersToUpdate = this.selectedSamples?.map((sample: any) => {
+            const referralOrder: any = sample?.orders?.filter((order: any) => order?.order?.encounter?.encounterType?.uuid === this.encounterType && !order?.order?.encounter?.form)?.[0];
+            
+            return {
+              uuid: referralOrder?.order?.uuid,
+              fulfillerStatus: "COMPLETED",
+              encounter: referralOrder?.order?.encounter?.uuid,
+            }
+        })
 
-        return orderUpdateRequests.toPromise()
+        return await this.orderService.updateOrdersViaEncounter(ordersToUpdate).toPromise();
+
       }
 }

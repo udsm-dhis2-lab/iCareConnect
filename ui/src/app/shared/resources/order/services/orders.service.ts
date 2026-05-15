@@ -71,8 +71,10 @@ export class OrdersService {
     );
   }
   
-  updateOrderFulfillerStatus(orderUuid, order: any): Observable<any> {
-    return this.openMRSHttpClient.put(`order/${orderUuid}`, order).pipe(
+  updateOrderFulfillerStatus(orderUuid: string, status: string): Observable<any> {
+    const payload = { fulfillerStatus: status };
+ 
+    return this.openMRSHttpClient.post(`order/${orderUuid}/fulfillerstatus`, payload).pipe(
       map((response) => {
         return response;
       }),

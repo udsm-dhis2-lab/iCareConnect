@@ -155,7 +155,7 @@ export class ReferralPackagingInformationComponent {
       const observations = selectedSamples?.map((sample: any) => {
         const encounter = sampleToEncounterMap.get(sample?.uuid);
         
-        return Object.values(this.formValues)?.map((formValue: any) => {
+        return Object.values(this.formValues)?.filter((formValue: any) => !!formValue?.value)?.map((formValue: any) => {
           let value = formValue?.value;
           if(value instanceof Date ){
             value = formatDateToString(value, "YYYY-MM-DD hh:mm:ss")
