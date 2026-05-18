@@ -1,10 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ReferralSystemSettingsService } from '../../services/referral-system-settings.service';
 import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/store/reducers';
 import { loadCustomOpenMRSForms } from "src/app/store/actions";
-import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
+import { SampleReferralService } from '../../services/referral-samples.service';
 
 @Component({
   selector: 'app-add-sample-referrals',
@@ -13,12 +12,12 @@ import { FormValue } from "src/app/shared/modules/form/models/form-value.model";
   styleUrl: './add-sample-referrals.component.scss'
 })
 export class AddSampleReferralsComponent {
-  private referralSystemSettingsService = inject(ReferralSystemSettingsService);
+  private sampleReferralService = inject(SampleReferralService);
   private store = inject(Store<AppState>);
   dialogRef = inject(MatDialogRef<AddSampleReferralsComponent>);
   data = inject(MAT_DIALOG_DATA);
 
-  referralSettings = this.referralSystemSettingsService.referralSettings();
+  referralSettings = this.sampleReferralService.referralSettings();
   referralForms = this.referralSettings?.forms || {};
   encounterTypeUuid = this.referralSettings?.referralEncounterType || null;
 

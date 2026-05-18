@@ -1,5 +1,4 @@
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { ReferralSystemSettingsService } from '../../services/referral-system-settings.service';
 import { Observable, zip } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { SampleReferralService } from '../../services/referral-samples.service';
@@ -16,7 +15,6 @@ import { getProviderDetails, getCurrentUserDetails } from 'src/app/store/selecto
   styleUrl: './sample-referral-form.component.scss'
 })
 export class SampleReferralFormComponent {
-  private referralSystemSettingsService = inject(ReferralSystemSettingsService);
   private sampleReferralService = inject(SampleReferralService);
   private store = inject(Store<AppState>);
   
@@ -33,10 +31,10 @@ export class SampleReferralFormComponent {
   provider$?: Observable<any>;
   currentUser$?: Observable<any>;
   
-  orderType = this.referralSystemSettingsService.referralSettings()?.referralOrderType || null;
-  encounterType = this.referralSystemSettingsService.referralSettings()?.referralEncounterType || null;
-  encounterRole = this.referralSystemSettingsService.referralSettings()?.encounterRole || null;
-  referralOrderConcept = this.referralSystemSettingsService.referralSettings()?.referralOrderConcept || null;
+  orderType = this.sampleReferralService.referralSettings()?.referralOrderType || null;
+  encounterType = this.sampleReferralService.referralSettings()?.referralEncounterType || null;
+  encounterRole = this.sampleReferralService.referralSettings()?.encounterRole || null;
+  referralOrderConcept = this.sampleReferralService.referralSettings()?.referralOrderConcept || null;
   
   page = 1;
   pageSize = 10;

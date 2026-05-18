@@ -1,5 +1,4 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
-import { ReferralSystemSettingsService } from '../../services/referral-system-settings.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SamplesService } from 'src/app/shared/services/samples.service';
 import { ObservationService } from 'src/app/shared/resources/observation/services';
@@ -19,7 +18,6 @@ import { formatDateToString } from 'src/app/shared/helpers/format-date.helper';
   styleUrl: './referral-destination-information.component.scss'
 })
 export class ReferralDestinationInformationComponent {
-  private referralSystemSettingsService = inject(ReferralSystemSettingsService);
   private sampleReferralService = inject(SampleReferralService);
   private store = inject(Store<AppState>);
   private encounterService = inject(EncountersService);
@@ -34,11 +32,11 @@ export class ReferralDestinationInformationComponent {
   provider$?: Observable<any>;
   currentUser$?: Observable<any>;
   
-  formId = this.referralSystemSettingsService.referralSettings()?.forms?.destination_information || null;
-  orderType = this.referralSystemSettingsService.referralSettings()?.referralOrderType || null;
-  encounterType = this.referralSystemSettingsService.referralSettings()?.referralEncounterType || null;
-  encounterRole = this.referralSystemSettingsService.referralSettings()?.encounterRole || null;
-  referralOrderConcept = this.referralSystemSettingsService.referralSettings()?.referralOrderConcept || null;
+  formId = this.sampleReferralService.referralSettings()?.forms?.destination_information || null;
+  orderType = this.sampleReferralService.referralSettings()?.referralOrderType || null;
+  encounterType = this.sampleReferralService.referralSettings()?.referralEncounterType || null;
+  encounterRole = this.sampleReferralService.referralSettings()?.encounterRole || null;
+  referralOrderConcept = this.sampleReferralService.referralSettings()?.referralOrderConcept || null;
   
   loading = false;
   

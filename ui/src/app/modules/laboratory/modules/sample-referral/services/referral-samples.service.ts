@@ -1,15 +1,18 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, signal } from "@angular/core";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { BASE_URL } from "src/app/shared/constants/constants.constants";
+import { tap } from "rxjs/operators";
 
 @Injectable({
   providedIn: "root",
 })
 export class SampleReferralService {
+    referralSettings?: any = signal<any>({});
+    
     constructor(
         private httpClient: HttpClient,
-        private systemSettingsService: SystemSettingsService
+        private systemSettingsService: SystemSettingsService,
     ) {}
 
 
@@ -41,6 +44,13 @@ export class SampleReferralService {
     }
 
     getReferralSettings(){
-        return this.systemSettingsService.getSystemSettingsByKey("iCare.laboratory.sampleReferral.settings.referralForm")
+        return this.systemSettingsService.getSystemSettingsByKey("iCare.laboratory.sampleReferral.settings.referralForm").pipe(
+            tap((settings: any) => {
+                if (!settings) {
+                    console.warn("No referral form settings found for sample referral module");
+                }
+                this.referralSettings.set(settings);
+            })
+        )
     }
 }

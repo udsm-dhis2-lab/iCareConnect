@@ -1,5 +1,4 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
-import { ReferralSystemSettingsService } from '../../services/referral-system-settings.service';
 import { Observable, zip } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { SampleReferralService } from '../../services/referral-samples.service';
@@ -19,7 +18,6 @@ import { formatDateToString } from 'src/app/shared/helpers/format-date.helper';
   styleUrl: './referral-transport-information.component.scss'
 })
 export class ReferralTransportInformationComponent {
-  private referralSystemSettingsService = inject(ReferralSystemSettingsService);
       private sampleReferralService = inject(SampleReferralService);
       private store = inject(Store<AppState>);
       private encounterService = inject(EncountersService);
@@ -34,11 +32,11 @@ export class ReferralTransportInformationComponent {
       provider$?: Observable<any>;
       currentUser$?: Observable<any>;
       
-      formId = this.referralSystemSettingsService.referralSettings()?.forms?.transport_information || null;
-      orderType = this.referralSystemSettingsService.referralSettings()?.referralOrderType || null;
-      encounterType = this.referralSystemSettingsService.referralSettings()?.referralEncounterType || null;
-      encounterRole = this.referralSystemSettingsService.referralSettings()?.encounterRole || null;
-      referralOrderConcept = this.referralSystemSettingsService.referralSettings()?.referralOrderConcept || null;
+      formId = this.sampleReferralService.referralSettings()?.forms?.transport_information || null;
+      orderType = this.sampleReferralService.referralSettings()?.referralOrderType || null;
+      encounterType = this.sampleReferralService.referralSettings()?.referralEncounterType || null;
+      encounterRole = this.sampleReferralService.referralSettings()?.encounterRole || null;
+      referralOrderConcept = this.sampleReferralService.referralSettings()?.referralOrderConcept || null;
       
       loading = false;
       

@@ -1,6 +1,5 @@
 import { Component, effect, inject, Injector, Input, OnDestroy, OnInit } from "@angular/core";
 import { SampleReferralService } from "../../services/referral-samples.service";
-import { ReferralSystemSettingsService } from "../../services/referral-system-settings.service";
 import { Observable, Subject } from "rxjs";
 import { LabDateService } from "src/app/modules/laboratory/services/lab-date.service";
 import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
@@ -16,7 +15,6 @@ import { AddSampleReferralsComponent } from "../../dialogs/add-sample-referrals/
 export class ReferredSamplesComponent implements OnInit, OnDestroy {
   private injector = inject(Injector);
   private sampleReferralService = inject(SampleReferralService);
-  private referralSystemSettingsService = inject(ReferralSystemSettingsService);
   private labDateService = inject(LabDateService);
   private dialog = inject(MatDialog);
 
@@ -48,7 +46,7 @@ export class ReferredSamplesComponent implements OnInit, OnDestroy {
     this.startDate = this.labDateService.startDate();
     this.endDate = this.labDateService.endDate();
     
-    this.referralOrderTypeUuid = this.referralSystemSettingsService.referralSettings()?.referralOrderType;
+    this.referralOrderTypeUuid = this.sampleReferralService.referralSettings()?.referralOrderType;
     
     if (this.referralOrderTypeUuid && this.startDate && this.endDate) {
       this.getSamplesByReferralOrderType(this.referralOrderTypeUuid);
