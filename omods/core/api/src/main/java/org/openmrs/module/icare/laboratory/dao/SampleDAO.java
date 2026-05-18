@@ -541,7 +541,10 @@ public class SampleDAO extends BaseDAO<Sample> {
 			query.setParameter("orderTypeUuid", orderTypeUuid);
 		}
 		if (fulfillerStatus != null && !fulfillerStatus.isEmpty()) {
-			query.setParameter("fulfillerStatus", fulfillerStatus);
+			try {
+				query.setParameter("fulfillerStatus", Order.FulfillerStatus.valueOf(fulfillerStatus));
+			}
+			catch (IllegalArgumentException ignored) {}
 		}
 		if (formUuid != null && !formUuid.isEmpty()) {
 			query.setParameter("formUuid", formUuid);

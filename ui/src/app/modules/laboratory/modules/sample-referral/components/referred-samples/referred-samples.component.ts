@@ -74,6 +74,7 @@ export class ReferredSamplesComponent implements OnInit, OnDestroy {
       startDate: formatDateToString(this.startDate, "yyyy-MM-dd"),
       endDate: formatDateToString(this.endDate, "yyyy-MM-dd"),
       haveThisOrderType: true,
+      fulfillerStatus: "COMPLETED"
     });
   }
 

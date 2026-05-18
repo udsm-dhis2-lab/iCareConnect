@@ -23,6 +23,7 @@ export class SampleReferralService {
          formUuid?: string,
          haveThisForm?: boolean,
          combineWithOr?: boolean,
+         fulfillerStatus?: string,
          q?: string;
      } = {
          paging: true,
