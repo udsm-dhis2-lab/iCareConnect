@@ -11,8 +11,9 @@
         <app-sample-referral-form
             [formId]="formId"
             [haveThisForm]="false"
-            [withOrderType]="false"
-            [combineWithOr]="true"
+            [withOrderType]="true"
+            [combineWithOr]="false"
+            [showMarkedOnlyField]="true"
             [saveButtonText]="'Save Sample Information'"
             (saveForm)="onSaveSampleInformation($event)"
         ></app-sample-referral-form>

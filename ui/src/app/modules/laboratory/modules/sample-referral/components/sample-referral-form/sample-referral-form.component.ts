@@ -5,7 +5,7 @@ import { tap } from 'rxjs/operators';
 import { SampleReferralService } from '../../services/referral-samples.service';
 import { FormValue } from 'src/app/shared/modules/form/models/form-value.model';
 import { AppState } from 'src/app/store/reducers';
-import { Store } from '@ngrx/store';
+import { INIT, Store } from '@ngrx/store';
 import { getProviderDetails, getCurrentUserDetails } from 'src/app/store/selectors/current-user.selectors';
 
 
@@ -25,6 +25,7 @@ export class SampleReferralFormComponent {
   @Input() haveThisForm: boolean = false;
   @Input() withOrderType: boolean = false;
   @Input() combineWithOr: boolean = false;
+  @Input() showMarkedOnlyField: boolean = false;
 
   @Output() saveForm = new EventEmitter<any>();
 
@@ -140,6 +141,14 @@ export class SampleReferralFormComponent {
 
   onSearchChange(searchTerm: string) {
     this.searchText = searchTerm;
+    this.page = 1;
+    this.appendOptions = false;
+    this.getUnreferredSamples();
+  }
+
+  onToggleSamples(event: any) {
+    this.withOrderType = !this.withOrderType
+    this.combineWithOr = !this.combineWithOr
     this.page = 1;
     this.appendOptions = false;
     this.getUnreferredSamples();
