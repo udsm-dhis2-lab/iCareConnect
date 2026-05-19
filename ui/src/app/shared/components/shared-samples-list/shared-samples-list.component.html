@@ -233,7 +233,9 @@
           <th rowspan="2">
             <div
               class="d-flex justify-content-end"
-              *ngIf="tabType === 'samples-to-accept'"
+              *ngIf="
+                tabType === 'samples-to-accept' || tabType === 'authorization'
+              "
             >
               <section class="ml-4" title="Tick to select all">
                 <mat-checkbox
@@ -371,15 +373,7 @@
                 *ngIf="orderCount == 0"
                 [attr.rowspan]="sample?.orders?.length"
               >
-                {{
-                  !LISConfigurations?.isLIS
-                    ? sample?.priorityHigh
-                      ? "Urgent"
-                      : "Routine"
-                    : sample?.priorityStatus?.status
-                    ? sample?.priorityStatus?.status
-                    : "Routine"
-                }}
+                {{ sample?.priorityHigh ? "Urgent" : "Routine" }}
               </td>
 
               <td
@@ -410,7 +404,7 @@
                 </div>
                 <div class="d-flex justify-content-end">
                   <div
-                    class="d-flex justify-content-end"
+                    class="d-flex justify-content-end align-items-center"
                     *ngIf="
                       tabType === 'result-entry' || tabType === 'authorization'
                     "
@@ -439,6 +433,19 @@
                     >
                       Print
                     </button>
+                    <section *ngIf="tabType === 'authorization'" class="ml-4">
+                      <mat-checkbox
+                        color="primary"
+                        [checked]="keyedSelectedSamples[sample?.id]"
+                        [disabled]="!canUserAuthorize(sample)"
+                        [matTooltip]="
+                          !canUserAuthorize(sample)
+                            ? 'You cannot authorise results processed by you'
+                            : ''
+                        "
+                        (change)="onSelectItem($event, sample)"
+                      ></mat-checkbox>
+                    </section>
                   </div>
                   <div
                     *ngIf="tabType === 'completed-samples'"
@@ -792,13 +799,7 @@
                                 [attr.rowspan]="sample?.orders?.length"
                               >
                                 {{
-                                  !LISConfigurations?.isLIS
-                                    ? sample?.priorityHigh
-                                      ? "Urgent"
-                                      : "Routine"
-                                    : sample?.priorityStatus?.status
-                                    ? sample?.priorityStatus?.status
-                                    : "Routine"
+                                  sample?.priorityHigh ? "Urgent" : "Routine"
                                 }}
                               </td>
                               <td

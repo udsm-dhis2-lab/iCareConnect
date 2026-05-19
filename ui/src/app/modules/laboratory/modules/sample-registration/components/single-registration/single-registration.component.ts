@@ -36,6 +36,8 @@ import { getLocationsByIds } from "src/app/store/selectors";
 import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { webSocket } from "rxjs/webSocket";
 import { Textbox } from "src/app/shared/modules/form/models/text-box.model";
+import { GlobalSettingService } from "src/app/shared/resources/global-setting/services/globalsetting.service";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 
 @Component({
   selector: "app-single-registration",
@@ -92,7 +94,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   receivedByField: any;
 
   testOrders: any[] = [];
-   groupedTestOrdersByDepartments: any[] = [];
+  groupedTestOrdersByDepartments: any[] = [];
   errorMessage: string = "";
 
   sampleLabelsUsedDetails: any[] = [];
@@ -144,6 +146,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   generalObservationsData: any;
   isGeneralObsFormValid: boolean = true;
   formId: string;
+  priorityFieldSettings: any;
 
   constructor(
     private samplesService: SamplesService,
@@ -158,7 +161,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     private orderService: OrdersService,
     private conceptService: ConceptsService,
     private otherSystemsService: OtherClientLevelSystemsService,
-    private store: Store<AppState>
+    private systemSettings: SystemSettingsService,
+    private store: Store<AppState>,
   ) {
     this.currentLocation = JSON.parse(localStorage.getItem("currentLocation"));
   }
@@ -172,25 +176,30 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     // console.log(
     //   "sampleRegistrationCategories refKey",
     //   this.sampleRegistrationCategories
     // );
+    this.priorityFieldSettings = await this.systemSettings
+      .getSystemSettingsByKey(
+        "iCare.laboratory.settings.single.sample.registration.priorityField",
+      )
+      .toPromise();
     this.registrationCategory = this.sampleRegistrationCategories[0];
     const userLocationsIds = JSON.parse(
-      this.currentUser?.userProperties?.locations
+      this.currentUser?.userProperties?.locations,
     );
     this.labLocations$ = this.store.select(getLocationsByIds(userLocationsIds));
     this.labSampleLabel$ = this.samplesService.getSampleLabel();
     this.referringDoctorFields = Object.keys(
-      this.allRegistrationFields?.referringDoctorFields
+      this.allRegistrationFields?.referringDoctorFields,
     ).map((key) => {
       return this.allRegistrationFields?.referringDoctorFields[key];
     });
 
     this.specimenDetailsFields = Object.keys(
-      this.allRegistrationFields?.specimenDetailFields
+      this.allRegistrationFields?.specimenDetailFields,
     )
       .slice(0, 3)
       .map((key) => {
@@ -229,7 +238,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     this.renderGenericForms = true;
   }
 
-  onCustomFormUpdate(data: FormValue): void {
+  async onCustomFormUpdate(data: FormValue): Promise<void> {
     this.isGeneralObsFormValid = data.isValid;
     this.generalObsFormData = {
       ...this.generalObsFormData,
@@ -241,7 +250,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     if (this.selectedSpecimenUuid) {
       this.testsUnderSpecimen$ =
         this.labTestsService.getSetMembersByConceptUuid(
-          this.selectedSpecimenUuid
+          this.selectedSpecimenUuid,
         );
     }
     this.generalObservationsData = groupBy(
@@ -252,7 +261,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
           form: this.generalObsFormData[key]?.form,
         };
       }) || [],
-      "form"
+      "form",
     );
   }
 
@@ -351,7 +360,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
       this.receivedOnTime,
       this.receivedOnDateLatestValue
         ? this.receivedOnDateLatestValue
-        : this.maximumDate
+        : this.maximumDate,
     );
     if (this.collectedOnTime || this.broughtOnTime) {
       let valid1 = this.isValidTime(
@@ -364,14 +373,14 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
         this.receivedOnTime,
         this.receivedOnDateLatestValue
           ? this.receivedOnDateLatestValue
-          : this.maximumDate
+          : this.maximumDate,
       );
 
       let valid2 = (this.receivedOnTimeValid = this.isValidTime(
         this.receivedOnTime,
         this.receivedOnDateLatestValue
           ? this.receivedOnDateLatestValue
-          : this.maximumDate
+          : this.maximumDate,
       ));
       this.receivedOnTimeValid = valid1 && valid2 ? true : false;
     }
@@ -391,7 +400,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
       this.collectedOnTime,
       this.collectedOnDateLatestValue
         ? this.collectedOnDateLatestValue
-        : this.maximumDate
+        : this.maximumDate,
     );
     if (this.broughtOnTime || this.receivedOnTime) {
       this.collectedOnTimeValid = this.isValidTime(
@@ -402,7 +411,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
         this.broughtOnTime ? this.broughtOnTime : this.receivedOnTime,
         this.broughtOnDateLatestValue
           ? this.broughtOnDateLatestValue
-          : this?.receivedOnDateLatestValue
+          : this?.receivedOnDateLatestValue,
       );
     }
     this.formData = {
@@ -425,7 +434,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
       this.broughtOnTime,
       this.broughtOnDateLatestValue
         ? this.broughtOnDateLatestValue
-        : this.maximumDate
+        : this.maximumDate,
     );
 
     if (this.receivedOnTime) {
@@ -437,7 +446,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
         this.receivedOnTime,
         this.receivedOnDateLatestValue
           ? this.receivedOnDateLatestValue
-          : this.maximumDate
+          : this.maximumDate,
       );
       valid3 = valid1 && valid2 ? true : false;
     }
@@ -450,7 +459,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
         this.broughtOnTime,
         this.broughtOnDateLatestValue
           ? this.broughtOnDateLatestValue
-          : this.maximumDate
+          : this.maximumDate,
       );
     }
     this.broughtOnTimeValid = valid1 && valid2 && valid3 && valid4;
@@ -474,40 +483,40 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     if (formValues.getValues()?.collectedOn?.value.toString()?.length > 0) {
       let collected_on_date;
       collected_on_date = this.getDateStringFromDate(
-        new Date(formValues.getValues()?.collectedOn?.value)
+        new Date(formValues.getValues()?.collectedOn?.value),
       );
       this.collectedOnDateLatestValue = collected_on_date;
       this.collectedOnTimeValid = this.isValidTime(
         this.collectedOnTime,
         this.collectedOnDateLatestValue
           ? this.collectedOnDateLatestValue
-          : this.maximumDate
+          : this.maximumDate,
       );
     }
     if (formValues.getValues()?.receivedOn?.value?.toString()?.length > 0) {
       let received_on_date;
       received_on_date = this.getDateStringFromDate(
-        new Date(formValues.getValues()?.receivedOn?.value)
+        new Date(formValues.getValues()?.receivedOn?.value),
       );
       this.receivedOnDateLatestValue = received_on_date;
       this.receivedOnTimeValid = this.isValidTime(
         this.receivedOnTime,
         this.receivedOnDateLatestValue
           ? this.receivedOnDateLatestValue
-          : this.maximumDate
+          : this.maximumDate,
       );
     }
     if (formValues.getValues()?.broughtOn?.value.toString()?.length > 0) {
       let brought_on_date;
       brought_on_date = this.getDateStringFromDate(
-        new Date(formValues.getValues()?.broughtOn?.value)
+        new Date(formValues.getValues()?.broughtOn?.value),
       );
       this.broughtOnDateLatestValue = brought_on_date;
       this.broughtOnTimeValid = this.isValidTime(
         this.broughtOnTime,
         this.broughtOnDateLatestValue
           ? this.broughtOnDateLatestValue
-          : this.maximumDate
+          : this.maximumDate,
       );
     }
 
@@ -561,13 +570,13 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
               ...this.formData[key],
             },
           ],
-          "id"
+          "id",
         );
       }
     });
     this.groupedTestOrdersByDepartments = formulateSamplesByDepartments(
       this.labSections,
-      this.testOrders
+      this.testOrders,
     );
 
     if (this.testOrders?.length === 0) {
@@ -620,7 +629,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
       const uuid = (this.testsFromExternalSystemsConfigs.filter(
         (testConfigs) =>
           testConfigs?.referenceKeyPart ===
-          this.selectedSystem?.testsSearchingKey
+          this.selectedSystem?.testsSearchingKey,
       ) || [])[0]?.value;
       this.testsUnderSpecimen$ = this.conceptService
         .getConceptDetailsByUuid(uuid, "custom:(uuid,display)")
@@ -651,7 +660,58 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     this.formData = { ...this.formData, ...clinicalData };
   }
 
-  onSave(event: Event, forRejection?: boolean, labLocations?: any[]): void {
+  async getUrgencyValue() {
+    if (!this.priorityFieldSettings) {
+      console.log(
+        "",
+        "Error loading global variable for urgency field (iCare.laboratory.settings.single.sample.registration.priorityField) , check if it's set correctly",
+      );
+      return null;
+    }
+
+    let allFieldsValues: any = [];
+
+    Object.keys(this.generalObservationsData).forEach((key) => {
+      allFieldsValues = [
+        ...allFieldsValues,
+        ...this.generalObservationsData[key].map((field: any) => {
+          return {
+            concept: field?.concept,
+            value: field?.value,
+          };
+        }),
+      ];
+    });
+
+    const urgencyField = allFieldsValues.find(
+      (field: any) =>
+        field?.concept === this.priorityFieldSettings?.urgencyFieldConcept &&
+        field?.value,
+    );
+
+    if (!urgencyField) {
+      return null;
+    }
+
+    const urgencyValueMappings: any =
+      (await this.conceptService
+        .getConceptMappingByConceptUuid(urgencyField?.value)
+        .toPromise()) || of([]).toPromise();
+
+    return (
+      urgencyValueMappings?.results?.find(
+        (mapping: any) =>
+          mapping?.conceptReferenceTerm?.conceptSource?.uuid ===
+          this.priorityFieldSettings?.urgencyMappingSource,
+      )?.conceptReferenceTerm?.code || null
+    );
+  }
+
+  async onSave(
+    event: Event,
+    forRejection?: boolean,
+    labLocations?: any[],
+  ): Promise<void> {
     event.stopPropagation();
     if (labLocations?.length === 1) {
       this.currentLabLocation = labLocations[0];
@@ -671,7 +731,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
       },
     });
 
-    confirmationDialogue.afterClosed().subscribe((closingObject) => {
+    confirmationDialogue.afterClosed().subscribe(async (closingObject) => {
       if (closingObject?.confirmed) {
         // Identify if tests ordered are well configured
 
@@ -680,7 +740,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
         this.sampleLabelsUsedDetails = [];
         const doctorsAttributesWithValues =
           this.referringDoctorAttributes.filter(
-            (attribute) => this.formData["attribute-" + attribute?.value]?.value
+            (attribute) =>
+              this.formData["attribute-" + attribute?.value]?.value,
           ) || [];
         if (
           doctorsAttributesWithValues?.length !=
@@ -697,26 +758,28 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
           });
         }
 
+        const priority = await this.getUrgencyValue();
+
         const testOrdersWithNoDepartments: any[] = flatten(
           this.groupedTestOrdersByDepartments
             ?.map((groupedTestOrdersByDepartment: any) => {
               if (
                 (
                   groupedTestOrdersByDepartment?.filter(
-                    (testOrder: any) => !testOrder?.departmentUuid
+                    (testOrder: any) => !testOrder?.departmentUuid,
                   ) || []
                 )?.length > 0
               ) {
                 return (
                   groupedTestOrdersByDepartment?.filter(
-                    (testOrder: any) => !testOrder?.departmentUuid
+                    (testOrder: any) => !testOrder?.departmentUuid,
                   ) || []
                 );
               }
             })
             ?.filter(
-              (testOrdersWithNoDepartment: any) => testOrdersWithNoDepartment
-            )
+              (testOrdersWithNoDepartment: any) => testOrdersWithNoDepartment,
+            ),
         );
         this.personDetailsData =
           this.registrationCategory?.refKey !== "non-clinical"
@@ -730,7 +793,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
           }
             ${(
               testOrdersWithNoDepartments?.map(
-                (testOrderWithNoDept: any) => testOrderWithNoDept?.display
+                (testOrderWithNoDept: any) => testOrderWithNoDept?.display,
               ) || []
             ).join(", ")}
             " ${
@@ -746,7 +809,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
               if (conceptSetsResponse && !conceptSetsResponse?.error) {
                 const groupedTestorders = groupBy(
                   conceptSetsResponse,
-                  "testOrder"
+                  "testOrder",
                 );
                 this.groupedTestOrdersByDepartments = [];
                 Object.keys(groupedTestorders).forEach((key: string) => {
@@ -762,7 +825,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                 zip(
                   this.registrationService.getPatientIdentifierTypes(),
                   this.locationService.getFacilityCode(),
-                  this.registrationService.getAutoFilledPatientIdentifierType()
+                  this.registrationService.getAutoFilledPatientIdentifierType(),
                 ).subscribe((results) => {
                   if (results) {
                     const patientIdentifierTypes = results[0];
@@ -779,7 +842,6 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                 2. Create visit (Orders should be added in)
                 3. Create sample
                 */
-
                           this.patientPayload = {
                             person: {
                               names: [
@@ -803,9 +865,11 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                 : true,
                               addresses: [
                                 {
-                                  address1: this.personDetailsData?.address,
-                                  address2: this.personDetailsData?.address,
-                                  address3: this.personDetailsData?.address,
+                                  address1: this.personDetailsData?.ward?.uuid,
+                                  address2:
+                                    this.personDetailsData?.council?.uuid,
+                                  address3:
+                                    this.personDetailsData?.region?.uuid,
                                   cityVillage: "",
                                   country: "",
                                   postalCode: "",
@@ -823,7 +887,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                   value: this.personDetailsData?.email,
                                 },
                               ]?.filter(
-                                (personAttribute: any) => personAttribute?.value
+                                (personAttribute: any) =>
+                                  personAttribute?.value,
                               ),
                             },
                             identifiers:
@@ -831,12 +896,21 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                               "non-clinical"
                                 ? (patientIdentifierTypes || [])
                                     .map((personIdentifierType) => {
-                                      if(!this.personDetailsData?.identifiers?.filter((identifier) => {
-                                        return identifier?.identifierType?.uuid === personIdentifierType.id;
-                                      })?.filter(identifier => identifier)?.length){
+                                      if (
+                                        !this.personDetailsData?.identifiers
+                                          ?.filter((identifier) => {
+                                            return (
+                                              identifier?.identifierType
+                                                ?.uuid ===
+                                              personIdentifierType.id
+                                            );
+                                          })
+                                          ?.filter((identifier) => identifier)
+                                          ?.length
+                                      ) {
                                         if (
                                           personIdentifierType.id ===
-                                          this.preferredPersonIdentifier 
+                                          this.preferredPersonIdentifier
                                         ) {
                                           return {
                                             identifier: this.personDetailsData[
@@ -852,9 +926,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                               this.currentLocation?.uuid ||
                                               "7fdfa2cb-bc95-405a-88c6-32b7673c0453", // TODO: Find a way to softcode this,
                                             preferred: true,
-                                          }
-                                        }
-                                        else {
+                                          };
+                                        } else {
                                           return {
                                             identifier:
                                               this.personDetailsData[
@@ -872,7 +945,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                     })
                                     .filter(
                                       (patientIdentifier) =>
-                                        patientIdentifier?.identifier
+                                        patientIdentifier?.identifier,
                                     )
                                 : [
                                     {
@@ -886,15 +959,22 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                     },
                                   ],
                           };
-        
-                          if(!this.patientPayload?.identifiers?.filter(identifier => identifier)?.length){
-                            this.patientPayload = omit(this.patientPayload, 'identifiers');
+
+                          if (
+                            !this.patientPayload?.identifiers?.filter(
+                              (identifier) => identifier,
+                            )?.length
+                          ) {
+                            this.patientPayload = omit(
+                              this.patientPayload,
+                              "identifiers",
+                            );
                           }
                           this.savingData = true;
                           this.registrationService
                             .createPatient(
                               this.patientPayload,
-                              this.personDetailsData?.patientUuid
+                              this.personDetailsData?.patientUuid,
                             )
                             .subscribe((patientResponse) => {
                               this.savingDataResponse = patientResponse;
@@ -939,12 +1019,12 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                 ) {
                                   const personDataAttributeKeys =
                                     Object.keys(this.personDetailsData).filter(
-                                      (key) => key.indexOf("attribute-") === 0
+                                      (key) => key.indexOf("attribute-") === 0,
                                     ) || [];
 
                                   const formDataAttributeKeys =
                                     Object.keys(this.formData).filter(
-                                      (key) => key.indexOf("attribute-") === 0
+                                      (key) => key.indexOf("attribute-") === 0,
                                     ) || [];
 
                                   personDataAttributeKeys.forEach((key) => {
@@ -1006,7 +1086,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                   indication: "Sample Registration",
                                   attributes:
                                     visAttributes.filter(
-                                      (attribute) => attribute?.value
+                                      (attribute) => attribute?.value,
                                     ) || [],
                                 };
 
@@ -1023,7 +1103,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                           (groupedTestOrders) => {
                                             const orders = uniqBy(
                                               groupedTestOrders,
-                                              "testOrder"
+                                              "testOrder",
                                             ).map((testOrder) => {
                                               // TODO: Remove hard coded order type
                                               return {
@@ -1034,7 +1114,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                 orderer: this.provider?.uuid,
                                                 patient: patientResponse?.uuid,
                                                 careSetting: "OUTPATIENT",
-                                                urgency: "ROUTINE", // TODO: Change to reflect users input
+                                                urgency: priority ?? "ROUTINE",
                                                 instructions: "",
                                                 type: "testorder",
                                               };
@@ -1064,7 +1144,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                 obs:
                                                   obs?.filter(
                                                     (observation) =>
-                                                      observation?.value
+                                                      observation?.value,
                                                   ) || [],
                                                 encounterProviders: [
                                                   {
@@ -1079,7 +1159,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                             encounterObjects = [
                                               ...encounterObjects,
                                               ...Object.keys(
-                                                this.generalObservationsData
+                                                this.generalObservationsData,
                                               ).map((key) => {
                                                 return {
                                                   visit: visitResponse?.uuid,
@@ -1094,7 +1174,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                     this.generalObservationsData[
                                                       key
                                                     ]?.map((obs) =>
-                                                      omit(obs, "form")
+                                                      omit(obs, "form"),
                                                     ) || []
                                                   )
                                                     .filter((obs) => obs?.value)
@@ -1103,29 +1183,29 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                         ...obsValue,
                                                         value:
                                                           obsValue?.value?.indexOf(
-                                                            "GMT+"
+                                                            "GMT+",
                                                           ) === -1
                                                             ? obsValue?.value
                                                             : formatDateToYYMMDD(
                                                                 new Date(
-                                                                  obsValue?.value
-                                                                )
+                                                                  obsValue?.value,
+                                                                ),
                                                               ) +
                                                               " " +
                                                               this.formatDimeChars(
                                                                 new Date(
-                                                                  obsValue?.value
+                                                                  obsValue?.value,
                                                                 )
                                                                   .getHours()
-                                                                  .toString()
+                                                                  .toString(),
                                                               ) +
                                                               ":" +
                                                               this.formatDimeChars(
                                                                 new Date(
-                                                                  obsValue?.value
+                                                                  obsValue?.value,
                                                                 )
                                                                   .getMinutes()
-                                                                  .toString()
+                                                                  .toString(),
                                                               ),
                                                       };
                                                     }),
@@ -1145,16 +1225,16 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                               ...encounterObjects.map(
                                                 (encounterObject) =>
                                                   this.labOrdersService.createLabOrdersViaEncounter(
-                                                    encounterObject
-                                                  )
-                                              )
+                                                    encounterObject,
+                                                  ),
+                                              ),
                                             ).pipe(
                                               map((responses) => {
                                                 return responses[0];
-                                              })
+                                              }),
                                             );
-                                          }
-                                        )
+                                          },
+                                        ),
                                       ).subscribe((responses: any[]) => {
                                         if (responses) {
                                           // console.log(
@@ -1170,7 +1250,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                   encounterResponse?.orders.map(
                                                     (order) => {
                                                       return order?.uuid;
-                                                    }
+                                                    },
                                                   );
                                                 this.orderService
                                                   .getOrdersByUuids(orderUuids)
@@ -1187,7 +1267,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                         const keyedOrders =
                                                           keyBy(
                                                             ordersResponse,
-                                                            "uuid"
+                                                            "uuid",
                                                           );
                                                         this.samplesService
                                                           .getIncreamentalSampleLabel()
@@ -1206,8 +1286,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                     ]?.filter(
                                                                       (dpt) =>
                                                                         dpt?.systemName?.indexOf(
-                                                                          "LAB_DEPARTMENT:"
-                                                                        ) > -1
+                                                                          "LAB_DEPARTMENT:",
+                                                                        ) > -1,
                                                                     ) || [])[0]
                                                                       ?.uuid,
                                                                   },
@@ -1224,22 +1304,22 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                   orders:
                                                                     encounterResponse?.orders.map(
                                                                       (
-                                                                        order
+                                                                        order,
                                                                       ) => {
                                                                         return {
                                                                           uuid: order?.uuid,
                                                                         };
-                                                                      }
+                                                                      },
                                                                     ),
                                                                 };
                                                                 // Create sample
                                                                 this.samplesService
                                                                   .createLabSample(
-                                                                    sample
+                                                                    sample,
                                                                   )
                                                                   .subscribe(
                                                                     (
-                                                                      sampleResponse
+                                                                      sampleResponse,
                                                                     ) => {
                                                                       this.savingDataResponse =
                                                                         sampleResponse;
@@ -1270,7 +1350,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
 
                                                                         sampleResponse?.orders?.forEach(
                                                                           (
-                                                                            order
+                                                                            order,
                                                                           ) => {
                                                                             ordersWithConceptsDetails =
                                                                               [
@@ -1289,7 +1369,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                                     },
                                                                                 },
                                                                               ];
-                                                                          }
+                                                                          },
                                                                         );
 
                                                                         this.savingData =
@@ -1317,7 +1397,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                                 },
                                                                               user: {
                                                                                 uuid: localStorage.getItem(
-                                                                                  "userUuid"
+                                                                                  "userUuid",
                                                                                 ),
                                                                               },
                                                                               remarks:
@@ -1348,7 +1428,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                                 },
                                                                               user: {
                                                                                 uuid: localStorage.getItem(
-                                                                                  "userUuid"
+                                                                                  "userUuid",
                                                                                 ),
                                                                               },
                                                                               category:
@@ -1376,7 +1456,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                                   },
                                                                                 user: {
                                                                                   uuid: localStorage.getItem(
-                                                                                    "userUuid"
+                                                                                    "userUuid",
                                                                                   ),
                                                                                 },
                                                                               },
@@ -1398,7 +1478,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                                   },
                                                                                 user: {
                                                                                   uuid: localStorage.getItem(
-                                                                                    "userUuid"
+                                                                                    "userUuid",
                                                                                   ),
                                                                                 },
                                                                                 category:
@@ -1421,7 +1501,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                                 },
                                                                               user: {
                                                                                 uuid: localStorage.getItem(
-                                                                                  "userUuid"
+                                                                                  "userUuid",
                                                                                 ),
                                                                               },
                                                                               remarks:
@@ -1439,11 +1519,11 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                         ) {
                                                                           zip(
                                                                             this.samplesService.setMultipleSampleStatuses(
-                                                                              statuses
-                                                                            )
+                                                                              statuses,
+                                                                            ),
                                                                           ).subscribe(
                                                                             (
-                                                                              sampleStatusResponse
+                                                                              sampleStatusResponse,
                                                                             ) => {
                                                                               this.savingDataResponse =
                                                                                 sampleStatusResponse;
@@ -1488,13 +1568,13 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                                         true,
                                                                                       panelClass:
                                                                                         "custom-dialog-container",
-                                                                                    }
+                                                                                    },
                                                                                   )
                                                                                   .afterClosed()
                                                                                   .subscribe(
                                                                                     () => {
                                                                                       this.openBarCodeDialog(
-                                                                                        data
+                                                                                        data,
                                                                                       );
                                                                                       this.isRegistrationReady =
                                                                                         false;
@@ -1503,24 +1583,24 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                                                           this.isRegistrationReady =
                                                                                             true;
                                                                                         },
-                                                                                        200
+                                                                                        200,
                                                                                       );
-                                                                                    }
+                                                                                    },
                                                                                   );
                                                                                 this.savingData =
                                                                                   false;
                                                                               }
-                                                                            }
+                                                                            },
                                                                           );
                                                                         }
                                                                       }
-                                                                    }
+                                                                    },
                                                                   );
                                                               }
-                                                            }
+                                                            },
                                                           );
                                                       }
-                                                    }
+                                                    },
                                                   );
 
                                                 // Set diagnosis if any
@@ -1557,7 +1637,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                           this.savingData =
                                                             false;
                                                         }
-                                                      }
+                                                      },
                                                     );
                                                 }
                                               } else {
@@ -1565,7 +1645,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                                 this.errorMessage =
                                                   encounterResponse?.error?.message;
                                               }
-                                            }
+                                            },
                                           );
                                         }
                                       });
@@ -1584,7 +1664,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                         const labRequest =
                                           this.createLabRequestPayload(
                                             this.personDetailsData
-                                              ?.pimaCOVIDLinkDetails
+                                              ?.pimaCOVIDLinkDetails,
                                           );
                                         this.otherSystemsService
                                           .sendLabRequest(labRequest)
@@ -1603,13 +1683,14 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                                   ?.error?.fieldErrors
                                   ? patientResponse?.error?.error?.message
                                   : !Object.keys(
-                                      patientResponse?.error?.error?.fieldErrors
+                                      patientResponse?.error?.error
+                                        ?.fieldErrors,
                                     )?.length
                                   ? "Error occured hence couldn't save the form"
                                   : patientResponse?.error?.error?.fieldErrors[
                                       Object.keys(
                                         patientResponse?.error?.error
-                                          ?.fieldErrors
+                                          ?.fieldErrors,
                                       )[0]
                                     ][0]?.message;
                                 this.savingData = false;
@@ -1657,7 +1738,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     time: string,
     date: string,
     validTime?: string,
-    validDate?: string
+    validDate?: string,
   ): boolean {
     if (time) {
       let currentDate = new Date();
@@ -1746,7 +1827,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
             } ${results?.sampleData?.patient?.familyName}`,
             Date: formatDateToYYMMDD(
               new Date(results?.sampleData?.created),
-              true
+              true,
             ),
             Storage: "",
             Department:
@@ -1790,9 +1871,9 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
             new Date(
               this.getTimestampFromDateAndTime(
                 this.receivedOnDateLatestValue,
-                this.receivedOnTime
-              )
-            )
+                this.receivedOnTime,
+              ),
+            ),
           ),
         },
         { dataElement: "D0RBm3alWd9", value: "RT - PCR" },
@@ -1802,9 +1883,9 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
             new Date(
               this.getTimestampFromDateAndTime(
                 this.receivedOnDateLatestValue,
-                this.receivedOnTime
-              )
-            )
+                this.receivedOnTime,
+              ),
+            ),
           ),
         },
         { dataElement: "HTBFvtjeztu", value: true },
@@ -1813,8 +1894,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
       eventDate: new Date(
         this.getTimestampFromDateAndTime(
           this.receivedOnDateLatestValue,
-          this.receivedOnTime
-        )
+          this.receivedOnTime,
+        ),
       ),
     };
     return this.labRequestPayload;

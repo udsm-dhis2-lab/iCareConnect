@@ -19,7 +19,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatGridListModule } from "@angular/material/grid-list";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDatepickerModule } from "@angular/material/datepicker";
-import { MatNativeDateModule } from "@angular/material/core";
+import { MatMomentDateModule } from "@angular/material-moment-adapter";
 import { MatMenuModule } from "@angular/material/menu";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatDividerModule } from "@angular/material/divider";
@@ -42,7 +42,7 @@ import { MatSidenavModule } from "@angular/material/sidenav";
 
 export const materialModules = [
   MatMenuModule,
-  MatNativeDateModule,
+  MatMomentDateModule,
   MatExpansionModule,
   MatButtonModule,
   MatAutocompleteModule,

@@ -15,7 +15,15 @@ import {
   ThemePalette,
 } from "@angular/material/core";
 import { Observable, of } from "rxjs";
-import { DATE_FORMATS_DD_MM_YYYY } from "src/app/core/constants/date-formats.constants";
+import {
+  DATE_FORMATS_DD_MM_YYYY,
+  DATETIME_FORMATS_DD_MM_YYYY,
+} from "src/app/core/constants/date-formats.constants";
+import {
+  NGX_MAT_DATE_FORMATS,
+  NgxMatDateAdapter,
+} from "@angular-material-components/datetime-picker";
+import { NgxMatMomentDateAdapter } from "../../adapters/ngx-mat-moment-date.adapter";
 import { Field } from "../../models/field.model";
 import { FormService } from "../../services";
 
@@ -31,6 +39,8 @@ import { FormService } from "../../services";
     },
 
     { provide: MAT_DATE_FORMATS, useValue: DATE_FORMATS_DD_MM_YYYY },
+    { provide: NgxMatDateAdapter, useClass: NgxMatMomentDateAdapter },
+    { provide: NGX_MAT_DATE_FORMATS, useValue: DATETIME_FORMATS_DD_MM_YYYY },
   ],
 })
 export class FieldComponent implements AfterViewInit {
@@ -43,7 +53,7 @@ export class FieldComponent implements AfterViewInit {
   @Input() shouldDisable: boolean;
   members$: Observable<any[]> = of([]);
 
-  public color: ThemePalette = 'primary';
+  public color: ThemePalette = "primary";
 
   constructor(private formService: FormService) {}
 
@@ -78,7 +88,7 @@ export class FieldComponent implements AfterViewInit {
             this.field?.searchControlType !== "location"
               ? this.field?.searchTerm
               : "",
-          limit: 50,
+          limit: 50, // TODO: (LOCATION) What should be the default limit for search results?
           tag: this.field?.searchTerm,
           class: this.field?.conceptClass,
           source: this.field?.source,
@@ -86,13 +96,14 @@ export class FieldComponent implements AfterViewInit {
           v:
             this.field?.searchControlType === "concept"
               ? "custom:(uuid,display,datatype,conceptClass,mappings)"
-              : this.field?.searchControlType === "residenceLocation"
+              : this.field?.searchControlType === "residenceLocation" ||
+                this.field?.searchControlType === "location"
               ? "custom:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display)))))"
               : "custom:(uuid,display)",
         },
         this.field?.searchControlType,
         this.field?.filteringItems,
-        this.field
+        this.field,
       );
     } else if (this.field?.options?.length > 0) {
       this.members$ = of(this.field?.options);
@@ -179,7 +190,6 @@ export class FieldComponent implements AfterViewInit {
 
   onListenKeyEvent(event: KeyboardEvent, fieldtype: any): void {
     if (fieldtype === "number") {
-
       if (
         event.key === "Backspace" ||
         event.key === "ArrowLeft" ||
@@ -220,16 +230,24 @@ export class FieldComponent implements AfterViewInit {
 
   get getOptionValue(): any {
     const matchedOption = (this.field.options.filter(
-      (option) => option?.key === this.value
+      (option) => option?.key === this.value,
     ) || [])[0];
     return matchedOption ? matchedOption?.value : "";
   }
 
   get getOptionValueLabel(): any {
     const matchedOption = (this.field.options.filter(
-      (option) => option?.key === this.value
+      (option) => option?.key === this.value,
     ) || [])[0];
     return matchedOption ? matchedOption?.label : "";
+  }
+
+  get getSelectedLocationDisplay(): string {
+    const currentValue = this.form?.controls[this.field.id]?.value;
+    if (currentValue && typeof currentValue === "object") {
+      return currentValue?.display || currentValue?.name || "";
+    }
+    return "";
   }
 
   searchItem(event: any, field?: any): void {
@@ -250,7 +268,8 @@ export class FieldComponent implements AfterViewInit {
       source: this.field?.source,
       v:
         field?.searchControlType === "residenceLocation" ||
-        field?.searchControlType === "healthFacility"
+        field?.searchControlType === "healthFacility" ||
+        field?.searchControlType === "location"
           ? "custom:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display,parentLocation:(uuid,display)))))"
           : field?.searchControlType === "concept" ||
             field?.conceptClass === "Diagnosis"
@@ -261,7 +280,7 @@ export class FieldComponent implements AfterViewInit {
       parameters,
       this.field?.searchControlType,
       this.field?.filteringItems,
-      this.field
+      this.field,
     );
   }
 
@@ -279,8 +298,8 @@ export class FieldComponent implements AfterViewInit {
       field?.options?.filter(
         (option) =>
           option?.label?.toLowerCase()?.indexOf(searchingText?.toLowerCase()) >
-          -1
-      ) || []
+          -1,
+      ) || [],
     );
     let objectToUpdate: any = {};
     if (!searchingText || searchingText?.length === 0) {
@@ -306,6 +325,8 @@ export class FieldComponent implements AfterViewInit {
     objectToUpdate[field?.key] =
       field?.searchControlType === "drugStock"
         ? item
+        : field?.searchControlType === "location"
+        ? item
         : !field?.searchControlType ||
           field?.searchControlType !== "residenceLocation"
         ? value
@@ -322,7 +343,7 @@ export class FieldComponent implements AfterViewInit {
   displayLabelFunc(value?: any): string {
     return value
       ? this.field?.options?.find(
-          (option) => option?.value === (value?.value ? value?.value : value)
+          (option) => option?.value === (value?.value ? value?.value : value),
         )?.label
       : undefined;
   }

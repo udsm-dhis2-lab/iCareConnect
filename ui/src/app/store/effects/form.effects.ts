@@ -32,9 +32,9 @@ export class FormEffects {
         concatMap((action) =>
           of(action).pipe(
             withLatestFrom(
-              this.store.pipe(select(getFormsByNames(action.formConfigs)))
-            )
-          )
+              this.store.pipe(select(getFormsByNames(action.formConfigs))),
+            ),
+          ),
         ),
         tap(([{ formConfigs }, formFromStore]) => {
           if (formFromStore.length === 0) {
@@ -42,7 +42,7 @@ export class FormEffects {
               new Notification({
                 message: "Loading Consultation forms",
                 type: "LOADING",
-              })
+              }),
             );
 
             this.store.dispatch(initiateFormLoadingState());
@@ -52,7 +52,7 @@ export class FormEffects {
                   new Notification({
                     message: "Consultation forms successfully loaded",
                     type: "SUCCESS",
-                  })
+                  }),
                 );
 
                 this.store.dispatch(upsertForms({ forms }));
@@ -62,16 +62,16 @@ export class FormEffects {
                   new Notification({
                     message: "Error loading consultation forms",
                     type: "ERROR",
-                  })
+                  }),
                 );
 
                 this.store.dispatch(loadFormsFailed({ error }));
-              }
+              },
             );
           }
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   customOpenMRSForm$ = createEffect(() =>
@@ -90,11 +90,11 @@ export class FormEffects {
                     formField?.field?.concept,
                     formField,
                     action?.causesOfDeathConcepts,
-                    formResponse?.conceptSourceUuid
+                    formResponse?.conceptSourceUuid,
                   );
                 }),
                 ["fieldNumber"],
-                ["asc"]
+                ["asc"],
               );
 
               const keyedGroups =
@@ -110,22 +110,22 @@ export class FormEffects {
                       keyedGroups[key]?.map((fieldItem) =>
                         fieldItem?.formField
                           ? fieldItem?.formField
-                          : fieldItem?.formFiels
-                      )
+                          : fieldItem?.formFiels,
+                      ),
                     )
                   : null,
                 unGroupedFields:
                   formattedFormFields?.filter(
-                    (formField: any) => !formField?.formField
+                    (formField: any) => !formField?.formField,
                   ) || [],
                 isForm: true,
               };
               return upsertForms({ forms: [formattedForm] });
-            })
+            }),
           );
         }
-      })
-    )
+      }),
+    ),
   );
 
   customOpenMRSForms$ = createEffect(() =>
@@ -151,11 +151,12 @@ export class FormEffects {
                           formField?.field?.concept,
                           formField,
                           action.causesOfDeathConcepts,
-                          formResponse?.conceptSourceUuid
+                          formResponse?.conceptSourceUuid,
+                          formResponse?.formFields
                         ),
                       ],
                       ["fieldNumber", "fieldPart"],
-                      ["asc", "asc"]
+                      ["asc", "asc"],
                     );
                   }
                 });
@@ -176,8 +177,8 @@ export class FormEffects {
                           keyedGroups[key]?.map((fieldItem) =>
                             fieldItem?.formField
                               ? fieldItem?.formField
-                              : fieldItem
-                          )
+                              : fieldItem,
+                          ),
                         )
                       : null,
                     isForm: true,
@@ -185,19 +186,19 @@ export class FormEffects {
                 ];
               });
               return upsertForms({ forms: forms });
-            })
+            }),
           );
         } else {
           return from([]);
         }
-      })
-    )
+      }),
+    ),
   );
 
   constructor(
     private actions$: Actions,
     private formService: FormService,
     private store: Store<AppState>,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
   ) {}
 }

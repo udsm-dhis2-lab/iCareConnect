@@ -8,7 +8,7 @@ import { map, take } from "rxjs/operators";
 import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
 import { LocationService } from "src/app/core/services";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { formatDateToString, formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { ProviderAttributeGet } from "src/app/shared/resources/openmrs";
 import {
   NHIFBiometricMethodE,
@@ -540,12 +540,8 @@ export class LaboratoryComponent implements OnInit {
       this.store.dispatch(clearVisitsDatesParameters());
       this.parameters = {
         ...this.parameters,
-        startDate: `${this.startDate.getFullYear()}-${
-          this.startDate.getMonth() + 1
-        }-${this.startDate.getDate()}`,
-        endDate: `${this.endDate.getFullYear()}-${
-          this.endDate.getMonth() + 1
-        }-${this.endDate.getDate()}`,
+        startDate: formatDateToString(new Date(this.startDate), "yyyy-MM-dd"),
+        endDate: formatDateToString(new Date(this.endDate), "yyyy-MM-dd"),
       };
 
       this.store.dispatch(

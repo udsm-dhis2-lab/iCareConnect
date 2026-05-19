@@ -4,6 +4,7 @@ package org.openmrs.module.icare.laboratory.dao;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
+import org.openmrs.Order;
 import org.openmrs.Visit;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.module.icare.core.ListResult;
@@ -480,209 +481,124 @@ public class SampleDAO extends BaseDAO<Sample> {
 	}
 	
 	public ListResult<SampleExt> getSamplesWithoutAllocations(Date startDate, Date endDate, Pager pager,
-			String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
-			String acceptedByUuid, String testConceptUuid, String departmentUuid, String specimenSourceUuid,
-			String instrumentUuid, String visitUuid, String excludeStatus) {
-
+	        String locationUuid, String sampleCategory, String testCategory, String q, String hasStatus,
+	        String acceptedByUuid, String testConceptUuid, String departmentUuid, String specimenSourceUuid,
+	        String instrumentUuid, String visitUuid, String excludeStatus) {
+		
 		DbSession session = this.getSession();
-
-		String queryStr = "SELECT DISTINCT sp \n" + "FROM Sample sp ";
-		// if (sampleCategory != null) {
-		// queryStr += " JOIN sp.sampleStatuses ss ";
-		// }
-
+		
+		String queryStr = "SELECT sp FROM Sample sp ";
+		queryStr += " LEFT JOIN sp.sampleOrders sos LEFT JOIN sos.order o ";
+		
 		if (testConceptUuid != null) {
-			queryStr += " LEFT JOIN sp.sampleOrders sos JOIN sos.id.order o JOIN o.concept orderConcept ";
-			if (q != null) {
-			} else {
-				queryStr += " WHERE orderConcept.uuid =:testConceptUuid ";
-			}
+			queryStr += " JOIN o.concept orderConcept ";
 		}
-
+		
 		if (q != null) {
 			queryStr += " JOIN sp.visit v LEFT JOIN v.patient p LEFT JOIN p.names pname LEFT JOIN p.identifiers pi LEFT JOIN v.attributes va ";
-
-			if (testConceptUuid != null) {
-				queryStr += " WHERE orderConcept.uuid =:testConceptUuid ";
-			}
-
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
-			}
-
+		}
+		
+		boolean hasWhere = false;
+		
+		if (testConceptUuid != null) {
+			queryStr += " WHERE orderConcept.uuid = :testConceptUuid ";
+			hasWhere = true;
+		}
+		
+		if (q != null) {
+			queryStr += (hasWhere ? " AND " : " WHERE ");
 			queryStr += "(lower(sp.label) like lower(:q) OR (lower(concat(pname.givenName,pname.middleName,pname.familyName)) LIKE lower(:q) OR lower(pname.givenName) LIKE lower(:q) OR lower(pname.middleName) LIKE lower(:q) OR lower(pname.familyName) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.familyName)) LIKE lower(:q) OR lower(concat(pname.givenName,'',pname.middleName)) LIKE lower(:q) OR lower(concat(pname.middleName,'',pname.familyName)) LIKE lower(:q)  OR pi.identifier LIKE :q OR lower(va.valueReference) LIKE lower(:q)))";
+			hasWhere = true;
 		}
-
+		
 		if (startDate != null && endDate != null) {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
-			}
-			queryStr += " ((cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) \n"
-					+ "OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate))";
+			queryStr += (hasWhere ? " AND " : " WHERE ");
+			queryStr += " ((cast(sp.dateTime as date) BETWEEN :startDate AND :endDate) OR (cast(sp.dateCreated as date) BETWEEN :startDate AND :endDate))";
+			hasWhere = true;
 		}
-
+		
 		if (departmentUuid != null) {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
-			}
-			queryStr += "sp.concept.uuid =:departmentUuid";
+			queryStr += (hasWhere ? " AND " : " WHERE ");
+			queryStr += " sp.concept.uuid = :departmentUuid";
+			hasWhere = true;
 		}
-
+		
 		if (specimenSourceUuid != null) {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
-			}
-			queryStr += "sp.specimenSource.uuid =:specimenSourceUuid";
+			queryStr += (hasWhere ? " AND " : " WHERE ");
+			queryStr += " sp.specimenSource.uuid = :specimenSourceUuid";
+			hasWhere = true;
 		}
-
+		
 		if (instrumentUuid != null) {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
-			}
-			queryStr += " sp IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS' AND sst.sample IN (SELECT testAllocation.sampleOrder.id.sample FROM TestAllocation testAllocation WHERE testAllocation IN (SELECT res.testAllocation FROM Result res WHERE res.instrument.uuid =:instrumentUuid)))) ";
+			queryStr += (hasWhere ? " AND " : " WHERE ");
+			queryStr += " sp IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS' AND sst.sample IN (SELECT testAllocation.sampleOrder.id.sample FROM TestAllocation testAllocation WHERE testAllocation IN (SELECT res.testAllocation FROM Result res WHERE res.instrument.uuid = :instrumentUuid)))) ";
+			hasWhere = true;
 		}
-
+		
 		if (locationUuid != null) {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
-			}
+			queryStr += (hasWhere ? " AND " : " WHERE ");
 			queryStr += " sp.visit.location = (SELECT l FROM Location l WHERE l.uuid = :locationUuid)";
+			hasWhere = true;
 		}
+		
 		if (sampleCategory != null) {
-
-			if (sampleCategory.toLowerCase().equals("not accepted")) {
-				if (!queryStr.contains("WHERE")) {
-					queryStr += " WHERE ";
-				} else {
-					queryStr += " AND ";
-				}
-				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'  OR  lower(sst.category) LIKE 'reject%' OR lower(sst.category) LIKE 'dispose%')) ";
-
-			} else if (sampleCategory.toLowerCase().equals("no results")) {
-				if (!queryStr.contains("WHERE")) {
-					queryStr += " WHERE ";
-				} else {
-					queryStr += " AND ";
-				}
-				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS'  OR  lower(sst.category) LIKE 'reject%' OR lower(sst.category) LIKE 'dispose%')) AND sp IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'))";
-
-			} else if (sampleCategory.toLowerCase().equals("rejected")) {
-				if (!queryStr.contains("WHERE")) {
-					queryStr += " WHERE ";
-				} else {
-					queryStr += " AND ";
-				}
-				queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE lower(sst.category) LIKE 'reject%')";
+			queryStr += (hasWhere ? " AND " : " WHERE ");
+			hasWhere = true;
+			if (sampleCategory.equalsIgnoreCase("not accepted")) {
+				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED' OR lower(sst.category) LIKE 'reject%' OR lower(sst.category) LIKE 'dispose%')) ";
+			} else if (sampleCategory.equalsIgnoreCase("no results")) {
+				queryStr += " sp NOT IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='HAS_RESULTS' OR lower(sst.category) LIKE 'reject%' OR lower(sst.category) LIKE 'dispose%')) AND sp IN (SELECT DISTINCT sst.sample FROM SampleStatus sst WHERE (sst.category='ACCEPTED'))";
+			} else if (sampleCategory.equalsIgnoreCase("rejected")) {
+				queryStr += " sp IN (SELECT sst.sample FROM SampleStatus sst WHERE lower(sst.category) LIKE 'reject%')";
 			} else {
-
-				if (!queryStr.contains("WHERE")) {
-					queryStr += " WHERE ";
-				} else {
-					queryStr += " AND ";
-				}
-				queryStr += "sp IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category=:sampleCategory)";
-
+				queryStr += " sp IN (SELECT sst.sample FROM SampleStatus sst WHERE sst.category = :sampleCategory)";
 			}
-
 		}
-		if (testCategory != null && testCategory != "Completed") {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
-			}
-			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.category=:testCategory))";
+		
+		if (testCategory != null && !"Completed".equals(testCategory)) {
+			queryStr += (hasWhere ? " AND " : " WHERE ");
+			queryStr += " sp IN (SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testallocstatus.testAllocation FROM TestAllocationStatus testallocstatus WHERE testallocstatus.category = :testCategory))";
+			hasWhere = true;
 		}
-
-		if (testCategory == "Completed") {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
-			}
-			queryStr += "sp IN(SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testresults.testAllocation FROM Result testresults))) ";
-
-			// queryStr+="LEFT JOIN TestAllocation testalloc ON
-			// testalloc.sampleOrder.id.sample = sp JOIN Result testresults ON
-			// testresults.testAllocation = testalloc GROUP BY sp HAVING
-			// COUNT(testalloc)=COUNT(testresults) ";
-
-			// queryStr +=" LEFT JOIN sp.testAllocations al LEFT JOIN
-			// al.testAllocationResults ar GROUP BY sp HAVING COUNT(al.id) =
-			// COUNT(ar.testAllocation)";
-
+		
+		if ("Completed".equals(testCategory)) {
+			queryStr += (hasWhere ? " AND " : " WHERE ");
+			queryStr += " sp IN (SELECT testalloc.sampleOrder.id.sample FROM TestAllocation testalloc WHERE testalloc IN (SELECT testresults.testAllocation FROM Result testresults)) ";
+			hasWhere = true;
 		}
-
+		
 		if (hasStatus != null) {
-			if (hasStatus.toLowerCase().equals("no")) {
-
-				if (!queryStr.contains("WHERE")) {
-					queryStr += " WHERE ";
-				} else {
-					queryStr += " AND ";
-				}
-				queryStr += "sp NOT IN( SELECT samplestatus.sample FROM SampleStatus samplestatus)";
-
-			}
-			if (hasStatus.toLowerCase().equals("yes")) {
-
-				if (!queryStr.contains("WHERE")) {
-					queryStr += " WHERE ";
-				} else {
-					queryStr += " AND ";
-				}
-
+			queryStr += (hasWhere ? " AND " : " WHERE ");
+			hasWhere = true;
+			if (hasStatus.equalsIgnoreCase("no")) {
+				queryStr += " sp NOT IN (SELECT samplestatus.sample FROM SampleStatus samplestatus)";
+			} else if (hasStatus.equalsIgnoreCase("yes")) {
 				if (acceptedByUuid == null) {
-					queryStr += "sp IN( SELECT samplestatus.sample FROM SampleStatus samplestatus)";
-
-				}
-				if (acceptedByUuid != null) {
-					queryStr += "sp IN ( SELECT samplestatus.sample FROM SampleStatus samplestatus WHERE samplestatus.user IN( SELECT usr FROM User usr WHERE uuid = :acceptedByUuid))";
-
+					queryStr += " sp IN (SELECT samplestatus.sample FROM SampleStatus samplestatus)";
+				} else {
+					queryStr += " sp IN (SELECT samplestatus.sample FROM SampleStatus samplestatus WHERE samplestatus.user IN (SELECT usr FROM User usr WHERE uuid = :acceptedByUuid))";
 				}
 			}
 		}
-
+		
 		if (visitUuid != null) {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
-			}
-			queryStr += "sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
-
+			queryStr += (hasWhere ? " AND " : " WHERE ");
+			queryStr += " sp.visit = (SELECT v FROM Visit v WHERE v.uuid = :visitUuid)";
+			hasWhere = true;
 		}
-
+		
 		if (excludeStatus != null) {
-
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
-			}
-
-			queryStr += "sp NOT IN( SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN(:statuses)))";
-
+			queryStr += (hasWhere ? " AND " : " WHERE ");
+			queryStr += " sp NOT IN (SELECT sst.sample FROM SampleStatus sst WHERE sst.category IN (:statuses))";
+			hasWhere = true;
 		}
-
-		queryStr += " ORDER BY sp.dateCreated DESC";
-		// if (sampleCategory != null) {
-		// queryStr += ",ss.timestamp DESC";
-		// }
-		System.out.println(queryStr);
+		
+		queryStr += " GROUP BY sp.id, sp.dateCreated ";
+		queryStr += " ORDER BY MIN(CASE WHEN o.urgency = :urgency THEN 0 ELSE 1 END) ASC, sp.dateCreated DESC";
+		
 		Query query = session.createQuery(queryStr);
+		query.setParameter("urgency", org.openmrs.Order.Urgency.STAT);
+		
 		if (startDate != null && endDate != null) {
 			query.setParameter("startDate", startDate);
 			query.setParameter("endDate", endDate);
@@ -690,78 +606,55 @@ public class SampleDAO extends BaseDAO<Sample> {
 		if (locationUuid != null) {
 			query.setParameter("locationUuid", locationUuid);
 		}
-
-		if (sampleCategory != null && !sampleCategory.toLowerCase().equals("not accepted")
-				&& !sampleCategory.toLowerCase().equals("no results")
-				&& !sampleCategory.toLowerCase().equals("rejected")) {
-			query.setParameter("sampleCategory", sampleCategory);
-		}
-
 		if (q != null) {
 			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
 		}
-
 		if (departmentUuid != null) {
 			query.setParameter("departmentUuid", departmentUuid);
 		}
-
 		if (specimenSourceUuid != null) {
 			query.setParameter("specimenSourceUuid", specimenSourceUuid);
 		}
-
-		if (testCategory != null && testCategory != "Completed") {
+		if (testCategory != null && !"Completed".equals(testCategory)) {
 			query.setParameter("testCategory", testCategory);
 		}
-
-		if (acceptedByUuid != null && hasStatus.toLowerCase().equals("yes")) {
+		if (acceptedByUuid != null && "yes".equalsIgnoreCase(hasStatus)) {
 			query.setParameter("acceptedByUuid", acceptedByUuid);
 		}
 		if (testConceptUuid != null) {
 			query.setParameter("testConceptUuid", testConceptUuid);
 		}
-
 		if (instrumentUuid != null) {
 			query.setParameter("instrumentUuid", instrumentUuid);
 		}
-
 		if (visitUuid != null) {
 			query.setParameter("visitUuid", visitUuid);
 		}
-
+		if (sampleCategory != null
+		        && !Arrays.asList("not accepted", "no results", "rejected").contains(sampleCategory.toLowerCase())) {
+			query.setParameter("sampleCategory", sampleCategory);
+		}
 		if (excludeStatus != null) {
-			Pattern pattern = Pattern.compile("List:\\[(.*?)\\]");
-			Matcher matcher = pattern.matcher(excludeStatus);
-			String excludedValue;
-			if (matcher.find()) {
-				excludedValue = matcher.group(1);
-			} else {
-				excludedValue = excludeStatus;
-			}
-
-			String[] valuesArray = excludedValue.split(",");
-			List<String> valueList = new ArrayList<>(Arrays.asList(valuesArray));
+			String cleanExclude = excludeStatus.replace("List:[", "").replace("]", "");
+			List<String> valueList = Arrays.asList(cleanExclude.split(","));
 			query.setParameterList("statuses", valueList);
 		}
-
+		
 		if (pager.isAllowed()) {
 			pager.setTotal(query.list().size());
-			// pager.setPageCount(pager.getT);
 			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
 			query.setMaxResults(pager.getPageSize());
 		}
-
-		List<Sample> rawSamples = query.list();
-
-		List<SampleExt> finalResults = new ArrayList<>();
-
+		
+		List<Sample> rawSamples = (List<Sample>) query.list();
+		List<SampleExt> finalResults = new ArrayList<SampleExt>();
 		for (Sample parent : rawSamples) {
 			SampleExt child = new SampleExt();
 			BeanUtils.copyProperties(parent, child);
-
 			finalResults.add(child);
 		}
-
-		ListResult<SampleExt> listResults = new ListResult<>();
+		
+		ListResult<SampleExt> listResults = new ListResult<SampleExt>();
 		listResults.setPager(pager);
 		listResults.setResults(finalResults);
 		return listResults;
