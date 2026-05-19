@@ -98,8 +98,6 @@ export class SamplesService {
 
     if (excludeAllocations) {
       parameters = [...parameters, "excludeAllocations=true"];
-    } else {
-      parameters = [...parameters, "excludeAllocations=true"];
     }
     return this.httpClient
       .get(
