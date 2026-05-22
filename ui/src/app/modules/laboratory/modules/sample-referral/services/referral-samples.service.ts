@@ -3,12 +3,14 @@ import { Injectable, signal } from "@angular/core";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { BASE_URL } from "src/app/shared/constants/constants.constants";
 import { tap } from "rxjs/operators";
+import { set } from "cypress/types/lodash";
+
 
 @Injectable({
   providedIn: "root",
 })
 export class SampleReferralService {
-    referralSettings?: any = signal<any>({});
+    private sampleReferralSettings?: any = signal<any>({});
     
     constructor(
         private httpClient: HttpClient,
@@ -49,8 +51,19 @@ export class SampleReferralService {
                 if (!settings) {
                     console.warn("No referral form settings found for sample referral module");
                 }
-                this.referralSettings.set(settings);
+                this.sampleReferralSettings.set(settings);
             })
         )
+    }
+
+    referralSettings() {
+        if(!this.sampleReferralSettings() || Object.keys(this.sampleReferralSettings()).length === 0) {
+            
+            setTimeout(async () => {
+                await this.getReferralSettings().toPromise();
+            }, 0);
+        }
+
+        return this.sampleReferralSettings();
     }
 }

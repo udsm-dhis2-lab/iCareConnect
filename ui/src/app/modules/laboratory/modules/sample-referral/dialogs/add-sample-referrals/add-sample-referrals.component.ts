@@ -34,4 +34,10 @@ export class AddSampleReferralsComponent {
   closeDialog() {
     this.dialogRef.close();
   }
+
+  onCompletereferralForm(){
+    this.dialogRef.close({
+      formCompleted: true
+    });
+  }
 }

@@ -5,6 +5,7 @@ import { map } from "rxjs/operators";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { VisitsService } from "../../resources/visits/services/visits.service";
 import { SamplesService } from "../../services/samples.service";
+import { SampleReferralService } from "src/app/modules/laboratory/modules/sample-referral/services/referral-samples.service";
 
 @Component({
   selector: "app-shared-sample-details",
@@ -29,8 +30,11 @@ export class SharedSampleDetailsComponent implements OnInit {
   constructor(
     private visitService: VisitsService,
     private conceptService: ConceptsService,
-    private sampleService: SamplesService
+    private sampleService: SamplesService,
+    private sampleReferralService: SampleReferralService
   ) {}
+
+  referralOrderConcept = this.sampleReferralService.referralSettings()?.referralOrderConcept;
 
   get sampleStatusesByCategory() {
     return keyBy(this.sample.statuses, "category");

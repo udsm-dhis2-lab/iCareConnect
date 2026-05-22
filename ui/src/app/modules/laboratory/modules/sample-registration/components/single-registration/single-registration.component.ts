@@ -1722,7 +1722,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
     return char.length == 1 ? "0" + char : char;
   }
 
-  async markSampleForReferral(sample: any, patient: any, priority: string = "ROUTINE"): Promise<void> {
+  async markSampleForReferral(sample: any, patient: any, priority: string): Promise<void> {
     const provider = this.provider;
     const referralOrderConcept = this.sampleReferralService.referralSettings()?.referralOrderConcept || null;
     const orderType = this.sampleReferralService.referralSettings()?.referralOrderType || null;
@@ -1755,7 +1755,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
       type: "order",
       orderType: orderType,
       action: "NEW",
-      urgency: priority,
+      urgency: priority || "ROUTINE",
       careSetting: "OUTPATIENT" ,
       patient: patient?.uuid,
       concept: referralOrderConcept,

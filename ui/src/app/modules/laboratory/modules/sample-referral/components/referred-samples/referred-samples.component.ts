@@ -30,6 +30,8 @@ export class ReferredSamplesComponent implements OnInit, OnDestroy {
   pageSize = 10;
   pageCounts: number[] = [10, 20, 25, 50];
 
+  selectedSampleUuid: string | null = null;
+
   constructor() {
     this.subject
           .pipe(debounceTime(2000), distinctUntilChanged())
@@ -89,7 +91,15 @@ export class ReferredSamplesComponent implements OnInit, OnDestroy {
       maxHeight: "80vh",
       closeOnNavigation: false,
       disableClose: true
+    }).afterClosed().subscribe((data) => {
+      if(data?.formCompleted) {
+        this.getSamplesByReferralOrderType(this.referralOrderTypeUuid!);
+      }
     });
+  }
+
+  onViewSampleDetails(sample: any){
+    this.selectedSampleUuid = sample?.uuid;
   }
 
   ngOnDestroy() {
