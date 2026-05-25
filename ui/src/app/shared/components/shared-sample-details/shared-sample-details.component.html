@@ -63,6 +63,12 @@
       </div>
       <div class="row d-flex">
         <ng-container *ngFor="let encounter of params?.encounterInformation">
+          @if(viewForReferral){
+            <div class="col-12 mt-12">
+              <b> {{ encounter?.form?.display }} </b>
+            </div> 
+            <hr>
+          }
           <div
             class="col-md-6 col-sm-12 col-sx-12"
             *ngFor="let formField of encounter?.form?.formFields"

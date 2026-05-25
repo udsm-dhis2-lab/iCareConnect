@@ -11,12 +11,14 @@ import { ReferralPackagingInformationComponent } from './components/referral-pac
 import { ReferralTransportInformationComponent } from './components/referral-transport-information/referral-transport-information.component';
 import { SampleReferralFormComponent } from "./components/sample-referral-form/sample-referral-form.component";
 import { AddSampleReferralsComponent } from "./dialogs/add-sample-referrals/add-sample-referrals.component";
+import { EditSampleReferralsComponent } from "./dialogs/edit-sample-referrals/edit-sample-referrals.component";
 
 @NgModule({
   declarations: [
     HomeComponent, 
     ReferredSamplesComponent,
     AddSampleReferralsComponent,
+    EditSampleReferralsComponent,
     ReferralSampleInformationComponent,
     ReferralDestinationInformationComponent,
     ReferralPackagingInformationComponent,

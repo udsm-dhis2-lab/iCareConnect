@@ -6,6 +6,10 @@ import { formatDateToString } from "src/app/shared/helpers/format-date.helper";
 import { debounceTime, distinctUntilChanged } from "rxjs/operators";
 import { MatDialog } from "@angular/material/dialog";
 import { AddSampleReferralsComponent } from "../../dialogs/add-sample-referrals/add-sample-referrals.component";
+import { EditSampleReferralsComponent } from "../../dialogs/edit-sample-referrals/edit-sample-referrals.component";
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/store/reducers";
+import { loadCustomOpenMRSForms } from "src/app/store/actions";
 
 @Component({
   selector: "app-referred-samples",
@@ -17,6 +21,7 @@ export class ReferredSamplesComponent implements OnInit, OnDestroy {
   private sampleReferralService = inject(SampleReferralService);
   private labDateService = inject(LabDateService);
   private dialog = inject(MatDialog);
+  private store = inject(Store<AppState>);
 
   
   referredSamples$?: Observable<any>;
@@ -53,6 +58,12 @@ export class ReferredSamplesComponent implements OnInit, OnDestroy {
     if (this.referralOrderTypeUuid && this.startDate && this.endDate) {
       this.getSamplesByReferralOrderType(this.referralOrderTypeUuid);
     }
+
+    this.store.dispatch(
+          loadCustomOpenMRSForms({
+            formUuids: Object.values(this.sampleReferralService.referralSettings()?.forms || {}),
+          })
+        );
   }
 
   reloadSampleListOnDateChange() {
@@ -105,5 +116,21 @@ export class ReferredSamplesComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.dialog.closeAll();
   }
+
+  // onEditSample(sample: any){
+  //   this.dialog.open(EditSampleReferralsComponent, {
+  //     maxWidth: "80vw",
+  //     maxHeight: "80vh",
+  //     closeOnNavigation: false,
+  //     disableClose: true,
+  //     data: {
+  //       sample: sample
+  //     }
+  //   }).afterClosed().subscribe((data) => {
+  //     if(data?.formCompleted) {
+  //       this.getSamplesByReferralOrderType(this.referralOrderTypeUuid!);
+  //     }
+  //   });
+  // }
 
 }

@@ -23,6 +23,7 @@ export class SharedSampleDetailsComponent implements OnInit {
   @Input() departments: any[];
   @Input() specimenSources: any[];
   @Input() codedReasonsForRejection: any[];
+  @Input() viewForReferral: boolean = false;
 
   sampleDetails$: Observable<any>;
   externalSystems$: Observable<any[]>;
@@ -35,6 +36,8 @@ export class SharedSampleDetailsComponent implements OnInit {
   ) {}
 
   referralOrderConcept = this.sampleReferralService.referralSettings()?.referralOrderConcept;
+  referralEncounterType = this.sampleReferralService.referralSettings()?.referralEncounterType;
+  referralForms = this.sampleReferralService.referralSettings()?.forms;
 
   get sampleStatusesByCategory() {
     return keyBy(this.sample.statuses, "category");
@@ -57,6 +60,7 @@ export class SharedSampleDetailsComponent implements OnInit {
       })
       .pipe(
         map((encounters) => {
+          encounters =  this.viewForReferral ? encounters?.filter((encounter) => encounter?.encounterType?.uuid === this.referralEncounterType) : encounters;
           return encounters?.map((encounter) => {
             return {
               ...encounter,

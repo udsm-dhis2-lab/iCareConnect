@@ -86,7 +86,7 @@
                       <mat-icon>remove_red_eye</mat-icon>
                       View details
                     </button>
-                    <button mat-menu-item [disabled]="true">
+                    <button mat-menu-item (click)="onEditSample(sample)" [disabled]="true">
                       <mat-icon>edit</mat-icon>
                       Edit
                     </button>
@@ -95,7 +95,7 @@
               </tr>
               <tr *ngIf="sample?.uuid === selectedSampleUuid" class="sample-details-row">
                 <td colspan="100%">
-                  <app-shared-sample-details [sample]="sample"></app-shared-sample-details>
+                  <app-shared-sample-details [sample]="sample" [viewForReferral]="true"></app-shared-sample-details>
                 </td>
               </tr>
             </ng-container>

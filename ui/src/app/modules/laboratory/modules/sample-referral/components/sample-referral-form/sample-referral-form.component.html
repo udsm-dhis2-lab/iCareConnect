@@ -16,8 +16,12 @@
         </div>
     }
     <div class="col-12">
-        <app-render-openmrs-form [formId]="formId" [colClass]="'col-md-12 col-sm-12 col-lg-12'"
-            (formDataUpdate)="onFormUpdate($event)"></app-render-openmrs-form>
+        <app-render-openmrs-form 
+            [formId]="formId" 
+            [colClass]="'col-md-12 col-sm-12 col-lg-12'"
+            [observations]="observations"
+            (formDataUpdate)="onFormUpdate($event)"
+        ></app-render-openmrs-form>
     </div>
 </div>
 <div class="row align-items-end">

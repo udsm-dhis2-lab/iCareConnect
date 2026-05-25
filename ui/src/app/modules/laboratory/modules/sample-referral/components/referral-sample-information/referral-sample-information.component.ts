@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { Observable, zip } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { SampleReferralService } from '../../services/referral-samples.service';
@@ -26,6 +26,8 @@ export class ReferralSampleInformationComponent {
   private observationService = inject(ObservationService);
   private sampleService = inject(SamplesService)
   private snackbar = inject(MatSnackBar);
+
+  @Input() observations?: any
 
 
   @Output() stepComplete = new EventEmitter<any>();
