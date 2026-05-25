@@ -1,0 +1,32 @@
+@if(!formId || this.loading){
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+} @else {
+<div class="row">
+    <div class="{{ showMarkedOnlyField ? 'col-10' : 'col-12' }}">
+        <app-multiple-results-entry [options]="options" [label]="'Select Samples'"
+            [noEntriesFoundLabel]="'No samples found!'" [loading]="loadingOptions" (loadMore)="onLoadMore()"
+            (searchChange)="onSearchChange($event)" (selectedList)="onSelection($event)"></app-multiple-results-entry>
+        
+    </div>
+    @if(showMarkedOnlyField){
+        <div class="col-2">
+            <mat-checkbox color="primary" (change)="onToggleSamples($event)" [checked]="withOrderType">
+                Only marked for referral
+            </mat-checkbox>
+        </div>
+    }
+    <div class="col-12">
+        <app-render-openmrs-form 
+            [formId]="formId" 
+            [colClass]="'col-md-12 col-sm-12 col-lg-12'"
+            [observations]="observations"
+            (formDataUpdate)="onFormUpdate($event)"
+        ></app-render-openmrs-form>
+    </div>
+</div>
+<div class="row align-items-end">
+    <div class="col-12 d-flex justify-content-end">
+        <button mat-raised-button color="primary" [disabled]="!isValid" (click)="onSave()">{{ saveButtonText }}</button>
+    </div>
+</div>
+}

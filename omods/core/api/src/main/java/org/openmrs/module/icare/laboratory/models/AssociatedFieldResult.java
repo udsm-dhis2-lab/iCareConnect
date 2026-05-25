@@ -120,4 +120,9 @@ public class AssociatedFieldResult extends BaseOpenmrsData implements java.io.Se
 
         return associatedFieldResultMap;
     }
+	
+	@Override
+	public Map<String, Object> toMap(Object... params) {
+		return toMap();
+	}
 }

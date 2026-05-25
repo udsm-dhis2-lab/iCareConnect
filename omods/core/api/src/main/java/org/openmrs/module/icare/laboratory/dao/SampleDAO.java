@@ -357,6 +357,207 @@ public class SampleDAO extends BaseDAO<Sample> {
 		return listResults;
 	}
 	
+	//	public ListResult<Sample> getSamplesByOrderType(Date startDate, Date endDate, Pager pager, String orderTypeUuid,
+	//	        Boolean haveThisOrderType, String q) {
+	//
+	//		DbSession session = this.getSession();
+	//
+	//		String hqlBase = " FROM Sample s ";
+	//
+	//		if (haveThisOrderType != null && haveThisOrderType && orderTypeUuid != null) {
+	//			hqlBase += " JOIN s.sampleOrders so JOIN so.order o JOIN o.orderType ot ";
+	//		}
+	//
+	//		String whereClause = "";
+	//		boolean hasWhere = false;
+	//
+	//		if (orderTypeUuid != null) {
+	//			if (haveThisOrderType != null && haveThisOrderType) {
+	//				whereClause += " WHERE ot.uuid = :orderTypeUuid ";
+	//				hasWhere = true;
+	//			} else {
+	//				whereClause += " WHERE s.id NOT IN (SELECT s2.id FROM Sample s2 JOIN s2.sampleOrders so2 JOIN so2.order o2 JOIN o2.orderType ot2 WHERE ot2.uuid = :orderTypeUuid) ";
+	//				hasWhere = true;
+	//			}
+	//		}
+	//
+	//		if (q != null && !q.isEmpty()) {
+	//			whereClause += (hasWhere ? " AND " : " WHERE ");
+	//			whereClause += " s.label LIKE :q ";
+	//			hasWhere = true;
+	//		}
+	//
+	//		if (startDate != null && endDate != null) {
+	//			whereClause += (hasWhere ? " AND " : " WHERE ");
+	//			whereClause += " s.dateCreated >= :startDate AND s.dateCreated <= :endDate ";
+	//			hasWhere = true;
+	//		}
+	//
+	//		String countHql = "SELECT count(DISTINCT s.id) " + hqlBase + whereClause;
+	//		Query countQuery = session.createQuery(countHql);
+	//		setParameters(countQuery, orderTypeUuid, q, startDate, endDate);
+	//
+	//		Long totalCount = (Long) countQuery.uniqueResult();
+	//
+	//		String dataHql = "SELECT s " + hqlBase + whereClause + " GROUP BY s.id ORDER BY s.dateCreated DESC";
+	//		Query query = session.createQuery(dataHql);
+	//		setParameters(query, orderTypeUuid, q, startDate, endDate);
+	//
+	//		ListResult<Sample> listResults = new ListResult<Sample>();
+	//		if (pager != null && pager.isAllowed()) {
+	//			pager.setTotal(totalCount.intValue());
+	//			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+	//			query.setMaxResults(pager.getPageSize());
+	//			listResults.setPager(pager);
+	//		}
+	//
+	//		listResults.setResults(query.list());
+	//		return listResults;
+	//	}
+	
+	//	private void setParameters(Query query, String orderTypeUuid, String q, Date startDate, Date endDate) {
+	//		if (orderTypeUuid != null) {
+	//			query.setParameter("orderTypeUuid", orderTypeUuid);
+	//		}
+	//		if (q != null && !q.isEmpty()) {
+	//			query.setParameter("q", "%" + q + "%");
+	//		}
+	//		if (startDate != null && endDate != null) {
+	//			query.setParameter("startDate", startDate);
+	//			query.setParameter("endDate", endDate);
+	//		}
+	//	}
+	
+	public ListResult<Sample> getSamplesByOrderType(Date startDate, Date endDate, Pager pager, String orderTypeUuid,
+	        Boolean haveThisOrderType, String q, String fulfillerStatus, String formUuid, Boolean haveThisForm,
+	        Boolean combineWithOr) {
+		
+		DbSession session = this.getSession();
+		
+		ListResult<Sample> listResults = new ListResult<Sample>();
+		listResults.setResults(new ArrayList<Sample>());
+		listResults.setPager(pager);
+		
+		if (endDate != null) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(endDate);
+			cal.set(Calendar.HOUR_OF_DAY, 23);
+			cal.set(Calendar.MINUTE, 59);
+			cal.set(Calendar.SECOND, 59);
+			endDate = cal.getTime();
+		}
+		
+		String hqlJoins = " FROM Sample s " + " JOIN s.sampleOrders so " + " JOIN so.order o ";
+		
+		if (orderTypeUuid != null && !orderTypeUuid.isEmpty()) {
+			hqlJoins += " LEFT JOIN o.orderType ot ";
+		}
+		if (formUuid != null && !formUuid.isEmpty()) {
+			hqlJoins += " LEFT JOIN o.encounter e LEFT JOIN e.form f ";
+		}
+		
+		String whereClause = " WHERE o.voided = false ";
+		
+		String orderTypeCondition = "";
+		String formCondition = "";
+		
+		if (orderTypeUuid != null && !orderTypeUuid.isEmpty()) {
+			orderTypeCondition = haveThisOrderType != null && haveThisOrderType ? "ot.uuid = :orderTypeUuid"
+			        : "s.id NOT IN (SELECT so2.sample.id FROM SampleOrder so2 WHERE so2.order.orderType.uuid = :orderTypeUuid AND so2.order.voided = false)";
+		}
+		
+		if (formUuid != null && !formUuid.isEmpty()) {
+			formCondition = haveThisForm != null && haveThisForm ? "f.uuid = :formUuid"
+			        : "s.id NOT IN (SELECT so3.sample.id FROM SampleOrder so3 WHERE so3.order.encounter.form.uuid = :formUuid AND so3.order.voided = false)";
+		}
+		
+		boolean useOr = combineWithOr != null && combineWithOr;
+		
+		if (!orderTypeCondition.isEmpty() && !formCondition.isEmpty()) {
+			whereClause += useOr ? " AND (" + orderTypeCondition + " OR " + formCondition + ")" : " AND "
+			        + orderTypeCondition + " AND " + formCondition;
+		} else if (!orderTypeCondition.isEmpty()) {
+			whereClause += " AND " + orderTypeCondition;
+		} else if (!formCondition.isEmpty()) {
+			whereClause += " AND " + formCondition;
+		}
+		
+		if (fulfillerStatus != null && !fulfillerStatus.isEmpty()) {
+			whereClause += " AND o.fulfillerStatus = :fulfillerStatus ";
+		}
+		
+		if (q != null && !q.isEmpty()) {
+			whereClause += " AND s.label LIKE :q ";
+		}
+		
+		if (startDate != null && endDate != null) {
+			whereClause += " AND o.dateCreated >= :startDate AND o.dateCreated <= :endDate ";
+		}
+		
+		String countHql = "SELECT count(DISTINCT s.id) " + hqlJoins + whereClause;
+		Query countQuery = session.createQuery(countHql);
+		this.setExtendedParameters(countQuery, orderTypeUuid, q, startDate, endDate, fulfillerStatus, formUuid);
+		Long totalCount = (Long) countQuery.uniqueResult();
+		
+		if (totalCount == null || totalCount == 0) {
+			if (pager != null)
+				pager.setTotal(0);
+			return listResults;
+		}
+		
+		String idHql = "SELECT s.id " + hqlJoins + whereClause + " GROUP BY s.id "
+		        + " ORDER BY MIN(CASE WHEN o.urgency = :statUrgency THEN 0 ELSE 1 END) ASC, MAX(o.dateCreated) DESC";
+		
+		Query idQuery = session.createQuery(idHql);
+		this.setExtendedParameters(idQuery, orderTypeUuid, q, startDate, endDate, fulfillerStatus, formUuid);
+		idQuery.setParameter("statUrgency", org.openmrs.Order.Urgency.STAT);
+		
+		if (pager != null && pager.isAllowed()) {
+			pager.setTotal(totalCount.intValue());
+			idQuery.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
+			idQuery.setMaxResults(pager.getPageSize());
+		}
+		
+		List<Integer> ids = idQuery.list();
+		if (ids == null || ids.isEmpty())
+			return listResults;
+		
+		String dataHql = "SELECT DISTINCT s FROM Sample s " + " JOIN FETCH s.sampleOrders so " + " JOIN FETCH so.order o "
+		        + " JOIN FETCH o.orderType ot " + " LEFT JOIN FETCH o.encounter e " + " LEFT JOIN FETCH e.form f "
+		        + " WHERE s.id IN (:ids) "
+		        + " ORDER BY CASE WHEN o.urgency = :statUrgency THEN 0 ELSE 1 END ASC, o.dateCreated DESC";
+		
+		Query dataQuery = session.createQuery(dataHql);
+		dataQuery.setParameterList("ids", ids);
+		dataQuery.setParameter("statUrgency", org.openmrs.Order.Urgency.STAT);
+		
+		listResults.setResults(dataQuery.list());
+		return listResults;
+	}
+	
+	private void setExtendedParameters(Query query, String orderTypeUuid, String q, Date startDate, Date endDate,
+	        String fulfillerStatus, String formUuid) {
+		if (orderTypeUuid != null) {
+			query.setParameter("orderTypeUuid", orderTypeUuid);
+		}
+		if (fulfillerStatus != null && !fulfillerStatus.isEmpty()) {
+			try {
+				query.setParameter("fulfillerStatus", Order.FulfillerStatus.valueOf(fulfillerStatus));
+			}
+			catch (IllegalArgumentException ignored) {}
+		}
+		if (formUuid != null && !formUuid.isEmpty()) {
+			query.setParameter("formUuid", formUuid);
+		}
+		if (q != null && !q.isEmpty()) {
+			query.setParameter("q", "%" + q + "%");
+		}
+		if (startDate != null && endDate != null) {
+			query.setParameter("startDate", startDate);
+			query.setParameter("endDate", endDate);
+		}
+	}
+	
 	public List<Sample> getSamplesByVisitOrPatientAndOrDates(String visitId, String patient, Date startDate, Date endDate) {
 		
 		DbSession session = this.getSession();

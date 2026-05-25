@@ -70,6 +70,17 @@ export class OrdersService {
       catchError((error) => of(error))
     );
   }
+  
+  updateOrderFulfillerStatus(orderUuid: string, status: string): Observable<any> {
+    const payload = { fulfillerStatus: status };
+ 
+    return this.openMRSHttpClient.post(`order/${orderUuid}/fulfillerstatus`, payload).pipe(
+      map((response) => {
+        return response;
+      }),
+      catchError((error) => of(error))
+    );
+  }
 
   getOrdersByVisitAndOrderType({ visit, orderType }): Observable<any> {
     return this.openMRSHttpClient

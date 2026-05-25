@@ -141,6 +141,7 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 		this.code = code;
 	}
 	
+	@Override
 	public Map<String, Object> toMap() {
 		
 		Map<String, Object> requisitionObject = new HashMap<String, Object>();
@@ -200,6 +201,11 @@ public class Requisition extends BaseOpenmrsData implements java.io.Serializable
 		}
 		
 		return requisitionObject;
+	}
+	
+	@Override
+	public Map<String, Object> toMap(Object... params) {
+		return toMap();
 	}
 	
 	public Map<String, Object> toMapWithItems() {
