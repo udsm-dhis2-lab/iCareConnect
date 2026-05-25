@@ -64,4 +64,9 @@ public class Pager implements JSONConverter {
 		result.put("pageSize", this.pageSize);
 		return result;
 	}
+	
+	@Override
+	public Map<String, Object> toMap(Object... params) {
+		return toMap();
+	}
 }

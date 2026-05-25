@@ -5,6 +5,7 @@ import { map } from "rxjs/operators";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { VisitsService } from "../../resources/visits/services/visits.service";
 import { SamplesService } from "../../services/samples.service";
+import { SampleReferralService } from "src/app/modules/laboratory/modules/sample-referral/services/referral-samples.service";
 
 @Component({
   selector: "app-shared-sample-details",
@@ -22,6 +23,7 @@ export class SharedSampleDetailsComponent implements OnInit {
   @Input() departments: any[];
   @Input() specimenSources: any[];
   @Input() codedReasonsForRejection: any[];
+  @Input() viewForReferral: boolean = false;
 
   sampleDetails$: Observable<any>;
   externalSystems$: Observable<any[]>;
@@ -29,8 +31,13 @@ export class SharedSampleDetailsComponent implements OnInit {
   constructor(
     private visitService: VisitsService,
     private conceptService: ConceptsService,
-    private sampleService: SamplesService
+    private sampleService: SamplesService,
+    private sampleReferralService: SampleReferralService
   ) {}
+
+  referralOrderConcept = this.sampleReferralService.referralSettings()?.referralOrderConcept;
+  referralEncounterType = this.sampleReferralService.referralSettings()?.referralEncounterType;
+  referralForms = this.sampleReferralService.referralSettings()?.forms;
 
   get sampleStatusesByCategory() {
     return keyBy(this.sample.statuses, "category");
@@ -53,6 +60,7 @@ export class SharedSampleDetailsComponent implements OnInit {
       })
       .pipe(
         map((encounters) => {
+          encounters =  this.viewForReferral ? encounters?.filter((encounter) => encounter?.encounterType?.uuid === this.referralEncounterType) : encounters;
           return encounters?.map((encounter) => {
             return {
               ...encounter,

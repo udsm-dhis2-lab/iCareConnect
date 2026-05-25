@@ -20,6 +20,8 @@ export class SampleRegistrationFinalizationComponent implements OnInit {
   rejectionReasons: any;
   isFormValid: boolean = false;
   saving: boolean = false;
+  markSampleForReferral: boolean = false;
+
   constructor(
     private dialogRef: MatDialogRef<SampleRegistrationFinalizationComponent>,
     private dialog: MatDialog,
@@ -42,6 +44,10 @@ export class SampleRegistrationFinalizationComponent implements OnInit {
       searchControlType: "concept",
       shouldHaveLiveSearchForDropDownFields: true,
     });
+  }
+
+  onMarkSampleForReferral(event: any): void {
+    this.markSampleForReferral = event.checked;
   }
 
   onFinalize(event: Event, actionType: string): void {
@@ -78,7 +84,9 @@ export class SampleRegistrationFinalizationComponent implements OnInit {
           }
         });
     } else {
-      this.dialogRef.close();
+      this.dialogRef.close({
+        markSampleForReferral: this.markSampleForReferral,
+      });
     }
   }
 

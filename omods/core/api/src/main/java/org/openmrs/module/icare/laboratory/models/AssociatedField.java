@@ -82,6 +82,7 @@ public class AssociatedField extends BaseOpenmrsData implements java.io.Serializ
 		return associatedField;
 	}
 	
+	@Override
 	public  Map<String,Object> toMap(){
 
         Map<String,Object> associatedFieldMap = new HashMap<>();
@@ -120,4 +121,9 @@ public class AssociatedField extends BaseOpenmrsData implements java.io.Serializ
         return  associatedFieldMap;
 
     }
+	
+	@Override
+	public Map<String, Object> toMap(Object... params) {
+		return toMap();
+	}
 }

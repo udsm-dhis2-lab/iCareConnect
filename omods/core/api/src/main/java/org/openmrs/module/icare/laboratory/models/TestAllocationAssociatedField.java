@@ -106,4 +106,9 @@ public class TestAllocationAssociatedField extends BaseOpenmrsData implements JS
 
         return testAllocationAssociatedFieldMap;
     }
+	
+	@Override
+	public Map<String, Object> toMap(Object... params) {
+		return toMap();
+	}
 }

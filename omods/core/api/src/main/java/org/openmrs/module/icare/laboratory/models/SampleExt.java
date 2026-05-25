@@ -84,8 +84,10 @@ public class SampleExt extends Sample {
         sampleObject.put("voided", this.getVoided());
         HashMap<String, Object> visitObject = new HashMap<String, Object>();
         visitObject.put("uuid", this.getVisit().getUuid());
+        visitObject.put("visitType", this.getVisit().getVisitType().getUuid());
         visitObject.put("startDateTime", this.getVisit().getStartDatetime());
         visitObject.put("stopDateTime", this.getVisit().getStopDatetime());
+
         List<Map<String, Object>> visitAttributes = new ArrayList<>();
         if ( this.getVisit().getAttributes().size() > 0) {
             for(VisitAttribute visitAttribute: this.getVisit().getAttributes()) {
@@ -127,9 +129,9 @@ public class SampleExt extends Sample {
         List<Map<String, Object>> orders = new ArrayList<Map<String, Object>>();
       
         for (SampleOrder sampleOrder : this.getSampleOrders()) {
-                boolean excludeAllocations = true;
+            boolean includeAllocations = false;
         	if (sampleOrder.getOrder() != null && !sampleOrder.getOrder().getVoided()) {
-        		orders.add(sampleOrder.toMap(excludeAllocations));
+        		orders.add(sampleOrder.toMap(includeAllocations));
         	}
         }
 

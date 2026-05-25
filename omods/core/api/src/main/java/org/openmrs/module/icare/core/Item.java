@@ -99,6 +99,7 @@ public class Item extends BaseOpenmrsData implements java.io.Serializable, JSONC
 		return null;
 	}
 	
+	@Override
 	public Map<String, Object> toMap() {
 		Map<String, Object> itemMap = new HashMap<String, Object>();
 		itemMap.put("unit", this.getUnit());
@@ -145,6 +146,11 @@ public class Item extends BaseOpenmrsData implements java.io.Serializable, JSONC
 		itemMap.put("voided", this.getVoided());
 		
 		return itemMap;
+	}
+	
+	@Override
+	public Map<String, Object> toMap(Object... params) {
+		return toMap();
 	}
 	
 	public Boolean getStockable() {

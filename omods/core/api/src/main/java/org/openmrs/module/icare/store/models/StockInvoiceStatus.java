@@ -81,6 +81,11 @@ public class StockInvoiceStatus extends BaseOpenmrsData implements java.io.Seria
         return stockInvoiceStatusMap;
     }
 	
+	@Override
+	public Map<String, Object> toMap(Object... params) {
+		return toMap();
+	}
+	
 	public static StockInvoiceStatus fromMap(Map<String, Object> stockInvoiceStatusMap) {
 		
 		StockInvoiceStatus stockInvoiceStatus = new StockInvoiceStatus();

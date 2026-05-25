@@ -80,6 +80,11 @@ public class Supplier extends BaseOpenmrsData implements java.io.Serializable, J
         return supplierMap;
     }
 	
+	@Override
+	public Map<String, Object> toMap(Object... params) {
+		return toMap();
+	}
+	
 	public static Supplier fromMap(Map<String, Object> supplierMap) {
 		
 		Supplier supplier = new Supplier();

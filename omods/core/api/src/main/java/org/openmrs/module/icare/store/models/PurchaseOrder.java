@@ -40,4 +40,9 @@ public class PurchaseOrder extends BaseOpenmrsData implements java.io.Serializab
 	public Map<String, Object> toMap() {
 		return null;
 	}
+	
+	@Override
+	public Map<String, Object> toMap(Object... params) {
+		return toMap();
+	}
 }

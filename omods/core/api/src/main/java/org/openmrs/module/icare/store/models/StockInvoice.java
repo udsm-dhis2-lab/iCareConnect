@@ -173,6 +173,8 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
         return stockInvoice;
     }
 
+
+    @Override
     public Map<String, Object> toMap() {
 
         HashMap<String, Object> stockInvoiceObject = new HashMap<String, Object>();
@@ -230,6 +232,11 @@ public class StockInvoice extends BaseOpenmrsData implements java.io.Serializabl
         }
 
         return stockInvoiceObject;
+    }
+
+    @Override
+    public Map<String, Object> toMap(Object... params){
+        return toMap();
     }
 
     // Added this function to optimize performance when getting stock invoices
