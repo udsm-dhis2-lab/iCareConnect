@@ -117,20 +117,20 @@ export class ReferredSamplesComponent implements OnInit, OnDestroy {
     this.dialog.closeAll();
   }
 
-  // onEditSample(sample: any){
-  //   this.dialog.open(EditSampleReferralsComponent, {
-  //     maxWidth: "80vw",
-  //     maxHeight: "80vh",
-  //     closeOnNavigation: false,
-  //     disableClose: true,
-  //     data: {
-  //       sample: sample
-  //     }
-  //   }).afterClosed().subscribe((data) => {
-  //     if(data?.formCompleted) {
-  //       this.getSamplesByReferralOrderType(this.referralOrderTypeUuid!);
-  //     }
-  //   });
-  // }
+  onEditSample(sample: any){
+    this.dialog.open(EditSampleReferralsComponent, {
+      maxWidth: "80vw",
+      maxHeight: "80vh",
+      closeOnNavigation: false,
+      disableClose: true,
+      data: {
+        sample: sample
+      }
+    }).afterClosed().subscribe((data) => {
+      if(data?.reLoadSamples) {
+        this.getSamplesByReferralOrderType(this.referralOrderTypeUuid!);
+      }
+    });
+  }
 
 }

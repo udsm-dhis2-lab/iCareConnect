@@ -13,6 +13,9 @@
             [withOrderType]="true"
             [combineWithOr]="false"
             [saveButtonText]="'Save Packaging Information'"
+            [observations]="observations"
+            [selectedSample]="selectedSample"
+            (stepComplete)="stepComplete.emit()"
             (saveForm)="onSavePackagingInformation($event)"></app-sample-referral-form>
     }
 }
