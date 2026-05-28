@@ -13,6 +13,9 @@ currentUser: currentUser$ | async
             [withOrderType]="true"
             [combineWithOr]="false"
             [saveButtonText]="'Save Transport Information'"
+            [observations]="observations"
+            [selectedSample]="selectedSample"
+            (stepComplete)="stepComplete.emit()"
             (saveForm)="onSaveTransportInformation($event)"></app-sample-referral-form>
     }
 
