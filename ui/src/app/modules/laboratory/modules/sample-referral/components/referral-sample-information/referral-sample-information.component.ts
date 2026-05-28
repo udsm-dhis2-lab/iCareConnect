@@ -27,8 +27,8 @@ export class ReferralSampleInformationComponent {
   private sampleService = inject(SamplesService)
   private snackbar = inject(MatSnackBar);
 
-  @Input() observations?: any
-
+  @Input() observations?: any;
+  @Input() selectedSample?: any;
 
   @Output() stepComplete = new EventEmitter<any>();
   

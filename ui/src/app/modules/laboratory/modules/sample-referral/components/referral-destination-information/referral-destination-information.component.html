@@ -13,6 +13,9 @@
             [withOrderType]="true"
             [combineWithOr]="false"
             [saveButtonText]="'Save Destination Information'"
+            [observations]="observations"
+            [selectedSample]="selectedSample"
+            (stepComplete)="stepComplete.emit()"
             (saveForm)="onSaveDestinationInformation($event)"></app-sample-referral-form>
     }
 }

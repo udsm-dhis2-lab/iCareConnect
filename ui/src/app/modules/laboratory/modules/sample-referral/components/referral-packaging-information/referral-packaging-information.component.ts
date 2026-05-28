@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SamplesService } from 'src/app/shared/services/samples.service';
 import { ObservationService } from 'src/app/shared/resources/observation/services';
@@ -24,7 +24,10 @@ export class ReferralPackagingInformationComponent {
     private observationService = inject(ObservationService);
     private sampleService = inject(SamplesService)
     private snackbar = inject(MatSnackBar);
-  
+
+    @Input() observations?: any;
+    @Input() selectedSample?: any;
+
     @Output() stepComplete = new EventEmitter<any>();
     
     unreferredSamples$?: Observable<any>;
