@@ -63,26 +63,27 @@ export class SharedRenderReportDashboardComponent implements OnInit {
 
   dateRangeSelect() {
     if (this.startDate && this.endDate) {
-      this.onSelectPeriod(null, "custom-range");
+      this.onSelectPeriod(undefined, "custom-range");
     }
   }
 
-  onSelectPeriod(buttonToggleChange: MatButtonToggleChange, mode?: string) {
+  onSelectPeriod(buttonToggleChange?: MatButtonToggleChange, mode?: string) {
     if (buttonToggleChange) {
       this.startDate = null;
       this.endDate = null;
     }
     this.dateChanged = false;
+    
 
     setTimeout(() => {
       this.selectionDates = {
-        startDate: moment(formatDateToYYMMDD(this.startDate))
+        startDate: moment(this.startDate)
           .startOf("day")
           .format()
           .split("T")
           .join(" ")
           .split("+")[0],
-        endDate: moment(formatDateToYYMMDD(this.endDate))
+        endDate: moment(this.endDate)
           .endOf("day")
           .format()
           .split("T")
