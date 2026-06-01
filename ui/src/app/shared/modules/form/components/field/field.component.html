@@ -324,6 +324,7 @@
       [required]="field?.required"
       (selectionChange)="onFieldUpdate()"
       [value]="value"
+      [compareWith]="compareByUuid"
       multiple
     >
       <!-- <mat-select-trigger *ngIf="field?.value">

@@ -626,6 +626,12 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		}
 		List<Provider> providers = (List<Provider>) Context.getService(ProviderService.class).getProvidersByPerson(
 		    Context.getAuthenticatedUser().getPerson());
+		
+		if (providers == null || providers.isEmpty()) {
+			throw new ConfigurationException(
+			        "No provider found for the authenticated user. Please ensure the user is linked to a provider.");
+		}
+		
 		encounter.setProvider(encounterService.getEncounterRoleByUuid(registrationEncounterRoleId), providers.get(0));
 		
 		encounterService.getEncounterRoleByUuid(registrationEncounterRoleId);
@@ -827,11 +833,13 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 				Map<String, Object> status = (Map<String, Object>) callbackData.get("Status");
 				Map<String, Object> feedbackData = (Map<String, Object>) callbackData.get("FeedbackData");
 				if (feedbackData.containsKey("gepgPmtSpInfo")) {
-					@SuppressWarnings("unchecked") Map<String, Object> gepgPmtSpInfo = (Map<String, Object>) feedbackData.get("gepgPmtSpInfo");
-					@SuppressWarnings("unchecked") Map<String, Object> pymtTrxInf = (Map<String, Object>) gepgPmtSpInfo.get("PymtTrxInf");
+					@SuppressWarnings("unchecked")
+					Map<String, Object> gepgPmtSpInfo = (Map<String, Object>) feedbackData.get("gepgPmtSpInfo");
+					@SuppressWarnings("unchecked")
+					Map<String, Object> pymtTrxInf = (Map<String, Object>) gepgPmtSpInfo.get("PymtTrxInf");
 					String requestId = status.containsKey("RequestId") ? (String) status.get("RequestId") : null;
 					Payment payment = this.paymentDAO.getPaymentByRequestId(Integer.parseInt(requestId));
-					if(payment != null){
+					if (payment != null) {
 						Invoice invoice = invoiceDAO.findById(payment.getInvoice().getId());
 						if (pymtTrxInf.get("PayCtrNum") != null && !pymtTrxInf.get("PayCtrNum").equals("0")) {
 							payment.setReferenceNumber((String) pymtTrxInf.get("PayCtrNum"));
@@ -876,7 +884,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 							String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
 							systemAuth.put("Signature", signature);
 
-                        } else {
+						} else {
 							ackData.put("SystemAckCode", "0");
 							ackData.put("Description", "Fail, No Data with this RequestId");
 							ackData.put("RequestId", requestId);
@@ -884,14 +892,16 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 							String ackDataJson = new ObjectMapper().writeValueAsString(ackData);
 							String signature = SignatureUtils.signData(ackDataJson, clientPrivateKey);
 							systemAuth.put("Signature", signature);
-                        }
-                        systemAuth.put("SystemCode", systemCode);
-                        response.put("SystemAuth", systemAuth);
-                        response.put("AckData", ackData);
-                    }
+						}
+						systemAuth.put("SystemCode", systemCode);
+						response.put("SystemAuth", systemAuth);
+						response.put("AckData", ackData);
+					}
 				} else if (feedbackData.containsKey("gepgBillSubResp")) {
-					@SuppressWarnings("unchecked") Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
-					@SuppressWarnings("unchecked") Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
+					@SuppressWarnings("unchecked")
+					Map<String, Object> gepgBillSubResp = (Map<String, Object>) feedbackData.get("gepgBillSubResp");
+					@SuppressWarnings("unchecked")
+					Map<String, Object> billTrxInf = (Map<String, Object>) gepgBillSubResp.get("BillTrxInf");
 
 					String billIdString = (String) billTrxInf.get("BillId");
 
@@ -1283,7 +1293,7 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 
 		String gepgPaymentOption = administrationService.getGlobalProperty(GEPG_PAYMENT_OPTION);
 
-		if(gepgPaymentOption == null || gepgPaymentOption.isEmpty()){
+		if (gepgPaymentOption == null || gepgPaymentOption.isEmpty()) {
 			throw new Exception("GePG Payment Option (" + GEPG_PAYMENT_OPTION + ") was not set.");
 		}
 
