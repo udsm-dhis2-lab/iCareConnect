@@ -64,12 +64,12 @@
       [placeholder]="field?.placeholder"
       class="{{ fieldClass || 'field-input' }}"
       [type]="
-    (field?.label === 'Dose' || field?.label === 'Duration') 
-      ? 'number' 
-      : field?.type === 'number' 
-      ? 'text' 
-      : field?.type
-  "
+        field?.label === 'Dose' || field?.label === 'Duration'
+          ? 'number'
+          : field?.type === 'number'
+          ? 'text'
+          : field?.type
+      "
       [required]="field?.required"
       matInput
       step="any"
@@ -268,14 +268,7 @@
       aria-label="{{ field?.label }}"
       [required]="field?.required"
       matInput
-      [value]="
-        field?.value &&
-        (members$ | async) &&
-        (members$ | async)?.length == 1 &&
-        (members$ | async)[0]
-          ? (members$ | async)[0]?.display
-          : ''
-      "
+      [value]="getSelectedLocationDisplay || ''"
       [disabled]="field?.disabled"
       autocomplete="off"
       (keyup)="searchItem($event, field)"

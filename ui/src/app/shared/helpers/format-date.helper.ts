@@ -126,9 +126,27 @@ export function toISOStringFormat(options: { date: Date, timezoneOffset: boolean
 
 /**
  * Formats a given date object into a string representation, using a specified format string.
+ * Prefer to use this function instead of formatDateToYYMMDD for better flexibility in formatting date strings.
  * @param date The date object
- * @param format The format string (default is 'DD-MM-YYYY')
- * @returns The formatted date string
+ * @param format The format string (default is 'DD-MM-YYYY') which can include the following placeholders:
+ * - YYYY: 4-digit year
+ * - MM: 2-digit month (01-12)
+ * - DD: 2-digit day of the month (01-31)
+ * - hh: 2-digit hours (00-23)
+ * - mm: 2-digit minutes (00-59)
+ * - ss: 2-digit seconds (00-59)
+ * - SSS: 3-digit milliseconds (000-999)
+ * @returns The formatted date string or an empty string if the date is invalid or formatting fails.
+ * @example
+ * // Format a date to 'YYYY-MM-DD'
+ * formatDateToString(new Date(), 'YYYY-MM-DD');
+  * @example
+ * // Format a date to 'DD/MM/YYYY'
+ * formatDateToString(new Date(), 'DD/MM/YYYY');
+  * @example
+ * // Format a date to 'hh:mm:ss'
+ * formatDateToString(new Date(), 'hh:mm:ss');
+  * @example
  */
 export function formatDateToString(date: Date = new Date(), format: string = 'DD-MM-YYYY'): string {
   try {
@@ -139,6 +157,19 @@ export function formatDateToString(date: Date = new Date(), format: string = 'DD
     const minutes = date.getMinutes();
     const seconds = date.getSeconds();
     const milliseconds = date.getMilliseconds();
+
+    if(format?.includes('yyyy')){
+      format = format.replace('yyyy', 'YYYY');
+    }
+
+    if(format?.includes('yy') && !format?.includes('yyyy')){
+      format = format.replace('yy', 'YY');
+    }
+
+    if(format?.includes('dd')){
+      format = format.replace('dd', 'DD');
+    }
+
 
     return format
       .replace('YYYY', year.toString())

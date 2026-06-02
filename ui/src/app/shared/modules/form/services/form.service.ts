@@ -15,13 +15,13 @@ export class FormService {
   constructor(
     private api: Api,
     private httpClient: OpenmrsHttpClientService,
-    private systemSettingsService: SystemSettingsService
+    private systemSettingsService: SystemSettingsService,
   ) {}
 
   getForms(formConfigs: FormConfig[]): Observable<any[]> {
     return this.systemSettingsService
       .getSystemSettingsByKey(
-        `icare.forms.formFieldsConcepts.dataTypeExtensionReference.conceptSourceUuid`
+        `icare.forms.formFieldsConcepts.dataTypeExtensionReference.conceptSourceUuid`,
       )
       .pipe(
         mergeMap((conceptSourceUuid) => {
@@ -31,23 +31,23 @@ export class FormService {
                 this.getForm(
                   formConfig.name,
                   formConfig.formLevel,
-                  conceptSourceUuid
-                )
+                  conceptSourceUuid,
+                ),
               );
-            })
+            }),
           ).pipe(
             map((forms) => {
               return (forms || []).filter((form) => form);
-            })
+            }),
           );
-        })
+        }),
       );
   }
 
   async getForm(
     formName: string,
     queryLevel: number,
-    conceptSourceUuid?: string
+    conceptSourceUuid?: string,
   ): Promise<any> {
     const formConceptResult = await this.api.concept.getAllConcepts({
       name: formName,
@@ -63,20 +63,19 @@ export class FormService {
     parameters,
     searchControlType?,
     filteringItems?,
-    field?
+    field?,
   ): Observable<any[]> {
-    // console.log("searchControlType", searchControlType);
     if (field?.conceptUuid) {
       return from(
         this.api.concept.getConcept(field?.conceptUuid, {
           v: "custom:(uuid,display,setMembers:(uuid,display),answers:(uuid,display))",
-        })
+        }),
       ).pipe(
         map((response: any) =>
           response?.answers?.length > 0
             ? response?.answers
-            : response?.setMembers
-        )
+            : response?.setMembers,
+        ),
       );
     } else if (parameters?.class === "Diagnosis") {
       return from(this.api.concept.getAllConcepts(parameters)).pipe(
@@ -86,19 +85,19 @@ export class FormService {
               (result: any) =>
                 parameters?.class &&
                 result.conceptClass?.display.toLowerCase() ===
-                  parameters?.class.toLowerCase()
+                  parameters?.class.toLowerCase(),
             ) || [],
             ["display"],
-            ["asc"]
+            ["asc"],
           );
-        })
+        }),
       );
     } else if (!searchControlType || searchControlType === "concept") {
       if (parameters?.value) {
         return from(this.api.concept.getConcept(parameters?.value)).pipe(
           map((response) => {
             return [response];
-          })
+          }),
         );
       } else {
         let params = omit(parameters, "value");
@@ -117,7 +116,7 @@ export class FormService {
                     result.conceptClass?.display.toLowerCase() ===
                       (field?.isDiagnosis
                         ? "diagnosis"
-                        : parameters?.class.toLowerCase())
+                        : parameters?.class.toLowerCase()),
                 ) || []
               )?.map((result) => {
                 return {
@@ -133,7 +132,7 @@ export class FormService {
                 };
               }),
               ["display"],
-              ["asc"]
+              ["asc"],
             );
             if (!hasSearchTerm) {
               return concepts;
@@ -153,14 +152,14 @@ export class FormService {
             } else {
               return concepts;
             }
-          })
+          }),
         );
       }
     } else if (searchControlType === "person") {
       return from(this.api.person.getAllPersons({ q: parameters?.q })).pipe(
         map((response) => {
           return response?.results;
-        })
+        }),
       );
     } else if (searchControlType === "user") {
       // console.log("parameter", parameters);
@@ -170,7 +169,7 @@ export class FormService {
         return from(
           this.api.user.getUser(parameters?.value, {
             v,
-          })
+          }),
         ).pipe(
           map((user: any) => [
             {
@@ -178,7 +177,7 @@ export class FormService {
               display: user?.person?.display,
               name: user?.person?.display,
             },
-          ])
+          ]),
         );
       } else {
         return from(this.api.user.getAllUsers({ q: parameters?.q, v })).pipe(
@@ -190,7 +189,7 @@ export class FormService {
                 name: user?.person?.display,
               };
             });
-          })
+          }),
         );
       }
     } else if (searchControlType === "location") {
@@ -199,11 +198,11 @@ export class FormService {
           q: parameters?.q ? parameters?.q : null,
           v: parameters?.v,
           tag: !parameters?.q ? parameters?.tag : null,
-        })
+        }),
       ).pipe(
         map((response) => {
           return response?.results || [];
-        })
+        }),
       );
     } else if (searchControlType === "searchFromOptions") {
       return of(
@@ -213,15 +212,15 @@ export class FormService {
               -1 ||
             option?.formField?.label
               .toLowerCase()
-              .indexOf(parameters?.q.toLowerCase()) > -1
-        )
+              .indexOf(parameters?.q.toLowerCase()) > -1,
+        ),
       );
     } else if (searchControlType === "billableItem") {
       return this.httpClient
         .get(
           `icare/item?limit=${parameters?.limit}&startIndex=0${
             "&q=" + parameters?.q.toLowerCase()
-          }`
+          }`,
         )
         .pipe(
           map((response) => {
@@ -237,12 +236,12 @@ export class FormService {
                     };
                   })
                   .filter((item) => item?.stockable),
-                "display"
+                "display",
               ),
               ["display"],
-              ["asc"]
+              ["asc"],
             );
-          })
+          }),
         );
     } else if (searchControlType === "conceptreferenceterm") {
       let query = {};
@@ -255,7 +254,7 @@ export class FormService {
       }
 
       return from(
-        this.api.conceptreferenceterm.getAllConceptReferenceTerms(query)
+        this.api.conceptreferenceterm.getAllConceptReferenceTerms(query),
       ).pipe(
         map((response) =>
           response?.results.map((result) => {
@@ -263,24 +262,24 @@ export class FormService {
               ...result,
               display: result?.display.split(": ")[1],
             };
-          })
+          }),
         ),
-        catchError((error) => of(error))
+        catchError((error) => of(error)),
       );
     } else if (searchControlType === "Drug") {
       const formattedParamters = omit(parameters, "class", "v");
       const keyedDispensingLocations = keyBy(
         filteringItems?.applicable,
-        "uuid"
+        "uuid",
       );
       const dispensableStock = keyBy(
         filteringItems.items.filter(
-          (item) => keyedDispensingLocations[item?.location?.uuid]
+          (item) => keyedDispensingLocations[item?.location?.uuid],
         ) || [],
-        "name"
+        "name",
       );
       return from(
-        this.api.drug.getAllDrugs({ ...formattedParamters, v: "full" })
+        this.api.drug.getAllDrugs({ ...formattedParamters, v: "full" }),
       ).pipe(
         map((response) => {
           const formattedData = response?.results.map((result: any) => {
@@ -304,7 +303,7 @@ export class FormService {
           });
           // console.log('formattedData', formattedData);
           return formattedData;
-        })
+        }),
       );
       // this.drugs = drugsResults?.results || [];
       // return formatDrugs(this.drugs);)
@@ -314,7 +313,7 @@ export class FormService {
         ...["stock?locationUuid", "stockout?location"].map((stockApiPath) => {
           return this.httpClient
             .get(
-              `store/${stockApiPath}=${field?.locationUuid}&q=${parameters?.q}&paging=false`
+              `store/${stockApiPath}=${field?.locationUuid}&q=${parameters?.q}&paging=false`,
             )
             .pipe(
               map((response) => {
@@ -333,12 +332,12 @@ export class FormService {
                         },
                         quantity: 0,
                       };
-                    }
+                    },
                   );
                 } else {
                   formattedResponse = (
                     response?.results?.filter(
-                      (batch) => batch?.expiryDate > new Date().getTime()
+                      (batch) => batch?.expiryDate > new Date().getTime(),
                     ) || []
                   )?.map((batch) => {
                     return {
@@ -357,7 +356,7 @@ export class FormService {
                       concept: batch?.item?.concept,
                     };
                   }),
-                  "itemUuid"
+                  "itemUuid",
                 );
                 return (Object.keys(groupedByItemUuid) || [])?.map(
                   (itemUuid) => {
@@ -366,10 +365,10 @@ export class FormService {
                         (groupedByItemUuid[itemUuid] || [])?.map(
                           (batchData) => {
                             return batchData;
-                          }
+                          },
                         ),
-                        "quantity"
-                      )
+                        "quantity",
+                      ),
                     );
                     return {
                       uuid: groupedByItemUuid[itemUuid][0]?.item?.drug
@@ -403,17 +402,17 @@ export class FormService {
                       quantity: totalQuantity,
                       isStockOut: totalQuantity === 0 ? true : false,
                     };
-                  }
+                  },
                 );
-              })
+              }),
             );
-        })
+        }),
       ).pipe(
         map((responses) => {
           const allDrugItems = orderBy(
             flatten(responses),
             ["display", ["quantity"]],
-            ["asc"]["asc"]
+            ["asc"]["asc"],
           );
           const drugIitemsGroupedByItemUuid = groupBy(allDrugItems, "itemUuid");
           const formattedDrugItems = (
@@ -424,17 +423,17 @@ export class FormService {
                 (drugIitemsGroupedByItemUuid[itemUuid] || []).map(
                   (batchData) => {
                     return batchData;
-                  }
+                  },
                 ),
-                "quantity"
-              )
+                "quantity",
+              ),
             );
             return {
               ...drugIitemsGroupedByItemUuid[itemUuid][0],
               batches: flatten(
                 drugIitemsGroupedByItemUuid[itemUuid]?.map((batchDetails) => {
                   return batchDetails?.batches;
-                })
+                }),
               ),
               display:
                 drugIitemsGroupedByItemUuid[itemUuid][0]?.name +
@@ -446,14 +445,14 @@ export class FormService {
             };
           });
           return formattedDrugItems;
-        })
+        }),
       );
     } else if (searchControlType === "residenceLocation") {
       return from(
         this.api.location.getAllLocations({
           q: parameters?.q ? parameters?.q : null,
           v: parameters?.v,
-        })
+        }),
       ).pipe(
         map((response) => {
           // TODO: Remove the hardcoded 'village' by creating a new location API that respondto search and tag together
@@ -461,17 +460,17 @@ export class FormService {
             response?.results?.filter(
               (village: any) =>
                 village?.display?.toLowerCase()?.indexOf("village") > -1 ||
-                village?.display?.toLowerCase()?.indexOf("street") > -1
+                village?.display?.toLowerCase()?.indexOf("street") > -1,
             ) || []
           );
-        })
+        }),
       );
     } else if (searchControlType === "healthFacility") {
       return from(
         this.api.location.getAllLocations({
           q: parameters?.q ? parameters?.q : null,
           v: parameters?.v,
-        })
+        }),
       ).pipe(
         map((response) => {
           return (
@@ -480,7 +479,7 @@ export class FormService {
                 facility?.display?.toLowerCase()?.indexOf("dispensary") > -1 ||
                 facility?.display?.toLowerCase()?.indexOf("hospital") > -1 ||
                 facility?.display?.toLowerCase()?.indexOf("health") > -1 ||
-                facility?.display?.toLowerCase()?.indexOf("clinic") > -1
+                facility?.display?.toLowerCase()?.indexOf("clinic") > -1,
             ) || []
           )?.map((location: any) => {
             return {
@@ -499,23 +498,23 @@ export class FormService {
                   : ""),
             };
           });
-        })
+        }),
       );
     } else if (searchControlType === "form") {
       return from(
         this.api.form.getAllForms({
           q: parameters?.q ? parameters?.q : null,
           v: parameters?.v,
-        })
+        }),
       ).pipe(
         map((response) => {
           return response?.results || [];
-        })
+        }),
       );
     }
   }
 
-  getCustomeOpenMRSForm(uuid): Observable<any> {
+  getCustomeOpenMRSForm(uuid: string): Observable<any> {
     /**
      * TODO:Dynamicall construct the fields
      */
@@ -524,15 +523,15 @@ export class FormService {
     return zip(
       this.httpClient.get("form/" + uuid + fields),
       this.systemSettingsService.getSystemSettingsByKey(
-        `icare.forms.formFieldsConcepts.dataTypeExtensionReference.conceptSourceUuid`
-      )
+        `icare.forms.formFieldsConcepts.dataTypeExtensionReference.conceptSourceUuid`,
+      ),
     ).pipe(
       map((responses) => {
         return { ...responses[0], conceptSourceUuid: responses[1] };
       }),
       catchError((error) => {
         return of(error);
-      })
+      }),
     );
   }
 
@@ -540,11 +539,11 @@ export class FormService {
     return zip(
       ...uuids.map((uuid) => {
         return from(this.getCustomeOpenMRSForm(uuid));
-      })
+      }),
     ).pipe(
       map((formResponse: any) => {
         return formResponse;
-      })
+      }),
     );
   }
 }

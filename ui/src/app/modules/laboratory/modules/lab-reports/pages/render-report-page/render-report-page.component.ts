@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, effect, inject, Injector, OnInit } from "@angular/core";
 import { MatButtonToggleChange } from "@angular/material/button-toggle";
 import { ActivatedRoute } from "@angular/router";
 import { Store } from "@ngrx/store";
@@ -14,6 +14,7 @@ import {
   getParentLocation,
 } from "src/app/store/selectors";
 import * as moment from "moment";
+import { LabDateService } from "src/app/modules/laboratory/services/lab-date.service";
 
 @Component({
   selector: "app-render-report-page",
@@ -21,15 +22,19 @@ import * as moment from "moment";
   styleUrls: ["./render-report-page.component.scss"],
 })
 export class RenderReportPageComponent implements OnInit {
+  labDateService: LabDateService = inject(LabDateService);
+  private injector = inject(Injector);
+
   reportId: string;
   report$: Observable<any>;
   loadingReportData: boolean = false;
-  startDate: Date;
-  endDate: Date;
+  startDate?: Date;
+  endDate?: Date;
   dateChanged: boolean = false;
   facilityDetails$: Observable<any>;
   selectionDates: any;
   excelDownloadFormat$: Observable<any>;
+  
   constructor(
     private route: ActivatedRoute,
     private exportService: ExportService,
@@ -64,6 +69,14 @@ export class RenderReportPageComponent implements OnInit {
         };
       })
     );
+
+    effect(() => {
+        this.startDate = this.labDateService.startDate();
+        this.endDate = this.labDateService.endDate();
+  
+        this.dateRangeSelect();
+
+      }, { injector: this.injector });
   }
 
   dateRangeSelect() {
@@ -74,10 +87,12 @@ export class RenderReportPageComponent implements OnInit {
 
   onSelectPeriod(buttonToggleChange: MatButtonToggleChange, mode?: string) {
     if (buttonToggleChange) {
-      this.startDate = null;
-      this.endDate = null;
+      this.startDate = undefined;
+      this.endDate = undefined;
     }
     this.dateChanged = false;
+
+    console.log("Selected period:", this.startDate, this.endDate);
 
     setTimeout(() => {
       this.selectionDates = {

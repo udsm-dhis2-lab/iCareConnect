@@ -304,7 +304,7 @@ export class ExemptionComponent implements OnInit, AfterContentInit {
       });
 
     //Update encounter to void if voidEncounter True
-    if (voidEncounter === true) {
+    if (voidEncounter) {
       this.encounterService.voidEncounter(exemptionEncounter).subscribe({
         next: (encounter) => {
           console.warn("==> Successfully updated encounter: ", encounter);

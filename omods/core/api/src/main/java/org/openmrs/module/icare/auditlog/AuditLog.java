@@ -289,6 +289,7 @@ public class AuditLog implements Serializable, JSONConverter {
 		return getChildAuditLogs().size() > 0;
 	}
 	
+	@Override
 	public Map<String, Object> toMap() {
 		Map<String, Object> auditLogMap = new HashMap<>();
 		if (this.getUuid() != null) {
@@ -315,5 +316,10 @@ public class AuditLog implements Serializable, JSONConverter {
 
 		return auditLogMap;
 
+	}
+	
+	@Override
+	public Map<String, Object> toMap(Object... params) {
+		return toMap();
 	}
 }

@@ -1,4 +1,6 @@
 import { NgModule } from "@angular/core";
+import { MAT_DATE_FORMATS } from "@angular/material/core";
+import { DATE_FORMATS_DD_MM_YYYY } from "src/app/core/constants/date-formats.constants";
 import { CommonModule } from "@angular/common";
 import { modules } from "./modules";
 import { materialModules } from "./material-modules";
@@ -67,6 +69,9 @@ import { FingerCaptureComponent } from './components/finger-capture/finger-captu
     FingerCaptureComponent,
   
   ],
-  providers: [...sharedServices],
+  providers: [
+    ...sharedServices,
+    { provide: MAT_DATE_FORMATS, useValue: DATE_FORMATS_DD_MM_YYYY },
+  ],
 })
 export class SharedModule {}

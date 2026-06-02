@@ -7,7 +7,7 @@ import { filter, orderBy } from "lodash";
 
 const getFormState = createSelector(
   getRootState,
-  (state: AppState) => state.form
+  (state: AppState) => state.form,
 );
 
 export const { selectEntities: getFormsEntities, selectAll: getAllForms } =
@@ -16,8 +16,8 @@ export const { selectEntities: getFormsEntities, selectAll: getAllForms } =
 export const getFormsByNames = (formConfigs: FormConfig[]) =>
   createSelector(getAllForms, (forms: ICAREForm[]) =>
     (forms || []).filter((form) =>
-      (formConfigs || []).some((formConfig) => formConfig.name === form.name)
-    )
+      (formConfigs || []).some((formConfig) => formConfig.name === form.name),
+    ),
   );
 
 export const getOpenMRSForms = createSelector(getAllForms, (forms) => {
@@ -35,7 +35,7 @@ export const getFormEntitiesByNames = (formConfigs: FormConfig[]) =>
 
 export const getFormsLoadingState = createSelector(
   getFormState,
-  (formState: FormState) => formState.loading
+  (formState: FormState) => formState.loading,
 );
 
 export const getCustomOpenMRSFormById = (id: string) =>
@@ -49,6 +49,6 @@ export const getCustomOpenMRSFormsByIds = (formUUids: string[]) =>
     return orderBy(
       filter(allForms, (form) => formUUids.indexOf(form.uuid) > -1),
       ["name"],
-      ["asc"]
+      ["asc"],
     );
   });

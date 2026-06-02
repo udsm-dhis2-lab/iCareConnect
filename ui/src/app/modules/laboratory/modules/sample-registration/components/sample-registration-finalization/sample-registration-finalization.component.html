@@ -1,27 +1,28 @@
 <div class="sample-registration-confirmation p-3">
   <div class="h5">{{ dialogData?.popupHeader }}</div>
   <div class="rejection-reasons">
-    <app-form
-      *ngIf="dialogData?.forRejection"
-      [fields]="[rejectionReasonField]"
-      (formUpdate)="onFormUpdate($event)"
-    >
-    </app-form>
+    @if(dialogData?.forRejection){
+      <app-form
+        [fields]="[rejectionReasonField]"
+        (formUpdate)="onFormUpdate($event)"
+      >
+      </app-form>
+    }
+
+    @if(dialogData?.canReferSample){
+      <div>
+        <mat-checkbox color="primary" (change)="onMarkSampleForReferral($event)">
+          Mark this sample for referral
+        </mat-checkbox>
+      </div>
+    }
   </div>
   <div class="w-100 d-flex justify-content-end mt-2">
     <button
-      *ngIf="!dialogData?.forRejection"
-      mat-stroked-button
-      (click)="onFinalize($event, 'continue')"
-    >
-      Done
-    </button>
-    <button
-      *ngIf="dialogData?.forRejection"
       mat-stroked-button
       color="primary"
-      [disabled]="!isFormValid"
-      (click)="onFinalize($event, 'reject')"
+      [disabled]="!isFormValid && dialogData?.forRejection"
+      (click)="onFinalize($event, dialogData?.forRejection ? 'reject': 'continue')"
       class="ml-2"
     >
       Done

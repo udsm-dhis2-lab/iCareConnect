@@ -330,6 +330,44 @@ public class LaboratoryController {
 		return null;
 	}
 	
+	@RequestMapping(value = "order-type/{orderType}/samples", method = RequestMethod.GET)
+	@ResponseBody
+	public Map<String, Object> getSamplesByOrderType(@PathVariable String orderType,
+	        @RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(value = "q", required = false) String q,
+	        @RequestParam(value = "haveThisOrderType", required = false) Boolean haveThisOrderType,
+	        @RequestParam(value = "fulfillerStatus", required = false) String fulfillerStatus,
+	        @RequestParam(value = "formUuid", required = false) String formUuid,
+	        @RequestParam(value = "haveThisForm", required = false) Boolean haveThisForm,
+	        @RequestParam(value = "combineWithOr", required = false) Boolean combineWithOr) throws Exception {
+		Date start = null;
+		Date end = null;
+		if (startDate != null && endDate != null) {
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			
+			start = formatter.parse(startDate);
+			end = formatter.parse(endDate);
+		}
+		
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+		
+		haveThisOrderType = (haveThisOrderType != null) ? haveThisOrderType : false;
+		haveThisForm = (haveThisForm != null) ? haveThisForm : false;
+		
+		ListResult<Sample> sampleResults = laboratoryService.getSamplesByOrderType(start, end, pager, orderType,
+		    haveThisOrderType, q, fulfillerStatus, formUuid, haveThisForm, combineWithOr);
+		
+		return sampleResults.toMap(true);
+	}
+	
 	@RequestMapping(value = "sampleaccept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> acceptSample(@RequestBody Map<String, Object> sampleStatusWithAllocations)
