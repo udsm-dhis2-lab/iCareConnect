@@ -3,11 +3,10 @@ import {
   Component,
   OnDestroy,
   OnInit,
-  TemplateRef,
   ViewChild,
 } from "@angular/core";
 import { FormControl } from "@angular/forms";
-import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { MatDialog } from "@angular/material/dialog";
 import { PageEvent, MatPaginator } from "@angular/material/paginator";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatSort } from "@angular/material/sort";
@@ -39,6 +38,7 @@ import { StorageLocationTypeDialogComponent } from "./dialog/storage-location-ty
 import { StorageLocationDialogComponent } from "./dialog/storage-location-dialog/storage-location-dialog.component";
 import { GenerateSlotsDialogComponent } from "./dialog/generate-slots-dialog/generate-slots-dialog.component";
 import { StorageLocationPreviewDialogComponent } from "./dialog/storage-location-preview-dialog/storage-location-preview-dialog.component";
+import { DeleteConfirmDialogComponent } from "./dialog/delete-confirm-dialog/delete-confirm-dialog.component";
 
 interface DeleteDialogState {
   entityLabel: string;
@@ -65,7 +65,6 @@ export class SampleManagementComponent
   @ViewChild("storagePaginator") storagePaginator?: MatPaginator;
   @ViewChild("locationTypePaginator") locationTypePaginator?: MatPaginator;
   @ViewChild("locationPaginator") locationPaginator?: MatPaginator;
-  @ViewChild("deleteConfirmDialog") deleteConfirmDialog?: TemplateRef<unknown>;
 
   readonly displayedStorageTypeColumns: string[] = ["name", "actions"];
   readonly displayedStorageColumns: string[] = [
@@ -116,9 +115,6 @@ export class SampleManagementComponent
   loadingLocations = false;
   refreshingReferenceData = false;
 
-  deleteDialogState: DeleteDialogState | null = null;
-  deleteDialogError = "";
-  deleting = false;
 
   storageTypes: StorageTypeRecord[] = [];
   storages: StorageRecord[] = [];
@@ -132,7 +128,6 @@ export class SampleManagementComponent
   locationPager: PagerInfo = this.createDefaultPager(1, 10);
 
   private readonly destroy$ = new Subject<void>();
-  private deleteDialogRef?: MatDialogRef<unknown>;
 
   constructor(
     private readonly dialog: MatDialog,
@@ -740,137 +735,85 @@ export class SampleManagementComponent
   }
 
   private openDeleteDialog(state: DeleteDialogState): void {
-    if (!this.deleteConfirmDialog) {
-      return;
-    }
-
-    this.deleteDialogState = state;
-    this.deleteDialogError = "";
-    this.deleting = false;
-
-    this.deleteDialogRef = this.dialog.open(this.deleteConfirmDialog, {
+    const dialogRef = this.dialog.open(DeleteConfirmDialogComponent, {
       width: "520px",
-      maxWidth: "96vw",
+      maxWidth: "80vw",
       autoFocus: false,
       restoreFocus: false,
       disableClose: true,
-      panelClass: "delete-confirm-dialog-panel",
+      panelClass: "storage-delete-dialog-panel",
+      data: {
+        entityLabel: state.entityLabel,
+        name: state.name,
+        description: state.description,
+        impactMessage: state.impactMessage,
+        confirmLabel: state.confirmLabel,
+        confirmAction: () => this.getDeleteRequest(state),
+      },
     });
 
-    this.deleteDialogRef
+    dialogRef
       .afterClosed()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.resetDeleteDialogState();
+      .subscribe((result) => {
+        if (result?.deleted) {
+          this.handleDeleteSuccess(state);
+        }
       });
   }
 
-  closeDeleteDialog(): void {
-    if (this.deleting) {
-      return;
-    }
-    this.deleteDialogRef?.close();
-  }
-
-  confirmDelete(): void {
-    if (!this.deleteDialogState || this.deleting) {
-      return;
-    }
-
-    this.deleting = true;
-    this.deleteDialogError = "";
-
-    let deleteRequest: any;
-    switch (this.deleteDialogState.kind) {
+  private getDeleteRequest(state: DeleteDialogState): any {
+    switch (state.kind) {
       case "storageType":
-        deleteRequest = this.samplesService.deleteStorageType(
-          this.deleteDialogState.uuid,
-        );
-        break;
+        return this.samplesService.deleteStorageType(state.uuid);
       case "storage":
-        deleteRequest = this.samplesService.deleteStorage(
-          this.deleteDialogState.uuid,
-        );
-        break;
+        return this.samplesService.deleteStorage(state.uuid);
       case "locationType":
-        deleteRequest = this.samplesService.deleteStorageLocationType(
-          this.deleteDialogState.uuid,
-        );
-        break;
+        return this.samplesService.deleteStorageLocationType(state.uuid);
       default:
-        deleteRequest = this.samplesService.deleteStorageLocation(
-          this.deleteDialogState.uuid,
-        );
-        break;
+        return this.samplesService.deleteStorageLocation(state.uuid);
     }
-
-    deleteRequest
-      .pipe(
-        finalize(() => {
-          this.deleting = false;
-        }),
-        takeUntil(this.destroy$),
-      )
-      .subscribe({
-        next: () => {
-          if (this.deleteDialogState?.kind === "storageType") {
-            this.showSuccess("Storage type deleted successfully.");
-            if (
-              this.storageTypeFilterControl.value === this.deleteDialogState.uuid
-            ) {
-              this.storageTypeFilterControl.setValue(null, { emitEvent: false });
-            }
-            this.rewindStorageTypePageIfNeeded();
-            this.loadStorageTypes();
-            this.storagePager.page = 1;
-            this.loadStorages();
-          } else if (this.deleteDialogState?.kind === "storage") {
-            this.showSuccess("Storage unit deleted successfully.");
-            this.rewindStoragePageIfNeeded();
-            this.loadStorages();
-          } else if (this.deleteDialogState?.kind === "locationType") {
-            this.showSuccess("Location level deleted successfully.");
-            if (
-              this.locationTypeFilterControl.value === this.deleteDialogState.uuid
-            ) {
-              this.locationTypeFilterControl.setValue(null, {
-                emitEvent: false,
-              });
-            }
-            this.rewindLocationTypePageIfNeeded();
-            this.loadLocationTypes();
-            this.loadLocationReferenceData();
-            this.loadLocations();
-          } else {
-            this.showSuccess("Storage location deleted successfully.");
-            if (
-              this.parentLocationFilterControl.value === this.deleteDialogState.uuid
-            ) {
-              this.parentLocationFilterControl.setValue(null, {
-                emitEvent: false,
-              });
-            }
-            this.rewindLocationPageIfNeeded();
-            this.loadLocationReferenceData();
-            this.loadLocations();
-          }
-
-          this.deleteDialogRef?.close(true);
-        },
-        error: (error: unknown) => {
-          this.deleteDialogError = this.getErrorMessage(
-            error,
-            `Unable to delete ${this.deleteDialogState?.entityLabel}.`,
-          );
-        },
-      });
   }
 
-  private resetDeleteDialogState(): void {
-    this.deleteDialogRef = undefined;
-    this.deleteDialogState = null;
-    this.deleteDialogError = "";
-    this.deleting = false;
+  private handleDeleteSuccess(state: DeleteDialogState): void {
+    if (state.kind === "storageType") {
+      this.showSuccess("Storage type deleted successfully.");
+      if (this.storageTypeFilterControl.value === state.uuid) {
+        this.storageTypeFilterControl.setValue(null, { emitEvent: false });
+      }
+      this.rewindStorageTypePageIfNeeded();
+      this.loadStorageTypes();
+      this.storagePager.page = 1;
+      this.loadStorages();
+      return;
+    }
+
+    if (state.kind === "storage") {
+      this.showSuccess("Storage unit deleted successfully.");
+      this.rewindStoragePageIfNeeded();
+      this.loadStorages();
+      return;
+    }
+
+    if (state.kind === "locationType") {
+      this.showSuccess("Location level deleted successfully.");
+      if (this.locationTypeFilterControl.value === state.uuid) {
+        this.locationTypeFilterControl.setValue(null, { emitEvent: false });
+      }
+      this.rewindLocationTypePageIfNeeded();
+      this.loadLocationTypes();
+      this.loadLocationReferenceData();
+      this.loadLocations();
+      return;
+    }
+
+    this.showSuccess("Storage location deleted successfully.");
+    if (this.parentLocationFilterControl.value === state.uuid) {
+      this.parentLocationFilterControl.setValue(null, { emitEvent: false });
+    }
+    this.rewindLocationPageIfNeeded();
+    this.loadLocationReferenceData();
+    this.loadLocations();
   }
 
   private loadStorageTypes(): void {

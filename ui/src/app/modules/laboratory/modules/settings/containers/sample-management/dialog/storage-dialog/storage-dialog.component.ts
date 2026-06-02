@@ -9,7 +9,10 @@ import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { finalize } from "rxjs/operators";
 import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
-import { StorageDialogData, StorageTypeRecord } from "../../models/sample-management.models";
+import {
+  StorageDialogData,
+  StorageTypeRecord,
+} from "../../models/sample-management.models";
 
 @Component({
   selector: "app-storage-dialog",

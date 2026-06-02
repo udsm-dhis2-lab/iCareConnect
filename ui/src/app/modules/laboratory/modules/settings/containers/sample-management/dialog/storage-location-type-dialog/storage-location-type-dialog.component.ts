@@ -1,5 +1,10 @@
 import { Component, Inject, OnInit } from "@angular/core";
-import { AbstractControl, FormBuilder, FormGroup, Validators } from "@angular/forms";
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { finalize } from "rxjs/operators";
@@ -25,10 +30,28 @@ export class StorageLocationTypeDialogComponent implements OnInit {
   });
 
   readonly behaviourOptions = [
-    { value: "REFERENCE", label: "Reference location only", helper: "Used for path steps such as Department or Room." },
-    { value: "STRUCTURAL", label: "Organising container", helper: "Used for places that can contain children, such as Freezer, Rack, or Box." },
-    { value: "FINAL_POSITION", label: "Final sample position", helper: "Used for positions where a sample can finally be stored, such as Position, Slot, or Well." },
-    { value: "FLEXIBLE", label: "Can do both", helper: "Can organise children and also act as a final sample position." },
+    {
+      value: "REFERENCE",
+      label: "Reference location only",
+      helper: "Used for path steps such as Department or Room.",
+    },
+    {
+      value: "STRUCTURAL",
+      label: "Organising container",
+      helper:
+        "Used for places that can contain children, such as Freezer, Rack, or Box.",
+    },
+    {
+      value: "FINAL_POSITION",
+      label: "Final sample position",
+      helper:
+        "Used for positions where a sample can finally be stored, such as Position, Slot, or Well.",
+    },
+    {
+      value: "FLEXIBLE",
+      label: "Can do both",
+      helper: "Can organise children and also act as a final sample position.",
+    },
   ];
 
   readonly orientationOptions = [
@@ -42,7 +65,8 @@ export class StorageLocationTypeDialogComponent implements OnInit {
   saving = false;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public readonly data: StorageLocationTypeDialogData,
+    @Inject(MAT_DIALOG_DATA)
+    public readonly data: StorageLocationTypeDialogData,
     private readonly dialogRef: MatDialogRef<StorageLocationTypeDialogComponent>,
     private readonly formBuilder: FormBuilder,
     private readonly snackBar: MatSnackBar,
@@ -51,7 +75,9 @@ export class StorageLocationTypeDialogComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.data?.record) {
-      const metadata = this.parseMetadata(this.data.record.metadataJson || null);
+      const metadata = this.parseMetadata(
+        this.data.record.metadataJson || null,
+      );
       this.form.patchValue({
         uuid: this.data.record.uuid || null,
         id: this.data.record.id ?? null,
@@ -74,24 +100,39 @@ export class StorageLocationTypeDialogComponent implements OnInit {
       }
       const currentCode = (this.form.get("code")?.value || "").trim();
       if (!currentCode) {
-        this.form.patchValue({ code: this.suggestCode(value) }, { emitEvent: false });
+        this.form.patchValue(
+          { code: this.suggestCode(value) },
+          { emitEvent: false },
+        );
       }
     });
   }
 
   get title(): string {
-    return this.data.mode === "create" ? "Create location level" : "Edit location level";
+    return this.data.mode === "create"
+      ? "Create location level"
+      : "Edit location level";
   }
 
   get submitLabel(): string {
     return this.data.mode === "create" ? "Save location level" : "Save changes";
   }
 
-  get codeControl(): AbstractControl | null { return this.form.get("code"); }
-  get nameControl(): AbstractControl | null { return this.form.get("name"); }
-  get selectedBehaviour() { return this.behaviourOptions.find((option) => option.value === this.form.get("behaviourKind")?.value); }
+  get codeControl(): AbstractControl | null {
+    return this.form.get("code");
+  }
+  get nameControl(): AbstractControl | null {
+    return this.form.get("name");
+  }
+  get selectedBehaviour() {
+    return this.behaviourOptions.find(
+      (option) => option.value === this.form.get("behaviourKind")?.value,
+    );
+  }
 
-  close(): void { this.dialogRef.close(); }
+  close(): void {
+    this.dialogRef.close();
+  }
 
   save(): void {
     if (this.form.invalid || this.saving) {
@@ -107,20 +148,33 @@ export class StorageLocationTypeDialogComponent implements OnInit {
       code: (this.form.get("code")?.value || "").trim().toUpperCase(),
       description: (this.form.get("description")?.value || "").trim() || null,
       levelOrder: this.toNumberOrNull(this.form.get("levelOrder")?.value),
-      structural: behaviourKind === "STRUCTURAL" || behaviourKind === "FLEXIBLE",
-      slotBearing: behaviourKind === "FINAL_POSITION" || behaviourKind === "FLEXIBLE",
+      structural:
+        behaviourKind === "STRUCTURAL" || behaviourKind === "FLEXIBLE",
+      slotBearing:
+        behaviourKind === "FINAL_POSITION" || behaviourKind === "FLEXIBLE",
       metadataJson: this.buildMetadataJson(),
     };
 
     this.saving = true;
-    this.samplesService.saveStorageLocationType(payload).pipe(finalize(() => (this.saving = false))).subscribe({
-      next: (response: any) => this.dialogRef.close({ saved: true, response }),
-      error: (error: unknown) => {
-        this.snackBar.open(this.getErrorMessage(error, "Unable to save location level."), "Close", {
-          duration: 5000, horizontalPosition: "right", verticalPosition: "top", panelClass: ["error-snackbar"],
-        });
-      },
-    });
+    this.samplesService
+      .saveStorageLocationType(payload)
+      .pipe(finalize(() => (this.saving = false)))
+      .subscribe({
+        next: (response: any) =>
+          this.dialogRef.close({ saved: true, response }),
+        error: (error: unknown) => {
+          this.snackBar.open(
+            this.getErrorMessage(error, "Unable to save location level."),
+            "Close",
+            {
+              duration: 5000,
+              horizontalPosition: "right",
+              verticalPosition: "top",
+              panelClass: ["error-snackbar"],
+            },
+          );
+        },
+      });
   }
 
   private suggestCode(value: string): string {
@@ -131,18 +185,27 @@ export class StorageLocationTypeDialogComponent implements OnInit {
       .slice(0, 64);
   }
 
-  private resolveBehaviourKind(structural: boolean, slotBearing: boolean): string {
+  private resolveBehaviourKind(
+    structural: boolean,
+    slotBearing: boolean,
+  ): string {
     if (structural && slotBearing) return "FLEXIBLE";
     if (structural) return "STRUCTURAL";
     if (slotBearing) return "FINAL_POSITION";
     return "REFERENCE";
   }
 
-  private parseMetadata(metadataJson: string | null): { orientation?: string; notes?: string } {
+  private parseMetadata(metadataJson: string | null): {
+    orientation?: string;
+    notes?: string;
+  } {
     if (!metadataJson) return {};
     try {
       const parsed = JSON.parse(metadataJson);
-      return { orientation: parsed?.orientation || undefined, notes: parsed?.notes || undefined };
+      return {
+        orientation: parsed?.orientation || undefined,
+        notes: parsed?.notes || undefined,
+      };
     } catch {
       return {};
     }
@@ -152,7 +215,8 @@ export class StorageLocationTypeDialogComponent implements OnInit {
     const metadata: Record<string, string> = {};
     const orientation = this.form.get("orientation")?.value;
     const notes = (this.form.get("additionalNotes")?.value || "").trim();
-    if (orientation && orientation !== "STANDARD") metadata.orientation = orientation;
+    if (orientation && orientation !== "STANDARD")
+      metadata.orientation = orientation;
     if (notes) metadata.notes = notes;
     return Object.keys(metadata).length ? JSON.stringify(metadata) : null;
   }
@@ -163,6 +227,11 @@ export class StorageLocationTypeDialogComponent implements OnInit {
   }
 
   private getErrorMessage(error: any, fallback: string): string {
-    return error?.error?.error?.message || error?.error?.message || error?.message || fallback;
+    return (
+      error?.error?.error?.message ||
+      error?.error?.message ||
+      error?.message ||
+      fallback
+    );
   }
 }
