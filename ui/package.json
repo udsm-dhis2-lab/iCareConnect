@@ -1,9 +1,9 @@
 {
   "name": "icare-ui",
-  "version": "0.0.0",
+  "version": "1.0.1",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node --max-old-space-size=8192 ./node_modules/@angular/cli/bin/ng serve",
     "build": "NODE_OPTIONS=--max_old_space_size=8192 ng build",
     "build:prod": "ng build --aot --configuration production",
     "test": "ng test",

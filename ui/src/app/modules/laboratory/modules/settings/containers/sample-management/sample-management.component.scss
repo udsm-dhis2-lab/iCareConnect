@@ -1,0 +1,253 @@
+.sample-management-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.page-title-block {
+  max-width: 880px;
+}
+
+.page-kicker,
+.summary-label,
+.delete-dialog-kicker,
+.delete-dialog-target-label {
+  margin: 0 0 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  color: #5b6472;
+}
+
+.page-title-block h1,
+.summary-card h2,
+.empty-state h3,
+.delete-dialog-copy h2 {
+  margin: 0;
+}
+
+.page-description,
+.dialog-description,
+.delete-dialog-description,
+.empty-state p,
+.state-block p,
+.summary-card p {
+  margin: 0.4rem 0 0;
+  color: #5b6472;
+}
+
+.summary-strip {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.summary-card {
+  border-left: 4px solid #d2d8e4;
+  border-radius: 12px;
+}
+
+.summary-card--primary {
+  border-left-color: #2c6692;
+}
+
+.workspace-tabs {
+  background: transparent;
+}
+
+.tab-content {
+  padding-top: 1rem;
+}
+
+.workspace-card {
+  border-radius: 16px;
+}
+
+.workspace-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.workspace-toolbar--two-lines {
+  align-items: stretch;
+}
+
+.toolbar-search-field {
+  min-width: 280px;
+  flex: 1 1 320px;
+}
+
+.toolbar-filters-grid {
+  display: grid;
+  gap: 1rem;
+  flex: 1 1 640px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.toolbar-filters-grid--three-columns {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.table-meta-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0.5rem 0 1rem;
+  color: #5b6472;
+  font-size: 0.875rem;
+}
+
+.helper-warning {
+  color: #b26a00;
+}
+
+.table-wrapper {
+  overflow: auto;
+}
+
+.metadata-table {
+  width: 100%;
+}
+
+.actions-column {
+  width: 220px;
+  min-width: 220px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+th.actions-column,
+td.actions-column {
+  overflow: visible !important;
+}
+
+.actions-column--stacked {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.cell-primary {
+  font-weight: 600;
+}
+
+.cell-secondary {
+  color: #5b6472;
+  font-size: 0.8125rem;
+  margin-top: 0.2rem;
+}
+
+.empty-state,
+.state-block {
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.75rem;
+  padding: 2rem 1rem;
+}
+
+.empty-state mat-icon,
+.state-block mat-icon {
+  transform: scale(1.2);
+  color: #74809a;
+}
+
+.delete-dialog-shell {
+  display: flex;
+  flex-direction: column;
+}
+
+.delete-dialog-header {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding-bottom: 1rem;
+}
+
+.delete-dialog-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(244, 67, 54, 0.12);
+  color: #d32f2f;
+}
+
+.delete-dialog-body {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.delete-dialog-target {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.delete-dialog-impact,
+.delete-dialog-error {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  color: #5b6472;
+}
+
+.delete-dialog-error {
+  color: #d32f2f;
+}
+
+.delete-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
+}
+
+.delete-dialog-actions button mat-progress-spinner {
+  margin-right: 0.4rem;
+}
+
+@media (max-width: 960px) {
+  .page-header,
+  .workspace-toolbar,
+  .table-meta-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-actions {
+    justify-content: flex-start;
+  }
+
+  .actions-column--stacked {
+    flex-wrap: wrap;
+  }
+}

@@ -204,4 +204,68 @@ public interface LaboratoryService extends OpenmrsService {
 	AssociatedField updateAssociatedField(String associatedFieldUuid, AssociatedField associatedField);
 	
 	TestTimeConfig deleteTestTimeConfiguration(String testConfigUuid);
+	
+	SampleStatus addSampleStorageStatus(SampleStatus sampleStatus) throws Exception;
+	
+	SampleStatus addSampleDisposalStatus(SampleStatus sampleStatus) throws Exception;
+	
+	StorageType addStorageType(StorageType storageType) throws Exception;
+	
+	ListResult<StorageType> getStorageTypes(Pager pager, String q);
+	
+	StorageType getStorageTypeByUuid(String storageTypeUuid) throws Exception;
+	
+	StorageType updateStorageType(String storageTypeUuid, StorageType storageType) throws Exception;
+	
+	StorageType deleteStorageType(String storageTypeUuid, String reason) throws Exception;
+	
+	Storage addStorage(Storage storage) throws Exception;
+	
+	ListResult<Storage> getStorages(Pager pager, String q, String storageTypeUuid);
+	
+	Storage getStorageByUuid(String storageUuid) throws Exception;
+	
+	Storage updateStorage(String storageUuid, Storage storage) throws Exception;
+	
+	Storage deleteStorage(String storageUuid, String reason) throws Exception;
+	
+	StorageLocationType addStorageLocationType(StorageLocationType storageLocationType) throws Exception;
+	
+	ListResult<StorageLocationType> getStorageLocationTypes(Pager pager, String q);
+	
+	StorageLocationType getStorageLocationTypeByUuid(String storageLocationTypeUuid) throws Exception;
+	
+	StorageLocationType updateStorageLocationType(String storageLocationTypeUuid, StorageLocationType storageLocationType)
+	        throws Exception;
+	
+	StorageLocationType deleteStorageLocationType(String storageLocationTypeUuid, String reason) throws Exception;
+	
+	StorageLocation addStorageLocation(StorageLocation storageLocation) throws Exception;
+	
+	ListResult<StorageLocation> getStorageLocations(Pager pager, String q, String parentLocationUuid,
+	        String locationTypeUuid, Boolean slotOnly);
+	
+	StorageLocation getStorageLocationByUuid(String storageLocationUuid) throws Exception;
+	
+	StorageLocation updateStorageLocation(String storageLocationUuid, StorageLocation storageLocation) throws Exception;
+	
+	StorageLocation deleteStorageLocation(String storageLocationUuid, String reason) throws Exception;
+	
+	List<StorageLocation> generateStorageLocationSlots(String storageLocationUuid, Integer rowsCount, Integer columnsCount,
+	        Integer layersCount, String slotPattern) throws Exception;
+	
+	SampleStorageOccupancy storeSample(String sampleUuid, String slotLocationUuid, String occupancyType,
+	        Double quantityStored, String quantityUnit, String remarks) throws Exception;
+	
+	SampleStorageOccupancy moveStoredSample(String sampleUuid, String slotLocationUuid, String remarks) throws Exception;
+	
+	SampleStorageOccupancy releaseStoredSample(String sampleUuid, String releaseReason) throws Exception;
+	
+	SampleDisposalRecord disposeSample(String sampleUuid, String disposalMethod, String disposalReason, String remarks)
+	        throws Exception;
+	
+	Map<String, Object> getSampleStorageSummary(String sampleUuid) throws Exception;
+	
+	Map<String, Object> getSlotOccupancySummary(String slotLocationUuid) throws Exception;
+	
 }

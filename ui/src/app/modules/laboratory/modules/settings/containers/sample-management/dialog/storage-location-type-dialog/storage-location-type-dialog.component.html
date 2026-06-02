@@ -1,0 +1,90 @@
+<div class="dialog-shell">
+  <div class="dialog-header">
+    <div>
+      <p class="dialog-kicker">Storage setup</p>
+      <h2>{{ title }}</h2>
+      <p class="dialog-description">
+        Define a reusable location level such as Department, Room, Freezer, Box, or Position.
+        This level will later be used when building the laboratory storage path.
+      </p>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <form class="dialog-form" [formGroup]="form" (ngSubmit)="save()">
+    <div class="dialog-content">
+      <section class="dialog-section">
+        <h3>Basic details</h3>
+        <div class="dialog-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" maxlength="128" placeholder="For example: Freezer" />
+            <mat-error *ngIf="nameControl?.hasError('required')">Name is required.</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Code</mat-label>
+            <input matInput formControlName="code" maxlength="64" placeholder="For example: FREEZER" />
+            <mat-hint>Short code used by the system and reports.</mat-hint>
+            <mat-error *ngIf="codeControl?.hasError('required')">Code is required.</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="dialog-grid-span-2">
+            <mat-label>Description</mat-label>
+            <textarea matInput rows="3" formControlName="description" placeholder="Explain what this location level represents in the laboratory."></textarea>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Sequence order</mat-label>
+            <input matInput type="number" min="1" formControlName="levelOrder" placeholder="For example: 3" />
+            <mat-hint>Lower numbers appear earlier in the storage path.</mat-hint>
+          </mat-form-field>
+        </div>
+      </section>
+
+      <section class="dialog-section">
+        <h3>How this level will be used</h3>
+        <div class="dialog-grid">
+          <mat-form-field appearance="outline" class="dialog-grid-span-2">
+            <mat-label>Use this level for</mat-label>
+            <mat-select formControlName="behaviourKind">
+              <mat-option *ngFor="let option of behaviourOptions" [value]="option.value">{{ option.label }}</mat-option>
+            </mat-select>
+            <mat-hint>{{ selectedBehaviour?.helper }}</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Layout direction</mat-label>
+            <mat-select formControlName="orientation">
+              <mat-option *ngFor="let option of orientationOptions" [value]="option.value">{{ option.label }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Additional notes</mat-label>
+            <textarea matInput rows="3" formControlName="additionalNotes" placeholder="Optional guidance for staff."></textarea>
+          </mat-form-field>
+        </div>
+      </section>
+
+      <div class="dialog-inline-note">
+        <mat-icon>info</mat-icon>
+        <span>
+          <strong>Preview:</strong> this level will be stored as
+          <strong>{{ selectedBehaviour?.label || 'Reference location only' }}</strong>.
+          Technical background details are prepared automatically from the simple fields above.
+        </span>
+      </div>
+    </div>
+
+    <div class="dialog-actions dialog-actions--sticky">
+      <button mat-stroked-button type="button" (click)="close()">Close</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="saving">
+        <mat-icon *ngIf="!saving">save</mat-icon>
+        <mat-spinner *ngIf="saving" diameter="20"></mat-spinner>
+        {{ submitLabel }}
+      </button>
+    </div>
+  </form>
+</div>

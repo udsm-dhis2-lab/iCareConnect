@@ -285,7 +285,7 @@ export const getLocationById = createSelector(
 export const getBedsGroupedByTheCurrentLocationChildren = createSelector(
   getLocations,
   (locations: Location[], props) => {
-    const currentLocation = (_.filter(locations, {
+    const currentLocation: any = (_.filter(locations, {
       id: props?.id,
       retired: false,
     }) || [])[0];
@@ -323,7 +323,7 @@ export const getBedsGroupedByTheCurrentLocationChildren = createSelector(
 export const getCabinetsGroupedByTheCurrentLocationChildren = createSelector(
   getLocations,
   (locations: Location[], props) => {
-    const currentLocation = (_.filter(locations, {
+    const currentLocation: any = (_.filter(locations, {
       id: props?.id,
       retired: false,
     }) || [])[0];
@@ -443,7 +443,7 @@ export const getAllLocationsUnderWardAsFlatArray = createSelector(
     return _.uniq([
       currentLocation?.uuid,
       ...flattenList([formattedLocation])
-        .map((item) => item.id)
+        .map((item: any) => item.id)
         ?.filter((uuid) => uuid),
     ]);
   }
@@ -490,7 +490,7 @@ export const getAllLocationsMortuaryAsFlatArray = createSelector(
     return _.uniq([
       currentLocation?.uuid,
       ...flattenList([formattedLocation])
-        .map((item) => item.id)
+        .map((item: any) => item.id)
         ?.filter((uuid) => uuid),
     ]);
   }

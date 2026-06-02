@@ -48,16 +48,65 @@ public class SampleDAO extends BaseDAO<Sample> {
 		return query.list();
 	}
 	
+	//	public Sample getSamplesById(String id) {
+	//		DbSession session = this.getSession();
+	//		String queryStr = "SELECT sample FROM Sample sample WHERE sp.label = :label";
+	//		Query query = session.createQuery(queryStr);
+	//		query.setParameter("label", id);
+	//		if (!query.list().isEmpty()) {
+	//			return (Sample) query.list().get(0);
+	//		} else {
+	//			return new Sample();
+	//		}
+	//	}
+	
+	//	public Sample getSamplesById(String id) {
+	//		if (id == null || id.trim().equals("")) {
+	//			return null;
+	//		}
+	//
+	//		DbSession session = this.getSession();
+	//
+	//		String queryStr = "SELECT sp FROM Sample sp " + "WHERE sp.label = :label " + "AND sp.voided = false";
+	//
+	//		Query query = session.createQuery(queryStr);
+	//		query.setParameter("label", id.trim());
+	//		query.setMaxResults(1);
+	//
+	//		List<Sample> samples = query.list();
+	//		return samples.isEmpty() ? null : samples.get(0);
+	//	}
+	
 	public Sample getSamplesById(String id) {
-		DbSession session = this.getSession();
-		String queryStr = "SELECT sample FROM Sample sample WHERE sp.label = :label";
-		Query query = session.createQuery(queryStr);
-		query.setParameter("label", id);
-		if (!query.list().isEmpty()) {
-			return (Sample) query.list().get(0);
-		} else {
-			return new Sample();
+		if (id == null || id.trim().equals("")) {
+			return null;
 		}
+		
+		DbSession session = this.getSession();
+		
+		String queryStr = "SELECT sp FROM Sample sp " + "WHERE sp.label = :label "
+		        + "AND (sp.voided IS NULL OR sp.voided = false) " + "ORDER BY sp.dateCreated DESC";
+		
+		Query query = session.createQuery(queryStr);
+		query.setParameter("label", id.trim());
+		
+		/*
+		 * Load only two rows so that we can detect duplicate active labels.
+		 * If two rows are returned, it is unsafe to silently choose one.
+		 */
+		query.setMaxResults(2);
+		
+		List<Sample> samples = query.list();
+		
+		if (samples.isEmpty()) {
+			return null;
+		}
+		
+		if (samples.size() > 1) {
+			throw new IllegalStateException("Multiple active samples found with label '" + id.trim() + "'");
+		}
+		
+		return samples.get(0);
 	}
 	
 	public List<Sample> getSamplesByDates(Date startDate, Date endDate) {
@@ -867,5 +916,23 @@ public class SampleDAO extends BaseDAO<Sample> {
 		Query query = session.createQuery(queryStr);
 		query.setParameter("batchSampleUuid", batchSampleUuid);
 		return query.list();
+	}
+	
+	public Sample getSamplesByLabel(String label) {
+		if (label == null || label.trim().equals("")) {
+			return null;
+		}
+		
+		DbSession session = this.getSession();
+		
+		//		String queryStr = "SELECT sp FROM Sample sp " + "WHERE sp.voided = false " + "AND sp.label = :label";
+		String queryStr = "SELECT sample FROM Sample sample WHERE sp.label = :label";
+		
+		Query query = session.createQuery(queryStr);
+		query.setParameter("label", label.trim());
+		query.setMaxResults(1);
+		
+		List<Sample> results = query.list();
+		return results.isEmpty() ? null : results.get(0);
 	}
 }

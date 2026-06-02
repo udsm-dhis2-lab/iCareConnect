@@ -1,0 +1,68 @@
+<div class="dialog-shell">
+  <div class="dialog-header">
+    <div>
+      <p class="dialog-kicker">Position setup</p>
+      <h2>Prepare storage positions for {{ data.location.name }}</h2>
+      <p class="dialog-description">
+        Confirm the layout and choose how the generated positions should be labelled.
+      </p>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <form class="dialog-form" [formGroup]="form" (ngSubmit)="generate()">
+    <div class="dialog-content">
+      <div class="dialog-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Rows</mat-label>
+          <input matInput type="number" min="1" formControlName="rowsCount" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Columns</mat-label>
+          <input matInput type="number" min="1" formControlName="columnsCount" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Layers</mat-label>
+          <input matInput type="number" min="1" formControlName="layersCount" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Position label format</mat-label>
+          <mat-select formControlName="slotPatternPreset">
+            <mat-option *ngFor="let option of slotPatternOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+          <mat-hint>Choose a ready format or use a custom format.</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" *ngIf="usingCustomPattern" class="dialog-grid-span-2">
+          <mat-label>Custom label format</mat-label>
+          <input matInput formControlName="customSlotPattern" placeholder="For example: A$&#123;row&#125;-&#123;column&#125;" />
+          <mat-hint>Available placeholders: $&#123;row&#125;, $&#123;column&#125;, $&#123;layer&#125;, $&#123;rowNumber&#125;. Curly-brace versions like &#123;column&#125; also work.</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <div class="projection-card">
+        <mat-icon>grid_view</mat-icon>
+        <div>
+          <strong>{{ projectedSlots }}</strong>
+          <span>position{{ projectedSlots === 1 ? '' : 's' }} will be prepared</span>
+          <small>Example label: {{ slotPatternPreview }}</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-actions dialog-actions--sticky">
+      <button mat-stroked-button type="button" (click)="close()">Close</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="generating">
+        <mat-icon *ngIf="!generating">auto_awesome</mat-icon>
+        <mat-spinner *ngIf="generating" diameter="20"></mat-spinner>
+        Prepare positions
+      </button>
+    </div>
+  </form>
+</div>
