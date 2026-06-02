@@ -41,6 +41,13 @@ const routes: Routes = [
           ).then((m) => m.LaboratoryInvestigationModule),
       },
       {
+        path: "sample-referral",
+        loadChildren: () =>
+          import("./modules/sample-referral/sample-referral.module").then(
+            (m) => m.SampleReferralModule
+          ),
+      },
+      {
         path: "sample-tracking",
         loadChildren: () =>
           import("./modules/sample-tracking/sample-tracking.module").then(

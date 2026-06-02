@@ -1,0 +1,29 @@
+<div
+  *ngIf="{
+    datesParameters: datesParameters$ | async,
+    LISConfigurations: LISConfigurations$ | async,
+    sampleReferralSettings: sampleReferralSettings$ | async
+  } as params"
+>
+
+
+@if(params?.LISConfigurations?.isLIS && params?.sampleReferralSettings){
+  <div style="margin-top: -20px">
+
+  <div class="mb-2">
+      @if(params?.datesParameters){
+      <app-shared-samples-summary-dashboard [datesParams]="params?.datesParameters" [dashboardSingleValueDataSetsReferenceKey]="
+                'iCare.laboratory.sampleResults.dashboard.settings.samples.singleValue'
+              "></app-shared-samples-summary-dashboard>
+      }
+    </div>
+
+    <h5 class="mb-2 mt-4">Sample Referrals</h5>
+    <router-outlet></router-outlet>
+
+  </div>
+}
+  <mat-progress-bar *ngIf="
+        !params?.LISConfigurations || !params?.sampleReferralSettings || !params?.datesParameters
+      " mode="indeterminate"></mat-progress-bar>
+</div>

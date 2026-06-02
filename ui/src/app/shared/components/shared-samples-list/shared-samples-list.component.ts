@@ -11,6 +11,7 @@ import { MatCheckboxChange } from "@angular/material/checkbox";
 import { MatRadioChange } from "@angular/material/radio";
 import { MatSelectChange } from "@angular/material/select";
 import { MatDialog } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { Store } from "@ngrx/store";
 import { omit, keyBy } from "lodash";
 import { Observable, of } from "rxjs";
@@ -20,11 +21,12 @@ import { SamplesService } from "src/app/shared/services/samples.service";
 import { AppState } from "src/app/store/reducers";
 import { getCurrentUserDetails } from "src/app/store/selectors/current-user.selectors";
 import { VisitsService } from "../../resources/visits/services";
-import { map } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { webSocket } from "rxjs/webSocket";
 import { BarCodeModalComponent } from "src/app/shared/dialogs/bar-code-modal/bar-code-modal.component";
 import { formatDateToYYMMDD } from "../../helpers/format-date.helper";
 import { SampleDisposeDialogComponent, SampleStoreDialogComponent } from "../../dialogs";
+import { SampleReferralService } from "src/app/modules/laboratory/modules/sample-referral/services/referral-samples.service";
 
 @Component({
   selector: "app-shared-samples-list",
@@ -57,6 +59,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
   samples$: Observable<{ pager: any; results: any[] }>;
   labEquipments$: Observable<any[]>;
+  sampleReferralSettings$: Observable<any>;
 
   pageCounts: any[] = [1, 5, 10, 20, 25, 50, 100, 200];
 
@@ -72,6 +75,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
   itemsToShow: any = {};
   currentUser$: Observable<any>;
+  currentUserUuid: string = "";
   listType: string = "patients";
 
   currentSamplesByVisits$: Observable<any[]>;
@@ -87,11 +91,11 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     private dialog: MatDialog,
     private store: Store<AppState>,
     private visitsService: VisitsService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private snackBar: MatSnackBar,
+    private sampleReferralService: SampleReferralService
   ) {}
 
-
-  
   ngAfterViewInit(): void {
     this.connection = webSocket(this.barcodeSettings?.socketUrl);
     this.connection.subscribe({
@@ -101,7 +105,6 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     });
     // [tabType]="'completed-samples'"
     if (this.listType === "samples") {
-      
       this.getSamples({
         category: this.category,
         hasStatus: this.hasStatus,
@@ -111,12 +114,12 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     } else {
       this.getPatients();
     }
-    this.cdr.detectChanges(); 
+    this.cdr.detectChanges();
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.listType = !this.LISConfigurations?.isLIS ? "patients" : "samples";
-    this.pageSize = this.tabType == "completed-samples"?200:100;
+    this.pageSize = this.tabType == "completed-samples" ? 200 : 100;
     this.sampleVisitParameters = {
       hasStatus: this.hasStatus,
       sampleCategory:
@@ -124,7 +127,9 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
           ? "NOT ACCEPTED"
           : this.category,
     };
-    
+
+    await this.sampleReferralService.getReferralSettings().toPromise()
+
     this.searchingTestField = new Dropdown({
       id: "test",
       key: "test",
@@ -156,6 +161,20 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     });
 
     this.currentUser$ = this.store.select(getCurrentUserDetails);
+    this.currentUser$.subscribe((user) => {
+      this.currentUserUuid = user?.uuid || "";
+    });
+  }
+
+  canUserAuthorize(sample: any): boolean {
+    if (!this.LISConfigurations?.isLIS) return true;
+    return !sample?.orders?.some((order: any) =>
+      order?.testAllocations?.some((alloc: any) =>
+        alloc?.results?.some(
+          (r: any) => r?.creator?.uuid === this.currentUserUuid,
+        ),
+      ),
+    );
   }
 
   toggleCurrentPatientSamples(event: MatCheckboxChange, samples: any[]): void {
@@ -167,14 +186,14 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       this.currentPatientSelectedSamples = {};
     }
     this.currentPatientSelectedSamplesCount = Object.keys(
-      this.currentPatientSelectedSamples
+      this.currentPatientSelectedSamples,
     )?.length;
   }
 
   toggleCurrentPatientSample(
     event: MatCheckboxChange,
     sample: any,
-    allSamples: any[]
+    allSamples: any[],
   ): void {
     if (event.checked) {
       this.currentPatientSelectedSamples[sample?.uuid] = sample;
@@ -184,12 +203,12 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     } else {
       this.currentPatientSelectedSamples = omit(
         this.currentPatientSelectedSamples,
-        sample?.id
+        sample?.id,
       );
       this.allCurrentPatientSamplesSelected = false;
     }
     this.currentPatientSelectedSamplesCount = Object.keys(
-      this.currentPatientSelectedSamples
+      this.currentPatientSelectedSamples,
     )?.length;
   }
 
@@ -197,7 +216,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     event.stopPropagation();
     this.selectedSampleDetails.emit({
       data: Object.keys(this.currentPatientSelectedSamples).map(
-        (key) => this.currentPatientSelectedSamples[key]
+        (key) => this.currentPatientSelectedSamples[key],
       ),
       actionType: "reject",
     });
@@ -211,7 +230,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
     this.selectedSampleDetails.emit({
       data: Object.keys(this.currentPatientSelectedSamples).map(
-        (key) => this.currentPatientSelectedSamples[key]
+        (key) => this.currentPatientSelectedSamples[key],
       ),
       actionType: "accept",
     });
@@ -262,7 +281,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
         null,
         null,
         this.category,
-        this.excludedSampleCategories
+        this.excludedSampleCategories,
       )
       .pipe(
         map((response) => {
@@ -270,21 +289,18 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
             pager: null,
             results: response?.map((visitData) => visitData?.visit),
           };
-        })  
+        }),
       );
-      
   }
 
   getSamplesListByVisit(event: Event, visit: any, parameters: any): void {
- 
     event.stopPropagation();
     this.currentVisit = visit;
-    this.showModal=true;
+    this.showModal = true;
     this.currentSamplesByVisits$ = this.visitsService.getSamplesByVisitUuid(
       visit?.uuid,
-      parameters
+      parameters,
     );
-    
   }
 
   getSamples(params?: any): void {
@@ -318,7 +334,21 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
         ? localStorage?.getItem("currentLocation").indexOf("{") > -1
           ? JSON.parse(localStorage?.getItem("currentLocation"))?.uuid
           : null
-        : null
+        : null,
+    ).pipe(
+      map((response: any) => {
+        const referralOrderConcept = this.sampleReferralService.referralSettings()?.referralOrderConcept;
+
+        return {
+          ...response,
+          results: response?.results?.map((sample: any) => {
+            return {
+              ...sample,
+              orders: sample?.orders?.filter((order: any) => order?.order?.concept?.uuid !== referralOrderConcept)
+            }
+          })
+        }
+      })
     );
   }
 
@@ -344,7 +374,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     } else {
       this.samplesToViewMoreDetails = omit(
         this.samplesToViewMoreDetails,
-        sample?.uuid
+        sample?.uuid,
       );
     }
   }
@@ -460,7 +490,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
     this.selectedSamples = event?.checked
       ? [...this.selectedSamples, sample]
       : this.selectedSamples?.filter(
-          (selectedSample) => selectedSample?.label !== sample?.label
+          (selectedSample) => selectedSample?.label !== sample?.label,
         ) || [];
     this.keyedSelectedSamples[sample?.id] = sample;
     this.samplesForAction.emit(this.selectedSamples);
@@ -468,9 +498,27 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
 
   onSelectAll(event: MatCheckboxChange, samples: any[]): void {
     this.selectedSamples = [];
-    this.selectedSamples = event?.checked
-      ? [...this.selectedSamples, ...samples]
-      : [];
+    if (event?.checked) {
+      const eligible =
+        this.tabType === "authorization"
+          ? (samples || []).filter((s) => this.canUserAuthorize(s))
+          : samples || [];
+      this.selectedSamples = [...eligible];
+
+      if (this.tabType === "authorization" && eligible.length < (samples || []).length) {
+        const skipped = (samples || []).length - eligible.length;
+        this.snackBar.open(
+          `${skipped} sample(s) skipped — you cannot authorise results processed by you`,
+          "OK",
+          {
+            horizontalPosition: "center",
+            verticalPosition: "bottom",
+            duration: 4000,
+            panelClass: ["snack-color"],
+          },
+        );
+      }
+    }
     this.keyedSelectedSamples =
       this.selectedSamples?.length > 0 ? keyBy(this.selectedSamples, "id") : {};
     this.samplesForAction.emit(this.selectedSamples);
@@ -573,7 +621,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
             } ${results?.sampleData?.patient?.familyName}`,
             Date: formatDateToYYMMDD(
               new Date(results?.sampleData?.created),
-              true
+              true,
             ),
             Storage: "",
             Department:
@@ -594,7 +642,7 @@ export class SharedSamplesListComponent implements OnInit, AfterViewInit {
       });
   }
 
-  closeModal(){
+  closeModal() {
     this.showModal = false;
   }
 }

@@ -9,72 +9,58 @@ import org.openmrs.module.icare.store.models.StockInvoice;
 import org.openmrs.module.icare.store.models.StockInvoiceStatus;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
-	
-	public ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status, String q, Date startDate,
-	        Date endDate) {
+
+	public ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status, String q, Date startDate, Date endDate) {
 		DbSession session = this.getSession();
-		String queryStr = " SELECT stinv FROM StockInvoice stinv WHERE stinv.voided = false";
-		
+
+		StringBuilder hql = new StringBuilder("FROM StockInvoice stinv WHERE stinv.voided = false");
+		Map<String, Object> params = new HashMap<>();
+
 		if (status == StockInvoiceStatus.Type.DRAFT) {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE";
-			} else {
-				queryStr += " AND";
-			}
-			queryStr += " stinv IN (SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'DRAFT') AND stinv NOT IN( SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'RECEIVED') ";
+			hql.append(" AND EXISTS (SELECT s FROM StockInvoiceStatus s WHERE s.stockInvoice = stinv AND s.status = 'DRAFT')");
+			hql.append(" AND NOT EXISTS (SELECT s FROM StockInvoiceStatus s WHERE s.stockInvoice = stinv AND s.status = 'RECEIVED')");
 		}
-		
+
 		if (status == StockInvoiceStatus.Type.RECEIVED) {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE";
-			} else {
-				queryStr += " AND";
-			}
-			queryStr += " stinv IN (SELECT stinvstatus.stockInvoice FROM StockInvoiceStatus stinvstatus WHERE stinvstatus.status LIKE 'RECEIVED') ";
+			hql.append(" AND EXISTS (SELECT s FROM StockInvoiceStatus s WHERE s.stockInvoice = stinv AND UPPER(s.status) = 'RECEIVED')");
 		}
-		
+
 		if (startDate != null && endDate != null) {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND";
-			}
-			queryStr += " (cast(stinv.receivingDate as date) BETWEEN :startDate AND :endDate)";
+			hql.append(" AND stinv.receivingDate BETWEEN :startDate AND :endDate");
+			params.put("startDate", startDate);
+			params.put("endDate", endDate);
 		}
-		
-		if (q != null) {
-			if (!queryStr.contains("WHERE")) {
-				queryStr += " WHERE ";
-			} else {
-				queryStr += " AND ";
-			}
-			
-			queryStr += "lower(stinv.invoiceNumber) like lower(:q) ";
+
+		if (q != null && !q.isEmpty()) {
+			hql.append(" AND lower(stinv.invoiceNumber) LIKE lower(:q)");
+			params.put("q", "%" + q.replace(" ", "%") + "%");
 		}
-		
-		Query query = session.createQuery(queryStr);
-		if (startDate != null && endDate != null) {
-			query.setParameter("startDate", startDate);
-			query.setParameter("endDate", endDate);
+
+		Query countQuery = session.createQuery("SELECT count(stinv) " + hql);
+		for (Map.Entry<String, Object> entry : params.entrySet()) {
+			countQuery.setParameter(entry.getKey(), entry.getValue());
 		}
-		
-		if (q != null) {
-			query.setParameter("q", "%" + q.replace(" ", "%") + "%");
+		long totalCount = (Long) countQuery.uniqueResult();
+
+		Query query = session.createQuery("SELECT stinv " + hql + " ORDER BY stinv.receivingDate DESC");
+		for (Map.Entry<String, Object> entry : params.entrySet()) {
+			query.setParameter(entry.getKey(), entry.getValue());
 		}
-		
+
 		if (pager.isAllowed()) {
-			pager.setTotal(query.list().size());
+			pager.setTotal((int) totalCount);
 			query.setFirstResult((pager.getPage() - 1) * pager.getPageSize());
 			query.setMaxResults(pager.getPageSize());
 		}
-		
-		ListResult<StockInvoice> listResults = new ListResult();
+
+		ListResult<StockInvoice> listResults = new ListResult<>();
 		listResults.setPager(pager);
 		listResults.setResults(query.list());
 		return listResults;
-		
 	}
 	
 	public StockInvoice updateStockInvoice(StockInvoice stockInvoice) {

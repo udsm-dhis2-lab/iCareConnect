@@ -21,6 +21,7 @@ export class CaptureFormDataComponent implements OnInit {
   @Input() isGenericForm: boolean;
   @Input() formValidationRules: any[];
   @Input() isFormHorizontal: boolean;
+  @Input() colClass?: string;
   observations$: Observable<any>;
   genericFormFields: any[];
 

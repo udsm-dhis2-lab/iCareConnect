@@ -570,6 +570,12 @@ export class ConceptsService {
     );
   }
 
+  getConceptMappingByConceptUuid(conceptUuid: string) {
+        return this.httpClient.get(
+            `concept/${conceptUuid}/mapping?v=custom:(display,uuid,conceptReferenceTerm:(uuid,display,name,code,conceptSource:(uuid,display)))`
+        );
+    }
+
   getConceptsWithItemsDetails(parameters?: any): Observable<any> {
     return this.httpClient
       .get(`icare/conceptswithitems?${parameters ? parameters.join("&") : ""}`)

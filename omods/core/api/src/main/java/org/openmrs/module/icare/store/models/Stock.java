@@ -67,6 +67,7 @@ public class Stock implements java.io.Serializable, JSONConverter {
 		this.quantity = quantity;
 	}
 	
+	@Override
 	public Map<String, Object> toMap() {
 		
 		Map<String, Object> stockObject = new HashMap<String, Object>();
@@ -87,6 +88,11 @@ public class Stock implements java.io.Serializable, JSONConverter {
 		stockObject.put("location", locationObject);
 		
 		return stockObject;
+	}
+	
+	@Override
+	public Map<String, Object> toMap(Object... params) {
+		return toMap();
 	}
 	
 	public Item getItem() {

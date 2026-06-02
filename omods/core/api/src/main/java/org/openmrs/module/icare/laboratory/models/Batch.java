@@ -101,6 +101,7 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 		
 	}
 	
+	@Override
 	public Map<String, Object> toMap() {
 		
 		HashMap<String, Object> batchObject = new HashMap<String, Object>();
@@ -128,5 +129,10 @@ public class Batch extends BaseOpenmrsData implements java.io.Serializable, JSON
 			batchObject.put("batchSet", batchSetObject);
 		}
 		return batchObject;
+	}
+	
+	@Override
+	public Map<String, Object> toMap(Object... params) {
+		return toMap();
 	}
 }

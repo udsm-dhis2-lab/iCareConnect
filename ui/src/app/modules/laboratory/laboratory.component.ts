@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from "@angular/core";
+import { Component, OnInit, signal, ViewEncapsulation } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { Title } from "@angular/platform-browser";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
@@ -8,7 +8,7 @@ import { map, take } from "rxjs/operators";
 import { iCareConnectConfigurationsModel } from "src/app/core/models/lis-configurations.model";
 import { LocationService } from "src/app/core/services";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
-import { formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
+import { formatDateToString, formatDateToYYMMDD } from "src/app/shared/helpers/format-date.helper";
 import { ProviderAttributeGet } from "src/app/shared/resources/openmrs";
 import {
   NHIFBiometricMethodE,
@@ -45,6 +45,7 @@ import { getLISConfigurations } from "src/app/store/selectors/lis-configurations
 import { LabMenu } from "./resources/models/lab-menu.model";
 import { loadSpecimenSources } from "./store/actions/specimen-sources-and-tests-management.actions";
 import { FingerCaptureComponent } from "src/app/shared/components/finger-capture/finger-capture.component";
+import { LabDateService } from "./services/lab-date.service";
 @Component({
   selector: "lab-root",
   templateUrl: "./laboratory.component.html",
@@ -133,6 +134,13 @@ export class LaboratoryComponent implements OnInit {
       subMenus: [],
     },
     {
+      name: "Sample Referral",
+      route: "sample-referral",
+      id: "referral",
+      icon: "share",
+      subMenus: [],
+    },
+    {
       name: "Sample Tracking",
       route: "sample-tracking",
       id: "tracking",
@@ -191,7 +199,8 @@ export class LaboratoryComponent implements OnInit {
     private titleService: Title,
     private locationService: LocationService,
     private systemSettingsService: SystemSettingsService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private labDateService: LabDateService
   ) {
     this.store.dispatch(loadRolesDetails());
     this.store.dispatch(loadOrderTypes());
@@ -379,8 +388,12 @@ export class LaboratoryComponent implements OnInit {
       ),
     };
 
-    this.startDate = this.parameters?.startDate;
-    this.endDate = this.parameters?.endDate;
+    this.startDate = new Date(this.parameters?.startDate);
+    this.endDate = new Date(this.parameters?.endDate);
+
+    this.labDateService.startDate.set(this.startDate);
+    this.labDateService.endDate.set(this.endDate);
+    
 
     this.store.dispatch(
       loadLabConfigurations({ periodParameters: this.parameters })
@@ -530,6 +543,9 @@ export class LaboratoryComponent implements OnInit {
   }
 
   onDateChange(reload?: boolean) {
+    this.labDateService.startDate.set(new Date(this.startDate));
+    this.labDateService.endDate.set(new Date(this.endDate));
+
     if (reload && this.endDate) {
       this.store.dispatch(clearLoadedLabOrders());
 
@@ -537,12 +553,8 @@ export class LaboratoryComponent implements OnInit {
       this.store.dispatch(clearVisitsDatesParameters());
       this.parameters = {
         ...this.parameters,
-        startDate: `${this.startDate.getFullYear()}-${
-          this.startDate.getMonth() + 1
-        }-${this.startDate.getDate()}`,
-        endDate: `${this.endDate.getFullYear()}-${
-          this.endDate.getMonth() + 1
-        }-${this.endDate.getDate()}`,
+        startDate: formatDateToString(new Date(this.startDate), "yyyy-MM-dd"),
+        endDate: formatDateToString(new Date(this.endDate), "yyyy-MM-dd"),
       };
 
       this.store.dispatch(

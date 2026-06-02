@@ -116,9 +116,7 @@ export class MatSelectSearchComponent
   @Input() placeholderLabel = "Search";
 
   /** Label to be shown when no entries are found. Set to null if no message should be shown. */
-  @Input() noEntriesFoundLabel = "Keine Optionen gefunden";
-
-  /** Reference to the search input field */
+  @Input() noEntriesFoundLabel = "No option found!";
   @ViewChild("searchSelectInput", { read: ElementRef })
   searchSelectInput: ElementRef;
 

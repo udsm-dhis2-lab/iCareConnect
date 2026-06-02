@@ -5,145 +5,178 @@ import {
   Input,
   Output,
   EventEmitter,
+  OnDestroy,
+  OnChanges,
 } from "@angular/core";
 import { UntypedFormControl } from "@angular/forms";
 import { MatSelect, MatSelectChange } from "@angular/material/select";
 
 import { ReplaySubject, Subject } from "rxjs";
-import { take, takeUntil } from "rxjs/operators";
-
-interface Bank {
-  id: string;
-  name: string;
-}
+import { debounceTime, distinctUntilChanged, takeUntil } from "rxjs/operators";
 
 @Component({
   selector: "app-multiple-results-entry",
   templateUrl: "./multiple-results-entry.component.html",
   styleUrls: ["./multiple-results-entry.component.scss"],
 })
-export class MultipleResultsEntryComponent implements OnInit {
-  version = null;
+export class MultipleResultsEntryComponent implements OnInit, OnDestroy, OnChanges {
   @Input() options: any[];
-  @Input() value: any;
+  @Input() value: any[];
+  @Input() label: string = "";
+  @Input() loading: boolean = false;
+  @Input() noEntriesFoundLabel: string = "";
+
   @Output() selectedList: EventEmitter<any[]> = new EventEmitter<any[]>();
+  @Output() loadMore: EventEmitter<void> = new EventEmitter<void>();
+  @Output() searchChange: EventEmitter<string> = new EventEmitter<string>();
 
-  multipleSelectionFormControl: UntypedFormControl = new UntypedFormControl();
   list: any[];
+  private previousSelectedValues: any[] = [];
 
-  /** control for the selected item */
   public listCtrl: UntypedFormControl = new UntypedFormControl();
-
-  /** control for the MatSelect filter keyword */
   public listFilterCtrl: UntypedFormControl = new UntypedFormControl();
-
-  /** control for the selected item for multi-selection */
   public listMultiCtrl: UntypedFormControl = new UntypedFormControl();
-
-  /** control for the MatSelect filter keyword multi-selection */
   public listMultiFilterCtrl: UntypedFormControl = new UntypedFormControl();
 
-  /** list of items filtered by search keyword */
-  public filteredList: ReplaySubject<Bank[]> = new ReplaySubject<Bank[]>(1);
-
-  /** list of items filtered by search keyword for multi-selection */
+  public filteredList: ReplaySubject<any> = new ReplaySubject<any>(1);
   public filteredMultiList: ReplaySubject<any> = new ReplaySubject<any>(1);
 
-  @ViewChild("singleSelect") singleSelect: MatSelect;
+  panelElement?: HTMLElement;
 
-  /** Subject that emits when the component has been destroyed. */
+  @ViewChild("singleSelect") singleSelect: MatSelect;
+  @ViewChild("multiSelect", { static: false }) multiSelect: MatSelect;
+
   private _onDestroy = new Subject<void>();
+  private scrollListener: (() => void) | null = null;
 
   ngOnInit() {
-    // this.selectedList.emit(this.value);
-    this.setList(this.options);
+    this.setupSearchSubscription();
+    this.setList(this.options || []);
+  }
+
+  ngOnChanges(changes: any) {
+    if (changes['options'] && !changes['options'].firstChange) {
+      this.setList(this.options || []);
+    }
+    if (changes['value'] && !changes['value'].firstChange) {
+      this.updateSelectionFromValue();
+    }
+  }
+
+  private updateSelectionFromValue() {
+    if (this.value && this.value.length > 0 && this.list) {
+      const valueSet = new Set(this.value);
+      const defaultValues = this.list.filter((item) => valueSet.has(item.value));
+      if (defaultValues.length !== this.listMultiCtrl.value?.length) {
+        this.listMultiCtrl.setValue(defaultValues);
+        this.selectedList.emit(this.listMultiCtrl.value);
+      }
+    }
+  }
+
+  private setupSearchSubscription() {
+    this.listMultiFilterCtrl.valueChanges
+      .pipe(takeUntil(this._onDestroy), debounceTime(300), distinctUntilChanged())
+      .subscribe((searchTerm: string) => {
+        this.searchChange.emit(searchTerm);
+      });
   }
 
   setList(list: any[]) {
     this.list = list;
-    const defaultValues =
-      this.list?.filter(
-        (item) =>
-          (this.value?.filter((val) => val === (item?.value || item?.id)) || [])
-            ?.length > 0
-      ) || [];
-    // set default selection
-    this.listMultiCtrl.setValue(defaultValues);
+    
+    if (this.previousSelectedValues && this.previousSelectedValues.length > 0) {
+      const existingValues = new Set(this.previousSelectedValues);
+      const stillValid = this.list.filter(
+        (item) => existingValues.has(item.value || item)
+      );
+      if (stillValid.length > 0) {
+        this.listMultiCtrl.setValue(stillValid);
+      } else if (this.value && this.value.length > 0) {
+        const valueSet = new Set(this.value);
+        const defaultValues = this.list.filter((item) => valueSet.has(item.value));
+        this.listMultiCtrl.setValue(defaultValues);
+      }
+    } else if (this.value && this.value.length > 0) {
+      const valueSet = new Set(this.value);
+      const defaultValues = this.list.filter((item) => valueSet.has(item.value));
+      this.listMultiCtrl.setValue(defaultValues);
+    }
+    
     this.selectedList.emit(this.listMultiCtrl.value);
-
-    // load the initial list
     this.filteredList.next(this.list.slice());
     this.filteredMultiList.next(this.list.slice());
-
-    // listen for search field value changes
-    this.listFilterCtrl.valueChanges
-      .pipe(takeUntil(this._onDestroy))
-      .subscribe(() => {
-        this.filterList();
-      });
-    this.listMultiFilterCtrl.valueChanges
-      .pipe(takeUntil(this._onDestroy))
-      .subscribe(() => {
-        this.filterListMulti();
-      });
   }
 
   ngAfterViewInit() {
-    // this.setInitialValue();
+    if (this.multiSelect) {
+      this.multiSelect.openedChange.pipe(takeUntil(this._onDestroy)).subscribe(
+        (opened) => {
+          if (opened) {
+            setTimeout(() => this.attachScrollListener(), 150);
+          } else {
+            this.detachScrollListener();
+          }
+        }
+      );
+    }
+  }
+
+  private attachScrollListener() {
+    if (this.scrollListener) return;
+
+    const panel = document.querySelector('.infinite-scroll-panel.mat-mdc-select-panel') as HTMLElement;
+    if (!panel) return;
+
+    this.panelElement = panel;
+
+    this.scrollListener = () => {
+      const threshold = 100;
+
+      if (
+        panel.scrollTop + panel.clientHeight >=
+        panel.scrollHeight - threshold &&
+        !this.loading
+      ) {
+        this.loadMore.emit();
+      }
+    };
+
+    panel.addEventListener('scroll', this.scrollListener, { passive: true });
+  }
+
+  private detachScrollListener() {
+    const panel = document.querySelector('.infinite-scroll-panel.mat-mdc-select-panel');
+    if (panel && this.scrollListener) {
+      panel.removeEventListener('scroll', this.scrollListener);
+    }
+    this.scrollListener = null;
+    this.panelElement = null;
   }
 
   getSelectedValues(event: MatSelectChange): void {
+    this.previousSelectedValues = this.listMultiCtrl.value?.map(v => v.value || v) || [];
     this.selectedList.emit(this.listMultiCtrl.value);
   }
 
   ngOnDestroy() {
     this._onDestroy.next();
     this._onDestroy.complete();
-  }
-
-  /**
-   * Sets the initial value after the filteredList are loaded initially
-   */
-  private setInitialValue() {
-    this.filteredList
-      .pipe(take(1), takeUntil(this._onDestroy))
-      .subscribe(() => {
-        this.singleSelect.compareWith = (a: any, b: any) => a?.key === b?.key;
-      });
-  }
-
-  private filterList() {
-    if (!this.list) {
-      return;
-    }
-    // get the search keyword
-    let search = this.listFilterCtrl.value;
-    if (!search) {
-      this.filteredList.next(this.list.slice());
-      return;
-    } else {
-      search = search.toLowerCase();
-    }
-    // filter the list
-    this.filteredList.next(
-      this.list.filter((item) => item?.name.toLowerCase().indexOf(search) > -1)
-    );
+    this.detachScrollListener();
   }
 
   private filterListMulti() {
     if (!this.list) {
       return;
     }
-    // get the search keyword
-    let search = this.listMultiFilterCtrl.value;
+    const search = this.listMultiFilterCtrl.value;
     if (!search) {
       this.filteredMultiList.next(this.list.slice());
       return;
-    } else {
-      search = search.toLowerCase();
     }
+    const searchLower = search.toLowerCase();
     this.filteredMultiList.next(
-      this.list.filter((item) => item?.name.toLowerCase().indexOf(search) > -1)
+      this.list.filter((item) => item?.name?.toLowerCase().includes(searchLower))
     );
   }
 }
