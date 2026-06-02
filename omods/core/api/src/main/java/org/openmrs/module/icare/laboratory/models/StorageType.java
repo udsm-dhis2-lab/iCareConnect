@@ -54,6 +54,11 @@ public class StorageType extends BaseOpenmrsData implements Serializable, JSONCo
 		return storageTypeObject;
 	}
 	
+	@Override
+	public Map<String, Object> toMap(Object... params) throws Exception {
+        return new HashMap<>();
+	}
+	
 	public String getName() {
 		return this.name;
 	}

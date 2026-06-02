@@ -66,6 +66,11 @@ public class Storage extends BaseOpenmrsData implements Serializable, JSONConver
 		return storageObject;
 	}
 	
+	@Override
+	public Map<String, Object> toMap(Object... params) throws Exception {
+        return new HashMap<>();
+	}
+	
 	public String getName() {
 		return this.name;
 	}

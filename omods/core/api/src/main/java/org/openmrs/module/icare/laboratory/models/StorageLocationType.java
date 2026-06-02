@@ -90,6 +90,11 @@ public class StorageLocationType extends BaseOpenmrsData implements Serializable
 	}
 	
 	@Override
+	public Map<String, Object> toMap(Object... params) throws Exception {
+        return new HashMap<>();
+	}
+	
+	@Override
 	public Integer getId() {
 		return id;
 	}

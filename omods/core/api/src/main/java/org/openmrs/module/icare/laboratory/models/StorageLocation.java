@@ -201,6 +201,11 @@ public class StorageLocation extends BaseOpenmrsData implements Serializable, JS
 	}
 	
 	@Override
+	public Map<String, Object> toMap(Object... params) throws Exception {
+        return new HashMap<>();
+	}
+	
+	@Override
 	public Integer getId() {
 		return id;
 	}
