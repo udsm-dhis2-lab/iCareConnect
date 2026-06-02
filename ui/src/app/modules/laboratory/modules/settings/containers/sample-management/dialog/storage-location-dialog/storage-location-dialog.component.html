@@ -1,165 +1,638 @@
-<div class="dialog-shell dialog-shell--wide">
+<div
+  class="dialog-shell storage-config-dialog dialog-shell--wide dialog-shell--storage-location"
+>
   <div class="dialog-header">
-    <div>
-      <p class="dialog-kicker">Storage setup</p>
+    <div class="dialog-title-block">
+      <p class="dialog-kicker">Storage hierarchy setup</p>
       <h2>{{ title }}</h2>
       <p class="dialog-description">
-        Configure one step in the laboratory storage path. Use the form below to describe where samples will be stored and how positions should be prepared.
+        Configure one step in the laboratory storage path. Use these details to
+        define where samples are kept, how child locations are arranged, and how
+        final positions should be prepared.
       </p>
     </div>
+
+    <span class="dialog-mode-badge">
+      {{ data.mode === "create" ? "New location" : "Editing location" }}
+    </span>
   </div>
 
   <mat-divider></mat-divider>
 
   <form class="dialog-form" [formGroup]="form" (ngSubmit)="save()">
     <div class="dialog-content">
-      <section class="dialog-section">
-        <h3>Basic details</h3>
-        <div class="dialog-grid">
-          <mat-form-field appearance="outline">
-            <mat-label>Name</mat-label>
-            <input matInput formControlName="name" maxlength="255" placeholder="For example: Freezer A" />
-            <mat-error *ngIf="nameControl?.hasError('required')">Name is required.</mat-error>
-          </mat-form-field>
+      <aside class="dialog-side-panel">
+        <section class="summary-card summary-card--primary">
+          <div class="summary-card-header">
+            <p class="section-kicker">Live summary</p>
+            <span
+              class="summary-badge"
+              [class.summary-badge--slot]="form.get('slot')?.value === true"
+            >
+              {{
+                form.get("slot")?.value === true
+                  ? "Final position"
+                  : "Storage location"
+              }}
+            </span>
+          </div>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Code</mat-label>
-            <input matInput formControlName="code" maxlength="128" placeholder="For example: FRZ-A-01" />
-            <mat-hint>Short code used in labels and reports.</mat-hint>
-            <mat-error *ngIf="codeControl?.hasError('required')">Code is required.</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Location level</mat-label>
-            <mat-select formControlName="locationTypeUuid">
-              <mat-option *ngFor="let type of data.locationTypes" [value]="type.uuid || type.id">
-                {{ type.name }} ({{ type.code }})
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Inside which location</mat-label>
-            <mat-select formControlName="parentLocationUuid">
-              <mat-option [value]="null">Top-level location</mat-option>
-              <mat-option *ngFor="let location of data.availableParents" [value]="location.uuid || location.id">
-                {{ location.pathLabel || location.name }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Barcode or label</mat-label>
-            <input matInput formControlName="barcode" maxlength="255" placeholder="Optional barcode or printed label" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Use as a final sample position</mat-label>
-            <mat-select formControlName="slot">
-              <mat-option [value]="false">No</mat-option>
-              <mat-option [value]="true">Yes</mat-option>
-            </mat-select>
-            <mat-hint>Choose Yes only when this exact location can hold one sample directly.</mat-hint>
-          </mat-form-field>
-        </div>
-      </section>
-
-      <section class="dialog-section">
-        <h3>Layout and prepared positions</h3>
-        <div class="dialog-grid">
-          <mat-form-field appearance="outline">
-            <mat-label>Rows</mat-label>
-            <input matInput type="number" min="1" formControlName="rowsCount" placeholder="Optional" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Columns</mat-label>
-            <input matInput type="number" min="1" formControlName="columnsCount" placeholder="Optional" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Layers</mat-label>
-            <input matInput type="number" min="1" formControlName="layersCount" placeholder="Optional" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Position label format</mat-label>
-            <mat-select formControlName="slotPatternPreset">
-              <mat-option *ngFor="let option of slotPatternOptions" [value]="option.value">{{ option.label }}</mat-option>
-            </mat-select>
-            <mat-hint>Choose a ready format or use a custom format.</mat-hint>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" *ngIf="usingCustomPattern" class="dialog-grid-span-2">
-            <mat-label>Custom label format</mat-label>
-            <input matInput formControlName="customSlotPattern" placeholder="For example: A$&#123;row&#125;-&#123;column&#125;" />
-            <mat-hint>Available placeholders: $&#123;row&#125;, $&#123;column&#125;, $&#123;layer&#125;, $&#123;rowNumber&#125;. Curly-brace versions like &#123;column&#125; also work.</mat-hint>
-          </mat-form-field>
-
-          <div class="pattern-preview-card dialog-grid-span-2">
-            <mat-icon>grid_view</mat-icon>
-            <div>
-              <strong>Example position label</strong>
-              <span>{{ slotPatternPreview }}</span>
+          <div class="summary-stack">
+            <div class="summary-item">
+              <span class="summary-label">Location name</span>
+              <span class="summary-value">{{
+                nameControl?.value || "Not provided"
+              }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Code</span>
+              <span class="summary-value summary-value--mono">{{
+                codeControl?.value || "AUTO / REQUIRED"
+              }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Location level</span>
+              <span class="summary-value">{{
+                selectedType?.name || "Not selected"
+              }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Parent path</span>
+              <span class="summary-value">{{
+                selectedParent?.pathLabel ||
+                  selectedParent?.name ||
+                  "Top-level location"
+              }}</span>
             </div>
           </div>
+        </section>
+
+        <section class="summary-card">
+          <div class="summary-card-header">
+            <p class="section-kicker">Position planning</p>
+          </div>
+
+          <div class="summary-stack">
+            <div class="summary-item">
+              <span class="summary-label">Rows × Columns × Layers</span>
+              <span class="summary-value">
+                {{ form.get("rowsCount")?.value || "-" }} ×
+                {{ form.get("columnsCount")?.value || "-" }} ×
+                {{ form.get("layersCount")?.value || "1" }}
+              </span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Example position label</span>
+              <span class="summary-value summary-value--mono">{{
+                slotPatternPreview
+              }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Capacity</span>
+              <span class="summary-value">{{
+                form.get("capacity")?.value || "Not specified"
+              }}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="guidance-card">
+          <mat-icon>tips_and_updates</mat-icon>
+          <p>{{ selectedTypeUsageSummary }}</p>
+        </section>
+      </aside>
+
+      <section class="dialog-main-panel">
+        <section class="dialog-section">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">Required information</p>
+              <h3>Basic details</h3>
+            </div>
+            <span class="section-helper"
+              >Name, code, level, and parent define the exact place in the
+              hierarchy.</span
+            >
+          </div>
+
+          <div class="dialog-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Name</mat-label>
+              <input
+                matInput
+                formControlName="name"
+                maxlength="255"
+                placeholder="For example: Freezer A"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Enter a clear, staff-friendly name. Use the common laboratory wording that users will recognize on lists and reports."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-hint align="end"
+                >{{ nameControl?.value?.length || 0 }}/255</mat-hint
+              >
+              <mat-error *ngIf="nameControl?.hasError('required')"
+                >Name is required.</mat-error
+              >
+              <mat-error *ngIf="nameControl?.hasError('maxlength')"
+                >Use 255 characters or fewer.</mat-error
+              >
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Code</mat-label>
+              <input
+                matInput
+                formControlName="code"
+                maxlength="128"
+                placeholder="For example: FRZ-A-01"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Use a short unique code for labels, reports, and integrations. Prefer uppercase letters, numbers, and hyphens."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-hint>Short code used in labels and reports.</mat-hint>
+              <mat-error *ngIf="codeControl?.hasError('required')"
+                >Code is required.</mat-error
+              >
+              <mat-error *ngIf="codeControl?.hasError('maxlength')"
+                >Use 128 characters or fewer.</mat-error
+              >
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Location level</mat-label>
+              <mat-select formControlName="locationTypeUuid">
+                <mat-option
+                  *ngFor="let type of data.locationTypes"
+                  [value]="type.uuid || type.id"
+                >
+                  {{ type.name }} ({{ type.code }})
+                </mat-option>
+              </mat-select>
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Select the hierarchy level this location belongs to, such as Department, Room, Freezer, Box, or Position."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-hint>{{ selectedTypeUsageSummary }}</mat-hint>
+              <mat-error
+                *ngIf="form.get('locationTypeUuid')?.hasError('required')"
+                >Location level is required.</mat-error
+              >
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Inside which location</mat-label>
+              <mat-select formControlName="parentLocationUuid">
+                <mat-option [value]="null">Top-level location</mat-option>
+                <mat-option
+                  *ngFor="let location of data.availableParents"
+                  [value]="location.uuid || location.id"
+                >
+                  {{ location.pathLabel || location.name }}
+                </mat-option>
+              </mat-select>
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Select the parent location that contains this item. Choose top-level when this item starts the path."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Barcode or label</mat-label>
+              <input
+                matInput
+                formControlName="barcode"
+                maxlength="255"
+                placeholder="Optional barcode or printed label"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Optional physical barcode or printed label used to identify this storage item during routine work."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-hint align="end"
+                >{{ form.get("barcode")?.value?.length || 0 }}/255</mat-hint
+              >
+              <mat-error *ngIf="form.get('barcode')?.hasError('maxlength')"
+                >Use 255 characters or fewer.</mat-error
+              >
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Use as a final sample position</mat-label>
+              <mat-select formControlName="slot">
+                <mat-option [value]="false">No</mat-option>
+                <mat-option [value]="true">Yes</mat-option>
+              </mat-select>
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Choose Yes only when this exact location can directly hold one sample. Containers that hold child positions should remain No."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-hint
+                >Choose Yes only when this exact location can hold one sample
+                directly.</mat-hint
+              >
+            </mat-form-field>
+          </div>
+        </section>
+
+        <section class="dialog-section">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">Layout planning</p>
+              <h3>Layout and prepared positions</h3>
+            </div>
+            <span class="section-helper"
+              >Use this when the location has rows, columns, layers, or
+              generated slots.</span
+            >
+          </div>
+
+          <div class="dialog-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Rows</mat-label>
+              <input
+                matInput
+                type="number"
+                min="1"
+                formControlName="rowsCount"
+                placeholder="Optional"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Number of horizontal rows to prepare. Use this when the location has a grid or box-style layout."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-error *ngIf="form.get('rowsCount')?.hasError('min')"
+                >Rows must be greater than zero.</mat-error
+              >
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Columns</mat-label>
+              <input
+                matInput
+                type="number"
+                min="1"
+                formControlName="columnsCount"
+                placeholder="Optional"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Number of vertical columns to prepare. Combine with rows and layers to calculate prepared positions."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-error *ngIf="form.get('columnsCount')?.hasError('min')"
+                >Columns must be greater than zero.</mat-error
+              >
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Layers</mat-label>
+              <input
+                matInput
+                type="number"
+                min="1"
+                formControlName="layersCount"
+                placeholder="Optional"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Number of stacked layers or levels. Use 1 when the container has no separate layers."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-error *ngIf="form.get('layersCount')?.hasError('min')"
+                >Layers must be greater than zero.</mat-error
+              >
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Position label format</mat-label>
+              <mat-select formControlName="slotPatternPreset">
+                <mat-option
+                  *ngFor="let option of slotPatternOptions"
+                  [value]="option.value"
+                >
+                  {{ option.label }}
+                </mat-option>
+              </mat-select>
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Choose how position labels should be generated. Use custom format when your lab has a special label pattern."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-hint>Choose a ready format or use a custom format.</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field
+              appearance="outline"
+              *ngIf="usingCustomPattern"
+              class="dialog-grid-span-2"
+            >
+              <mat-label>Custom label format</mat-label>
+              <input
+                matInput
+                formControlName="customSlotPattern"
+                placeholder="For example: A$&#123;row&#125;-&#123;column&#125;"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Build labels using placeholders such as ${row}, ${column}, ${layer}, and ${rowNumber}."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-hint
+                >Available placeholders: $&#123;row&#125;, $&#123;column&#125;,
+                $&#123;layer&#125;, $&#123;rowNumber&#125;. Curly-brace versions
+                like &#123;column&#125; also work.</mat-hint
+              >
+            </mat-form-field>
+
+            <div class="pattern-preview-card dialog-grid-span-2">
+              <mat-icon>view_module</mat-icon>
+              <div>
+                <strong>Example position label</strong>
+                <span>{{ slotPatternPreview }}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="dialog-section">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">Storage control</p>
+              <h3>Conditions and extra information</h3>
+            </div>
+            <span class="section-helper"
+              >Capture temperature, capacity, department, and arrangement notes
+              where relevant.</span
+            >
+          </div>
+
+          <div class="dialog-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Storage condition</mat-label>
+              <mat-select formControlName="storageConditionType">
+                <mat-option [value]="null">Not specified</mat-option>
+                <mat-option
+                  *ngFor="let option of storageConditionOptions"
+                  [value]="option.value"
+                >
+                  {{ option.label }}
+                </mat-option>
+              </mat-select>
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Select the expected storage condition, such as room temperature, refrigerated, frozen, or ultra-low temperature."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Capacity</mat-label>
+              <input
+                matInput
+                type="number"
+                min="1"
+                formControlName="capacity"
+                placeholder="Optional"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Maximum supported capacity for this unit or location. Use it to guide planning and prevent over-allocation."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-error *ngIf="form.get('capacity')?.hasError('min')"
+                >Capacity must be greater than zero.</mat-error
+              >
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Minimum temperature (°C)</mat-label>
+              <input
+                matInput
+                type="number"
+                formControlName="minTemperature"
+                placeholder="Optional"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Lowest acceptable operating temperature in degrees Celsius for this storage location or unit."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Maximum temperature (°C)</mat-label>
+              <input
+                matInput
+                type="number"
+                formControlName="maxTemperature"
+                placeholder="Optional"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Highest acceptable operating temperature in degrees Celsius for this storage location or unit."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Department code</mat-label>
+              <input
+                matInput
+                formControlName="departmentCode"
+                maxlength="64"
+                placeholder="For example: VIRO"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Optional laboratory department code used for grouping, reporting, or operational filtering."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-hint align="end"
+                >{{
+                  form.get("departmentCode")?.value?.length || 0
+                }}/64</mat-hint
+              >
+              <mat-error
+                *ngIf="form.get('departmentCode')?.hasError('maxlength')"
+                >Use 64 characters or fewer.</mat-error
+              >
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Layout direction</mat-label>
+              <mat-select formControlName="orientation">
+                <mat-option
+                  *ngFor="let option of orientationOptions"
+                  [value]="option.value"
+                >
+                  {{ option.label }}
+                </mat-option>
+              </mat-select>
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Defines how rows and columns should be interpreted when positions are displayed or generated."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="dialog-grid-span-2">
+              <mat-label>Additional notes</mat-label>
+              <textarea
+                matInput
+                rows="3"
+                formControlName="additionalNotes"
+                placeholder="Optional guidance for staff, such as special handling or arrangement notes."
+              ></textarea>
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Optional operational guidance for staff, such as handling notes, naming rules, or storage instructions."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-hint align="end"
+                >{{
+                  form.get("additionalNotes")?.value?.length || 0
+                }}/500</mat-hint
+              >
+              <mat-error
+                *ngIf="form.get('additionalNotes')?.hasError('maxlength')"
+                >Use 500 characters or fewer.</mat-error
+              >
+            </mat-form-field>
+          </div>
+        </section>
+
+        <div class="dialog-inline-note">
+          <mat-icon>info</mat-icon>
+          <span>{{ selectedTypeUsageSummary }}</span>
         </div>
       </section>
-
-      <section class="dialog-section">
-        <h3>Conditions and extra information</h3>
-        <div class="dialog-grid">
-          <mat-form-field appearance="outline">
-            <mat-label>Storage condition</mat-label>
-            <mat-select formControlName="storageConditionType">
-              <mat-option [value]="null">Not specified</mat-option>
-              <mat-option *ngFor="let option of storageConditionOptions" [value]="option.value">{{ option.label }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Capacity</mat-label>
-            <input matInput type="number" min="1" formControlName="capacity" placeholder="Optional" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Minimum temperature (°C)</mat-label>
-            <input matInput type="number" formControlName="minTemperature" placeholder="Optional" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Maximum temperature (°C)</mat-label>
-            <input matInput type="number" formControlName="maxTemperature" placeholder="Optional" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Department code</mat-label>
-            <input matInput formControlName="departmentCode" maxlength="64" placeholder="For example: VIRO" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Layout direction</mat-label>
-            <mat-select formControlName="orientation">
-              <mat-option *ngFor="let option of orientationOptions" [value]="option.value">{{ option.label }}</mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="dialog-grid-span-2">
-            <mat-label>Additional notes</mat-label>
-            <textarea matInput rows="3" formControlName="additionalNotes" placeholder="Optional guidance for staff, such as special handling or arrangement notes."></textarea>
-          </mat-form-field>
-        </div>
-      </section>
-
-      <div class="dialog-inline-note">
-        <mat-icon>info</mat-icon>
-        <span>{{ selectedTypeUsageSummary }}</span>
-      </div>
     </div>
 
     <div class="dialog-actions dialog-actions--sticky">
       <button mat-stroked-button type="button" (click)="close()">Close</button>
-      <button mat-flat-button color="primary" type="submit" [disabled]="saving">
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="saving || form.invalid || form.pending"
+      >
         <mat-icon *ngIf="!saving">save</mat-icon>
         <mat-spinner *ngIf="saving" diameter="20"></mat-spinner>
         {{ submitLabel }}

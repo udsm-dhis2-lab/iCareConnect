@@ -41,13 +41,18 @@ export class GenerateSlotsDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const resolvedPattern = this.resolveSlotPatternPreset(this.data.location.slotPattern || null);
+    const resolvedPattern = this.resolveSlotPatternPreset(
+      this.data.location.slotPattern || null,
+    );
     this.form.patchValue({
       rowsCount: this.data.location.rowsCount || 1,
       columnsCount: this.data.location.columnsCount || 1,
       layersCount: this.data.location.layersCount || 1,
       slotPatternPreset: resolvedPattern,
-      customSlotPattern: resolvedPattern === this.customPatternOptionValue ? this.data.location.slotPattern || "" : "",
+      customSlotPattern:
+        resolvedPattern === this.customPatternOptionValue
+          ? this.data.location.slotPattern || ""
+          : "",
     });
   }
 
@@ -59,7 +64,10 @@ export class GenerateSlotsDialogComponent implements OnInit {
   }
 
   get usingCustomPattern(): boolean {
-    return this.form.get("slotPatternPreset")?.value === this.customPatternOptionValue;
+    return (
+      this.form.get("slotPatternPreset")?.value ===
+      this.customPatternOptionValue
+    );
   }
 
   get slotPatternPreview(): string {
@@ -114,13 +122,15 @@ export class GenerateSlotsDialogComponent implements OnInit {
     return pattern && allowed.includes(pattern)
       ? pattern
       : pattern
-        ? this.customPatternOptionValue
-        : "${row}${column}";
+      ? this.customPatternOptionValue
+      : "${row}${column}";
   }
 
   private resolveSelectedSlotPattern(): string | null {
     if (this.usingCustomPattern) {
-      const customPattern = (this.form.get("customSlotPattern")?.value || "").trim();
+      const customPattern = (
+        this.form.get("customSlotPattern")?.value || ""
+      ).trim();
       return customPattern || "${row}${column}";
     }
     return this.form.get("slotPatternPreset")?.value || null;
@@ -135,6 +145,11 @@ export class GenerateSlotsDialogComponent implements OnInit {
   }
 
   private getErrorMessage(error: any, fallback: string): string {
-    return error?.error?.error?.message || error?.error?.message || error?.message || fallback;
+    return (
+      error?.error?.error?.message ||
+      error?.error?.message ||
+      error?.message ||
+      fallback
+    );
   }
 }

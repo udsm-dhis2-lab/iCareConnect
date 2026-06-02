@@ -1,62 +1,166 @@
-<div class="dialog-shell">
+<div class="dialog-shell storage-config-dialog dialog-shell--storage-unit">
   <div class="dialog-header">
-    <div>
-      <p class="dialog-kicker">Metadata setup</p>
+    <div class="dialog-title-block">
+      <p class="dialog-kicker">Storage unit setup</p>
       <h2>{{ title }}</h2>
       <p class="dialog-description">
-        Register the physical unit staff will use. When you need room, fridge,
-        rack, or shelf precision without changing the schema, encode that path
-        in the storage unit name.
+        Register the physical unit staff will use, such as a room, fridge,
+        freezer, rack, shelf, or cabinet.
       </p>
     </div>
+
+    <span class="dialog-mode-badge">
+      {{ data.mode === "create" ? "New unit" : "Editing unit" }}
+    </span>
   </div>
 
   <mat-divider></mat-divider>
 
   <form class="dialog-form" [formGroup]="form" (ngSubmit)="save()">
-    <div class="dialog-grid">
-      <mat-form-field appearance="outline" class="dialog-grid-span-2">
-        <mat-label>Storage unit name</mat-label>
-        <input
-          matInput
-          type="text"
-          formControlName="name"
-          maxlength="32"
-          placeholder="For example: Virology / Room 2 / Fridge 01 / Shelf B"
-        />
-        <mat-hint align="end">{{ storageNameControl?.value?.length || 0 }}/32</mat-hint>
-        <mat-error *ngIf="storageNameControl?.hasError('required')">Storage unit name is required.</mat-error>
-        <mat-error *ngIf="storageNameControl?.hasError('maxlength')">Use 32 characters or fewer.</mat-error>
-      </mat-form-field>
+    <div class="dialog-content">
+      <aside class="dialog-side-panel">
+        <section class="summary-card summary-card--primary">
+          <div class="summary-card-header">
+            <p class="section-kicker">Live summary</p>
+          </div>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Storage type</mat-label>
-        <mat-select formControlName="storageTypeUuid">
-          <mat-option *ngFor="let type of data.storageTypes" [value]="type.uuid || type.id">
-            {{ type.name }}
-          </mat-option>
-        </mat-select>
-        <mat-error *ngIf="storageTypeControl?.hasError('required')">Storage type is required.</mat-error>
-      </mat-form-field>
+          <div class="summary-stack">
+            <div class="summary-item">
+              <span class="summary-label">Storage unit</span>
+              <span class="summary-value">{{
+                storageNameControl?.value || "Not provided"
+              }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Capacity</span>
+              <span class="summary-value">{{
+                capacityControl?.value || "Not provided"
+              }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Available types</span>
+              <span class="summary-value">{{
+                data.storageTypes?.length || 0
+              }}</span>
+            </div>
+          </div>
+        </section>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Capacity</mat-label>
-        <input
-          matInput
-          type="number"
-          min="1"
-          formControlName="capacity"
-          placeholder="For example: 120"
-        />
-        <mat-hint>Total supported positions or slots</mat-hint>
-        <mat-error *ngIf="capacityControl?.hasError('required')">Capacity is required.</mat-error>
-        <mat-error *ngIf="capacityControl?.hasError('min')">Capacity must be greater than zero.</mat-error>
-      </mat-form-field>
+        <section class="guidance-card">
+          <mat-icon>inventory_2</mat-icon>
+          <p>
+            Use a clear physical name that staff can recognize during storage,
+            retrieval, and audit review.
+          </p>
+        </section>
+      </aside>
+
+      <section class="form-card">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Required information</p>
+            <h3>Storage unit details</h3>
+          </div>
+        </div>
+
+        <div class="dialog-grid">
+          <mat-form-field appearance="outline" class="dialog-grid-span-2">
+            <mat-label>Storage unit name</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="name"
+              maxlength="32"
+              placeholder="For example: Virology / Room 2 / Fridge 01"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              class="field-info-button"
+              matTooltip="Enter a clear, staff-friendly name. Use the common laboratory wording that users will recognize on lists and reports."
+              matTooltipPosition="above"
+              aria-label="More information about this field"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+            <mat-hint align="end"
+              >{{ storageNameControl?.value?.length || 0 }}/32</mat-hint
+            >
+            <mat-error *ngIf="storageNameControl?.hasError('required')"
+              >Storage unit name is required.</mat-error
+            >
+            <mat-error *ngIf="storageNameControl?.hasError('maxlength')"
+              >Use 32 characters or fewer.</mat-error
+            >
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Storage type</mat-label>
+            <mat-select formControlName="storageTypeUuid">
+              <mat-option
+                *ngFor="let type of data.storageTypes"
+                [value]="type.uuid || type.id"
+              >
+                {{ type.name }}
+              </mat-option>
+            </mat-select>
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              class="field-info-button"
+              matTooltip="Select the physical category of this unit, such as freezer, refrigerator, shelf, rack, or cabinet."
+              matTooltipPosition="above"
+              aria-label="More information about this field"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+            <mat-error *ngIf="storageTypeControl?.hasError('required')"
+              >Storage type is required.</mat-error
+            >
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Capacity</mat-label>
+            <input
+              matInput
+              type="number"
+              min="1"
+              formControlName="capacity"
+              placeholder="For example: 120"
+            />
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              class="field-info-button"
+              matTooltip="Maximum supported capacity for this unit or location. Use it to guide planning and prevent over-allocation."
+              matTooltipPosition="above"
+              aria-label="More information about this field"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+            <mat-hint>Total supported positions or slots</mat-hint>
+            <mat-error *ngIf="capacityControl?.hasError('required')"
+              >Capacity is required.</mat-error
+            >
+            <mat-error *ngIf="capacityControl?.hasError('min')"
+              >Capacity must be greater than zero.</mat-error
+            >
+          </mat-form-field>
+        </div>
+      </section>
     </div>
 
-    <div class="dialog-actions">
+    <div class="dialog-actions dialog-actions--sticky">
       <button mat-stroked-button type="button" (click)="close()">Close</button>
-      <button mat-flat-button color="primary" type="submit" [disabled]="saving">
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="saving || form.invalid || form.pending"
+      >
         <mat-icon *ngIf="!saving">save</mat-icon>
         <mat-spinner *ngIf="saving" diameter="20"></mat-spinner>
         {{ submitLabel }}

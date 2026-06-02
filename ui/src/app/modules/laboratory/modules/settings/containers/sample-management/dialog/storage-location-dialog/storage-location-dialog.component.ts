@@ -1,10 +1,19 @@
 import { Component, Inject, OnInit } from "@angular/core";
-import { AbstractControl, FormBuilder, FormGroup, Validators } from "@angular/forms";
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from "@angular/forms";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { finalize } from "rxjs/operators";
 import { SamplesService } from "src/app/modules/laboratory/resources/services/samples.service";
-import { StorageLocationDialogData, StorageLocationRecord, StorageLocationTypeRecord } from "../../models/sample-management.models";
+import {
+  StorageLocationDialogData,
+  StorageLocationRecord,
+  StorageLocationTypeRecord,
+} from "../../models/sample-management.models";
 
 @Component({
   selector: "app-storage-location-dialog",
@@ -37,7 +46,10 @@ export class StorageLocationDialogComponent implements OnInit {
 
   readonly storageConditionOptions = [
     { value: "AMBIENT", label: "Ambient room temperature" },
-    { value: "CONTROLLED_ROOM_TEMPERATURE", label: "Controlled room temperature" },
+    {
+      value: "CONTROLLED_ROOM_TEMPERATURE",
+      label: "Controlled room temperature",
+    },
     { value: "REFRIGERATED_2_8", label: "Refrigerated (2°C to 8°C)" },
     { value: "FROZEN_MINUS_20", label: "Frozen (-20°C)" },
     { value: "ULTRA_LOW_MINUS_80", label: "Ultra-low frozen (-80°C)" },
@@ -78,22 +90,35 @@ export class StorageLocationDialogComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.data?.record) {
-      const metadata = this.parseMetadata(this.data.record.metadataJson || null);
-      const resolvedPattern = this.resolveSlotPatternPreset(this.data.record.slotPattern || null);
+      const metadata = this.parseMetadata(
+        this.data.record.metadataJson || null,
+      );
+      const resolvedPattern = this.resolveSlotPatternPreset(
+        this.data.record.slotPattern || null,
+      );
       this.form.patchValue({
         uuid: this.data.record.uuid || null,
         id: this.data.record.id ?? null,
         name: this.data.record.name || "",
         code: this.data.record.code || "",
-        locationTypeUuid: this.data.record.locationType?.uuid || this.data.record.locationType?.id || null,
-        parentLocationUuid: this.data.record.parentLocation?.uuid || this.data.record.parentLocation?.id || null,
+        locationTypeUuid:
+          this.data.record.locationType?.uuid ||
+          this.data.record.locationType?.id ||
+          null,
+        parentLocationUuid:
+          this.data.record.parentLocation?.uuid ||
+          this.data.record.parentLocation?.id ||
+          null,
         barcode: this.data.record.barcode || "",
         storageConditionType: this.data.record.storageConditionType || null,
         rowsCount: this.data.record.rowsCount ?? null,
         columnsCount: this.data.record.columnsCount ?? null,
         layersCount: this.data.record.layersCount ?? null,
         slotPatternPreset: resolvedPattern,
-        customSlotPattern: resolvedPattern === this.customPatternOptionValue ? this.data.record.slotPattern || "" : "",
+        customSlotPattern:
+          resolvedPattern === this.customPatternOptionValue
+            ? this.data.record.slotPattern || ""
+            : "",
         slot: this.data.record.slot ?? false,
         minTemperature: this.data.record.minTemperature ?? null,
         maxTemperature: this.data.record.maxTemperature ?? null,
@@ -103,7 +128,9 @@ export class StorageLocationDialogComponent implements OnInit {
         additionalNotes: metadata.notes || "",
       });
     } else if (this.data?.parentLocation) {
-      this.form.patchValue({ parentLocationUuid: this.data.parentLocation.uuid || null });
+      this.form.patchValue({
+        parentLocationUuid: this.data.parentLocation.uuid || null,
+      });
     }
 
     this.form.get("storageConditionType")?.valueChanges.subscribe((value) => {
@@ -116,7 +143,10 @@ export class StorageLocationDialogComponent implements OnInit {
       }
       const currentCode = (this.form.get("code")?.value || "").trim();
       if (!currentCode) {
-        this.form.patchValue({ code: this.suggestCode(value) }, { emitEvent: false });
+        this.form.patchValue(
+          { code: this.suggestCode(value) },
+          { emitEvent: false },
+        );
       }
     });
   }
@@ -130,7 +160,9 @@ export class StorageLocationDialogComponent implements OnInit {
   }
 
   get submitLabel(): string {
-    return this.data.mode === "create" ? "Save storage location" : "Save changes";
+    return this.data.mode === "create"
+      ? "Save storage location"
+      : "Save changes";
   }
 
   get codeControl(): AbstractControl | null {
@@ -146,11 +178,16 @@ export class StorageLocationDialogComponent implements OnInit {
   }
 
   get selectedParent(): StorageLocationRecord | undefined {
-    return this.resolveParentLocation(this.form.get("parentLocationUuid")?.value);
+    return this.resolveParentLocation(
+      this.form.get("parentLocationUuid")?.value,
+    );
   }
 
   get usingCustomPattern(): boolean {
-    return this.form.get("slotPatternPreset")?.value === this.customPatternOptionValue;
+    return (
+      this.form.get("slotPatternPreset")?.value ===
+      this.customPatternOptionValue
+    );
   }
 
   get slotPatternPreview(): string {
@@ -209,17 +246,22 @@ export class StorageLocationDialogComponent implements OnInit {
       parentLocation: this.selectedParent?.uuid
         ? { uuid: this.selectedParent.uuid }
         : this.selectedParent?.id
-          ? { id: this.selectedParent.id }
-          : null,
+        ? { id: this.selectedParent.id }
+        : null,
       barcode: (this.form.get("barcode")?.value || "").trim() || null,
       rowsCount: this.toNumberOrNull(this.form.get("rowsCount")?.value),
       columnsCount: this.toNumberOrNull(this.form.get("columnsCount")?.value),
       layersCount: this.toNumberOrNull(this.form.get("layersCount")?.value),
       slotPattern: this.resolveSelectedSlotPattern(),
       slot: this.form.get("slot")?.value === true,
-      storageConditionType: this.form.get("storageConditionType")?.value || null,
-      minTemperature: this.toNumberOrNull(this.form.get("minTemperature")?.value),
-      maxTemperature: this.toNumberOrNull(this.form.get("maxTemperature")?.value),
+      storageConditionType:
+        this.form.get("storageConditionType")?.value || null,
+      minTemperature: this.toNumberOrNull(
+        this.form.get("minTemperature")?.value,
+      ),
+      maxTemperature: this.toNumberOrNull(
+        this.form.get("maxTemperature")?.value,
+      ),
       capacity: this.toNumberOrNull(this.form.get("capacity")?.value),
       metadataJson: this.buildMetadataJson(),
     };
@@ -255,7 +297,10 @@ export class StorageLocationDialogComponent implements OnInit {
   }
 
   private applyRecommendedTemperatures(condition: string | null): void {
-    const recommendations: Record<string, { min: number | null; max: number | null }> = {
+    const recommendations: Record<
+      string,
+      { min: number | null; max: number | null }
+    > = {
       AMBIENT: { min: 20, max: 25 },
       CONTROLLED_ROOM_TEMPERATURE: { min: 20, max: 25 },
       REFRIGERATED_2_8: { min: 2, max: 8 },
@@ -272,10 +317,16 @@ export class StorageLocationDialogComponent implements OnInit {
     const currentMin = this.form.get("minTemperature")?.value;
     const currentMax = this.form.get("maxTemperature")?.value;
     if (currentMin === null || currentMin === undefined || currentMin === "") {
-      this.form.patchValue({ minTemperature: recommendations[condition].min }, { emitEvent: false });
+      this.form.patchValue(
+        { minTemperature: recommendations[condition].min },
+        { emitEvent: false },
+      );
     }
     if (currentMax === null || currentMax === undefined || currentMax === "") {
-      this.form.patchValue({ maxTemperature: recommendations[condition].max }, { emitEvent: false });
+      this.form.patchValue(
+        { maxTemperature: recommendations[condition].max },
+        { emitEvent: false },
+      );
     }
   }
 
@@ -286,13 +337,15 @@ export class StorageLocationDialogComponent implements OnInit {
     return pattern && allowed.includes(pattern)
       ? pattern
       : pattern
-        ? this.customPatternOptionValue
-        : "${row}${column}";
+      ? this.customPatternOptionValue
+      : "${row}${column}";
   }
 
   private resolveSelectedSlotPattern(): string | null {
     if (this.usingCustomPattern) {
-      const customPattern = (this.form.get("customSlotPattern")?.value || "").trim();
+      const customPattern = (
+        this.form.get("customSlotPattern")?.value || ""
+      ).trim();
       return customPattern || "${row}${column}";
     }
     return this.form.get("slotPatternPreset")?.value || null;
@@ -328,7 +381,9 @@ export class StorageLocationDialogComponent implements OnInit {
 
   private buildMetadataJson(): string | null {
     const metadata: Record<string, string> = {};
-    const departmentCode = (this.form.get("departmentCode")?.value || "").trim();
+    const departmentCode = (
+      this.form.get("departmentCode")?.value || ""
+    ).trim();
     const orientation = this.form.get("orientation")?.value;
     const notes = (this.form.get("additionalNotes")?.value || "").trim();
 
@@ -345,12 +400,20 @@ export class StorageLocationDialogComponent implements OnInit {
     return Object.keys(metadata).length ? JSON.stringify(metadata) : null;
   }
 
-  private resolveLocationType(uuidOrId: string | number | null): StorageLocationTypeRecord | undefined {
-    return this.data.locationTypes.find((type) => type.uuid === uuidOrId || type.id === uuidOrId);
+  private resolveLocationType(
+    uuidOrId: string | number | null,
+  ): StorageLocationTypeRecord | undefined {
+    return this.data.locationTypes.find(
+      (type) => type.uuid === uuidOrId || type.id === uuidOrId,
+    );
   }
 
-  private resolveParentLocation(uuidOrId: string | number | null): StorageLocationRecord | undefined {
-    return this.data.availableParents.find((location) => location.uuid === uuidOrId || location.id === uuidOrId);
+  private resolveParentLocation(
+    uuidOrId: string | number | null,
+  ): StorageLocationRecord | undefined {
+    return this.data.availableParents.find(
+      (location) => location.uuid === uuidOrId || location.id === uuidOrId,
+    );
   }
 
   private toNumberOrNull(value: unknown): number | null {
@@ -359,6 +422,11 @@ export class StorageLocationDialogComponent implements OnInit {
   }
 
   private getErrorMessage(error: any, fallback: string): string {
-    return error?.error?.error?.message || error?.error?.message || error?.message || fallback;
+    return (
+      error?.error?.error?.message ||
+      error?.error?.message ||
+      error?.message ||
+      fallback
+    );
   }
 }

@@ -44,6 +44,7 @@ import { StorageLocationTypeDialogComponent } from "./containers/sample-manageme
 import { StorageLocationDialogComponent } from "./containers/sample-management/dialog/storage-location-dialog/storage-location-dialog.component";
 import { GenerateSlotsDialogComponent } from "./containers/sample-management/dialog/generate-slots-dialog/generate-slots-dialog.component";
 import { StorageLocationPreviewDialogComponent } from "./containers/sample-management/dialog/storage-location-preview-dialog/storage-location-preview-dialog.component";
+import { DeleteConfirmDialogComponent } from "./containers/sample-management/dialog/delete-confirm-dialog/delete-confirm-dialog.component";
 
 @NgModule({
     imports: [
@@ -95,6 +96,7 @@ import { StorageLocationPreviewDialogComponent } from "./containers/sample-manag
         StorageLocationDialogComponent,
         GenerateSlotsDialogComponent,
         StorageLocationPreviewDialogComponent,
+        DeleteConfirmDialogComponent
     ],
 })
 export class SettingsModule { }

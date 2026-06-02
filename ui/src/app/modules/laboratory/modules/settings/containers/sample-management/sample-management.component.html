@@ -1,16 +1,16 @@
 <div class="sample-management-page">
-  <section class="page-header">
+  <section class="page-header" aria-labelledby="sample-storage-setup-title">
     <div class="page-title-block">
       <p class="page-kicker">Laboratory settings</p>
-      <h1>Sample storage setup</h1>
+      <h1 id="sample-storage-setup-title">Sample storage setup</h1>
       <p class="page-description">
         Configure the laboratory storage layout that will later be used to
         store, move, and dispose samples safely. Set up location levels,
-        storage locations, and storage positions in a simple guided way.
+        storage locations, and storage positions in a guided workflow.
       </p>
     </div>
 
-    <div class="page-actions">
+    <div class="page-actions" aria-label="Page actions">
       <button mat-stroked-button type="button" (click)="refreshAll()">
         <mat-icon>refresh</mat-icon>
         Refresh all
@@ -18,36 +18,82 @@
     </div>
   </section>
 
-  <section class="summary-strip">
-    <mat-card class="summary-card summary-card--primary">
-      <p class="summary-label">Configuration readiness</p>
-      <h2>{{ hierarchyReadinessLabel }}</h2>
-      <p>{{ totalLocationTypes }} location level{{ totalLocationTypes === 1 ? '' : 's' }} · {{ totalLocations }} configured storage location{{ totalLocations === 1 ? '' : 's' }}</p>
-    </mat-card>
+  <section class="summary-strip" aria-label="Storage configuration summary">
+    <div class="summary-tile summary-tile--primary">
+      <div class="summary-icon" aria-hidden="true">
+        <mat-icon>check_circle</mat-icon>
+      </div>
+      <div class="summary-content">
+        <p class="summary-label">Configuration readiness</p>
+        <h2>{{ hierarchyReadinessLabel }}</h2>
+        <p>
+          {{ totalLocationTypes }} location level{{ totalLocationTypes === 1 ? '' : 's' }} ·
+          {{ totalLocations }} configured storage location{{ totalLocations === 1 ? '' : 's' }}
+        </p>
+      </div>
+    </div>
 
-    <mat-card class="summary-card">
-      <p class="summary-label">Final position levels</p>
-      <h2>{{ slotBearingTypeCount }}</h2>
-      <p>Levels that can be used as final sample positions.</p>
-    </mat-card>
+    <div class="summary-tile">
+      <div class="summary-icon" aria-hidden="true">
+        <mat-icon>schema</mat-icon>
+      </div>
+      <div class="summary-content">
+        <p class="summary-label">Final position levels</p>
+        <h2>{{ slotBearingTypeCount }}</h2>
+        <p>Levels that can hold samples directly.</p>
+      </div>
+    </div>
 
-    <mat-card class="summary-card">
-      <p class="summary-label">Structured locations</p>
-      <h2>{{ structuralLocationCount }}</h2>
-      <p>Locations ready for rows, columns, layers, and position generation.</p>
-    </mat-card>
+    <div class="summary-tile">
+      <div class="summary-icon" aria-hidden="true">
+        <mat-icon>account_tree</mat-icon>
+      </div>
+      <div class="summary-content">
+        <p class="summary-label">Structured locations</p>
+        <h2>{{ structuralLocationCount }}</h2>
+        <p>Locations ready for rows, columns, layers, and position generation.</p>
+      </div>
+    </div>
 
-    <mat-card class="summary-card">
-      <p class="summary-label">Configured positions</p>
-      <h2>{{ slotLocationCount }}</h2>
-      <p>Final storage positions currently available in the configuration.</p>
-    </mat-card>
+    <div class="summary-tile">
+      <div class="summary-icon" aria-hidden="true">
+        <mat-icon>view_module</mat-icon>
+      </div>
+      <div class="summary-content">
+        <p class="summary-label">Configured positions</p>
+        <h2>{{ slotLocationCount }}</h2>
+        <p>Final storage positions currently available.</p>
+      </div>
+    </div>
   </section>
 
   <mat-tab-group class="workspace-tabs" animationDuration="0ms">
     <mat-tab label="Location levels">
       <div class="tab-content">
-        <mat-card class="workspace-card">
+        <section class="workspace-panel" aria-labelledby="location-levels-heading">
+          <div class="workspace-header">
+            <div>
+              <p class="workspace-kicker">Storage hierarchy</p>
+              <h2 id="location-levels-heading">Location levels</h2>
+              <p>
+                Define the ordered levels that make up the laboratory storage path,
+                such as Department, Room, Freezer, Rack, Box, and Position.
+              </p>
+            </div>
+
+            <div class="toolbar-actions toolbar-actions--header">
+              <button mat-stroked-button type="button" (click)="refreshLocationTypes()">
+                <mat-icon>sync</mat-icon>
+                Refresh
+              </button>
+
+              <button mat-flat-button color="primary" type="button" (click)="openCreateLocationTypeDialog()">
+                <mat-icon>add</mat-icon>
+                New location level
+              </button>
+            </div>
+          </div>
+
           <div class="workspace-toolbar">
             <mat-form-field appearance="outline" class="toolbar-search-field">
               <mat-label>Search location levels</mat-label>
@@ -59,18 +105,6 @@
               />
               <mat-icon matPrefix>search</mat-icon>
             </mat-form-field>
-
-            <div class="toolbar-actions">
-              <button mat-stroked-button type="button" (click)="refreshLocationTypes()">
-                <mat-icon>sync</mat-icon>
-                Refresh
-              </button>
-
-              <button mat-flat-button color="primary" type="button" (click)="openCreateLocationTypeDialog()">
-                <mat-icon>add</mat-icon>
-                New location level
-              </button>
-            </div>
           </div>
 
           <div class="table-meta-row">
@@ -101,7 +135,9 @@
 
               <ng-container matColumnDef="code">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>Code</th>
-                <td mat-cell *matCellDef="let row">{{ row.code }}</td>
+                <td mat-cell *matCellDef="let row">
+                  <span class="code-pill">{{ row.code }}</span>
+                </td>
               </ng-container>
 
               <ng-container matColumnDef="levelOrder">
@@ -117,24 +153,26 @@
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef class="actions-column">Actions</th>
                 <td mat-cell *matCellDef="let row" class="actions-column">
-                  <button
-                    mat-icon-button
-                    color="primary"
-                    type="button"
-                    matTooltip="Edit location type"
-                    (click)="openEditLocationTypeDialog(row)"
-                  >
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button
-                    mat-icon-button
-                    color="warn"
-                    type="button"
-                    matTooltip="Delete location type"
-                    (click)="deleteLocationType(row)"
-                  >
-                    <mat-icon>delete</mat-icon>
-                  </button>
+                  <div class="row-actions">
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      type="button"
+                      matTooltip="Edit location type"
+                      (click)="openEditLocationTypeDialog(row)"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      type="button"
+                      matTooltip="Delete location type"
+                      (click)="deleteLocationType(row)"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
                 </td>
               </ng-container>
 
@@ -152,13 +190,42 @@
               (page)="onLocationTypePageChange($event)"
             ></mat-paginator>
           </div>
-        </mat-card>
+        </section>
       </div>
     </mat-tab>
 
     <mat-tab label="Storage locations">
       <div class="tab-content">
-        <mat-card class="workspace-card">
+        <section class="workspace-panel" aria-labelledby="storage-locations-heading">
+          <div class="workspace-header">
+            <div>
+              <p class="workspace-kicker">Configured storage path</p>
+              <h2 id="storage-locations-heading">Storage locations</h2>
+              <p>
+                Build the actual laboratory storage structure and prepare final sample
+                positions from the configured location levels.
+              </p>
+            </div>
+
+            <div class="toolbar-actions toolbar-actions--header">
+              <button mat-stroked-button type="button" (click)="refreshLocations()">
+                <mat-icon>sync</mat-icon>
+                Refresh
+              </button>
+
+              <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                (click)="openCreateRootLocationDialog()"
+                [disabled]="!locationTypes.length"
+              >
+                <mat-icon>add</mat-icon>
+                New top-level location
+              </button>
+            </div>
+          </div>
+
           <div class="workspace-toolbar workspace-toolbar--two-lines">
             <div class="toolbar-filters-grid toolbar-filters-grid--three-columns">
               <mat-form-field appearance="outline" class="toolbar-search-field">
@@ -201,18 +268,6 @@
                 </mat-select>
               </mat-form-field>
             </div>
-
-            <div class="toolbar-actions">
-              <button mat-stroked-button type="button" (click)="refreshLocations()">
-                <mat-icon>sync</mat-icon>
-                Refresh
-              </button>
-
-              <button mat-flat-button color="primary" type="button" (click)="openCreateRootLocationDialog()" [disabled]="!locationTypes.length">
-                <mat-icon>add</mat-icon>
-                New top-level location
-              </button>
-            </div>
           </div>
 
           <div class="table-meta-row">
@@ -232,7 +287,7 @@
               mat-table
               matSort
               [dataSource]="locationsDataSource"
-              class="metadata-table"
+              class="metadata-table metadata-table--locations"
               #locationSort="matSort"
               *ngIf="locations.length > 0; else locationEmptyState"
             >
@@ -267,52 +322,54 @@
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef class="actions-column">Actions</th>
                 <td mat-cell *matCellDef="let row" class="actions-column actions-column--stacked">
-                  <button
-                    mat-icon-button
-                    color="primary"
-                    type="button"
-                    matTooltip="Add child location"
-                    (click)="openCreateChildLocationDialog(row)"
-                  >
-                    <mat-icon>playlist_add</mat-icon>
-                  </button>
-                  <button
-                    mat-icon-button
-                    color="primary"
-                    type="button"
-                    matTooltip="Prepare storage positions"
-                    [disabled]="!canGenerateSlots(row)"
-                    (click)="openGenerateSlotsDialog(row)"
-                  >
-                    <mat-icon>grid_view</mat-icon>
-                  </button>
-                  <button
-                    mat-icon-button
-                    color="primary"
-                    type="button"
-                    matTooltip="Preview prepared positions"
-                    (click)="viewGeneratedPositions(row)"
-                  >
-                    <mat-icon>visibility</mat-icon>
-                  </button>
-                  <button
-                    mat-icon-button
-                    color="primary"
-                    type="button"
-                    matTooltip="Edit storage location"
-                    (click)="openEditLocationDialog(row)"
-                  >
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button
-                    mat-icon-button
-                    color="warn"
-                    type="button"
-                    matTooltip="Remove storage location"
-                    (click)="deleteLocation(row)"
-                  >
-                    <mat-icon>delete</mat-icon>
-                  </button>
+                  <div class="row-actions row-actions--many">
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      type="button"
+                      matTooltip="Add child location"
+                      (click)="openCreateChildLocationDialog(row)"
+                    >
+                      <mat-icon>playlist_add</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      type="button"
+                      matTooltip="Prepare storage positions"
+                      [disabled]="!canGenerateSlots(row)"
+                      (click)="openGenerateSlotsDialog(row)"
+                    >
+                      <mat-icon>view_module</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      type="button"
+                      matTooltip="Preview prepared positions"
+                      (click)="viewGeneratedPositions(row)"
+                    >
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      type="button"
+                      matTooltip="Edit storage location"
+                      (click)="openEditLocationDialog(row)"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      type="button"
+                      matTooltip="Remove storage location"
+                      (click)="deleteLocation(row)"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
                 </td>
               </ng-container>
 
@@ -330,58 +387,12 @@
               (page)="onLocationPageChange($event)"
             ></mat-paginator>
           </div>
-        </mat-card>
+        </section>
       </div>
     </mat-tab>
   </mat-tab-group>
 </div>
 
-<ng-template #deleteConfirmDialog>
-  <div class="delete-dialog-shell" *ngIf="deleteDialogState as dialogState">
-    <div class="delete-dialog-header">
-      <div class="delete-dialog-icon">
-        <mat-icon>warning_amber</mat-icon>
-      </div>
-      <div class="delete-dialog-copy">
-        <p class="delete-dialog-kicker">Confirm deletion</p>
-        <h2>Delete {{ dialogState.entityLabel }}</h2>
-        <p class="delete-dialog-description">
-          {{ dialogState.description }}
-        </p>
-      </div>
-    </div>
-
-    <mat-divider></mat-divider>
-
-    <div class="delete-dialog-body">
-      <div class="delete-dialog-target">
-        <span class="delete-dialog-target-label">Selected {{ dialogState.entityLabel }}</span>
-        <strong>{{ dialogState.name }}</strong>
-      </div>
-
-      <div class="delete-dialog-impact">
-        <mat-icon>info</mat-icon>
-        <span>{{ dialogState.impactMessage }}</span>
-      </div>
-
-      <div class="delete-dialog-error" *ngIf="deleteDialogError">
-        <mat-icon>error_outline</mat-icon>
-        <span>{{ deleteDialogError }}</span>
-      </div>
-    </div>
-
-    <div class="delete-dialog-actions">
-      <button mat-stroked-button type="button" (click)="closeDeleteDialog()" [disabled]="deleting">
-        Cancel
-      </button>
-
-      <button mat-flat-button color="warn" type="button" (click)="confirmDelete()" [disabled]="deleting">
-        <mat-progress-spinner *ngIf="deleting" diameter="18" mode="indeterminate"></mat-progress-spinner>
-        <span>{{ dialogState.confirmLabel }}</span>
-      </button>
-    </div>
-  </div>
-</ng-template>
 
 <ng-template #storageTypeLoadingState>
   <div class="state-block">
