@@ -5396,4 +5396,28 @@
                                  referencedTableName="users" referencedColumnNames="user_id"/>
     </changeSet>
 
+    <changeSet id="add_lb_sample_label_index_20260521" author="walter-v-faustine" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(1)
+                FROM information_schema.STATISTICS
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = 'lb_sample'
+                AND INDEX_NAME = 'idx_lb_sample_label'
+            </sqlCheck>
+        </preConditions>
+
+        <comment>
+            Add index on lb_sample.label to support fast sample lookup by barcode/sample ID.
+        </comment>
+
+        <sql>
+            ALTER TABLE lb_sample ADD INDEX idx_lb_sample_label (label(191));
+        </sql>
+
+        <rollback>
+            ALTER TABLE lb_sample DROP INDEX idx_lb_sample_label;
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>

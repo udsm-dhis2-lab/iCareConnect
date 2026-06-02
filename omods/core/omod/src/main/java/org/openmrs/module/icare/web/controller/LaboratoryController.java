@@ -76,34 +76,36 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.net.URLEncoder;
+
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/lab")
 public class LaboratoryController {
-
+	
 	@Autowired
 	LaboratoryService laboratoryService;
-
+	
 	@Autowired
 	ICareService iCareService;
-
+	
 	@Autowired
 	VisitService visitService;
-
+	
 	@Autowired
 	ConceptService conceptService;
-
+	
 	@Autowired
 	OrderService orderService;
-
+	
 	@Autowired
 	ProviderService providerService;
-
+	
 	@Autowired
 	UserService userService;
-
+	
 	@Autowired
 	LocationService locationService;
-
+	
 	@RequestMapping(value = "visit", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getPendingVisit(@RequestParam(defaultValue = "100") Integer limit,
@@ -123,7 +125,7 @@ public class LaboratoryController {
 		retults.put("results", responseSamplesObject);
 		return retults;
 	}
-
+	
 	@RequestMapping(value = "sample", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> createNewSample(@RequestBody Map<String, Object> sample) throws IOException {
@@ -219,7 +221,7 @@ public class LaboratoryController {
 		response.put("uuid", createdSample.getUuid());
 		return response;
 	}
-
+	
 	@RequestMapping(value = "sample", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getSamplesByVisit(
@@ -266,7 +268,7 @@ public class LaboratoryController {
 
 		return responseSamplesObject;
 	}
-
+	
 	@RequestMapping(value = "sample/{sampleIdentification}", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getSamplesByIdentification(@PathVariable String sampleIdentification) throws Exception {
@@ -277,37 +279,37 @@ public class LaboratoryController {
 		}
 		return sample.toMap();
 	}
-
+	
 	@RequestMapping(value = "samples", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getAllSamples(@RequestParam(value = "startDate", required = false) String startDate,
-	                                         @RequestParam(value = "endDate", required = false) String endDate,
-	                                         @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
-	                                         @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	                                         @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
-	                                         @RequestParam(value = "location", required = false) String locationUuid,
-	                                         @RequestParam(value = "sampleCategory", required = false) String sampleCategory,
-	                                         @RequestParam(value = "testCategory", required = false) String testCategory,
-	                                         @RequestParam(value = "hasStatus", required = false) String hasStatus,
-	                                         @RequestParam(value = "q", required = false) String q,
-	                                         @RequestParam(value = "excludeAllocations", required = false) boolean excludeAllocations,
-	                                         @RequestParam(value = "acceptedBy", required = false) String acceptedByUuid,
-	                                         @RequestParam(value = "test", required = false) String testConceptUuid,
-	                                         @RequestParam(value = "department", required = false) String departmentUuid,
-	                                         @RequestParam(value = "specimen", required = false) String specimenSourceUuid,
-	                                         @RequestParam(value = "instrument", required = false) String instrumentUuid,
-	                                         @RequestParam(value = "visit", required = false) String visitUuid,
-	                                         @RequestParam(value = "excludeStatus", required = false) String excludeStatus) throws Exception {
-
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(value = "location", required = false) String locationUuid,
+	        @RequestParam(value = "sampleCategory", required = false) String sampleCategory,
+	        @RequestParam(value = "testCategory", required = false) String testCategory,
+	        @RequestParam(value = "hasStatus", required = false) String hasStatus,
+	        @RequestParam(value = "q", required = false) String q,
+	        @RequestParam(value = "excludeAllocations", required = false) boolean excludeAllocations,
+	        @RequestParam(value = "acceptedBy", required = false) String acceptedByUuid,
+	        @RequestParam(value = "test", required = false) String testConceptUuid,
+	        @RequestParam(value = "department", required = false) String departmentUuid,
+	        @RequestParam(value = "specimen", required = false) String specimenSourceUuid,
+	        @RequestParam(value = "instrument", required = false) String instrumentUuid,
+	        @RequestParam(value = "visit", required = false) String visitUuid,
+	        @RequestParam(value = "excludeStatus", required = false) String excludeStatus) throws Exception {
+		
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-
+			
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-
+			
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
-
+			
 		}
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
@@ -315,19 +317,19 @@ public class LaboratoryController {
 		pager.setPage(page);
 		if (!excludeAllocations) {
 			ListResult<Sample> sampleResults = laboratoryService.getSamples(start, end, pager, locationUuid, sampleCategory,
-					testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid,
-					instrumentUuid, visitUuid, excludeStatus);
+			    testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid, specimenSourceUuid,
+			    instrumentUuid, visitUuid, excludeStatus);
 			return sampleResults.toMap();
 		}
 		if (excludeAllocations) {
 			ListResult<SampleExt> sampleResults = laboratoryService.getSamplesWithoutAllocations(start, end, pager,
-					locationUuid, sampleCategory, testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid,
-					specimenSourceUuid, instrumentUuid, visitUuid, excludeStatus);
+			    locationUuid, sampleCategory, testCategory, q, hasStatus, acceptedByUuid, testConceptUuid, departmentUuid,
+			    specimenSourceUuid, instrumentUuid, visitUuid, excludeStatus);
 			return sampleResults.toMap();
 		}
 		return null;
 	}
-
+	
 	@RequestMapping(value = "sampleaccept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> acceptSample(@RequestBody Map<String, Object> sampleStatusWithAllocations)
@@ -369,18 +371,18 @@ public class LaboratoryController {
 		response.put("allocations", savedAllocationsListMap);
 		return response;
 	}
-
+	
 	@RequestMapping(value = "samplestatus", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addSampleStatus(@RequestBody Map<String, Object> sampleStatusObject) throws Exception {
-
+		
 		SampleStatus sampleStatus = SampleStatus.fromMap(sampleStatusObject);
-
+		
 		SampleStatus savedSampleStatus = laboratoryService.updateSampleStatus(sampleStatus);
-
+		
 		return savedSampleStatus.toMap();// sampleStatusResponse;
 	}
-
+	
 	@RequestMapping(value = "sampleorder", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> createsampleorder(@RequestBody Map<String, Object> sampleOrderObject) throws Exception {
@@ -391,7 +393,7 @@ public class LaboratoryController {
 		// save the sampleorder
 		return newSampleOrder.toMap(true);
 	}
-
+	
 	@RequestMapping(value = "sample/{sampleUuid}/orders", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getSampleOrdersBySampleUuid(@PathVariable String sampleUuid) throws Exception {
@@ -404,7 +406,7 @@ public class LaboratoryController {
 		}
 		return orders;
 	}
-
+	
 	@RequestMapping(value = "sampledorders/{visitUuid}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getSampledOrdersByVisit(@PathVariable String visitUuid) throws Exception {
@@ -417,7 +419,7 @@ public class LaboratoryController {
 		}
 		return orders;
 	}
-
+	
 	@RequestMapping(value = "assign", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateSampleOrder(@RequestBody Map<String, Object> sampleOrderObject) throws Exception {
@@ -427,7 +429,7 @@ public class LaboratoryController {
 		// save the sampleorder
 		return newSampleOrder.toMap(true);
 	}
-
+	
 	@RequestMapping(value = "allocation", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addTestAllocation(@RequestBody Map<String, Object> testAllocationObject) throws Exception {
@@ -435,26 +437,26 @@ public class LaboratoryController {
 		TestAllocation createdTestAllocation = laboratoryService.allocateTestWithSample(testAllocation);
 		return createdTestAllocation.toMap();
 	}
-
+	
 	@RequestMapping(value = "allocations", method = RequestMethod.GET)
 	@ResponseBody
 	public List<TestAllocation> getAllocation() {
 		return laboratoryService.getAllAllocations();
-
+		
 	}
-
+	
 	@RequestMapping(value = "allocation", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getAllocation(@RequestParam(value = "uuid", required = true) String uuid) {
 		return laboratoryService.getAllocationByUuid(uuid).toMap();
 	}
-
+	
 	@RequestMapping(value = "allocationsbyorder", method = RequestMethod.GET)
 	@ResponseBody
 	public List<TestAllocation> getAllocationsByOrder(@RequestParam(value = "uuid", required = true) String uuid) {
 		return laboratoryService.getAllocationsByOrder(uuid);
 	}
-
+	
 	@RequestMapping(value = "allocationsbysample", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getAllocationsBySample(
@@ -482,7 +484,7 @@ public class LaboratoryController {
 
 		return allocations;
 	}
-
+	
 	@RequestMapping(value = "results", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addTestAllocationResult(@RequestBody Map<String, Object> resultObject) throws Exception {
@@ -491,7 +493,7 @@ public class LaboratoryController {
 		Result savedResults = laboratoryService.recordTestAllocationResults(result);
 		return savedResults.toMap();
 	}
-
+	
 	@RequestMapping(value = "multipleresults", method = RequestMethod.POST)
 	@ResponseBody
 	public List<Map<String, Object>> saveMultipleResults(@RequestBody List<Map<String, Object>> results)
@@ -505,7 +507,7 @@ public class LaboratoryController {
 		List<Map<String, Object>> savedResultsResponse = laboratoryService.saveMultipleResults(formattedResults);
 		return savedResultsResponse;
 	}
-
+	
 	@RequestMapping(value = "machineobs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> saveMachineObservations(@RequestBody Map<String, Object> machinePayload)
@@ -543,7 +545,7 @@ public class LaboratoryController {
 		response.put("obsWithIssues", obsWithIssues);
 		return response;
 	}
-
+	
 	private void validateMachinePayload(Map<String, Object> machinePayload) {
 		if (machinePayload.get("sampleUuid") == null && machinePayload.get("sampleId") == null) {
 			throw new RuntimeException("Sample identification is missing");
@@ -556,7 +558,7 @@ public class LaboratoryController {
 			throw new RuntimeException("Key `code` on test object is missing");
 		}
 	}
-
+	
 	private Sample getSampleFromPayload(Map<String, Object> machinePayload) {
 		String sampleIdentification = null;
 		if (machinePayload.get("sampleUuid") != null) {
@@ -568,10 +570,10 @@ public class LaboratoryController {
 		}
 		return null;
 	}
-
+	
 	private void processSampleOrders(Sample sample, Map<String, Object> test, List<Map<String, Object>> observations,
-	                                 List<Map<String, Object>> mappedParameters, List<Result> formattedResults,
-	                                 List<Map<String, Object>> obsWithIssues) throws Exception {
+	        List<Map<String, Object>> mappedParameters, List<Result> formattedResults,
+	        List<Map<String, Object>> obsWithIssues) throws Exception {
 		List<SampleOrder> sampleOrders = sample.getSampleOrders();
 		ConceptSource mappingConceptSource = getConceptSource();
 		for (SampleOrder sampleOrder : sampleOrders) {
@@ -580,51 +582,51 @@ public class LaboratoryController {
 			System.out.println("concept----" + mapped);
 			if (mapped) {
 				processTestAllocations(sampleOrder, observations, concept, mappedParameters, formattedResults,
-						obsWithIssues, mappingConceptSource);
+				    obsWithIssues, mappingConceptSource);
 			}
 		}
 	}
-
+	
 	private ConceptSource getConceptSource() throws Exception {
 		AdministrationService administrationService = Context.getAdministrationService();
 		String globalPropertyValue = administrationService
-				.getGlobalProperty(ICareConfig.MACHINE_INTEGRATION_PRIMARY_CONCEPT_SOURCE);
+		        .getGlobalProperty(ICareConfig.MACHINE_INTEGRATION_PRIMARY_CONCEPT_SOURCE);
 		if (globalPropertyValue == null) {
 			throw new RuntimeException("Reference concept source is missing");
 		}
-
+		
 		ConceptSource mappingConceptSource = Context.getConceptService().getConceptSourceByUuid(globalPropertyValue);
 		if (mappingConceptSource == null) {
 			throw new RuntimeException("The configured concept source is not valid");
 		}
-
+		
 		return mappingConceptSource;
 	}
-
+	
 	private boolean isConceptMapped(Concept concept, Map<String, Object> test, ConceptSource mappingConceptSource) {
 		if (!concept.getConceptMappings().isEmpty()) {
 			for (ConceptMap conceptMap : concept.getConceptMappings()) {
 				System.out.println("Codding "
-						+ conceptMap
-						.getConceptReferenceTerm()
-						.getConceptSource()
-						.getUuid()
-						.equals(
-								mappingConceptSource.getUuid()
-										+ conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))));
+				        + conceptMap
+				                .getConceptReferenceTerm()
+				                .getConceptSource()
+				                .getUuid()
+				                .equals(
+				                    mappingConceptSource.getUuid()
+				                            + conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))));
 				if (conceptMap.getConceptReferenceTerm().getConceptSource().getUuid().equals(mappingConceptSource.getUuid())
-						&& conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))) {
+				        && conceptMap.getConceptReferenceTerm().getCode().equals(test.get("code"))) {
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-
+	
 	private void processTestAllocations(SampleOrder sampleOrder, List<Map<String, Object>> observations, Concept concept,
-	                                    List<Map<String, Object>> mappedParameters, List<Result> formattedResults,
-	                                    List<Map<String, Object>> obsWithIssues, ConceptSource mappingConceptSource) throws ParseException {
-
+	        List<Map<String, Object>> mappedParameters, List<Result> formattedResults,
+	        List<Map<String, Object>> obsWithIssues, ConceptSource mappingConceptSource) throws ParseException {
+		
 		List<TestAllocation> testAllocations = sampleOrder.getTestAllocations();
 		List<Concept> parameters = concept.getSetMembers();
 		System.out.println("Parameters :" + parameters);
@@ -633,14 +635,14 @@ public class LaboratoryController {
 				String code = extractObservationCode(observation);
 				if (code != null) {
 					processParameters(parameters, code, mappedParameters, formattedResults, obsWithIssues, observation,
-							testAllocations, mappingConceptSource);
+					    testAllocations, mappingConceptSource);
 				} else {
 					obsWithIssues.add(observation);
 				}
 			}
 		}
 	}
-
+	
 	private String extractObservationCode(Map<String, Object> observation) {
 		if (observation.get("loinc") != null) {
 			return observation.get("loinc").toString();
@@ -655,31 +657,31 @@ public class LaboratoryController {
 		}
 		return null;
 	}
-
+	
 	private void processParameters(List<Concept> parameters, String code, List<Map<String, Object>> mappedParameters,
-	                               List<Result> formattedResults, List<Map<String, Object>> obsWithIssues, Map<String, Object> observation,
-	                               List<TestAllocation> testAllocations, ConceptSource mappingConceptSource) throws ParseException {
-
+	        List<Result> formattedResults, List<Map<String, Object>> obsWithIssues, Map<String, Object> observation,
+	        List<TestAllocation> testAllocations, ConceptSource mappingConceptSource) throws ParseException {
+		
 		for (Concept parameter : parameters) {
 			for (ConceptMap parameterConceptMap : parameter.getConceptMappings()) {
 				System.out.println("Match parameter concept map :"
-						+ (parameterConceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
-						.equals(mappingConceptSource.getUuid())));
+				        + (parameterConceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
+				                .equals(mappingConceptSource.getUuid())));
 				// && parameterConceptMap.getConceptReferenceTerm().getCode().equals(code)
 				if (parameterConceptMap.getConceptReferenceTerm().getConceptSource().getUuid()
-						.equals(mappingConceptSource.getUuid())
-						&& parameterConceptMap.getConceptReferenceTerm().getCode().equals(code)) {
+				        .equals(mappingConceptSource.getUuid())
+				        && parameterConceptMap.getConceptReferenceTerm().getCode().equals(code)) {
 					saveResults(testAllocations, parameter, observation, formattedResults, mappedParameters);
 					return;
 				}
-
+				
 			}
 		}
 		obsWithIssues.add(observation);
 	}
-
+	
 	private void saveResults(List<TestAllocation> testAllocations, Concept parameter, Map<String, Object> observation,
-	                         List<Result> formattedResults, List<Map<String, Object>> mappedParameters) throws ParseException {
+	        List<Result> formattedResults, List<Map<String, Object>> mappedParameters) throws ParseException {
 		;
 		for (TestAllocation testAllocation : testAllocations) {
 			if (testAllocation.getTestConcept().getUuid().equals(parameter.getUuid())) {
@@ -691,7 +693,7 @@ public class LaboratoryController {
 		System.out.println("formatted Results :---" + formattedResults);
 		System.out.println("mappedParameters  :---" + mappedParameters);
 	}
-
+	
 	private Map<String, Object> createResultMap(Concept parameter, Map<String, Object> observation,
 	                                            TestAllocation testAllocation) {
 		Map<String, Object> result = new HashMap<>();
@@ -711,9 +713,9 @@ public class LaboratoryController {
 		}
 		return result;
 	}
-
+	
 	private void saveSampleStatus(Sample sample, User user) throws Exception {
-
+		
 		SampleStatus sampleStatus = new SampleStatus();
 		sampleStatus.setUser(user);
 		sampleStatus.setSample(sample);
@@ -722,142 +724,142 @@ public class LaboratoryController {
 		sampleStatus.setCategory("HAS_RESULTS");
 		laboratoryService.saveSampleStatus(sampleStatus);
 	}
-
+	
 	@RequestMapping(value = "voidmultipleresults", method = RequestMethod.PUT)
 	@ResponseBody
 	public List<Map<String, Object>> voidMultipleResults(@RequestBody Map<String, Object> resultsToVoid) throws Exception {
 		List<Map<String, Object>> savedResultsResponse = laboratoryService.voidMultipleResults(resultsToVoid);
 		return savedResultsResponse;
 	}
-
+	
 	@RequestMapping(value = "resultsinstrument", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> saveResultsInstrument(@RequestBody Map<String, Object> resultsInstrument) throws Exception {
 		Map<String, Object> savedResultsInstrumentResponse = laboratoryService.saveResultsInstrument(resultsInstrument);
 		return savedResultsInstrumentResponse;
 	}
-
+	
 	@RequestMapping(value = "results", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Result> getResults() {
 		return laboratoryService.getResults();
 	}
-
+	
 	@RequestMapping(value = "allocationstatus", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addTestAllocationStatus(@RequestBody HashMap<String, Object> testAllocationStatusObject)
-			throws Exception {
+	        throws Exception {
 		TestAllocationStatus testAllocationStatus = TestAllocationStatus.fromMap(testAllocationStatusObject);
 		TestAllocationStatus savedTestAllocationStatus = laboratoryService.updateTestAllocationStatus(testAllocationStatus);
 		return savedTestAllocationStatus.toMap();
-
+		
 	}
-
+	
 	@RequestMapping(value = "allocationstatuses", method = RequestMethod.POST)
 	@ResponseBody
 	public List<Map<String, Object>> saveTestAllocationStatuses(
-			@RequestBody List<Map<String, Object>> testAllocationStatusesObject) throws Exception {
+	        @RequestBody List<Map<String, Object>> testAllocationStatusesObject) throws Exception {
 		List<TestAllocationStatus> testAllocationStatuses = new ArrayList<TestAllocationStatus>();
 		for (Map<String, Object> testAllocationStatusObject : testAllocationStatusesObject) {
 			System.out.println(testAllocationStatusesObject);
 			TestAllocationStatus testAllocationStatus = TestAllocationStatus.fromMap(testAllocationStatusObject);
 			testAllocationStatuses.add(testAllocationStatus);
 		}
-
+		
 		return laboratoryService.updateTestAllocationStatuses(testAllocationStatuses);
-
+		
 	}
-
+	
 	@RequestMapping(value = "testtime", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addTestTimeConfiguration(@RequestBody HashMap<String, Object> testTimeConfigurationMap) {
-
+		
 		TestTimeConfig testTimeConfig = TestTimeConfig.fromMap(testTimeConfigurationMap);
-
+		
 		Concept testConcept = conceptService.getConceptByUuid(testTimeConfig.getConcept().getUuid());
-
+		
 		testTimeConfig.setConcept(testConcept);
-
+		
 		TestTimeConfig savedTestTimeConfig = laboratoryService.createTestTimeConfig(testTimeConfig);
-
+		
 		return savedTestTimeConfig.toMap();
-
+		
 	}
-
+	
 	@RequestMapping(value = "testtime/{configUUid}", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateTestTimeConfiguration(@PathVariable String configUUid,
-	                                                       @RequestBody Map<String, Object> testTimeConfigurationMap) {
-
+	        @RequestBody Map<String, Object> testTimeConfigurationMap) {
+		
 		TestTimeConfig testTimeConfig = TestTimeConfig.fromMap(testTimeConfigurationMap);
-
+		
 		TestTimeConfig oldTestTimeConfig = laboratoryService.getTestTimeConfig(configUUid);
-
+		
 		testTimeConfig.setDateCreated(oldTestTimeConfig.getDateCreated());
-
+		
 		testTimeConfig.setCreator(oldTestTimeConfig.getCreator());
-
+		
 		Concept testConcept = conceptService.getConceptByUuid(testTimeConfig.getConcept().getUuid());
-
+		
 		testTimeConfig.setConcept(testConcept);
-
+		
 		User userUpdating = Context.getAuthenticatedUser();
-
+		
 		testTimeConfig.setChangedBy(userUpdating);
-
+		
 		testTimeConfig.setDateChanged(new Date());
-
+		
 		TestTimeConfig savedTestTimeConfig = laboratoryService.updateTestTimeConfig(testTimeConfig);
-
+		
 		return savedTestTimeConfig.toMap();
-
+		
 	}
-
+	
 	@RequestMapping(value = "testtime", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getTestTimeConfigurations(
-			@RequestParam(value = "concept", required = false) String conceptUuid, @RequestParam(required = false) String q) {
-
+	        @RequestParam(value = "concept", required = false) String conceptUuid, @RequestParam(required = false) String q) {
+		
 		if (conceptUuid == null) {
 			List<TestTimeConfig> testTimeConfigs = this.laboratoryService.getTestTimeConfigs(q);
-
+			
 			List<Map<String, Object>> configsMapList = new ArrayList<Map<String, Object>>();
-
+			
 			for (TestTimeConfig config : testTimeConfigs) {
 				configsMapList.add(config.toMap());
 			}
 			return configsMapList;
-
+			
 		} else {
 			List<TestTimeConfig> testTimeConfigs = this.laboratoryService.getTestTimeConfigByConcept(conceptUuid);
-
+			
 			List<Map<String, Object>> configsMapList = new ArrayList<Map<String, Object>>();
-
+			
 			for (TestTimeConfig config : testTimeConfigs) {
 				configsMapList.add(config.toMap());
 			}
 			return configsMapList;
-
+			
 		}
-
+		
 	}
-
+	
 	@RequestMapping(value = "testtime/{testConfigUuid}", method = RequestMethod.DELETE)
 	@ResponseBody
 	public Map<String, Object> deletetestTimeConfiguration(@PathVariable("testConfigUuid") String testConfigUuid) {
 		TestTimeConfig testTimeConfig = laboratoryService.deleteTestTimeConfiguration(testConfigUuid);
 		return testTimeConfig.toMap();
 	}
-
+	
 	@RequestMapping(value = "testrange", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> addTestRangeConfiguration(@RequestBody HashMap<String, Object> testRangeConfigurationMap) {
-
+		
 		TestRangeConfig testRangeConfig = TestRangeConfig.fromMap(testRangeConfigurationMap);
-
+		
 		List<TestRangeConfig> testRangeConfigs = laboratoryService.getTestRangeByConceptAndGender(testRangeConfig
-				.getConcept().getUuid(), testRangeConfig.getGender());
-
+		        .getConcept().getUuid(), testRangeConfig.getGender());
+		
 		// if(testRangeConfigs.size() > 0){
 		//
 		// Map<String, Object> configsExistNotification = new HashMap<>();
@@ -868,73 +870,73 @@ public class LaboratoryController {
 		// return configsExistNotification;
 		//
 		// }
-
+		
 		Concept testConcept = conceptService.getConceptByUuid(testRangeConfig.getConcept().getUuid());
-
+		
 		testRangeConfig.setConcept(testConcept);
-
+		
 		TestRangeConfig savedTestRangeConfig = laboratoryService.createTestRangeConfig(testRangeConfig);
-
+		
 		return savedTestRangeConfig.toMap();
-
+		
 	}
-
+	
 	@RequestMapping(value = "testrange/{configUuid}", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> updateTestRangeConfiguration(@PathVariable String configUuid,
-	                                                        @RequestBody HashMap<String, Object> testRangeConfigurationMap) {
-
+	        @RequestBody HashMap<String, Object> testRangeConfigurationMap) {
+		
 		TestRangeConfig testRangeConfig = TestRangeConfig.fromMap(testRangeConfigurationMap);
-
+		
 		TestRangeConfig oldTestRangeConfig = laboratoryService.getTestRangeConfig(configUuid);
-
+		
 		testRangeConfig.setDateCreated(oldTestRangeConfig.getDateCreated());
-
+		
 		testRangeConfig.setCreator(oldTestRangeConfig.getCreator());
-
+		
 		Concept testConcept = conceptService.getConceptByUuid(testRangeConfig.getConcept().getUuid());
-
+		
 		testRangeConfig.setConcept(testConcept);
-
+		
 		User userUpdating = Context.getAuthenticatedUser();
-
+		
 		testRangeConfig.setChangedBy(userUpdating);
-
+		
 		testRangeConfig.setDateChanged(new Date());
-
+		
 		TestRangeConfig updatedTestRangeConfig = laboratoryService.updateTestRangeConfig(testRangeConfig);
-
+		
 		return updatedTestRangeConfig.toMap();
-
+		
 	}
-
+	
 	@RequestMapping(value = "testrange", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getTestRangeConfigurations(
-			@RequestParam(value = "concept", required = false) String conceptUuid) {
-
+	        @RequestParam(value = "concept", required = false) String conceptUuid) {
+		
 		if (conceptUuid == null) {
 			List<TestRangeConfig> testRangeConfigs = this.laboratoryService.getTestRangeConfigs();
-
+			
 			List<Map<String, Object>> configsMapList = new ArrayList<Map<String, Object>>();
-
+			
 			for (TestRangeConfig config : testRangeConfigs) {
 				configsMapList.add(config.toMap());
 			}
 			return configsMapList;
-
+			
 		} else {
 			List<TestRangeConfig> testRangeConfigs = this.laboratoryService.getTestRangeConfigByConcept(conceptUuid);
-
+			
 			List<Map<String, Object>> configsMapList = new ArrayList<Map<String, Object>>();
-
+			
 			for (TestRangeConfig config : testRangeConfigs) {
 				configsMapList.add(config.toMap());
 			}
 			return configsMapList;
 		}
 	}
-
+	
 	@RequestMapping(value = "sampleidgen", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> generateSampleLabel() {
@@ -943,151 +945,151 @@ public class LaboratoryController {
 		label.put("label", sampleLabel);
 		return label;
 	}
-
+	
 	@RequestMapping(value = "labidgen", method = RequestMethod.GET)
 	@ResponseBody
 	public List<String> generateLaboratoryIdLabels(
-			@RequestParam(value = "globalProperty", required = true) String globalProperty,
-			@RequestParam(value = "metadataType", required = true) String metadataType,
-			@RequestParam(value = "count", required = false) Integer count) {
+	        @RequestParam(value = "globalProperty", required = true) String globalProperty,
+	        @RequestParam(value = "metadataType", required = true) String metadataType,
+	        @RequestParam(value = "count", required = false) Integer count) {
 		List<String> labLabels = laboratoryService.generateLaboratoryIdLabels(globalProperty, metadataType, count);
 		return labLabels;
 	}
-
+	
 	@RequestMapping(value = "samplelable", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> geenerateSampleLable() {
-
+		
 		// check if there is a lable existing
 		List<SampleLable> sampleLables = laboratoryService.getSampleLables();
-
+		
 		if (sampleLables.size() > 0) {
-
+			
 			SampleLable existingSampleLable = sampleLables.get(0);
 			Date lastDate = existingSampleLable.getTime();
-
+			
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(lastDate);
-
+			
 			Integer existingMonth = calendar.get(Calendar.MONTH);
 			Integer existingDate = calendar.get(Calendar.DATE);
-
+			
 			Date now = new Date();
 			Calendar calendar1 = Calendar.getInstance();
 			Integer currentMonth = calendar1.get(Calendar.MONTH);
 			Integer currentDate = calendar1.get(Calendar.DATE);
-
+			
 			if (currentDate == existingDate && currentMonth == existingMonth) {
 				SampleLable sampleLable = new SampleLable();
 				sampleLable.setTime(now);
 				sampleLable.setCurrentLable(existingSampleLable.getCurrentLable() + 1);
 				sampleLable.setId(existingSampleLable.getId());
-
+				
 				SampleLable savedSampleLable = laboratoryService.updateSampleLable(sampleLable,
-						existingSampleLable.getCurrentLable());
-
+				    existingSampleLable.getCurrentLable());
+				
 				return savedSampleLable.toMap();
 			} else {
-
+				
 				SampleLable sampleLable = new SampleLable();
 				sampleLable.setTime(now);
 				sampleLable.setCurrentLable(1);
 				sampleLable.setId(existingSampleLable.getId());
-
+				
 				SampleLable savedSampleLable = laboratoryService.updateSampleLable(sampleLable,
-						existingSampleLable.getCurrentLable());
-
+				    existingSampleLable.getCurrentLable());
+				
 				return savedSampleLable.toMap();
-
+				
 			}
 		} else {
-
+			
 			SampleLable sampleLable = new SampleLable();
 			sampleLable.setCurrentLable(1);
-
+			
 			Date currentTime = new Date();
 			sampleLable.setTime(currentTime);
-
+			
 			SampleLable savedSampleLable = laboratoryService.addSampleLable(sampleLable);
-
+			
 			return savedSampleLable.toMap();
-
+			
 		}
-
+		
 	}
-
+	
 	@RequestMapping(value = "testorderlocation", method = RequestMethod.POST)
 	@ResponseBody
 	public TestOrderLocation createTestOrderWithLocation(@RequestBody Map<String, Object> testOrderLocation) {
-
+		
 		return laboratoryService.addTestOrderWithLocation(TestOrderLocation.fromMap(testOrderLocation));
-
+		
 	}
-
+	
 	@RequestMapping(value = "workloadsummary", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> onGetWorkloadSummary(@RequestParam(value = "startDate", required = false) String startDate,
-	                                                @RequestParam(value = "endDate", required = false) String endDate) throws ParseException {
-
+	        @RequestParam(value = "endDate", required = false) String endDate) throws ParseException {
+		
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-
+			
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-
+			
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
-
+			
 		}
-
+		
 		WorkloadSummary workloadSummary = laboratoryService.getWorkLoadSummary(start, end);
-
+		
 		return workloadSummary.toMap();
 	}
-
+	
 	@RequestMapping(value = "batches", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addBatch(@RequestBody List<Map<String, Object>> batchesObject) throws Exception {
-
+		
 		Batch batch = new Batch();
 		List<Map<String, Object>> newBatches = new ArrayList<Map<String, Object>>();
-
+		
 		for (Map<String, Object> batchObject : batchesObject) {
-
+			
 			batch = Batch.fromMap(batchObject);
-
+			
 			if ((batchObject.get("batchSet")) != null) {
-
+				
 				BatchSet batchSet = laboratoryService.getBatchSetByUuid(((Map) batchObject.get("batchSet")).get("uuid")
-						.toString());
+				        .toString());
 				batch.setBatchSet(batchSet);
 			}
-
+			
 			Batch newBatch = laboratoryService.addBatch(batch);
 			newBatches.add(newBatch.toMap());
 		}
 		return newBatches;
 	}
-
+	
 	@RequestMapping(value = "batches", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getbatches(@RequestParam(value = "startDate", required = false) String startDate,
-	                                            @RequestParam(value = "endDate", required = false) String endDate,
-	                                            @RequestParam(value = "uuid", required = false) String uuid,
-	                                            @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
-	                                            @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
-
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "uuid", required = false) String uuid,
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+		
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-
+			
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
 		}
-
+		
 		List<Batch> batches = laboratoryService.getBatches(start, end, uuid, q, startIndex, limit);
-
+		
 		List<Map<String, Object>> responseBatchesObject = new ArrayList<Map<String, Object>>();
 		for (Batch batch : batches) {
 			Map<String, Object> batchObject = batch.toMap();
@@ -1095,16 +1097,16 @@ public class LaboratoryController {
 		}
 		return responseBatchesObject;
 	}
-
+	
 	@RequestMapping(value = "batchSample", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getBatchSampleByUuid(@RequestParam(value = "uuid", required = true) String uuid)
-			throws Exception {
-
+	        throws Exception {
+		
 		BatchSample batchSample = laboratoryService.getBatchSampleByUuid(uuid);
 		return batchSample.toMap();
 	}
-
+	
 	@RequestMapping(value = "batchsamples", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addBatchSamples(@RequestBody List<Map<String, Object>> batchSamplesObject)
@@ -1122,7 +1124,7 @@ public class LaboratoryController {
 
 		return newBatchSamples;
 	}
-
+	
 	@RequestMapping(value = "batchsamples", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getBatchSamples(
@@ -1152,53 +1154,53 @@ public class LaboratoryController {
 		return responseBatchSampleObject;
 
 	}
-
+	
 	@RequestMapping(value = "batchsets", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addBatchSet(@RequestBody List<Map<String, Object>> batchSetsObject) {
-
+		
 		BatchSet batchSet = new BatchSet();
 		List<Map<String, Object>> newBatchSets = new ArrayList<Map<String, Object>>();
-
+		
 		for (Map<String, Object> batchSetObject : batchSetsObject) {
-
+			
 			batchSet = BatchSet.fromMap(batchSetObject);
 			BatchSet newBatchSet = laboratoryService.addBatchSet(batchSet);
 			newBatchSets.add(newBatchSet.toMap());
 		}
-
+		
 		return newBatchSets;
-
+		
 	}
-
+	
 	@RequestMapping(value = "batchstatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> addBatchStatus(@RequestBody Map<String, Object> batchStatusObject) throws Exception {
-
+		
 		BatchStatus batchStatus = BatchStatus.fromMap(batchStatusObject);
 		BatchStatus savedBatchStatus = laboratoryService.addBatchStatus(batchStatus);
-
+		
 		return savedBatchStatus.toMap();
 	}
-
+	
 	@RequestMapping(value = "batchsets", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getbatchsets(@RequestParam(value = "startDate", required = false) String startDate,
-	                                              @RequestParam(value = "endDate", required = false) String endDate,
-	                                              @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
-	                                              @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
-
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+		
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-
+			
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
 		}
-
+		
 		List<BatchSet> batchsets = laboratoryService.getBatchSets(start, end, q, startIndex, limit);
-
+		
 		List<Map<String, Object>> responseBatchSetsObject = new ArrayList<Map<String, Object>>();
 		for (BatchSet batchSet : batchsets) {
 			Map<String, Object> batchObject = batchSet.toMap();
@@ -1206,45 +1208,45 @@ public class LaboratoryController {
 		}
 		return responseBatchSetsObject;
 	}
-
+	
 	@RequestMapping(value = "batchsetstatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> addBatchSetStatus(@RequestBody Map<String, Object> batchSetStatusObject) throws Exception {
-
+		
 		BatchSetStatus batchSetStatus = BatchSetStatus.fromMap(batchSetStatusObject);
 		BatchSetStatus savedbatchSetStatus = laboratoryService.addBatchSetStatus(batchSetStatus);
-
+		
 		return savedbatchSetStatus.toMap();
-
+		
 	}
-
+	
 	@RequestMapping(value = "worksheets", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getWorkSheets(@RequestParam(value = "startDate", required = false) String startDate,
-	                                               @RequestParam(value = "endDate", required = false) String endDate,
-	                                               @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
-	                                               @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
-
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+		
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-
+			
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
 		}
-
+		
 		List<Worksheet> worksheets = laboratoryService.getWorksheets(start, end, q, startIndex, limit);
-
+		
 		List<Map<String, Object>> responseWorkSheetsObject = new ArrayList<Map<String, Object>>();
 		for (Worksheet worksheet : worksheets) {
 			Map<String, Object> worksheetObject = worksheet.toMap();
 			responseWorkSheetsObject.add(worksheetObject);
 		}
-
+		
 		return responseWorkSheetsObject;
 	}
-
+	
 	@RequestMapping(value = "worksheets", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addWorksheet(@RequestBody List<Map<String, Object>> worksheetsObject) {
@@ -1274,35 +1276,35 @@ public class LaboratoryController {
 		return newWorksheets;
 
 	}
-
+	
 	@RequestMapping(value = "worksheetcontrols", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getWorkSheetControls(
-			@RequestParam(value = "startDate", required = false) String startDate,
-			@RequestParam(value = "endDate", required = false) String endDate,
-			@RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
-			@RequestParam(defaultValue = "100") Integer limit) throws ParseException {
-
+	        @RequestParam(value = "startDate", required = false) String startDate,
+	        @RequestParam(value = "endDate", required = false) String endDate,
+	        @RequestParam(value = "q", required = false) String q, @RequestParam(defaultValue = "0") Integer startIndex,
+	        @RequestParam(defaultValue = "100") Integer limit) throws ParseException {
+		
 		Date start = null;
 		Date end = null;
 		if (startDate != null && endDate != null) {
-
+			
 			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			start = formatter.parse(startDate);
 			end = formatter.parse(endDate);
 		}
-
+		
 		List<WorksheetControl> worksheetControls = laboratoryService.getWorksheetControls(start, end, q, startIndex, limit);
-
+		
 		List<Map<String, Object>> responseWorkSheetControlsObject = new ArrayList<Map<String, Object>>();
 		for (WorksheetControl worksheetControl : worksheetControls) {
 			Map<String, Object> worksheetControlObject = worksheetControl.toMap();
 			responseWorkSheetControlsObject.add(worksheetControlObject);
 		}
-
+		
 		return responseWorkSheetControlsObject;
 	}
-
+	
 	@RequestMapping(value = "worksheetcontrols", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addWorksheetControl(
@@ -1326,16 +1328,16 @@ public class LaboratoryController {
 		return newWorksheetControls;
 
 	}
-
+	
 	@RequestMapping(value = "worksheetdefinition", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getWorksheetDefinitionByUuid(@RequestParam(value = "uuid", required = true) String uuid)
-			throws ParseException {
-
+	        throws ParseException {
+		
 		Map<String, Object> worksheetDefinition = laboratoryService.getWorksheetDefinitionByUuid(uuid);
 		return worksheetDefinition;
 	}
-
+	
 	@RequestMapping(value = "worksheetdefinitions", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getWorksheetDefinitions(
@@ -1371,7 +1373,7 @@ public class LaboratoryController {
 		}
 		return worksheetDefinitionsObject;
 	}
-
+	
 	@RequestMapping(value = "worksheetdefinitions", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addWorksheetDefinitions(
@@ -1389,7 +1391,7 @@ public class LaboratoryController {
 		}
 		return newWorksheetDefinitions;
 	}
-
+	
 	@RequestMapping(value = "worksheetsamples", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getWorksheetSamples(
@@ -1419,7 +1421,7 @@ public class LaboratoryController {
 		}
 		return worksheetSamplesObject;
 	}
-
+	
 	@RequestMapping(value = "worksheetsamples", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addWorksheetSamples(@RequestBody List<Map<String, Object>> worksheetSamplesObject)
@@ -1437,28 +1439,28 @@ public class LaboratoryController {
 		}
 		return newWorksheetSamples;
 	}
-
+	
 	@RequestMapping(value = "worksheetstatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> addWorksheetStatus(@RequestBody Map<String, Object> worksheetStatusObject) throws Exception {
-
+		
 		WorksheetStatus worksheetStatus = WorksheetStatus.fromMap(worksheetStatusObject);
 		WorksheetStatus newWorksheetStatus = laboratoryService.addWorksheetStatus(worksheetStatus);
 		return newWorksheetStatus.toMap();
-
+		
 	}
-
+	
 	@RequestMapping(value = "worksheetsamplestatus", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> addWorksheetSampleStatus(@RequestBody Map<String, Object> worksheetSampleObject)
-			throws Exception {
-
+	        throws Exception {
+		
 		WorksheetSampleStatus worksheetSampleStatus = WorksheetSampleStatus.fromMap(worksheetSampleObject);
 		WorksheetSampleStatus newWorksheetSampleStatus = laboratoryService.addWorksheetSampleStatus(worksheetSampleStatus);
-
+		
 		return newWorksheetSampleStatus.toMap();
 	}
-
+	
 	@RequestMapping(value = "associatedfields", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addAssociatedFields(
@@ -1477,7 +1479,7 @@ public class LaboratoryController {
 		return createdAssociatedFieldsListMap;
 
 	}
-
+	
 	@RequestMapping(value = "associatedfields", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getAssociatedFields(@RequestParam(required = false, value = "q") String q,
@@ -1493,27 +1495,27 @@ public class LaboratoryController {
 
 		return responseAssociatedFields;
 	}
-
+	
 	@RequestMapping(value = "associatedfield/{associatedFieldUuid}", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getAssociatedFieldByUuid(@PathVariable String associatedFieldUuid) {
-
+		
 		AssociatedField associatedField = laboratoryService.getAssociatedFieldByUuid(associatedFieldUuid);
 		return associatedField.toMap();
 	}
-
+	
 	@RequestMapping(value = "associatedfield/{associatedFieldUuid}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> updateAssociatedField(@PathVariable String associatedFieldUuid,
-	                                                 @RequestBody Map<String, Object> associatedFieldMap) {
-
+	        @RequestBody Map<String, Object> associatedFieldMap) {
+		
 		AssociatedField associatedField = AssociatedField.fromMap(associatedFieldMap);
 		AssociatedField updatedAssociatedField = laboratoryService.updateAssociatedField(associatedFieldUuid,
-				associatedField);
-
+		    associatedField);
+		
 		return updatedAssociatedField.toMap();
 	}
-
+	
 	@RequestMapping(value = "testallocationassociatedfields", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addTestAllocationAssociatedFields(
@@ -1534,7 +1536,7 @@ public class LaboratoryController {
 
 		return createdAllocationAssociatedField;
 	}
-
+	
 	@RequestMapping(value = "testallocationassociatedfields", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getTestAllocationAssociatedField(
@@ -1555,7 +1557,7 @@ public class LaboratoryController {
 
 		return testAllocationAssociatedFieldsListMap;
 	}
-
+	
 	@RequestMapping(value = "associatedfieldresults", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public List<Map<String, Object>> addAssociatedFieldResult(
@@ -1572,7 +1574,7 @@ public class LaboratoryController {
 		}
 		return createdAssociatedFieldResultListMap;
 	}
-
+	
 	@RequestMapping(value = "associatedfieldresults", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getAssociatedFieldResults(
@@ -1592,26 +1594,26 @@ public class LaboratoryController {
 
 		return associatedFieldResultListMap;
 	}
-
+	
 	@RequestMapping(value = "storagetype", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> addStorageType(@RequestBody Map<String, Object> storageTypeObject) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.addStorageType(
-					StorageType.fromMap(storageTypeObject)).toMap(), HttpStatus.CREATED);
+			    StorageType.fromMap(storageTypeObject)).toMap(), HttpStatus.CREATED);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = { "storagetype", "storagetypes" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> getStorageTypes(HttpServletRequest request,
-	                                           @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
-	                                           @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	                                           @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
-	                                           @RequestParam(value = "q", required = false) String q) {
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(value = "q", required = false) String q) {
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
@@ -1626,37 +1628,37 @@ public class LaboratoryController {
 		response.put("storageTypes", items);
 		return response;
 	}
-
+	
 	@RequestMapping(value = { "storagetype/{storageTypeUuid}", "storagetypes/{storageTypeUuid}" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> getStorageTypeByUuid(@PathVariable("storageTypeUuid") String storageTypeUuid) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.getStorageTypeByUuid(storageTypeUuid).toMap(),
-					HttpStatus.OK);
+			        HttpStatus.OK);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = { "storagetype/{storageTypeUuid}", "storagetypes/{storageTypeUuid}" }, method = {
-			RequestMethod.POST, RequestMethod.PUT }, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	        RequestMethod.POST, RequestMethod.PUT }, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> updateStorageType(@PathVariable("storageTypeUuid") String storageTypeUuid,
-	                                                             @RequestBody Map<String, Object> storageTypeObject) {
+	        @RequestBody Map<String, Object> storageTypeObject) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.updateStorageType(storageTypeUuid,
-					StorageType.fromMap(storageTypeObject)).toMap(), HttpStatus.OK);
+			    StorageType.fromMap(storageTypeObject)).toMap(), HttpStatus.OK);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = { "storagetype/{storageTypeUuid}", "storagetypes/{storageTypeUuid}" }, method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<?> deleteStorageType(@PathVariable("storageTypeUuid") String storageTypeUuid,
-	                                           @RequestParam(value = "reason", required = false) String reason) {
+	        @RequestParam(value = "reason", required = false) String reason) {
 		try {
 			laboratoryService.deleteStorageType(storageTypeUuid, reason);
 			return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
@@ -1665,27 +1667,27 @@ public class LaboratoryController {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = "storage", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> addStorage(@RequestBody Map<String, Object> storageObject) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.addStorage(Storage.fromMap(storageObject))
-					.toMap(), HttpStatus.CREATED);
+			        .toMap(), HttpStatus.CREATED);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = { "storage", "storages" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> getStorages(HttpServletRequest request,
-	                                       @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
-	                                       @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	                                       @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
-	                                       @RequestParam(value = "q", required = false) String q,
-	                                       @RequestParam(value = "storageTypeUuid", required = false) String storageTypeUuid) {
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(value = "q", required = false) String q,
+	        @RequestParam(value = "storageTypeUuid", required = false) String storageTypeUuid) {
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
@@ -1700,37 +1702,37 @@ public class LaboratoryController {
 		response.put("storages", items);
 		return response;
 	}
-
+	
 	@RequestMapping(value = { "storage/{storageUuid}", "storages/{storageUuid}" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> getStorageByUuid(@PathVariable("storageUuid") String storageUuid) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.getStorageByUuid(storageUuid).toMap(),
-					HttpStatus.OK);
+			        HttpStatus.OK);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = { "storage/{storageUuid}", "storages/{storageUuid}" }, method = { RequestMethod.POST,
-			RequestMethod.PUT }, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	        RequestMethod.PUT }, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> updateStorage(@PathVariable("storageUuid") String storageUuid,
-	                                                         @RequestBody Map<String, Object> storageObject) {
+	        @RequestBody Map<String, Object> storageObject) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.updateStorage(storageUuid,
-					Storage.fromMap(storageObject)).toMap(), HttpStatus.OK);
+			    Storage.fromMap(storageObject)).toMap(), HttpStatus.OK);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = { "storage/{storageUuid}", "storages/{storageUuid}" }, method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<?> deleteStorage(@PathVariable("storageUuid") String storageUuid,
-	                                       @RequestParam(value = "reason", required = false) String reason) {
+	        @RequestParam(value = "reason", required = false) String reason) {
 		try {
 			laboratoryService.deleteStorage(storageUuid, reason);
 			return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
@@ -1739,26 +1741,26 @@ public class LaboratoryController {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = "storage-location-type", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> addStorageLocationType(@RequestBody Map<String, Object> requestObject) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.addStorageLocationType(
-					StorageLocationType.fromMap(requestObject)).toMap(), HttpStatus.CREATED);
+			    StorageLocationType.fromMap(requestObject)).toMap(), HttpStatus.CREATED);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = { "storage-location-type", "storage-location-types" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> getStorageLocationTypes(HttpServletRequest request,
-	                                                   @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
-	                                                   @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	                                                   @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
-	                                                   @RequestParam(value = "q", required = false) String q) {
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(value = "q", required = false) String q) {
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
@@ -1773,37 +1775,37 @@ public class LaboratoryController {
 		response.put("storageLocationTypes", items);
 		return response;
 	}
-
+	
 	@RequestMapping(value = { "storage-location-type/{uuid}", "storage-location-types/{uuid}" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> getStorageLocationTypeByUuid(@PathVariable("uuid") String uuid) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.getStorageLocationTypeByUuid(uuid).toMap(),
-					HttpStatus.OK);
+			        HttpStatus.OK);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = { "storage-location-type/{uuid}", "storage-location-types/{uuid}" }, method = {
-			RequestMethod.POST, RequestMethod.PUT }, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	        RequestMethod.POST, RequestMethod.PUT }, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> updateStorageLocationType(@PathVariable("uuid") String uuid,
-	                                                                     @RequestBody Map<String, Object> requestObject) {
+	        @RequestBody Map<String, Object> requestObject) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.updateStorageLocationType(uuid,
-					StorageLocationType.fromMap(requestObject)).toMap(), HttpStatus.OK);
+			    StorageLocationType.fromMap(requestObject)).toMap(), HttpStatus.OK);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = { "storage-location-type/{uuid}", "storage-location-types/{uuid}" }, method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<?> deleteStorageLocationType(@PathVariable("uuid") String uuid,
-	                                                   @RequestParam(value = "reason", required = false) String reason) {
+	        @RequestParam(value = "reason", required = false) String reason) {
 		try {
 			laboratoryService.deleteStorageLocationType(uuid, reason);
 			return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
@@ -1812,35 +1814,35 @@ public class LaboratoryController {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = "storage-location", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> addStorageLocation(@RequestBody Map<String, Object> requestObject) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.addStorageLocation(
-					StorageLocation.fromMap(requestObject)).toMap(), HttpStatus.CREATED);
+			    StorageLocation.fromMap(requestObject)).toMap(), HttpStatus.CREATED);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = { "storage-location", "storage-locations" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public Map<String, Object> getStorageLocations(HttpServletRequest request,
-	                                               @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
-	                                               @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
-	                                               @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
-	                                               @RequestParam(value = "q", required = false) String q,
-	                                               @RequestParam(value = "parentLocationUuid", required = false) String parentLocationUuid,
-	                                               @RequestParam(value = "locationTypeUuid", required = false) String locationTypeUuid,
-	                                               @RequestParam(value = "slotOnly", required = false) Boolean slotOnly) {
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(value = "q", required = false) String q,
+	        @RequestParam(value = "parentLocationUuid", required = false) String parentLocationUuid,
+	        @RequestParam(value = "locationTypeUuid", required = false) String locationTypeUuid,
+	        @RequestParam(value = "slotOnly", required = false) Boolean slotOnly) {
 		Pager pager = new Pager();
 		pager.setAllowed(paging);
 		pager.setPageSize(pageSize);
 		pager.setPage(page);
 		ListResult<StorageLocation> results = laboratoryService.getStorageLocations(pager, q, parentLocationUuid,
-				locationTypeUuid, slotOnly);
+		    locationTypeUuid, slotOnly);
 		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
 		for (StorageLocation item : results.getResults()) {
 			items.add(item.toMap());
@@ -1850,37 +1852,37 @@ public class LaboratoryController {
 		response.put("storageLocations", items);
 		return response;
 	}
-
+	
 	@RequestMapping(value = { "storage-location/{uuid}", "storage-locations/{uuid}" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> getStorageLocationByUuid(@PathVariable("uuid") String uuid) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.getStorageLocationByUuid(uuid).toMap(),
-					HttpStatus.OK);
+			        HttpStatus.OK);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = { "storage-location/{uuid}", "storage-locations/{uuid}" }, method = { RequestMethod.POST,
-			RequestMethod.PUT }, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	        RequestMethod.PUT }, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> updateStorageLocation(@PathVariable("uuid") String uuid,
-	                                                                 @RequestBody Map<String, Object> requestObject) {
+	        @RequestBody Map<String, Object> requestObject) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.updateStorageLocation(uuid,
-					StorageLocation.fromMap(requestObject)).toMap(), HttpStatus.OK);
+			    StorageLocation.fromMap(requestObject)).toMap(), HttpStatus.OK);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = { "storage-location/{uuid}", "storage-locations/{uuid}" }, method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<?> deleteStorageLocation(@PathVariable("uuid") String uuid,
-	                                               @RequestParam(value = "reason", required = false) String reason) {
+	        @RequestParam(value = "reason", required = false) String reason) {
 		try {
 			laboratoryService.deleteStorageLocation(uuid, reason);
 			return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
@@ -1889,23 +1891,23 @@ public class LaboratoryController {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = { "storage-location/{uuid}/generate-slots", "storage-locations/{uuid}/generate-slots" }, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> generateStorageSlots(@PathVariable("uuid") String uuid,
-	                                                                @RequestBody(required = false) Map<String, Object> requestObject) {
+	        @RequestBody(required = false) Map<String, Object> requestObject) {
 		try {
 			Integer rowsCount = requestObject != null && requestObject.get("rowsCount") != null ? Integer
-																								  .parseInt(requestObject.get("rowsCount").toString()) : null;
+			        .parseInt(requestObject.get("rowsCount").toString()) : null;
 			Integer columnsCount = requestObject != null && requestObject.get("columnsCount") != null ? Integer
-																										.parseInt(requestObject.get("columnsCount").toString()) : null;
+			        .parseInt(requestObject.get("columnsCount").toString()) : null;
 			Integer layersCount = requestObject != null && requestObject.get("layersCount") != null ? Integer
-																									  .parseInt(requestObject.get("layersCount").toString()) : null;
+			        .parseInt(requestObject.get("layersCount").toString()) : null;
 			String slotPattern = requestObject != null && requestObject.get("slotPattern") != null ? requestObject.get(
-					"slotPattern").toString() : null;
+			    "slotPattern").toString() : null;
 			List<Map<String, Object>> locations = new ArrayList<Map<String, Object>>();
 			for (StorageLocation location : laboratoryService.generateStorageLocationSlots(uuid, rowsCount, columnsCount,
-					layersCount, slotPattern)) {
+			    layersCount, slotPattern)) {
 				locations.add(location.toMap());
 			}
 			Map<String, Object> response = new HashMap<String, Object>();
@@ -1917,7 +1919,7 @@ public class LaboratoryController {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = "sample-storage/store", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> storeSample(@RequestBody Map<String, Object> requestObject) {
@@ -1925,89 +1927,176 @@ public class LaboratoryController {
 			String sampleUuid = requestObject.get("sampleUuid").toString();
 			String slotLocationUuid = requestObject.get("slotLocationUuid").toString();
 			String occupancyType = requestObject.get("occupancyType") != null ? requestObject.get("occupancyType")
-																				.toString() : null;
+			        .toString() : null;
 			Double quantityStored = requestObject.get("quantityStored") != null ? Double.valueOf(requestObject.get(
-					"quantityStored").toString()) : null;
+			    "quantityStored").toString()) : null;
 			String quantityUnit = requestObject.get("quantityUnit") != null ? requestObject.get("quantityUnit").toString()
-					: null;
+			        : null;
 			String remarks = requestObject.get("remarks") != null ? requestObject.get("remarks").toString() : null;
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.storeSample(sampleUuid, slotLocationUuid,
-					occupancyType, quantityStored, quantityUnit, remarks).toMap(), HttpStatus.CREATED);
+			    occupancyType, quantityStored, quantityUnit, remarks).toMap(), HttpStatus.CREATED);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = "sample-storage/move", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> moveStoredSample(@RequestBody Map<String, Object> requestObject) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.moveStoredSample(
-					requestObject.get("sampleUuid").toString(), requestObject.get("slotLocationUuid").toString(),
-					requestObject.get("remarks") != null ? requestObject.get("remarks").toString() : null).toMap(),
-					HttpStatus.OK);
+			    requestObject.get("sampleUuid").toString(), requestObject.get("slotLocationUuid").toString(),
+			    requestObject.get("remarks") != null ? requestObject.get("remarks").toString() : null).toMap(),
+			        HttpStatus.OK);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = "sample-storage/release", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> releaseStoredSample(@RequestBody Map<String, Object> requestObject) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.releaseStoredSample(
-					requestObject.get("sampleUuid").toString(),
-					requestObject.get("releaseReason") != null ? requestObject.get("releaseReason").toString() : null).toMap(),
-					HttpStatus.OK);
+			    requestObject.get("sampleUuid").toString(),
+			    requestObject.get("releaseReason") != null ? requestObject.get("releaseReason").toString() : null).toMap(),
+			        HttpStatus.OK);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = "sample-disposal/dispose", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> disposeSample(@RequestBody Map<String, Object> requestObject) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.disposeSample(
-					requestObject.get("sampleUuid").toString(),
-					requestObject.get("disposalMethod") != null ? requestObject.get("disposalMethod").toString() : null,
-					requestObject.get("disposalReason") != null ? requestObject.get("disposalReason").toString() : null,
-					requestObject.get("remarks") != null ? requestObject.get("remarks").toString() : null).toMap(),
-					HttpStatus.CREATED);
+			    requestObject.get("sampleUuid").toString(),
+			    requestObject.get("disposalMethod") != null ? requestObject.get("disposalMethod").toString() : null,
+			    requestObject.get("disposalReason") != null ? requestObject.get("disposalReason").toString() : null,
+			    requestObject.get("remarks") != null ? requestObject.get("remarks").toString() : null).toMap(),
+			        HttpStatus.CREATED);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = "sample-storage/sample/{sampleUuid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> getSampleStorageSummary(@PathVariable("sampleUuid") String sampleUuid) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.getSampleStorageSummary(sampleUuid),
-					HttpStatus.OK);
+			        HttpStatus.OK);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
 	@RequestMapping(value = "sample-storage/slot/{slotLocationUuid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> getSlotOccupancySummary(
-			@PathVariable("slotLocationUuid") String slotLocationUuid) {
+	        @PathVariable("slotLocationUuid") String slotLocationUuid) {
 		try {
 			return new ResponseEntity<Map<String, Object>>(laboratoryService.getSlotOccupancySummary(slotLocationUuid),
-					HttpStatus.OK);
+			        HttpStatus.OK);
 		}
 		catch (Exception exception) {
 			return buildStorageApiErrorResponse(exception);
 		}
 	}
-
+	
+	//	@RequestMapping(value = "samplelookup", method = RequestMethod.GET)
+	//	@ResponseBody
+	//	public ResponseEntity<Map<String, Object>> getSampleByLabel(
+	//			@RequestParam(value = "sampleId", required = true) String sampleId) throws Exception {
+	//
+	//		Sample sample = laboratoryService.getSampleById(sampleId);
+	//
+	//		if (sample == null || sample.getUuid() == null) {
+	//			Map<String, Object> response = new HashMap<>();
+	//			response.put("found", false);
+	//			response.put("sampleId", sampleId);
+	//			response.put("message", "No sample found with the provided sample ID/barcode.");
+	//			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+	//		}
+	//
+	//		Map<String, Object> response = new HashMap<>();
+	//		response.put("found", true);
+	//		response.put("uuid", sample.getUuid());
+	//		response.put("label", sample.getLabel());
+	//
+	//		return new ResponseEntity<>(response, HttpStatus.OK);
+	//	}
+	
+	@RequestMapping(value = "samplelookup", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getSampleLookup(
+	        @RequestParam(value = "sampleId", required = false) String sampleId) throws Exception {
+		
+		if (sampleId == null || sampleId.trim().equals("")) {
+			return new ResponseEntity<Map<String, Object>>(buildOperationOutcome("SAMPLE_ID_REQUIRED",
+			    "Sample ID/barcode is required.", sampleId), HttpStatus.BAD_REQUEST);
+		}
+		
+		try {
+			Sample sample = laboratoryService.getSampleById(sampleId.trim());
+			
+			if (sample == null || sample.getUuid() == null) {
+				return new ResponseEntity<Map<String, Object>>(buildOperationOutcome("SAMPLE_NOT_FOUND",
+				    "No active sample was found with the provided sample ID/barcode.", sampleId), HttpStatus.NOT_FOUND);
+			}
+			
+			Map<String, Object> response = new LinkedHashMap<String, Object>();
+			
+			Map<String, Object> lookup = new LinkedHashMap<String, Object>();
+			lookup.put("type", "sampleLabel");
+			lookup.put("value", sampleId.trim());
+			lookup.put("matchedBy", "exact-label");
+			
+			Map<String, Object> sampleObject = new LinkedHashMap<String, Object>();
+			sampleObject.put("uuid", sample.getUuid());
+			sampleObject.put("label", sample.getLabel());
+			sampleObject.put("voided", sample.getVoided());
+			
+			String encodedSampleId = URLEncoder.encode(sampleId.trim(), "UTF-8");
+			
+			Map<String, Object> links = new LinkedHashMap<String, Object>();
+			links.put("self", "/openmrs/ws/rest/v1/lab/samplelookup?sampleId=" + encodedSampleId);
+			links.put("sample", "/openmrs/ws/rest/v1/lab/sample/" + sample.getUuid());
+			links.put("allocations", "/openmrs/ws/rest/v1/lab/allocationsbysample?uuid=" + sample.getUuid());
+			
+			Map<String, Object> meta = new LinkedHashMap<String, Object>();
+			meta.put("apiVersion", "v1");
+			meta.put("timestamp", new Date());
+			
+			response.put("resourceType", "SampleLookup");
+			response.put("found", true);
+			response.put("lookup", lookup);
+			response.put("sample", sampleObject);
+			response.put("links", links);
+			response.put("meta", meta);
+			
+			/*
+			 * Optional backward-compatible fields.
+			 * Keep these if any existing client already reads response.uuid or response.label.
+			 */
+			response.put("uuid", sample.getUuid());
+			response.put("label", sample.getLabel());
+			
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+			
+		}
+		catch (IllegalStateException duplicateException) {
+			return new ResponseEntity<Map<String, Object>>(buildOperationOutcome("DUPLICATE_SAMPLE_LABEL",
+			    "More than one active sample exists with the same sample ID/barcode.", sampleId), HttpStatus.CONFLICT);
+		}
+	}
+	
 	private Map<String, Object> buildPagerMap(HttpServletRequest request, Pager pager) {
 		Map<String, Object> pagerObject = new HashMap<String, Object>();
 		int page = pager != null ? pager.getPage() : 1;
@@ -2025,7 +2114,7 @@ public class LaboratoryController {
 		pagerObject.put("previousPage", page > 1 ? buildPageUrl(request, page - 1, pageSize) : null);
 		return pagerObject;
 	}
-
+	
 	private String buildPageUrl(HttpServletRequest request, int page, int pageSize) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(request.getRequestURL().toString());
@@ -2049,7 +2138,7 @@ public class LaboratoryController {
 		}
 		return builder.toString();
 	}
-
+	
 	private String encodeUrlValue(String value) {
 		try {
 			return URLEncoder.encode(value, "UTF-8");
@@ -2058,40 +2147,40 @@ public class LaboratoryController {
 			return value;
 		}
 	}
-
+	
 	private ResponseEntity<Map<String, Object>> buildStorageApiErrorResponse(Exception exception) {
 		Map<String, Object> response = new HashMap<String, Object>();
 		Map<String, Object> error = new HashMap<String, Object>();
 		HttpStatus status = resolveStorageExceptionStatus(exception);
 		error.put("code", resolveStorageExceptionCode(status, exception));
 		error.put("message", exception != null && exception.getMessage() != null ? exception.getMessage()
-				: "Unexpected server error");
+		        : "Unexpected server error");
 		error.put("status", status.value());
 		response.put("error", error);
 		return new ResponseEntity<Map<String, Object>>(response, status);
 	}
-
+	
 	private HttpStatus resolveStorageExceptionStatus(Exception exception) {
 		String message = exception != null && exception.getMessage() != null ? exception.getMessage().toLowerCase(
-				Locale.ENGLISH) : "";
+		    Locale.ENGLISH) : "";
 		if (message.contains("already exists") || message.contains("still associated") || message.contains("still in use")
-				|| message.contains("still has child") || message.contains("currently occupied")
-				|| message.contains("already occupied") || message.contains("no final sample position level is configured")) {
+		        || message.contains("still has child") || message.contains("currently occupied")
+		        || message.contains("already occupied") || message.contains("no final sample position level is configured")) {
 			return HttpStatus.CONFLICT;
 		}
 		if (message.contains("does not exist") || message.contains("not found")) {
 			return HttpStatus.NOT_FOUND;
 		}
 		if (message.contains("is required") || message.contains("details are required") || message.contains("invalid")
-				|| message.contains("not a slot")) {
+		        || message.contains("not a slot")) {
 			return HttpStatus.BAD_REQUEST;
 		}
 		return HttpStatus.INTERNAL_SERVER_ERROR;
 	}
-
+	
 	private String resolveStorageExceptionCode(HttpStatus status, Exception exception) {
 		String message = exception != null && exception.getMessage() != null ? exception.getMessage().toLowerCase(
-				Locale.ENGLISH) : "";
+		    Locale.ENGLISH) : "";
 		if (status == HttpStatus.CONFLICT) {
 			if (message.contains("no final sample position level is configured")) {
 				return "FINAL_POSITION_LEVEL_NOT_CONFIGURED";
@@ -2133,5 +2222,29 @@ public class LaboratoryController {
 		}
 		return "INTERNAL_SERVER_ERROR";
 	}
-
+	
+	private Map<String, Object> buildOperationOutcome(String code, String message, String sampleId) {
+		Map<String, Object> response = new LinkedHashMap<String, Object>();
+		
+		Map<String, Object> error = new LinkedHashMap<String, Object>();
+		error.put("code", code);
+		error.put("message", message);
+		
+		Map<String, Object> details = new LinkedHashMap<String, Object>();
+		details.put("sampleId", sampleId);
+		
+		error.put("details", details);
+		
+		Map<String, Object> meta = new LinkedHashMap<String, Object>();
+		meta.put("apiVersion", "v1");
+		meta.put("timestamp", new Date());
+		
+		response.put("resourceType", "OperationOutcome");
+		response.put("found", false);
+		response.put("error", error);
+		response.put("meta", meta);
+		
+		return response;
+	}
+	
 }
