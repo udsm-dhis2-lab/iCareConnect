@@ -10,7 +10,7 @@ import { set } from "cypress/types/lodash";
   providedIn: "root",
 })
 export class SampleReferralService {
-    private sampleReferralSettings?: any = signal<any>({});
+    private sampleReferralSettings?: any = signal<any>(null);
     
     constructor(
         private httpClient: HttpClient,
@@ -52,6 +52,7 @@ export class SampleReferralService {
                     console.warn("No referral form settings found for sample referral module");
                 }
                 this.sampleReferralSettings.set(settings);
+                console.log("Referral form settings for sample referral module: ", typeof this.sampleReferralSettings());
             })
         )
     }
@@ -63,6 +64,7 @@ export class SampleReferralService {
                 await this.getReferralSettings().toPromise();
             }, 0);
         }
+
 
         return this.sampleReferralSettings();
     }

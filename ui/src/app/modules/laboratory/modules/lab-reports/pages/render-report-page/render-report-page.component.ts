@@ -92,8 +92,6 @@ export class RenderReportPageComponent implements OnInit {
     }
     this.dateChanged = false;
 
-    console.log("Selected period:", this.startDate, this.endDate);
-
     setTimeout(() => {
       this.selectionDates = {
         startDate: moment(formatDateToYYMMDD(this.startDate))
