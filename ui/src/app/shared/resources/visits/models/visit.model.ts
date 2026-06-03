@@ -213,7 +213,7 @@ export class Visit {
       (this.encounters || []).map((encounter) => encounter?.orders)
     )
       .filter(
-        (order) =>
+        (order: any) =>
           order?.orderType?.uuid === "BIL00000IIIIIIIIIIIIIIIIIIIIIIIOTYPE"
       )
       .map((order) => new DrugOrder(order, this.bills, this.payments));
@@ -224,7 +224,7 @@ export class Visit {
       (this.encounters || []).map((encounter) => encounter?.orders)
     )
       .filter(
-        (order) =>
+        (order: any) =>
           order && order.orderType?.display.toLowerCase() === "prescription"
       )
       .map((order) => new DrugOrder(order, this.bills, this.payments));
@@ -279,7 +279,7 @@ export class Visit {
       })
     )
       .filter(
-        (order) =>
+        (order: any) =>
           order &&
           order.type === "testorder" &&
           !order?.dateStopped &&
@@ -294,7 +294,7 @@ export class Visit {
       (this.encounters || []).map((encounter) => encounter?.orders)
     )
       .filter(
-        (order) =>
+        (order: any) =>
           order &&
           order?.orderType?.name.toLowerCase() === "radiology order" &&
           !order?.dateStopped &&
@@ -312,7 +312,7 @@ export class Visit {
       })
     )
       .filter(
-        (order) =>
+        (order: any) =>
           order &&
           order?.orderType?.name.toLowerCase() === "procedure order" &&
           !order?.dateStopped &&
@@ -330,7 +330,7 @@ export class Visit {
       })
     )
       .filter(
-        (order) =>
+        (order: any) =>
           order &&
           order?.orderType?.name.toLowerCase() !== "procedure order" &&
           order?.orderType?.name.toLowerCase() !== "radiology order" &&

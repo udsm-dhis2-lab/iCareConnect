@@ -29,9 +29,29 @@
           (dispose)="onDispose($event)"
         ></app-sample-disposal> -->
 
+        <!-- <app-sample-to-print-results
+          [tabType]="'completed-samples'"
+          [codedSampleRejectionReasons]="
+            params?.codedSampleRejectionReasons
+          "
+          [labConfigs]="labConfigs"
+          [datesParameters]="datesParameters"
+          [LISConfigurations]="LISConfigurations"
+          [category]="'HAS_RESULTS'"
+          [hasStatus]="'YES'"
+          [patients]="patients"
+          [sampleTypes]="sampleTypes"
+          [labSamplesDepartments]="labSamplesDepartments"
+          [labSamplesContainers]="labSamplesContainers"
+          [userUuid]="userUuid"
+          [viewType]="'authorization'"
+          (dataToPrint)="onGetDataToPrint($event)"
+        ></app-sample-to-print-results> -->
+
         <app-shared-samples-list
           *ngIf="!shouldRerenderSamplesList"
           [tabType]="'sample-disposal'"
+          [category]="'HAS_RESULTS'"
           [LISConfigurations]="LISConfigurations"
           [labSamplesDepartments]="labSamplesDepartments"
           [externalSystemsReferenceConceptUuid]="
@@ -39,8 +59,10 @@
           "
           [hasStatus]="'YES'"
           [showLegend]="true"
+          [patients]="patients"
           [datesParameters]="datesParameters"
           [excludeAllocations]="true"
+          [viewType]="'authorization'"
           [sampleTypes]="sampleTypes"
           [codedSampleRejectionReasons]="codedSampleRejectionReasons"
           (selectedSampleDetails)="onGetSelectedSampleDetails($event)"

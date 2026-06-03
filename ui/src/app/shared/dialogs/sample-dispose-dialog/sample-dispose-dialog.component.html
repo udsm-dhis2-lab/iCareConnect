@@ -1,0 +1,127 @@
+<h2 mat-dialog-title>Dispose sample</h2>
+
+<mat-dialog-content class="sample-dispose-dialog-content">
+  <div class="sample-dispose-dialog-shell">
+    <aside class="dialog-side-panel dialog-side-panel--summary">
+      <div class="sample-summary-card sample-summary-card--danger">
+        <div class="summary-card-header">
+          <p class="section-kicker">Sample summary</p>
+          <span class="summary-badge summary-badge--danger">Disposal flow</span>
+        </div>
+
+        <div class="summary-stack">
+          <div class="summary-item">
+            <span class="summary-label">Laboratory No.</span>
+            <span class="summary-value">{{ sample?.label || '-' }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Specimen</span>
+            <span class="summary-value">{{ sample?.specimenSource?.name || sample?.specimenSource?.display || '-' }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Current state</span>
+            <span class="summary-value">{{ currentOccupancy ? 'Currently stored' : 'Awaiting disposal' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <div class="summary-item">
+          <span class="summary-label">Current storage path</span>
+          <span class="summary-value">{{ summaryPath }}</span>
+        </div>
+        <div class="summary-item" *ngIf="currentOccupancy?.storedAt">
+          <span class="summary-label">Stored on</span>
+          <span class="summary-value">{{ currentOccupancy?.storedAt | date: 'medium' }}</span>
+        </div>
+      </div>
+    </aside>
+
+    <section class="dialog-main-panel">
+      <mat-progress-bar *ngIf="loadingSummary" mode="indeterminate"></mat-progress-bar>
+
+      <div class="dispose-main-layout">
+        <section class="storage-context-card">
+          <div class="summary-card-header">
+            <p class="section-kicker">Current storage summary</p>
+            <span class="summary-badge">{{ currentOccupancy ? 'Stored' : 'No active slot' }}</span>
+          </div>
+
+          <ng-container *ngIf="currentOccupancy; else noStorageState">
+            <div class="summary-stack">
+              <div class="summary-item">
+                <span class="summary-label">Prepared position</span>
+                <span class="summary-value">{{ currentOccupancy?.slotLocation?.name || '-' }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="summary-label">Full path</span>
+                <span class="summary-value">{{ currentOccupancy?.fullAddress || currentOccupancy?.slotLocation?.pathLabel || '-' }}</span>
+              </div>
+              <div class="summary-item" *ngIf="currentOccupancy?.remarks">
+                <span class="summary-label">Storage remarks</span>
+                <span class="summary-value">{{ currentOccupancy?.remarks }}</span>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-template #noStorageState>
+            <div class="empty-storage-state">
+              The sample is not currently assigned to an active prepared position.
+            </div>
+          </ng-template>
+        </section>
+
+        <form [formGroup]="form" class="dispose-form-card">
+          <div class="summary-card-header">
+            <p class="section-kicker">Disposal details</p>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Disposal method</mat-label>
+            <mat-select formControlName="disposalMethod">
+              <mat-option *ngFor="let method of disposalMethods" [value]="method">{{ method }}</mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('disposalMethod')?.hasError('required')">
+              Disposal method is required.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Reason for disposal</mat-label>
+            <textarea
+              matInput
+              rows="4"
+              formControlName="disposalReason"
+              placeholder="Describe why the sample is being disposed"
+            ></textarea>
+            <mat-error *ngIf="form.get('disposalReason')?.hasError('required')">
+              Disposal reason is required.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Additional note (optional)</mat-label>
+            <textarea
+              matInput
+              rows="4"
+              formControlName="remarks"
+              placeholder="Optional disposal note"
+            ></textarea>
+          </mat-form-field>
+        </form>
+      </div>
+
+      <div *ngIf="errorMessage" class="dialog-error-state">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage }}</span>
+      </div>
+    </section>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="sample-dispose-dialog-actions">
+  <button mat-stroked-button type="button" (click)="close()" [disabled]="saving">Close</button>
+  <button mat-flat-button color="warn" type="button" (click)="save()" [disabled]="saving || loadingSummary">
+    Dispose sample
+  </button>
+</mat-dialog-actions>

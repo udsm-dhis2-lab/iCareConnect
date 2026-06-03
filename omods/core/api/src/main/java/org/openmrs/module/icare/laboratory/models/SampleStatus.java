@@ -116,34 +116,53 @@ public class SampleStatus { // implements java.io.Serializable {
 	public static SampleStatus fromMap(Map<String, Object> map) throws ParseException {
 		SampleStatus sampleStatus = new SampleStatus();
 		
-		Sample sample = new Sample();
-		sample.setUuid(((Map) map.get("sample")).get("uuid").toString());
-		sampleStatus.setSample(sample);
+		if (map == null) {
+			return sampleStatus;
+		}
 		
-		User user = new User();
-		user.setUuid(((Map) map.get("user")).get("uuid").toString());
-		sampleStatus.setUser(user);
+		if (map.get("sample") != null && map.get("sample") instanceof Map) {
+			Sample sample = new Sample();
+			Object sampleUuid = ((Map) map.get("sample")).get("uuid");
+			if (sampleUuid != null) {
+				sample.setUuid(sampleUuid.toString());
+			}
+			sampleStatus.setSample(sample);
+		}
 		
-		sampleStatus.setStatus((map.get("status")).toString());
-		sampleStatus.setRemarks((map.get("remarks")).toString());
+		if (map.get("user") != null && map.get("user") instanceof Map) {
+			User user = new User();
+			Object userUuid = ((Map) map.get("user")).get("uuid");
+			if (userUuid != null) {
+				user.setUuid(userUuid.toString());
+			}
+			sampleStatus.setUser(user);
+		}
+		
+		if (map.get("status") != null) {
+			sampleStatus.setStatus(map.get("status").toString());
+		}
+		if (map.get("remarks") != null) {
+			sampleStatus.setRemarks(map.get("remarks").toString());
+		}
 		if (map.get("category") != null) {
-			sampleStatus.setCategory((map.get("category")).toString());
+			sampleStatus.setCategory(map.get("category").toString());
 		}
 		if (map.get("retired") != null) {
-			sampleStatus.setRetired((Boolean) map.get("retired"));
+			if (map.get("retired") instanceof Boolean) {
+				sampleStatus.setRetired((Boolean) map.get("retired"));
+			} else {
+				sampleStatus.setRetired(Boolean.parseBoolean(map.get("retired").toString()));
+			}
 		}
 		if (map.get("timestamp") == null) {
-			
 			sampleStatus.setTimestamp(new Date());
-			
+		} else if (map.get("timestamp") instanceof Date) {
+			sampleStatus.setTimestamp((Date) map.get("timestamp"));
 		} else {
-			
 			String dateString = map.get("timestamp").toString();
-			
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 			Date parsedDate = dateFormat.parse(dateString);
 			sampleStatus.setTimestamp(parsedDate);
-			
 		}
 		
 		return sampleStatus;

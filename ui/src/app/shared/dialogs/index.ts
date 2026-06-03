@@ -10,6 +10,8 @@ import { VisitConsultationStatusModalComponent } from "./visit-consultation-stat
 import { SharedPdfPreviewComponent } from "./shared-pdf-preview/shared-pdf-preview.component";
 import { ManageReportsModalComponent } from "./manage-reports-modal/manage-reports-modal.component";
 import { SharedRemotePatientHistoryModalComponent } from "./shared-remote-patient-history-modal/shared-remote-patient-history-modal.component";
+import { SampleStoreDialogComponent } from "./sample-store-dialog/sample-store-dialog.component";
+import { SampleDisposeDialogComponent } from "./sample-dispose-dialog/sample-dispose-dialog.component";
 
 export const sharedDialogs: any[] = [
   PatientListDialogComponent,
@@ -24,9 +26,13 @@ export const sharedDialogs: any[] = [
   SharedPdfPreviewComponent,
   ManageReportsModalComponent,
   SharedRemotePatientHistoryModalComponent,
+  SampleStoreDialogComponent,
+  SampleDisposeDialogComponent
 ];
 export {
   PatientListDialogComponent,
+  SampleStoreDialogComponent,
+  SampleDisposeDialogComponent,
   DispensingFormComponent,
   ShortMessageConstructionComponent,
 };

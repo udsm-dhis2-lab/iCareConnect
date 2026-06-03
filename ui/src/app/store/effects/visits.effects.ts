@@ -111,12 +111,12 @@ export class VisitsEffects {
               // const groupedOrders = _.groupBy(response, 'identifier');
               const formattedData = patientsMergedWithOrders.map(
                 (patientInfo) => {
-                  const reCollect =
-                    _.orderBy(
+                  const reCollect: any =
+                    (_.orderBy(
                       _.groupBy(patientInfo['orderedItems'], 'concept_uuid'),
                       ['sample_collection_date'],
                       ['desc']
-                    )[0]?.recollection === 'RECOLLECT'
+                    )[0] as any)?.recollection === 'RECOLLECT'
                       ? true
                       : false;
                   return {

@@ -1,0 +1,1262 @@
+:host {
+  display: block;
+  color: #1d2f3f;
+  font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.dialog-shell {
+  display: flex;
+  flex-direction: column;
+  width: min(1120px, 80vw);
+  max-height: 90vh;
+  background: #fff;
+  overflow: hidden;
+}
+
+.dialog-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 1.25rem 1.5rem 1rem;
+  background: #fff;
+}
+
+.dialog-title-block {
+  min-width: 0;
+}
+
+.dialog-kicker,
+.section-kicker,
+.summary-label {
+  margin: 0;
+  color: #61788f;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.dialog-header h2 {
+  margin: 0.15rem 0 0;
+  color: #17324d;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.dialog-description {
+  max-width: 760px;
+  margin: 0.45rem 0 0;
+  color: #5f7489;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.dialog-mode-badge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: #eef7ff;
+  color: #2c6692;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dialog-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 1.25rem 1.5rem 1rem;
+  background: #f7f9fc;
+}
+
+.preview-summary-card {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(120px, 0.7fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.summary-item {
+  min-width: 0;
+  border: 1px solid #d8e0ea;
+  border-left: 4px solid #2c6692;
+  border-radius: 14px;
+  background: #fff;
+  padding: 14px 16px;
+}
+
+.summary-item strong {
+  display: block;
+  margin-top: 6px;
+  color: #1d2f3f;
+  font-size: 15px;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.summary-item--path strong {
+  font-size: 16px;
+}
+
+.dialog-error-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border: 1px solid #f0c3c3;
+  border-left: 4px solid #c62828;
+  border-radius: 12px;
+  background: #fff4f4;
+  color: #9f4040;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.preview-tabs {
+  border: 1px solid #d8e0ea;
+  border-radius: 16px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.tab-panel {
+  min-height: 380px;
+  padding: 18px;
+}
+
+.preview-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.preview-toolbar h3 {
+  margin: 0.2rem 0 0;
+  color: #1f3448;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.preview-toolbar p:not(.section-kicker) {
+  max-width: 620px;
+  margin: 0.35rem 0 0;
+  color: #61788f;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.preview-toolbar--compact {
+  margin-bottom: 16px;
+}
+
+.layer-panel {
+  min-width: 220px;
+  text-align: right;
+}
+
+.preview-toolbar__label {
+  display: block;
+  margin-bottom: 8px;
+  color: #61788f;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.layer-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.position-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #587086;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border: 1px solid #d0dbe8;
+  border-radius: 4px;
+}
+
+.legend-swatch--prepared {
+  background: #e6f5ec;
+  border-color: #8fc9a7;
+}
+
+.legend-swatch--draft {
+  background: #f8fbff;
+}
+
+.state-block,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  border: 1px dashed #d7e1ec;
+  border-radius: 14px;
+  color: #61788f;
+  text-align: center;
+}
+
+.state-block {
+  gap: 12px;
+}
+
+.empty-state .mat-icon {
+  color: #6a8197;
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+}
+
+.empty-state h3 {
+  margin: 12px 0 4px;
+  color: #1f3448;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.empty-state p,
+.state-block p {
+  margin: 0;
+  color: #61788f;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.layout-grid-shell {
+  overflow: auto;
+  border: 1px dashed #d7e1ec;
+  border-radius: 14px;
+  padding: 12px 12px 24px;
+  scrollbar-gutter: stable;
+}
+
+.layout-grid {
+  display: grid;
+  gap: 10px;
+  min-width: max-content;
+}
+
+.grid-header-corner,
+.grid-column-header,
+.grid-row-header,
+.grid-cell {
+  border-radius: 12px;
+}
+
+.grid-header-corner,
+.grid-column-header,
+.grid-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  background: #eef3fb;
+  color: #4f6479;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.grid-cell {
+  min-height: 76px;
+  border: 1px solid #d5deea;
+  background: #f8fbff;
+  padding: 12px;
+  transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.grid-cell--ready {
+  border-color: #8fc9a7;
+  background: #f2fbf5;
+}
+
+.grid-cell:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(17, 56, 92, 0.08);
+}
+
+.grid-cell__label {
+  color: #1d3550;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.grid-cell__meta {
+  margin-top: 6px;
+  color: #61788f;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.grid-cell__meta--ready {
+  color: #26734d;
+}
+
+.children-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.children-list__item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid #d8e0ea;
+  border-radius: 14px;
+  background: #fbfcfe;
+  padding: 14px 16px;
+}
+
+.child-main {
+  min-width: 0;
+}
+
+.cell-primary {
+  color: #1f3448;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.cell-secondary {
+  margin-top: 3px;
+  color: #61788f;
+  font-size: 13px;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.child-badge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eef1f6;
+  color: #5f7388;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.child-badge--slot {
+  background: #e6f5ec;
+  color: #26734d;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem 1.25rem;
+  background: #fff;
+}
+
+.dialog-actions--sticky {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  border-top: 1px solid #e5ebf2;
+  box-shadow: 0 -8px 20px rgba(17, 56, 92, 0.04);
+}
+
+@media (max-width: 1280px) {
+  .dialog-shell {
+    width: 96vw;
+  }
+}
+
+@media (max-width: 960px) {
+  .preview-summary-card {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .preview-toolbar {
+    flex-direction: column;
+  }
+
+  .layer-panel {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .layer-chips {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 760px) {
+  .dialog-header,
+  .dialog-content,
+  .dialog-actions {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .dialog-header {
+    flex-direction: column;
+  }
+
+  .preview-summary-card {
+    grid-template-columns: 1fr;
+  }
+
+  .children-list__item {
+    flex-direction: column;
+  }
+
+  .dialog-actions button {
+    width: 100%;
+  }
+}
+
+.dialog-shell {
+  --dialog-preferred-width: 1120px;
+}
+
+/* --------------------------------------------------------------------------
+   UX hardening: prevent accidental horizontal scroll, keep dialogs within a
+   practical viewport cap, and support tooltip-based field guidance.
+   -------------------------------------------------------------------------- */
+:host,
+:host * {
+  box-sizing: border-box;
+}
+
+.dialog-shell {
+  width: min(var(--dialog-preferred-width), 80vw) !important;
+  max-width: 80vw;
+  overflow-x: hidden;
+}
+
+.dialog-header,
+.dialog-content,
+.dialog-form,
+.dialog-main-panel,
+.dialog-side-panel,
+.form-card,
+.summary-card,
+.preview-tabs,
+.tab-panel {
+  min-width: 0;
+}
+
+.dialog-header,
+.summary-card-header,
+.section-heading,
+.preview-toolbar,
+.dialog-actions {
+  flex-wrap: wrap;
+}
+
+.dialog-content {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.dialog-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+}
+
+.dialog-grid-span-2 {
+  grid-column: 1 / -1;
+}
+
+.section-helper {
+  max-width: min(100%, 320px);
+  text-align: left;
+}
+
+.field-info-button {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  padding: 0 !important;
+  color: #6a8197;
+}
+
+.field-info-button .mat-icon,
+.field-info-button mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  line-height: 18px;
+}
+
+.field-info-button:hover {
+  color: #2c6692;
+}
+
+::ng-deep .dialog-shell .mat-mdc-form-field,
+::ng-deep .dialog-shell .mat-form-field {
+  min-width: 0;
+}
+
+::ng-deep .dialog-shell .mat-mdc-form-field-infix,
+::ng-deep .dialog-shell .mat-form-field-infix {
+  min-width: 0;
+  width: auto;
+}
+
+@media (max-width: 1180px) {
+  .dialog-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .dialog-shell {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px);
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .dialog-actions button {
+    width: 100%;
+  }
+}
+
+
+/* Keep the preview grid fluid. It should shrink cells before creating a horizontal scrollbar. */
+.layout-grid-shell {
+  overflow-x: hidden;
+}
+
+.layout-grid {
+  width: 100%;
+  min-width: 0;
+}
+
+.grid-header-corner,
+.grid-column-header,
+.grid-row-header,
+.grid-cell {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.grid-column-header,
+.grid-row-header {
+  padding: 8px 6px;
+  font-size: clamp(10px, 0.75vw, 12px);
+}
+
+.grid-cell {
+  padding: 10px 8px;
+}
+
+.grid-cell__label {
+  font-size: clamp(12px, 1vw, 16px);
+}
+
+.grid-cell__meta {
+  font-size: clamp(10px, 0.75vw, 12px);
+}
+
+
+/* --------------------------------------------------------------------------
+   v3 responsive containment hardening
+   --------------------------------------------------------------------------
+   The dialog content is constrained by the Material dialog overlay. The shell
+   therefore uses the available overlay width instead of adding another 80vw
+   width inside it. This prevents the common case where the inner shell becomes
+   80vw plus overlay padding and causes a horizontal scrollbar.
+   -------------------------------------------------------------------------- */
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+:host,
+:host * {
+  box-sizing: border-box;
+}
+
+.dialog-shell {
+  container-type: inline-size;
+  width: min(var(--dialog-preferred-width, 960px), 100%) !important;
+  max-width: min(100%, calc(100vw - 24px)) !important;
+  overflow-x: hidden !important;
+}
+
+.dialog-form,
+.dialog-content,
+.dialog-main-panel,
+.dialog-side-panel,
+.form-card,
+.summary-card,
+.guidance-card,
+.dialog-section,
+.preview-tabs,
+.tab-panel,
+.projection-card,
+.pattern-preview-card,
+.storage-preview-card {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.dialog-content {
+  width: 100%;
+  overflow-x: hidden !important;
+  overflow-y: auto;
+}
+
+.dialog-header,
+.dialog-actions,
+.summary-card-header,
+.section-heading,
+.preview-toolbar,
+.projection-card,
+.pattern-preview-card,
+.storage-preview-card,
+.guidance-card {
+  flex-wrap: wrap;
+}
+
+.dialog-title-block,
+.dialog-description,
+.section-helper,
+.summary-value,
+.cell-primary,
+.cell-secondary,
+.projection-card > div,
+.pattern-preview-card > div,
+.storage-preview-card > div {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.dialog-grid,
+.preview-summary-card {
+  width: 100%;
+  max-width: 100%;
+}
+
+.dialog-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)) !important;
+}
+
+.dialog-grid-span-2 {
+  grid-column: 1 / -1 !important;
+}
+
+.section-helper {
+  max-width: min(100%, 360px);
+  text-align: left;
+}
+
+.field-info-button {
+  flex: 0 0 auto;
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  padding: 0 !important;
+  color: #6a8197;
+}
+
+.field-info-button .mat-icon,
+.field-info-button mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  line-height: 18px;
+}
+
+::ng-deep .dialog-shell .mat-mdc-form-field,
+::ng-deep .dialog-shell .mat-form-field {
+  width: 100%;
+  min-width: 0 !important;
+  max-width: 100%;
+}
+
+::ng-deep .dialog-shell .mat-mdc-form-field-infix,
+::ng-deep .dialog-shell .mat-form-field-infix {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100%;
+}
+
+::ng-deep .dialog-shell .mat-mdc-select-trigger,
+::ng-deep .dialog-shell .mat-mdc-select-value,
+::ng-deep .dialog-shell input,
+::ng-deep .dialog-shell textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@container (max-width: 860px) {
+  .dialog-content {
+    grid-template-columns: 1fr !important;
+  }
+
+  .dialog-grid,
+  .preview-summary-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  .dialog-side-panel,
+  .dialog-main-panel,
+  .form-card,
+  .summary-card {
+    width: 100%;
+  }
+
+  .section-heading,
+  .dialog-header,
+  .preview-toolbar,
+  .children-list__item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .section-helper,
+  .layer-panel {
+    max-width: none;
+    text-align: left;
+  }
+
+  .layer-chips {
+    justify-content: flex-start;
+  }
+}
+
+@container (max-width: 620px) {
+  .dialog-header,
+  .dialog-content,
+  .dialog-actions {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .dialog-header h2 {
+    font-size: 20px;
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .dialog-actions button {
+    width: 100%;
+  }
+}
+
+
+/* Preview dialog specific: allow summaries and grid cells to compress instead
+   of forcing a horizontal scrollbar. */
+.dialog-shell--preview .dialog-content {
+  display: block;
+}
+
+.preview-summary-card {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)) !important;
+}
+
+.layout-grid-shell {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
+.layout-grid {
+  width: 100%;
+  min-width: 0 !important;
+  gap: clamp(4px, 0.7vw, 10px);
+}
+
+.grid-header-corner,
+.grid-column-header,
+.grid-row-header,
+.grid-cell {
+  min-width: 0 !important;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.grid-column-header,
+.grid-row-header {
+  min-height: clamp(32px, 4vw, 46px);
+  padding: 6px 4px;
+  font-size: clamp(9px, 0.8vw, 12px);
+}
+
+.grid-cell {
+  min-height: clamp(48px, 6vw, 76px);
+  padding: clamp(6px, 0.8vw, 12px);
+}
+
+.grid-cell__label,
+.grid-cell__meta {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grid-cell__label {
+  font-size: clamp(11px, 1vw, 16px);
+}
+
+.grid-cell__meta {
+  font-size: clamp(9px, 0.8vw, 12px);
+}
+
+@container (max-width: 720px) {
+  .tab-panel {
+    padding: 12px;
+  }
+
+  .layout-grid-shell {
+    padding: 8px 8px 14px;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   v4 width expansion and no-horizontal-scroll correction
+   --------------------------------------------------------------------------
+   The v3 fallback made the shell 100% of the current Material dialog surface,
+   which allowed Angular Material to keep the dialog narrow. This override makes
+   each dialog request its preferred working width while still respecting the
+   80vw cap and small-screen limits.
+   -------------------------------------------------------------------------- */
+:host {
+  display: block;
+  width: auto;
+  max-width: min(80vw, calc(100vw - 24px));
+  overflow-x: hidden;
+}
+
+.dialog-shell {
+  width: min(var(--dialog-preferred-width, 960px), 80vw, calc(100vw - 24px)) !important;
+  max-width: min(80vw, calc(100vw - 24px)) !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.dialog-content {
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
+.dialog-grid {
+  min-width: 0 !important;
+  max-width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important;
+}
+
+.dialog-grid-span-2 {
+  grid-column: 1 / -1 !important;
+}
+
+.dialog-actions {
+  justify-content: flex-end;
+}
+
+@media (max-width: 960px) {
+  :host {
+    max-width: calc(100vw - 24px);
+  }
+
+  .dialog-shell {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .dialog-actions button {
+    width: 100%;
+  }
+}
+
+
+/* v4 preview grid correction: avoid forcing a bottom horizontal scrollbar. */
+.layout-grid-shell {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
+.layout-grid {
+  width: 100%;
+  min-width: 0 !important;
+}
+
+.grid-column-header,
+.grid-row-header,
+.grid-cell {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.grid-cell__label,
+.grid-cell__meta {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   v5 Material dialog overlay correction
+   --------------------------------------------------------------------------
+   Angular Material controls dialog width from the CDK overlay pane and the
+   MDC dialog surface, not from the inner component alone. The previous shell
+   width could therefore be clipped when the opener kept a narrow default pane.
+
+   These selectors are intentionally scoped to storage-config-dialog shells.
+   They expand the overlay up to the relevant working width, keep the 80vw cap,
+   and make the Material container/surface stretch instead of clipping content.
+   -------------------------------------------------------------------------- */
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.dialog-shell.storage-config-dialog {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  max-height: min(90vh, calc(100vh - 24px));
+  overflow: hidden !important;
+}
+
+.dialog-shell.storage-config-dialog,
+.dialog-shell.storage-config-dialog * {
+  box-sizing: border-box;
+}
+
+.dialog-content,
+.dialog-form,
+.dialog-header,
+.dialog-actions,
+.dialog-side-panel,
+.dialog-main-panel,
+.summary-card,
+.guidance-card,
+.dialog-section,
+.projection-card,
+.pattern-preview-card,
+.preview-tabs,
+.tab-panel {
+  min-width: 0 !important;
+  max-width: 100%;
+}
+
+.dialog-content {
+  overflow-x: hidden !important;
+  overflow-y: auto;
+}
+
+.dialog-grid {
+  width: 100%;
+  min-width: 0 !important;
+  max-width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)) !important;
+}
+
+.dialog-grid-span-2 {
+  grid-column: 1 / -1 !important;
+}
+
+/* Default storage metadata dialogs */
+::ng-deep .cdk-overlay-pane:has(.storage-config-dialog) {
+  width: min(820px, 80vw) !important;
+  max-width: min(80vw, calc(100vw - 24px)) !important;
+  min-width: 0 !important;
+}
+
+/* Wider hierarchy and preview dialogs */
+::ng-deep .cdk-overlay-pane:has(.dialog-shell--wide),
+::ng-deep .cdk-overlay-pane:has(.dialog-shell--preview),
+::ng-deep .cdk-overlay-pane:has(.dialog-shell--storage-location) {
+  width: min(1180px, 80vw) !important;
+}
+
+/* Generate positions dialog */
+::ng-deep .cdk-overlay-pane:has(.dialog-shell--generate-slots) {
+  width: min(940px, 80vw) !important;
+}
+
+/* Location type dialog */
+::ng-deep .cdk-overlay-pane:has(.dialog-shell--location-type) {
+  width: min(980px, 80vw) !important;
+}
+
+/* Storage unit dialog */
+::ng-deep .cdk-overlay-pane:has(.dialog-shell--storage-unit) {
+  width: min(860px, 80vw) !important;
+}
+
+/* Small storage type dialog */
+::ng-deep .cdk-overlay-pane:has(.dialog-shell--storage-type) {
+  width: min(680px, 80vw) !important;
+}
+
+::ng-deep .cdk-overlay-pane:has(.storage-config-dialog) .mat-mdc-dialog-container {
+  display: flex !important;
+  position: relative !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  max-height: min(90vh, calc(100vh - 24px)) !important;
+  overflow: hidden !important;
+}
+
+::ng-deep .cdk-overlay-pane:has(.storage-config-dialog) .mdc-dialog__container,
+::ng-deep .cdk-overlay-pane:has(.storage-config-dialog) .mdc-dialog__surface,
+::ng-deep .cdk-overlay-pane:has(.storage-config-dialog) .mat-mdc-dialog-surface {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  max-height: min(90vh, calc(100vh - 24px)) !important;
+}
+
+::ng-deep .cdk-overlay-pane:has(.storage-config-dialog) .mdc-dialog__surface,
+::ng-deep .cdk-overlay-pane:has(.storage-config-dialog) .mat-mdc-dialog-surface {
+  overflow: hidden !important;
+  border-radius: 16px;
+}
+
+@media (max-width: 960px) {
+  ::ng-deep .cdk-overlay-pane:has(.storage-config-dialog) {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .dialog-header,
+  .dialog-content,
+  .dialog-actions {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse !important;
+    align-items: stretch !important;
+  }
+
+  .dialog-actions button {
+    width: 100%;
+  }
+}
+
+/* v5 preview grid containment: keep grid inside dialog; truncate long labels instead of scrolling. */
+.layout-grid-shell {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
+.layout-grid {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100%;
+}
+
+.grid-column-header,
+.grid-row-header,
+.grid-cell {
+  min-width: 0 !important;
+}
+
+.grid-cell__label,
+.grid-cell__meta,
+.cell-primary,
+.cell-secondary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   v7 form-help spacing + fixed side information panel
+   --------------------------------------------------------------------------
+   1. Material hints/errors are allowed to occupy natural height, avoiding
+      overlap with the next form field.
+   2. On dialogs with a left summary/guide panel, the left panel stays visible
+      while the main form area scrolls. The side panel gets its own vertical
+      scroll only when its content is taller than the available dialog height.
+   -------------------------------------------------------------------------- */
+.dialog-shell.storage-config-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: min(90vh, calc(100vh - 24px)) !important;
+}
+
+.dialog-shell.storage-config-dialog .dialog-form {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.dialog-shell.storage-config-dialog .dialog-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: stretch;
+  overscroll-behavior: contain;
+}
+
+.dialog-shell.storage-config-dialog .dialog-content:has(.dialog-side-panel) {
+  overflow: hidden !important;
+}
+
+.dialog-shell.storage-config-dialog .dialog-content:not(:has(.dialog-side-panel)) {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.dialog-shell.storage-config-dialog .dialog-side-panel,
+.dialog-shell.storage-config-dialog .dialog-main-panel {
+  min-height: 0;
+  max-height: 100%;
+  overscroll-behavior: contain;
+}
+
+.dialog-shell.storage-config-dialog .dialog-side-panel {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.dialog-shell.storage-config-dialog .dialog-main-panel {
+  align-self: stretch;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.dialog-shell.storage-config-dialog .dialog-grid {
+  row-gap: 24px !important;
+}
+
+.dialog-shell.storage-config-dialog .mat-mdc-form-field,
+.dialog-shell.storage-config-dialog .mat-form-field {
+  margin-bottom: 6px;
+}
+
+::ng-deep .dialog-shell.storage-config-dialog .mat-mdc-form-field-subscript-wrapper,
+::ng-deep .dialog-shell.storage-config-dialog .mat-form-field-subscript-wrapper {
+  position: static !important;
+  min-height: 20px;
+  overflow: visible !important;
+  line-height: 1.35;
+}
+
+::ng-deep .dialog-shell.storage-config-dialog .mat-mdc-form-field-hint-wrapper,
+::ng-deep .dialog-shell.storage-config-dialog .mat-mdc-form-field-error-wrapper,
+::ng-deep .dialog-shell.storage-config-dialog .mat-form-field-hint-wrapper,
+::ng-deep .dialog-shell.storage-config-dialog .mat-form-field-error-wrapper {
+  position: static !important;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 4px 12px 0;
+  line-height: 1.35;
+  transform: none !important;
+}
+
+::ng-deep .dialog-shell.storage-config-dialog .mat-mdc-form-field-hint,
+::ng-deep .dialog-shell.storage-config-dialog .mat-mdc-form-field-error,
+::ng-deep .dialog-shell.storage-config-dialog .mat-hint,
+::ng-deep .dialog-shell.storage-config-dialog .mat-error {
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+
+::ng-deep .dialog-shell.storage-config-dialog .mat-mdc-form-field-bottom-align::before {
+  display: none !important;
+}
+
+.dialog-shell.storage-config-dialog .field-info-button {
+  opacity: 0.82;
+}
+
+.dialog-shell.storage-config-dialog .field-info-button:focus-visible {
+  outline: 2px solid rgba(44, 102, 146, 0.35);
+  outline-offset: 2px;
+}
+
+@container (max-width: 860px) {
+  .dialog-shell.storage-config-dialog .dialog-content:has(.dialog-side-panel) {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .dialog-shell.storage-config-dialog .dialog-side-panel,
+  .dialog-shell.storage-config-dialog .dialog-main-panel {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 960px) {
+  .dialog-shell.storage-config-dialog .dialog-content:has(.dialog-side-panel) {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .dialog-shell.storage-config-dialog .dialog-side-panel,
+  .dialog-shell.storage-config-dialog .dialog-main-panel {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}

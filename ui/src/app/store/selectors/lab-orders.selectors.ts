@@ -50,8 +50,8 @@ export const getLabOrdersKeyedByConceptUuid = createSelector(
 export const getFailedLabOrders = createSelector(
   getLabOrdersState,
   (state: LabOrdersState) => {
-    const keyedByConceptOrders = {};
-    _.each(state.failedOrders, (order) => {
+    const keyedByConceptOrders: any = {};
+    _.each(state.failedOrders, (order: any) => {
       keyedByConceptOrders[order?.concept] = order;
     });
     return keyedByConceptOrders;

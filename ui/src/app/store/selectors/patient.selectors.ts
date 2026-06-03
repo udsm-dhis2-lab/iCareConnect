@@ -62,7 +62,7 @@ export const getSamplesToCollectSelector = createSelector(
 
     let collectedOrders = [];
     let ordersNotCollectedGroupedBySpecimenType = [];
-    _.map(ordersGroupedBySamples, (groupedOrders) => {
+    _.map(ordersGroupedBySamples, (groupedOrders: any) => {
       let items = [];
       let ordersNotCollected = [];
       _.map(groupedOrders?.items, (order) => {
@@ -120,7 +120,7 @@ export const getSamplesCollectedSelector = createSelector(
       props?.uuid
     );
     let ordersCollectedGroupedBySpecimenType = [];
-    _.map(ordersGroupedBySamples, (groupedOrders) => {
+    _.map(ordersGroupedBySamples, (groupedOrders: any) => {
       let orders = [];
       _.map(groupedOrders?.items, (order) => {
         if (order?.sampleCollection?.status == 'Collected') {

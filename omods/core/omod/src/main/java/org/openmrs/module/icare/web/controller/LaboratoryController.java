@@ -1,16 +1,15 @@
 package org.openmrs.module.icare.web.controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.openmrs.Concept;
 import org.openmrs.ConceptMap;
@@ -39,6 +38,12 @@ import org.openmrs.module.icare.laboratory.models.BatchSet;
 import org.openmrs.module.icare.laboratory.models.BatchSetStatus;
 import org.openmrs.module.icare.laboratory.models.BatchStatus;
 import org.openmrs.module.icare.laboratory.models.Result;
+import org.openmrs.module.icare.laboratory.models.Storage;
+import org.openmrs.module.icare.laboratory.models.StorageLocation;
+import org.openmrs.module.icare.laboratory.models.StorageLocationType;
+import org.openmrs.module.icare.laboratory.models.StorageType;
+import org.openmrs.module.icare.laboratory.models.SampleStorageOccupancy;
+import org.openmrs.module.icare.laboratory.models.SampleDisposalRecord;
 import org.openmrs.module.icare.laboratory.models.Sample;
 import org.openmrs.module.icare.laboratory.models.SampleExt;
 import org.openmrs.module.icare.laboratory.models.SampleLable;
@@ -60,6 +65,8 @@ import org.openmrs.module.icare.laboratory.models.WorksheetStatus;
 import org.openmrs.module.icare.laboratory.services.LaboratoryService;
 import org.openmrs.module.webservices.rest.web.RestConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,6 +75,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.net.URLEncoder;
 
 @Controller
 @RequestMapping(value = "/rest/" + RestConstants.VERSION_1 + "/lab")
@@ -100,7 +109,7 @@ public class LaboratoryController {
 	@RequestMapping(value = "visit", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> getPendingVisit(@RequestParam(defaultValue = "100") Integer limit,
-			@RequestParam(defaultValue = "0") Integer startIndex) {
+	                                           @RequestParam(defaultValue = "0") Integer startIndex) {
 
 		List<Visit> visits = laboratoryService.getSamplePendingVisits(limit, startIndex);
 
@@ -724,7 +733,7 @@ public class LaboratoryController {
 	}
 	
 	private Map<String, Object> createResultMap(Concept parameter, Map<String, Object> observation,
-			TestAllocation testAllocation) {
+	                                            TestAllocation testAllocation) {
 		Map<String, Object> result = new HashMap<>();
 		result.put("abnormal", false);
 		Map<String, Object> parameterConcept = new HashMap<>();
@@ -1512,7 +1521,7 @@ public class LaboratoryController {
 	@RequestMapping(value = "associatedfields", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Map<String, Object>> getAssociatedFields(@RequestParam(required = false, value = "q") String q,
-			@RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) {
+	                                                     @RequestParam(defaultValue = "0") Integer startIndex, @RequestParam(defaultValue = "100") Integer limit) {
 
 		List<Map<String, Object>> responseAssociatedFields = new ArrayList<>();
 
@@ -1623,4 +1632,657 @@ public class LaboratoryController {
 
 		return associatedFieldResultListMap;
 	}
+	
+	@RequestMapping(value = "storagetype", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> addStorageType(@RequestBody Map<String, Object> storageTypeObject) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.addStorageType(
+			    StorageType.fromMap(storageTypeObject)).toMap(), HttpStatus.CREATED);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = { "storagetype", "storagetypes" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> getStorageTypes(HttpServletRequest request,
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(value = "q", required = false) String q) {
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+		ListResult<StorageType> results = laboratoryService.getStorageTypes(pager, q);
+		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+		for (StorageType storageType : results.getResults()) {
+			items.add(storageType.toMap());
+		}
+		Map<String, Object> response = new HashMap<String, Object>();
+		response.put("pager", buildPagerMap(request, pager));
+		response.put("storageTypes", items);
+		return response;
+	}
+	
+	@RequestMapping(value = { "storagetype/{storageTypeUuid}", "storagetypes/{storageTypeUuid}" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getStorageTypeByUuid(@PathVariable("storageTypeUuid") String storageTypeUuid) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.getStorageTypeByUuid(storageTypeUuid).toMap(),
+			        HttpStatus.OK);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = { "storagetype/{storageTypeUuid}", "storagetypes/{storageTypeUuid}" }, method = {
+	        RequestMethod.POST, RequestMethod.PUT }, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> updateStorageType(@PathVariable("storageTypeUuid") String storageTypeUuid,
+	        @RequestBody Map<String, Object> storageTypeObject) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.updateStorageType(storageTypeUuid,
+			    StorageType.fromMap(storageTypeObject)).toMap(), HttpStatus.OK);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = { "storagetype/{storageTypeUuid}", "storagetypes/{storageTypeUuid}" }, method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<?> deleteStorageType(@PathVariable("storageTypeUuid") String storageTypeUuid,
+	        @RequestParam(value = "reason", required = false) String reason) {
+		try {
+			laboratoryService.deleteStorageType(storageTypeUuid, reason);
+			return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = "storage", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> addStorage(@RequestBody Map<String, Object> storageObject) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.addStorage(Storage.fromMap(storageObject))
+			        .toMap(), HttpStatus.CREATED);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = { "storage", "storages" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> getStorages(HttpServletRequest request,
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(value = "q", required = false) String q,
+	        @RequestParam(value = "storageTypeUuid", required = false) String storageTypeUuid) {
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+		ListResult<Storage> results = laboratoryService.getStorages(pager, q, storageTypeUuid);
+		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+		for (Storage storage : results.getResults()) {
+			items.add(storage.toMap());
+		}
+		Map<String, Object> response = new HashMap<String, Object>();
+		response.put("pager", buildPagerMap(request, pager));
+		response.put("storages", items);
+		return response;
+	}
+	
+	@RequestMapping(value = { "storage/{storageUuid}", "storages/{storageUuid}" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getStorageByUuid(@PathVariable("storageUuid") String storageUuid) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.getStorageByUuid(storageUuid).toMap(),
+			        HttpStatus.OK);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = { "storage/{storageUuid}", "storages/{storageUuid}" }, method = { RequestMethod.POST,
+	        RequestMethod.PUT }, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> updateStorage(@PathVariable("storageUuid") String storageUuid,
+	        @RequestBody Map<String, Object> storageObject) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.updateStorage(storageUuid,
+			    Storage.fromMap(storageObject)).toMap(), HttpStatus.OK);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = { "storage/{storageUuid}", "storages/{storageUuid}" }, method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<?> deleteStorage(@PathVariable("storageUuid") String storageUuid,
+	        @RequestParam(value = "reason", required = false) String reason) {
+		try {
+			laboratoryService.deleteStorage(storageUuid, reason);
+			return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = "storage-location-type", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> addStorageLocationType(@RequestBody Map<String, Object> requestObject) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.addStorageLocationType(
+			    StorageLocationType.fromMap(requestObject)).toMap(), HttpStatus.CREATED);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = { "storage-location-type", "storage-location-types" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> getStorageLocationTypes(HttpServletRequest request,
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(value = "q", required = false) String q) {
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+		ListResult<StorageLocationType> results = laboratoryService.getStorageLocationTypes(pager, q);
+		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+		for (StorageLocationType item : results.getResults()) {
+			items.add(item.toMap());
+		}
+		Map<String, Object> response = new HashMap<String, Object>();
+		response.put("pager", buildPagerMap(request, pager));
+		response.put("storageLocationTypes", items);
+		return response;
+	}
+	
+	@RequestMapping(value = { "storage-location-type/{uuid}", "storage-location-types/{uuid}" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getStorageLocationTypeByUuid(@PathVariable("uuid") String uuid) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.getStorageLocationTypeByUuid(uuid).toMap(),
+			        HttpStatus.OK);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = { "storage-location-type/{uuid}", "storage-location-types/{uuid}" }, method = {
+	        RequestMethod.POST, RequestMethod.PUT }, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> updateStorageLocationType(@PathVariable("uuid") String uuid,
+	        @RequestBody Map<String, Object> requestObject) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.updateStorageLocationType(uuid,
+			    StorageLocationType.fromMap(requestObject)).toMap(), HttpStatus.OK);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = { "storage-location-type/{uuid}", "storage-location-types/{uuid}" }, method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<?> deleteStorageLocationType(@PathVariable("uuid") String uuid,
+	        @RequestParam(value = "reason", required = false) String reason) {
+		try {
+			laboratoryService.deleteStorageLocationType(uuid, reason);
+			return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = "storage-location", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> addStorageLocation(@RequestBody Map<String, Object> requestObject) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.addStorageLocation(
+			    StorageLocation.fromMap(requestObject)).toMap(), HttpStatus.CREATED);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = { "storage-location", "storage-locations" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> getStorageLocations(HttpServletRequest request,
+	        @RequestParam(defaultValue = "true", value = "paging", required = false) boolean paging,
+	        @RequestParam(defaultValue = "50", value = "pageSize", required = false) Integer pageSize,
+	        @RequestParam(defaultValue = "1", value = "page", required = false) Integer page,
+	        @RequestParam(value = "q", required = false) String q,
+	        @RequestParam(value = "parentLocationUuid", required = false) String parentLocationUuid,
+	        @RequestParam(value = "locationTypeUuid", required = false) String locationTypeUuid,
+	        @RequestParam(value = "slotOnly", required = false) Boolean slotOnly) {
+		Pager pager = new Pager();
+		pager.setAllowed(paging);
+		pager.setPageSize(pageSize);
+		pager.setPage(page);
+		ListResult<StorageLocation> results = laboratoryService.getStorageLocations(pager, q, parentLocationUuid,
+		    locationTypeUuid, slotOnly);
+		List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+		for (StorageLocation item : results.getResults()) {
+			items.add(item.toMap());
+		}
+		Map<String, Object> response = new HashMap<String, Object>();
+		response.put("pager", buildPagerMap(request, pager));
+		response.put("storageLocations", items);
+		return response;
+	}
+	
+	@RequestMapping(value = { "storage-location/{uuid}", "storage-locations/{uuid}" }, method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getStorageLocationByUuid(@PathVariable("uuid") String uuid) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.getStorageLocationByUuid(uuid).toMap(),
+			        HttpStatus.OK);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = { "storage-location/{uuid}", "storage-locations/{uuid}" }, method = { RequestMethod.POST,
+	        RequestMethod.PUT }, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> updateStorageLocation(@PathVariable("uuid") String uuid,
+	        @RequestBody Map<String, Object> requestObject) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.updateStorageLocation(uuid,
+			    StorageLocation.fromMap(requestObject)).toMap(), HttpStatus.OK);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = { "storage-location/{uuid}", "storage-locations/{uuid}" }, method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<?> deleteStorageLocation(@PathVariable("uuid") String uuid,
+	        @RequestParam(value = "reason", required = false) String reason) {
+		try {
+			laboratoryService.deleteStorageLocation(uuid, reason);
+			return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = { "storage-location/{uuid}/generate-slots", "storage-locations/{uuid}/generate-slots" }, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> generateStorageSlots(@PathVariable("uuid") String uuid,
+	        @RequestBody(required = false) Map<String, Object> requestObject) {
+		try {
+			Integer rowsCount = requestObject != null && requestObject.get("rowsCount") != null ? Integer
+			        .parseInt(requestObject.get("rowsCount").toString()) : null;
+			Integer columnsCount = requestObject != null && requestObject.get("columnsCount") != null ? Integer
+			        .parseInt(requestObject.get("columnsCount").toString()) : null;
+			Integer layersCount = requestObject != null && requestObject.get("layersCount") != null ? Integer
+			        .parseInt(requestObject.get("layersCount").toString()) : null;
+			String slotPattern = requestObject != null && requestObject.get("slotPattern") != null ? requestObject.get(
+			    "slotPattern").toString() : null;
+			List<Map<String, Object>> locations = new ArrayList<Map<String, Object>>();
+			for (StorageLocation location : laboratoryService.generateStorageLocationSlots(uuid, rowsCount, columnsCount,
+			    layersCount, slotPattern)) {
+				locations.add(location.toMap());
+			}
+			Map<String, Object> response = new HashMap<String, Object>();
+			response.put("generatedCount", locations.size());
+			response.put("storageLocations", locations);
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = "sample-storage/store", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> storeSample(@RequestBody Map<String, Object> requestObject) {
+		try {
+			String sampleUuid = requestObject.get("sampleUuid").toString();
+			String slotLocationUuid = requestObject.get("slotLocationUuid").toString();
+			String occupancyType = requestObject.get("occupancyType") != null ? requestObject.get("occupancyType")
+			        .toString() : null;
+			Double quantityStored = requestObject.get("quantityStored") != null ? Double.valueOf(requestObject.get(
+			    "quantityStored").toString()) : null;
+			String quantityUnit = requestObject.get("quantityUnit") != null ? requestObject.get("quantityUnit").toString()
+			        : null;
+			String remarks = requestObject.get("remarks") != null ? requestObject.get("remarks").toString() : null;
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.storeSample(sampleUuid, slotLocationUuid,
+			    occupancyType, quantityStored, quantityUnit, remarks).toMap(), HttpStatus.CREATED);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = "sample-storage/move", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> moveStoredSample(@RequestBody Map<String, Object> requestObject) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.moveStoredSample(
+			    requestObject.get("sampleUuid").toString(), requestObject.get("slotLocationUuid").toString(),
+			    requestObject.get("remarks") != null ? requestObject.get("remarks").toString() : null).toMap(),
+			        HttpStatus.OK);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = "sample-storage/release", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> releaseStoredSample(@RequestBody Map<String, Object> requestObject) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.releaseStoredSample(
+			    requestObject.get("sampleUuid").toString(),
+			    requestObject.get("releaseReason") != null ? requestObject.get("releaseReason").toString() : null).toMap(),
+			        HttpStatus.OK);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = "sample-disposal/dispose", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> disposeSample(@RequestBody Map<String, Object> requestObject) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.disposeSample(
+			    requestObject.get("sampleUuid").toString(),
+			    requestObject.get("disposalMethod") != null ? requestObject.get("disposalMethod").toString() : null,
+			    requestObject.get("disposalReason") != null ? requestObject.get("disposalReason").toString() : null,
+			    requestObject.get("remarks") != null ? requestObject.get("remarks").toString() : null).toMap(),
+			        HttpStatus.CREATED);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = "sample-storage/sample/{sampleUuid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getSampleStorageSummary(@PathVariable("sampleUuid") String sampleUuid) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.getSampleStorageSummary(sampleUuid),
+			        HttpStatus.OK);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	@RequestMapping(value = "sample-storage/slot/{slotLocationUuid}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getSlotOccupancySummary(
+	        @PathVariable("slotLocationUuid") String slotLocationUuid) {
+		try {
+			return new ResponseEntity<Map<String, Object>>(laboratoryService.getSlotOccupancySummary(slotLocationUuid),
+			        HttpStatus.OK);
+		}
+		catch (Exception exception) {
+			return buildStorageApiErrorResponse(exception);
+		}
+	}
+	
+	//	@RequestMapping(value = "samplelookup", method = RequestMethod.GET)
+	//	@ResponseBody
+	//	public ResponseEntity<Map<String, Object>> getSampleByLabel(
+	//			@RequestParam(value = "sampleId", required = true) String sampleId) throws Exception {
+	//
+	//		Sample sample = laboratoryService.getSampleById(sampleId);
+	//
+	//		if (sample == null || sample.getUuid() == null) {
+	//			Map<String, Object> response = new HashMap<>();
+	//			response.put("found", false);
+	//			response.put("sampleId", sampleId);
+	//			response.put("message", "No sample found with the provided sample ID/barcode.");
+	//			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+	//		}
+	//
+	//		Map<String, Object> response = new HashMap<>();
+	//		response.put("found", true);
+	//		response.put("uuid", sample.getUuid());
+	//		response.put("label", sample.getLabel());
+	//
+	//		return new ResponseEntity<>(response, HttpStatus.OK);
+	//	}
+	
+	@RequestMapping(value = "samplelookup", method = RequestMethod.GET)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getSampleLookup(
+	        @RequestParam(value = "sampleId", required = false) String sampleId) throws Exception {
+		
+		if (sampleId == null || sampleId.trim().equals("")) {
+			return new ResponseEntity<Map<String, Object>>(buildOperationOutcome("SAMPLE_ID_REQUIRED",
+			    "Sample ID/barcode is required.", sampleId), HttpStatus.BAD_REQUEST);
+		}
+		
+		try {
+			Sample sample = laboratoryService.getSampleById(sampleId.trim());
+			
+			if (sample == null || sample.getUuid() == null) {
+				return new ResponseEntity<Map<String, Object>>(buildOperationOutcome("SAMPLE_NOT_FOUND",
+				    "No active sample was found with the provided sample ID/barcode.", sampleId), HttpStatus.NOT_FOUND);
+			}
+			
+			Map<String, Object> response = new LinkedHashMap<String, Object>();
+			
+			Map<String, Object> lookup = new LinkedHashMap<String, Object>();
+			lookup.put("type", "sampleLabel");
+			lookup.put("value", sampleId.trim());
+			lookup.put("matchedBy", "exact-label");
+			
+			Map<String, Object> sampleObject = new LinkedHashMap<String, Object>();
+			sampleObject.put("uuid", sample.getUuid());
+			sampleObject.put("label", sample.getLabel());
+			sampleObject.put("voided", sample.getVoided());
+			
+			String encodedSampleId = URLEncoder.encode(sampleId.trim(), "UTF-8");
+			
+			Map<String, Object> links = new LinkedHashMap<String, Object>();
+			links.put("self", "/openmrs/ws/rest/v1/lab/samplelookup?sampleId=" + encodedSampleId);
+			links.put("sample", "/openmrs/ws/rest/v1/lab/sample/" + sample.getUuid());
+			links.put("allocations", "/openmrs/ws/rest/v1/lab/allocationsbysample?uuid=" + sample.getUuid());
+			
+			Map<String, Object> meta = new LinkedHashMap<String, Object>();
+			meta.put("apiVersion", "v1");
+			meta.put("timestamp", new Date());
+			
+			response.put("resourceType", "SampleLookup");
+			response.put("found", true);
+			response.put("lookup", lookup);
+			response.put("sample", sampleObject);
+			response.put("links", links);
+			response.put("meta", meta);
+			
+			/*
+			 * Optional backward-compatible fields.
+			 * Keep these if any existing client already reads response.uuid or response.label.
+			 */
+			response.put("uuid", sample.getUuid());
+			response.put("label", sample.getLabel());
+			
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+			
+		}
+		catch (IllegalStateException duplicateException) {
+			return new ResponseEntity<Map<String, Object>>(buildOperationOutcome("DUPLICATE_SAMPLE_LABEL",
+			    "More than one active sample exists with the same sample ID/barcode.", sampleId), HttpStatus.CONFLICT);
+		}
+	}
+	
+	private Map<String, Object> buildPagerMap(HttpServletRequest request, Pager pager) {
+		Map<String, Object> pagerObject = new HashMap<String, Object>();
+		int page = pager != null ? pager.getPage() : 1;
+		int pageSize = pager != null ? pager.getPageSize() : 50;
+		int total = pager != null ? pager.getTotal() : 0;
+		int pageCount = pageSize > 0 ? (int) Math.ceil((double) total / (double) pageSize) : 1;
+		if (pageCount <= 0) {
+			pageCount = 1;
+		}
+		pagerObject.put("page", page);
+		pagerObject.put("pageSize", pageSize);
+		pagerObject.put("total", total);
+		pagerObject.put("pageCount", pageCount);
+		pagerObject.put("nextPage", page < pageCount ? buildPageUrl(request, page + 1, pageSize) : null);
+		pagerObject.put("previousPage", page > 1 ? buildPageUrl(request, page - 1, pageSize) : null);
+		return pagerObject;
+	}
+	
+	private String buildPageUrl(HttpServletRequest request, int page, int pageSize) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(request.getRequestURL().toString());
+		builder.append("?page=").append(page);
+		builder.append("&pageSize=").append(pageSize);
+		Map<String, String[]> parameterMap = request.getParameterMap();
+		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+			String key = entry.getKey();
+			if ("page".equals(key) || "pageSize".equals(key)) {
+				continue;
+			}
+			String[] values = entry.getValue();
+			if (values == null) {
+				continue;
+			}
+			for (String value : values) {
+				if (value != null && !value.trim().equals("")) {
+					builder.append("&").append(encodeUrlValue(key)).append("=").append(encodeUrlValue(value));
+				}
+			}
+		}
+		return builder.toString();
+	}
+	
+	private String encodeUrlValue(String value) {
+		try {
+			return URLEncoder.encode(value, "UTF-8");
+		}
+		catch (UnsupportedEncodingException e) {
+			return value;
+		}
+	}
+	
+	private ResponseEntity<Map<String, Object>> buildStorageApiErrorResponse(Exception exception) {
+		Map<String, Object> response = new HashMap<String, Object>();
+		Map<String, Object> error = new HashMap<String, Object>();
+		HttpStatus status = resolveStorageExceptionStatus(exception);
+		error.put("code", resolveStorageExceptionCode(status, exception));
+		error.put("message", exception != null && exception.getMessage() != null ? exception.getMessage()
+		        : "Unexpected server error");
+		error.put("status", status.value());
+		response.put("error", error);
+		return new ResponseEntity<Map<String, Object>>(response, status);
+	}
+	
+	private HttpStatus resolveStorageExceptionStatus(Exception exception) {
+		String message = exception != null && exception.getMessage() != null ? exception.getMessage().toLowerCase(
+		    Locale.ENGLISH) : "";
+		if (message.contains("already exists") || message.contains("still associated") || message.contains("still in use")
+		        || message.contains("still has child") || message.contains("currently occupied")
+		        || message.contains("already occupied") || message.contains("no final sample position level is configured")) {
+			return HttpStatus.CONFLICT;
+		}
+		if (message.contains("does not exist") || message.contains("not found")) {
+			return HttpStatus.NOT_FOUND;
+		}
+		if (message.contains("is required") || message.contains("details are required") || message.contains("invalid")
+		        || message.contains("not a slot")) {
+			return HttpStatus.BAD_REQUEST;
+		}
+		return HttpStatus.INTERNAL_SERVER_ERROR;
+	}
+	
+	private String resolveStorageExceptionCode(HttpStatus status, Exception exception) {
+		String message = exception != null && exception.getMessage() != null ? exception.getMessage().toLowerCase(
+		    Locale.ENGLISH) : "";
+		if (status == HttpStatus.CONFLICT) {
+			if (message.contains("no final sample position level is configured")) {
+				return "FINAL_POSITION_LEVEL_NOT_CONFIGURED";
+			}
+			if (message.contains("storage location type")) {
+				return "STORAGE_LOCATION_TYPE_CONFLICT";
+			}
+			if (message.contains("storage location")) {
+				return "STORAGE_LOCATION_CONFLICT";
+			}
+			if (message.contains("storage type") && message.contains("still")) {
+				return "STORAGE_TYPE_IN_USE";
+			}
+			if (message.contains("slot")) {
+				return "SLOT_OCCUPIED";
+			}
+			return "CONFLICT";
+		}
+		if (status == HttpStatus.NOT_FOUND) {
+			if (message.contains("storage location type")) {
+				return "STORAGE_LOCATION_TYPE_NOT_FOUND";
+			}
+			if (message.contains("storage location")) {
+				return "STORAGE_LOCATION_NOT_FOUND";
+			}
+			if (message.contains("storage type")) {
+				return "STORAGE_TYPE_NOT_FOUND";
+			}
+			if (message.contains("storage")) {
+				return "STORAGE_NOT_FOUND";
+			}
+			if (message.contains("sample")) {
+				return "SAMPLE_NOT_FOUND";
+			}
+			return "NOT_FOUND";
+		}
+		if (status == HttpStatus.BAD_REQUEST) {
+			return "BAD_REQUEST";
+		}
+		return "INTERNAL_SERVER_ERROR";
+	}
+	
+	private Map<String, Object> buildOperationOutcome(String code, String message, String sampleId) {
+		Map<String, Object> response = new LinkedHashMap<String, Object>();
+		
+		Map<String, Object> error = new LinkedHashMap<String, Object>();
+		error.put("code", code);
+		error.put("message", message);
+		
+		Map<String, Object> details = new LinkedHashMap<String, Object>();
+		details.put("sampleId", sampleId);
+		
+		error.put("details", details);
+		
+		Map<String, Object> meta = new LinkedHashMap<String, Object>();
+		meta.put("apiVersion", "v1");
+		meta.put("timestamp", new Date());
+		
+		response.put("resourceType", "OperationOutcome");
+		response.put("found", false);
+		response.put("error", error);
+		response.put("meta", meta);
+		
+		return response;
+	}
+	
 }

@@ -1,0 +1,883 @@
+:host {
+  display: block;
+  color: #1d2f3f;
+  font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.dialog-shell {
+  display: flex;
+  flex-direction: column;
+  width: min(680px, 80vw);
+  max-height: 90vh;
+  background: #fff;
+  overflow: hidden;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 1.25rem 1.5rem 1rem;
+  background: #fff;
+}
+
+.dialog-title-block {
+  min-width: 0;
+}
+
+.dialog-kicker,
+.section-kicker {
+  margin: 0;
+  color: #61788f;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.dialog-header h2 {
+  margin: 0.15rem 0 0;
+  color: #17324d;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.dialog-description {
+  margin: 0.45rem 0 0;
+  color: #5f7489;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.dialog-mode-badge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: #eef7ff;
+  color: #2c6692;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dialog-form {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.dialog-content {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.8fr) minmax(0, 1.2fr);
+  gap: 16px;
+  overflow: auto;
+  padding: 1.25rem 1.5rem 1rem;
+  background: #f7f9fc;
+}
+
+.summary-card,
+.form-card {
+  min-width: 0;
+  border: 1px solid #d8e0ea;
+  border-radius: 16px;
+  background: #fff;
+  padding: 16px;
+}
+
+.summary-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border-left: 4px solid #2c6692;
+  background: #f8fbff;
+}
+
+.summary-card .mat-icon {
+  flex: 0 0 auto;
+  color: #2c6692;
+}
+
+.summary-card h3,
+.form-card h3 {
+  margin: 0.25rem 0 0;
+  color: #1f3448;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.summary-card p:not(.section-kicker) {
+  margin: 0.4rem 0 0;
+  color: #61788f;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.section-heading {
+  margin-bottom: 14px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem 1.25rem;
+  background: #fff;
+}
+
+.dialog-actions--sticky {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  border-top: 1px solid #e5ebf2;
+  box-shadow: 0 -8px 20px rgba(17, 56, 92, 0.04);
+}
+
+.dialog-actions .mat-mdc-progress-spinner,
+.dialog-actions .mat-progress-spinner {
+  display: inline-block;
+  margin-right: 0.25rem;
+}
+
+::ng-deep .dialog-shell .mat-mdc-form-field,
+::ng-deep .dialog-shell .mat-form-field {
+  width: 100%;
+}
+
+::ng-deep .dialog-shell .mat-mdc-text-field-wrapper {
+  border-radius: 12px;
+}
+
+@media (max-width: 760px) {
+  .dialog-shell {
+    width: 96vw;
+  }
+
+  .dialog-header,
+  .dialog-content,
+  .dialog-actions {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .dialog-header,
+  .dialog-content {
+    grid-template-columns: 1fr;
+  }
+
+  .dialog-header {
+    flex-direction: column;
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .dialog-actions button {
+    width: 100%;
+  }
+}
+
+.dialog-shell {
+  --dialog-preferred-width: 680px;
+}
+
+/* --------------------------------------------------------------------------
+   UX hardening: prevent accidental horizontal scroll, keep dialogs within a
+   practical viewport cap, and support tooltip-based field guidance.
+   -------------------------------------------------------------------------- */
+:host,
+:host * {
+  box-sizing: border-box;
+}
+
+.dialog-shell {
+  width: min(var(--dialog-preferred-width), 80vw) !important;
+  max-width: 80vw;
+  overflow-x: hidden;
+}
+
+.dialog-header,
+.dialog-content,
+.dialog-form,
+.dialog-main-panel,
+.dialog-side-panel,
+.form-card,
+.summary-card,
+.preview-tabs,
+.tab-panel {
+  min-width: 0;
+}
+
+.dialog-header,
+.summary-card-header,
+.section-heading,
+.preview-toolbar,
+.dialog-actions {
+  flex-wrap: wrap;
+}
+
+.dialog-content {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.dialog-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+}
+
+.dialog-grid-span-2 {
+  grid-column: 1 / -1;
+}
+
+.section-helper {
+  max-width: min(100%, 320px);
+  text-align: left;
+}
+
+.field-info-button {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  padding: 0 !important;
+  color: #6a8197;
+}
+
+.field-info-button .mat-icon,
+.field-info-button mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  line-height: 18px;
+}
+
+.field-info-button:hover {
+  color: #2c6692;
+}
+
+::ng-deep .dialog-shell .mat-mdc-form-field,
+::ng-deep .dialog-shell .mat-form-field {
+  min-width: 0;
+}
+
+::ng-deep .dialog-shell .mat-mdc-form-field-infix,
+::ng-deep .dialog-shell .mat-form-field-infix {
+  min-width: 0;
+  width: auto;
+}
+
+@media (max-width: 1180px) {
+  .dialog-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .dialog-shell {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px);
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .dialog-actions button {
+    width: 100%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   v3 responsive containment hardening
+   --------------------------------------------------------------------------
+   The dialog content is constrained by the Material dialog overlay. The shell
+   therefore uses the available overlay width instead of adding another 80vw
+   width inside it. This prevents the common case where the inner shell becomes
+   80vw plus overlay padding and causes a horizontal scrollbar.
+   -------------------------------------------------------------------------- */
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+:host,
+:host * {
+  box-sizing: border-box;
+}
+
+.dialog-shell {
+  container-type: inline-size;
+  width: min(var(--dialog-preferred-width, 960px), 100%) !important;
+  max-width: min(100%, calc(100vw - 24px)) !important;
+  overflow-x: hidden !important;
+}
+
+.dialog-form,
+.dialog-content,
+.dialog-main-panel,
+.dialog-side-panel,
+.form-card,
+.summary-card,
+.guidance-card,
+.dialog-section,
+.preview-tabs,
+.tab-panel,
+.projection-card,
+.pattern-preview-card,
+.storage-preview-card {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.dialog-content {
+  width: 100%;
+  overflow-x: hidden !important;
+  overflow-y: auto;
+}
+
+.dialog-header,
+.dialog-actions,
+.summary-card-header,
+.section-heading,
+.preview-toolbar,
+.projection-card,
+.pattern-preview-card,
+.storage-preview-card,
+.guidance-card {
+  flex-wrap: wrap;
+}
+
+.dialog-title-block,
+.dialog-description,
+.section-helper,
+.summary-value,
+.cell-primary,
+.cell-secondary,
+.projection-card > div,
+.pattern-preview-card > div,
+.storage-preview-card > div {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.dialog-grid,
+.preview-summary-card {
+  width: 100%;
+  max-width: 100%;
+}
+
+.dialog-grid {
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 220px), 1fr)
+  ) !important;
+}
+
+.dialog-grid-span-2 {
+  grid-column: 1 / -1 !important;
+}
+
+.section-helper {
+  max-width: min(100%, 360px);
+  text-align: left;
+}
+
+.field-info-button {
+  flex: 0 0 auto;
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  padding: 0 !important;
+  color: #6a8197;
+}
+
+.field-info-button .mat-icon,
+.field-info-button mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  line-height: 18px;
+}
+
+::ng-deep .dialog-shell .mat-mdc-form-field,
+::ng-deep .dialog-shell .mat-form-field {
+  width: 100%;
+  min-width: 0 !important;
+  max-width: 100%;
+}
+
+::ng-deep .dialog-shell .mat-mdc-form-field-infix,
+::ng-deep .dialog-shell .mat-form-field-infix {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100%;
+}
+
+::ng-deep .dialog-shell .mat-mdc-select-trigger,
+::ng-deep .dialog-shell .mat-mdc-select-value,
+::ng-deep .dialog-shell input,
+::ng-deep .dialog-shell textarea {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@container (max-width: 860px) {
+  .dialog-content {
+    grid-template-columns: 1fr !important;
+  }
+
+  .dialog-grid,
+  .preview-summary-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  .dialog-side-panel,
+  .dialog-main-panel,
+  .form-card,
+  .summary-card {
+    width: 100%;
+  }
+
+  .section-heading,
+  .dialog-header,
+  .preview-toolbar,
+  .children-list__item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .section-helper,
+  .layer-panel {
+    max-width: none;
+    text-align: left;
+  }
+
+  .layer-chips {
+    justify-content: flex-start;
+  }
+}
+
+@container (max-width: 620px) {
+  .dialog-header,
+  .dialog-content,
+  .dialog-actions {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .dialog-header h2 {
+    font-size: 20px;
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .dialog-actions button {
+    width: 100%;
+  }
+}
+
+/* Dialogs with a side summary and main form should wrap by container width,
+   not by browser width. This removes horizontal scrolling in narrow dialogs. */
+.dialog-content {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 340px), 1fr)
+  ) !important;
+  align-items: start;
+}
+
+@container (max-width: 760px) {
+  .dialog-content {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   v4 width expansion and no-horizontal-scroll correction
+   --------------------------------------------------------------------------
+   The v3 fallback made the shell 100% of the current Material dialog surface,
+   which allowed Angular Material to keep the dialog narrow. This override makes
+   each dialog request its preferred working width while still respecting the
+   80vw cap and small-screen limits.
+   -------------------------------------------------------------------------- */
+:host {
+  display: block;
+  width: auto;
+  max-width: min(80vw, calc(100vw - 24px));
+  overflow-x: hidden;
+}
+
+.dialog-shell {
+  width: min(
+    var(--dialog-preferred-width, 960px),
+    80vw,
+    calc(100vw - 24px)
+  ) !important;
+  max-width: min(80vw, calc(100vw - 24px)) !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+.dialog-content {
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
+.dialog-grid {
+  min-width: 0 !important;
+  max-width: 100%;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 260px), 1fr)
+  ) !important;
+}
+
+.dialog-grid-span-2 {
+  grid-column: 1 / -1 !important;
+}
+
+.dialog-actions {
+  justify-content: flex-end;
+}
+
+@media (max-width: 960px) {
+  :host {
+    max-width: calc(100vw - 24px);
+  }
+
+  .dialog-shell {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .dialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .dialog-actions button {
+    width: 100%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   v5 Material dialog overlay correction
+   --------------------------------------------------------------------------
+   Angular Material controls dialog width from the CDK overlay pane and the
+   MDC dialog surface, not from the inner component alone. The previous shell
+   width could therefore be clipped when the opener kept a narrow default pane.
+
+   These selectors are intentionally scoped to storage-config-dialog shells.
+   They expand the overlay up to the relevant working width, keep the 80vw cap,
+   and make the Material container/surface stretch instead of clipping content.
+   -------------------------------------------------------------------------- */
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.dialog-shell.storage-config-dialog {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  max-height: min(90vh, calc(100vh - 24px));
+  overflow: hidden !important;
+}
+
+.dialog-shell.storage-config-dialog,
+.dialog-shell.storage-config-dialog * {
+  box-sizing: border-box;
+}
+
+.dialog-content,
+.dialog-form,
+.dialog-header,
+.dialog-actions,
+.dialog-side-panel,
+.dialog-main-panel,
+.summary-card,
+.guidance-card,
+.dialog-section,
+.projection-card,
+.pattern-preview-card,
+.preview-tabs,
+.tab-panel {
+  min-width: 0 !important;
+  max-width: 100%;
+}
+
+.dialog-content {
+  overflow-x: hidden !important;
+  overflow-y: auto;
+}
+
+.dialog-grid {
+  width: 100%;
+  min-width: 0 !important;
+  max-width: 100%;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 260px), 1fr)
+  ) !important;
+}
+
+.dialog-grid-span-2 {
+  grid-column: 1 / -1 !important;
+}
+
+/* Default storage metadata dialogs */
+::ng-deep .cdk-overlay-pane:has(.storage-config-dialog) {
+  width: min(820px, 80vw) !important;
+  max-width: min(80vw, calc(100vw - 24px)) !important;
+  min-width: 0 !important;
+}
+
+/* Wider hierarchy and preview dialogs */
+::ng-deep .cdk-overlay-pane:has(.dialog-shell--wide),
+::ng-deep .cdk-overlay-pane:has(.dialog-shell--preview),
+::ng-deep .cdk-overlay-pane:has(.dialog-shell--storage-location) {
+  width: min(1180px, 80vw) !important;
+}
+
+/* Generate positions dialog */
+::ng-deep .cdk-overlay-pane:has(.dialog-shell--generate-slots) {
+  width: min(940px, 80vw) !important;
+}
+
+/* Location type dialog */
+::ng-deep .cdk-overlay-pane:has(.dialog-shell--location-type) {
+  width: min(980px, 80vw) !important;
+}
+
+/* Storage unit dialog */
+::ng-deep .cdk-overlay-pane:has(.dialog-shell--storage-unit) {
+  width: min(860px, 80vw) !important;
+}
+
+/* Small storage type dialog */
+::ng-deep .cdk-overlay-pane:has(.dialog-shell--storage-type) {
+  width: min(680px, 80vw) !important;
+}
+
+::ng-deep
+  .cdk-overlay-pane:has(.storage-config-dialog)
+  .mat-mdc-dialog-container {
+  display: flex !important;
+  position: relative !important;
+  align-items: stretch !important;
+  justify-content: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  max-height: min(90vh, calc(100vh - 24px)) !important;
+  overflow: hidden !important;
+}
+
+::ng-deep .cdk-overlay-pane:has(.storage-config-dialog) .mdc-dialog__container,
+::ng-deep .cdk-overlay-pane:has(.storage-config-dialog) .mdc-dialog__surface,
+::ng-deep
+  .cdk-overlay-pane:has(.storage-config-dialog)
+  .mat-mdc-dialog-surface {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  max-height: min(90vh, calc(100vh - 24px)) !important;
+}
+
+::ng-deep .cdk-overlay-pane:has(.storage-config-dialog) .mdc-dialog__surface,
+::ng-deep
+  .cdk-overlay-pane:has(.storage-config-dialog)
+  .mat-mdc-dialog-surface {
+  overflow: hidden !important;
+  border-radius: 16px;
+}
+
+@media (max-width: 960px) {
+  ::ng-deep .cdk-overlay-pane:has(.storage-config-dialog) {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .dialog-header,
+  .dialog-content,
+  .dialog-actions {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .dialog-actions {
+    flex-direction: column-reverse !important;
+    align-items: stretch !important;
+  }
+
+  .dialog-actions button {
+    width: 100%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   v7 form-help spacing + fixed side information panel
+   --------------------------------------------------------------------------
+   1. Material hints/errors are allowed to occupy natural height, avoiding
+      overlap with the next form field.
+   2. On dialogs with a left summary/guide panel, the left panel stays visible
+      while the main form area scrolls. The side panel gets its own vertical
+      scroll only when its content is taller than the available dialog height.
+   -------------------------------------------------------------------------- */
+.dialog-shell.storage-config-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: min(90vh, calc(100vh - 24px)) !important;
+}
+
+.dialog-shell.storage-config-dialog .dialog-form {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.dialog-shell.storage-config-dialog .dialog-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  align-items: stretch;
+  overscroll-behavior: contain;
+}
+
+.dialog-shell.storage-config-dialog .dialog-content:has(.dialog-side-panel) {
+  overflow: hidden !important;
+}
+
+.dialog-shell.storage-config-dialog
+  .dialog-content:not(:has(.dialog-side-panel)) {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.dialog-shell.storage-config-dialog .dialog-side-panel,
+.dialog-shell.storage-config-dialog .dialog-main-panel {
+  min-height: 0;
+  max-height: 100%;
+  overscroll-behavior: contain;
+}
+
+.dialog-shell.storage-config-dialog .dialog-side-panel {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.dialog-shell.storage-config-dialog .dialog-main-panel {
+  align-self: stretch;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.dialog-shell.storage-config-dialog .dialog-grid {
+  row-gap: 24px !important;
+}
+
+.dialog-shell.storage-config-dialog .mat-mdc-form-field,
+.dialog-shell.storage-config-dialog .mat-form-field {
+  margin-bottom: 6px;
+}
+
+::ng-deep
+  .dialog-shell.storage-config-dialog
+  .mat-mdc-form-field-subscript-wrapper,
+::ng-deep
+  .dialog-shell.storage-config-dialog
+  .mat-form-field-subscript-wrapper {
+  position: static !important;
+  min-height: 20px;
+  overflow: visible !important;
+  line-height: 1.35;
+}
+
+::ng-deep .dialog-shell.storage-config-dialog .mat-mdc-form-field-hint-wrapper,
+::ng-deep .dialog-shell.storage-config-dialog .mat-mdc-form-field-error-wrapper,
+::ng-deep .dialog-shell.storage-config-dialog .mat-form-field-hint-wrapper,
+::ng-deep .dialog-shell.storage-config-dialog .mat-form-field-error-wrapper {
+  position: static !important;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 4px 12px 0;
+  line-height: 1.35;
+  transform: none !important;
+}
+
+::ng-deep .dialog-shell.storage-config-dialog .mat-mdc-form-field-hint,
+::ng-deep .dialog-shell.storage-config-dialog .mat-mdc-form-field-error,
+::ng-deep .dialog-shell.storage-config-dialog .mat-hint,
+::ng-deep .dialog-shell.storage-config-dialog .mat-error {
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
+
+::ng-deep
+  .dialog-shell.storage-config-dialog
+  .mat-mdc-form-field-bottom-align::before {
+  display: none !important;
+}
+
+.dialog-shell.storage-config-dialog .field-info-button {
+  opacity: 0.82;
+}
+
+.dialog-shell.storage-config-dialog .field-info-button:focus-visible {
+  outline: 2px solid rgba(44, 102, 146, 0.35);
+  outline-offset: 2px;
+}
+
+@container (max-width: 860px) {
+  .dialog-shell.storage-config-dialog .dialog-content:has(.dialog-side-panel) {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .dialog-shell.storage-config-dialog .dialog-side-panel,
+  .dialog-shell.storage-config-dialog .dialog-main-panel {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 960px) {
+  .dialog-shell.storage-config-dialog .dialog-content:has(.dialog-side-panel) {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .dialog-shell.storage-config-dialog .dialog-side-panel,
+  .dialog-shell.storage-config-dialog .dialog-main-panel {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
