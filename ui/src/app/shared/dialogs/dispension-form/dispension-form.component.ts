@@ -170,7 +170,7 @@ export class DispensingFormComponent implements OnInit {
       )
       .pipe(
         tap((response) => {
-          if (response === "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {
@@ -191,7 +191,7 @@ export class DispensingFormComponent implements OnInit {
       )
       .pipe(
         tap((response) => {
-          if (response === "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {
@@ -215,7 +215,7 @@ export class DispensingFormComponent implements OnInit {
           if (response?.error) {
             this.errors = [...this.errors, response.error];
           }
-          if (response === "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {
@@ -236,7 +236,7 @@ export class DispensingFormComponent implements OnInit {
           if (response?.error) {
             this.errors = [...this.errors, response.error];
           }
-          if (response === "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {

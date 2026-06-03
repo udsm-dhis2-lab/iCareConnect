@@ -79,7 +79,7 @@ export class NewRequisitionFormComponent implements OnInit {
       )
       .pipe(
         map((response) => {
-          if (response === "none") {
+          if (!response) {
             this.errors = response?.error
               ? [...this.errors, response]
               : [
@@ -94,7 +94,7 @@ export class NewRequisitionFormComponent implements OnInit {
                   },
                 ];
             return response;
-          } else if (response && (!response?.error || response !== "none")) {
+          } else if (response && !response?.error) {
             return response;
           } else if (response) {
             this.errors = response?.error
