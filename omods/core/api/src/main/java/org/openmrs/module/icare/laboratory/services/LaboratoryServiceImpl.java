@@ -1440,6 +1440,20 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 			result.setInstrument(instrument);
 		}
 		
+		if (result.getInstruments() != null && !result.getInstruments().isEmpty()) {
+			List<Concept> managedInstruments = new ArrayList<Concept>();
+			for (Concept stub : result.getInstruments()) {
+				if (stub == null || stub.getUuid() == null) {
+					continue;
+				}
+				Concept managed = Context.getConceptService().getConceptByUuid(stub.getUuid());
+				if (managed != null) {
+					managedInstruments.add(managed);
+				}
+			}
+			result.setInstruments(managedInstruments);
+		}
+		
 		if (result.getInstrumentCode() != null) {
 			String code = result.getInstrumentCode().toString();
 			String conceptClassUuid = "";

@@ -63,6 +63,27 @@ export class FieldComponent implements AfterViewInit {
 
   @Output() fileFieldUpdate: EventEmitter<any> = new EventEmitter<any>();
 
+  compareByUuid = (a: any, b: any): boolean => {
+    if (a == null || b == null) {
+      return a === b;
+    }
+    const aIsObj = typeof a === "object";
+    const bIsObj = typeof b === "object";
+    if (aIsObj && bIsObj) {
+      if (a.uuid != null && b.uuid != null) {
+        return a.uuid === b.uuid;
+      }
+      return a === b;
+    }
+    if (aIsObj && a.uuid != null) {
+      return a.uuid === b;
+    }
+    if (bIsObj && b.uuid != null) {
+      return b.uuid === a;
+    }
+    return a === b;
+  };
+
   ngAfterViewInit() {
     if (typeof this.field?.value === "object") {
       this.value =

@@ -47,8 +47,8 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "value_group_id", nullable = true)
-    @JsonIgnore
-    private Result valueGroup;
+	@JsonIgnore
+	private Result valueGroup;
 
 	@Column(name = "value_date_time")
 	private Date valueDatetime;
@@ -70,7 +70,7 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "test_allocation_id", nullable = false)
-	   @JsonBackReference
+	@JsonBackReference
 	private TestAllocation testAllocation;
 
 	@Transient
@@ -85,6 +85,11 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "instrument_id", nullable = true)
 	private Concept instrument;
+
+	// Multiple instruments support (for multi-select functionality)
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "lb_result_instruments", joinColumns = @JoinColumn(name = "result_id"), inverseJoinColumns = @JoinColumn(name = "instrument_id"))
+	private List<Concept> instruments = new ArrayList<>();
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "result")
 	private List<AssociatedFieldResult> associatedFieldResults = new ArrayList<>(0);
@@ -351,6 +356,19 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 			result.setInstrumentCode(instrumentCode);
 		}
 
+		if (map.get("instruments") != null && map.get("instruments") instanceof List) {
+			List<Map<String, Object>> instrumentsList = (List<Map<String, Object>>) map.get("instruments");
+			List<Concept> instrumentsForResult = new ArrayList<Concept>();
+			for (Map<String, Object> instrumentMap : instrumentsList) {
+				if (instrumentMap != null && instrumentMap.get("uuid") != null) {
+					Concept instrument = new Concept();
+					instrument.setUuid(instrumentMap.get("uuid").toString());
+					instrumentsForResult.add(instrument);
+				}
+			}
+			result.setInstruments(instrumentsForResult);
+		}
+
 		if (map.get("resultStatus") != null) {
 			result.setResultStatus(map.get("resultStatus").toString());
 		}
@@ -472,6 +490,22 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 
 		resultsObject.put("instrument", instrument);
 
+		if (this.getInstruments() != null && !this.getInstruments().isEmpty()) {
+			List<Map<String, Object>> instrumentsList = new ArrayList<Map<String, Object>>();
+			for (Concept inst : this.getInstruments()) {
+				Map<String, Object> instMap = new HashMap<String, Object>();
+				instMap.put("uuid", inst.getUuid());
+				instMap.put("display", inst.getDisplayString());
+				if (inst.getName() != null && inst.getName().getName() != null) {
+					instMap.put("name", inst.getName().getName());
+				}
+				instrumentsList.add(instMap);
+			}
+			resultsObject.put("instruments", instrumentsList);
+		} else {
+			resultsObject.put("instruments", new ArrayList<Map<String, Object>>());
+		}
+
 		HashMap<String, Object> resultsConceptObject = new HashMap<String, Object>();
 		resultsConceptObject.put("uuid", this.getConcept().getUuid());
 		resultsObject.put("concept", resultsConceptObject);
@@ -553,6 +587,14 @@ public class Result extends BaseOpenmrsData implements java.io.Serializable {
 
 	public void setInstrument(Concept instrument) {
 		this.instrument = instrument;
+	}
+
+	public List<Concept> getInstruments() {
+		return instruments;
+	}
+
+	public void setInstruments(List<Concept> instruments) {
+		this.instruments = instruments;
 	}
 
 	public String getInstrumentCode() {

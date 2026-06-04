@@ -814,6 +814,39 @@
                 referencedColumnNames="concept_id"
                 referencedTableName="concept"/>
     </changeSet>
+   <changeSet id="create_lb_result_instruments_join_table" author="yuseif" dbms="mysql">
+        <validCheckSum>ANY</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_result_instruments"/>
+            </not>
+        </preConditions>
+        <comment>Creating join table for multiple instruments per result (multi-select support) using raw SQL</comment>
+        <sql>
+            CREATE TABLE lb_result_instruments (
+                result_id INT NOT NULL,
+                instrument_id INT NOT NULL,
+                CONSTRAINT lb_result_instruments_pk PRIMARY KEY (result_id, instrument_id),
+                CONSTRAINT fk_result_instruments_result_id 
+                    FOREIGN KEY (result_id) REFERENCES lb_test_result(test_result_id),
+                CONSTRAINT fk_result_instruments_instrument_id 
+                    FOREIGN KEY (instrument_id) REFERENCES concept(concept_id)
+            ) ENGINE=InnoDB;
+
+            CREATE INDEX idx_result_instruments_result_id ON lb_result_instruments(result_id);
+        </sql>
+    </changeSet>
+
+    <changeSet id="drop_sequence_from_lb_result_instruments" author="yuseif" dbms="mysql">
+        <validCheckSum>ANY</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="lb_result_instruments" columnName="sequence"/>
+        </preConditions>
+        <comment>Dropping sequence column using raw SQL</comment>
+        <sql>
+            ALTER TABLE lb_result_instruments DROP COLUMN sequence;
+        </sql>
+    </changeSet>
     <changeSet id="add_columns_to_lb_sample" author="josephat-mwakyusa" dbms="mysql">
         <preConditions onFail="MARK_RAN">
             <not>

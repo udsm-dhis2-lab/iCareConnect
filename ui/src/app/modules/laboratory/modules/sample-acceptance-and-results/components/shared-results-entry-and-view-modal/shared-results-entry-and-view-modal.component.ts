@@ -5,7 +5,7 @@ import {
   MatDialog,
 } from "@angular/material/dialog";
 import { Observable, of, zip } from "rxjs";
-import { map } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { SystemSettingsService } from "src/app/core/services/system-settings.service";
 import { ConceptGet, ConceptGetFull } from "src/app/shared/resources/openmrs";
 import { SampleAllocationObject } from "src/app/shared/resources/sample-allocations/models/allocation.model";
@@ -77,7 +77,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     private store: Store<AppState>,
     private sampleService: SamplesService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
@@ -88,7 +88,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     this.userUuid = localStorage.getItem("userUuid");
     this.multipleResultsAttributeType$ = this.systemSettingsService
       .getSystemSettingsByKey(
-        `iCare.laboratory.settings.testParameters.attributes.multipleResultsAttributeTypeUuid`
+        `iCare.laboratory.settings.testParameters.attributes.multipleResultsAttributeTypeUuid`,
       )
       .pipe(
         map((response) => {
@@ -98,12 +98,12 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
             this.errors = [...this.errors, response];
             return response;
           }
-        })
+        }),
       );
 
     this.calculatedValueExpressionAttributeType$ = this.systemSettingsService
       .getSystemSettingsByKey(
-        `iCare.laboratory.settings.testParameters.calculateValueExpressionAttributeTypeUuid`
+        `iCare.laboratory.settings.testParameters.calculateValueExpressionAttributeTypeUuid`,
       )
       .pipe(
         map((response) => {
@@ -113,7 +113,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
             this.errors = [...this.errors, response];
             return response;
           }
-        })
+        }),
       );
 
     this.getAllocations();
@@ -147,7 +147,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               }),
             };
           }
-        })
+        }),
       );
   }
 
@@ -160,7 +160,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
 
   toggleSideNavigationGrouped(
     event: Event,
-    parametersWithDefinedRelationship: any[]
+    parametersWithDefinedRelationship: any[],
   ): void {
     event.stopPropagation();
     this.selectedParametersWithDefinedRelationship =
@@ -176,9 +176,25 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   }
 
   getAllocations(): void {
-    this.sampleAllocations$ =
-      this.sampleAllocationService.getAllocationsBySampleUuid(
-        this.data?.sample?.uuid
+    this.sampleAllocations$ = this.sampleAllocationService
+      .getAllocationsBySampleUuid(this.data?.sample?.uuid)
+      .pipe(
+        tap((allocations) => {
+          // Initialize selectedInstruments from existing data when allocations load
+          if (allocations && allocations.length > 0) {
+            allocations.forEach((order) => {
+              if (order?.allocations && order.allocations.length > 0) {
+                const allocation = order.allocations[0];
+                const existingInstruments =
+                  this.getExistingInstruments(allocation);
+                if (existingInstruments) {
+                  this.selectedInstruments[order?.concept?.uuid] =
+                    existingInstruments;
+                }
+              }
+            });
+          }
+        }),
       );
   }
 
@@ -198,11 +214,11 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         dataValue?.parameter?.datatype?.display === "Complex"
       ) {
         let existingFile = this.files.find(
-          (file) => file.parameterUuid === dataValue?.parameter?.uuid
+          (file) => file.parameterUuid === dataValue?.parameter?.uuid,
         );
         this.files = [
           ...this.files.filter(
-            (file) => file?.parameterUuid !== dataValue?.parameter?.uuid
+            (file) => file?.parameterUuid !== dataValue?.parameter?.uuid,
           ),
           existingFile
             ? {
@@ -241,12 +257,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
             parent: dataValue?.parent,
             parentUuid: dataValue?.parent?.uuid,
             sample: dataValue?.sample,
-            instrument:
-              order && this.selectedInstruments[order?.concept?.uuid]
-                ? {
-                    uuid: this.selectedInstruments[order?.concept?.uuid],
-                  }
-                : null,
+            ...this.formatInstrumentsPayload(
+              order && this.selectedInstruments[order?.concept?.uuid],
+            ),
             status: {
               category: "RESULT_REMARKS",
               status: "REMARKS",
@@ -285,12 +298,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                 }
               : null,
             abnormal: false,
-            instrument:
-              order && this.selectedInstruments[order?.concept?.uuid]
-                ? {
-                    uuid: this.selectedInstruments[order?.concept?.uuid],
-                  }
-                : null,
+            ...this.formatInstrumentsPayload(
+              order && this.selectedInstruments[order?.concept?.uuid],
+            ),
             status: {
               category: "RESULT_REMARKS",
               status: "REMARKS",
@@ -404,10 +414,10 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                               "order",
                               "sample",
                               "parameter",
-                            ]
+                            ],
                           );
                         });
-                      })
+                      }),
                     );
                     this.sampleAllocationService
                       .saveResultsViaAllocations(results)
@@ -416,7 +426,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                           if (
                             (
                               this.data?.sample?.statuses?.filter(
-                                (status) => status?.category === "HAS_RESULTS"
+                                (status) => status?.category === "HAS_RESULTS",
                               ) || []
                             )?.length === 0
                           ) {
@@ -472,12 +482,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                 }
               : null,
             abnormal: false,
-            instrument:
-              order && this.selectedInstruments[order?.concept?.uuid]
-                ? {
-                    uuid: this.selectedInstruments[order?.concept?.uuid],
-                  }
-                : null,
+            ...this.formatInstrumentsPayload(
+              order && this.selectedInstruments[order?.concept?.uuid],
+            ),
             status: {
               category: "RESULT_REMARKS",
               status: "REMARKS",
@@ -547,16 +554,16 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
             zip(
               allocationAmendmentStatuses?.length > 0
                 ? this.sampleAllocationService.saveAllocationStatuses(
-                    allocationAmendmentStatuses
+                    allocationAmendmentStatuses,
                   )
                 : of(null),
               (
                 this.data?.sample?.statuses?.filter(
-                  (status) => status?.category === "HAS_RESULTS"
+                  (status) => status?.category === "HAS_RESULTS",
                 ) || []
               )?.length === 0
                 ? this.sampleService.saveSampleStatus(status)
-                : of(null)
+                : of(null),
             ).subscribe((response) => {});
 
             this.snackBar.open(`Results saved successfully`, "OK", {
@@ -607,12 +614,12 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                           return {
                             uuid: result?.uuid,
                           };
-                        })
+                        }),
                       );
-                    })
+                    }),
                   );
                 }
-              })
+              }),
             ),
             sample: this.data?.sample?.uuid,
             voided: true,
@@ -634,7 +641,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     order: any,
     confirmed?: boolean,
     approvalStatusType?: string,
-    related?: boolean
+    related?: boolean,
   ): void {
     event.stopPropagation();
     if (confirmed) {
@@ -657,7 +664,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                     return orderBy(
                       group?.results,
                       ["dateCreated"],
-                      ["desc"]
+                      ["desc"],
                     )[0];
                   });
               let approvalStatuses = [];
@@ -708,7 +715,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               return approvalStatuses;
             }
           })
-          ?.filter((allStatus) => allStatus)
+          ?.filter((allStatus) => allStatus),
       );
       this.saving = true;
       this.shouldConfirm = false;
@@ -719,7 +726,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
             if (
               (
                 this.allocationStatuses?.filter(
-                  (status) => status?.status === "AUTHORIZED"
+                  (status) => status?.status === "AUTHORIZED",
                 ) || []
               )?.length > 0
             ) {
@@ -741,7 +748,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
             } else if (
               (
                 response?.sample?.statuses?.filter(
-                  (status) => status?.status === "APPROVED"
+                  (status) => status?.status === "APPROVED",
                 ) || []
               )?.length === 0
             ) {
@@ -780,7 +787,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                 verticalPosition: "bottom",
                 duration: 3500,
                 panelClass: ["snack-color"],
-              }
+              },
             );
             this.errors = [this.errors, response];
           }
@@ -810,7 +817,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
     parameter: ConceptGetFull,
     allocation: SampleAllocationObject,
     calculatedValueExpressionAttributeType?: string,
-    dataValuesEntities?: any
+    dataValuesEntities?: any,
   ): void {
     this.dataValuesEntities$ = this.store.select(getDataValuesEntities);
     let newDataValuesEntitiesData = Object.keys(dataValuesEntities).map(
@@ -823,7 +830,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
             value: dataObject?.value,
           };
         }
-      }
+      },
     );
     this.store.dispatch(
       upsertEnteredDataValues({
@@ -833,14 +840,14 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
             value: dataObject?.value,
           },
         ],
-      })
+      }),
     );
     const formattedParameter = dataObject?.parameter;
     const expressionAttribute = (formattedParameter?.attributes?.filter(
       (attribute: any) =>
         !attribute?.voided &&
         attribute?.attributeType?.uuid ===
-          calculatedValueExpressionAttributeType
+          calculatedValueExpressionAttributeType,
     ) || [])[0];
     if (expressionAttribute) {
       this.calculatedParameters[formattedParameter?.uuid] = {
@@ -862,7 +869,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
             };
           }),
           ["value"],
-          ["asc"]
+          ["asc"],
         ) || [];
       const valuesData = orderBy(dataObject?.value, ["value"], ["asc"]);
       const keyedPrevValue: any = keyBy(prevValues, "value");
@@ -870,7 +877,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         prevValues?.length !== valuesData?.length ||
         ((
           valuesData?.filter(
-            (valueData: any) => keyedPrevValue[valueData?.value]
+            (valueData: any) => keyedPrevValue[valueData?.value],
           ) || []
         )?.length !== prevValues?.length &&
           valuesData?.length > 0)
@@ -958,7 +965,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                   {
                     ...existingObs,
                     voided: true,
-                  }
+                  },
                 )
                 .subscribe((response) => {
                   if (response) {
@@ -995,7 +1002,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
         results[key]?.multipleResults &&
         !isEqual(
           orderBy(results[key]?.value, ["value"], ["asc"])?.map(
-            (dataValue) => dataValue?.value
+            (dataValue) => dataValue?.value,
           ) || [],
           orderBy(
             results[key]?.previousValue?.map((val) => {
@@ -1004,13 +1011,13 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
               };
             }),
             ["val"],
-            ["asc"]
-          )?.map((dataValue) => dataValue?.val) || []
+            ["asc"],
+          )?.map((dataValue) => dataValue?.val) || [],
         )
       ) {
         this.multipleResults = [
           ...(this.multipleResults?.filter(
-            (result) => result?.allocation?.id !== results[key]?.allocation?.id
+            (result) => result?.allocation?.id !== results[key]?.allocation?.id,
           ) || []),
           results[key],
         ];
@@ -1020,7 +1027,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
           results[key]?.previousValue?.length > 0 &&
           (
             results[key]?.previousValue?.filter(
-              (prevValue: any) => prevValue === results[key]?.value
+              (prevValue: any) => prevValue === results[key]?.value,
             ) || []
           )?.length > 0
             ? false
@@ -1054,12 +1061,9 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                     uuid: results[key]?.relatedResult?.uuid,
                   }
                 : null,
-              instrument:
-                order && this.selectedInstruments[order?.concept?.uuid]
-                  ? {
-                      uuid: this.selectedInstruments[order?.concept?.uuid],
-                    }
-                  : null,
+              ...this.formatInstrumentsPayload(
+                order && this.selectedInstruments[order?.concept?.uuid],
+              ),
               abnormal: false,
               status: this.remarksData[results[key]?.parameter?.uuid]
                 ? {
@@ -1147,15 +1151,10 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                           resultGroup: {
                             uuid: resultsResponse[0]?.uuid,
                           },
-                          instrument:
+                          ...this.formatInstrumentsPayload(
                             order &&
-                            this.selectedInstruments[order?.concept?.uuid]
-                              ? {
-                                  uuid: this.selectedInstruments[
-                                    order?.concept?.uuid
-                                  ],
-                                }
-                              : null,
+                              this.selectedInstruments[order?.concept?.uuid],
+                          ),
                           abnormal: false,
                           testedDate:
                             this.selectedTestedByDetails[
@@ -1190,21 +1189,21 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                               }
                             : null,
                         };
-                      })
+                      }),
                     );
                     zip(
                       this.sampleAllocationService.saveResultsViaAllocations(
-                        results
+                        results,
                       ),
                       this.sampleAllocationService.saveResultsViaAllocations(
-                        this.relatedResults
-                      )
+                        this.relatedResults,
+                      ),
                     ).subscribe((response) => {
                       if (response) {
                         if (
                           (
                             this.data?.sample?.statuses?.filter(
-                              (status) => status?.category === "HAS_RESULTS"
+                              (status) => status?.category === "HAS_RESULTS",
                             ) || []
                           )?.length === 0
                         ) {
@@ -1231,7 +1230,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                                     verticalPosition: "bottom",
                                     duration: 3500,
                                     panelClass: ["snack-color"],
-                                  }
+                                  },
                                 );
                                 this.saving = false;
                                 this.getAllocations();
@@ -1247,7 +1246,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
                                 verticalPosition: "bottom",
                                 duration: 3500,
                                 panelClass: ["snack-color"],
-                              }
+                              },
                             );
                             this.saving = false;
                             this.getAllocations();
@@ -1281,7 +1280,74 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
   }
 
   onGetSelectedInstrument(instrument: any, order: any): void {
+    // Handle both single value and array of instruments (multi-select)
     this.selectedInstruments[order?.concept?.uuid] = instrument;
+  }
+
+  /**
+   * Extract existing instruments from allocation results
+   * Supports both single instrument and multi-select instruments array
+   */
+  getExistingInstruments(allocation: any): any {
+    if (!allocation) {
+      return null;
+    }
+
+    // Check if allocation has results with instruments
+    const results = allocation?.results || [];
+    if (results.length === 0) {
+      return null;
+    }
+
+    // Get the first result (most recent)
+    const result = results[0];
+
+    // Check for new multi-select instruments array first
+    if (
+      result?.instruments &&
+      Array.isArray(result.instruments) &&
+      result.instruments.length > 0
+    ) {
+      return result.instruments;
+    }
+
+    // Fall back to single instrument field for backward compatibility
+    if (result?.instrument) {
+      return result.instrument;
+    }
+
+    return null;
+  }
+
+  /**
+   * Format instruments for API payload
+   * Maintains backward compatibility with single instrument field
+   * while supporting new multi-select instruments array
+   */
+  private formatInstrumentsPayload(instrumentValue: any): any {
+    if (!instrumentValue) {
+      return null;
+    }
+
+    // If it's an array (multi-select)
+    if (Array.isArray(instrumentValue)) {
+      if (instrumentValue.length === 0) {
+        return null;
+      }
+      return {
+        instrument: { uuid: instrumentValue[0]?.uuid || instrumentValue[0] },
+        instruments: instrumentValue.map((inst) => ({
+          uuid: inst?.uuid || inst,
+        })),
+      };
+    }
+
+    // If it's a single value (backward compatibility)
+    const uuid = instrumentValue?.uuid || instrumentValue;
+    return {
+      instrument: { uuid },
+      instruments: [{ uuid }],
+    };
   }
 
   onGetSelectedTestedBy(testedByDetails: any, order: any): void {
@@ -1298,7 +1364,7 @@ export class SharedResultsEntryAndViewModalComponent implements OnInit {
 
       const value = calculateFieldValueFromCalculationExpression(
         dataObject,
-        expressionAttribute
+        expressionAttribute,
       );
       fieldValues = [
         ...fieldValues,

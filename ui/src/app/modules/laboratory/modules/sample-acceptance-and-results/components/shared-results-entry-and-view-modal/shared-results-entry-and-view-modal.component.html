@@ -389,12 +389,12 @@
                               ((!data?.LISConfigurations?.isLIS &&
                                 (
                                   order?.authorizationStatuses
-                                  | filterAuthorizationStatuses: ''
+                                  | filterAuthorizationStatuses : ''
                                 )?.length === 0) ||
                                 (data?.LISConfigurations?.isLIS &&
                                   (
                                     order?.authorizationStatuses
-                                    | filterAuthorizationStatuses: ''
+                                    | filterAuthorizationStatuses : ''
                                   )?.length === 0)) &&
                               order?.finalResults?.length > 0
                             "
@@ -418,7 +418,7 @@
                               data?.currentUser?.uuid &&
                             (
                               order?.authorizationStatuses
-                              | filterAuthorizationStatuses: ''
+                              | filterAuthorizationStatuses : ''
                             )?.length === 0
                           "
                           class="alert alert-warning mt-2"
@@ -432,7 +432,7 @@
                               order?.authorizationStatuses?.length > 0 &&
                               (
                                 order?.authorizationStatuses
-                                | filterAuthorizationStatuses: ''
+                                | filterAuthorizationStatuses : ''
                               )?.length === 0
                             "
                             validateFormFields
@@ -444,7 +444,7 @@
                             *ngIf="
                               (
                                 order?.authorizationStatuses
-                                | filterAuthorizationStatuses: ''
+                                | filterAuthorizationStatuses : ''
                               )?.length > 0
                             "
                           >
@@ -490,6 +490,7 @@
                           <app-shared-instrument-selection
                             [conceptReferenceTerm]="'LIS_INSTRUMENT'"
                             [order]="order"
+                            [existingInstruments]="getExistingInstruments(order?.allocations?.[0])"
                             (selectedInstrument)="
                               onGetSelectedInstrument($event, order)
                             "
@@ -643,7 +644,7 @@
                               data?.currentUser?.uuid &&
                             (
                               order?.authorizationStatuses
-                              | filterAuthorizationStatuses: ''
+                              | filterAuthorizationStatuses : ''
                             )?.length === 0
                           "
                           class="alert alert-warning mt-2"
@@ -707,6 +708,7 @@
                           <app-shared-instrument-selection
                             [conceptReferenceTerm]="'LIS_INSTRUMENT'"
                             [order]="order"
+                            [existingInstruments]="getExistingInstruments(order?.allocations?.[0])"
                             (selectedInstrument)="
                               onGetSelectedInstrument($event, order)
                             "
@@ -805,7 +807,7 @@
                 {{ result?.creator?.display }}
               </td>
               <td>
-                {{ result?.dateCreated | date: "medium" }}
+                {{ result?.dateCreated | date : "medium" }}
               </td>
               <td>
                 {{
@@ -817,7 +819,7 @@
                   On
                   <b>
                     {{
-                      result?.authorizationStatus?.timestamp | date: "medium"
+                      result?.authorizationStatus?.timestamp | date : "medium"
                     }}
                   </b>
                   by
