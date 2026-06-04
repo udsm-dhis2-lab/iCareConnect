@@ -3,7 +3,8 @@
   *ngIf="{
     samples: samples$ | async,
     labEquipments: labEquipments$ | async,
-    currentUser: currentUser$ | async
+    currentUser: currentUser$ | async,
+    sampleReferralSettings: sampleReferralSettings$ | async
   } as params"
 >
   <div class="filter-and-legend row d-flex justify-content-between">
@@ -52,7 +53,20 @@
     mode="indeterminate"
     *ngIf="!params?.samples"
   ></mat-progress-bar>
-  <div class="row">
+  <ng-template #sampleDetailsPresentation let-sample="sample">
+    <section
+      class="sample-details-panel"
+      [ngClass]="getSampleDetailsPanelClasses(sample)"
+    >
+      <div class="sample-details-legacy-block">
+        <div class="sample-details-legacy-title">
+          Additional existing sample details
+        </div>
+        <app-shared-sample-details [sample]="sample"></app-shared-sample-details>
+      </div>
+    </section>
+  </ng-template>
+  <div class="row sample-header-top-row">
     <div class="col-md-3 col-sx-12 col-sm-12 d-flex justify-content-left">
       <mat-radio-group *ngIf="!LISConfigurations?.isLIS">
         <mat-radio-button
@@ -72,129 +86,107 @@
         >
       </mat-radio-group>
     </div>
-    <div
-      *ngIf="params?.samples"
-      class="col-md-9 col-sx-12 col-sm-12 mt-1 d-flex justify-content-end"
-    >
-      <section class="w-50 d-flex justify-content-end">
-        <mat-checkbox
-          *ngIf="LISConfigurations?.isLIS"
-          [disabled]="
-            params?.currentUser &&
-            !params?.currentUser?.userPrivileges['ALL'] &&
-            !params?.currentUser?.userPrivileges[
-              'SAMPLE TESTING AND RESULTS_SHOW_MRN'
-            ]
-          "
-          color="primary"
-          [checked]="itemsToShow['mrn']"
-          (change)="toggleItemToShow($event, 'mrn')"
-          >Patient Identification</mat-checkbox
-        >
-        <mat-checkbox
-          *ngIf="LISConfigurations?.isLIS"
-          [disabled]="
-            params?.currentUser &&
-            !params?.currentUser?.userPrivileges['ALL'] &&
-            !params?.currentUser?.userPrivileges[
-              'SAMPLE TESTING AND RESULTS_SHOW_GENDER'
-            ]
-          "
-          color="primary"
-          class="ml-3"
-          [checked]="itemsToShow['gender']"
-          (change)="toggleItemToShow($event, 'gender')"
-          >Gender</mat-checkbox
-        >
-        <mat-checkbox
-          [disabled]="
-            params?.currentUser &&
-            !params?.currentUser?.userPrivileges['ALL'] &&
-            !params?.currentUser?.userPrivileges[
-              'SAMPLE TESTING AND RESULTS_SHOW_NAMES'
-            ]
-          "
-          color="primary"
-          class="ml-3"
-          [checked]="itemsToShow['names']"
-          (change)="toggleItemToShow($event, 'names')"
-          >Names</mat-checkbox
-        >
-      </section>
+  </div>
 
-      <div
-        class="w-50 mb-2 d-flex justify-content-end"
-        style="height: 20px"
-        *ngIf="showLegend"
-      >
-        <table style="border: none; margin-left: 15px">
-          <tr style="height: 20px">
-            <td style="width: 30px; border: solid 1px #e2e2e2"></td>
-            <td>
-              <div style="margin-left: 3px; margin-right: 20px">No results</div>
-            </td>
-            <td
-              style="
-                background-color: #ec864acf;
-                width: 30px;
-                margin-left: 20px;
-              "
-            ></td>
-            <td>
-              <div style="margin-left: 3px; margin-right: 20px">
-                Has results
-              </div>
-            </td>
-            <td
-              style="width: 30px; margin-left: 20x"
-              [ngStyle]="{
-                'background-color': !LISConfigurations?.isLIS
-                  ? '#f5f171f7'
-                  : '#0080009e'
-              }"
-            ></td>
-            <td>
-              <div style="margin-left: 3px; margin-right: 20px">
+  <div class="row sample-header-visibility-row" *ngIf="params?.samples">
+    <div class="col-md-12 col-sx-12 col-sm-12">
+      <div class="sample-header-visibility-bar">
+        <section class="sample-header-visibility-controls">
+          <mat-checkbox
+            *ngIf="LISConfigurations?.isLIS"
+            [disabled]="
+              params?.currentUser &&
+              !params?.currentUser?.userPrivileges['ALL'] &&
+              !params?.currentUser?.userPrivileges[
+                'SAMPLE TESTING AND RESULTS_SHOW_MRN'
+              ]
+            "
+            color="primary"
+            [checked]="itemsToShow['mrn']"
+            (change)="toggleItemToShow($event, 'mrn')"
+            >Patient Identification</mat-checkbox
+          >
+          <mat-checkbox
+            *ngIf="LISConfigurations?.isLIS"
+            [disabled]="
+              params?.currentUser &&
+              !params?.currentUser?.userPrivileges['ALL'] &&
+              !params?.currentUser?.userPrivileges[
+                'SAMPLE TESTING AND RESULTS_SHOW_GENDER'
+              ]
+            "
+            color="primary"
+            [checked]="itemsToShow['gender']"
+            (change)="toggleItemToShow($event, 'gender')"
+            >Gender</mat-checkbox
+          >
+          <mat-checkbox
+            [disabled]="
+              params?.currentUser &&
+              !params?.currentUser?.userPrivileges['ALL'] &&
+              !params?.currentUser?.userPrivileges[
+                'SAMPLE TESTING AND RESULTS_SHOW_NAMES'
+              ]
+            "
+            color="primary"
+            [checked]="itemsToShow['names']"
+            (change)="toggleItemToShow($event, 'names')"
+            >Names</mat-checkbox
+          >
+        </section>
+
+        <div class="sample-header-legend-wrapper" *ngIf="showLegend">
+          <div class="sample-status-legend" aria-label="Sample status legend">
+            <div class="sample-status-legend-item">
+              <span class="sample-status-legend-swatch sample-status-legend-swatch--no-results"></span>
+              <span>No results</span>
+            </div>
+
+            <div class="sample-status-legend-item">
+              <span class="sample-status-legend-swatch sample-status-legend-swatch--has-results"></span>
+              <span>Has results</span>
+            </div>
+
+            <div class="sample-status-legend-item">
+              <span
+                class="sample-status-legend-swatch"
+                [ngClass]="!LISConfigurations?.isLIS ? 'sample-status-legend-swatch--waiting-approval' : 'sample-status-legend-swatch--authorized'"
+              ></span>
+              <span>
                 {{
                   !LISConfigurations?.isLIS
                     ? "Waiting second approval"
                     : "Authorized"
                 }}
-              </div>
-            </td>
-            <!-- <td
-          *ngIf="LISConfigurations?.isLIS"
-          style="background-color: #d04747ab; width: 40px; margin-left: 20px"
-        ></td>
-        <td *ngIf="LISConfigurations?.isLIS">
-          <div style="margin-left: 3px">Has Amended results</div>
-        </td> -->
+              </span>
+            </div>
 
-            <td
-              *ngIf="!LISConfigurations?.isLIS"
-              style="
-                background-color: #d04747ab;
-                width: 40px;
-                margin-left: 20px;
-              "
-            ></td>
-            <td *ngIf="!LISConfigurations?.isLIS">
-              <div style="margin-left: 3px">Has rejected results</div>
-            </td>
+            <div class="sample-status-legend-item" *ngIf="!LISConfigurations?.isLIS">
+              <span class="sample-status-legend-swatch sample-status-legend-swatch--rejected"></span>
+              <span>Has rejected results</span>
+            </div>
 
-            <td
-              *ngIf="!LISConfigurations?.isLIS"
-              style="
-                background-color: #6fd67bcf;
-                width: 40px;
-                margin-left: 20px;
-              "
-            ></td>
-            <td *ngIf="!LISConfigurations?.isLIS">
-              <div style="margin-left: 3px">Completed</div>
-            </td>
-          </tr>
-        </table>
+            <div class="sample-status-legend-item" *ngIf="!LISConfigurations?.isLIS">
+              <span class="sample-status-legend-swatch sample-status-legend-swatch--completed"></span>
+              <span>Completed</span>
+            </div>
+
+            <div class="sample-status-legend-item" *ngIf="LISConfigurations?.isLIS">
+              <span class="sample-status-legend-swatch sample-lifecycle-legend-key sample-lifecycle-legend-key--stored"></span>
+              <span>Stored</span>
+            </div>
+
+            <div class="sample-status-legend-item" *ngIf="LISConfigurations?.isLIS">
+              <span class="sample-status-legend-swatch sample-lifecycle-legend-key sample-lifecycle-legend-key--disposed"></span>
+              <span>Disposed</span>
+            </div>
+
+            <div class="sample-status-legend-item" *ngIf="LISConfigurations?.isLIS">
+              <span class="sample-status-legend-swatch sample-lifecycle-legend-key sample-lifecycle-legend-key--stored-and-disposed"></span>
+              <span>Stored and disposed</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -278,6 +270,9 @@
               [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
             >
               <td
+                class="sample-row-status-cell"
+                [ngClass]="getSampleLifecycleBorderClasses(sample)"
+                [attr.title]="getSampleLifecycleTitle(sample)"
                 *ngIf="orderCount == 0"
                 [attr.rowspan]="sample?.orders?.length"
               >
@@ -382,7 +377,7 @@
                 [attr.rowspan]="sample?.orders?.length"
               >
                 <span>
-                  {{ sample?.disposedStatus ? "DISPOSED" : "NOT DISPOSED" }}
+                  {{ isSampleDisposed(sample) ? "DISPOSED" : "NOT DISPOSED" }}
                 </span>
               </td>
               <td
@@ -395,7 +390,7 @@
                 >
                   <button
                     mat-flat-button
-                    [disabled]="sample?.disposedStatus"
+                    [disabled]="isSampleDisposed(sample)"
                     color="primary"
                     (click)="onDispose($event, sample)"
                   >
@@ -433,6 +428,7 @@
                     >
                       Print
                     </button>
+            
                     <section *ngIf="tabType === 'authorization'" class="ml-4">
                       <mat-checkbox
                         color="primary"
@@ -522,6 +518,33 @@
                     mat-flat-button
                     class="mt-2"
                     color="primary"
+                    (click)="onStore($event, sample)"
+                  >
+                    <mat-icon>archive</mat-icon>
+                    Store
+                  </button>
+                </div>
+
+                <div class="w-100 d-flex justify-content-end">
+                  <button
+                    *ngIf="LISConfigurations?.isLIS"
+                    mat-flat-button
+                    class="mt-2"
+                    color="primary"
+                    (click)="onOpenDisposeDialog($event, sample)"
+                    [disabled]="isSampleDisposed(sample)"
+                  >
+                    <mat-icon>delete_outline</mat-icon>
+                    Dispose
+                  </button>
+                </div>
+
+                <div class="w-100 d-flex justify-content-end">
+                  <button
+                    *ngIf="LISConfigurations?.isLIS"
+                    mat-flat-button
+                    class="mt-2"
+                    color="primary"
                     (click)="onToggleViewSampleDetails($event, sample)"
                   >
                     <mat-icon *ngIf="!samplesToViewMoreDetails[sample?.uuid]"
@@ -540,44 +563,13 @@
               *ngIf="samplesToViewMoreDetails[sample?.uuid]"
               class="sample-details-row"
             >
-              <td colspan="100%">
-                <app-shared-sample-details
-                  [sample]="sample"
-                ></app-shared-sample-details>
-              </td>
-              <td>
-                <div
-                  class="d-flex justify-content-end"
-                  *ngIf="tabType === 'samples-to-accept'"
-                >
-                  <!-- <button
-                    *ngIf="LISConfigurations?.isLIS"
-                    mat-flat-button
-                    color="primary"
-                    (click)="onAccept($event, sample, 'accept')"
-                  >
-                    Accept
-                  </button>
-  
-                  <button
-                    *ngIf="LISConfigurations?.isLIS"
-                    mat-stroked-button
-                    (click)="onReject($event, sample, 'reject')"
-                    class="ml-2 reject-button"
-                  >
-                    Reject
-                  </button>
-                  <section
-                    class="ml-4"
-                    *ngIf="LISConfigurations?.isLIS"
-                    title="Tick to accept or reject"
-                  >
-                    <mat-checkbox
-                      color="primary"
-                      (change)="onSelectItem($event, sample)"
-                    ></mat-checkbox>
-                  </section> -->
-                </div>
+              <td colspan="100">
+                <ng-container
+                  *ngTemplateOutlet="
+                    sampleDetailsPresentation;
+                    context: { sample: sample }
+                  "
+                ></ng-container>
               </td>
             </tr>
           </ng-container>
@@ -749,6 +741,9 @@
                               [ngClass]="{ 'row-alternated': count % 2 !== 0 }"
                             >
                               <td
+                                class="sample-row-status-cell"
+                                [ngClass]="getSampleLifecycleBorderClasses(sample)"
+                                [attr.title]="getSampleLifecycleTitle(sample)"
                                 *ngIf="orderCount == 0"
                                 [attr.rowspan]="sample?.orders?.length"
                               >
@@ -953,6 +948,19 @@
                                     }}
                                   </button>
                                 </div>
+                              </td>
+                            </tr>
+                            <tr
+                              *ngIf="samplesToViewMoreDetails[sample?.uuid]"
+                              class="sample-details-row"
+                            >
+                              <td colspan="100">
+                                <ng-container
+                                  *ngTemplateOutlet="
+                                    sampleDetailsPresentation;
+                                    context: { sample: sample }
+                                  "
+                                ></ng-container>
                               </td>
                             </tr>
                           </ng-container>

@@ -1,0 +1,71 @@
+<div class="delete-dialog-shell storage-delete-dialog">
+  <div class="delete-dialog-header">
+    <div class="delete-dialog-icon" aria-hidden="true">
+      <mat-icon>warning</mat-icon>
+    </div>
+
+    <div class="delete-dialog-copy">
+      <p class="delete-dialog-kicker">Confirm deletion</p>
+      <h2>Delete {{ data.entityLabel }}</h2>
+      <p class="delete-dialog-description">
+        {{ data.description }}
+      </p>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="delete-dialog-body">
+    <div class="delete-dialog-target">
+      <span class="delete-dialog-target-label"
+        >Selected {{ data.entityLabel }}</span
+      >
+      <strong>{{ data.name }}</strong>
+    </div>
+
+    <div class="delete-dialog-impact">
+      <mat-icon>info</mat-icon>
+      <span>{{ data.impactMessage }}</span>
+    </div>
+
+    <div class="delete-dialog-warning">
+      <mat-icon>security</mat-icon>
+      <span
+        >This action should only continue when you are certain the record is not
+        being used operationally.</span
+      >
+    </div>
+
+    <div class="delete-dialog-error" *ngIf="errorMessage">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+  </div>
+
+  <div class="delete-dialog-actions">
+    <button
+      mat-stroked-button
+      type="button"
+      (click)="close()"
+      [disabled]="deleting"
+    >
+      Cancel
+    </button>
+
+    <button
+      mat-flat-button
+      color="warn"
+      type="button"
+      (click)="confirm()"
+      [disabled]="deleting"
+    >
+      <mat-progress-spinner
+        *ngIf="deleting"
+        diameter="18"
+        mode="indeterminate"
+      ></mat-progress-spinner>
+      <mat-icon *ngIf="!deleting">delete</mat-icon>
+      <span>{{ confirmLabel }}</span>
+    </button>
+  </div>
+</div>

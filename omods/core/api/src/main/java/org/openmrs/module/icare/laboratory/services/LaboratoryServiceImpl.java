@@ -25,6 +25,18 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	SampleStatusDAO sampleStatusDAO;
 	
+	StorageDAO storageDAO;
+	
+	StorageTypeDAO storageTypeDAO;
+	
+	StorageLocationTypeDAO storageLocationTypeDAO;
+	
+	StorageLocationDAO storageLocationDAO;
+	
+	SampleStorageOccupancyDAO sampleStorageOccupancyDAO;
+	
+	SampleDisposalRecordDAO sampleDisposalRecordDAO;
+	
 	TestAllocationDAO testAllocationDAO;
 	
 	ResultDAO resultDAO;
@@ -77,6 +89,30 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	
 	public void setSampleStatusDAO(SampleStatusDAO sampleStatusDAO) {
 		this.sampleStatusDAO = sampleStatusDAO;
+	}
+	
+	public void setStorageDAO(StorageDAO storageDAO) {
+		this.storageDAO = storageDAO;
+	}
+	
+	public void setStorageTypeDAO(StorageTypeDAO storageTypeDAO) {
+		this.storageTypeDAO = storageTypeDAO;
+	}
+	
+	public void setStorageLocationTypeDAO(StorageLocationTypeDAO storageLocationTypeDAO) {
+		this.storageLocationTypeDAO = storageLocationTypeDAO;
+	}
+	
+	public void setStorageLocationDAO(StorageLocationDAO storageLocationDAO) {
+		this.storageLocationDAO = storageLocationDAO;
+	}
+	
+	public void setSampleStorageOccupancyDAO(SampleStorageOccupancyDAO sampleStorageOccupancyDAO) {
+		this.sampleStorageOccupancyDAO = sampleStorageOccupancyDAO;
+	}
+	
+	public void setSampleDisposalRecordDAO(SampleDisposalRecordDAO sampleDisposalRecordDAO) {
+		this.sampleDisposalRecordDAO = sampleDisposalRecordDAO;
 	}
 	
 	public void setTestAllocationDAO(TestAllocationDAO testAllocationDAO) {
@@ -192,6 +228,14 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 	}
 	
 	@Override
+	public ListResult<Sample> getSamplesByOrderType(Date startDate, Date endDate, Pager pager, String orderTypeUuid,
+	        Boolean haveThisOrderType, String q, String fulfillerStatus, String formUuid, Boolean haveThisForm,
+	        Boolean combineWithOr) {
+		return this.sampleDAO.getSamplesByOrderType(startDate, endDate, pager, orderTypeUuid, haveThisOrderType, q,
+		    fulfillerStatus, formUuid, haveThisForm, combineWithOr);
+	}
+	
+	@Override
 	public List<Sample> getSampleByDates(Date startDate, Date endDate) {
 		return this.sampleDAO.getSamplesByDates(startDate, endDate);
 	}
@@ -231,6 +275,898 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 		
 		// Save the sampleStatus entity
 		return this.sampleStatusDAO.save(sampleStatus);
+	}
+	
+	@Override
+	public SampleStatus addSampleStorageStatus(SampleStatus sampleStatus) throws Exception {
+		if (sampleStatus == null) {
+			throw new Exception("Sample storage status details are required.");
+		}
+		if (sampleStatus.getCategory() == null || sampleStatus.getCategory().trim().equals("")) {
+			sampleStatus.setCategory("STORAGE");
+		}
+		if (sampleStatus.getStatus() == null || sampleStatus.getStatus().trim().equals("")) {
+			sampleStatus.setStatus("STORED");
+		}
+		if (sampleStatus.getTimestamp() == null) {
+			sampleStatus.setTimestamp(new Date());
+		}
+		return updateSampleStatus(sampleStatus);
+	}
+	
+	@Override
+	public SampleStatus addSampleDisposalStatus(SampleStatus sampleStatus) throws Exception {
+		if (sampleStatus == null) {
+			throw new Exception("Sample disposal status details are required.");
+		}
+		if (sampleStatus.getCategory() == null || sampleStatus.getCategory().trim().equals("")) {
+			sampleStatus.setCategory("DISPOSAL");
+		}
+		if (sampleStatus.getStatus() == null || sampleStatus.getStatus().trim().equals("")) {
+			sampleStatus.setStatus("DISPOSED");
+		}
+		if (sampleStatus.getTimestamp() == null) {
+			sampleStatus.setTimestamp(new Date());
+		}
+		return updateSampleStatus(sampleStatus);
+	}
+	
+	@Override
+	public StorageType addStorageType(StorageType storageType) throws Exception {
+		if (storageType == null || storageType.getName() == null || storageType.getName().trim().equals("")) {
+			throw new Exception("Storage type name is required.");
+		}
+		String normalizedName = storageType.getName().trim();
+		for (StorageType existingStorageType : getAllStorageTypesUnsafe()) {
+			if (isActive(existingStorageType) && existingStorageType.getName() != null
+			        && existingStorageType.getName().trim().equalsIgnoreCase(normalizedName)) {
+				throw new Exception("Storage type '" + normalizedName + "' already exists.");
+			}
+		}
+		storageType.setName(normalizedName);
+		applyCreationAudit(storageType);
+		return this.storageTypeDAO.save(storageType);
+	}
+	
+	@Override
+	public ListResult<StorageType> getStorageTypes(Pager pager, String q) {
+		return this.storageTypeDAO.getStorageTypes(pager, q);
+	}
+	
+	@Override
+	public StorageType getStorageTypeByUuid(String storageTypeUuid) throws Exception {
+		StorageType storageType = this.storageTypeDAO.findByUuid(storageTypeUuid);
+		if (!isActive(storageType)) {
+			throw new Exception("Storage type with uuid '" + storageTypeUuid + "' does not exist.");
+		}
+		return storageType;
+	}
+	
+	@Override
+	public StorageType updateStorageType(String storageTypeUuid, StorageType storageType) throws Exception {
+		StorageType existingStorageType = getStorageTypeByUuid(storageTypeUuid);
+		if (storageType != null && storageType.getName() != null && !storageType.getName().trim().equals("")) {
+			String normalizedName = storageType.getName().trim();
+			for (StorageType candidate : getAllStorageTypesUnsafe()) {
+				if (isActive(candidate) && candidate.getName() != null
+				        && candidate.getName().trim().equalsIgnoreCase(normalizedName)
+				        && !candidate.getUuid().equals(existingStorageType.getUuid())) {
+					throw new Exception("Storage type '" + normalizedName + "' already exists.");
+				}
+			}
+			existingStorageType.setName(normalizedName);
+		}
+		applyChangeAudit(existingStorageType);
+		return this.storageTypeDAO.update(existingStorageType);
+	}
+	
+	@Override
+	public StorageType deleteStorageType(String storageTypeUuid, String reason) throws Exception {
+		StorageType existingStorageType = getStorageTypeByUuid(storageTypeUuid);
+		for (Storage storage : getAllStoragesUnsafe()) {
+			if (isActive(storage) && storage.getStorageType() != null
+			        && existingStorageType.getUuid().equals(storage.getStorageType().getUuid())) {
+				throw new Exception("Storage type '" + existingStorageType.getName()
+				        + "' is still in use and cannot be deleted.");
+			}
+		}
+		applyDeleteAudit(existingStorageType, reason);
+		return this.storageTypeDAO.update(existingStorageType);
+	}
+	
+	@Override
+	public Storage addStorage(Storage storage) throws Exception {
+		if (storage == null) {
+			throw new Exception("Storage details are required.");
+		}
+		if (storage.getName() == null || storage.getName().trim().equals("")) {
+			throw new Exception("Storage name is required.");
+		}
+		StorageType resolvedStorageType = resolveStorageTypeReference(storage.getStorageType());
+		String normalizedName = storage.getName().trim();
+		for (Storage existingStorage : getAllStoragesUnsafe()) {
+			if (isActive(existingStorage) && existingStorage.getName() != null
+			        && existingStorage.getName().trim().equalsIgnoreCase(normalizedName)
+			        && existingStorage.getStorageType() != null
+			        && resolvedStorageType.getUuid().equals(existingStorage.getStorageType().getUuid())) {
+				throw new Exception("Storage '" + normalizedName + "' already exists for storage type '"
+				        + resolvedStorageType.getName() + "'.");
+			}
+		}
+		storage.setName(normalizedName);
+		storage.setStorageType(resolvedStorageType);
+		applyCreationAudit(storage);
+		return this.storageDAO.save(storage);
+	}
+	
+	@Override
+	public ListResult<Storage> getStorages(Pager pager, String q, String storageTypeUuid) {
+		return this.storageDAO.getStorages(pager, q, storageTypeUuid);
+	}
+	
+	@Override
+	public Storage getStorageByUuid(String storageUuid) throws Exception {
+		Storage storage = this.storageDAO.findByUuid(storageUuid);
+		if (!isActive(storage)) {
+			throw new Exception("Storage with uuid '" + storageUuid + "' does not exist.");
+		}
+		return storage;
+	}
+	
+	@Override
+	public Storage updateStorage(String storageUuid, Storage storage) throws Exception {
+		Storage existingStorage = getStorageByUuid(storageUuid);
+		StorageType resolvedStorageType = existingStorage.getStorageType();
+		if (storage != null
+		        && storage.getStorageType() != null
+		        && ((storage.getStorageType().getUuid() != null && !storage.getStorageType().getUuid().trim().equals("")) || hasValidStorageTypeId(storage
+		                .getStorageType()))) {
+			resolvedStorageType = resolveStorageTypeReference(storage.getStorageType());
+		}
+		String normalizedName = storage != null && storage.getName() != null && !storage.getName().trim().equals("") ? storage
+		        .getName().trim() : existingStorage.getName();
+		for (Storage candidate : getAllStoragesUnsafe()) {
+			if (isActive(candidate) && candidate.getName() != null
+			        && candidate.getName().trim().equalsIgnoreCase(normalizedName) && candidate.getStorageType() != null
+			        && resolvedStorageType.getUuid().equals(candidate.getStorageType().getUuid())
+			        && !candidate.getUuid().equals(existingStorage.getUuid())) {
+				throw new Exception("Storage '" + normalizedName + "' already exists for storage type '"
+				        + resolvedStorageType.getName() + "'.");
+			}
+		}
+		existingStorage.setName(normalizedName);
+		if (storage != null && storage.getCapacity() != null) {
+			existingStorage.setCapacity(storage.getCapacity());
+		}
+		existingStorage.setStorageType(resolvedStorageType);
+		applyChangeAudit(existingStorage);
+		return this.storageDAO.update(existingStorage);
+	}
+	
+	@Override
+	public Storage deleteStorage(String storageUuid, String reason) throws Exception {
+		Storage existingStorage = getStorageByUuid(storageUuid);
+		applyDeleteAudit(existingStorage, reason);
+		return this.storageDAO.update(existingStorage);
+	}
+	
+	private StorageType resolveStorageTypeReference(StorageType storageTypeReference) throws Exception {
+		if (storageTypeReference == null) {
+			throw new Exception("Storage type is required.");
+		}
+		StorageType storageType = null;
+		if (storageTypeReference.getUuid() != null && !storageTypeReference.getUuid().trim().equals("")) {
+			storageType = this.storageTypeDAO.findByUuid(storageTypeReference.getUuid());
+		}
+		if (!isActive(storageType) && hasValidStorageTypeId(storageTypeReference)) {
+			for (StorageType candidate : getAllStorageTypesUnsafe()) {
+				if (isActive(candidate) && candidate.getId().intValue() == storageTypeReference.getId().intValue()) {
+					storageType = candidate;
+					break;
+				}
+			}
+		}
+		if (!isActive(storageType)) {
+			throw new Exception("Storage type does not exist.");
+		}
+		return storageType;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<StorageType> getAllStorageTypesUnsafe() {
+		return (List<StorageType>) IteratorUtils.toList(this.storageTypeDAO.findAll().iterator());
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<Storage> getAllStoragesUnsafe() {
+		return (List<Storage>) IteratorUtils.toList(this.storageDAO.findAll().iterator());
+	}
+	
+	private boolean hasValidStorageTypeId(StorageType storageTypeReference) {
+		return storageTypeReference != null && storageTypeReference.getId() != null
+		        && storageTypeReference.getId().intValue() > 0;
+	}
+	
+	private boolean isActive(BaseOpenmrsData data) {
+		return data != null && (data.getVoided() == null || !data.getVoided());
+	}
+	
+	private void applyCreationAudit(BaseOpenmrsData data) {
+		if (data.getUuid() == null || data.getUuid().trim().equals("")) {
+			data.setUuid(UUID.randomUUID().toString());
+		}
+		if (data.getCreator() == null) {
+			data.setCreator(Context.getAuthenticatedUser());
+		}
+		if (data.getDateCreated() == null) {
+			data.setDateCreated(new Date());
+		}
+		data.setVoided(false);
+	}
+	
+	private void applyChangeAudit(BaseOpenmrsData data) {
+		data.setChangedBy(Context.getAuthenticatedUser());
+		data.setDateChanged(new Date());
+	}
+	
+	private void applyDeleteAudit(BaseOpenmrsData data, String reason) {
+		data.setVoided(true);
+		data.setVoidedBy(Context.getAuthenticatedUser());
+		data.setDateVoided(new Date());
+		data.setVoidReason(reason != null && !reason.trim().equals("") ? reason.trim() : "Deleted via API");
+	}
+	
+	@Override
+	public StorageLocationType addStorageLocationType(StorageLocationType storageLocationType) throws Exception {
+		if (storageLocationType == null) {
+			throw new Exception("Storage location type details are required.");
+		}
+		if (storageLocationType.getCode() == null || storageLocationType.getCode().trim().equals("")) {
+			throw new Exception("Storage location type code is required.");
+		}
+		if (storageLocationType.getName() == null || storageLocationType.getName().trim().equals("")) {
+			throw new Exception("Storage location type name is required.");
+		}
+		String normalizedCode = storageLocationType.getCode().trim().toUpperCase(Locale.ENGLISH);
+		String normalizedName = storageLocationType.getName().trim();
+		for (StorageLocationType candidate : getAllStorageLocationTypesUnsafe()) {
+			if (!isActive(candidate)) {
+				continue;
+			}
+			if ((candidate.getCode() != null && candidate.getCode().trim().equalsIgnoreCase(normalizedCode))
+			        || (candidate.getName() != null && candidate.getName().trim().equalsIgnoreCase(normalizedName))) {
+				throw new Exception("Storage location type '" + normalizedName + "' already exists.");
+			}
+		}
+		storageLocationType.setCode(normalizedCode);
+		storageLocationType.setName(normalizedName);
+		if (storageLocationType.getStructural() == null) {
+			storageLocationType.setStructural(false);
+		}
+		if (storageLocationType.getSlotBearing() == null) {
+			storageLocationType.setSlotBearing(false);
+		}
+		applyCreationAudit(storageLocationType);
+		return this.storageLocationTypeDAO.save(storageLocationType);
+	}
+	
+	@Override
+	public ListResult<StorageLocationType> getStorageLocationTypes(Pager pager, String q) {
+		return this.storageLocationTypeDAO.getStorageLocationTypes(pager, q);
+	}
+	
+	@Override
+	public StorageLocationType getStorageLocationTypeByUuid(String storageLocationTypeUuid) throws Exception {
+		StorageLocationType type = this.storageLocationTypeDAO.findByUuid(storageLocationTypeUuid);
+		if (!isActive(type)) {
+			throw new Exception("Storage location type with uuid '" + storageLocationTypeUuid + "' does not exist.");
+		}
+		return type;
+	}
+	
+	@Override
+	public StorageLocationType updateStorageLocationType(String storageLocationTypeUuid,
+	        StorageLocationType storageLocationType) throws Exception {
+		StorageLocationType existing = getStorageLocationTypeByUuid(storageLocationTypeUuid);
+		String normalizedCode = storageLocationType != null && storageLocationType.getCode() != null
+		        && !storageLocationType.getCode().trim().equals("") ? storageLocationType.getCode().trim()
+		        .toUpperCase(Locale.ENGLISH) : existing.getCode();
+		String normalizedName = storageLocationType != null && storageLocationType.getName() != null
+		        && !storageLocationType.getName().trim().equals("") ? storageLocationType.getName().trim() : existing
+		        .getName();
+		for (StorageLocationType candidate : getAllStorageLocationTypesUnsafe()) {
+			if (!isActive(candidate) || candidate.getUuid().equals(existing.getUuid())) {
+				continue;
+			}
+			if ((candidate.getCode() != null && candidate.getCode().trim().equalsIgnoreCase(normalizedCode))
+			        || (candidate.getName() != null && candidate.getName().trim().equalsIgnoreCase(normalizedName))) {
+				throw new Exception("Storage location type '" + normalizedName + "' already exists.");
+			}
+		}
+		existing.setCode(normalizedCode);
+		existing.setName(normalizedName);
+		if (storageLocationType != null) {
+			if (storageLocationType.getDescription() != null) {
+				existing.setDescription(storageLocationType.getDescription());
+			}
+			if (storageLocationType.getLevelOrder() != null) {
+				existing.setLevelOrder(storageLocationType.getLevelOrder());
+			}
+			if (storageLocationType.getStructural() != null) {
+				existing.setStructural(storageLocationType.getStructural());
+			}
+			if (storageLocationType.getSlotBearing() != null) {
+				existing.setSlotBearing(storageLocationType.getSlotBearing());
+			}
+			if (storageLocationType.getMetadataJson() != null) {
+				existing.setMetadataJson(storageLocationType.getMetadataJson());
+			}
+		}
+		applyChangeAudit(existing);
+		return this.storageLocationTypeDAO.update(existing);
+	}
+	
+	@Override
+	public StorageLocationType deleteStorageLocationType(String storageLocationTypeUuid, String reason) throws Exception {
+		StorageLocationType existing = getStorageLocationTypeByUuid(storageLocationTypeUuid);
+		for (StorageLocation location : getAllStorageLocationsUnsafe()) {
+			if (isActive(location) && location.getLocationType() != null
+			        && existing.getUuid().equals(location.getLocationType().getUuid())) {
+				throw new Exception("Storage location type '" + existing.getName()
+				        + "' is still associated with one or more storage locations.");
+			}
+		}
+		applyDeleteAudit(existing, reason);
+		return this.storageLocationTypeDAO.update(existing);
+	}
+	
+	@Override
+	public StorageLocation addStorageLocation(StorageLocation storageLocation) throws Exception {
+		if (storageLocation == null) {
+			throw new Exception("Storage location details are required.");
+		}
+		if (storageLocation.getCode() == null || storageLocation.getCode().trim().equals("")) {
+			throw new Exception("Storage location code is required.");
+		}
+		if (storageLocation.getName() == null || storageLocation.getName().trim().equals("")) {
+			throw new Exception("Storage location name is required.");
+		}
+		StorageLocationType resolvedType = resolveStorageLocationTypeReference(storageLocation.getLocationType());
+		StorageLocation resolvedParent = resolveStorageLocationParentReference(storageLocation.getParentLocation());
+		String normalizedCode = storageLocation.getCode().trim().toUpperCase(Locale.ENGLISH);
+		String normalizedName = storageLocation.getName().trim();
+		ensureUniqueStorageLocation(normalizedCode, normalizedName, resolvedParent, null);
+		storageLocation.setCode(normalizedCode);
+		storageLocation.setName(normalizedName);
+		storageLocation.setLocationType(resolvedType);
+		storageLocation.setParentLocation(resolvedParent);
+		storageLocation.setPathDepth(calculatePathDepth(resolvedParent));
+		storageLocation.setPathLabel(buildStorageLocationPath(resolvedParent, normalizedName));
+		if (storageLocation.getSlot() == null) {
+			storageLocation.setSlot(Boolean.TRUE.equals(resolvedType.getSlotBearing()));
+		}
+		applyCreationAudit(storageLocation);
+		return this.storageLocationDAO.save(storageLocation);
+	}
+	
+	@Override
+	public ListResult<StorageLocation> getStorageLocations(Pager pager, String q, String parentLocationUuid,
+	        String locationTypeUuid, Boolean slotOnly) {
+		return this.storageLocationDAO.getStorageLocations(pager, q, parentLocationUuid, locationTypeUuid, slotOnly);
+	}
+	
+	@Override
+	public StorageLocation getStorageLocationByUuid(String storageLocationUuid) throws Exception {
+		StorageLocation location = this.storageLocationDAO.findByUuid(storageLocationUuid);
+		if (!isActive(location)) {
+			throw new Exception("Storage location with uuid '" + storageLocationUuid + "' does not exist.");
+		}
+		return location;
+	}
+	
+	@Override
+	public StorageLocation updateStorageLocation(String storageLocationUuid, StorageLocation storageLocation)
+	        throws Exception {
+		StorageLocation existing = getStorageLocationByUuid(storageLocationUuid);
+		StorageLocationType resolvedType = existing.getLocationType();
+		if (storageLocation != null
+		        && storageLocation.getLocationType() != null
+		        && (storageLocation.getLocationType().getUuid() != null || storageLocation.getLocationType().getId() != null)) {
+			resolvedType = resolveStorageLocationTypeReference(storageLocation.getLocationType());
+		}
+		StorageLocation resolvedParent = existing.getParentLocation();
+		if (storageLocation != null
+		        && storageLocation.getParentLocation() != null
+		        && (storageLocation.getParentLocation().getUuid() != null || storageLocation.getParentLocation().getId() != null)) {
+			resolvedParent = resolveStorageLocationParentReference(storageLocation.getParentLocation());
+		}
+		String normalizedCode = storageLocation != null && storageLocation.getCode() != null
+		        && !storageLocation.getCode().trim().equals("") ? storageLocation.getCode().trim()
+		        .toUpperCase(Locale.ENGLISH) : existing.getCode();
+		String normalizedName = storageLocation != null && storageLocation.getName() != null
+		        && !storageLocation.getName().trim().equals("") ? storageLocation.getName().trim() : existing.getName();
+		ensureUniqueStorageLocation(normalizedCode, normalizedName, resolvedParent, existing.getUuid());
+		existing.setCode(normalizedCode);
+		existing.setName(normalizedName);
+		existing.setLocationType(resolvedType);
+		existing.setParentLocation(resolvedParent);
+		existing.setPathDepth(calculatePathDepth(resolvedParent));
+		existing.setPathLabel(buildStorageLocationPath(resolvedParent, normalizedName));
+		if (storageLocation != null) {
+			if (storageLocation.getBarcode() != null) {
+				existing.setBarcode(storageLocation.getBarcode());
+			}
+			if (storageLocation.getRowsCount() != null) {
+				existing.setRowsCount(storageLocation.getRowsCount());
+			}
+			if (storageLocation.getColumnsCount() != null) {
+				existing.setColumnsCount(storageLocation.getColumnsCount());
+			}
+			if (storageLocation.getLayersCount() != null) {
+				existing.setLayersCount(storageLocation.getLayersCount());
+			}
+			if (storageLocation.getSlotPattern() != null) {
+				existing.setSlotPattern(storageLocation.getSlotPattern());
+			}
+			if (storageLocation.getSlotSeparator() != null) {
+				existing.setSlotSeparator(storageLocation.getSlotSeparator());
+			}
+			if (storageLocation.getSlot() != null) {
+				existing.setSlot(storageLocation.getSlot());
+			}
+			if (storageLocation.getStorageConditionType() != null) {
+				existing.setStorageConditionType(storageLocation.getStorageConditionType());
+			}
+			if (storageLocation.getMinTemperature() != null) {
+				existing.setMinTemperature(storageLocation.getMinTemperature());
+			}
+			if (storageLocation.getMaxTemperature() != null) {
+				existing.setMaxTemperature(storageLocation.getMaxTemperature());
+			}
+			if (storageLocation.getCapacity() != null) {
+				existing.setCapacity(storageLocation.getCapacity());
+			}
+			if (storageLocation.getMetadataJson() != null) {
+				existing.setMetadataJson(storageLocation.getMetadataJson());
+			}
+		}
+		applyChangeAudit(existing);
+		return this.storageLocationDAO.update(existing);
+	}
+	
+	@Override
+	public StorageLocation deleteStorageLocation(String storageLocationUuid, String reason) throws Exception {
+		StorageLocation existing = getStorageLocationByUuid(storageLocationUuid);
+		for (StorageLocation child : getAllStorageLocationsUnsafe()) {
+			if (isActive(child) && child.getParentLocation() != null
+			        && existing.getUuid().equals(child.getParentLocation().getUuid())) {
+				throw new Exception("Storage location '" + existing.getName() + "' still has child locations.");
+			}
+		}
+		for (SampleStorageOccupancy occupancy : getAllSampleStorageOccupanciesUnsafe()) {
+			if (isActive(occupancy) && occupancy.getActiveOccupancy() != null && occupancy.getActiveOccupancy()
+			        && occupancy.getSlotLocation() != null
+			        && existing.getUuid().equals(occupancy.getSlotLocation().getUuid())) {
+				throw new Exception("Storage location '" + existing.getName()
+				        + "' is currently occupied and cannot be deleted.");
+			}
+		}
+		applyDeleteAudit(existing, reason);
+		return this.storageLocationDAO.update(existing);
+	}
+	
+	@Override
+	public List<StorageLocation> generateStorageLocationSlots(String storageLocationUuid, Integer rowsCount,
+	        Integer columnsCount, Integer layersCount, String slotPattern) throws Exception {
+		StorageLocation parent = getStorageLocationByUuid(storageLocationUuid);
+		Integer rows = rowsCount != null ? rowsCount : parent.getRowsCount();
+		Integer columns = columnsCount != null ? columnsCount : parent.getColumnsCount();
+		Integer layers = layersCount != null ? layersCount : parent.getLayersCount();
+		if (rows == null || rows.intValue() <= 0) {
+			rows = 1;
+		}
+		if (columns == null || columns.intValue() <= 0) {
+			columns = 1;
+		}
+		if (layers == null || layers.intValue() <= 0) {
+			layers = 1;
+		}
+		StorageLocationType slotType = resolveSlotLocationType();
+		List<StorageLocation> createdSlots = new ArrayList<StorageLocation>();
+		for (int layer = 1; layer <= layers.intValue(); layer++) {
+			for (int row = 1; row <= rows.intValue(); row++) {
+				for (int column = 1; column <= columns.intValue(); column++) {
+					String label = generateSlotLabel(layer, row, column,
+					    slotPattern != null && !slotPattern.trim().equals("") ? slotPattern : parent.getSlotPattern());
+					String code = parent.getCode() + "-" + label;
+					StorageLocation existingSlot = findStorageLocationByCodeUnderParent(code, parent);
+					if (isActive(existingSlot)) {
+						createdSlots.add(existingSlot);
+						continue;
+					}
+					StorageLocation slot = new StorageLocation();
+					slot.setCode(code);
+					slot.setName(label);
+					slot.setLocationType(slotType);
+					slot.setParentLocation(parent);
+					slot.setSlot(true);
+					slot.setPathDepth(calculatePathDepth(parent));
+					slot.setPathLabel(buildStorageLocationPath(parent, label));
+					applyCreationAudit(slot);
+					createdSlots.add(this.storageLocationDAO.save(slot));
+				}
+			}
+		}
+		return createdSlots;
+	}
+	
+	@Override
+	public SampleStorageOccupancy storeSample(String sampleUuid, String slotLocationUuid, String occupancyType,
+	        Double quantityStored, String quantityUnit, String remarks) throws Exception {
+		Sample sample = resolveSampleReferenceByUuid(sampleUuid);
+		StorageLocation slotLocation = resolveSlotLocation(slotLocationUuid);
+		ensureSlotAvailableForStorage(slotLocation, sample.getUuid());
+		SampleStorageOccupancy current = this.sampleStorageOccupancyDAO.getActiveBySampleUuid(sample.getUuid());
+		if (isActive(current) && Boolean.TRUE.equals(current.getActiveOccupancy())) {
+			throw new Exception("Sample '" + sample.getLabel() + "' is already assigned to an active storage slot.");
+		}
+		SampleStorageOccupancy occupancy = new SampleStorageOccupancy();
+		occupancy.setSample(sample);
+		occupancy.setSlotLocation(slotLocation);
+		occupancy.setOccupancyType(occupancyType != null && !occupancyType.trim().equals("") ? occupancyType.trim()
+		        .toUpperCase(Locale.ENGLISH) : "PRIMARY");
+		occupancy.setStoredAt(new Date());
+		occupancy.setActiveOccupancy(true);
+		occupancy.setDisposed(false);
+		occupancy.setQuantityStored(quantityStored);
+		occupancy.setQuantityUnit(quantityUnit);
+		occupancy.setRemarks(remarks);
+		occupancy.setFullAddress(slotLocation.getPathLabel());
+		applyCreationAudit(occupancy);
+		SampleStorageOccupancy saved = this.sampleStorageOccupancyDAO.save(occupancy);
+		saveCompatibilitySampleStatus(sample, "STORAGE", "STORED", "Stored at " + slotLocation.getPathLabel()
+		        + (remarks != null && !remarks.trim().equals("") ? " | " + remarks.trim() : ""));
+		return saved;
+	}
+	
+	@Override
+	public SampleStorageOccupancy moveStoredSample(String sampleUuid, String slotLocationUuid, String remarks)
+	        throws Exception {
+		Sample sample = resolveSampleReferenceByUuid(sampleUuid);
+		SampleStorageOccupancy current = this.sampleStorageOccupancyDAO.getActiveBySampleUuid(sample.getUuid());
+		if (!isActive(current) || !Boolean.TRUE.equals(current.getActiveOccupancy())) {
+			throw new Exception("Sample '" + sample.getLabel() + "' is not currently stored in an active slot.");
+		}
+		StorageLocation targetSlot = resolveSlotLocation(slotLocationUuid);
+		ensureSlotAvailableForStorage(targetSlot, sample.getUuid());
+		current.setActiveOccupancy(false);
+		current.setReleasedAt(new Date());
+		current.setRemarks(appendRemark(current.getRemarks(), remarks));
+		applyChangeAudit(current);
+		this.sampleStorageOccupancyDAO.update(current);
+		SampleStorageOccupancy moved = storeSample(sample.getUuid(), targetSlot.getUuid(),
+		    current.getOccupancyType() != null ? current.getOccupancyType() : "PRIMARY", current.getQuantityStored(),
+		    current.getQuantityUnit(), remarks);
+		saveCompatibilitySampleStatus(sample, "STORAGE_MOVED", "MOVED", "Moved from " + current.getFullAddress() + " to "
+		        + targetSlot.getPathLabel() + (remarks != null && !remarks.trim().equals("") ? " | " + remarks.trim() : ""));
+		return moved;
+	}
+	
+	@Override
+	public SampleStorageOccupancy releaseStoredSample(String sampleUuid, String releaseReason) throws Exception {
+		Sample sample = resolveSampleReferenceByUuid(sampleUuid);
+		SampleStorageOccupancy current = this.sampleStorageOccupancyDAO.getActiveBySampleUuid(sample.getUuid());
+		if (!isActive(current) || !Boolean.TRUE.equals(current.getActiveOccupancy())) {
+			throw new Exception("Sample '" + sample.getLabel() + "' is not currently stored in an active slot.");
+		}
+		current.setActiveOccupancy(false);
+		current.setReleasedAt(new Date());
+		current.setRemarks(appendRemark(current.getRemarks(), releaseReason));
+		applyChangeAudit(current);
+		SampleStorageOccupancy updated = this.sampleStorageOccupancyDAO.update(current);
+		saveCompatibilitySampleStatus(sample, "STORAGE_RELEASED", "REMOVED FROM STORAGE",
+		    "Released from " + current.getFullAddress()
+		            + (releaseReason != null && !releaseReason.trim().equals("") ? " | " + releaseReason.trim() : ""));
+		return updated;
+	}
+	
+	@Override
+	public SampleDisposalRecord disposeSample(String sampleUuid, String disposalMethod, String disposalReason, String remarks)
+	        throws Exception {
+		Sample sample = resolveSampleReferenceByUuid(sampleUuid);
+		SampleStorageOccupancy current = this.sampleStorageOccupancyDAO.getActiveBySampleUuid(sample.getUuid());
+		if (isActive(current) && Boolean.TRUE.equals(current.getActiveOccupancy())) {
+			current.setActiveOccupancy(false);
+			current.setDisposed(true);
+			current.setReleasedAt(new Date());
+			current.setRemarks(appendRemark(current.getRemarks(), remarks));
+			applyChangeAudit(current);
+			this.sampleStorageOccupancyDAO.update(current);
+		}
+		SampleDisposalRecord record = new SampleDisposalRecord();
+		record.setSample(sample);
+		record.setOccupancy(current);
+		record.setDisposalMethod(disposalMethod != null && !disposalMethod.trim().equals("") ? disposalMethod.trim()
+		        : "UNSPECIFIED");
+		record.setDisposalReason(disposalReason != null && !disposalReason.trim().equals("") ? disposalReason.trim()
+		        : "Disposed");
+		record.setDisposedAt(new Date());
+		record.setApprovalRequired(false);
+		record.setApproved(true);
+		record.setRemarks(remarks);
+		applyCreationAudit(record);
+		SampleDisposalRecord saved = this.sampleDisposalRecordDAO.save(record);
+		saveCompatibilitySampleStatus(sample, "DISPOSED", "DISPOSED", "Disposed"
+		        + (disposalMethod != null && !disposalMethod.trim().equals("") ? " via " + disposalMethod.trim() : "")
+		        + (disposalReason != null && !disposalReason.trim().equals("") ? " | " + disposalReason.trim() : "")
+		        + (remarks != null && !remarks.trim().equals("") ? " | " + remarks.trim() : ""));
+		return saved;
+	}
+	
+	@Override
+	public Map<String, Object> getSampleStorageSummary(String sampleUuid) throws Exception {
+		Sample sample = resolveSampleReferenceByUuid(sampleUuid);
+		Map<String, Object> response = new HashMap<String, Object>();
+		response.put("sampleUuid", sample.getUuid());
+		response.put("sampleLabel", sample.getLabel());
+		SampleStorageOccupancy current = this.sampleStorageOccupancyDAO.getActiveBySampleUuid(sample.getUuid());
+		response.put("currentOccupancy", current != null ? current.toMap() : null);
+		List<Map<String, Object>> history = new ArrayList<Map<String, Object>>();
+		for (SampleStorageOccupancy occupancy : this.sampleStorageOccupancyDAO.getBySampleUuid(sample.getUuid())) {
+			history.add(occupancy.toMap());
+		}
+		response.put("storageHistory", history);
+		SampleDisposalRecord disposalRecord = this.sampleDisposalRecordDAO.getLatestBySampleUuid(sample.getUuid());
+		response.put("disposal", disposalRecord != null ? disposalRecord.toMap() : null);
+		response.put("disposed", disposalRecord != null);
+		return response;
+	}
+	
+	@Override
+	public Map<String, Object> getSlotOccupancySummary(String slotLocationUuid) throws Exception {
+		StorageLocation slot = resolveSlotLocation(slotLocationUuid);
+		SampleStorageOccupancy occupancy = this.sampleStorageOccupancyDAO.getActiveBySlotUuid(slot.getUuid());
+		Map<String, Object> response = new HashMap<String, Object>();
+		response.put("slotLocation", slot.toMap());
+		response.put("occupied", occupancy != null);
+		response.put("occupancy", occupancy != null ? occupancy.toMap() : null);
+		return response;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<StorageLocationType> getAllStorageLocationTypesUnsafe() {
+		return (List<StorageLocationType>) IteratorUtils.toList(this.storageLocationTypeDAO.findAll().iterator());
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<StorageLocation> getAllStorageLocationsUnsafe() {
+		return (List<StorageLocation>) IteratorUtils.toList(this.storageLocationDAO.findAll().iterator());
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<SampleStorageOccupancy> getAllSampleStorageOccupanciesUnsafe() {
+		return (List<SampleStorageOccupancy>) IteratorUtils.toList(this.sampleStorageOccupancyDAO.findAll().iterator());
+	}
+	
+	private StorageLocationType resolveStorageLocationTypeReference(StorageLocationType typeReference) throws Exception {
+		if (typeReference == null) {
+			throw new Exception("Storage location type is required.");
+		}
+		StorageLocationType resolved = null;
+		if (typeReference.getUuid() != null && !typeReference.getUuid().trim().equals("")) {
+			resolved = this.storageLocationTypeDAO.findByUuid(typeReference.getUuid());
+		}
+		if (!isActive(resolved) && typeReference.getId() != null) {
+			for (StorageLocationType candidate : getAllStorageLocationTypesUnsafe()) {
+				if (isActive(candidate) && candidate.getId().intValue() == typeReference.getId().intValue()) {
+					resolved = candidate;
+					break;
+				}
+			}
+		}
+		if (!isActive(resolved)) {
+			throw new Exception("Storage location type does not exist.");
+		}
+		return resolved;
+	}
+	
+	private StorageLocation resolveStorageLocationParentReference(StorageLocation parentReference) throws Exception {
+		if (parentReference == null) {
+			return null;
+		}
+		StorageLocation parent = null;
+		if (parentReference.getUuid() != null && !parentReference.getUuid().trim().equals("")) {
+			parent = this.storageLocationDAO.findByUuid(parentReference.getUuid());
+		}
+		if (!isActive(parent) && parentReference.getId() != null) {
+			for (StorageLocation candidate : getAllStorageLocationsUnsafe()) {
+				if (isActive(candidate) && candidate.getId().intValue() == parentReference.getId().intValue()) {
+					parent = candidate;
+					break;
+				}
+			}
+		}
+		if (parentReference != null && !isActive(parent)) {
+			throw new Exception("Parent storage location does not exist.");
+		}
+		return parent;
+	}
+	
+	private void ensureUniqueStorageLocation(String normalizedCode, String normalizedName, StorageLocation parent,
+	        String excludedUuid) throws Exception {
+		String parentUuid = parent != null ? parent.getUuid() : null;
+		for (StorageLocation candidate : getAllStorageLocationsUnsafe()) {
+			if (!isActive(candidate)) {
+				continue;
+			}
+			if (excludedUuid != null && excludedUuid.equals(candidate.getUuid())) {
+				continue;
+			}
+			String candidateParentUuid = candidate.getParentLocation() != null ? candidate.getParentLocation().getUuid()
+			        : null;
+			boolean sameParent = (parentUuid == null && candidateParentUuid == null)
+			        || (parentUuid != null && parentUuid.equals(candidateParentUuid));
+			if (!sameParent) {
+				continue;
+			}
+			if ((candidate.getCode() != null && candidate.getCode().trim().equalsIgnoreCase(normalizedCode))
+			        || (candidate.getName() != null && candidate.getName().trim().equalsIgnoreCase(normalizedName))) {
+				throw new Exception("Storage location '" + normalizedName + "' already exists under the selected parent.");
+			}
+		}
+	}
+	
+	private Integer calculatePathDepth(StorageLocation parent) {
+		return parent == null || parent.getPathDepth() == null ? 1 : parent.getPathDepth().intValue() + 1;
+	}
+	
+	private String buildStorageLocationPath(StorageLocation parent, String selfName) {
+		if (parent == null || parent.getPathLabel() == null || parent.getPathLabel().trim().equals("")) {
+			return selfName;
+		}
+		return parent.getPathLabel() + " / " + selfName;
+	}
+	
+	private StorageLocationType resolveSlotLocationType() throws Exception {
+		StorageLocationType exactSlot = null;
+		StorageLocationType preferredSlotBearing = null;
+		StorageLocationType namedFinalPosition = null;
+		for (StorageLocationType candidate : getAllStorageLocationTypesUnsafe()) {
+			if (!isActive(candidate)) {
+				continue;
+			}
+			String code = candidate.getCode() != null ? candidate.getCode().trim() : "";
+			String name = candidate.getName() != null ? candidate.getName().trim() : "";
+			if ("SLOT".equalsIgnoreCase(code)) {
+				exactSlot = candidate;
+				break;
+			}
+			if (Boolean.TRUE.equals(candidate.getSlotBearing())) {
+				if (preferredSlotBearing == null || compareLocationTypeOrder(candidate, preferredSlotBearing) < 0) {
+					preferredSlotBearing = candidate;
+				}
+				if (name.equalsIgnoreCase("position") || name.equalsIgnoreCase("slot") || name.equalsIgnoreCase("well")
+				        || name.equalsIgnoreCase("cell") || code.equalsIgnoreCase("POSITION")
+				        || code.equalsIgnoreCase("WELL") || code.equalsIgnoreCase("CELL")) {
+					if (namedFinalPosition == null || compareLocationTypeOrder(candidate, namedFinalPosition) < 0) {
+						namedFinalPosition = candidate;
+					}
+				}
+			}
+		}
+		if (exactSlot != null) {
+			return exactSlot;
+		}
+		if (namedFinalPosition != null) {
+			return namedFinalPosition;
+		}
+		if (preferredSlotBearing != null) {
+			return preferredSlotBearing;
+		}
+		throw new Exception(
+		        "No final sample position level is configured. Create or update a location level and mark it as usable for final sample positions, then try again.");
+	}
+	
+	private int compareLocationTypeOrder(StorageLocationType first, StorageLocationType second) {
+		Integer firstOrder = first != null && first.getLevelOrder() != null ? first.getLevelOrder() : Integer.MAX_VALUE;
+		Integer secondOrder = second != null && second.getLevelOrder() != null ? second.getLevelOrder() : Integer.MAX_VALUE;
+		return firstOrder.compareTo(secondOrder);
+	}
+	
+	private String generateSlotLabel(int layer, int row, int column, String pattern) {
+		String rowLabel = rowToAlphabet(row);
+		String defaultPattern = pattern != null && !pattern.trim().equals("") ? pattern.trim() : "${row}${column}";
+		String label = defaultPattern.replace("${layer}", String.valueOf(layer)).replace("{layer}", String.valueOf(layer))
+		        .replace("${row}", rowLabel).replace("{row}", rowLabel).replace("${rowNumber}", String.valueOf(row))
+		        .replace("{rowNumber}", String.valueOf(row)).replace("${column}", String.valueOf(column))
+		        .replace("{column}", String.valueOf(column));
+		if (label.equals(defaultPattern)) {
+			if (layer > 1) {
+				label = "L" + layer + "-" + rowLabel + column;
+			} else {
+				label = rowLabel + column;
+			}
+		}
+		return label;
+	}
+	
+	private String rowToAlphabet(int row) {
+		StringBuilder sb = new StringBuilder();
+		int value = row;
+		while (value > 0) {
+			int rem = (value - 1) % 26;
+			sb.insert(0, (char) ('A' + rem));
+			value = (value - 1) / 26;
+		}
+		return sb.toString();
+	}
+	
+	private StorageLocation findStorageLocationByCodeUnderParent(String code, StorageLocation parent) {
+		String parentUuid = parent != null ? parent.getUuid() : null;
+		for (StorageLocation candidate : getAllStorageLocationsUnsafe()) {
+			if (!isActive(candidate)) {
+				continue;
+			}
+			String candidateParentUuid = candidate.getParentLocation() != null ? candidate.getParentLocation().getUuid()
+			        : null;
+			boolean sameParent = (parentUuid == null && candidateParentUuid == null)
+			        || (parentUuid != null && parentUuid.equals(candidateParentUuid));
+			if (sameParent && candidate.getCode() != null && candidate.getCode().trim().equalsIgnoreCase(code)) {
+				return candidate;
+			}
+		}
+		return null;
+	}
+	
+	private StorageLocation resolveSlotLocation(String slotLocationUuid) throws Exception {
+		StorageLocation slot = getStorageLocationByUuid(slotLocationUuid);
+		if (!Boolean.TRUE.equals(slot.getSlot())) {
+			throw new Exception("Selected storage location is not a slot.");
+		}
+		return slot;
+	}
+	
+	private void ensureSlotAvailableForStorage(StorageLocation slotLocation, String sameSampleUuid) throws Exception {
+		SampleStorageOccupancy slotOccupancy = this.sampleStorageOccupancyDAO.getActiveBySlotUuid(slotLocation.getUuid());
+		if (isActive(slotOccupancy) && Boolean.TRUE.equals(slotOccupancy.getActiveOccupancy())
+		        && slotOccupancy.getSample() != null
+		        && (sameSampleUuid == null || !sameSampleUuid.equals(slotOccupancy.getSample().getUuid()))) {
+			throw new Exception("Storage slot '" + slotLocation.getPathLabel() + "' is already occupied.");
+		}
+	}
+	
+	private Sample resolveSampleReferenceByUuid(String sampleUuid) throws Exception {
+		Sample sample = this.getSampleByUuid(sampleUuid);
+		if (sample == null) {
+			throw new Exception("Sample with uuid '" + sampleUuid + "' does not exist.");
+		}
+		return sample;
+	}
+	
+	private void saveCompatibilitySampleStatus(Sample sample, String category, String status, String remarks)
+	        throws Exception {
+		SampleStatus sampleStatus = new SampleStatus();
+		sampleStatus.setSample(sample);
+		sampleStatus.setUser(Context.getAuthenticatedUser());
+		sampleStatus.setCategory(category);
+		sampleStatus.setStatus(status);
+		sampleStatus.setRemarks(remarks);
+		sampleStatus.setTimestamp(new Date());
+		if (category != null && category.toUpperCase(Locale.ENGLISH).startsWith("DISPOSE")) {
+			addSampleDisposalStatus(sampleStatus);
+		} else {
+			addSampleStorageStatus(sampleStatus);
+		}
+	}
+	
+	private String appendRemark(String existingRemark, String extraRemark) {
+		if (extraRemark == null || extraRemark.trim().equals("")) {
+			return existingRemark;
+		}
+		if (existingRemark == null || existingRemark.trim().equals("")) {
+			return extraRemark.trim();
+		}
+		return existingRemark + " | " + extraRemark.trim();
 	}
 	
 	// public SampleStatus updateSampleStatus(SampleStatus sampleStatus) throws
@@ -829,15 +1765,15 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 
 				if (shouldSendEmail.equals("true")
 						&& administrationService
-								.getGlobalProperty(ICareConfig.LAB_RESULTS_SUBJECT_CONFIGURATION_HTML) != null
+						.getGlobalProperty(ICareConfig.LAB_RESULTS_SUBJECT_CONFIGURATION_HTML) != null
 						&& administrationService
-								.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_ATTACHMENT_CONFIGURATION_HTML) != null
+						.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_ATTACHMENT_CONFIGURATION_HTML) != null
 						&& administrationService
-								.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_SUMMARY_CONFIGURATION_HTML) != null
+						.getGlobalProperty(ICareConfig.LAB_RESULTS_BODY_SUMMARY_CONFIGURATION_HTML) != null
 						&& (administrationService
-								.getGlobalProperty(ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE) != null
-								|| administrationService
-										.getGlobalProperty(ICareConfig.ICARE_VISIT_EMAIL_ATTRIBUTE_TYPE) != null)) {
+						.getGlobalProperty(ICareConfig.ICARE_PERSON_EMAIL_ATTRIBUTE_TYPE) != null
+						|| administrationService
+						.getGlobalProperty(ICareConfig.ICARE_VISIT_EMAIL_ATTRIBUTE_TYPE) != null)) {
 					String attchmentHtml = "";
 
 					List<String> emailsToSendResults = new ArrayList<>();
@@ -901,7 +1837,7 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 						for (SampleOrder sampleOrder : sample.getSampleOrders()) {
 							newTableBodies = newTableBodies
 									+ tbodyContent.replace("{test}",
-											sampleOrder.getOrder().getConcept().getDisplayString());
+									sampleOrder.getOrder().getConcept().getDisplayString());
 							String regExpForParameterRow = "<tr parameterrepeatable>.*?</tr>";
 							Pattern parameterPattern = Pattern.compile(regExpForParameterRow, Pattern.DOTALL);
 							Matcher parameterRowMatcher = parameterPattern.matcher(tbodyContent.toString());
@@ -929,10 +1865,10 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 												if (result != null && allocationStatus != null
 														&& allocationStatus.getTestResult() != null
 														&& allocationStatus.getTestResult().getUuid()
-																.equals(result.getUuid())
+														.equals(result.getUuid())
 														&& allocationStatus.getCategory() != null
 														&& allocationStatus.getCategory()
-																.equalsIgnoreCase("result_remarks")
+														.equalsIgnoreCase("result_remarks")
 														&& allocationStatus.getRemarks() != null) {
 													comment = allocationStatus.getRemarks();
 												}
@@ -942,9 +1878,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 									}
 									newRows = newRows
 											+ parameterRow.replace("{sn}", Integer.toString(count))
-													.replace("{parameter}", conceptSetMember.getDisplayString())
-													.replace("{result}", resultValue)
-													.replace("{comment}", comment);
+											.replace("{parameter}", conceptSetMember.getDisplayString())
+											.replace("{result}", resultValue)
+											.replace("{comment}", comment);
 									newTableBodies = newTableBodies.replace(parameterRow, newRows);
 									count = count + 1;
 								}
@@ -966,9 +1902,9 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 											if (result != null && allocationStatus != null
 													&& allocationStatus.getTestResult() != null
 													&& allocationStatus.getTestResult().getUuid()
-															.equals(result.getUuid())
+													.equals(result.getUuid())
 													&& allocationStatus.getCategory() != null && allocationStatus
-															.getCategory().equalsIgnoreCase("result_remarks")) {
+													.getCategory().equalsIgnoreCase("result_remarks")) {
 												comment = allocationStatus.getRemarks();
 											}
 										}
@@ -977,8 +1913,8 @@ public class LaboratoryServiceImpl extends BaseOpenmrsService implements Laborat
 								}
 								newRows = newRows
 										+ parameterRow.replace("{sn}", "1")
-												.replace("{parameter}", orderConcept.getDisplayString())
-												.replace("{result}", resultValue).replace("{comment}", comment);
+										.replace("{parameter}", orderConcept.getDisplayString())
+										.replace("{result}", resultValue).replace("{comment}", comment);
 								newTableBodies = newTableBodies.replace(parameterRow, newRows);
 							}
 							attchmentHtml = attchmentHtml.replace(matcher.group(0), newTableBodies);

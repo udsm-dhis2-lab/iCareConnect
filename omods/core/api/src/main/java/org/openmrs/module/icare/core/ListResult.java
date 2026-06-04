@@ -42,4 +42,18 @@ public class ListResult<T extends JSONConverter> implements JSONConverter {
 		result.put("results", resultObjectList);
 		return result;
 	}
+	
+	@Override
+	public Map<String, Object> toMap(Object... params) throws Exception {
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("pager", this.pager.toMap());
+		List<Map<String, Object>> resultObjectList = new ArrayList<Map<String, Object>>();
+		for (T data : results) {
+			Map<String, Object> sampleObject = data.toMap(params);
+			//add the sample after creating its object
+			resultObjectList.add(sampleObject);
+		}
+		result.put("results", resultObjectList);
+		return result;
+	}
 }

@@ -1,0 +1,170 @@
+:host {
+  display: block;
+}
+
+.sample-dispose-dialog-content {
+  width: auto;
+  max-width: 80vw;
+  // min-width: 1040px;
+  max-height: calc(90vh - 92px);
+  padding-bottom: 0;
+  overflow: hidden;
+}
+
+.sample-dispose-dialog-shell {
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: stretch;
+  min-height: calc(72vh - 120px);
+}
+
+.dialog-side-panel,
+.dialog-main-panel {
+  min-height: 0;
+  border: 1px solid #d8e0ea;
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 18px;
+}
+
+.dialog-side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sample-summary-card,
+.status-card,
+.storage-context-card,
+.dispose-form-card {
+  border: 1px solid #d8e0ea;
+  border-radius: 14px;
+  padding: 16px;
+  background: #fbfcfe;
+}
+
+.sample-summary-card--danger {
+  border-left: 4px solid #c0544e;
+  background: #fff8f8;
+}
+
+.summary-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.summary-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.summary-item,
+.detail-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.summary-label,
+.detail-label,
+.section-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #61788f;
+}
+
+.summary-value,
+.detail-value {
+  color: #1d2f3f;
+  font-size: 14px;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.summary-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eef1f6;
+  color: #5f7388;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.summary-badge--danger {
+  background: #fdeceb;
+  color: #bf4a43;
+}
+
+.dialog-main-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.dispose-main-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 16px;
+  min-height: 0;
+}
+
+.dispose-form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.empty-storage-state {
+  border: 1px dashed #d8e0ea;
+  border-radius: 12px;
+  padding: 20px;
+  color: #61788f;
+  text-align: center;
+}
+
+.dialog-error-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fff4f4;
+  border-left: 4px solid #c62828;
+  color: #c62828;
+}
+
+.sample-dispose-dialog-actions {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding-top: 12px;
+}
+
+// @media screen and (max-width: 1320px) {
+//   .sample-dispose-dialog-content {
+//     width: 78vw;
+//     min-width: 0;
+//   }
+// }
+
+// @media screen and (max-width: 1080px) {
+//   .sample-dispose-dialog-content {
+//     width: 80vw;
+//     max-width: 80vw;
+//   }
+
+//   .sample-dispose-dialog-shell,
+//   .dispose-main-layout {
+//     grid-template-columns: 1fr;
+//   }
+// }

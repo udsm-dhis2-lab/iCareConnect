@@ -65,7 +65,7 @@ export class LabOrdersBillingInfoEffects {
           .pipe(
             map((response) => {
               let billingInfo = {};
-              _.map(response, (billingData) => {
+              _.map(response, (billingData: any) => {
                 _.map(billingData?.orderByQuoteLines, (qLine) => {
                   if (
                     qLine?.paidAmount >= qLine?.saleQuoteLine?.payableAmount ||

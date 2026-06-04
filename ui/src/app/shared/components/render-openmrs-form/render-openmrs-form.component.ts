@@ -13,6 +13,9 @@ import { getCustomOpenMRSFormById } from "src/app/store/selectors/form.selectors
 })
 export class RenderOpenmrsFormComponent implements OnInit {
   @Input() formId: string;
+  @Input() colClass?: string;
+  @Input() observations?: any;
+
   customForm$: Observable<any>;
   @Output() formDataUpdate: EventEmitter<FormValue> =
     new EventEmitter<FormValue>();

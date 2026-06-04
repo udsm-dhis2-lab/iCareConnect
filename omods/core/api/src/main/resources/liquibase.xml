@@ -2395,8 +2395,8 @@
             <foreignKeyConstraintExists foreignKeyName="discount_discount_criteria_discount_criteria_id_fk"/>
         </preConditions>
         <dropForeignKeyConstraint
-                    baseTableName="bl_discount"
-                    constraintName="discount_discount_criteria_discount_criteria_id_fk"/>
+                baseTableName="bl_discount"
+                constraintName="discount_discount_criteria_discount_criteria_id_fk"/>
     </changeSet>
     <changeSet id="add_columns_to_st_ledger" author="jesse-justin" dbms="mysql">
         <preConditions onFail="MARK_RAN">
@@ -2922,13 +2922,13 @@
             </not>
         </preConditions>
         <addForeignKeyConstraint
-                        baseColumnNames="visit_id"
-                        baseTableName="bl_invoice"
-                        constraintName="bl_invoice_visit_id_visit_visit_id_fk"
-                        referencedColumnNames="visit_id"
-                        referencedTableName="visit"/>
+                baseColumnNames="visit_id"
+                baseTableName="bl_invoice"
+                constraintName="bl_invoice_visit_id_visit_visit_id_fk"
+                referencedColumnNames="visit_id"
+                referencedTableName="visit"/>
         <dropColumn columnName="patient_id"
-                             tableName="bl_invoice"/>
+                    tableName="bl_invoice"/>
     </changeSet>
     <changeSet author="vincent_minde" id="create_prescription">
         <createTable tableName="prescription">
@@ -5206,4 +5206,251 @@
             </column>
         </addColumn>
     </changeSet>
+
+    <changeSet id="create_lb_storage_location_type" author="walter-v-faustine" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_storage_location_type"/>
+            </not>
+        </preConditions>
+        <createTable tableName="lb_storage_location_type">
+            <column name="storage_location_type_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="level_order" type="INT"/>
+            <column name="structural" type="BIT" defaultValueBoolean="false"/>
+            <column name="slot_bearing" type="BIT" defaultValueBoolean="false"/>
+            <column name="metadata_json" type="TEXT"/>
+            <column name="creator" type="INT"/>
+            <column name="date_created" type="DATETIME"/>
+            <column name="changed_by" type="INT"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" type="BIT" defaultValueBoolean="false"/>
+            <column name="voided_by" type="INT"/>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="void_reason" type="VARCHAR(255)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="lb_storage_location_type" baseColumnNames="creator"
+                                 constraintName="fk_lb_storage_location_type_creator"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint baseTableName="lb_storage_location_type" baseColumnNames="changed_by"
+                                 constraintName="fk_lb_storage_location_type_changed_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint baseTableName="lb_storage_location_type" baseColumnNames="voided_by"
+                                 constraintName="fk_lb_storage_location_type_voided_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+    </changeSet>
+
+    <changeSet id="create_lb_storage_location" author="walter-v-faustine" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_storage_location"/>
+            </not>
+        </preConditions>
+        <createTable tableName="lb_storage_location">
+            <column name="storage_location_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="code" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="storage_location_type_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_location_id" type="INT"/>
+            <column name="legacy_storage_type_id" type="INT"/>
+            <column name="legacy_storage_id" type="INT"/>
+            <column name="barcode" type="VARCHAR(255)"/>
+            <column name="path_label" type="VARCHAR(1024)"/>
+            <column name="path_depth" type="INT"/>
+            <column name="rows_count" type="INT"/>
+            <column name="columns_count" type="INT"/>
+            <column name="layers_count" type="INT"/>
+            <column name="slot_pattern" type="VARCHAR(255)"/>
+            <column name="slot_separator" type="VARCHAR(16)"/>
+            <column name="is_slot" type="BIT" defaultValueBoolean="false"/>
+            <column name="storage_condition_type" type="VARCHAR(64)"/>
+            <column name="min_temperature" type="DOUBLE"/>
+            <column name="max_temperature" type="DOUBLE"/>
+            <column name="capacity" type="INT"/>
+            <column name="metadata_json" type="TEXT"/>
+            <column name="creator" type="INT"/>
+            <column name="date_created" type="DATETIME"/>
+            <column name="changed_by" type="INT"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" type="BIT" defaultValueBoolean="false"/>
+            <column name="voided_by" type="INT"/>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="void_reason" type="VARCHAR(255)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="lb_storage_location" baseColumnNames="storage_location_type_id"
+                                 constraintName="fk_lb_storage_location_type"
+                                 referencedTableName="lb_storage_location_type" referencedColumnNames="storage_location_type_id"/>
+        <addForeignKeyConstraint baseTableName="lb_storage_location" baseColumnNames="parent_location_id"
+                                 constraintName="fk_lb_storage_location_parent"
+                                 referencedTableName="lb_storage_location" referencedColumnNames="storage_location_id"/>
+        <addForeignKeyConstraint baseTableName="lb_storage_location" baseColumnNames="legacy_storage_type_id"
+                                 constraintName="fk_lb_storage_location_legacy_storage_type"
+                                 referencedTableName="lb_storage_type" referencedColumnNames="storage_type_id"/>
+        <addForeignKeyConstraint baseTableName="lb_storage_location" baseColumnNames="legacy_storage_id"
+                                 constraintName="fk_lb_storage_location_legacy_storage"
+                                 referencedTableName="lb_storage" referencedColumnNames="storage_id"/>
+        <addForeignKeyConstraint baseTableName="lb_storage_location" baseColumnNames="creator"
+                                 constraintName="fk_lb_storage_location_creator"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint baseTableName="lb_storage_location" baseColumnNames="changed_by"
+                                 constraintName="fk_lb_storage_location_changed_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint baseTableName="lb_storage_location" baseColumnNames="voided_by"
+                                 constraintName="fk_lb_storage_location_voided_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+    </changeSet>
+
+    <changeSet id="create_lb_sample_storage_occupancy" author="walter-v-faustine" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_sample_storage_occupancy"/>
+            </not>
+        </preConditions>
+        <createTable tableName="lb_sample_storage_occupancy">
+            <column name="sample_storage_occupancy_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="sample_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slot_location_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="occupancy_type" type="VARCHAR(32)"/>
+            <column name="full_address" type="VARCHAR(1024)"/>
+            <column name="stored_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="released_at" type="DATETIME"/>
+            <column name="active_occupancy" type="BIT" defaultValueBoolean="true"/>
+            <column name="disposed" type="BIT" defaultValueBoolean="false"/>
+            <column name="quantity_stored" type="DOUBLE"/>
+            <column name="quantity_unit" type="VARCHAR(64)"/>
+            <column name="remarks" type="TEXT"/>
+            <column name="creator" type="INT"/>
+            <column name="date_created" type="DATETIME"/>
+            <column name="changed_by" type="INT"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" type="BIT" defaultValueBoolean="false"/>
+            <column name="voided_by" type="INT"/>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="void_reason" type="VARCHAR(255)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="lb_sample_storage_occupancy" baseColumnNames="sample_id"
+                                 constraintName="fk_lb_sample_storage_occupancy_sample"
+                                 referencedTableName="lb_sample" referencedColumnNames="sample_id"/>
+        <addForeignKeyConstraint baseTableName="lb_sample_storage_occupancy" baseColumnNames="slot_location_id"
+                                 constraintName="fk_lb_sample_storage_occupancy_slot"
+                                 referencedTableName="lb_storage_location" referencedColumnNames="storage_location_id"/>
+        <addForeignKeyConstraint baseTableName="lb_sample_storage_occupancy" baseColumnNames="creator"
+                                 constraintName="fk_lb_sample_storage_occupancy_creator"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint baseTableName="lb_sample_storage_occupancy" baseColumnNames="changed_by"
+                                 constraintName="fk_lb_sample_storage_occupancy_changed_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint baseTableName="lb_sample_storage_occupancy" baseColumnNames="voided_by"
+                                 constraintName="fk_lb_sample_storage_occupancy_voided_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+    </changeSet>
+
+    <changeSet id="create_lb_sample_disposal_record" author="walter-v-faustine" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="lb_sample_disposal_record"/>
+            </not>
+        </preConditions>
+        <createTable tableName="lb_sample_disposal_record">
+            <column name="sample_disposal_record_id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(38)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="sample_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="occupancy_id" type="INT"/>
+            <column name="disposal_method" type="VARCHAR(128)"/>
+            <column name="disposal_reason" type="TEXT"/>
+            <column name="disposed_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="approval_required" type="BIT" defaultValueBoolean="false"/>
+            <column name="approved" type="BIT" defaultValueBoolean="true"/>
+            <column name="remarks" type="TEXT"/>
+            <column name="creator" type="INT"/>
+            <column name="date_created" type="DATETIME"/>
+            <column name="changed_by" type="INT"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="voided" type="BIT" defaultValueBoolean="false"/>
+            <column name="voided_by" type="INT"/>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="void_reason" type="VARCHAR(255)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="lb_sample_disposal_record" baseColumnNames="sample_id"
+                                 constraintName="fk_lb_sample_disposal_record_sample"
+                                 referencedTableName="lb_sample" referencedColumnNames="sample_id"/>
+        <addForeignKeyConstraint baseTableName="lb_sample_disposal_record" baseColumnNames="occupancy_id"
+                                 constraintName="fk_lb_sample_disposal_record_occupancy"
+                                 referencedTableName="lb_sample_storage_occupancy" referencedColumnNames="sample_storage_occupancy_id"/>
+        <addForeignKeyConstraint baseTableName="lb_sample_disposal_record" baseColumnNames="creator"
+                                 constraintName="fk_lb_sample_disposal_record_creator"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint baseTableName="lb_sample_disposal_record" baseColumnNames="changed_by"
+                                 constraintName="fk_lb_sample_disposal_record_changed_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+        <addForeignKeyConstraint baseTableName="lb_sample_disposal_record" baseColumnNames="voided_by"
+                                 constraintName="fk_lb_sample_disposal_record_voided_by"
+                                 referencedTableName="users" referencedColumnNames="user_id"/>
+    </changeSet>
+
+    <changeSet id="add_lb_sample_label_index_20260521" author="walter-v-faustine" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(1)
+                FROM information_schema.STATISTICS
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = 'lb_sample'
+                AND INDEX_NAME = 'idx_lb_sample_label'
+            </sqlCheck>
+        </preConditions>
+
+        <comment>
+            Add index on lb_sample.label to support fast sample lookup by barcode/sample ID.
+        </comment>
+
+        <sql>
+            ALTER TABLE lb_sample ADD INDEX idx_lb_sample_label (label(191));
+        </sql>
+
+        <rollback>
+            ALTER TABLE lb_sample DROP INDEX idx_lb_sample_label;
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>

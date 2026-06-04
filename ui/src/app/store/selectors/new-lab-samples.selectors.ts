@@ -822,7 +822,7 @@ function getTestAllocationsWithResults(allocations) {
       };
     }) || [],
     "conceptUuid"
-  )?.filter((allocation) => allocation?.hasResult);
+  )?.filter((allocation: any) => allocation?.hasResult);
 }
 
 function getCompletedOrders(orders, isLIS?: boolean) {

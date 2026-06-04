@@ -1,0 +1,75 @@
+<div class="dialog-shell storage-config-dialog dialog-shell--storage-type">
+  <div class="dialog-header">
+    <div class="dialog-title-block">
+      <p class="dialog-kicker">Storage metadata</p>
+      <h2>{{ title }}</h2>
+      <p class="dialog-description">
+        Define the container category used by the laboratory, such as Freezer, Refrigerator, Shelf, Cabinet, or Rack.
+      </p>
+    </div>
+
+    <span class="dialog-mode-badge">
+      {{ data.mode === 'create' ? 'New type' : 'Editing type' }}
+    </span>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <form class="dialog-form" [formGroup]="form" (ngSubmit)="save()">
+    <div class="dialog-content">
+      <section class="summary-card">
+        <mat-icon>category</mat-icon>
+        <div>
+          <p class="section-kicker">Simple classification</p>
+          <h3>Used to group storage units</h3>
+          <p>
+            Keep the name short and recognizable so staff can quickly distinguish freezers, refrigerators, shelves, and cabinets.
+          </p>
+        </div>
+      </section>
+
+      <section class="form-card">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Required information</p>
+            <h3>Storage type name</h3>
+          </div>
+        </div>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Name</mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="name"
+            maxlength="32"
+            placeholder="For example: Refrigerator"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            class="field-info-button"
+            matTooltip="Enter a clear, staff-friendly name. Use the common laboratory wording that users will recognize on lists and reports."
+            matTooltipPosition="above"
+            aria-label="More information about this field"
+          >
+            <mat-icon>info_outline</mat-icon>
+          </button>
+          <mat-hint align="end">{{ nameControl?.value?.length || 0 }}/32</mat-hint>
+          <mat-error *ngIf="nameControl?.hasError('required')">Name is required.</mat-error>
+          <mat-error *ngIf="nameControl?.hasError('maxlength')">Use 32 characters or fewer.</mat-error>
+        </mat-form-field>
+      </section>
+    </div>
+
+    <div class="dialog-actions dialog-actions--sticky">
+      <button mat-stroked-button type="button" (click)="close()">Close</button>
+      <button mat-flat-button color="primary" type="submit" [disabled]="saving || form.invalid || form.pending">
+        <mat-icon *ngIf="!saving">save</mat-icon>
+        <mat-spinner *ngIf="saving" diameter="20"></mat-spinner>
+        {{ submitLabel }}
+      </button>
+    </div>
+  </form>
+</div>

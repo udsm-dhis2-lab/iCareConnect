@@ -134,6 +134,13 @@ export class LaboratoryComponent implements OnInit {
       subMenus: [],
     },
     {
+      name: "Sample Referral",
+      route: "sample-referral",
+      id: "referral",
+      icon: "share",
+      subMenus: [],
+    },
+    {
       name: "Sample Tracking",
       route: "sample-tracking",
       id: "tracking",
@@ -170,6 +177,12 @@ export class LaboratoryComponent implements OnInit {
           name: "Price list",
           route: "settings/price-list",
           id: "price-list",
+          icon: "money",
+        },
+        {
+          name: "Sample Management",
+          route: "settings/sample-management",
+          id: "sample-management",
           icon: "money",
         },
       ],
@@ -530,8 +543,8 @@ export class LaboratoryComponent implements OnInit {
   }
 
   onDateChange(reload?: boolean) {
-    this.labDateService.startDate.set(this.startDate);
-    this.labDateService.endDate.set(this.endDate);
+    this.labDateService.startDate.set(new Date(this.startDate));
+    this.labDateService.endDate.set(new Date(this.endDate));
 
     if (reload && this.endDate) {
       this.store.dispatch(clearLoadedLabOrders());

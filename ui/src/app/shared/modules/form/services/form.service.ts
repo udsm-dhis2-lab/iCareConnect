@@ -537,7 +537,7 @@ export class FormService {
     }
   }
 
-  getCustomeOpenMRSForm(uuid): Observable<any> {
+  getCustomeOpenMRSForm(uuid: string): Observable<any> {
     /**
      * TODO:Dynamicall construct the fields
      */

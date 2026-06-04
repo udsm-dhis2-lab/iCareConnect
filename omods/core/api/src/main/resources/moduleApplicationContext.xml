@@ -12,7 +12,7 @@
 
     <context:component-scan base-package="org.openmrs.module.icare" />
     <bean id="icare.ICareService"
-            class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+          class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
         <property name="transactionManager">
             <ref bean="transactionManager" />
         </property>
@@ -134,6 +134,41 @@
                 </property>
                 <property name="sampleStatusDAO" >
                     <bean class="org.openmrs.module.icare.laboratory.dao.SampleStatusDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+                <property name="storageDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.StorageDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="storageTypeDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.StorageTypeDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="storageLocationTypeDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.StorageLocationTypeDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="storageLocationDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.StorageLocationDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="sampleStorageOccupancyDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.SampleStorageOccupancyDAO">
+                        <property name="sessionFactory" ref="dbSessionFactory" />
+                    </bean>
+                </property>
+
+                <property name="sampleDisposalRecordDAO">
+                    <bean class="org.openmrs.module.icare.laboratory.dao.SampleDisposalRecordDAO">
                         <property name="sessionFactory" ref="dbSessionFactory" />
                     </bean>
                 </property>

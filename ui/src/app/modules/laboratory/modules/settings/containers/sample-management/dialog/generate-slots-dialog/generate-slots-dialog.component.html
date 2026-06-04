@@ -1,0 +1,234 @@
+<div class="dialog-shell storage-config-dialog dialog-shell--generate-slots">
+  <div class="dialog-header">
+    <div class="dialog-title-block">
+      <p class="dialog-kicker">Position preparation</p>
+      <h2>Prepare storage positions for {{ data.location.name }}</h2>
+      <p class="dialog-description">
+        Confirm the layout and choose how generated positions should be labelled
+        before creating the final sample slots.
+      </p>
+    </div>
+
+    <span class="dialog-mode-badge">Slot generator</span>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <form class="dialog-form" [formGroup]="form" (ngSubmit)="generate()">
+    <div class="dialog-content">
+      <aside class="dialog-side-panel">
+        <section class="summary-card summary-card--primary">
+          <div class="summary-card-header">
+            <p class="section-kicker">Generation summary</p>
+          </div>
+
+          <div class="projection-number">{{ projectedSlots }}</div>
+          <p class="projection-label">
+            position{{ projectedSlots === 1 ? "" : "s" }} will be prepared
+          </p>
+
+          <div class="summary-stack">
+            <div class="summary-item">
+              <span class="summary-label">Location</span>
+              <span class="summary-value">{{
+                data.location.pathLabel || data.location.name
+              }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Example label</span>
+              <span class="summary-value summary-value--mono">{{
+                slotPatternPreview
+              }}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="guidance-card">
+          <mat-icon>rule</mat-icon>
+          <p>
+            Rows are labelled alphabetically, columns numerically, and layers
+            help represent stacked storage areas.
+          </p>
+        </section>
+      </aside>
+
+      <section class="dialog-main-panel">
+        <section class="dialog-section">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">Grid definition</p>
+              <h3>Layout dimensions</h3>
+            </div>
+            <span class="section-helper"
+              >Set the number of rows, columns, and layers that should be
+              generated.</span
+            >
+          </div>
+
+          <div class="dialog-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Rows</mat-label>
+              <input
+                matInput
+                type="number"
+                min="1"
+                formControlName="rowsCount"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Number of horizontal rows to prepare. Use this when the location has a grid or box-style layout."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-error *ngIf="form.get('rowsCount')?.hasError('required')"
+                >Rows are required.</mat-error
+              >
+              <mat-error *ngIf="form.get('rowsCount')?.hasError('min')"
+                >Rows must be greater than zero.</mat-error
+              >
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Columns</mat-label>
+              <input
+                matInput
+                type="number"
+                min="1"
+                formControlName="columnsCount"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Number of vertical columns to prepare. Combine with rows and layers to calculate prepared positions."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-error *ngIf="form.get('columnsCount')?.hasError('required')"
+                >Columns are required.</mat-error
+              >
+              <mat-error *ngIf="form.get('columnsCount')?.hasError('min')"
+                >Columns must be greater than zero.</mat-error
+              >
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Layers</mat-label>
+              <input
+                matInput
+                type="number"
+                min="1"
+                formControlName="layersCount"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Number of stacked layers or levels. Use 1 when the container has no separate layers."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-error *ngIf="form.get('layersCount')?.hasError('required')"
+                >Layers are required.</mat-error
+              >
+              <mat-error *ngIf="form.get('layersCount')?.hasError('min')"
+                >Layers must be greater than zero.</mat-error
+              >
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Position label format</mat-label>
+              <mat-select formControlName="slotPatternPreset">
+                <mat-option
+                  *ngFor="let option of slotPatternOptions"
+                  [value]="option.value"
+                >
+                  {{ option.label }}
+                </mat-option>
+              </mat-select>
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Choose how position labels should be generated. Use custom format when your lab has a special label pattern."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-hint>Choose a ready format or use a custom format.</mat-hint>
+            </mat-form-field>
+
+            <mat-form-field
+              appearance="outline"
+              *ngIf="usingCustomPattern"
+              class="dialog-grid-span-2"
+            >
+              <mat-label>Custom label format</mat-label>
+              <input
+                matInput
+                formControlName="customSlotPattern"
+                placeholder="For example: A$&#123;row&#125;-&#123;column&#125;"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                class="field-info-button"
+                matTooltip="Build labels using placeholders such as ${row}, ${column}, ${layer}, and ${rowNumber}."
+                matTooltipPosition="above"
+                aria-label="More information about this field"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+              <mat-hint
+                >Available placeholders: $&#123;row&#125;, $&#123;column&#125;,
+                $&#123;layer&#125;, $&#123;rowNumber&#125;. Curly-brace versions
+                like &#123;column&#125; also work.</mat-hint
+              >
+            </mat-form-field>
+          </div>
+        </section>
+
+        <div class="projection-card">
+          <mat-icon>view_module</mat-icon>
+          <div>
+            <strong
+              >{{ projectedSlots }} position{{
+                projectedSlots === 1 ? "" : "s"
+              }}</strong
+            >
+            <span>will be generated for this storage location.</span>
+            <small>Example label: {{ slotPatternPreview }}</small>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="dialog-actions dialog-actions--sticky">
+      <button mat-stroked-button type="button" (click)="close()">Close</button>
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="generating || form.invalid || form.pending"
+      >
+        <mat-icon *ngIf="!generating">auto_awesome</mat-icon>
+        <mat-spinner *ngIf="generating" diameter="20"></mat-spinner>
+        Prepare positions
+      </button>
+    </div>
+  </form>
+</div>

@@ -47,7 +47,7 @@ export class CurrentPrescriptionComponent implements OnInit {
       )
       .pipe(
         tap((response) => {
-          if (response === "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {
@@ -65,7 +65,7 @@ export class CurrentPrescriptionComponent implements OnInit {
       .getSystemSettingsByKey("iCare.clinic.prescription.arrangement")
       .pipe(
         map((response) => {
-          if (response === "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {

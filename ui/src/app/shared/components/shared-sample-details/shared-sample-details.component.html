@@ -63,6 +63,12 @@
       </div>
       <div class="row d-flex">
         <ng-container *ngFor="let encounter of params?.encounterInformation">
+          @if(viewForReferral){
+            <div class="col-12 mt-12">
+              <b> {{ encounter?.form?.display }} </b>
+            </div> 
+            <hr>
+          }
           <div
             class="col-md-6 col-sm-12 col-sx-12"
             *ngFor="let formField of encounter?.form?.formFields"
@@ -144,30 +150,25 @@
       <div class="order-table">
         <table class="table mt-2">
           <tbody>
-            <ng-container
-              *ngFor="
-                let order of params?.sampleDetails?.orders;
-                let count = index
-              "
-            >
+            @for(order of params?.sampleDetails?.orders; track $index; let count = $index){
+              @if(order?.order?.concept?.uuid !== referralOrderConcept) {
               <tr>
                 <!-- <td>
-                  {{ count + 1 }}
-                </td> -->
+                                  {{ count + 1 }}
+                                </td> -->
                 <td colspan="3">
                   {{ order?.order?.concept?.display }}
                 </td>
                 <!-- <td>
-                  {{ allocation?.concept?.display }}
-                </td> -->
+                                  {{ allocation?.concept?.display }}
+                                </td> -->
               </tr>
+              
               <ng-container *ngIf="order?.testAllocations">
-                <tr
-                  *ngFor="
-                    let allocation of order?.testAllocations;
-                    let countAllocation = index
-                  "
-                >
+                <tr *ngFor="
+                                    let allocation of order?.testAllocations;
+                                    let countAllocation = index
+                                  ">
                   <td>
                     {{ countAllocation + 1 }}
                   </td>
@@ -175,20 +176,16 @@
                     {{ allocation?.concept?.display }}
                   </td>
                   <!-- <td>
-                  {{ allocation?.concept?.display }}
-                </td> -->
+                                  {{ allocation?.concept?.display }}
+                                </td> -->
                   <td>
-                    <app-shared-parameter-results
-                      [order]="order"
-                      [hideParameterLabel]="true"
-                      [parameter]="allocation?.concept"
-                      [count]="0"
-                      [units]=""
-                    ></app-shared-parameter-results>
+                    <app-shared-parameter-results [order]="order" [hideParameterLabel]="true" [parameter]="allocation?.concept"
+                      [count]="0" [units]=""></app-shared-parameter-results>
                   </td>
                 </tr>
               </ng-container>
-            </ng-container>
+              }
+            }
           </tbody>
         </table>
       </div>

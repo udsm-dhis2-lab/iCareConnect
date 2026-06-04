@@ -135,6 +135,7 @@ import { SharedRemotePatientHistoryComponent } from "./shared-remote-patient-his
 import { FingerPrintComponent } from "./finger-print/finger-print.component";
 import { FingerDialogComponent } from "./finger-dialog/finger-dialog.component";
 import { FingerCaptureComponent } from "./finger-capture/finger-capture.component";
+import { RenderOpenmrsFormComponent } from "./render-openmrs-form/render-openmrs-form.component";
 
 export const components: any[] = [
   FingerPrintComponent,
@@ -273,7 +274,8 @@ export const components: any[] = [
   SharedCollectedAmountComponent,
   SharedRemotePatientHistoryComponent,
   FingerDialogComponent,
-  FingerCaptureComponent
+  FingerCaptureComponent,
+  RenderOpenmrsFormComponent
 ];
 
 export const sharedEntryComponents: any[] = [

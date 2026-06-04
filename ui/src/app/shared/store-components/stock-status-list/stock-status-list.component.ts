@@ -68,7 +68,7 @@ export class StockStatusListComponent implements OnInit {
     this.consumeLedgerUuid$.subscribe((response: any) => {
       if (response?.error) {
         this.errors = [...this.errors, response];
-      } else if (response === "none") {
+      } else if (!response) {
         this.errors = [
           ...this.errors,
           {
