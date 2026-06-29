@@ -93,7 +93,11 @@ export class FormService {
         }),
       );
     } else if (!searchControlType || searchControlType === "concept") {
-      if (parameters?.value) {
+      const valueIsArray =
+        Array.isArray(parameters?.value) && parameters.value.length > 0;
+      const hasSingleValue =
+        !Array.isArray(parameters?.value) && !!parameters?.value;
+      if (hasSingleValue) {
         return from(this.api.concept.getConcept(parameters?.value)).pipe(
           map((response) => {
             return [response];
@@ -106,7 +110,9 @@ export class FormService {
           ...params,
           q: hasSearchTerm ? field?.searchTerm : params?.q,
         };
-        return from(this.api.concept.getAllConcepts(params)).pipe(
+        const searchResults$ = from(
+          this.api.concept.getAllConcepts(params),
+        ).pipe(
           map((response) => {
             const concepts = orderBy(
               (
@@ -154,6 +160,23 @@ export class FormService {
             }
           }),
         );
+
+        if (valueIsArray) {
+          const preSelected$ = from(
+            Promise.all(
+              (parameters.value as string[]).map((uuid: string) =>
+                this.api.concept.getConcept(uuid),
+              ),
+            ),
+          ).pipe(map((responses: any[]) => responses.filter((c) => !!c)));
+          return zip(searchResults$, preSelected$).pipe(
+            map(([searched, preSelected]) =>
+              uniqBy([...preSelected, ...searched], "uuid"),
+            ),
+          );
+        }
+
+        return searchResults$;
       }
     } else if (searchControlType === "person") {
       return from(this.api.person.getAllPersons({ q: parameters?.q })).pipe(
