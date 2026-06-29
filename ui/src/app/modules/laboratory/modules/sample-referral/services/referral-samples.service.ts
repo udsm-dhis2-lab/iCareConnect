@@ -52,7 +52,6 @@ export class SampleReferralService {
                     console.warn("No referral form settings found for sample referral module");
                 }
                 this.sampleReferralSettings.set(settings);
-                console.log("Referral form settings for sample referral module: ", typeof this.sampleReferralSettings());
             })
         )
     }

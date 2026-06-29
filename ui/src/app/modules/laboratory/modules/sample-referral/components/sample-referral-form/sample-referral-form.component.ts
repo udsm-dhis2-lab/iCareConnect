@@ -187,7 +187,7 @@ export class SampleReferralFormComponent {
   async onSave(){
     if(!this.isValid) return;
 
-    if(this.selectedSamples){
+    if(this.selectedSamples && this.observations){
       await this.updateObservations();
       return;
     }
