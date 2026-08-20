@@ -12,7 +12,7 @@
         </div>
     } @else {
         <div class="{{ showMarkedOnlyField ? 'col-10' : 'col-12' }}">
-            <app-multiple-results-entry [options]="options" [label]="'Select Samples'"
+            <app-multiple-results-entry [options]="options" [label]="'Select Samples'" [value]="selectedValues"
                 [noEntriesFoundLabel]="'No samples found!'" [loading]="loadingOptions" (loadMore)="onLoadMore()"
                 (searchChange)="onSearchChange($event)" (selectedList)="onSelection($event)"></app-multiple-results-entry>
             
@@ -30,7 +30,6 @@
             [formId]="formId" 
             [colClass]="'col-md-12 col-sm-12 col-lg-12'"
             [observations]="obsData"
-            [selectedSample]="selectedSample"
             (formDataUpdate)="onFormUpdate($event)"
         ></app-render-openmrs-form>
     </div>
