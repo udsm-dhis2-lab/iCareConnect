@@ -512,7 +512,7 @@
                     Send
                   </button>
                 </div>
-                <div class="w-100 d-flex justify-content-end">
+                <div *ngIf="tabType === 'authorization'" class="w-100 d-flex justify-content-end">
                   <button
                     *ngIf="LISConfigurations?.isLIS"
                     mat-flat-button
@@ -525,7 +525,7 @@
                   </button>
                 </div>
 
-                <div class="w-100 d-flex justify-content-end">
+                <div *ngIf="tabType === 'authorization'" class="w-100 d-flex justify-content-end">
                   <button
                     *ngIf="LISConfigurations?.isLIS"
                     mat-flat-button
