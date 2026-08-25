@@ -61,6 +61,7 @@ export class SampleReferralFormComponent {
   selectedSamples: any[] = [];
   formValues: any;
   validStatus?: boolean;
+  selectedValues: any[]= [] 
 
   obsData: any = {};
   
@@ -128,6 +129,12 @@ export class SampleReferralFormComponent {
             this.options = [...this.options, ...newOptions];
           } else {
             this.options = this.samples?.map((sample: any) => { 
+              if (!this.showMarkedOnlyField) {
+                this.selectedValues = [
+                  ...this.selectedValues,
+                  sample?.uuid
+                ]
+              }
               return { 
                 name: sample?.label, 
                 value: sample?.uuid 
@@ -187,7 +194,7 @@ export class SampleReferralFormComponent {
   async onSave(){
     if(!this.isValid) return;
 
-    if(this.selectedSamples){
+    if(this.selectedSamples && this.observations){
       await this.updateObservations();
       return;
     }

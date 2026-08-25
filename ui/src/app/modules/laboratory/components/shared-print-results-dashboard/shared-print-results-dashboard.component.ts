@@ -36,7 +36,7 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
       )
       .pipe(
         map((response) => {
-          if (response && !response?.error && response != "none") {
+          if (response && !response?.error) {
             return response;
           } else {
             this.errors = [
@@ -60,7 +60,7 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
       )
       .pipe(
         map((response) => {
-          if (response && !response?.error && response != "none") {
+          if (response && !response?.error) {
             return response;
           } else {
             this.errors = [
@@ -84,7 +84,7 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
       )
       .pipe(
         map((response) => {
-          if (response && !response?.error && response != "none") {
+          if (response && !response?.error) {
             return response;
           } else {
             this.errors = [
@@ -108,7 +108,7 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
       )
       .pipe(
         map((response) => {
-          if (response && !response?.error && response != "none") {
+          if (response && !response?.error) {
             return response;
           } else {
             this.errors = [
@@ -133,7 +133,7 @@ export class SharedPrintResultsDashboardComponent implements OnInit {
       )
       .pipe(
         map((response) => {
-          if (response && !response?.error && response != "none") {
+          if (response && !response?.error) {
             return response;
           } else {
             this.errors = [

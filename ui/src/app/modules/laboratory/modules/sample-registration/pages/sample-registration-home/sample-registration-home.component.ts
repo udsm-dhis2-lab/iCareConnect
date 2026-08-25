@@ -56,7 +56,7 @@ export class SampleRegistrationHomeComponent implements OnInit {
         `lis.registration.sampleRegistrationCategories.concept.uuid`
       );
     this.sampleRegistrationCategoriesConceptUuid$.subscribe((response: any) => {
-      if (response && response === "none") {
+      if (!response) {
         this.errors = [
           ...this.errors,
           {

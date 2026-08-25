@@ -199,7 +199,7 @@ export class CurrentPatientBillingComponent implements OnInit {
           if (response?.error) {
             this.errors = [...this.errors, response.error];
           }
-          if (response === "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {
@@ -221,7 +221,7 @@ export class CurrentPatientBillingComponent implements OnInit {
           if (response?.error) {
             this.errors = [...this.errors, response.error];
           }
-          if (response === "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {
@@ -243,7 +243,7 @@ export class CurrentPatientBillingComponent implements OnInit {
           if (response?.error) {
             this.errors = [...this.errors, response.error];
           }
-          if (response === "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {

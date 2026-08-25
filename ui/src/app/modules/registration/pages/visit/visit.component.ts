@@ -286,8 +286,8 @@ export class VisitComponent implements OnInit {
     });
   }
 
-  setReferral(referral) {
-    if (referral == "none") {
+  setReferral(referral: any) {
+    if (!referral) {
       this.referralHospital = null;
     } else {
       if (this.referralHospital?.attributeUuid) {

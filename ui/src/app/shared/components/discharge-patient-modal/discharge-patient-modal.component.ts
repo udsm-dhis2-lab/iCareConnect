@@ -60,7 +60,7 @@ export class DischargePatientModalComponent implements OnInit {
         `iCareConnect.configurations.location.logoAttribute.uuid`
       );
     this.logoLocationAttributeTypeUuid$.subscribe((response: any) => {
-      if (response && response === "none") {
+      if (response && !response) {
         this.errors = [
           ...this.errors,
           {

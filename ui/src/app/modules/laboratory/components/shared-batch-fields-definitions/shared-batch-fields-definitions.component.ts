@@ -30,7 +30,7 @@ export class SharedBatchFieldsDefinitionsComponent implements OnInit {
       `icare.lis.sampleRegistrationFormsUuids.${this.registrationCategory?.refKey}`
     );
     this.formUuids$.subscribe((response: any) => {
-      if (response && (response?.error || response === "none")) {
+      if (response && (response?.error || !response)) {
         this.errors = [
           ...this.errors,
           {

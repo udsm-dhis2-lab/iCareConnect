@@ -101,7 +101,7 @@ export class PatientHistoryComponent implements OnInit {
       .getSystemSettingsByKey("iCare.clinic.prescription.arrangement")
       .pipe(
         map((response) => {
-          if (response === "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {
@@ -128,7 +128,7 @@ export class PatientHistoryComponent implements OnInit {
       )
       .pipe(
         tap((response) => {
-          if (response === "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {

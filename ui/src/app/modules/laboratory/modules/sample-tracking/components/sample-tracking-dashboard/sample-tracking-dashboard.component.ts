@@ -69,7 +69,7 @@ export class SampleTrackingDashboardComponent implements OnInit {
       .getSystemSettingsByKey("iCare.laboratory.settings.print.barcodeFormat")
       .pipe
       // tap((response) => {
-      //   if (response === "none") {
+      //   if (!response) {
       //     this.errors = [
       //       ...this.errors,
       //       {

@@ -32,7 +32,7 @@ export class SystemSettingsService {
             response?.results[0]?.value.indexOf("[") === 0
             ? JSON.parse(response?.results[0]?.value)
             : response?.results[0]?.value
-          : "none";
+          : null;
       }),
       catchError((error) => {
         return throwError(() => error)
@@ -48,7 +48,7 @@ export class SystemSettingsService {
             response?.value.indexOf("[") === 0
             ? JSON.parse(response?.value)
             : response?.value
-          : "none";
+          : null;
       }),
       catchError((error) => of(error))
     );

@@ -54,8 +54,8 @@ export class WorksheetsComponent implements OnInit {
           `iCare.laboratory.settings.sample.acceptedSamplesWithNoResults.dataSetReportUuid`
         )
         .pipe(
-          tap((response) => {
-            if (response && !response?.error && response !== "none") {
+          tap((response: any) => {
+            if (response && !response?.error) {
               return response;
             } else {
               this.errors = [

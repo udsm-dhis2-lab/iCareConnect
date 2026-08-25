@@ -172,7 +172,7 @@ export class RegisterSampleComponent implements OnInit {
       )
       .pipe(
         map((response) => {
-          if (response && response == "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {
@@ -214,7 +214,7 @@ export class RegisterSampleComponent implements OnInit {
       .getSystemSettingsByKey("iCare.laboratory.settings.print.barcodeFormat")
       .pipe(
         tap((response) => {
-          if (response === "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {

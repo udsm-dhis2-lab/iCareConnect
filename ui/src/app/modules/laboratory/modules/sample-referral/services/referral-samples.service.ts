@@ -10,7 +10,7 @@ import { set } from "cypress/types/lodash";
   providedIn: "root",
 })
 export class SampleReferralService {
-    private sampleReferralSettings?: any = signal<any>({});
+    private sampleReferralSettings?: any = signal<any>(null);
     
     constructor(
         private httpClient: HttpClient,
@@ -63,6 +63,7 @@ export class SampleReferralService {
                 await this.getReferralSettings().toPromise();
             }, 0);
         }
+
 
         return this.sampleReferralSettings();
     }

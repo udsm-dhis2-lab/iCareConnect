@@ -311,7 +311,7 @@ export class SharedPatientDashboardComponent implements OnInit {
       )
       .pipe(
         switchMap((response: any) => {
-          return response != "none"
+          return response
             ? this.locationService.getLocationsByTagName(response).pipe(
                 map((locationsResponse: any) => {
                   return locationsResponse;

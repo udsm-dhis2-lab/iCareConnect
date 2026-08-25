@@ -121,7 +121,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
       )
       .pipe(
         tap((response) => {
-          if (response === "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {
@@ -140,7 +140,7 @@ export class PatientGenericDrugOrderListComponent implements OnInit {
       .getSystemSettingsByKey("iCare.clinic.prescription.arrangement")
       .pipe(
         map((response) => {
-          if (response === "none") {
+          if (!response) {
             this.errors = [
               ...this.errors,
               {
