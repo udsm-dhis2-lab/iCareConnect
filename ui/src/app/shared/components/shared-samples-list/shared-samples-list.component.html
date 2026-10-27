@@ -62,7 +62,9 @@
         <div class="sample-details-legacy-title">
           Additional existing sample details
         </div>
-        <app-shared-sample-details [sample]="sample"></app-shared-sample-details>
+        <app-shared-sample-details
+          [sample]="sample"
+        ></app-shared-sample-details>
       </div>
     </section>
   </ng-template>
@@ -138,19 +140,27 @@
         <div class="sample-header-legend-wrapper" *ngIf="showLegend">
           <div class="sample-status-legend" aria-label="Sample status legend">
             <div class="sample-status-legend-item">
-              <span class="sample-status-legend-swatch sample-status-legend-swatch--no-results"></span>
+              <span
+                class="sample-status-legend-swatch sample-status-legend-swatch--no-results"
+              ></span>
               <span>No results</span>
             </div>
 
             <div class="sample-status-legend-item">
-              <span class="sample-status-legend-swatch sample-status-legend-swatch--has-results"></span>
+              <span
+                class="sample-status-legend-swatch sample-status-legend-swatch--has-results"
+              ></span>
               <span>Has results</span>
             </div>
 
             <div class="sample-status-legend-item">
               <span
                 class="sample-status-legend-swatch"
-                [ngClass]="!LISConfigurations?.isLIS ? 'sample-status-legend-swatch--waiting-approval' : 'sample-status-legend-swatch--authorized'"
+                [ngClass]="
+                  !LISConfigurations?.isLIS
+                    ? 'sample-status-legend-swatch--waiting-approval'
+                    : 'sample-status-legend-swatch--authorized'
+                "
               ></span>
               <span>
                 {{
@@ -161,28 +171,53 @@
               </span>
             </div>
 
-            <div class="sample-status-legend-item" *ngIf="!LISConfigurations?.isLIS">
-              <span class="sample-status-legend-swatch sample-status-legend-swatch--rejected"></span>
+            <div
+              class="sample-status-legend-item"
+              *ngIf="!LISConfigurations?.isLIS"
+            >
+              <span
+                class="sample-status-legend-swatch sample-status-legend-swatch--rejected"
+              ></span>
               <span>Has rejected results</span>
             </div>
 
-            <div class="sample-status-legend-item" *ngIf="!LISConfigurations?.isLIS">
-              <span class="sample-status-legend-swatch sample-status-legend-swatch--completed"></span>
+            <div
+              class="sample-status-legend-item"
+              *ngIf="!LISConfigurations?.isLIS"
+            >
+              <span
+                class="sample-status-legend-swatch sample-status-legend-swatch--completed"
+              ></span>
               <span>Completed</span>
             </div>
 
-            <div class="sample-status-legend-item" *ngIf="LISConfigurations?.isLIS">
-              <span class="sample-status-legend-swatch sample-lifecycle-legend-key sample-lifecycle-legend-key--stored"></span>
+            <div
+              class="sample-status-legend-item"
+              *ngIf="LISConfigurations?.isLIS"
+            >
+              <span
+                class="sample-status-legend-swatch sample-lifecycle-legend-key sample-lifecycle-legend-key--stored"
+              ></span>
               <span>Stored</span>
             </div>
 
-            <div class="sample-status-legend-item" *ngIf="LISConfigurations?.isLIS">
-              <span class="sample-status-legend-swatch sample-lifecycle-legend-key sample-lifecycle-legend-key--disposed"></span>
+            <div
+              class="sample-status-legend-item"
+              *ngIf="LISConfigurations?.isLIS"
+            >
+              <span
+                class="sample-status-legend-swatch sample-lifecycle-legend-key sample-lifecycle-legend-key--disposed"
+              ></span>
               <span>Disposed</span>
             </div>
 
-            <div class="sample-status-legend-item" *ngIf="LISConfigurations?.isLIS">
-              <span class="sample-status-legend-swatch sample-lifecycle-legend-key sample-lifecycle-legend-key--stored-and-disposed"></span>
+            <div
+              class="sample-status-legend-item"
+              *ngIf="LISConfigurations?.isLIS"
+            >
+              <span
+                class="sample-status-legend-swatch sample-lifecycle-legend-key sample-lifecycle-legend-key--stored-and-disposed"
+              ></span>
               <span>Stored and disposed</span>
             </div>
           </div>
@@ -428,7 +463,7 @@
                     >
                       Print
                     </button>
-            
+
                     <section *ngIf="tabType === 'authorization'" class="ml-4">
                       <mat-checkbox
                         color="primary"
@@ -512,7 +547,7 @@
                     Send
                   </button>
                 </div>
-                <div *ngIf="tabType === 'authorization'" class="w-100 d-flex justify-content-end">
+                <!-- <div *ngIf="tabType === 'authorization'" class="w-100 d-flex justify-content-end">
                   <button
                     *ngIf="LISConfigurations?.isLIS"
                     mat-flat-button
@@ -523,9 +558,23 @@
                     <mat-icon>archive</mat-icon>
                     Store
                   </button>
-                </div>
+                </div> -->
 
-                <div *ngIf="tabType === 'authorization'" class="w-100 d-flex justify-content-end">
+                <button
+                  *ngIf="LISConfigurations?.isLIS && !isSampleDisposed(sample)"
+                  mat-flat-button
+                  class="mt-2"
+                  color="primary"
+                  (click)="onStore($event, sample)"
+                >
+                  <mat-icon>archive</mat-icon>
+                  Store
+                </button>
+
+                <div
+                  *ngIf="tabType === 'authorization'"
+                  class="w-100 d-flex justify-content-end"
+                >
                   <button
                     *ngIf="LISConfigurations?.isLIS"
                     mat-flat-button
@@ -742,7 +791,9 @@
                             >
                               <td
                                 class="sample-row-status-cell"
-                                [ngClass]="getSampleLifecycleBorderClasses(sample)"
+                                [ngClass]="
+                                  getSampleLifecycleBorderClasses(sample)
+                                "
                                 [attr.title]="getSampleLifecycleTitle(sample)"
                                 *ngIf="orderCount == 0"
                                 [attr.rowspan]="sample?.orders?.length"
