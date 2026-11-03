@@ -1,7 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { keyBy, orderBy } from "lodash";
-import { Observable, zip } from "rxjs";
-import { map } from "rxjs/operators";
+import { flatten, keyBy, mapValues, orderBy, uniq } from "lodash";
+import { Observable, of, zip } from "rxjs";
+import { catchError, map, switchMap } from "rxjs/operators";
+import { SystemSettingsService } from "src/app/core/services/system-settings.service";
+import { SystemUsersService } from "src/app/core/services/system-users.service";
+import { isUserMappedConcept } from "../../modules/form/helpers/is-user-mapped-concept.helper";
 import { ConceptsService } from "../../resources/concepts/services/concepts.service";
 import { VisitsService } from "../../resources/visits/services/visits.service";
 import { SamplesService } from "../../services/samples.service";
@@ -32,7 +35,9 @@ export class SharedSampleDetailsComponent implements OnInit {
     private visitService: VisitsService,
     private conceptService: ConceptsService,
     private sampleService: SamplesService,
-    private sampleReferralService: SampleReferralService
+    private sampleReferralService: SampleReferralService,
+    private systemSettingsService: SystemSettingsService,
+    private systemUsersService: SystemUsersService
   ) {}
 
   referralOrderConcept = this.sampleReferralService.referralSettings()?.referralOrderConcept;
@@ -51,11 +56,11 @@ export class SharedSampleDetailsComponent implements OnInit {
       this.specimenSources,
       this.codedReasonsForRejection
     );
-    this.encounterInformation$ = this.visitService
+    const encounters$ = this.visitService
       .getVisitEncounterDetailsByVisitUuid({
         uuid: this.sample?.visit?.uuid,
         query: {
-          v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,encounterDatetime,encounterType,form:(uuid,display,formFields:(uuid,fieldNumber,fieldPart,field:(uuid,display,concept:(uuid,display,datatype,setMembers:(uuid,display,datatype))))),location,obs,orders,diagnoses,encounterProviders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
+          v: "custom:(uuid,visitType,startDatetime,encounters:(uuid,encounterDatetime,encounterType,form:(uuid,display,formFields:(uuid,fieldNumber,fieldPart,field:(uuid,display,concept:(uuid,display,datatype,mappings:(uuid,conceptReferenceTerm:(uuid,code,conceptSource:(uuid))),setMembers:(uuid,display,datatype,mappings:(uuid,conceptReferenceTerm:(uuid,code,conceptSource:(uuid)))))))),location,obs,orders,diagnoses,encounterProviders),stopDatetime,attributes:(uuid,display),location:(uuid,display,tags,parentLocation:(uuid,display)),patient:(uuid,display,identifiers,person,voided)",
         },
       })
       .pipe(
@@ -89,6 +94,18 @@ export class SharedSampleDetailsComponent implements OnInit {
           });
         })
       );
+    this.encounterInformation$ = zip(
+      encounters$,
+      this.systemSettingsService
+        .getSystemSettingsByKey(
+          `icare.forms.formFieldsConcepts.dataTypeExtensionReference.conceptSourceUuid`
+        )
+        .pipe(catchError(() => of(null)))
+    ).pipe(
+      switchMap(([encounters, conceptSourceUuid]) =>
+        this.getEncountersWithUserNames(encounters, conceptSourceUuid)
+      )
+    );
     this.diagnoses$ = this.visitService
       .getVisitDiagnosesByVisitUuid({
         uuid: this.sample?.visit?.uuid,
@@ -140,5 +157,74 @@ export class SharedSampleDetailsComponent implements OnInit {
           this.visitDetails.emit(response);
         }
       });
+  }
+
+  private getEncountersWithUserNames(
+    encounters: any[],
+    conceptSourceUuid: string
+  ): Observable<any[]> {
+    if (!Array.isArray(encounters) || !conceptSourceUuid) {
+      return of(encounters);
+    }
+    const userConceptUuids: string[] = uniq(
+      flatten(
+        encounters.map((encounter) =>
+          flatten(
+            (encounter?.form?.formFields || []).map((formField: any) => [
+              formField?.field?.concept,
+              ...(formField?.field?.concept?.setMembers || []),
+            ])
+          )
+        )
+      )
+        .filter((concept) => isUserMappedConcept(concept, conceptSourceUuid))
+        .map((concept: any) => concept?.uuid)
+    );
+    const userUuids: string[] = uniq(
+      flatten(
+        encounters.map((encounter) =>
+          userConceptUuids.map(
+            (conceptUuid) => encounter?.keyedObs?.[conceptUuid]?.latest?.value
+          )
+        )
+      ).filter((value) => value && typeof value === "string")
+    );
+    if (userUuids.length === 0) {
+      return of(encounters);
+    }
+    return zip(
+      ...userUuids.map((uuid) =>
+        this.systemUsersService.getUserById(uuid).pipe(
+          map((user: any) => {
+            return { uuid, name: user?.person?.display };
+          }),
+          catchError(() => of({ uuid, name: null }))
+        )
+      )
+    ).pipe(
+      map((users) => {
+        const usersByUuid = keyBy(users, "uuid");
+        return encounters.map((encounter) => {
+          return {
+            ...encounter,
+            keyedObs: mapValues(encounter?.keyedObs, (obs, conceptUuid) => {
+              const name =
+                userConceptUuids.indexOf(conceptUuid) > -1
+                  ? usersByUuid[obs?.latest?.value]?.name
+                  : null;
+              return name
+                ? {
+                    ...obs,
+                    latest: {
+                      ...obs?.latest,
+                      value: { uuid: obs?.latest?.value, display: name },
+                    },
+                  }
+                : obs;
+            }),
+          };
+        });
+      })
+    );
   }
 }
