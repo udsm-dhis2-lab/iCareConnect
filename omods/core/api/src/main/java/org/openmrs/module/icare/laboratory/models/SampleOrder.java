@@ -87,9 +87,9 @@ public class SampleOrder implements Serializable {
 
 		Map<String, Object> technicianObject = new HashMap<String, Object>();
 
-		boolean includeAllocations = (params.length > 0 && params[0] != null) ? SafeTypeCast.orDefault(params[0], Boolean.class, false) : false;
+		boolean includeAllocations = params.length > 0 && params[0] != null && SafeTypeCast.orDefault(params[0], Boolean.class, false);
 
-		boolean includeOrderEncounter = (params.length > 1 && params[1] != null) ? SafeTypeCast.orDefault(params[1], Boolean.class, false) : false;
+		boolean includeOrderEncounter = params.length > 1 && params[1] != null && SafeTypeCast.orDefault(params[1], Boolean.class, false);
 
 		if (this.getTechnician() != null) {
 

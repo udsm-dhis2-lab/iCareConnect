@@ -277,7 +277,8 @@ public class LaboratoryController {
 		if (sample == null) {
 			sample = laboratoryService.getSampleById(sampleIdentification);
 		}
-		return sample.toMap();
+		boolean includeTestAllocations = true;
+		return sample.toMap(false, includeTestAllocations);
 	}
 	
 	@RequestMapping(value = "samples", method = RequestMethod.GET)

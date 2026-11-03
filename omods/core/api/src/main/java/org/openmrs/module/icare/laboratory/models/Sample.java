@@ -871,7 +871,9 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 		sampleObject.put("label", this.getLabel());
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-		boolean includeOrderEncounter = (params.length > 0 && params[0] != null) ? SafeTypeCast.orDefault(params[0], Boolean.class, false) : false;
+		boolean includeOrderEncounter = params.length > 0 && params[0] != null && SafeTypeCast.orDefault(params[0], Boolean.class, false);
+
+		boolean includeOrderAllocations = params.length > 1 && params[1] != null && SafeTypeCast.orDefault(params[1], Boolean.class, false);
 
 		if (this.getDateTime() != null) {
 			//			sampleObject.put("created", sdf.format(this.getDateTime()));
@@ -982,7 +984,7 @@ public class Sample extends BaseOpenmrsData implements java.io.Serializable, JSO
 		for (SampleOrder sampleOrder : this.getSampleOrders()) {
 
 			if (!sampleOrder.getOrder().getVoided()) {
-				orders.add(sampleOrder.toMap(false, includeOrderEncounter));
+				orders.add(sampleOrder.toMap(includeOrderAllocations, includeOrderEncounter));
 			}
 		}
 

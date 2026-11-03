@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StockInvoiceDAO extends BaseDAO<StockInvoice> {
-
+	
 	public ListResult<StockInvoice> getStockInvoices(Pager pager, StockInvoiceStatus.Type status, String q, Date startDate, Date endDate) {
 		DbSession session = this.getSession();
 
