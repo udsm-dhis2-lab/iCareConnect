@@ -78,6 +78,7 @@ export class MultipleResultsEntryComponent implements OnInit, OnDestroy, OnChang
     this.listMultiFilterCtrl.valueChanges
       .pipe(takeUntil(this._onDestroy), debounceTime(300), distinctUntilChanged())
       .subscribe((searchTerm: string) => {
+        this.filterListMulti();
         this.searchChange.emit(searchTerm);
       });
   }
