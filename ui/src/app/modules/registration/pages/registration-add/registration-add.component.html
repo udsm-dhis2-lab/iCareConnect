@@ -328,9 +328,9 @@
           <div class="col-sm-3">
             <label for="">Birth information & Tribe</label>
           </div>
-          <div class="col-sm-6">
-            <div class="d-flex align-items-center">
-              <mat-form-field appearance="fill" class="w-25">
+          <div class="col-sm-9">
+            <div class="birth-details">
+              <mat-form-field appearance="fill" class="birth-details__age">
                 <mat-label>Age (Years)</mat-label>
                 <input
                   matInput
@@ -341,7 +341,10 @@
                   id="ageYears"
                 />
               </mat-form-field>
-              <mat-form-field appearance="fill" class="w-25 ml-1">
+              <mat-form-field
+                appearance="fill"
+                class="birth-details__age birth-details__age--months"
+              >
                 <mat-label>Age (Months)</mat-label>
                 <input
                   matInput
@@ -352,7 +355,7 @@
                   id="ageMonths"
                 />
               </mat-form-field>
-              <mat-form-field appearance="fill" class="w-25 ml-1">
+              <mat-form-field appearance="fill" class="birth-details__age">
                 <mat-label>Age (Days)</mat-label>
                 <input
                   matInput
@@ -363,18 +366,17 @@
                   id="ageDays"
                 />
               </mat-form-field>
-              <div class="ml-4 mr-4 h6">OR</div>
-              <mat-form-field appearance="fill" class="w-100">
-                <mat-label>Select Date of birth</mat-label>
+              <div class="mx-2 h6">OR</div>
+              <mat-form-field appearance="fill" class="birth-details__dob">
+                <mat-label>Date of birth</mat-label>
                 <input
                   matInput
-                  readonly="readonly"
                   [matDatepicker]="picker"
                   [(ngModel)]="patient['dob']"
                   (dateChange)="dateSet()"
                   name="dob"
                   [max]="maxDateForDateOfBirth"
-                  placeholder="Date of birth"
+                  placeholder="DD-MM-YYYY"
                   [disabled]="addingPatient && !patientAdded"
                   id="dob"
                   required
@@ -385,6 +387,7 @@
                   id="input-date-picker"
                 ></mat-datepicker-toggle>
                 <mat-datepicker #picker></mat-datepicker>
+                <mat-error>Enter a valid date of birth (DD-MM-YYYY)</mat-error>
               </mat-form-field>
               <!-- <mat-form-field appearance="fill" class="w-100">
                 <input
