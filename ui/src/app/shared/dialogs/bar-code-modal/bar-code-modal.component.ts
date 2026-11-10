@@ -1,8 +1,8 @@
 import { Component, Inject, OnInit } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 
-import { take, flatten } from "lodash";
-import { map } from "rxjs/operators";
+import { take } from "lodash";
+import { map, shareReplay } from "rxjs/operators";
 import { SamplesService } from "src/app/shared/services/samples.service";
 
 @Component({
@@ -36,15 +36,10 @@ export class BarCodeModalComponent implements OnInit {
     this.ordersToDisplay = take(this.sample?.orders, 2);
     this.dialogData = data;
   }
+  
 
   ngOnInit(): void {
-    this.sampleData$ = this.sampleService
-      .getSampleByUuid(
-        this.dialogData?.sample
-          ? this.dialogData?.sample?.uuid
-          : this.dialogData?.sampleLabelsUsedDetails[0]?.uuid
-      )
-      ?.pipe(
+    this.sampleData$ = this.sampleService.getSampleByUuid(this.dialogData?.sample ? this.dialogData?.sample?.uuid : this.dialogData?.sampleLabelsUsedDetails[0]?.uuid)?.pipe(
         map((sample) => {
           return {
             ...sample,
@@ -54,7 +49,8 @@ export class BarCodeModalComponent implements OnInit {
               })
               .join(","),
           };
-        })
+        }),
+        shareReplay(1)
       );
   }
 

@@ -182,10 +182,7 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
   }
 
   async ngOnInit(): Promise<void> {
-    // console.log(
-    //   "sampleRegistrationCategories refKey",
-    //   this.sampleRegistrationCategories
-    // );
+
     this.priorityFieldSettings = await this.systemSettings.getSystemSettingsByKey("iCare.laboratory.settings.single.sample.registration.priorityField").toPromise();
 
     await this.sampleReferralService.getReferralSettings().toPromise();
@@ -1168,20 +1165,13 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                       this.savingDataResponse = sampleStatusResponse;
                       
                       if (sampleStatusResponse) {
-                        const data =
-                          {
-                            identifier:
-                              this
-                                .currentSampleLabel,
-                            sample:
-                              sampleResponse,
+                        const data = {
+                            identifier: this.currentSampleLabel,
+                            sample: sampleResponse,
                             sampleLabelsUsedDetails:
-                              this
-                                .sampleLabelsUsedDetails,
+                              this.sampleLabelsUsedDetails,
                             isLis:
-                              this
-                                .LISConfigurations
-                                ?.isLIS,
+                              this.LISConfigurations?.isLIS,
                           };
                           
                           this.dialog.open(SampleRegistrationFinalizationComponent, {
@@ -1200,11 +1190,8 @@ export class SingleRegistrationComponent implements OnInit, AfterViewInit {
                               this.openBarCodeDialog(data);
                               this.isRegistrationReady = false;
                               setTimeout(() => this.isRegistrationReady = true, 200);
-                              
-                              console.log("results from finalization dialog", results);
 
                               if(results?.markSampleForReferral){
-                                console.log("Marking sample for referral with details", sampleResponse);
                                 this.markSampleForReferral(sampleResponse, patientResponse, priority);
                               }
                             },
