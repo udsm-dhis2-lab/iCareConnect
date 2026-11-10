@@ -61,7 +61,13 @@ import { MatSelectChange } from "@angular/material/select";
       deps: [MAT_DATE_LOCALE],
     },
 
-    { provide: MAT_DATE_FORMATS, useValue: DATE_FORMATS_DD_MM_YYYY },
+    {
+      provide: MAT_DATE_FORMATS,
+      useValue: {
+        ...DATE_FORMATS_DD_MM_YYYY,
+        parse: { dateInput: "DD-MM-YYYY" },
+      },
+    },
   ],
 })
 export class RegistrationAddComponent implements OnInit {
@@ -274,7 +280,18 @@ export class RegistrationAddComponent implements OnInit {
   }
 
   dateSet() {
-    //console.log(this.patient?.dob);
+    // A typed date can be unparseable (null) or in the future, so neither can
+    // be used to derive an age.
+    if (!this.patient?.dob || new Date(this.patient.dob) > new Date()) {
+      this.patient.dob = null;
+      this.patient.age = {
+        ...this.patient.age,
+        years: null,
+        months: null,
+        days: null,
+      };
+      return;
+    }
 
     // let birthdate = new Date(this.patient?.dob);
     // let ageObject = getDateDifferenceYearsMonthsDays(birthdate, new Date());
