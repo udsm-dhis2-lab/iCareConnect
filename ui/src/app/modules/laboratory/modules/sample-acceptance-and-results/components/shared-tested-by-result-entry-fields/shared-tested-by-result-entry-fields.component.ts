@@ -34,24 +34,23 @@ export class SharedTestedByResultEntryFieldsComponent implements OnInit {
               new Date(formattedAllocation?.finalResult?.testedDate)
             )
           : this.testedDate;
-
-        this.createTestedByDetailsField();
-      } else if (formattedAllocation?.finalResult?.groups) {
+      } else if (formattedAllocation?.finalResult?.groups?.length) {
         const results: any[] =
           formattedAllocation?.finalResult?.groups[
             formattedAllocation?.finalResult?.groups?.length - 1
           ]?.results;
         const currentResult = results[results?.length - 1];
-        this.testedBy = !this.testedBy
+
+        const reserveTestedByValue = formattedAllocation?.finalResult?.groups?.map((group) => group?.results?.map(result => result?.testedBy))?.[0]?.[0];
+
+        this.testedBy = !this.testedBy && currentResult?.testedBy
           ? currentResult?.testedBy
-          : this.testedBy;
+          : !this.testedBy && reserveTestedByValue ? reserveTestedByValue : this.testedBy;
         this.testedDate = !this.testedDate
           ? formatDateToYYMMDD(new Date(currentResult?.testedDate))
           : this.testedDate;
-        this.createTestedByDetailsField();
-      } else {
-        this.createTestedByDetailsField();
       }
+      this.createTestedByDetailsField();
     });
   }
 
@@ -62,7 +61,7 @@ export class SharedTestedByResultEntryFieldsComponent implements OnInit {
         key: "testedBy",
         label: "Tested By",
         options: [],
-        value: this.testedBy?.uuid,
+        value: this.testedBy,
         searchControlType: "user",
         shouldHaveLiveSearchForDropDownFields: true,
       }),
