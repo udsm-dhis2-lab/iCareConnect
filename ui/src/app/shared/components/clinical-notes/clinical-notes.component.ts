@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { Location } from "src/app/core/models";
@@ -37,7 +38,7 @@ export class ClinicalNotesComponent implements OnInit {
   @Input() provider: any;
   @Input() clinicConfigurations: any;
   @Input() forms: any[];
-  @Input() clearingFormTime?: number;
+  @Input() clearingFormTime?: number | null;
   savingObservations$: Observable<boolean>;
   ordersUpdates$: Observable<any>;
 
@@ -61,7 +62,8 @@ export class ClinicalNotesComponent implements OnInit {
     private store: Store<AppState>,
     private observationService: ObservationService,
     private globalSettingService: GlobalSettingService,
-    private googleAnalyticsService: GoogleAnalyticsService
+    private googleAnalyticsService: GoogleAnalyticsService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -106,7 +108,11 @@ export class ClinicalNotesComponent implements OnInit {
       latestObservations?.filter(
         (obs) => keyBy(concepts, "uuid")[obs?.conceptUuid]
       ) || [];
-    if (latestObsForCurrentForm?.length > 0) {
+    // Observations in the store belong to the active visit only, so by default saved
+    // data stays prefilled for the whole visit. A time limit applies only when the
+    // optional global property iCare.clinic.forms.observations.prefilStopTime is set.
+    this.useFilledObsData = true;
+    if (this.clearingFormTime > 0 && latestObsForCurrentForm?.length > 0) {
       const latestObsTime = (orderBy(
         latestObsForCurrentForm?.map((obs) => {
           return {
@@ -114,16 +120,14 @@ export class ClinicalNotesComponent implements OnInit {
             observationDatetime: new Date(obs?.observationDatetime),
           };
         }),
-        ["observationDatetime"]["desc"]
+        ["observationDatetime"],
+        ["desc"]
       ) || [])[0]?.observationDatetime;
 
       var duration = moment.duration(
         moment(new Date()).diff(moment(latestObsTime))
       );
-      // TODO: Add support to use configured time for the 2 hrs constant
-      console.log("clearingFormTime .....",this.clearingFormTime);
-      
-      this.useFilledObsData = duration.asHours() >= this.clearingFormTime ? false : true;
+      this.useFilledObsData = duration.asHours() < this.clearingFormTime;
     }
 
     this.dependedFormHasData = this.evaluateFormDependency(
@@ -280,11 +284,21 @@ export class ClinicalNotesComponent implements OnInit {
     this.observationService
       .saveEncounterWithObsDetails(encounterObject)
       .subscribe((res) => {
-        if (res) {
+        // The service converts HTTP errors into normal emissions (catchError -> of(error)),
+        // so a failed save arrives here as an error object without a uuid.
+        if (res?.uuid) {
           this.saveObservations.emit();
+          this.trackActionForAnalytics(`${this.currentCustomForm?.name}: Save`);
+        } else {
+          // Do not reload: keep what the user typed so they can retry.
+          this.snackBar.open(
+            `Failed to save ${this.currentCustomForm?.name || "form"}: ${
+              res?.message || res?.statusText || "unknown error"
+            }. Your entries have been kept, please try again.`,
+            "Close",
+            { duration: 8000, panelClass: ["snack-error"] }
+          );
         }
-
-        this.trackActionForAnalytics(`${this.currentCustomForm?.name}: Save`);
       });
     // this.saveObservations.emit(
     //   getObservationsFromForm(

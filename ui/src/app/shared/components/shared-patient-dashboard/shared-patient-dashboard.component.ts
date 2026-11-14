@@ -168,7 +168,9 @@ export class SharedPatientDashboardComponent implements OnInit {
   tabsToShow: string[] = ["LABORATORY", "PROCEDURE", "RADIOLOGY"];
   currentFormDetails: any = {};
   useSideBar: boolean = false;
-  clearingFormTime: number = 0.5;
+  // Hours after which saved clinical form data stops being prefilled.
+  // null = no time limit: saved data stays prefilled for the whole active visit.
+  clearingFormTime: number | null = null;
 
   selectedHistoryCategory: string = "local";
 
@@ -398,15 +400,15 @@ export class SharedPatientDashboardComponent implements OnInit {
       // const globalProperty = await this.globalSettingService.getSpecificGlobalProperties("ed9dac4a-5b2a-4a5f-8ee2-ca0d88b08506").toPromise();
       // const minutes = parseInt(globalProperty?.value ?? "0", 10);
       
-      // GET global property by key to ensure  clearing time is set for clinic module
+      // Optional override (minutes). When missing, empty, invalid or <= 0,
+      // there is no time limit and saved data stays prefilled for the whole visit.
       const globalProperty = await this.systemSettingsService.getSystemSettingsByKey("iCare.clinic.forms.observations.prefilStopTime").toPromise();
-      const minutes = parseInt(globalProperty ?? "0", 10);
-      
-      this.clearingFormTime = isNaN(minutes / 60) ? 0.5 : minutes / 60;
-      console.log("time received :",this.clearingFormTime);
+      const minutes = parseInt(globalProperty ?? "", 10);
+
+      this.clearingFormTime = !isNaN(minutes) && minutes > 0 ? minutes / 60 : null;
     } catch (error) {
       console.error("Error occurred:", error);
-      this.clearingFormTime = 0.5; 
+      this.clearingFormTime = null;
     }
   }
 
